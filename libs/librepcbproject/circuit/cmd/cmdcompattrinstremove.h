@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPATTRINSTREMOVE_H
-#define PROJECT_CMDCOMPATTRINSTREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDCOMPATTRINSTREMOVE_H
+#define LIBREPCB_PROJECT_CMDCOMPATTRINSTREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class ComponentInstance;
 class ComponentAttributeInstance;
-}
 
 /*****************************************************************************************
  *  Class CmdCompAttrInstRemove
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdCompAttrInstRemove class
@@ -65,6 +62,11 @@ class CmdCompAttrInstRemove final : public UndoCommand
         ComponentAttributeInstance& mAttrInstance;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDCOMPATTRINSTREMOVE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDCOMPATTRINSTREMOVE_H

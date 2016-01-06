@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "symbolinstancepropertiesdialog.h"
@@ -42,6 +41,10 @@
 #include <librepcbcommon/attributes/attributeunit.h>
 #include <librepcbproject/settings/projectsettings.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -424,3 +427,4 @@ void SymbolInstancePropertiesDialog::abortCmd()
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

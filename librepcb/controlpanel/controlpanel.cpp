@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <QFileDialog>
@@ -34,6 +33,11 @@
 #include <librepcblibrary/library.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbcommon/application.h>
+
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 
 using namespace project;
 
@@ -550,3 +554,5 @@ void ControlPanel::on_actionRescanLibrary_triggered()
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
+
+} // namespace librepcb

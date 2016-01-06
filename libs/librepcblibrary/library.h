@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARY_H
-#define LIBRARY_LIBRARY_H
+#ifndef LIBREPCB_LIBRARY_LIBRARY_H
+#define LIBREPCB_LIBRARY_LIBRARY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtSql>
 #include <librepcbcommon/uuid.h>
@@ -31,12 +30,14 @@
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Version;
 
 namespace library {
+
 class ComponentCategory;
 class PackageCategory;
 class Symbol;
@@ -44,13 +45,10 @@ class SpiceModel;
 class Package;
 class Component;
 class Device;
-}
 
 /*****************************************************************************************
  *  Class Library
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Library class
@@ -157,6 +155,11 @@ class Library final : public QObject
         QSqlDatabase mLibDatabase; ///< the SQLite database of the file #mLibFilePath
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_LIBRARY_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_LIBRARY_H

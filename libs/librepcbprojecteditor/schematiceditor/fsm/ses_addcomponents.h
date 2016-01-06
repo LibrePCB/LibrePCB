@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_ADDCOMPONENTS_H
-#define PROJECT_SES_ADDCOMPONENTS_H
+#ifndef LIBREPCB_PROJECT_SES_ADDCOMPONENTS_H
+#define LIBREPCB_PROJECT_SES_ADDCOMPONENTS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 namespace library {
 class Component;
@@ -38,18 +38,15 @@ class ComponentSymbolVariantItem;
 }
 
 namespace project {
+
 class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceEdit;
 class AddComponentDialog;
-}
 
 /*****************************************************************************************
  *  Class SES_AddComponents
  ****************************************************************************************/
-
-namespace project {
-
 
 /**
  * @brief The SES_AddComponents class
@@ -93,6 +90,11 @@ class SES_AddComponents final : public SES_Base
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_ADDCOMPONENTS_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_ADDCOMPONENTS_H

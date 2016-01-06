@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPESTRING_H
-#define ATTRTYPESTRING_H
+#ifndef LIBREPCB_ATTRTYPESTRING_H
+#define LIBREPCB_ATTRTYPESTRING_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeString
@@ -57,4 +61,10 @@ class AttrTypeString final : public AttributeType
         ~AttrTypeString() noexcept;
 };
 
-#endif // ATTRTYPESTRING_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPESTRING_H

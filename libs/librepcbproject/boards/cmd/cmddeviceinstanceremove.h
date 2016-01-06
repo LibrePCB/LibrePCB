@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDDEVICEINSTANCEREMOVE_H
-#define PROJECT_CMDDEVICEINSTANCEREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEREMOVE_H
+#define LIBREPCB_PROJECT_CMDDEVICEINSTANCEREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Board;
 class DeviceInstance;
-}
 
 /*****************************************************************************************
  *  Class CmdDeviceInstanceRemove
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdDeviceInstanceRemove class
@@ -66,6 +63,11 @@ class CmdDeviceInstanceRemove final : public UndoCommand
         DeviceInstance& mDevice;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDDEVICEINSTANCEREMOVE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDDEVICEINSTANCEREMOVE_H

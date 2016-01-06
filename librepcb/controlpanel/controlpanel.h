@@ -17,25 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONTROLPANEL_H
-#define CONTROLPANEL_H
+#ifndef LIBREPCB_CONTROLPANEL_H
+#define LIBREPCB_CONTROLPANEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class FilePath;
 class Workspace;
 
-namespace project{
+namespace project {
 class Project;
 class ProjectEditor;
 }
@@ -178,4 +178,10 @@ class ControlPanel final : public QMainWindow
         QHash<QString, project::ProjectEditor*> mOpenProjectEditors;
 };
 
-#endif // CONTROLPANEL_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_CONTROLPANEL_H

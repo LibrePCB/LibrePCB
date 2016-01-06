@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_DEVICE_H
-#define LIBRARY_DEVICE_H
+#ifndef LIBREPCB_LIBRARY_DEVICE_H
+#define LIBREPCB_LIBRARY_DEVICE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../libraryelement.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class Device
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Device class
@@ -89,6 +92,11 @@ class Device final : public LibraryElement
         QHash<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_DEVICE_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_DEVICE_H

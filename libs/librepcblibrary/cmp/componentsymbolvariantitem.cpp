@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "componentsymbolvariantitem.h"
 #include "component.h"
@@ -28,6 +27,10 @@
 #include "componentpinsignalmapitem.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
@@ -135,3 +138,4 @@ bool ComponentSymbolVariantItem::checkAttributesValidity() const noexcept
  ****************************************************************************************/
 
 } // namespace library
+} // namespace librepcb

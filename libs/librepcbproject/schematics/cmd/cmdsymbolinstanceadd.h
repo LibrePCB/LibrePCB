@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSYMBOLINSTANCEADD_H
-#define PROJECT_CMDSYMBOLINSTANCEADD_H
+#ifndef LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
+#define LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
@@ -31,20 +30,18 @@
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Schematic;
 class ComponentInstance;
 class SI_Symbol;
-}
 
 /*****************************************************************************************
  *  Class CmdSymbolInstanceAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSymbolInstanceAdd class
@@ -76,6 +73,11 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         SI_Symbol* mSymbol;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSYMBOLINSTANCEADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H

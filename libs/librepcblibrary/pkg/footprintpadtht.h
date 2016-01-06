@@ -17,20 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINTPADTHT_H
-#define LIBRARY_FOOTPRINTPADTHT_H
+#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADTHT_H
+#define LIBREPCB_LIBRARY_FOOTPRINTPADTHT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "footprintpad.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
 
 /*****************************************************************************************
  *  Class FootprintPadTht
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The FootprintPadTht class
@@ -88,6 +91,11 @@ class FootprintPadTht final : public FootprintPad
         Length mDrillDiameter;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_FOOTPRINTPADTHT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_FOOTPRINTPADTHT_H

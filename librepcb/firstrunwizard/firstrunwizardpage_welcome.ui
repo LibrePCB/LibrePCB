@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FirstRunWizardPage_Welcome</class>
- <widget class="QWizardPage" name="FirstRunWizardPage_Welcome">
+ <class>librepcb::FirstRunWizardPage_Welcome</class>
+ <widget class="QWizardPage" name="librepcb::FirstRunWizardPage_Welcome">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>373</width>
-    <height>142</height>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">

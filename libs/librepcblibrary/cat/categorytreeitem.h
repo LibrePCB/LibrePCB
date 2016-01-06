@@ -17,32 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_CATEGORYTREEITEM_H
-#define LIBRARY_CATEGORYTREEITEM_H
+#ifndef LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
+#define LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace library {
+
 class Library;
 class ComponentCategory;
 class PackageCategory;
-}
 
 /*****************************************************************************************
  *  Class CategoryTreeItem
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The CategoryTreeItem class
@@ -83,6 +80,11 @@ class CategoryTreeItem final
         QList<CategoryTreeItem*> mChilds;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_CATEGORYTREEITEM_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H

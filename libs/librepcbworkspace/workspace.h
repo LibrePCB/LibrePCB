@@ -17,20 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKSPACE_H
-#define WORKSPACE_H
+#ifndef LIBREPCB_WORKSPACE_H
+#define LIBREPCB_WORKSPACE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/filelock.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class ProjectTreeModel;
 class RecentProjectsModel;
@@ -214,4 +214,10 @@ class Workspace final : public QObject
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects
 };
 
-#endif // WORKSPACE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WORKSPACE_H

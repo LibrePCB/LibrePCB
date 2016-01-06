@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef LIBREPCB_APPLICATION_H
+#define LIBREPCB_APPLICATION_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QApplication>
 #include "version.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class Application
@@ -66,4 +70,10 @@ class Application final : public QApplication
         Application& operator=(const Application& rhs);
 };
 
-#endif // APPLICATION_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_APPLICATION_H

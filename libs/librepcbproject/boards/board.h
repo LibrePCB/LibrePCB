@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BOARD_H
-#define PROJECT_BOARD_H
+#ifndef LIBREPCB_PROJECT_BOARD_H
+#define LIBREPCB_PROJECT_BOARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/if_attributeprovider.h>
@@ -35,8 +34,9 @@
 #include "../erc/if_ercmsgprovider.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GridProperties;
 class GraphicsView;
@@ -44,16 +44,14 @@ class GraphicsScene;
 class SmartXmlFile;
 
 namespace project {
+
 class Project;
 class DeviceInstance;
 class BI_Base;
-}
 
 /*****************************************************************************************
  *  Class Board
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Board class represents a PCB of a project and is always part of a circuit
@@ -197,6 +195,11 @@ class Board final : public QObject, public IF_AttributeProvider,
         QHash<Uuid, DeviceInstance*> mDeviceInstances;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BOARD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BOARD_H

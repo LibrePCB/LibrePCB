@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SPICEMODEL_H
-#define LIBRARY_SPICEMODEL_H
+#ifndef LIBREPCB_LIBRARY_SPICEMODEL_H
+#define LIBREPCB_LIBRARY_SPICEMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../libraryelement.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class SpiceModel
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The SpiceModel class
@@ -58,6 +61,11 @@ class SpiceModel final : public LibraryElement
 
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_SPICEMODEL_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_SPICEMODEL_H

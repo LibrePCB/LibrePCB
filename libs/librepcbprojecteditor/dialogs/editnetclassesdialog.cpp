@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "editnetclassesdialog.h"
@@ -33,6 +32,10 @@
 #include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
 #include <librepcbproject/circuit/cmd/cmdnetclassremove.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -162,3 +165,4 @@ void EditNetClassesDialog::on_btnRemove_clicked()
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

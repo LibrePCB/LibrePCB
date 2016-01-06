@@ -17,26 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_EDITNETCLASSESDIALOG_H
-#define PROJECT_EDITNETCLASSESDIALOG_H
+#ifndef LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
+#define LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoStack;
 
 namespace project {
+
 class Circuit;
-}
 
 namespace Ui {
 class EditNetClassesDialog;
@@ -45,8 +45,6 @@ class EditNetClassesDialog;
 /*****************************************************************************************
  *  Class EditNetclassesDialog
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The EditNetClassesDialog class
@@ -86,6 +84,11 @@ class EditNetClassesDialog final : public QDialog
         UndoStack& mUndoStack;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_EDITNETCLASSESDIALOG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H

@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINTPAD_H
-#define LIBRARY_FOOTPRINTPAD_H
+#ifndef LIBREPCB_LIBRARY_FOOTPRINTPAD_H
+#define LIBREPCB_LIBRARY_FOOTPRINTPAD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/uuid.h>
@@ -31,10 +30,14 @@
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class FootprintPad
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The FootprintPad class
@@ -109,6 +112,11 @@ class FootprintPad : public IF_XmlSerializableObject
         mutable QPainterPath mPainterPathPx;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_FOOTPRINTPAD_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_FOOTPRINTPAD_H

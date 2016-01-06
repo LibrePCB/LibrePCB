@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BI_FOOTPRINT_H
-#define PROJECT_BI_FOOTPRINT_H
+#ifndef LIBREPCB_PROJECT_BI_FOOTPRINT_H
+#define LIBREPCB_PROJECT_BI_FOOTPRINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
@@ -31,24 +30,23 @@
 #include "../graphicsitems/bgi_footprint.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Board;
-class DeviceInstance;
-class BI_FootprintPad;
-}
+namespace librepcb {
 
 namespace library {
 class Footprint;
 }
 
+namespace project {
+
+class Board;
+class DeviceInstance;
+class BI_FootprintPad;
+
 /*****************************************************************************************
  *  Class BI_Footprint
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BI_Footprint class
@@ -131,6 +129,11 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         BGI_Footprint* mGraphicsItem;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BI_FOOTPRINT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BI_FOOTPRINT_H

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LibraryEditor</class>
- <widget class="QMainWindow" name="LibraryEditor">
+ <class>librepcb::library::LibraryEditor</class>
+ <widget class="QMainWindow" name="librepcb::library::LibraryEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,7 +22,7 @@
      <x>0</x>
      <y>0</y>
      <width>572</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>

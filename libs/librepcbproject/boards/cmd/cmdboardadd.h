@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDBOARDADD_H
-#define PROJECT_CMDBOARDADD_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDADD_H
+#define LIBREPCB_PROJECT_CMDBOARDADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class Board;
-}
 
 /*****************************************************************************************
  *  Class CmdBoardAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdBoardAdd class
@@ -70,6 +67,11 @@ class CmdBoardAdd final : public UndoCommand
         int mPageIndex;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDBOARDADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDBOARDADD_H

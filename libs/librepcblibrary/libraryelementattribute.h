@@ -17,33 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARYELEMENTATTRIBUTE_H
-#define LIBRARY_LIBRARYELEMENTATTRIBUTE_H
+#ifndef LIBREPCB_LIBRARY_LIBRARYELEMENTATTRIBUTE_H
+#define LIBREPCB_LIBRARY_LIBRARYELEMENTATTRIBUTE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class AttributeType;
 class AttributeUnit;
 
 namespace library {
+
 class Component;
-}
 
 /*****************************************************************************************
  *  Class LibraryElementAttribute
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The LibraryElementAttribute class represents an attribute of a library element
@@ -98,6 +96,11 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         QMap<QString, QString> mDefaultValues;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_LIBRARYELEMENTATTRIBUTE_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_LIBRARYELEMENTATTRIBUTE_H

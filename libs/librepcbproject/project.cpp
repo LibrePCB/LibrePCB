@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QPrinter>
 #include <librepcbcommon/exceptions.h>
@@ -42,6 +41,10 @@
 #include <librepcbcommon/application.h>
 #include "schematics/schematiclayerprovider.h"
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -755,3 +758,4 @@ void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (E
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLE_H
-#define HOLE_H
+#ifndef LIBREPCB_HOLE_H
+#define LIBREPCB_HOLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../units/all_length_units.h"
 #include "../fileio/if_xmlserializableobject.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class Hole
@@ -78,4 +82,10 @@ class Hole final : public IF_XmlSerializableObject
         Length mDiameter;
 };
 
-#endif // HOLE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_HOLE_H

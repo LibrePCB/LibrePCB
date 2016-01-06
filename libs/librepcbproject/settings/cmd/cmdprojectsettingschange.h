@@ -17,29 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDPROJECTSETTINGSCHANGE_H
-#define PROJECT_CMDPROJECTSETTINGSCHANGE_H
+#ifndef LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H
+#define LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class ProjectSettings;
-}
 
 /*****************************************************************************************
  *  Class CmdProjectSettingsChange
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdProjectSettingsChange class
@@ -80,6 +77,11 @@ class CmdProjectSettingsChange final : public UndoCommand
         QStringList mNormOrderNew;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDPROJECTSETTINGSCHANGE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H

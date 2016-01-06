@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSYMBOLINSTANCEREMOVE_H
-#define PROJECT_CMDSYMBOLINSTANCEREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDSYMBOLINSTANCEREMOVE_H
+#define LIBREPCB_PROJECT_CMDSYMBOLINSTANCEREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Schematic;
 class SI_Symbol;
-}
 
 /*****************************************************************************************
  *  Class CmdSymbolInstanceRemove
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSymbolInstanceRemove class
@@ -66,6 +63,11 @@ class CmdSymbolInstanceRemove final : public UndoCommand
         SI_Symbol& mSymbol;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSYMBOLINSTANCEREMOVE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEREMOVE_H

@@ -17,32 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SGI_NETLINE_H
-#define PROJECT_SGI_NETLINE_H
+#ifndef LIBREPCB_PROJECT_SGI_NETLINE_H
+#define LIBREPCB_PROJECT_SGI_NETLINE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "sgi_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SchematicLayer;
 
 namespace project {
+
 class SI_NetLine;
-}
 
 /*****************************************************************************************
  *  Class SGI_NetLine
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SGI_NetLine class
@@ -84,6 +82,11 @@ class SGI_NetLine final : public SGI_Base
         QPainterPath mShape;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SGI_NETLINE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SGI_NETLINE_H

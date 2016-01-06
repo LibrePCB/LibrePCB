@@ -17,34 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETPOINTADD_H
-#define PROJECT_CMDSCHEMATICNETPOINTADD_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTADD_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/units/point.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class NetSignal;
 class Schematic;
 class SI_SymbolPin;
 class SI_NetPoint;
-}
 
 /*****************************************************************************************
  *  Class CmdSchematicNetPointAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSchematicNetPointAdd class
@@ -77,6 +74,11 @@ class CmdSchematicNetPointAdd final : public UndoCommand
         SI_NetPoint* mNetPoint;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSCHEMATICNETPOINTADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTADD_H

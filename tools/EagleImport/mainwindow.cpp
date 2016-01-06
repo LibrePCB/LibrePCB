@@ -4,7 +4,6 @@
 #include "ui_mainwindow.h"
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
@@ -14,7 +13,8 @@
 #include <librepcbcommon/schematiclayer.h>
 #include "polygonsimplifier.h"
 
-using namespace library;
+using namespace librepcb;
+using namespace librepcb::library;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)

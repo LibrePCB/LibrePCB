@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SI_BASE_H
-#define PROJECT_SI_BASE_H
+#ifndef LIBREPCB_PROJECT_SI_BASE_H
+#define LIBREPCB_PROJECT_SI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class SI_Base
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Schematic Item Base (SI_Base) class
@@ -77,6 +80,11 @@ class SI_Base : public QObject
         bool mIsSelected;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SI_BASE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SI_BASE_H

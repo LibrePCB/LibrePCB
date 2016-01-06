@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPERESISTANCE_H
-#define ATTRTYPERESISTANCE_H
+#ifndef LIBREPCB_ATTRTYPERESISTANCE_H
+#define LIBREPCB_ATTRTYPERESISTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeResistance
@@ -57,4 +61,10 @@ class AttrTypeResistance final : public AttributeType
         ~AttrTypeResistance() noexcept;
 };
 
-#endif // ATTRTYPERESISTANCE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPERESISTANCE_H

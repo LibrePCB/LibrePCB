@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNDOSTACK_H
-#define UNDOSTACK_H
+#ifndef LIBREPCB_UNDOSTACK_H
+#define LIBREPCB_UNDOSTACK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "exceptions.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoCommand;
 
@@ -281,4 +281,10 @@ class UndoStack final : public QObject
         bool mCommandActive;
 };
 
-#endif // UNDOSTACK_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_UNDOSTACK_H

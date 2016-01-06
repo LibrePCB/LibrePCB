@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WSI_LIBRARYNORMORDER_H
-#define WSI_LIBRARYNORMORDER_H
+#ifndef LIBREPCB_WSI_LIBRARYNORMORDER_H
+#define LIBREPCB_WSI_LIBRARYNORMORDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "wsi_base.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class WSI_LibraryNormOrder
@@ -101,4 +105,10 @@ class WSI_LibraryNormOrder final : public WSI_Base
         QToolButton* mBtnRemove;
 };
 
-#endif // WSI_LIBRARYNORMORDER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WSI_LIBRARYNORMORDER_H

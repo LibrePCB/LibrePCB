@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "schematic.h"
 #include <librepcbcommon/fileio/smartxmlfile.h>
@@ -38,6 +37,10 @@
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/application.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -725,3 +728,4 @@ Schematic* Schematic::create(Project& project, const FilePath& filepath,
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <QPrinter>
@@ -30,6 +29,10 @@
 #include "../../project.h"
 #include <librepcbcommon/schematiclayer.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 QRectF SGI_NetPoint::sBoundingRect;
@@ -121,3 +124,4 @@ SchematicLayer* SGI_NetPoint::getSchematicLayer(int id) const noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

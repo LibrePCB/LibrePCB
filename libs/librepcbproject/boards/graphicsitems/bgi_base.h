@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BGI_BASE_H
-#define PROJECT_BGI_BASE_H
+#ifndef LIBREPCB_PROJECT_BGI_BASE_H
+#define LIBREPCB_PROJECT_BGI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/graphics/graphicsitem.h>
 #include "../board.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class BGI_Base
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Board Graphics Item Base (BGI_Base) class
@@ -55,6 +58,11 @@ class BGI_Base : public GraphicsItem
         BGI_Base& operator=(const BGI_Base& rhs) = delete;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BGI_BASE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BGI_BASE_H

@@ -17,37 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDDEVICEINSTANCEADD_H
-#define PROJECT_CMDDEVICEINSTANCEADD_H
+#ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
+#define LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Board;
-class ComponentInstance;
-class DeviceInstance;
-}
+namespace librepcb {
 
 namespace library {
 class Device;
 }
 
+namespace project {
+
+class Board;
+class ComponentInstance;
+class DeviceInstance;
+
 /*****************************************************************************************
  *  Class CmdDeviceInstanceAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdDeviceInstanceAdd class
@@ -80,6 +78,11 @@ class CmdDeviceInstanceAdd final : public UndoCommand
         DeviceInstance* mDeviceInstance;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDDEVICEINSTANCEADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H

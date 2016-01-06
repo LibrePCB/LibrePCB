@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ercmsglist.h"
 #include "ercmsg.h"
@@ -30,6 +29,10 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -174,3 +177,4 @@ XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

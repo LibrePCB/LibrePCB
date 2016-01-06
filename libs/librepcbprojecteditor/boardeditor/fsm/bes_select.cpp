@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "bes_select.h"
 #include "../boardeditor.h"
@@ -42,6 +41,10 @@
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -675,3 +678,4 @@ bool BES_Select::removeSelectedItems() noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

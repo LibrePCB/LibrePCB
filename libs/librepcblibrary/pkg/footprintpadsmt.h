@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINTPADSMT_H
-#define LIBRARY_FOOTPRINTPADSMT_H
+#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
+#define LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "footprintpad.h"
 #include <librepcbcommon/geometry/polygon.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class FootprintPadSmt
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The FootprintPadSmt class
@@ -85,6 +88,11 @@ class FootprintPadSmt final : public FootprintPad
         BoardSide_t mBoardSide;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_FOOTPRINTPADSMT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H

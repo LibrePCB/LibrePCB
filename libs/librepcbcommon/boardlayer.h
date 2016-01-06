@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOARDLAYER_H
-#define BOARDLAYER_H
+#ifndef LIBREPCB_BOARDLAYER_H
+#define LIBREPCB_BOARDLAYER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class BoardLayer
@@ -260,4 +264,10 @@ class BoardLayer final : public QObject
 
 */
 
-#endif // BOARDLAYER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_BOARDLAYER_H

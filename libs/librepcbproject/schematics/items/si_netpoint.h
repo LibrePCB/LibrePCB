@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SI_NETPOINT_H
-#define PROJECT_SI_NETPOINT_H
+#ifndef LIBREPCB_PROJECT_SI_NETPOINT_H
+#define LIBREPCB_PROJECT_SI_NETPOINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "si_base.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
@@ -31,12 +30,13 @@
 #include "../graphicsitems/sgi_netpoint.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
 class QGraphicsItem;
 
+namespace librepcb {
 namespace project {
+
 class Circuit;
 class Schematic;
 class NetSignal;
@@ -44,13 +44,10 @@ class SI_NetLine;
 class SI_Symbol;
 class SI_SymbolPin;
 class ErcMsg;
-}
 
 /*****************************************************************************************
  *  Class SI_NetPoint
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SI_NetPoint class
@@ -147,6 +144,11 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SI_NETPOINT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SI_NETPOINT_H

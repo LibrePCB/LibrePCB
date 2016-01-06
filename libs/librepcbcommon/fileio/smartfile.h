@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SMARTFILE_H
-#define SMARTFILE_H
+#ifndef LIBREPCB_SMARTFILE_H
+#define LIBREPCB_SMARTFILE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
 #include "filepath.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class SmartFile
@@ -245,4 +249,10 @@ class SmartFile
 
 };
 
-#endif // SMARTFILE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_SMARTFILE_H

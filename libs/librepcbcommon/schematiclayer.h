@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCHEMATICLAYER_H
-#define SCHEMATICLAYER_H
+#ifndef LIBREPCB_SCHEMATICLAYER_H
+#define LIBREPCB_SCHEMATICLAYER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class SchematicLayer
@@ -132,4 +136,10 @@ class SchematicLayer final : public QObject
 
 */
 
-#endif // SCHEMATICLAYER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_SCHEMATICLAYER_H

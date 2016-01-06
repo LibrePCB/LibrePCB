@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CIRCUIT_H
-#define PROJECT_CIRCUIT_H
+#ifndef LIBREPCB_PROJECT_CIRCUIT_H
+#define LIBREPCB_PROJECT_CIRCUIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
@@ -31,28 +30,27 @@
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SmartXmlFile;
-
-namespace project {
-class Project;
-class NetClass;
-class NetSignal;
-class ComponentInstance;
-}
 
 namespace library {
 class Component;
 class ComponentSymbolVariant;
 }
 
+namespace project {
+
+class Project;
+class NetClass;
+class NetSignal;
+class ComponentInstance;
+
 /*****************************************************************************************
  *  Class Circuit
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief   The Circuit class represents all electrical connections in a project (drawed
@@ -154,6 +152,11 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         QHash<Uuid, ComponentInstance*> mComponentInstances;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CIRCUIT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CIRCUIT_H

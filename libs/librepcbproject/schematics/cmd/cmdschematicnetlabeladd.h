@@ -17,33 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICNETLABELADD_H
-#define PROJECT_CMDSCHEMATICNETLABELADD_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/units/point.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class NetSignal;
 class Schematic;
 class SI_NetLabel;
-}
 
 /*****************************************************************************************
  *  Class CmdSchematicNetLabelAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSchematicNetLabelAdd class
@@ -72,6 +69,11 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
         SI_NetLabel* mNetLabel;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSCHEMATICNETLABELADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H

@@ -17,22 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_MOVE_H
-#define PROJECT_SES_MOVE_H
+#ifndef LIBREPCB_PROJECT_SES_MOVE_H
+#define LIBREPCB_PROJECT_SES_MOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Class SES_Move
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
 
+/*****************************************************************************************
+ *  Class SES_Move
+ ****************************************************************************************/
 
 /**
  * @brief The SES_Move class
@@ -54,6 +56,11 @@ class SES_Move final : public SES_Base
         bool exit(SEE_Base* event) noexcept override;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_MOVE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_MOVE_H

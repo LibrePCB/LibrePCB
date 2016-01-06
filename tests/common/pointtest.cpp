@@ -26,6 +26,10 @@
 #include <librepcbcommon/units/point.h>
 #include <librepcbcommon/units/angle.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace tests {
 
 /*****************************************************************************************
@@ -92,3 +96,4 @@ INSTANTIATE_TEST_CASE_P(PointTest, PointTest, ::testing::Values(
  ****************************************************************************************/
 
 } // namespace tests
+} // namespace librepcb

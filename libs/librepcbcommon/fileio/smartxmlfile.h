@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SMARTXMLFILE_H
-#define SMARTXMLFILE_H
+#ifndef LIBREPCB_SMARTXMLFILE_H
+#define LIBREPCB_SMARTXMLFILE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "smartfile.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomDocument;
 
@@ -147,4 +147,10 @@ class SmartXmlFile final : public SmartFile
 
 };
 
-#endif // SMARTXMLFILE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_SMARTXMLFILE_H

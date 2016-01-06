@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENTSIGNAL_H
-#define LIBRARY_COMPONENTSIGNAL_H
+#ifndef LIBREPCB_LIBRARY_COMPONENTSIGNAL_H
+#define LIBREPCB_LIBRARY_COMPONENTSIGNAL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class ComponentSignal
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The ComponentSignal class
@@ -111,6 +114,11 @@ class ComponentSignal final : public IF_XmlSerializableObject
         bool mIsClock;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_COMPONENTSIGNAL_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_COMPONENTSIGNAL_H

@@ -17,21 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_UNPLACEDCOMPONENTSDOCK_H
-#define PROJECT_UNPLACEDCOMPONENTSDOCK_H
+#ifndef LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
+#define LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GraphicsView;
 class GraphicsScene;
@@ -43,11 +43,11 @@ class Footprint;
 }
 
 namespace project {
+
 class Project;
 class Board;
 class ComponentInstance;
 class ProjectEditor;
-}
 
 namespace Ui {
 class UnplacedComponentsDock;
@@ -56,8 +56,6 @@ class UnplacedComponentsDock;
 /*****************************************************************************************
  *  Class SchematicPagesDock
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The UnplacedComponentsDock class
@@ -119,6 +117,11 @@ class UnplacedComponentsDock final : public QDockWidget
         bool mDisableListUpdate;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_UNPLACEDCOMPONENTSDOCK_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H

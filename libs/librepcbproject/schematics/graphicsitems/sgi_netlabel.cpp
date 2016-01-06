@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <QPrinter>
@@ -31,6 +30,10 @@
 #include "../../circuit/netsignal.h"
 #include <librepcbcommon/schematiclayer.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
@@ -167,3 +170,4 @@ SchematicLayer* SGI_NetLabel::getSchematicLayer(int id) const noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

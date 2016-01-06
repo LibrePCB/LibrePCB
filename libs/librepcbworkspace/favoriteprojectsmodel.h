@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FAVORITEPROJECTSMODEL_H
-#define FAVORITEPROJECTSMODEL_H
+#ifndef LIBREPCB_FAVORITEPROJECTSMODEL_H
+#define LIBREPCB_FAVORITEPROJECTSMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Workspace;
 
@@ -73,4 +73,10 @@ class FavoriteProjectsModel : public QAbstractListModel
         QList<FilePath> mFavoriteProjects;
 };
 
-#endif // FAVORITEPROJECTSMODEL_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_FAVORITEPROJECTSMODEL_H

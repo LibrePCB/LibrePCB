@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "libraryelementattribute.h"
 #include "librarybaseelement.h"
@@ -28,6 +27,10 @@
 #include <librepcbcommon/attributes/attributetype.h>
 #include <librepcbcommon/attributes/attributeunit.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
@@ -116,3 +119,4 @@ bool LibraryElementAttribute::checkAttributesValidity() const noexcept
  ****************************************************************************************/
 
 } // namespace library
+} // namespace librepcb

@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPECAPACITANCE_H
-#define ATTRTYPECAPACITANCE_H
+#ifndef LIBREPCB_ATTRTYPECAPACITANCE_H
+#define LIBREPCB_ATTRTYPECAPACITANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeCapacitance
@@ -57,4 +61,10 @@ class AttrTypeCapacitance final : public AttributeType
 
 };
 
-#endif // ATTRTYPECAPACITANCE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPECAPACITANCE_H

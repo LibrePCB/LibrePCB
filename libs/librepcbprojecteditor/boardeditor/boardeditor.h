@@ -17,32 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BOARDEDITOR_H
-#define PROJECT_BOARDEDITOR_H
+#ifndef LIBREPCB_PROJECT_BOARDEDITOR_H
+#define LIBREPCB_PROJECT_BOARDEDITOR_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/graphics/if_graphicsvieweventhandler.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GraphicsView;
 class GridProperties;
 
 namespace project {
+
 class ProjectEditor;
 class Project;
 class Board;
 class ErcMsgDock;
 class UnplacedComponentsDock;
 class BES_FSM;
-}
 
 namespace Ui {
 class BoardEditor;
@@ -51,8 +51,6 @@ class BoardEditor;
 /*****************************************************************************************
  *  Class BoardEditor
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BoardEditor class
@@ -140,6 +138,11 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         BES_FSM* mFsm;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BOARDEDITOR_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BOARDEDITOR_H

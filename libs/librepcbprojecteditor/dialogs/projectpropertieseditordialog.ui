@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ProjectPropertiesEditorDialog</class>
- <widget class="QDialog" name="ProjectPropertiesEditorDialog">
+ <class>librepcb::project::ProjectPropertiesEditorDialog</class>
+ <widget class="QDialog" name="librepcb::project::ProjectPropertiesEditorDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>470</width>
-    <height>379</height>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -99,7 +99,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ProjectPropertiesEditorDialog</receiver>
+   <receiver>librepcb::project::ProjectPropertiesEditorDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -115,7 +115,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ProjectPropertiesEditorDialog</receiver>
+   <receiver>librepcb::project::ProjectPropertiesEditorDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

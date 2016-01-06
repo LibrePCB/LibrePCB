@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGECATEGORY_H
-#define LIBRARY_PACKAGECATEGORY_H
+#ifndef LIBREPCB_LIBRARY_PACKAGECATEGORY_H
+#define LIBREPCB_LIBRARY_PACKAGECATEGORY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "librarycategory.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class PackageCategory
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The PackageCategory class
@@ -58,6 +61,11 @@ class PackageCategory final : public LibraryCategory
 
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_PACKAGECATEGORY_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_PACKAGECATEGORY_H

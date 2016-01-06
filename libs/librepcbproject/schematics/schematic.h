@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATIC_H
-#define PROJECT_SCHEMATIC_H
+#ifndef LIBREPCB_PROJECT_SCHEMATIC_H
+#define LIBREPCB_PROJECT_SCHEMATIC_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/uuid.h>
@@ -34,8 +33,9 @@
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GridProperties;
 class GraphicsView;
@@ -43,6 +43,7 @@ class GraphicsScene;
 class SmartXmlFile;
 
 namespace project {
+
 class Project;
 class NetSignal;
 class ComponentInstance;
@@ -52,13 +53,10 @@ class SI_SymbolPin;
 class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLabel;
-}
 
 /*****************************************************************************************
  *  Class Schematic
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Schematic class represents one schematic page of a project and is always
@@ -229,6 +227,11 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         QList<SI_NetLabel*> mNetLabels;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SCHEMATIC_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SCHEMATIC_H

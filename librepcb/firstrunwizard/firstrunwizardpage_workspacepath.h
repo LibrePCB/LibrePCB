@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
-#define FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#ifndef LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#define LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 namespace Ui {
 class FirstRunWizardPage_WorkspacePath;
@@ -77,4 +77,10 @@ class FirstRunWizardPage_WorkspacePath final : public QWizardPage
         QScopedPointer<Ui::FirstRunWizardPage_WorkspacePath> mUi;
 };
 
-#endif // FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H

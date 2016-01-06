@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_ATTRIBUTEPROVIDER_H
-#define IF_ATTRIBUTEPROVIDER_H
+#ifndef LIBREPCB_IF_ATTRIBUTEPROVIDER_H
+#define LIBREPCB_IF_ATTRIBUTEPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Interface IF_AttributeProvider
@@ -149,4 +153,10 @@ class IF_AttributeProvider
                                          int& length, QString& varNS, QString& varName) noexcept;
 };
 
-#endif // IF_ATTRIBUTEPROVIDER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_IF_ATTRIBUTEPROVIDER_H

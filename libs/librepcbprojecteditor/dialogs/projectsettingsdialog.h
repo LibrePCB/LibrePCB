@@ -17,27 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECTSETTINGSDIALOG_H
-#define PROJECT_PROJECTSETTINGSDIALOG_H
+#ifndef LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
+#define LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoStack;
 
 namespace project {
+
 class ProjectSettings;
 class CmdProjectSettingsChange;
-}
 
 namespace Ui {
 class ProjectSettingsDialog;
@@ -46,8 +46,6 @@ class ProjectSettingsDialog;
 /*****************************************************************************************
  *  Class ProjectSettingsDialog
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ProjectSettingsDialog class
@@ -98,6 +96,11 @@ class ProjectSettingsDialog final : public QDialog
         UndoStack& mUndoStack;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECTSETTINGSDIALOG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H

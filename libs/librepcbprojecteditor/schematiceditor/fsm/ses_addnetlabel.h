@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_ADDNETLABEL_H
-#define PROJECT_SES_ADDNETLABEL_H
+#ifndef LIBREPCB_PROJECT_SES_ADDNETLABEL_H
+#define LIBREPCB_PROJECT_SES_ADDNETLABEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Schematic;
 class SI_NetLabel;
 class CmdSchematicNetLabelEdit;
-}
 
 /*****************************************************************************************
  *  Class SES_AddNetLabel
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SES_AddNetLabel class
@@ -78,6 +75,11 @@ class SES_AddNetLabel final : public SES_Base
         CmdSchematicNetLabelEdit* mEditCmd;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_ADDNETLABEL_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_ADDNETLABEL_H

@@ -17,35 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
-#define LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/graphics/graphicsitem.h>
 #include "../cmp/componentsymbolvariantitem.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SchematicLayer;
 class IF_SchematicLayerProvider;
 
 namespace library {
+
 class SymbolPin;
 class ComponentSignal;
-}
 
 /*****************************************************************************************
  *  Class SymbolPinPreviewGraphicsItem
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The SymbolPinPreviewGraphicsItem class
@@ -105,6 +103,11 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         QPainterPath mShape;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H

@@ -17,37 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SGI_SYMBOL_H
-#define PROJECT_SGI_SYMBOL_H
+#ifndef LIBREPCB_PROJECT_SGI_SYMBOL_H
+#define LIBREPCB_PROJECT_SGI_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "sgi_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Text;
 class SchematicLayer;
-
-namespace project {
-class SI_Symbol;
-}
 
 namespace library {
 class Symbol;
 }
 
+namespace project {
+
+class SI_Symbol;
+
+
 /*****************************************************************************************
  *  Class SGI_Symbol
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SGI_Symbol class
@@ -106,6 +105,11 @@ class SGI_Symbol final : public SGI_Base
         QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SGI_SYMBOL_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SGI_SYMBOL_H

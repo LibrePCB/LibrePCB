@@ -17,31 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BES_SELECT_H
-#define PROJECT_BES_SELECT_H
+#ifndef LIBREPCB_PROJECT_BES_SELECT_H
+#define LIBREPCB_PROJECT_BES_SELECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "bes_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoCommand;
 
 namespace project {
+
 class CmdDeviceInstanceEdit;
-}
 
 /*****************************************************************************************
  *  Class BES_Select
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BES_Select class
@@ -100,6 +98,11 @@ class BES_Select final : public BES_Base
         QList<CmdDeviceInstanceEdit*> mDeviceEditCmds; ///< all footprint move commands
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BES_SELECT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BES_SELECT_H

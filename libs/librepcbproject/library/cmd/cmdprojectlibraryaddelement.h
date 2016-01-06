@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
-#define PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#ifndef LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#define LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class ProjectLibrary;
-}
 
 /*****************************************************************************************
  *  Class CmdProjectLibraryAddElement
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdProjectLibraryAddElement class
@@ -73,6 +70,11 @@ class CmdProjectLibraryAddElement final : public UndoCommand
         const ElementType& mElement;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H

@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRIBUTEUNIT_H
-#define ATTRIBUTEUNIT_H
+#ifndef LIBREPCB_ATTRIBUTEUNIT_H
+#define LIBREPCB_ATTRIBUTEUNIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttributeUnit
@@ -60,4 +64,10 @@ class AttributeUnit final
         QString mSymbolTr;      ///< e.g. "mV"
 };
 
-#endif // ATTRIBUTEUNIT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRIBUTEUNIT_H

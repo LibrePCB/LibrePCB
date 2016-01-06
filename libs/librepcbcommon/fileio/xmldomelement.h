@@ -17,21 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMLDOMELEMENT_H
-#define XMLDOMELEMENT_H
+#ifndef LIBREPCB_XMLDOMELEMENT_H
+#define LIBREPCB_XMLDOMELEMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QDomElement>
 #include "../exceptions.h"
 #include "filepath.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomDocument;
 
@@ -482,4 +482,10 @@ class XmlDomElement final
         QHash<QString, QString> mAttributes;///< all attributes of this element (key, value) in arbitrary order
 };
 
-#endif // XMLDOMELEMENT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_XMLDOMELEMENT_H

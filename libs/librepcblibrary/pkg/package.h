@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGE_H
-#define LIBRARY_PACKAGE_H
+#ifndef LIBREPCB_LIBRARY_PACKAGE_H
+#define LIBREPCB_LIBRARY_PACKAGE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../libraryelement.h"
 #include "packagepad.h"
 #include "footprint.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class Package
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Package class
@@ -96,6 +99,11 @@ class Package final : public LibraryElement
         Uuid mDefaultFootprintUuid; ///< points to one item of #mFootprints
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_PACKAGE_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_PACKAGE_H

@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ANGLE_H
-#define ANGLE_H
+#ifndef LIBREPCB_ANGLE_H
+#define LIBREPCB_ANGLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class Angle
@@ -349,4 +353,10 @@ class Angle
 QDataStream& operator<<(QDataStream& stream, const Angle& angle);
 QDebug operator<<(QDebug stream, const Angle& angle);
 
-#endif // ANGLE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ANGLE_H

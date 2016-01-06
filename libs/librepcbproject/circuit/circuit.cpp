@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
@@ -34,6 +33,10 @@
 #include <librepcblibrary/cmp/component.h>
 #include "../settings/projectsettings.h"
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -486,3 +489,4 @@ XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

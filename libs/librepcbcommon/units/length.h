@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LENGTH_H
-#define LENGTH_H
+#ifndef LIBREPCB_LENGTH_H
+#define LIBREPCB_LENGTH_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Typedefs
@@ -492,4 +496,10 @@ class Length
 QDataStream& operator<<(QDataStream& stream, const Length& length);
 QDebug operator<<(QDebug stream, const Length& length);
 
-#endif // LENGTH_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_LENGTH_H

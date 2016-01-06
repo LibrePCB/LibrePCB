@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_FSM_H
-#define PROJECT_SES_FSM_H
+#ifndef LIBREPCB_PROJECT_SES_FSM_H
+#define LIBREPCB_PROJECT_SES_FSM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class SES_FSM
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SES_FSM (Schematic Editor Finite State Machine) class
@@ -80,6 +83,11 @@ class SES_FSM final : public SES_Base
         QHash<State, SES_Base*> mSubStates;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_FSM_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_FSM_H

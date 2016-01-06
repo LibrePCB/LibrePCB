@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRIBUTETYPE_H
-#define ATTRIBUTETYPE_H
+#ifndef LIBREPCB_ATTRIBUTETYPE_H
+#define LIBREPCB_ATTRIBUTETYPE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class AttributeUnit;
 
@@ -101,4 +101,10 @@ class AttributeType
         const AttributeUnit* mDefaultUnit;
 };
 
-#endif // ATTRIBUTETYPE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRIBUTETYPE_H

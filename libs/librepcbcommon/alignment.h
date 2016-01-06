@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ALIGNMENT_H
-#define ALIGNMENT_H
+#ifndef LIBREPCB_ALIGNMENT_H
+#define LIBREPCB_ALIGNMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class HAlign
@@ -138,4 +142,10 @@ class Alignment final
         VAlign mV;
 };
 
-#endif // ALIGNMENT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ALIGNMENT_H

@@ -8,7 +8,8 @@
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>
 
-using namespace library;
+using namespace librepcb;
+using namespace librepcb::library;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)

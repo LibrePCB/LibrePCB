@@ -17,31 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICCLIPBOARD_H
-#define PROJECT_SCHEMATICCLIPBOARD_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H
+#define LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomElement;
 
 namespace project {
+
 class Schematic;
-}
 
 /*****************************************************************************************
  *  Class SchematicClipboard
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SchematicClipboard class
@@ -79,6 +77,11 @@ class SchematicClipboard final : public QObject
 
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SCHEMATICCLIPBOARD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H

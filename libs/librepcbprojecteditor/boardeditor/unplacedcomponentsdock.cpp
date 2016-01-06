@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "unplacedcomponentsdock.h"
@@ -42,6 +41,10 @@
 #include "../projecteditor.h"
 #include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -346,3 +349,4 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

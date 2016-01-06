@@ -20,12 +20,16 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QFileDialog>
 #include "firstrunwizardpage_workspacepath.h"
 #include "ui_firstrunwizardpage_workspacepath.h"
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbworkspace/workspace.h>
+
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -123,3 +127,5 @@ void FirstRunWizardPage_WorkspacePath::on_btnOpenWsBrowse_clicked()
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
+
+} // namespace librepcb

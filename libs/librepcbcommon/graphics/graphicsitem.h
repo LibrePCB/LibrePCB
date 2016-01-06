@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRAPHICSITEM_H
-#define GRAPHICSITEM_H
+#ifndef LIBREPCB_GRAPHICSITEM_H
+#define LIBREPCB_GRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class GraphicsItem
@@ -43,4 +47,10 @@ class GraphicsItem : public QGraphicsItem
         virtual ~GraphicsItem() noexcept;
 };
 
-#endif // GRAPHICSITEM_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_GRAPHICSITEM_H

@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_IF_ERCMSGPROVIDER_H
-#define PROJECT_IF_ERCMSGPROVIDER_H
+#ifndef LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
+#define LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this declaration
-}
 
 /*****************************************************************************************
  *  Macros
@@ -40,14 +40,12 @@ class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this de
  */
 #define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
 public: \
-    virtual const char* getErcMsgOwnerClassName() const noexcept {return #msgOwnerClassName;} \
+    virtual const char* getErcMsgOwnerClassName() const noexcept override {return #msgOwnerClassName;} \
 private:
 
 /*****************************************************************************************
  *  Class IF_ErcMsgProvider
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The IF_ErcMsgProvider class
@@ -67,6 +65,11 @@ class IF_ErcMsgProvider
         virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_IF_ERCMSGPROVIDER_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H

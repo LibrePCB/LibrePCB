@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SGI_BASE_H
-#define PROJECT_SGI_BASE_H
+#ifndef LIBREPCB_PROJECT_SGI_BASE_H
+#define LIBREPCB_PROJECT_SGI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/graphics/graphicsitem.h>
 #include "../schematic.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class SGI_Base
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Schematic Graphics Item Base (SGI_Base) class
@@ -55,6 +58,11 @@ class SGI_Base : public GraphicsItem
         SGI_Base& operator=(const SGI_Base& rhs) = delete;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SGI_BASE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SGI_BASE_H

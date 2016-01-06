@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SI_SYMBOL_H
-#define PROJECT_SI_SYMBOL_H
+#ifndef LIBREPCB_PROJECT_SI_SYMBOL_H
+#define LIBREPCB_PROJECT_SI_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "si_base.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
@@ -31,25 +30,24 @@
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Schematic;
-class ComponentInstance;
-class SI_SymbolPin;
-}
+namespace librepcb {
 
 namespace library {
 class Symbol;
 class ComponentSymbolVariantItem;
 }
 
+namespace project {
+
+class Schematic;
+class ComponentInstance;
+class SI_SymbolPin;
+
 /*****************************************************************************************
  *  Class SI_Symbol
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SI_Symbol class
@@ -146,6 +144,11 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         Angle mRotation;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SI_SYMBOL_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SI_SYMBOL_H

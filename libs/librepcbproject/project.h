@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECT_H
-#define PROJECT_PROJECT_H
+#ifndef LIBREPCB_PROJECT_PROJECT_H
+#define LIBREPCB_PROJECT_PROJECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/if_attributeprovider.h>
@@ -34,14 +33,17 @@
 #include <librepcbcommon/fileio/filelock.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
 class QPrinter;
+
+namespace librepcb {
+
 class SmartTextFile;
 class SmartXmlFile;
 
 namespace project {
+
 class ProjectSettings;
 class ProjectLibrary;
 class Circuit;
@@ -50,13 +52,10 @@ class SchematicLayerProvider;
 class ErcMsgList;
 class Board;
 class BoardLayerProvider;
-}
 
 /*****************************************************************************************
  *  Class Project
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Project class represents a whole (opened) project with all its content
@@ -576,6 +575,11 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECT_H

@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRAPHICSSCENE_H
-#define GRAPHICSSCENE_H
+#ifndef LIBREPCB_GRAPHICSSCENE_H
+#define LIBREPCB_GRAPHICSSCENE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Point;
 class GraphicsItem;
@@ -62,4 +62,10 @@ class GraphicsScene final : public QGraphicsScene
         QGraphicsRectItem* mSelectionRectItem;
 };
 
-#endif // GRAPHICSSCENE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_GRAPHICSSCENE_H

@@ -17,20 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRIDSETTINGSDIALOG_H
-#define GRIDSETTINGSDIALOG_H
+#ifndef LIBREPCB_GRIDSETTINGSDIALOG_H
+#define LIBREPCB_GRIDSETTINGSDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "../gridproperties.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 namespace Ui {
 class GridSettingsDialog;
@@ -93,4 +93,10 @@ class GridSettingsDialog final : public QDialog
         GridProperties mCurrentGrid;
 };
 
-#endif // GRIDSETTINGSDIALOG_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_GRIDSETTINGSDIALOG_H

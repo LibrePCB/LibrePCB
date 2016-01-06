@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_GRAPHICSVIEWEVENTHANDLER_H
-#define IF_GRAPHICSVIEWEVENTHANDLER_H
+#ifndef LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
+#define LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Interface IF_GraphicsViewEventHandler
@@ -45,4 +49,10 @@ class IF_GraphicsViewEventHandler
         virtual bool graphicsViewEventHandler(QEvent* event) = 0;
 };
 
-#endif // IF_GRAPHICSVIEWEVENTHANDLER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H

@@ -17,25 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
-#define PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
+#ifndef LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
+#define LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoStack;
 
 namespace project {
+
 class Project;
-}
 
 namespace Ui {
 class ProjectPropertiesEditorDialog;
@@ -44,8 +44,6 @@ class ProjectPropertiesEditorDialog;
 /*****************************************************************************************
  *  Class ProjectPropertiesEditorDialog
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ProjectPropertiesEditorDialog class
@@ -82,6 +80,11 @@ class ProjectPropertiesEditorDialog final : public QDialog
         bool mCommandActive;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H

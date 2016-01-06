@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKSPACESETTINGS_H
-#define WORKSPACESETTINGS_H
+#ifndef LIBREPCB_WORKSPACESETTINGS_H
+#define LIBREPCB_WORKSPACESETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/filepath.h>
 
@@ -37,8 +36,9 @@
 #include "items/wsi_appearance.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Workspace;
 class WorkspaceSettingsDialog;
@@ -138,4 +138,10 @@ class WorkspaceSettings final : public QObject
         WSI_Appearance* mAppearance;
 };
 
-#endif // WORKSPACESETTINGS_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WORKSPACESETTINGS_H

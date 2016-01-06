@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BI_BASE_H
-#define PROJECT_BI_BASE_H
+#ifndef LIBREPCB_PROJECT_BI_BASE_H
+#define LIBREPCB_PROJECT_BI_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class BI_Base
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The Board Item Base (BI_Base) class
@@ -78,6 +81,11 @@ class BI_Base : public QObject
         bool mIsSelected;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BI_BASE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BI_BASE_H

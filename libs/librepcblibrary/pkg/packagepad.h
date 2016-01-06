@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_PACKAGEPAD_H
-#define LIBRARY_PACKAGEPAD_H
+#ifndef LIBREPCB_LIBRARY_PACKAGEPAD_H
+#define LIBREPCB_LIBRARY_PACKAGEPAD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class PackagePad
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The PackagePad class
@@ -79,6 +82,11 @@ class PackagePad final : public IF_XmlSerializableObject
         QString mName;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_PACKAGEPAD_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_PACKAGEPAD_H

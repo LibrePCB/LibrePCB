@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BES_FSM_H
-#define PROJECT_BES_FSM_H
+#ifndef LIBREPCB_PROJECT_BES_FSM_H
+#define LIBREPCB_PROJECT_BES_FSM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "bes_base.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace project {
+
+/*****************************************************************************************
  *  Class BES_FSM
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BES_FSM (Board Editor Finite State Machine) class
@@ -80,6 +83,11 @@ class BES_FSM final : public BES_Base
         QHash<State, BES_Base*> mSubStates;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BES_FSM_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BES_FSM_H

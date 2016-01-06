@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDPROJECTSETMETADATA_H
-#define PROJECT_CMDPROJECTSETMETADATA_H
+#ifndef LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
+#define LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
-}
 
 /*****************************************************************************************
  *  Class CmdProjectSetMetadata
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdProjectSetMetadata class
@@ -80,6 +77,11 @@ class CmdProjectSetMetadata final : public UndoCommand
         QDateTime mNewCreated;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDPROJECTSETMETADATA_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H

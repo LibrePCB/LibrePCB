@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 #include "projectlibrary.h"
@@ -33,9 +32,13 @@
 #include <librepcblibrary/dev/device.h>
 #include <librepcbcommon/application.h>
 
-using namespace library;
-
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
+
+using namespace library;
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -336,3 +339,4 @@ void ProjectLibrary::cleanupRemovedElements(QHash<Uuid, const ElementType*>& rem
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SYSTEMINFO_H
-#define SYSTEMINFO_H
+#ifndef LIBREPCB_SYSTEMINFO_H
+#define LIBREPCB_SYSTEMINFO_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class SystemInfo
@@ -78,4 +82,10 @@ class SystemInfo final
         SystemInfo(); ///< make the default constructor inaccessible
 };
 
-#endif // SYSTEMINFO_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_SYSTEMINFO_H

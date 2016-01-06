@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#ifndef LIBREPCB_EXCEPTIONS_H
+#define LIBREPCB_EXCEPTIONS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class FilePath;
 
@@ -378,4 +378,10 @@ class UserCanceled : public Exception
         UserCanceled();
 };
 
-#endif // EXCEPTIONS_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_EXCEPTIONS_H

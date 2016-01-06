@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_BOARDLAYERPROVIDER_H
-#define IF_BOARDLAYERPROVIDER_H
+#ifndef LIBREPCB_IF_BOARDLAYERPROVIDER_H
+#define LIBREPCB_IF_BOARDLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class BoardLayer;
 
@@ -80,5 +80,11 @@ class IF_BoardLayerProvider
         IF_BoardLayerProvider& operator=(const IF_BoardLayerProvider& rhs) = delete;
 };
 
-#endif // IF_BOARDLAYERPROVIDER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_IF_BOARDLAYERPROVIDER_H
 

@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICLAYERPROVIDER_H
-#define PROJECT_SCHEMATICLAYERPROVIDER_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
+#define LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
-}
 
 /*****************************************************************************************
  *  Class SchematicLayerProvider
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SchematicLayerProvider class provides and manages all available schematic
@@ -79,6 +76,11 @@ class SchematicLayerProvider final : public IF_SchematicLayerProvider
         QMap<int, SchematicLayer*> mLayers;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SCHEMATICLAYERPROVIDER_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H

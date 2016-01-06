@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDNETCLASSEDIT_H
-#define PROJECT_CMDNETCLASSEDIT_H
+#ifndef LIBREPCB_PROJECT_CMDNETCLASSEDIT_H
+#define LIBREPCB_PROJECT_CMDNETCLASSEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Circuit;
 class NetClass;
-}
 
 /*****************************************************************************************
  *  Class CmdNetClassEdit
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdNetClassEdit class
@@ -73,6 +70,11 @@ class CmdNetClassEdit final : public UndoCommand
         QString mNewName;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDNETCLASSEDIT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDNETCLASSEDIT_H

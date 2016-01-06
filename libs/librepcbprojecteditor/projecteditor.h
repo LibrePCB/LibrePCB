@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECTEDITOR_H
-#define PROJECT_PROJECTEDITOR_H
+#ifndef LIBREPCB_PROJECT_PROJECTEDITOR_H
+#define LIBREPCB_PROJECT_PROJECTEDITOR_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/if_attributeprovider.h>
@@ -33,24 +32,24 @@
 #include <librepcbcommon/fileio/filelock.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+class QMainWindow;
+
+namespace librepcb {
 
 class Workspace;
-class QMainWindow;
 class UndoStack;
 
 namespace project {
+
 class Project;
 class SchematicEditor;
 class BoardEditor;
-}
 
 /*****************************************************************************************
  *  Class ProjectEditor
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ProjectEditor class
@@ -213,6 +212,11 @@ class ProjectEditor final : public QObject
         BoardEditor* mBoardEditor; ///< The board editor (GUI)
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECTEDITOR_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECTEDITOR_H

@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_NETSIGNAL_H
-#define PROJECT_NETSIGNAL_H
+#ifndef LIBREPCB_PROJECT_NETSIGNAL_H
+#define LIBREPCB_PROJECT_NETSIGNAL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcbcommon/uuid.h>
@@ -31,23 +30,21 @@
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Circuit;
 class NetClass;
 class ComponentSignalInstance;
 class SI_NetPoint;
 class SI_NetLabel;
 class ErcMsg;
-}
 
 /*****************************************************************************************
  *  Class NetSignal
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The NetSignal class
@@ -137,6 +134,11 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         NetClass* mNetClass;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_NETSIGNAL_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_NETSIGNAL_H

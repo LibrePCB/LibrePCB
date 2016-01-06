@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_drawwire.h"
 #include "../schematiceditor.h"
@@ -51,6 +50,10 @@
 #include <librepcbproject/circuit/cmd/cmdnetsignaledit.h>
 #include <librepcbcommon/gridproperties.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -940,3 +943,4 @@ Point SES_DrawWire::calcMiddlePointPos(const Point& p1, const Point p2, WireMode
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

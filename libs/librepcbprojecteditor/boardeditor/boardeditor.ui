@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BoardEditor</class>
- <widget class="QMainWindow" name="BoardEditor">
+ <class>librepcb::project::BoardEditor</class>
+ <widget class="QMainWindow" name="librepcb::project::BoardEditor">
   <property name="enabled">
    <bool>true</bool>
   </property>

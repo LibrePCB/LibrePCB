@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOLPIN_H
-#define LIBRARY_SYMBOLPIN_H
+#ifndef LIBREPCB_LIBRARY_SYMBOLPIN_H
+#define LIBREPCB_LIBRARY_SYMBOLPIN_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class SymbolPin
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The SymbolPin class
@@ -89,6 +92,11 @@ class SymbolPin final : public IF_XmlSerializableObject
         Angle mRotation;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_SYMBOLPIN_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_SYMBOLPIN_H

@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef LIBREPCB_POINT_H
+#define LIBREPCB_POINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "length.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Angle;
 
@@ -396,4 +396,10 @@ class Point
 QDataStream& operator<<(QDataStream& stream, const Point& point);
 QDebug operator<<(QDebug stream, const Point& point);
 
-#endif // POINT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_POINT_H

@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_SYMBOL_H
-#define LIBRARY_SYMBOL_H
+#ifndef LIBREPCB_LIBRARY_SYMBOL_H
+#define LIBREPCB_LIBRARY_SYMBOL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/geometry/polygon.h>
 #include <librepcbcommon/geometry/ellipse.h>
@@ -32,10 +31,14 @@
 #include "symbolpin.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class Symbol
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Symbol class
@@ -111,6 +114,11 @@ class Symbol final : public LibraryElement
         QList<Text*> mTexts;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_SYMBOL_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_SYMBOL_H

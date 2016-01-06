@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENT_H
-#define LIBRARY_COMPONENT_H
+#ifndef LIBREPCB_LIBRARY_COMPONENT_H
+#define LIBREPCB_LIBRARY_COMPONENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../libraryelement.h"
 #include "componentsignal.h"
@@ -31,10 +30,14 @@
 #include "../libraryelementattribute.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class Component
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Component class
@@ -136,6 +139,11 @@ class Component final : public LibraryElement
         Uuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_COMPONENT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_COMPONENT_H

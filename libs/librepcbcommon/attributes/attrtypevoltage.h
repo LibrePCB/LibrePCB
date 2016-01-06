@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPEVOLTAGE_H
-#define ATTRTYPEVOLTAGE_H
+#ifndef LIBREPCB_ATTRTYPEVOLTAGE_H
+#define LIBREPCB_ATTRTYPEVOLTAGE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeVoltage
@@ -57,4 +61,10 @@ class AttrTypeVoltage final : public AttributeType
         ~AttrTypeVoltage() noexcept;
 };
 
-#endif // ATTRTYPEVOLTAGE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPEVOLTAGE_H

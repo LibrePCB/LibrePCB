@@ -9,8 +9,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class XmlDomElement;
-
 class MainWindow : public QMainWindow
 {
         Q_OBJECT

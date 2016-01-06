@@ -17,36 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Circuit;
-class ComponentInstance;
-}
+namespace librepcb {
 
 namespace library {
 class Component;
 class ComponentSymbolVariant;
 }
 
+namespace project {
+
+class Circuit;
+class ComponentInstance;
+
 /*****************************************************************************************
  *  Class CmdComponentInstanceAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdComponentInstanceAdd class
@@ -80,6 +78,11 @@ class CmdComponentInstanceAdd final : public UndoCommand
         ComponentInstance* mComponentInstance;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDCOMPONENTINSTANCEADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H

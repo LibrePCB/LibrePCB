@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRIDPROPERTIES_H
-#define GRIDPROPERTIES_H
+#ifndef LIBREPCB_GRIDPROPERTIES_H
+#define LIBREPCB_GRIDPROPERTIES_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "fileio/if_xmlserializableobject.h"
 #include "units/all_length_units.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class GridProperties
@@ -90,4 +94,10 @@ class GridProperties final : public IF_XmlSerializableObject
         LengthUnit mUnit;
 };
 
-#endif // GRIDPROPERTIES_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_GRIDPROPERTIES_H

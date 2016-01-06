@@ -17,33 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SI_NETLABEL_H
-#define PROJECT_SI_NETLABEL_H
+#ifndef LIBREPCB_PROJECT_SI_NETLABEL_H
+#define LIBREPCB_PROJECT_SI_NETLABEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "si_base.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include "../graphicsitems/sgi_netlabel.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Circuit;
 class Schematic;
 class NetSignal;
-}
 
 /*****************************************************************************************
  *  Class SI_NetLabel
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SI_NetLabel class
@@ -116,6 +113,11 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         NetSignal* mNetSignal;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SI_NETLABEL_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SI_NETLABEL_H

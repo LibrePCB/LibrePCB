@@ -17,34 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_SELECT_H
-#define PROJECT_SES_SELECT_H
+#ifndef LIBREPCB_PROJECT_SES_SELECT_H
+#define LIBREPCB_PROJECT_SES_SELECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoCommand;
 
 namespace project {
+
 class CmdSymbolInstanceEdit;
 class CmdSchematicNetPointEdit;
 class CmdSchematicNetLabelEdit;
-}
 
 /*****************************************************************************************
  *  Class SES_Select
  ****************************************************************************************/
-
-namespace project {
-
 
 /**
  * @brief The SES_Select class (default state of the schematic editor FSM)
@@ -106,6 +103,11 @@ class SES_Select final : public SES_Base
         QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_SELECT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_SELECT_H

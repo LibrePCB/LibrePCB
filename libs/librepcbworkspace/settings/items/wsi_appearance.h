@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WSI_APPEARANCE_H
-#define WSI_APPEARANCE_H
+#ifndef LIBREPCB_WSI_APPEARANCE_H
+#define LIBREPCB_WSI_APPEARANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "wsi_base.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class WSI_Appearance
@@ -71,4 +75,10 @@ class WSI_Appearance final : public WSI_Base
         QCheckBox* mUseOpenGlCheckBox;
 };
 
-#endif // WSI_APPEARANCE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WSI_APPEARANCE_H

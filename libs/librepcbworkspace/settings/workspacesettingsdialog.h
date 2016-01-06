@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKSPACESETTINGSDIALOG_H
-#define WORKSPACESETTINGSDIALOG_H
+#ifndef LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#define LIBREPCB_WORKSPACESETTINGSDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class WorkspaceSettings;
 
@@ -85,4 +85,10 @@ class WorkspaceSettingsDialog final : public QDialog
         WorkspaceSettings& mSettings; ///< a pointer to the WorkspaceSettings object
 };
 
-#endif // WORKSPACESETTINGSDIALOG_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WORKSPACESETTINGSDIALOG_H

@@ -86,7 +86,6 @@ SOURCES += \
     graphics/graphicsitem.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
-    graphics/if_graphicsvieweventhandler.cpp \
     units/angle.cpp \
     units/length.cpp \
     units/lengthunit.cpp \

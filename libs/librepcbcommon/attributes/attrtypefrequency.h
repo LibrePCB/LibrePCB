@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPEFREQUENCY_H
-#define ATTRTYPEFREQUENCY_H
+#ifndef LIBREPCB_ATTRTYPEFREQUENCY_H
+#define LIBREPCB_ATTRTYPEFREQUENCY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeFrequency
@@ -57,4 +61,10 @@ class AttrTypeFrequency final : public AttributeType
         ~AttrTypeFrequency() noexcept;
 };
 
-#endif // ATTRTYPEFREQUENCY_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPEFREQUENCY_H

@@ -17,37 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BGI_FOOTPRINT_H
-#define PROJECT_BGI_FOOTPRINT_H
+#ifndef LIBREPCB_PROJECT_BGI_FOOTPRINT_H
+#define LIBREPCB_PROJECT_BGI_FOOTPRINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "bgi_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Text;
 class BoardLayer;
-
-namespace project {
-class BI_Footprint;
-}
 
 namespace library {
 class Footprint;
 }
 
+namespace project {
+
+class BI_Footprint;
+
 /*****************************************************************************************
  *  Class BGI_Footprint
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BGI_Footprint class
@@ -106,6 +104,11 @@ class BGI_Footprint final : public BGI_Base
         QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BGI_FOOTPRINT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BGI_FOOTPRINT_H

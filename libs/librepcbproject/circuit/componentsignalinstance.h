@@ -17,41 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_COMPONENTSIGNALINSTANCE_H
-#define PROJECT_COMPONENTSIGNALINSTANCE_H
+#ifndef LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
+#define LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomElement;
-
-namespace project {
-class ComponentInstance;
-class SI_SymbolPin;
-class NetSignal;
-class Circuit;
-class ErcMsg;
-}
 
 namespace library {
 class ComponentSignal;
 }
 
+namespace project {
+
+class ComponentInstance;
+class SI_SymbolPin;
+class NetSignal;
+class Circuit;
+class ErcMsg;
+
 /*****************************************************************************************
  *  Class ComponentSignalInstance
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ComponentSignalInstance class
@@ -142,6 +140,11 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_COMPONENTSIGNALINSTANCE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H

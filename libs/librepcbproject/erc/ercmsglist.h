@@ -17,34 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ERCMSGLIST_H
-#define PROJECT_ERCMSGLIST_H
+#ifndef LIBREPCB_PROJECT_ERCMSGLIST_H
+#define LIBREPCB_PROJECT_ERCMSGLIST_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SmartXmlFile;
 
 namespace project {
+
 class Project;
 class ErcMsg;
-}
 
 /*****************************************************************************************
  *  Class ErcMsgList
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ErcMsgList class contains a list of ERC messages which are visible for the user
@@ -103,6 +101,11 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
         QList<ErcMsg*> mItems; ///< contains all visible ERC messages
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_ERCMSGLIST_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_ERCMSGLIST_H

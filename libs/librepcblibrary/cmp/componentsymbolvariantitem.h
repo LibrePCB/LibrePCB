@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
-#define LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include "componentpinsignalmapitem.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class ComponentSymbolVariantItem
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The ComponentSymbolVariantItem class
@@ -89,6 +92,11 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         QMap<Uuid, ComponentPinSignalMapItem*> mPinSignalMap; ///< Key: Pin UUID (all pins required!)
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H

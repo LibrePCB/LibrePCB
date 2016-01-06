@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_DEVICEINSTANCE_H
-#define PROJECT_DEVICEINSTANCE_H
+#ifndef LIBREPCB_PROJECT_DEVICEINSTANCE_H
+#define LIBREPCB_PROJECT_DEVICEINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
@@ -32,17 +31,11 @@
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GraphicsScene;
-
-namespace project {
-class Project;
-class Board;
-class ComponentInstance;
-class BI_Footprint;
-}
 
 namespace library {
 class Device;
@@ -50,11 +43,16 @@ class Package;
 class Footprint;
 }
 
+namespace project {
+
+class Project;
+class Board;
+class ComponentInstance;
+class BI_Footprint;
+
 /*****************************************************************************************
  *  Class DeviceInstance
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The DeviceInstance class
@@ -147,6 +145,11 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         bool mIsMirrored;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_DEVICEINSTANCE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_DEVICEINSTANCE_H

@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/boardlayer.h>
@@ -28,6 +27,10 @@
 #include "footprintpadsmt.h"
 #include "footprintpadtht.h"
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
@@ -165,3 +168,4 @@ FootprintPad* FootprintPad::fromDomElement(const XmlDomElement& domElement) thro
  ****************************************************************************************/
 
 } // namespace library
+} // namespace librepcb

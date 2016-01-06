@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENTPINSIGNALMAPITEM_H
-#define LIBRARY_COMPONENTPINSIGNALMAPITEM_H
+#ifndef LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAPITEM_H
+#define LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAPITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class ComponentPinSignalMapItem
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The ComponentPinSignalMapItem class
@@ -93,6 +96,11 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         PinDisplayType_t mDisplayType;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_COMPONENTPINSIGNALMAPITEM_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAPITEM_H

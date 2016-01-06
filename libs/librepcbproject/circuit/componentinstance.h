@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_COMPONENTINSTANCE_H
-#define PROJECT_COMPONENTINSTANCE_H
+#ifndef LIBREPCB_PROJECT_COMPONENTINSTANCE_H
+#define LIBREPCB_PROJECT_COMPONENTINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
@@ -32,30 +31,29 @@
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomElement;
-
-namespace project {
-class Circuit;
-class ComponentAttributeInstance;
-class ComponentSignalInstance;
-class DeviceInstance;
-class SI_Symbol;
-class ErcMsg;
-}
 
 namespace library {
 class Component;
 class ComponentSymbolVariant;
 }
 
+namespace project {
+
+class Circuit;
+class ComponentAttributeInstance;
+class ComponentSignalInstance;
+class DeviceInstance;
+class SI_Symbol;
+class ErcMsg;
+
 /*****************************************************************************************
  *  Class ComponentInstance
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ComponentInstance class
@@ -215,6 +213,11 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         QScopedPointer<ErcMsg> mErcMsgUnplacedOptionalSymbols;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_COMPONENTINSTANCE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_COMPONENTINSTANCE_H

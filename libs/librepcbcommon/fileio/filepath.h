@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILEPATH_H
-#define FILEPATH_H
+#ifndef LIBREPCB_FILEPATH_H
+#define LIBREPCB_FILEPATH_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class FilePath
@@ -378,4 +382,10 @@ class FilePath final
 QDataStream& operator<<(QDataStream& stream, const FilePath& filepath);
 QDebug& operator<<(QDebug& stream, const FilePath& filepath);
 
-#endif // FILEPATH_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_FILEPATH_H

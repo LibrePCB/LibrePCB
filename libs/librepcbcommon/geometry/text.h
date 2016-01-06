@@ -17,17 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TEXT_H
-#define TEXT_H
+#ifndef LIBREPCB_TEXT_H
+#define LIBREPCB_TEXT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../fileio/if_xmlserializableobject.h"
 #include "../units/all_length_units.h"
 #include "../alignment.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class Text
@@ -93,4 +97,10 @@ class Text final : public IF_XmlSerializableObject
         Alignment mAlign;
 };
 
-#endif // TEXT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_TEXT_H

@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICEDITOREVENT_H
-#define PROJECT_SCHEMATICEDITOREVENT_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICEDITOREVENT_H
+#define LIBREPCB_PROJECT_SCHEMATICEDITOREVENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class Schematic;
 class SchematicEditor;
-}
 
 namespace Ui {
 class SchematicEditor;
 }
-
-namespace project {
 
 /*****************************************************************************************
  *  Class SEE_Base
@@ -205,6 +202,11 @@ class SEE_SwitchToSchematicPage final : public SEE_Base
         unsigned int mSchematicIndex; ///< the requested schematic page index
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SCHEMATICEDITOREVENT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SCHEMATICEDITOREVENT_H

@@ -17,35 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BI_FOOTPRINTPAD_H
-#define PROJECT_BI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
+#define LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "bi_base.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class BI_Footprint;
-class Circuit;
-}
+namespace librepcb {
 
 namespace library {
 class FootprintPad;
 }
 
+namespace project {
+
+class BI_Footprint;
+class Circuit;
+
 /*****************************************************************************************
  *  Class BI_FootprintPad
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BI_FootprintPad class
@@ -110,6 +108,11 @@ class BI_FootprintPad final : public BI_Base
         BGI_FootprintPad* mGraphicsItem;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BI_FOOTPRINTPAD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H

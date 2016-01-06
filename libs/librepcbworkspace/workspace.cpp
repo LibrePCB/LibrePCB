@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QFileDialog>
 #include "workspace.h"
@@ -34,6 +33,11 @@
 #include "favoriteprojectsmodel.h"
 #include "settings/workspacesettings.h"
 #include <librepcbcommon/schematiclayer.h>
+
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 
 using namespace library;
 using namespace project;
@@ -229,3 +233,5 @@ FilePath Workspace::chooseWorkspacePath() noexcept
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
+
+} // namespace librepcb

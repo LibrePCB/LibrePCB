@@ -17,28 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ADDCOMPONENTDIALOG_H
-#define PROJECT_ADDCOMPONENTDIALOG_H
+#ifndef LIBREPCB_PROJECT_ADDCOMPONENTDIALOG_H
+#define LIBREPCB_PROJECT_ADDCOMPONENTDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class GraphicsScene;
 class Workspace;
-
-namespace project {
-class Project;
-}
 
 namespace library {
 class Component;
@@ -49,11 +45,13 @@ class CategoryTreeModel;
 class ComponentCategory;
 }
 
+namespace project {
+
+class Project;
+
 namespace Ui {
 class AddComponentDialog;
 }
-
-namespace project {
 
 /*****************************************************************************************
  *  Class AddComponentDialog
@@ -113,6 +111,11 @@ class AddComponentDialog final : public QDialog
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_ADDCOMPONENTDIALOG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_ADDCOMPONENTDIALOG_H

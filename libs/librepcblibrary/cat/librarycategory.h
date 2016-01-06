@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARYCATEGORY_H
-#define LIBRARY_LIBRARYCATEGORY_H
+#ifndef LIBREPCB_LIBRARY_LIBRARYCATEGORY_H
+#define LIBREPCB_LIBRARY_LIBRARYCATEGORY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../librarybaseelement.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class LibraryCategory
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The LibraryCategory class extends the LibraryBaseElement class with some
@@ -84,6 +87,11 @@ class LibraryCategory : public LibraryBaseElement
         Uuid mParentUuid;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_LIBRARYCATEGORY_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_LIBRARYCATEGORY_H

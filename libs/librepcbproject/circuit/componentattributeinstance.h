@@ -17,28 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_COMPONENTATTRIBUTEINSTANCE_H
-#define PROJECT_COMPONENTATTRIBUTEINSTANCE_H
+#ifndef LIBREPCB_PROJECT_COMPONENTATTRIBUTEINSTANCE_H
+#define LIBREPCB_PROJECT_COMPONENTATTRIBUTEINSTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class AttributeType;
 class AttributeUnit;
 
+namespace project {
+
 /*****************************************************************************************
  *  Class ComponentAttributeInstance
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ComponentAttributeInstance class
@@ -92,6 +92,11 @@ class ComponentAttributeInstance final : public IF_XmlSerializableObject
         const AttributeUnit* mUnit;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_COMPONENTATTRIBUTEINSTANCE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_COMPONENTATTRIBUTEINSTANCE_H

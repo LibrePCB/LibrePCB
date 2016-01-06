@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
 #include "componentsignalinstance.h"
@@ -29,6 +32,10 @@
 #include "../project.h"
 #include "../settings/projectsettings.h"
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -239,3 +246,4 @@ void ComponentSignalInstance::updateErcMessages() noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

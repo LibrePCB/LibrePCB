@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_SCHEMATICLAYERPROVIDER_H
-#define IF_SCHEMATICLAYERPROVIDER_H
+#ifndef LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
+#define LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SchematicLayer;
 
@@ -80,5 +80,11 @@ class IF_SchematicLayerProvider
         IF_SchematicLayerProvider& operator=(const IF_SchematicLayerProvider& rhs) = delete;
 };
 
-#endif // IF_SCHEMATICLAYERPROVIDER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
 

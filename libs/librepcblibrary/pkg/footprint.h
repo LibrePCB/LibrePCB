@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_FOOTPRINT_H
-#define LIBRARY_FOOTPRINT_H
+#ifndef LIBREPCB_LIBRARY_FOOTPRINT_H
+#define LIBREPCB_LIBRARY_FOOTPRINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/geometry/polygon.h>
@@ -34,10 +33,14 @@
 #include "footprintpadtht.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class Footprint
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The Footprint class
@@ -133,6 +136,11 @@ class Footprint final : public IF_XmlSerializableObject
         QList<Hole*> mHoles;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_FOOTPRINT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_FOOTPRINT_H

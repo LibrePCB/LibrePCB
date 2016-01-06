@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "projectpropertieseditordialog.h"
@@ -29,6 +28,10 @@
 #include <librepcbcommon/undostack.h>
 #include <librepcbproject/cmd/cmdprojectsetmetadata.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -113,3 +116,4 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

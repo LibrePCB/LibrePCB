@@ -26,7 +26,11 @@
 #include "ui_libraryeditor.h"
 #include <librepcbworkspace/workspace.h>
 
-namespace library_editor{
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -47,4 +51,5 @@ LibraryEditor::~LibraryEditor() noexcept
  *  End of File
  ****************************************************************************************/
 
-} // namespace library_editor
+} // namespace library
+} // namespace librepcb

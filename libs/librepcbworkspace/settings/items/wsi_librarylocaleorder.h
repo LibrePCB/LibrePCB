@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WSI_LIBRARYLOCALEORDER_H
-#define WSI_LIBRARYLOCALEORDER_H
+#ifndef LIBREPCB_WSI_LIBRARYLOCALEORDER_H
+#define LIBREPCB_WSI_LIBRARYLOCALEORDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "wsi_base.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class WSI_LibraryLocaleOrder
@@ -104,4 +108,10 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         QToolButton* mBtnRemove;
 };
 
-#endif // WSI_LIBRARYLOCALEORDER_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WSI_LIBRARYLOCALEORDER_H

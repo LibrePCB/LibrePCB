@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "projecteditor.h"
 #include <librepcbcommon/undostack.h>
@@ -32,6 +31,10 @@
 #include "dialogs/projectsettingsdialog.h"
 #include "dialogs/editnetclassesdialog.h"
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -249,3 +252,4 @@ bool ProjectEditor::closeAndDestroy(bool askForSave, QWidget* msgBoxParent) noex
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

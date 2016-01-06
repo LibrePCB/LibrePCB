@@ -17,20 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FIRSTRUNWIZARD_H
-#define FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_FIRSTRUNWIZARD_H
+#define LIBREPCB_FIRSTRUNWIZARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 namespace Ui {
 class FirstRunWizard;
@@ -70,4 +70,10 @@ class FirstRunWizard final : public QWizard
         QScopedPointer<Ui::FirstRunWizard> mUi;
 };
 
-#endif // FIRSTRUNWIZARD_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_FIRSTRUNWIZARD_H

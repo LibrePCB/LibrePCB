@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BOARDEDITOREVENT_H
-#define PROJECT_BOARDEDITOREVENT_H
+#ifndef LIBREPCB_PROJECT_BOARDEDITOREVENT_H
+#define LIBREPCB_PROJECT_BOARDEDITOREVENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class Board;
 class BoardEditor;
-}
 
 namespace Ui {
 class BoardEditor;
 }
-
-namespace project {
 
 /*****************************************************************************************
  *  Class BEE_Base
@@ -144,6 +141,11 @@ class BEE_RedirectedQEvent final : public BEE_Base
         QEvent* mQEvent;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BOARDEDITOREVENT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BOARDEDITOREVENT_H

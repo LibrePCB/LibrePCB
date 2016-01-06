@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_LIBRARYBASEELEMENT_H
-#define LIBRARY_LIBRARYBASEELEMENT_H
+#ifndef LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H
+#define LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QObject>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
@@ -32,10 +31,14 @@
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class LibraryBaseElement
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The LibraryBaseElement class
@@ -219,6 +222,11 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QMap<QString, QString> mKeywords;     ///< key: locale (like "en_US"), value: keywords
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_LIBRARYBASEELEMENT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H

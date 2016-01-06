@@ -17,33 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDCOMPATTRINSTEDIT_H
-#define PROJECT_CMDCOMPATTRINSTEDIT_H
+#ifndef LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H
+#define LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class AttributeType;
 class AttributeUnit;
 
 namespace project {
+
 class ComponentInstance;
 class ComponentAttributeInstance;
-}
 
 /*****************************************************************************************
  *  Class CmdCompAttrInstEdit
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdCompAttrInstEdit class
@@ -80,6 +78,11 @@ class CmdCompAttrInstEdit final : public UndoCommand
         const AttributeUnit* mNewUnit;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDCOMPATTRINSTEDIT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H

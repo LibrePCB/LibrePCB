@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WSI_APPDEFAULTMEASUREMENTUNITS_H
-#define WSI_APPDEFAULTMEASUREMENTUNITS_H
+#ifndef LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H
+#define LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "wsi_base.h"
 #include <librepcbcommon/units/lengthunit.h>
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class WSI_AppDefaultMeasurementUnits
@@ -93,4 +97,10 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         QComboBox* mLengthUnitComboBox;
 };
 
-#endif // WSI_APPDEFAULTMEASUREMENTUNITS_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H

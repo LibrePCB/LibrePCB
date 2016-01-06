@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNDOCOMMAND_H
-#define UNDOCOMMAND_H
+#ifndef LIBREPCB_UNDOCOMMAND_H
+#define LIBREPCB_UNDOCOMMAND_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class UndoCommand
@@ -140,4 +144,10 @@ class UndoCommand
         QList<UndoCommand*> mChilds;
 };
 
-#endif // UNDOCOMMAND_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_UNDOCOMMAND_H

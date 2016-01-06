@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECTTREEMODEL_H
-#define PROJECTTREEMODEL_H
+#ifndef LIBREPCB_PROJECTTREEMODEL_H
+#define LIBREPCB_PROJECTTREEMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Workspace;
 class ProjectTreeItem;
@@ -79,4 +79,10 @@ class ProjectTreeModel : public QAbstractItemModel
         ProjectTreeItem* mRootProjectDirectory;
 };
 
-#endif // PROJECTTREEMODEL_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECTTREEMODEL_H

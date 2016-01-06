@@ -17,32 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWWIRE_H
-#define PROJECT_SES_DRAWWIRE_H
+#ifndef LIBREPCB_PROJECT_SES_DRAWWIRE_H
+#define LIBREPCB_PROJECT_SES_DRAWWIRE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class SI_NetPoint;
 class SI_NetLine;
-}
 
 /*****************************************************************************************
  *  Class SES_DrawWire
  ****************************************************************************************/
-
-namespace project {
-
 
 /**
  * @brief The SES_DrawWire class
@@ -128,6 +124,11 @@ class SES_DrawWire final : public SES_Base
         QComboBox* mWidthComboBox;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_DRAWWIRE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_DRAWWIRE_H

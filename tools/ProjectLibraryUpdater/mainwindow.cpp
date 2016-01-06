@@ -12,7 +12,8 @@
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
 
-using namespace library;
+using namespace librepcb;
+using namespace librepcb::library;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)

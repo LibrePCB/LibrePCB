@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LENGTHUNIT_H
-#define LENGTHUNIT_H
+#ifndef LIBREPCB_LENGTHUNIT_H
+#define LIBREPCB_LENGTHUNIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../exceptions.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class Length;
 class Point;
@@ -299,4 +299,10 @@ class LengthUnit final
 QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit);
 QDebug operator<<(QDebug stream, const LengthUnit& unit);
 
-#endif // LENGTHUNIT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_LENGTHUNIT_H

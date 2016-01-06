@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICREMOVE_H
-#define PROJECT_CMDSCHEMATICREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICREMOVE_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class Schematic;
-}
 
 /*****************************************************************************************
  *  Class CmdSchematicRemove
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSchematicRemove class
@@ -66,6 +63,11 @@ class CmdSchematicRemove final : public UndoCommand
         int mPageIndex;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSCHEMATICREMOVE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICREMOVE_H

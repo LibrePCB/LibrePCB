@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "componentattributeinstance.h"
 #include "componentinstance.h"
@@ -28,6 +27,10 @@
 #include <librepcbcommon/attributes/attributetype.h>
 #include <librepcbcommon/attributes/attributeunit.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
@@ -120,3 +123,4 @@ bool ComponentAttributeInstance::checkAttributesValidity() const noexcept
  ****************************************************************************************/
 
 } // namespace project
+} // namespace librepcb

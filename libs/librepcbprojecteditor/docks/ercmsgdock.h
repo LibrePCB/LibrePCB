@@ -17,25 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ERCMSGDOCK_H
-#define PROJECT_ERCMSGDOCK_H
+#ifndef LIBREPCB_PROJECT_ERCMSGDOCK_H
+#define LIBREPCB_PROJECT_ERCMSGDOCK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class ErcMsg;
 class ErcMsgList;
-}
 
 namespace Ui {
 class ErcMsgDock;
@@ -44,8 +43,6 @@ class ErcMsgDock;
 /*****************************************************************************************
  *  Class ErcMsgDock
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ErcMsgDock class
@@ -93,6 +90,11 @@ class ErcMsgDock final : public QDockWidget
         QHash<ErcMsg*, QTreeWidgetItem*> mErcMsgItems;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_ERCMSGDOCK_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_ERCMSGDOCK_H

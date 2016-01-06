@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILELOCK_H
-#define FILELOCK_H
+#ifndef LIBREPCB_FILELOCK_H
+#define LIBREPCB_FILELOCK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "filepath.h"
 #include "../exceptions.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class FileLock
@@ -288,4 +292,10 @@ class FileLock final
         bool mLockedByThisObject;
 };
 
-#endif // FILELOCK_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_FILELOCK_H

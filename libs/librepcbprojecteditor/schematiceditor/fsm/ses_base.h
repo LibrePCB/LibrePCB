@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_BASE_H
-#define PROJECT_SES_BASE_H
+#ifndef LIBREPCB_PROJECT_SES_BASE_H
+#define LIBREPCB_PROJECT_SES_BASE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
@@ -32,22 +31,21 @@
 #include <librepcbcommon/graphics/graphicsview.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoStack;
 class Workspace;
 
 namespace project {
+
 class Project;
 class Circuit;
-}
 
 /*****************************************************************************************
  *  Class SES_Base
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SES_Base (SchematicEditorState Base) class
@@ -87,6 +85,11 @@ class SES_Base : public QObject
         UndoStack& mUndoStack;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_BASE_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_BASE_H

@@ -17,24 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SCHEMATICPAGESDOCK_H
-#define PROJECT_SCHEMATICPAGESDOCK_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#define LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class SchematicEditor;
-}
 
 namespace Ui {
 class SchematicPagesDock;
@@ -43,8 +42,6 @@ class SchematicPagesDock;
 /*****************************************************************************************
  *  Class SchematicPagesDock
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SchematicPagesDock class
@@ -88,6 +85,11 @@ class SchematicPagesDock final : public QDockWidget
         Ui::SchematicPagesDock* mUi;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SCHEMATICPAGESDOCK_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H

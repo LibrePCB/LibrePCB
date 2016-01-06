@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_XMLSERIALIZABLEOBJECT_H
-#define IF_XMLSERIALIZABLEOBJECT_H
+#ifndef LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H
+#define LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include "../exceptions.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class XmlDomElement;
 
@@ -90,4 +90,10 @@ class IF_XmlSerializableObject
         virtual bool checkAttributesValidity() const noexcept = 0;
 };
 
-#endif // IF_XMLSERIALIZABLEOBJECT_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H

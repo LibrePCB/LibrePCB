@@ -17,22 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWRECT_H
-#define PROJECT_SES_DRAWRECT_H
+#ifndef LIBREPCB_PROJECT_SES_DRAWRECT_H
+#define LIBREPCB_PROJECT_SES_DRAWRECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Class SES_DrawRect
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
 
+/*****************************************************************************************
+ *  Class SES_DrawRect
+ ****************************************************************************************/
 
 /**
  * @brief The SES_DrawRect class
@@ -54,6 +56,11 @@ class SES_DrawRect final : public SES_Base
         bool exit(SEE_Base* event) noexcept override;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_DRAWRECT_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_DRAWRECT_H

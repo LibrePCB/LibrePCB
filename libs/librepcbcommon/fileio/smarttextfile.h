@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SMARTTEXTFILE_H
-#define SMARTTEXTFILE_H
+#ifndef LIBREPCB_SMARTTEXTFILE_H
+#define LIBREPCB_SMARTTEXTFILE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "smartfile.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class SmartTextFile
@@ -154,4 +158,10 @@ class SmartTextFile final : public SmartFile
         QByteArray mContent;
 };
 
-#endif // SMARTTEXTFILE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_SMARTTEXTFILE_H

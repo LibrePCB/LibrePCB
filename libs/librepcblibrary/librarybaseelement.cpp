@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "librarybaseelement.h"
 #include <librepcbcommon/fileio/smarttextfile.h>
@@ -28,6 +27,10 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
@@ -312,3 +315,4 @@ bool LibraryBaseElement::isDirectoryValidElement(const FilePath& dir) noexcept
  ****************************************************************************************/
 
 } // namespace library
+} // namespace librepcb

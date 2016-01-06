@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
-#define PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#define LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class UndoStack;
 class UndoCommand;
@@ -37,10 +37,10 @@ class AttributeType;
 class AttributeUnit;
 
 namespace project {
+
 class Project;
 class ComponentInstance;
 class SI_Symbol;
-}
 
 namespace Ui {
 class SymbolInstancePropertiesDialog;
@@ -49,8 +49,6 @@ class SymbolInstancePropertiesDialog;
 /*****************************************************************************************
  *  Class SymbolInstancePropertiesDialog
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SymbolInstancePropertiesDialog class
@@ -119,6 +117,11 @@ class SymbolInstancePropertiesDialog final : public QDialog
         const AttributeUnit* mSelectedAttrUnit;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H

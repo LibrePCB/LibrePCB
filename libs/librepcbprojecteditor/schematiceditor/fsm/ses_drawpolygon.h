@@ -17,22 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SES_DRAWPOLYGON_H
-#define PROJECT_SES_DRAWPOLYGON_H
+#ifndef LIBREPCB_PROJECT_SES_DRAWPOLYGON_H
+#define LIBREPCB_PROJECT_SES_DRAWPOLYGON_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "ses_base.h"
 
 /*****************************************************************************************
- *  Class SES_DrawPolygon
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
 
+/*****************************************************************************************
+ *  Class SES_DrawPolygon
+ ****************************************************************************************/
 
 /**
  * @brief The SES_DrawPolygon class
@@ -54,6 +56,11 @@ class SES_DrawPolygon final : public SES_Base
         bool exit(SEE_Base* event) noexcept override;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SES_DRAWPOLYGON_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SES_DRAWPOLYGON_H

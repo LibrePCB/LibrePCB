@@ -17,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_COMPONENTSYMBOLVARIANT_H
-#define LIBRARY_COMPONENTSYMBOLVARIANT_H
+#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H
+#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include "componentsymbolvariantitem.h"
 
 /*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+
+/*****************************************************************************************
  *  Class ComponentSymbolVariant
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The ComponentSymbolVariant class
@@ -101,6 +104,11 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
         QList<ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_COMPONENTSYMBOLVARIANT_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H

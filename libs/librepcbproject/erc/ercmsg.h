@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_ERCMSG_H
-#define PROJECT_ERCMSG_H
+#ifndef LIBREPCB_PROJECT_ERCMSG_H
+#define LIBREPCB_PROJECT_ERCMSG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class IF_ErcMsgProvider;
 class ErcMsgList;
 class Project;
-}
 
 /*****************************************************************************************
  *  Class ErcMsg
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ErcMsg class represents a message in the ERC (Electrical Rule Check) list
@@ -105,6 +102,11 @@ class ErcMsg
         bool mIsIgnored;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_ERCMSG_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_ERCMSG_H

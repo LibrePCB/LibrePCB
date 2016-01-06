@@ -17,17 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGON_H
-#define POLYGON_H
+#ifndef LIBREPCB_POLYGON_H
+#define LIBREPCB_POLYGON_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include "../units/all_length_units.h"
 #include "../fileio/if_xmlserializableobject.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class PolygonSegment
@@ -158,4 +162,10 @@ class Polygon final : public IF_XmlSerializableObject
         mutable QPainterPath mPainterPathPx;
 };
 
-#endif // POLYGON_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_POLYGON_H

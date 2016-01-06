@@ -17,30 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_BOARDLAYERPROVIDER_H
-#define PROJECT_BOARDLAYERPROVIDER_H
+#ifndef LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
+#define LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/if_boardlayerprovider.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
-}
 
 /*****************************************************************************************
  *  Class BoardLayerProvider
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The BoardLayerProvider class provides and manages all available board layers
@@ -79,6 +76,11 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
         QMap<int, BoardLayer*> mLayers;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_BOARDLAYERPROVIDER_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H

@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ELLIPSE_H
-#define ELLIPSE_H
+#ifndef LIBREPCB_ELLIPSE_H
+#define LIBREPCB_ELLIPSE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "../units/all_length_units.h"
 #include "../fileio/if_xmlserializableobject.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class Ellipse
@@ -98,4 +102,10 @@ class Ellipse final : public IF_XmlSerializableObject
         Angle mRotation;
 };
 
-#endif // ELLIPSE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ELLIPSE_H

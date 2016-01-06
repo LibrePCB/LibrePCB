@@ -20,7 +20,6 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <QtWidgets>
 #include <QPrinter>
@@ -30,6 +29,10 @@
 #include <librepcbcommon/schematiclayer.h>
 #include <librepcbcommon/if_schematiclayerprovider.h>
 
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
@@ -165,3 +168,4 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
  ****************************************************************************************/
 
 } // namespace library
+} // namespace librepcb

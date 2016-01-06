@@ -17,29 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRARY_CATEGORYTREEMODEL_H
-#define LIBRARY_CATEGORYTREEMODEL_H
+#ifndef LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
+#define LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace library {
+
 class Library;
 class CategoryTreeItem;
-}
 
 /*****************************************************************************************
  *  Class CategoryTreeModel
  ****************************************************************************************/
-
-namespace library {
 
 /**
  * @brief The CategoryTreeModel class
@@ -78,6 +75,11 @@ class CategoryTreeModel final : public QAbstractItemModel
         CategoryTreeItem* mRootItem;
 };
 
-} // namespace library
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // LIBRARY_CATEGORYTREEMODEL_H
+} // namespace library
+} // namespace librepcb
+
+#endif // LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H

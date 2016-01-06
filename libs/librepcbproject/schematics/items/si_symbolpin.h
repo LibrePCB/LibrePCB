@@ -17,29 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_SI_SYMBOLPIN_H
-#define PROJECT_SI_SYMBOLPIN_H
+#ifndef LIBREPCB_PROJECT_SI_SYMBOLPIN_H
+#define LIBREPCB_PROJECT_SI_SYMBOLPIN_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "si_base.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Circuit;
-class ComponentSignalInstance;
-class SI_Symbol;
-class SI_NetPoint;
-class ErcMsg;
-}
+namespace librepcb {
 
 namespace library {
 class SymbolPin;
@@ -47,11 +39,18 @@ class ComponentSignal;
 class ComponentPinSignalMapItem;
 }
 
+namespace project {
+
+class Circuit;
+class ComponentSignalInstance;
+class SI_Symbol;
+class SI_NetPoint;
+class ErcMsg;
+
+
 /*****************************************************************************************
  *  Class SI_SymbolPin
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The SI_SymbolPin class
@@ -125,6 +124,11 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredPin;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_SI_SYMBOLPIN_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_SI_SYMBOLPIN_H

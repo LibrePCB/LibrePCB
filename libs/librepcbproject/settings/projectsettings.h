@@ -17,32 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECTSETTINGS_H
-#define PROJECT_PROJECTSETTINGS_H
+#ifndef LIBREPCB_PROJECT_PROJECTSETTINGS_H
+#define LIBREPCB_PROJECT_PROJECTSETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+namespace librepcb {
 
 class SmartXmlFile;
 
 namespace project {
+
 class Project;
-}
 
 /*****************************************************************************************
  *  Class ProjectSettings
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ProjectSettings class
@@ -112,6 +110,11 @@ class ProjectSettings final : public QObject, public IF_XmlSerializableObject
         QStringList mNormOrder; ///< the list of norms in the right order
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECTSETTINGS_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECTSETTINGS_H

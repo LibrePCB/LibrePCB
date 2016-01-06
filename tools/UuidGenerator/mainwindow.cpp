@@ -4,6 +4,8 @@
 #include "ui_mainwindow.h"
 #include <librepcbcommon/uuid.h>
 
+using namespace librepcb;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)

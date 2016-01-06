@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRTYPEINDUCTANCE_H
-#define ATTRTYPEINDUCTANCE_H
+#ifndef LIBREPCB_ATTRTYPEINDUCTANCE_H
+#define LIBREPCB_ATTRTYPEINDUCTANCE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include "attributetype.h"
+
+/*****************************************************************************************
+ *  Namespace / Forward Declarations
+ ****************************************************************************************/
+namespace librepcb {
 
 /*****************************************************************************************
  *  Class AttrTypeInductance
@@ -57,4 +61,10 @@ class AttrTypeInductance final : public AttributeType
         ~AttrTypeInductance() noexcept;
 };
 
-#endif // ATTRTYPEINDUCTANCE_H
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace librepcb
+
+#endif // LIBREPCB_ATTRTYPEINDUCTANCE_H

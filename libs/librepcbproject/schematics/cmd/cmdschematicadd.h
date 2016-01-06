@@ -17,31 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_CMDSCHEMATICADD_H
-#define PROJECT_CMDSCHEMATICADD_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICADD_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
+namespace librepcb {
 namespace project {
+
 class Project;
 class Schematic;
-}
 
 /*****************************************************************************************
  *  Class CmdSchematicAdd
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The CmdSchematicAdd class
@@ -70,6 +67,11 @@ class CmdSchematicAdd final : public UndoCommand
         int mPageIndex;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_CMDSCHEMATICADD_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICADD_H

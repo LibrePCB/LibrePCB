@@ -17,25 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROJECT_PROJECTLIBRARY_H
-#define PROJECT_PROJECTLIBRARY_H
+#ifndef LIBREPCB_PROJECT_PROJECTLIBRARY_H
+#define LIBREPCB_PROJECT_PROJECTLIBRARY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Forward Declarations
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
-
-namespace project {
-class Project;
-}
+namespace librepcb {
 
 namespace library {
 class Symbol;
@@ -45,11 +41,13 @@ class Component;
 class Device;
 }
 
+namespace project {
+
+class Project;
+
 /*****************************************************************************************
  *  Class ProjectLibrary
  ****************************************************************************************/
-
-namespace project {
 
 /**
  * @brief The ProjectLibrary class
@@ -145,6 +143,11 @@ class ProjectLibrary final : public QObject
         QHash<Uuid, const library::Device*> mRemovedDevices;
 };
 
-} // namespace project
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
 
-#endif // PROJECT_PROJECTLIBRARY_H
+} // namespace project
+} // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_PROJECTLIBRARY_H
