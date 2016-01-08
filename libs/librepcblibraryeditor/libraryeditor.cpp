@@ -36,7 +36,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryEditor::LibraryEditor(Workspace& workspace) throw (Exception) :
+LibraryEditor::LibraryEditor(workspace::Workspace& workspace) throw (Exception) :
     QMainWindow(0), mWorkspace(workspace), mUi(new Ui::LibraryEditor)
 {
     mUi->setupUi(this);

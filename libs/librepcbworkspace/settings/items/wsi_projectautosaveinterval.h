@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Class WSI_ProjectAutosaveInterval
@@ -98,6 +99,7 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WSI_PROJECTAUTOSAVEINTERVAL_H

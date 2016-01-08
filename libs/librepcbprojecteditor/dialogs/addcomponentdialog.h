@@ -34,7 +34,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class Workspace;
 
 namespace library {
 class Component;
@@ -43,6 +42,10 @@ class Symbol;
 class SymbolPreviewGraphicsItem;
 class CategoryTreeModel;
 class ComponentCategory;
+}
+
+namespace workspace {
+class Workspace;
 }
 
 namespace project {
@@ -72,7 +75,8 @@ class AddComponentDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit AddComponentDialog(Workspace& workspace, Project& project, QWidget* parent = nullptr);
+        explicit AddComponentDialog(workspace::Workspace& workspace, Project& project,
+                                    QWidget* parent = nullptr);
         ~AddComponentDialog() noexcept;
 
         // Getters
@@ -97,7 +101,7 @@ class AddComponentDialog final : public QDialog
 
 
         // General
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         Project& mProject;
         Ui::AddComponentDialog* mUi;
         GraphicsScene* mPreviewScene;

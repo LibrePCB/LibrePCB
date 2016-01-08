@@ -31,6 +31,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -150,4 +151,5 @@ void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

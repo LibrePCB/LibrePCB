@@ -30,6 +30,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -66,4 +67,5 @@ QVariant WSI_Base::loadValue(const QString& key, const QVariant& defaultValue) c
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

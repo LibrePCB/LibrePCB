@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::WorkspaceSettingsDialog</class>
- <widget class="QDialog" name="librepcb::WorkspaceSettingsDialog">
+ <class>librepcb::workspace::WorkspaceSettingsDialog</class>
+ <widget class="QDialog" name="librepcb::workspace::WorkspaceSettingsDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -116,7 +116,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::WorkspaceSettingsDialog</receiver>
+   <receiver>librepcb::workspace::WorkspaceSettingsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -132,7 +132,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::WorkspaceSettingsDialog</receiver>
+   <receiver>librepcb::workspace::WorkspaceSettingsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

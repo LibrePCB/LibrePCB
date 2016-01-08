@@ -36,7 +36,10 @@
 namespace librepcb {
 
 class UndoStack;
+
+namespace workspace {
 class Workspace;
+}
 
 namespace project {
 
@@ -76,7 +79,7 @@ class SES_Base : public QObject
     protected:
 
         // General Attributes which are needed by some state objects
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         Project& mProject;
         Circuit& mCircuit;
         SchematicEditor& mEditor;

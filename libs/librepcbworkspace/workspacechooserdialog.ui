@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::WorkspaceChooserDialog</class>
- <widget class="QDialog" name="librepcb::WorkspaceChooserDialog">
+ <class>librepcb::workspace::WorkspaceChooserDialog</class>
+ <widget class="QDialog" name="librepcb::workspace::WorkspaceChooserDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -69,7 +69,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::WorkspaceChooserDialog</receiver>
+   <receiver>librepcb::workspace::WorkspaceChooserDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -85,7 +85,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::WorkspaceChooserDialog</receiver>
+   <receiver>librepcb::workspace::WorkspaceChooserDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -101,7 +101,7 @@
   <connection>
    <sender>workspacesListWidget</sender>
    <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>librepcb::WorkspaceChooserDialog</receiver>
+   <receiver>librepcb::workspace::WorkspaceChooserDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

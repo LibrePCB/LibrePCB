@@ -30,6 +30,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -128,4 +129,5 @@ ProjectTreeItem* ProjectTreeModel::getItem(const QModelIndex& index) const
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

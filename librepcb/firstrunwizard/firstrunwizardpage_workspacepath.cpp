@@ -47,7 +47,7 @@ FirstRunWizardPage_WorkspacePath::FirstRunWizardPage_WorkspacePath(QWidget *pare
     FilePath defaultWsPath = FilePath(QDir::homePath()).getPathTo("LibrePCB-Workspace");
     mUi->edtCreateWsPath->setText(defaultWsPath.toNative());
     mUi->edtOpenWsPath->setText(defaultWsPath.toNative());
-    if (Workspace::isValidWorkspacePath(defaultWsPath))
+    if (workspace::Workspace::isValidWorkspacePath(defaultWsPath))
         mUi->rbtnOpenWs->setChecked(true);
 }
 
@@ -76,7 +76,7 @@ bool FirstRunWizardPage_WorkspacePath::validatePage() noexcept
     else if (field("OpenWorkspace").toBool())
     {
         FilePath path(field("OpenWorkspacePath").toString());
-        if (!Workspace::isValidWorkspacePath(path))
+        if (!workspace::Workspace::isValidWorkspacePath(path))
         {
             QMessageBox::critical(this, tr("Invalid Directory"),
                 tr("The selected directory is not a valid workspace."));

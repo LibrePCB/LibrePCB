@@ -32,11 +32,6 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class ProjectTreeModel;
-class RecentProjectsModel;
-class FavoriteProjectsModel;
-class WorkspaceSettings;
-
 namespace library{
 class Library;
 }
@@ -44,6 +39,13 @@ class Library;
 namespace project{
 class Project;
 }
+
+namespace workspace {
+
+class ProjectTreeModel;
+class RecentProjectsModel;
+class FavoriteProjectsModel;
+class WorkspaceSettings;
 
 /*****************************************************************************************
  *  Class Workspace
@@ -218,6 +220,7 @@ class Workspace final : public QObject
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_H

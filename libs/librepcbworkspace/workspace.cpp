@@ -42,6 +42,8 @@ namespace librepcb {
 using namespace library;
 using namespace project;
 
+namespace workspace {
+
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -234,4 +236,5 @@ FilePath Workspace::chooseWorkspacePath() noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

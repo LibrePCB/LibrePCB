@@ -28,6 +28,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -117,4 +118,5 @@ void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex()
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

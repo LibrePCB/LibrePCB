@@ -40,6 +40,7 @@
 namespace librepcb {
 
 using namespace project;
+using namespace workspace;
 
 /*****************************************************************************************
  *  Constructors / Destructor

@@ -32,7 +32,9 @@
  ****************************************************************************************/
 namespace librepcb {
 
+namespace workspace {
 class Workspace;
+}
 
 namespace library {
 
@@ -56,7 +58,7 @@ class LibraryEditor final : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit LibraryEditor(Workspace& workspace) throw (Exception);
+        explicit LibraryEditor(workspace::Workspace& workspace) throw (Exception);
         ~LibraryEditor() noexcept;
 
 
@@ -67,7 +69,7 @@ class LibraryEditor final : public QMainWindow
         LibraryEditor& operator=(const LibraryEditor& rhs);
 
         // Attributes
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         Ui::LibraryEditor* mUi;
 };
 

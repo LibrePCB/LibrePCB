@@ -28,6 +28,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -102,4 +103,5 @@ void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value)
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

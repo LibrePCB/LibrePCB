@@ -29,6 +29,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -136,4 +137,5 @@ QVariant ProjectTreeItem::data(int role) const
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

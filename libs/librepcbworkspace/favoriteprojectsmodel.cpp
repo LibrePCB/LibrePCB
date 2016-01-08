@@ -30,6 +30,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -144,4 +145,5 @@ QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

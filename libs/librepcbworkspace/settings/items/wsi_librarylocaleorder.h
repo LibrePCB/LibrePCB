@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Class WSI_LibraryLocaleOrder
@@ -112,6 +113,7 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WSI_LIBRARYLOCALEORDER_H

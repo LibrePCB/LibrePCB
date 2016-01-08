@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 class Workspace;
 class ProjectTreeItem;
@@ -83,6 +84,7 @@ class ProjectTreeModel : public QAbstractItemModel
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_PROJECTTREEMODEL_H

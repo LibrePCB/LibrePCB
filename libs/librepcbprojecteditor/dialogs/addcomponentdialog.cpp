@@ -51,7 +51,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project, QWidget* parent) :
+AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project& project,
+                                       QWidget* parent) :
     QDialog(parent), mWorkspace(workspace), mProject(project),
     mUi(new Ui::AddComponentDialog), mPreviewScene(nullptr), mCategoryTreeModel(nullptr),
     mSelectedComponent(nullptr), mSelectedSymbVar(nullptr)

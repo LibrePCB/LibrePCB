@@ -33,11 +33,14 @@
 namespace librepcb {
 
 class FilePath;
-class Workspace;
 
 namespace project {
 class Project;
 class ProjectEditor;
+}
+
+namespace workspace {
+class Workspace;
 }
 
 namespace Ui {
@@ -61,7 +64,7 @@ class ControlPanel final : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit ControlPanel(Workspace& workspace);
+        explicit ControlPanel(workspace::Workspace& workspace);
         ~ControlPanel();
 
 
@@ -173,7 +176,7 @@ class ControlPanel final : public QMainWindow
 
 
         // Attributes
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         Ui::ControlPanel* mUi;
         QHash<QString, project::ProjectEditor*> mOpenProjectEditors;
 };

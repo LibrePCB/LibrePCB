@@ -28,6 +28,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -148,4 +149,5 @@ void WSI_AppLocale::updateComboBoxIndex()
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

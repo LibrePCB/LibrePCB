@@ -38,8 +38,11 @@ class QMainWindow;
 
 namespace librepcb {
 
-class Workspace;
 class UndoStack;
+
+namespace workspace {
+class Workspace;
+}
 
 namespace project {
 
@@ -68,7 +71,7 @@ class ProjectEditor final : public QObject
         /**
          * @brief The constructor
          */
-        explicit ProjectEditor(Workspace& workspace, Project& project) throw (Exception);
+        explicit ProjectEditor(workspace::Workspace& workspace, Project& project) throw (Exception);
 
         /**
          * @brief The destructor
@@ -78,7 +81,7 @@ class ProjectEditor final : public QObject
 
         // Getters: General
 
-        Workspace& getWorkspace() const noexcept {return mWorkspace;}
+        workspace::Workspace& getWorkspace() const noexcept {return mWorkspace;}
         Project& getProject() const noexcept {return mProject;}
 
         /**
@@ -202,7 +205,7 @@ class ProjectEditor final : public QObject
 
 
         // Attributes
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         Project& mProject;
 
         // General

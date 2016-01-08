@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Class WSI_AppLocale
@@ -107,6 +108,7 @@ class WSI_AppLocale final : public WSI_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WSI_APPLOCALE_H

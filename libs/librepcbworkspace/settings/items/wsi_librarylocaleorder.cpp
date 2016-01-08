@@ -28,6 +28,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -201,4 +202,5 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems()
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb

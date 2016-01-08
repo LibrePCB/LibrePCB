@@ -41,7 +41,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectEditor::ProjectEditor(Workspace& workspace, Project& project) throw (Exception) :
+ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project) throw (Exception) :
     QObject(nullptr), mWorkspace(workspace), mProject(project), mUndoStack(nullptr),
     mSchematicEditor(nullptr), mBoardEditor(nullptr)
 {

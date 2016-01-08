@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace workspace {
 
 /*****************************************************************************************
  *  Class WSI_AppDefaultMeasurementUnits
@@ -101,6 +102,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H

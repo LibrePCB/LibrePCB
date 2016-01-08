@@ -30,12 +30,13 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class WorkspaceSettings;
+namespace workspace {
 
 namespace Ui {
 class WorkspaceSettingsDialog;
 }
+
+class WorkspaceSettings;
 
 /*****************************************************************************************
  *  Class WorkspaceSettingsDialog
@@ -89,6 +90,7 @@ class WorkspaceSettingsDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACESETTINGSDIALOG_H
