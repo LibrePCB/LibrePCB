@@ -33,13 +33,13 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class GraphicsView;
 class GraphicsScene;
 
 namespace library {
 class Device;
 class Package;
 class Footprint;
+class FootprintPreviewGraphicsItem;
 }
 
 namespace project {
@@ -59,6 +59,8 @@ class UnplacedComponentsDock;
 
 /**
  * @brief The UnplacedComponentsDock class
+ *
+ * @todo This class is very provisional and may contain dangerous bugs...
  */
 class UnplacedComponentsDock final : public QDockWidget
 {
@@ -77,7 +79,8 @@ class UnplacedComponentsDock final : public QDockWidget
     private slots:
 
         void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
-        void on_cbxSelectedComponent_currentIndexChanged(int index);
+        void on_cbxSelectedDevice_currentIndexChanged(int index);
+        void on_cbxSelectedFootprint_currentIndexChanged(int index);
         void on_btnAdd_clicked();
         void on_pushButton_clicked();
         void on_btnAddAll_clicked();
@@ -95,8 +98,8 @@ class UnplacedComponentsDock final : public QDockWidget
         void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
         void setSelectedDeviceAndPackage(const library::Device* device,
                                          const library::Package* package) noexcept;
-        void addDevice(ComponentInstance& cmp, const Uuid& deviceUuid,
-                       const Uuid& footprintUuid) noexcept;
+        void setSelectedFootprintUuid(const Uuid& uuid) noexcept;
+        void addDevice(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
 
 
         // General
@@ -104,11 +107,12 @@ class UnplacedComponentsDock final : public QDockWidget
         Project& mProject;
         Board* mBoard;
         Ui::UnplacedComponentsDock* mUi;
-        GraphicsView* mFootprintPreviewGraphicsView;
         GraphicsScene* mFootprintPreviewGraphicsScene;
+        library::FootprintPreviewGraphicsItem* mFootprintPreviewGraphicsItem;
         ComponentInstance* mSelectedComponent;
         const library::Device* mSelectedDevice;
         const library::Package* mSelectedPackage;
+        Uuid mSelectedFootprintUuid;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;
         QMetaObject::Connection mBoardConnection1;
