@@ -59,6 +59,16 @@ FootprintPadSmt::~FootprintPadSmt() noexcept
  *  Getters
  ****************************************************************************************/
 
+int FootprintPadSmt::getLayerId() const noexcept
+{
+    switch (mBoardSide)
+    {
+        case BoardSide_t::TOP:      return BoardLayer::LayerID::TopCopper;
+        case BoardSide_t::BOTTOM:   return BoardLayer::LayerID::BottomCopper;
+        default: Q_ASSERT(false);   return -1;
+    }
+}
+
 const QPainterPath& FootprintPadSmt::toQPainterPathPx() const noexcept
 {
     if (mPainterPathPx.isEmpty()) {

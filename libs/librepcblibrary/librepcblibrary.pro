@@ -47,7 +47,9 @@ HEADERS += \
     pkg/packagepad.h \
     pkg/footprintpadtht.h \
     pkg/footprintpadsmt.h \
-    cmp/componentpinsignalmapitem.h
+    cmp/componentpinsignalmapitem.h \
+    pkg/footprintpadpreviewgraphicsitem.h \
+    pkg/footprintpreviewgraphicsitem.h
 
 SOURCES += \
     cat/componentcategory.cpp \
@@ -75,5 +77,7 @@ SOURCES += \
     pkg/packagepad.cpp \
     pkg/footprintpadtht.cpp \
     pkg/footprintpadsmt.cpp \
-    cmp/componentpinsignalmapitem.cpp
+    cmp/componentpinsignalmapitem.cpp \
+    pkg/footprintpadpreviewgraphicsitem.cpp \
+    pkg/footprintpreviewgraphicsitem.cpp
 

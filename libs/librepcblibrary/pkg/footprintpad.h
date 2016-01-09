@@ -67,6 +67,7 @@ class FootprintPad : public IF_XmlSerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
         const Length& getWidth() const noexcept {return mWidth;}
         const Length& getHeight() const noexcept {return mHeight;}
+        virtual int getLayerId() const noexcept = 0;
         QRectF getBoundingRectPx() const noexcept;
         virtual const QPainterPath& toQPainterPathPx() const noexcept = 0;
 

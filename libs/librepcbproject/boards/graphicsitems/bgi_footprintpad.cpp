@@ -113,7 +113,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 
     Q_ASSERT(mPadLayer); if (!mPadLayer) return;
     if (mPadLayer->isVisible()) {
-        painter->setPen(QPen(mPadLayer->getColor(mPad.isSelected()), 0));
+        painter->setPen(Qt::NoPen);
         painter->setBrush(mPadLayer->getColor(mPad.isSelected()));
         painter->drawPath(mLibPad.toQPainterPathPx());
     }

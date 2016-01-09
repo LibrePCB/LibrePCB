@@ -17,76 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
+#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include "footprintpad.h"
-#include <librepcbcommon/geometry/polygon.h>
+#include <QtCore>
+#include <QtWidgets>
+#include <librepcbcommon/graphics/graphicsitem.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class BoardLayer;
+class IF_BoardLayerProvider;
+
 namespace library {
 
+class PackagePad;
+class FootprintPad;
+
 /*****************************************************************************************
- *  Class FootprintPadSmt
+ *  Class FootprintPadPreviewGraphicsItem
  ****************************************************************************************/
 
 /**
- * @brief The FootprintPadSmt class
+ * @brief The FootprintPadPreviewGraphicsItem class
+ *
+ * @author ubruhin
+ * @date 2016-01-09
  */
-class FootprintPadSmt final : public FootprintPad
+class FootprintPadPreviewGraphicsItem final : public GraphicsItem
 {
-        Q_DECLARE_TR_FUNCTIONS(FootprintPadSmt)
-
     public:
 
-        // Types
-        enum class BoardSide_t { TOP, BOTTOM };
-
         // Constructors / Destructor
-        explicit FootprintPadSmt(const Uuid& padUuid, const Point& pos, const Angle& rot,
-                                 const Length& width, const Length& height, BoardSide_t side) noexcept;
-        explicit FootprintPadSmt(const XmlDomElement& domElement) throw (Exception);
-        ~FootprintPadSmt() noexcept;
-
-        // Getters
-        BoardSide_t getBoardSide() const noexcept {return mBoardSide;}
-        int getLayerId() const noexcept override;
-        const QPainterPath& toQPainterPathPx() const noexcept override;
+        explicit FootprintPadPreviewGraphicsItem(const IF_BoardLayerProvider& layerProvider,
+                                                 const FootprintPad& fptPad,
+                                                 const PackagePad* pkgPad = nullptr) noexcept;
+        ~FootprintPadPreviewGraphicsItem() noexcept;
 
         // Setters
-        void setBoardSide(BoardSide_t side) noexcept;
+        void setDrawBoundingRect(bool enable) noexcept {mDrawBoundingRect = enable;}
 
         // General Methods
+        void updateCacheAndRepaint() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        // Static Methods
-        static BoardSide_t stringToBoardSide(const QString& side) throw (Exception);
-        static QString boardSideToString(BoardSide_t side) noexcept;
+        // Inherited from QGraphicsItem
+        QRectF boundingRect() const noexcept {return mBoundingRect;}
+        QPainterPath shape() const noexcept {return mShape;}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
 
     private:
 
         // make some methods inaccessible...
-        FootprintPadSmt() = delete;
-        FootprintPadSmt(const FootprintPadSmt& other) = delete;
-        FootprintPadSmt& operator=(const FootprintPadSmt& rhs) = delete;
-
-        // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        FootprintPadPreviewGraphicsItem() = delete;
+        FootprintPadPreviewGraphicsItem(const FootprintPadPreviewGraphicsItem& other) = delete;
+        FootprintPadPreviewGraphicsItem& operator=(const FootprintPadPreviewGraphicsItem& rhs) = delete;
 
 
-        // Pin Attributes
-        BoardSide_t mBoardSide;
+        // General Attributes
+        const FootprintPad& mFootprintPad;
+        const PackagePad* mPackagePad;
+        BoardLayer* mLayer;
+        bool mDrawBoundingRect;
+
+        // Cached Attributes
+        QRectF mBoundingRect;
+        QPainterPath mShape;
 };
 
 /*****************************************************************************************
@@ -96,4 +98,4 @@ class FootprintPadSmt final : public FootprintPad
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
+#endif // LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H

@@ -61,10 +61,15 @@ FootprintPadTht::~FootprintPadTht() noexcept
  *  Getters
  ****************************************************************************************/
 
+int FootprintPadTht::getLayerId() const noexcept
+{
+    return BoardLayer::LayerID::Vias;
+}
+
 const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept
 {
     if (mPainterPathPx.isEmpty()) {
-        mPainterPathPx.setFillRule(Qt::WindingFill);
+        mPainterPathPx.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
         QRectF rect = getBoundingRectPx();
         switch (mShape)
         {
@@ -95,6 +100,8 @@ const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept
             }
             default: Q_ASSERT(false); break;
         }
+        // remove hole
+        mPainterPathPx.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
     }
     return mPainterPathPx;
 }

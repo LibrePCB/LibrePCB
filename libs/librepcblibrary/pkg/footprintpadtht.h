@@ -57,6 +57,7 @@ class FootprintPadTht final : public FootprintPad
         // Getters
         Shape_t getShape() const noexcept {return mShape;}
         const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
+        int getLayerId() const noexcept override;
         const QPainterPath& toQPainterPathPx() const noexcept override;
 
         // Setters

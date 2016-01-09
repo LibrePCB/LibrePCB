@@ -49,8 +49,8 @@ BoardLayer::BoardLayer(int id) :
 
         case OriginCrosses:
             mName = tr("Origin Crosses");
-            mColor = QColor(0, 0, 0, 50);
-            mColorHighlighted = QColor(0, 0, 0, 80);
+            mColor = QColor(255, 255, 255, 50);
+            mColorHighlighted = QColor(255, 255, 255, 80);
             mIsVisible = true;
             break;
 
