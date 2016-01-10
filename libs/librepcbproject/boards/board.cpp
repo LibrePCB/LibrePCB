@@ -99,6 +99,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         // emit the "attributesChanged" signal when the project has emited it
         connect(&mProject, &Project::attributesChanged, this, &Board::attributesChanged);
 
+        connect(&mProject.getCircuit(), &Circuit::componentAdded, this, &Board::updateErcMessages);
+        connect(&mProject.getCircuit(), &Circuit::componentRemoved, this, &Board::updateErcMessages);
+
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
@@ -414,12 +417,13 @@ void Board::updateErcMessages() noexcept
     // type: UnplacedComponent (ComponentInstances without DeviceInstance)
     if (mAddedToProject)
     {
-        foreach (const ComponentInstance* component, mProject.getCircuit().getComponentInstances())
+        const QHash<Uuid, ComponentInstance*>& componentInstances = mProject.getCircuit().getComponentInstances();
+        foreach (const ComponentInstance* component, componentInstances)
         {
             if (component->getLibComponent().isSchematicOnly()) continue;
-            DeviceInstance* comp = mDeviceInstances.value(component->getUuid());
+            DeviceInstance* device = mDeviceInstances.value(component->getUuid());
             ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(component->getUuid());
-            if ((!comp) && (!ercMsg))
+            if ((!device) && (!ercMsg))
             {
                 ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
                     component->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
@@ -427,10 +431,14 @@ void Board::updateErcMessages() noexcept
                 ercMsg->setVisible(true);
                 mErcMsgListUnplacedComponentInstances.insert(component->getUuid(), ercMsg);
             }
-            else if ((comp) && (ercMsg))
+            else if ((device) && (ercMsg))
             {
                 delete mErcMsgListUnplacedComponentInstances.take(component->getUuid());
             }
+        }
+        foreach (const Uuid& uuid, mErcMsgListUnplacedComponentInstances.keys()) {
+            if (!componentInstances.contains(uuid))
+                delete mErcMsgListUnplacedComponentInstances.take(uuid);
         }
     }
     else

@@ -289,6 +289,8 @@ void ComponentInstance::addToCircuit() throw (Exception)
 void ComponentInstance::removeFromCircuit() throw (Exception)
 {
     if (!mAddedToCircuit) throw LogicError(__FILE__, __LINE__);
+    if (!mSymbols.isEmpty()) throw LogicError(__FILE__, __LINE__);
+    if (!mDeviceInstances.isEmpty()) throw LogicError(__FILE__, __LINE__);
 
     foreach (ComponentSignalInstance* signal, mSignals)
         signal->removeFromCircuit();

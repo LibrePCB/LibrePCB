@@ -53,6 +53,8 @@
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlabelremove.h>
 #include <librepcbcommon/gridproperties.h>
+#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcbproject/boards/board.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -717,11 +719,18 @@ bool SES_Select::removeSelectedItems() noexcept
             }
         }
 
-        // remove components
+        // remove devices and components
         foreach (auto component, componentInstances)
         {
             if (component->getPlacedSymbolsCount() == 0)
             {
+                foreach (Board* board, mProject.getBoards()) {
+                    DeviceInstance* dev = board->getDeviceInstanceByComponentUuid(component->getUuid());
+                    if (dev) {
+                        CmdDeviceInstanceRemove* cmd = new CmdDeviceInstanceRemove(*board, *dev);
+                        mUndoStack.appendToCommand(cmd);
+                    }
+                }
                 CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *component);
                 mUndoStack.appendToCommand(cmd);
             }
