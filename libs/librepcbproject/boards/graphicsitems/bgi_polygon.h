@@ -17,72 +17,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_BASE_H
-#define LIBREPCB_PROJECT_BI_BASE_H
+#ifndef LIBREPCB_PROJECT_BGI_POLYGON_H
+#define LIBREPCB_PROJECT_BGI_POLYGON_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/units/all_length_units.h>
+#include "bgi_base.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
+class Polygon;
+class BoardLayer;
 
 namespace project {
 
+class BI_Polygon;
+
 /*****************************************************************************************
- *  Class BI_Base
+ *  Class BGI_Polygon
  ****************************************************************************************/
 
 /**
- * @brief The Board Item Base (BI_Base) class
+ * @brief The BGI_Polygon class
+ *
+ * @author ubruhin
+ * @date 2016-01-12
  */
-class BI_Base : public QObject
+class BGI_Polygon final : public BGI_Base
 {
-        Q_OBJECT
-
     public:
 
-        // Types
-        enum class Type_t {
-            //NetPoint,       ///< #project#BI_NetPoint
-            //NetLine,        ///< #project#BI_NetLine
-            //NetLabel,       ///< #project#BI_NetLabel
-            Footprint,      ///< librepcb#project#BI_Footprint
-            FootprintPad,   ///< librepcb#project#BI_FootprintPad
-            Polygon,        ///< librepcb#project#BI_Polygon
-        };
-
         // Constructors / Destructor
-        explicit BI_Base() noexcept;
-        virtual ~BI_Base() noexcept;
+        explicit BGI_Polygon(BI_Polygon& polygon) noexcept;
+        ~BGI_Polygon() noexcept;
 
-        // Getters
-        virtual Type_t getType() const noexcept = 0;
-        virtual const Point& getPosition() const noexcept = 0;
-        virtual bool getIsMirrored() const noexcept = 0;
-        bool isSelected() const noexcept {return mIsSelected;}
-        virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+        // General Methods
+        void updateCacheAndRepaint() noexcept;
 
-        // Setters
-        virtual void setSelected(bool selected) noexcept;
+        // Inherited from QGraphicsItem
+        QRectF boundingRect() const noexcept {return mBoundingRect;}
+        QPainterPath shape() const noexcept {return mShape;}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
 
     private:
 
         // make some methods inaccessible...
-        //BI_Base() = delete;
-        BI_Base(const BI_Base& other) = delete;
-        BI_Base& operator=(const BI_Base& rhs) = delete;
+        BGI_Polygon() = delete;
+        BGI_Polygon(const BGI_Polygon& other) = delete;
+        BGI_Polygon& operator=(const BGI_Polygon& rhs) = delete;
 
         // General Attributes
-        bool mIsSelected;
+        BI_Polygon& mBiPolygon;
+        const Polygon& mPolygon;
+
+        // Cached Attributes
+        BoardLayer* mLayer;
+        QRectF mBoundingRect;
+        QPainterPath mShape;
 };
 
 /*****************************************************************************************
@@ -92,4 +90,4 @@ class BI_Base : public QObject
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_BASE_H
+#endif // LIBREPCB_PROJECT_BGI_POLYGON_H

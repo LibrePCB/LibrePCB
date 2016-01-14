@@ -48,6 +48,7 @@ namespace project {
 class Project;
 class DeviceInstance;
 class BI_Base;
+class BI_Polygon;
 
 /*****************************************************************************************
  *  Class Board
@@ -118,11 +119,17 @@ class Board final : public QObject, public IF_AttributeProvider,
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // DeviceInstance Methods
-        const QHash<Uuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
+        const QMap<Uuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
         DeviceInstance* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
-        DeviceInstance* createDeviceInstance() throw (Exception);
+        //DeviceInstance* createDeviceInstance() throw (Exception);
         void addDeviceInstance(DeviceInstance& instance) throw (Exception);
         void removeDeviceInstance(DeviceInstance& instance) throw (Exception);
+
+        // Polygon Methods
+        const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
+        //BI_Polygon* createPolygon() throw (Exception);
+        void addPolygon(BI_Polygon& polygon) throw (Exception);
+        void removePolygon(BI_Polygon& polygon) throw (Exception);
 
         // General Methods
         void addToProject() throw (Exception);
@@ -192,7 +199,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
 
         // items
-        QHash<Uuid, DeviceInstance*> mDeviceInstances;
+        QMap<Uuid, DeviceInstance*> mDeviceInstances;
+        QList<BI_Polygon*> mPolygons;
 };
 
 /*****************************************************************************************

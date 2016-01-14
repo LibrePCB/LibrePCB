@@ -83,7 +83,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         Project& getProject() const noexcept {return mProject;}
 
         // NetClass Methods
-        const QHash<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
+        const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
         void addNetClass(NetClass& netclass) throw (Exception);
@@ -91,7 +91,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
 
         // NetSignal Methods
-        const QHash<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
+        const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
         NetSignal* createNetSignal(NetClass& netclass, QString name = QString()) throw (Exception);
@@ -100,7 +100,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // ComponentInstance Methods
-        const QHash<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
+        const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
         ComponentInstance* createComponentInstance(const library::Component& cmp,
@@ -147,9 +147,9 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         FilePath mXmlFilepath;
         SmartXmlFile* mXmlFile;
 
-        QHash<Uuid, NetClass*> mNetClasses;
-        QHash<Uuid, NetSignal*> mNetSignals;
-        QHash<Uuid, ComponentInstance*> mComponentInstances;
+        QMap<Uuid, NetClass*> mNetClasses;
+        QMap<Uuid, NetSignal*> mNetSignals;
+        QMap<Uuid, ComponentInstance*> mComponentInstances;
 };
 
 /*****************************************************************************************

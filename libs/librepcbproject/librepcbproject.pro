@@ -88,7 +88,9 @@ SOURCES += \
     circuit/cmd/cmdcomponentinstanceadd.cpp \
     circuit/cmd/cmdcomponentinstanceedit.cpp \
     circuit/cmd/cmdcomponentinstanceremove.cpp \
-    circuit/cmd/cmdcompsiginstsetnetsignal.cpp
+    circuit/cmd/cmdcompsiginstsetnetsignal.cpp \
+    boards/items/bi_polygon.cpp \
+    boards/graphicsitems/bgi_polygon.cpp
 
 HEADERS += \
     project.h \
@@ -159,6 +161,8 @@ HEADERS += \
     circuit/cmd/cmdcomponentinstanceadd.h \
     circuit/cmd/cmdcomponentinstanceedit.h \
     circuit/cmd/cmdcomponentinstanceremove.h \
-    circuit/cmd/cmdcompsiginstsetnetsignal.h
+    circuit/cmd/cmdcompsiginstsetnetsignal.h \
+    boards/items/bi_polygon.h \
+    boards/graphicsitems/bgi_polygon.h
 
 FORMS +=

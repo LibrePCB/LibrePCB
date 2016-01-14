@@ -223,8 +223,8 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
 
     if (mBoard)
     {
-        const QHash<Uuid, ComponentInstance*> componentsList = mProject.getCircuit().getComponentInstances();
-        const QHash<Uuid, DeviceInstance*> boardDeviceList = mBoard->getDeviceInstances();
+        const QMap<Uuid, ComponentInstance*> componentsList = mProject.getCircuit().getComponentInstances();
+        const QMap<Uuid, DeviceInstance*> boardDeviceList = mBoard->getDeviceInstances();
         foreach (ComponentInstance* component, componentsList)
         {
             if (boardDeviceList.contains(component->getUuid())) continue;

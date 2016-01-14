@@ -37,6 +37,7 @@
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include <librepcblibrary/cmp/component.h>
+#include "items/bi_polygon.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -91,6 +92,23 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                 DeviceInstance* comp = new DeviceInstance(*this, *node);
                 addDeviceInstance(*comp);
             }
+
+            // Load all geometry elements
+            for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
+                 node; node = node->getNextSibling())
+            {
+                if (node->getName() == "polygon")
+                {
+                    BI_Polygon* polygon = new BI_Polygon(*this, *node);
+                    addPolygon(*polygon);
+                }
+                else
+                {
+                    throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                        QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
+                        .arg(node->getName(), mFilePath.toNative()));
+                }
+            }
         }
 
         updateErcMessages();
@@ -107,6 +125,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
+        foreach (BI_Polygon* polygon, mPolygons)
+            try { removePolygon(*polygon); delete polygon; } catch (...) {}
         foreach (DeviceInstance* dev, mDeviceInstances)
             try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
         delete mGridProperties;         mGridProperties = nullptr;
@@ -119,6 +139,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 Board::~Board() noexcept
 {
     // delete all component instances (and catch all throwed exceptions)
+    foreach (BI_Polygon* polygon, mPolygons)
+        try { removePolygon(*polygon); delete polygon; } catch (...) {}
     foreach (DeviceInstance* dev, mDeviceInstances)
         try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
 
@@ -243,16 +265,16 @@ DeviceInstance* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const 
     return mDeviceInstances.value(uuid, nullptr);
 }
 
-DeviceInstance* Board::createDeviceInstance() throw (Exception)
+/*DeviceInstance* Board::createDeviceInstance() throw (Exception)
 {
-    /*if (getComponentInstanceByName(name))
+    if (getComponentInstanceByName(name))
     {
         throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
             "name \"%1\" does already exist in the circuit.")).arg(name));
     }
-    return new ComponentInstance(*this, cmp, symbVar, name);*/
+    return new ComponentInstance(*this, cmp, symbVar, name);
     return nullptr; // TODO
-}
+}*/
 
 void Board::addDeviceInstance(DeviceInstance& instance) throw (Exception)
 {
@@ -280,6 +302,35 @@ void Board::removeDeviceInstance(DeviceInstance& instance) throw (Exception)
     mDeviceInstances.remove(instance.getComponentInstance().getUuid());
     updateErcMessages();
     emit deviceRemoved(instance);
+}
+
+/*****************************************************************************************
+ *  Polygon Methods
+ ****************************************************************************************/
+
+/*BI_Polygon* Board::createPolygon() throw (Exception)
+{
+    if (getComponentInstanceByName(name))
+    {
+        throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
+            "name \"%1\" does already exist in the circuit.")).arg(name));
+    }
+    return new ComponentInstance(*this, cmp, symbVar, name);
+    return nullptr; // TODO
+}*/
+
+void Board::addPolygon(BI_Polygon& polygon) throw (Exception)
+{
+    Q_ASSERT(!mPolygons.contains(&polygon));
+    polygon.addToBoard(*mGraphicsScene);
+    mPolygons.append(&polygon);
+}
+
+void Board::removePolygon(BI_Polygon& polygon) throw (Exception)
+{
+    Q_ASSERT(mPolygons.contains(&polygon));
+    polygon.removeFromBoard(*mGraphicsScene);
+    mPolygons.removeAll(&polygon);
 }
 
 /*****************************************************************************************
@@ -409,6 +460,9 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* components = root->appendChild("device_instances");
     foreach (DeviceInstance* component, mDeviceInstances)
         components->appendChild(component->serializeToXmlDomElement());
+    XmlDomElement* geometry = root->appendChild("geometry");
+    foreach (BI_Polygon* polygon, mPolygons)
+        geometry->appendChild(polygon->serializeToXmlDomElement());
     return root.take();
 }
 
@@ -417,7 +471,7 @@ void Board::updateErcMessages() noexcept
     // type: UnplacedComponent (ComponentInstances without DeviceInstance)
     if (mAddedToProject)
     {
-        const QHash<Uuid, ComponentInstance*>& componentInstances = mProject.getCircuit().getComponentInstances();
+        const QMap<Uuid, ComponentInstance*>& componentInstances = mProject.getCircuit().getComponentInstances();
         foreach (const ComponentInstance* component, componentInstances)
         {
             if (component->getLibComponent().isSchematicOnly()) continue;

@@ -63,14 +63,14 @@ BoardLayer::BoardLayer(int id) :
 
         case FootprintGrabAreas:
             mName = tr("Footprint Grab Areas");
-            mColor = QColor(255, 255, 0, 30);
-            mColorHighlighted = QColor(255, 255, 0, 50);
+            mColor = QColor(255, 255, 0, 0);            // transparent
+            mColorHighlighted = QColor(255, 255, 0, 0); // transparent
             mIsVisible = true;
             break;
 
         case BoardOutline:
             mName = tr("Board Outline");
-            mColor = QColor(255, 255, 255, 150);
+            mColor = QColor(255, 255, 255, 180);
             mColorHighlighted = QColor(255, 255, 255, 220);
             mIsVisible = true;
             break;
