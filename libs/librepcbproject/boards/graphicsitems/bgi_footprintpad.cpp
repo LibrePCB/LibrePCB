@@ -78,17 +78,14 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
         const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad);
         Q_ASSERT(smt);
-        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) || (mPad.getIsMirrored())) {
-            mPadLayer = getBoardLayer(BoardLayer::LayerID::BottomCopper);
+        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) != mPad.getIsMirrored())
             setZValue(Board::ZValue_FootprintPadsBottom);
-        } else {
-            mPadLayer = getBoardLayer(BoardLayer::LayerID::TopCopper);
+        else
             setZValue(Board::ZValue_FootprintPadsTop);
-        }
     } else {
-        mPadLayer = getBoardLayer(BoardLayer::LayerID::Vias);
         setZValue(Board::ZValue_FootprintPadsTop);
     }
+    mPadLayer = getBoardLayer(mLibPad.getLayerId());
     Q_ASSERT(mPadLayer);
 
     // rotation
