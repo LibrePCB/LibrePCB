@@ -54,9 +54,8 @@ namespace project {
 BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     QMainWindow(0), mProjectEditor(projectEditor), mProject(project),
     mUi(new Ui::BoardEditor),
-    mGraphicsView(nullptr), mGridProperties(nullptr), mActiveBoardIndex(-1),
-    mBoardListActionGroup(this), mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr),
-    mFsm(nullptr)
+    mGraphicsView(nullptr), mActiveBoardIndex(-1), mBoardListActionGroup(this),
+    mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr), mFsm(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
@@ -72,13 +71,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
 
-    // create default grid properties
-    mGridProperties = new GridProperties();
-
     // add graphics view as central widget
     mGraphicsView = new GraphicsView(nullptr, this);
     mGraphicsView->setUseOpenGl(mProjectEditor.getWorkspace().getSettings().getAppearance()->getUseOpenGl());
-    mGraphicsView->setGridProperties(*mGridProperties);
     mGraphicsView->setBackgroundBrush(Qt::black);
     mGraphicsView->setForegroundBrush(Qt::white);
     //setCentralWidget(mGraphicsView);
@@ -207,7 +202,6 @@ BoardEditor::~BoardEditor()
     delete mUnplacedComponentsDock; mUnplacedComponentsDock = nullptr;
     delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mGraphicsView;           mGraphicsView = nullptr;
-    delete mGridProperties;         mGridProperties = nullptr;
     delete mUi;                     mUi = nullptr;
 }
 
@@ -363,17 +357,19 @@ void BoardEditor::on_actionRedo_triggered()
 
 void BoardEditor::on_actionGrid_triggered()
 {
-    GridSettingsDialog dialog(*mGridProperties, this);
-    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-            [this](const GridProperties& grid)
-            {   *mGridProperties = grid;
-                mGraphicsView->setGridProperties(grid);
-            });
-    if (dialog.exec())
-    {
-        foreach (Board* board, mProject.getBoards())
-            board->setGridProperties(*mGridProperties);
-        //mProjectEditor.setModifiedFlag(); TODO
+    Board* board = getActiveBoard();
+    if (board) {
+        GridSettingsDialog dialog(board->getGridProperties(), this);
+        connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+                [this](const GridProperties& grid)
+                {mGraphicsView->setGridProperties(grid);});
+        if (dialog.exec())
+        {
+            foreach (Board* board, mProject.getBoards())
+                board->setGridProperties(dialog.getGrid());
+            mGraphicsView->setGridProperties(board->getGridProperties());
+            //mProjectEditor.setModifiedFlag(); TODO
+        }
     }
 }
 

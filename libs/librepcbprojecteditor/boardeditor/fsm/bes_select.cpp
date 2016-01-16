@@ -397,7 +397,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(board); if (!board) break;
             Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
-            delta.mapToGrid(mEditor.getGridProperties().getInterval());
+            delta.mapToGrid(board->getGridProperties().getInterval());
 
             switch (sceneEvent->button())
             {
@@ -449,7 +449,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
 
             // get delta position
             Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
-            delta.mapToGrid(mEditor.getGridProperties().getInterval());
+            delta.mapToGrid(board->getGridProperties().getInterval());
             if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
 
             // move selected elements
@@ -528,7 +528,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
         foreach (BI_Base* item, items)
             center += item->getPosition();
         center /= items.count();
-        center.mapToGrid(mEditor.getGridProperties().getInterval());
+        center.mapToGrid(board->getGridProperties().getInterval());
     }
 
     bool commandActive = false;
@@ -589,7 +589,7 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
         foreach (BI_Base* item, items)
             center += item->getPosition();
         center /= items.count();
-        center.mapToGrid(mEditor.getGridProperties().getInterval());
+        center.mapToGrid(board->getGridProperties().getInterval());
     }
 
     bool commandActive = false;

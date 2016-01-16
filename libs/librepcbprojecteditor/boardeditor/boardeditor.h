@@ -70,7 +70,6 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         Project& getProject() const noexcept {return mProject;}
         int getActiveBoardIndex() const noexcept {return mActiveBoardIndex;}
         Board* getActiveBoard() const noexcept;
-        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
 
         // Setters
         bool setActiveBoardIndex(int index) noexcept;
@@ -123,7 +122,6 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         Project& mProject;
         Ui::BoardEditor* mUi;
         GraphicsView* mGraphicsView;
-        GridProperties* mGridProperties;
 
         // Misc
         int mActiveBoardIndex;
