@@ -200,12 +200,20 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     foreach (DeviceInstance* device, mDeviceInstances)
     {
         BI_Footprint& footprint = device->getFootprint();
-        if (footprint.getGrabAreaScenePx().contains(scenePosPx))
-            list.append(&footprint);
+        if (footprint.getGrabAreaScenePx().contains(scenePosPx)) {
+            if (footprint.getIsMirrored())
+                list.append(&footprint);
+            else
+                list.prepend(&footprint);
+        }
         foreach (BI_FootprintPad* pad, footprint.getPads())
         {
-            if (pad->getGrabAreaScenePx().contains(scenePosPx))
-                list.append(pad);
+            if (pad->getGrabAreaScenePx().contains(scenePosPx)) {
+                if (pad->getIsMirrored())
+                    list.append(pad);
+                else
+                    list.insert(1, pad);
+            }
         }
     }
     return list;

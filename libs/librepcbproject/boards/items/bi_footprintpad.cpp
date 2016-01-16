@@ -100,9 +100,7 @@ void BI_FootprintPad::updatePosition() noexcept
     mPosition = mFootprint.mapToScene(mFootprintPad->getPosition());
     mRotation = mFootprint.getRotation() + mFootprintPad->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setRotation(mRotation.toDeg());
-    bool m = (mGraphicsItem->transform().m11() * mGraphicsItem->transform().m22() < qreal(0));
-    if (getIsMirrored() != m) mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
+    updateGraphicsItemTransform();
     mGraphicsItem->updateCacheAndRepaint();
     //if (mRegisteredNetPoint)
     //    mRegisteredNetPoint->setPosition(mPosition);
@@ -159,6 +157,18 @@ void BI_FootprintPad::setSelected(bool selected) noexcept
 {
     BI_Base::setSelected(selected);
     mGraphicsItem->update();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void BI_FootprintPad::updateGraphicsItemTransform() noexcept
+{
+    QTransform t;
+    if (mFootprint.getIsMirrored()) t.scale(qreal(-1), qreal(1));
+    t.rotate(-mRotation.toDeg());
+    mGraphicsItem->setTransform(t);
 }
 
 /*****************************************************************************************

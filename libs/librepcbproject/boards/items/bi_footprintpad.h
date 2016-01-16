@@ -92,6 +92,9 @@ class BI_FootprintPad final : public BI_Base
         BI_FootprintPad(const BI_FootprintPad& other);
         BI_FootprintPad& operator=(const BI_FootprintPad& rhs);
 
+        // Private Methods
+        void updateGraphicsItemTransform() noexcept;
+
 
         // General
         Circuit& mCircuit;

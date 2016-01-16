@@ -36,6 +36,7 @@ class BoardLayer;
 
 namespace library {
 class FootprintPad;
+class PackagePad;
 }
 
 namespace project {
@@ -83,15 +84,11 @@ class BGI_FootprintPad final : public BGI_Base
         // General Attributes
         BI_FootprintPad& mPad;
         const library::FootprintPad& mLibPad;
-        QFont mFont;
+        const library::PackagePad* mLibPkgPad;
 
         // Cached Attributes
         BoardLayer* mPadLayer;
-        QStaticText mStaticText;
-        bool mRotate180;
         QRectF mBoundingRect;
-        QPointF mTextOrigin;
-        QRectF mTextBoundingRect;
         QPainterPath mShape;
 };
 

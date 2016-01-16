@@ -61,9 +61,7 @@ void BI_Footprint::init() throw (Exception)
 {
     mGraphicsItem = new BGI_Footprint(*this);
     mGraphicsItem->setPos(mDeviceInstance.getPosition().toPxQPointF());
-    mGraphicsItem->setRotation(-mDeviceInstance.getRotation().toDeg());
-    if (mDeviceInstance.getIsMirrored())
-        mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
+    updateGraphicsItemTransform();
 
     const library::Device& libDev = mDeviceInstance.getLibDevice();
     foreach (const Uuid& padUuid, getLibFootprint().getPadUuids())
@@ -173,10 +171,14 @@ XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
 
 Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
 {
-    if (mDeviceInstance.getIsMirrored())
-        return (mDeviceInstance.getPosition() + relativePos.mirrored(Qt::Horizontal)).rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition());
-    else
-        return (mDeviceInstance.getPosition() + relativePos).rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition());
+    if (mDeviceInstance.getIsMirrored()) {
+        return (mDeviceInstance.getPosition() + relativePos)
+                .rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition())
+                .mirrored(Qt::Horizontal, mDeviceInstance.getPosition());
+    } else {
+        return (mDeviceInstance.getPosition() + relativePos)
+                .rotated(mDeviceInstance.getRotation(), mDeviceInstance.getPosition());
+    }
 }
 
 bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -235,7 +237,8 @@ void BI_Footprint::deviceInstanceMoved(const Point& pos)
 
 void BI_Footprint::deviceInstanceRotated(const Angle& rot)
 {
-    mGraphicsItem->setRotation(-rot.toDeg());
+    Q_UNUSED(rot);
+    updateGraphicsItemTransform();
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads)
         pad->updatePosition();
@@ -243,8 +246,8 @@ void BI_Footprint::deviceInstanceRotated(const Angle& rot)
 
 void BI_Footprint::deviceInstanceMirrored(bool mirrored)
 {
-    bool m = (mGraphicsItem->transform().m11() * mGraphicsItem->transform().m22() < qreal(0));
-    if (mirrored != m) mGraphicsItem->setTransform(QTransform::fromScale(qreal(-1), qreal(1)), true);
+    Q_UNUSED(mirrored);
+    updateGraphicsItemTransform();
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads)
         pad->updatePosition();
@@ -253,6 +256,14 @@ void BI_Footprint::deviceInstanceMirrored(bool mirrored)
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+void BI_Footprint::updateGraphicsItemTransform() noexcept
+{
+    QTransform t;
+    if (mDeviceInstance.getIsMirrored()) t.scale(qreal(-1), qreal(1));
+    t.rotate(-mDeviceInstance.getRotation().toDeg());
+    mGraphicsItem->setTransform(t);
+}
 
 bool BI_Footprint::checkAttributesValidity() const noexcept
 {

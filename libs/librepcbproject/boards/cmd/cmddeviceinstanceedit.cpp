@@ -81,7 +81,7 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool
 {
     Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
     mNewPos.rotate(angle, center);
-    mNewRotation += angle;
+    mNewRotation += mNewMirrored ? -angle : angle; // mirror --> rotation direction is inverted!
     if (immediate)
     {
         mDevice.setPosition(mNewPos);

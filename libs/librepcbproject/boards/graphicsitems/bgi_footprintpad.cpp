@@ -32,6 +32,7 @@
 #include <librepcblibrary/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
 #include "../deviceinstance.h"
+#include <librepcblibrary/pkg/package.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -44,18 +45,11 @@ namespace project {
  ****************************************************************************************/
 
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
-    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
+    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad()), mLibPkgPad(nullptr)
 {
-    //QStringList localeOrder = mPad.getProject().getSettings().getLocaleOrder();
-    //setToolTip(mLibPad.getName(localeOrder) % ": " % mLibPad.getDescription(localeOrder));
-
-    mStaticText.setTextFormat(Qt::PlainText);
-    mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
-    mFont.setPixelSize(5);
+    mLibPkgPad = mPad.getFootprint().getDeviceInstance().getLibPackage().getPadByUuid(pad.getLibPadUuid());
+    Q_ASSERT(mLibPkgPad);
+    setToolTip(mLibPkgPad->getName());
 
     updateCacheAndRepaint();
 }
@@ -74,6 +68,9 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     mShape.setFillRule(Qt::WindingFill);
     mBoundingRect = QRectF();
 
+    mShape.addRect(mLibPad.getBoundingRectPx());
+    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
+
     // set Z value and layer
     if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
         const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad);
@@ -87,12 +84,6 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     }
     mPadLayer = getBoardLayer(mLibPad.getLayerId());
     Q_ASSERT(mPadLayer);
-
-    // rotation
-    Angle absAngle = mLibPad.getRotation() + mPad.getFootprint().getRotation();
-    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
-    mShape.addRect(mLibPad.getBoundingRectPx());
-    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     update();
 }

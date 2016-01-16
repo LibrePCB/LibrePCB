@@ -118,6 +118,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
         // Private Methods
         void init() throw (Exception);
+        void updateGraphicsItemTransform() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
