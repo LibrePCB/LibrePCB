@@ -276,11 +276,12 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
     if (mOriginCrossVisible)
     {
         // draw origin cross
+        qreal len = Length::fromMm(2.54).toPx();
         QPen originPen(foregroundBrush().color());
         originPen.setWidth(0);
         painter->setPen(originPen);
-        painter->drawLine(QLineF(-21.6, 0.0, 21.6, 0.0));
-        painter->drawLine(QLineF(0.0, -21.6, 0.0, 21.6));
+        painter->drawLine(QLineF(-len, 0.0, len, 0.0));
+        painter->drawLine(QLineF(0.0, -len, 0.0, len));
     }
 }
 
