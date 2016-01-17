@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/boardlayer.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
 #include "boardlayerstack.h"
 
 /*****************************************************************************************
@@ -34,8 +35,27 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
+    QObject(nullptr), mBoard(board)
+{
+    // load all layers
+    for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
+         node; node = node->getNextSibling())
+    {
+        BoardLayer* layer = new BoardLayer(*node);
+        if (!mLayers.contains(layer->getId())) {
+            mLayers.insert(layer->getId(), layer);
+        } else {
+            delete layer;
+            throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                QString(tr("Layer ID \"%1\" is defined multiple times in \"%2\"."))
+                .arg(layer->getId()).arg(domElement.getDocFilePath().toNative()));
+        }
+    }
+}
+
 BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
-    mBoard(board)
+    QObject(nullptr), mBoard(board)
 {
     // add all required layers
 
@@ -88,12 +108,34 @@ BoardLayerStack::~BoardLayerStack() noexcept
 }
 
 /*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* BoardLayerStack::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer_stack"));
+    XmlDomElement* layers = root->appendChild("layers");
+    foreach (const BoardLayer* layer, mLayers) {
+        layers->appendChild(layer->serializeToXmlDomElement());
+    }
+
+    return root.take();
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
 void BoardLayerStack::addLayer(int id) noexcept
 {
     mLayers.insert(id, new BoardLayer(id));
+}
+
+bool BoardLayerStack::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

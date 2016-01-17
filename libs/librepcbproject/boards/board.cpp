@@ -87,7 +87,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load layer stack
-            mLayerStack = new BoardLayerStack(*this);
+            mLayerStack = new BoardLayerStack(*this, *root.getFirstChild("layer_stack", true));
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
@@ -474,9 +474,10 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("name", mName);
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("device_instances");
-    foreach (DeviceInstance* component, mDeviceInstances)
-        components->appendChild(component->serializeToXmlDomElement());
+    root->appendChild(mLayerStack->serializeToXmlDomElement());
+    XmlDomElement* device_instances = root->appendChild("device_instances");
+    foreach (DeviceInstance* device, mDeviceInstances)
+        device_instances->appendChild(device->serializeToXmlDomElement());
     XmlDomElement* geometry = root->appendChild("geometry");
     foreach (BI_Polygon* polygon, mPolygons)
         geometry->appendChild(polygon->serializeToXmlDomElement());

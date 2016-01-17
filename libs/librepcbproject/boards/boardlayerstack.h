@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/if_boardlayerprovider.h>
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
@@ -42,21 +43,28 @@ class Board;
 /**
  * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
-class BoardLayerStack final : public IF_BoardLayerProvider
+class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
+                              public IF_BoardLayerProvider
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
+        explicit BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception);
         explicit BoardLayerStack(Board& board) throw (Exception);
         ~BoardLayerStack() noexcept;
 
         // Getters
         Board& getBoard() const noexcept {return mBoard;}
 
-        /**
-         * @copydoc IF_BoardLayerProvider#getBoardLayer()
-         */
+        /// @copydoc IF_BoardLayerProvider#getBoardLayer()
         BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
+
+        // General Methods
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
     private:
@@ -68,6 +76,9 @@ class BoardLayerStack final : public IF_BoardLayerProvider
 
         // Private Methods
         void addLayer(int id) noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
         // General

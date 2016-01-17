@@ -184,8 +184,8 @@ class XmlDomElement final
          * @brief Set or add an attribute to this element
          *
          * @tparam T        The text will be converted in this type. Available types:
-         *                  bool, const char*, QString, #Uuid, #LengthUnit, #Length,
-         *                  #Angle, #HAlign, #VAlign (tbc)
+         *                  bool, const char*, QString, QColor, #Uuid, #LengthUnit,
+         *                  #Length, #Angle, #HAlign, #VAlign (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
          * @param value     The attribute value
@@ -207,8 +207,8 @@ class XmlDomElement final
          * @brief Get the value of a specific attribute in the specified type
          *
          * @tparam T    The value will be converted in this type. Available types:
-         *              bool, uint, int, QString, #Uuid, #LengthUnit, #Length, #Angle,
-         *              #HAlign, #VAlign (tbc)
+         *              bool, uint, int, QString, QColor, #Uuid, #LengthUnit, #Length,
+         *              #Angle, #HAlign, #VAlign (tbc)
          *
          * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown

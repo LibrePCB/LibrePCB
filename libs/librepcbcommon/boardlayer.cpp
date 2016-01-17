@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "boardlayer.h"
+#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -32,6 +33,16 @@ namespace librepcb {
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
+
+BoardLayer::BoardLayer(const XmlDomElement& domElement) throw (Exception) :
+    QObject(0), mId(-1), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
+{
+    mId = domElement.getAttribute<uint>("id", true);
+    mName = domElement.getText<QString>(true);
+    mColor = domElement.getAttribute<QColor>("color", true);
+    mColorHighlighted = domElement.getAttribute<QColor>("color_hl", true);
+    mIsVisible = domElement.getAttribute<bool>("visible", true);
+}
 
 BoardLayer::BoardLayer(int id) :
     QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
@@ -318,6 +329,32 @@ BoardLayer::~BoardLayer()
 const QColor& BoardLayer::getColor(bool highlighted) const
 {
     return highlighted ? mColorHighlighted : mColor;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* BoardLayer::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer"));
+    root->setAttribute("id", mId);
+    root->setText(mName);
+    root->setAttribute("color", mColor);
+    root->setAttribute("color_hl", mColorHighlighted);
+    root->setAttribute("visible", mIsVisible);
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+bool BoardLayer::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************
