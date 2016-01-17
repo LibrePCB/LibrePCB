@@ -42,7 +42,7 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     addLayer(BoardLayer::LayerID::Grid);
     addLayer(BoardLayer::LayerID::Unrouted);
 
-    addLayer(BoardLayer::LayerID::BoardOutline);
+    addLayer(BoardLayer::LayerID::BoardOutlines);
     addLayer(BoardLayer::LayerID::Drills);
     addLayer(BoardLayer::LayerID::Vias);
     addLayer(BoardLayer::LayerID::ViaRestrict);
@@ -51,7 +51,7 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     addLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
     addLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
     addLayer(BoardLayer::LayerID::TopDeviceOutlines);
-    addLayer(BoardLayer::LayerID::TopTestPoint);
+    addLayer(BoardLayer::LayerID::TopTestPoints);
     addLayer(BoardLayer::LayerID::TopGlue);
     addLayer(BoardLayer::LayerID::TopPaste);
     addLayer(BoardLayer::LayerID::TopOverlayNames);
@@ -71,14 +71,14 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     addLayer(BoardLayer::LayerID::BottomOverlayNames);
     addLayer(BoardLayer::LayerID::BottomPaste);
     addLayer(BoardLayer::LayerID::BottomGlue);
-    addLayer(BoardLayer::LayerID::BottomTestPoint);
+    addLayer(BoardLayer::LayerID::BottomTestPoints);
     addLayer(BoardLayer::LayerID::BottomDeviceGrabAreas);
     addLayer(BoardLayer::LayerID::BottomDeviceOriginCrosses);
     addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
 
 #ifdef QT_DEBUG
-    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRect);
-    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRect);
+    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
+    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
 #endif
 }
 

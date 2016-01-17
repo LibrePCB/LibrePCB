@@ -57,7 +57,7 @@ class BoardLayer final : public QObject
             Unrouted                    = 3,
 
             // General Layers
-            BoardOutline                = 10,
+            BoardOutlines               = 10,
             Drills                      = 20,
             Vias                        = 30,
             ViaRestrict                 = 40,
@@ -68,7 +68,7 @@ class BoardLayer final : public QObject
             TopDeviceOutlines           = 200,
             TopDeviceOriginCrosses      = 201,
             TopDeviceGrabAreas          = 202,
-            TopTestPoint                = 210,
+            TopTestPoints               = 210,
             TopGlue                     = 220,
             TopPaste                    = 230,
             TopOverlayNames             = 240,
@@ -194,7 +194,7 @@ class BoardLayer final : public QObject
             BottomOverlayNames          = 460,
             BottomPaste                 = 470,
             BottomGlue                  = 480,
-            BottomTestPoint             = 490,
+            BottomTestPoints            = 490,
             BottomDeviceGrabAreas       = 498,
             BottomDeviceOriginCrosses   = 499,
             BottomDeviceOutlines        = 500,
@@ -202,8 +202,8 @@ class BoardLayer final : public QObject
 
 #ifdef QT_DEBUG
             // IDs 900-999: debug layers (for developers)
-            DEBUG_GraphicsItemsBoundingRect         = 900,
-            DEBUG_GraphicsItemsTextsBoundingRect    = 901,
+            DEBUG_GraphicsItemsBoundingRects         = 900,
+            DEBUG_GraphicsItemsTextsBoundingRects    = 901,
 #endif
 
             // Begin of User defined Layers

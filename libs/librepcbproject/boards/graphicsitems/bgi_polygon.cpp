@@ -104,7 +104,7 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 #ifdef QT_DEBUG
     // draw bounding rect
     const BoardLayer* layer = mBiPolygon.getProject().getBoardLayer(
-        BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
+        BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             painter->setPen(QPen(layer->getColor(selected), 0));

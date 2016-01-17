@@ -125,7 +125,7 @@ int MainWindow::convertBoardLayerId(int eagleLayerId)
     {
         case 1:  return BoardLayer::LayerID::TopCopper;
         case 16: return BoardLayer::LayerID::BottomCopper;
-        case 20: return BoardLayer::LayerID::BoardOutline;
+        case 20: return BoardLayer::LayerID::BoardOutlines;
         case 21: return BoardLayer::LayerID::TopOverlay;
         case 22: return BoardLayer::LayerID::BottomDeviceOutlines;
         case 25: return BoardLayer::LayerID::TopOverlayNames;
@@ -137,7 +137,7 @@ int MainWindow::convertBoardLayerId(int eagleLayerId)
         case 41: return BoardLayer::LayerID::TopCopperRestrict;
         case 42: return BoardLayer::LayerID::BottomCopperRestrict;
         case 43: return BoardLayer::LayerID::ViaRestrict;
-        case 46: return BoardLayer::LayerID::BoardOutline; // milling
+        case 46: return BoardLayer::LayerID::BoardOutlines; // milling
         case 48: return BoardLayer::LayerID::TopDeviceOutlines; // document
         case 49: return BoardLayer::LayerID::TopDeviceOriginCrosses; // reference
         case 51: return BoardLayer::LayerID::TopDeviceOutlines;

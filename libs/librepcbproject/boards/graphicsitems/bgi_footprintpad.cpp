@@ -119,7 +119,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     painter->drawPath(mLibPad.toQPainterPathPx());
 
 #ifdef QT_DEBUG
-    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
+    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             // draw bounding rect

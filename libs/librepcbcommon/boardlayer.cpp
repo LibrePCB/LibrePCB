@@ -54,8 +54,8 @@ BoardLayer::BoardLayer(int id) :
             mIsVisible = true;
             break;
 
-        case BoardOutline:
-            mName = tr("Board Outline");
+        case BoardOutlines:
+            mName = tr("Board Outlines");
             mColor = QColor(255, 255, 255, 180);
             mColorHighlighted = QColor(255, 255, 255, 220);
             mIsVisible = true;
@@ -76,211 +76,211 @@ BoardLayer::BoardLayer(int id) :
             break;
 
         case ViaRestrict:
-            mName = tr("ViaRestrict");
+            mName = tr("Via Restrict");
             mColor = QColor(255, 255, 0, 50);
             mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = false;
             break;
 
         case ThtPads:
-            mName = tr("ThtPads");
+            mName = tr("THT Pads");
             mColor = QColor(0, 255, 0, 150);
             mColorHighlighted = QColor(0, 255, 0, 220);
             mIsVisible = true;
             break;
 
         case TopDeviceOutlines:
-            mName = tr("TopDeviceOutlines");
+            mName = tr("Top Device Outlines");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopDeviceOriginCrosses:
-            mName = tr("TopDeviceOriginCrosses");
+            mName = tr("Top Device Origin Crosses");
             mColor = QColor(255, 255, 255, 50);
             mColorHighlighted = QColor(255, 255, 255, 80);
             mIsVisible = true;
             break;
 
         case TopDeviceGrabAreas:
-            mName = tr("TopDeviceGrabAreas");
+            mName = tr("Top Device Grab Areas");
             mColor = QColor(255, 255, 255, 20);
             mColorHighlighted = QColor(255, 255, 255, 50);
             mIsVisible = false;
             break;
 
-        case TopTestPoint:
-            mName = tr("TopTestPoint");
+        case TopTestPoints:
+            mName = tr("Top Test Points");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopGlue:
-            mName = tr("TopGlue");
+            mName = tr("Top Glue");
             mColor = QColor(224, 224, 224, 100);
             mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = false;
             break;
 
         case TopPaste:
-            mName = tr("TopPaste");
+            mName = tr("Top Paste");
             mColor = QColor(224, 224, 224, 100);
             mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = false;
             break;
 
         case TopOverlayNames:
-            mName = tr("TopOverlayNames");
+            mName = tr("Top Overlay Names");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopOverlayValues:
-            mName = tr("TopOverlayValues");
+            mName = tr("Top Overlay Values");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopOverlay:
-            mName = tr("TopOverlay");
+            mName = tr("Top Overlay");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case TopStopMask:
-            mName = tr("TopStopMask");
+            mName = tr("Top Stop Mask");
             mColor = QColor(255, 0, 0, 100);
             mColorHighlighted = QColor(255, 0, 0, 150);
             mIsVisible = false;
             break;
 
         case TopDeviceKeepout:
-            mName = tr("TopDeviceKeepout");
+            mName = tr("Top Device Keepout");
             mColor = QColor(255, 255, 0, 50);
             mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = false;
             break;
 
         case TopCopperRestrict:
-            mName = tr("TopCopperRestrict");
+            mName = tr("Top Copper Restrict");
             mColor = QColor(255, 255, 0, 50);
             mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = false;
             break;
 
         case TopCopper:
-            mName = tr("TopCopper");
+            mName = tr("Top Copper");
             mColor = QColor(255, 0, 0, 150);
             mColorHighlighted = QColor(255, 0, 0, 220);
             mIsVisible = true;
             break;
 
         case BottomDeviceOriginCrosses:
-            mName = tr("BottomDeviceOriginCrosses");
+            mName = tr("Bottom Device Origin Crosses");
             mColor = QColor(255, 255, 255, 50);
             mColorHighlighted = QColor(255, 255, 255, 80);
             mIsVisible = true;
             break;
 
         case BottomDeviceGrabAreas:
-            mName = tr("BottomDeviceGrabAreas");
+            mName = tr("Bottom Device Grab Areas");
             mColor = QColor(255, 255, 255, 20);
             mColorHighlighted = QColor(255, 255, 255, 50);
             mIsVisible = false;
             break;
 
-        case BottomTestPoint:
-            mName = tr("BottomTestPoint");
+        case BottomTestPoints:
+            mName = tr("Bottom Test Points");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomDeviceOutlines:
-            mName = tr("BottomDeviceOutlines");
+            mName = tr("Bottom Device Outlines");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomGlue:
-            mName = tr("BottomGlue");
+            mName = tr("Bottom Glue");
             mColor = QColor(224, 224, 224, 100);
             mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = false;
             break;
 
         case BottomPaste:
-            mName = tr("BottomPaste");
+            mName = tr("Bottom Paste");
             mColor = QColor(224, 224, 224, 100);
             mColorHighlighted = QColor(224, 224, 224, 120);
             mIsVisible = false;
             break;
 
         case BottomOverlayNames:
-            mName = tr("BottomOverlayNames");
+            mName = tr("Bottom Overlay Names");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomOverlayValues:
-            mName = tr("BottomOverlayValues");
+            mName = tr("Bottom Overlay Values");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomOverlay:
-            mName = tr("BottomOverlay");
+            mName = tr("Bottom Overlay");
             mColor = QColor(224, 224, 224, 150);
             mColorHighlighted = QColor(224, 224, 224, 220);
             mIsVisible = true;
             break;
 
         case BottomStopMask:
-            mName = tr("BottomStopMask");
+            mName = tr("Bottom Stop Mask");
             mColor = QColor(255, 0, 0, 100);
             mColorHighlighted = QColor(255, 0, 0, 150);
             mIsVisible = false;
             break;
 
         case BottomDeviceKeepout:
-            mName = tr("BottomDeviceKeepout");
+            mName = tr("Bottom Device Keepout");
             mColor = QColor(255, 255, 0, 50);
             mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = false;
             break;
 
         case BottomCopperRestrict:
-            mName = tr("BottomCopperRestrict");
+            mName = tr("Bottom Copper Restrict");
             mColor = QColor(255, 255, 0, 50);
             mColorHighlighted = QColor(255, 255, 0, 80);
             mIsVisible = false;
             break;
 
         case BottomCopper:
-            mName = tr("BottomCopper");
+            mName = tr("Bottom Copper");
             mColor = QColor(0, 0, 255, 150);
             mColorHighlighted = QColor(0, 0, 255, 220);
             mIsVisible = true;
             break;
 
 #ifdef QT_DEBUG
-        case DEBUG_GraphicsItemsBoundingRect:
-            mName = tr("DEBUG_GraphicsItemsBoundingRect");
+        case DEBUG_GraphicsItemsBoundingRects:
+            mName = tr("[DEBUG] GraphicsItems Bounding Rects");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
             mIsVisible = false;
             break;
 
-        case DEBUG_GraphicsItemsTextsBoundingRect:
-            mName = tr("DEBUG_GraphicsItemsTextsBoundingRect");
+        case DEBUG_GraphicsItemsTextsBoundingRects:
+            mName = tr("[DEBUG] GraphicsItems Texts Bounding Rects");
             mColor = Qt::darkRed;
             mColorHighlighted = Qt::red;
             mIsVisible = false;
