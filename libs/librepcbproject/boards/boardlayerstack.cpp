@@ -24,6 +24,7 @@
 #include <librepcbcommon/boardlayer.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "boardlayerstack.h"
+#include "board.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,26 +37,29 @@ namespace project {
  ****************************************************************************************/
 
 BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
-    QObject(nullptr), mBoard(board)
+    QObject(nullptr), mBoard(board), mLayersChanged(false)
 {
     // load all layers
     for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
          node; node = node->getNextSibling())
     {
-        BoardLayer* layer = new BoardLayer(*node);
+        QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
         if (!mLayers.contains(layer->getId())) {
-            mLayers.insert(layer->getId(), layer);
+            addLayer(*layer.take());
         } else {
-            delete layer;
             throw RuntimeError(__FILE__, __LINE__, node->getName(),
                 QString(tr("Layer ID \"%1\" is defined multiple times in \"%2\"."))
                 .arg(layer->getId()).arg(domElement.getDocFilePath().toNative()));
         }
     }
+
+    connect(&mBoard, &Board::attributesChanged,
+            this, &BoardLayerStack::boardAttributesChanged,
+            Qt::QueuedConnection);
 }
 
 BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
-    QObject(nullptr), mBoard(board)
+    QObject(nullptr), mBoard(board), mLayersChanged(false)
 {
     // add all required layers
 
@@ -100,6 +104,10 @@ BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
     addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
     addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
 #endif
+
+    connect(&mBoard, &Board::attributesChanged,
+            this, &BoardLayerStack::boardAttributesChanged,
+            Qt::QueuedConnection);
 }
 
 BoardLayerStack::~BoardLayerStack() noexcept
@@ -125,12 +133,37 @@ XmlDomElement* BoardLayerStack::serializeToXmlDomElement() const throw (Exceptio
 }
 
 /*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void BoardLayerStack::layerAttributesChanged() noexcept
+{
+    if (!mLayersChanged) {
+        emit mBoard.attributesChanged();
+        mLayersChanged = true;
+    }
+}
+
+void BoardLayerStack::boardAttributesChanged() noexcept
+{
+    mLayersChanged = false;
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
 void BoardLayerStack::addLayer(int id) noexcept
 {
-    mLayers.insert(id, new BoardLayer(id));
+    addLayer(*new BoardLayer(id));
+}
+
+void BoardLayerStack::addLayer(BoardLayer& layer) noexcept
+{
+    connect(&layer, &BoardLayer::attributesChanged,
+            this, &BoardLayerStack::layerAttributesChanged,
+            Qt::QueuedConnection);
+    mLayers.insert(layer.getId(), &layer);
 }
 
 bool BoardLayerStack::checkAttributesValidity() const noexcept

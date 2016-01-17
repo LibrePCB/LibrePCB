@@ -87,6 +87,11 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         void setSelected(bool selected) noexcept override;
 
 
+    private slots:
+
+        void boardAttributesChanged();
+
+
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()

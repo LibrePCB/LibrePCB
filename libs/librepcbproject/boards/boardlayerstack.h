@@ -58,6 +58,9 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         // Getters
         Board& getBoard() const noexcept {return mBoard;}
 
+        /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
+        QList<int> getAllBoardLayerIds() const noexcept {return mLayers.keys();}
+
         /// @copydoc IF_BoardLayerProvider#getBoardLayer()
         BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
 
@@ -65,6 +68,12 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+
+    private slots:
+
+        void layerAttributesChanged() noexcept;
+        void boardAttributesChanged() noexcept;
 
 
     private:
@@ -76,6 +85,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
         // Private Methods
         void addLayer(int id) noexcept;
+        void addLayer(BoardLayer& layer) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
@@ -84,6 +94,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         // General
         Board& mBoard; ///< A reference to the Board object (from the ctor)
         QMap<int, BoardLayer*> mLayers;
+        bool mLayersChanged;
 };
 
 /*****************************************************************************************

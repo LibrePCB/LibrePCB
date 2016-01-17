@@ -85,6 +85,11 @@ class BI_FootprintPad final : public BI_Base
         void setSelected(bool selected) noexcept override;
 
 
+    private slots:
+
+        void footprintAttributesChanged();
+
+
     private:
 
         // make some methods inaccessible...

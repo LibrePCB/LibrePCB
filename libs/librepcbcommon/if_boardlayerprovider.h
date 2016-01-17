@@ -63,6 +63,13 @@ class IF_BoardLayerProvider
         // Getters
 
         /**
+         * @brief Get all available board layer IDs
+         *
+         * @return A QList with all board layer IDs
+         */
+        virtual QList<int> getAllBoardLayerIds() const noexcept = 0;
+
+        /**
          * @brief Get the board layer with a specific ID
          *
          * @param id                The ID of the requested board layer
