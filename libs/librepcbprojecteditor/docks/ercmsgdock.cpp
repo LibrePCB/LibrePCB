@@ -219,7 +219,7 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept
     item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)];
     item->setText(0, QString(tr("Ignored (%1)")).arg(item->childCount()));
 
-    setWindowTitle(QString(tr("ERC Messages (%1)")).arg(countOfNonIgnoredErcMessages));
+    setWindowTitle(QString(tr("ERC [%1]")).arg(countOfNonIgnoredErcMessages));
 }
 
 /*****************************************************************************************
