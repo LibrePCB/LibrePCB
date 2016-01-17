@@ -34,7 +34,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
+BoardLayerStack::BoardLayerStack(Project& project) throw (Exception):
     mProject(project)
 {
     // add all required layers
@@ -82,7 +82,7 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
 #endif
 }
 
-BoardLayerProvider::~BoardLayerProvider() noexcept
+BoardLayerStack::~BoardLayerStack() noexcept
 {
     qDeleteAll(mLayers);        mLayers.clear();
 }
@@ -91,7 +91,7 @@ BoardLayerProvider::~BoardLayerProvider() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void BoardLayerProvider::addLayer(int id) noexcept
+void BoardLayerStack::addLayer(int id) noexcept
 {
     mLayers.insert(id, new BoardLayer(id));
 }

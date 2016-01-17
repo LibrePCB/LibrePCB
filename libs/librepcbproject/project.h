@@ -51,7 +51,7 @@ class Schematic;
 class SchematicLayerProvider;
 class ErcMsgList;
 class Board;
-class BoardLayerProvider;
+class BoardLayerStack;
 
 /*****************************************************************************************
  *  Class Project
@@ -570,7 +570,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project
-        BoardLayerProvider* mBoardLayerProvider; ///< All board layers of this project
+        BoardLayerStack* mBoardLayerProvider; ///< All board layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
 };

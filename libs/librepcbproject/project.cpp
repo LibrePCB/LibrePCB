@@ -227,7 +227,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // Load all board layers
-        mBoardLayerProvider = new BoardLayerProvider(*this);
+        mBoardLayerProvider = new BoardLayerStack(*this);
 
         // Load all boards
         if (create)

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
-#define LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
+#ifndef LIBREPCB_PROJECT_BOARDLAYERSTACK_H
+#define LIBREPCB_PROJECT_BOARDLAYERSTACK_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,20 +36,19 @@ namespace project {
 class Project;
 
 /*****************************************************************************************
- *  Class BoardLayerProvider
+ *  Class BoardLayerStack
  ****************************************************************************************/
 
 /**
- * @brief The BoardLayerProvider class provides and manages all available board layers
- *        which are used in the #project#BoardEditor class
+ * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
-class BoardLayerProvider final : public IF_BoardLayerProvider
+class BoardLayerStack final : public IF_BoardLayerProvider
 {
     public:
 
         // Constructors / Destructor
-        explicit BoardLayerProvider(Project& project) throw (Exception);
-        ~BoardLayerProvider() noexcept;
+        explicit BoardLayerStack(Project& project) throw (Exception);
+        ~BoardLayerStack() noexcept;
 
         // Getters
         Project& getProject() const noexcept {return mProject;}
@@ -63,9 +62,9 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
     private:
 
         // make some methods inaccessible...
-        BoardLayerProvider() = delete;
-        BoardLayerProvider(const BoardLayerProvider& other) = delete;
-        BoardLayerProvider& operator=(const BoardLayerProvider& rhs) = delete;
+        BoardLayerStack() = delete;
+        BoardLayerStack(const BoardLayerStack& other) = delete;
+        BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
 
         // Private Methods
         void addLayer(int id) noexcept;
@@ -83,4 +82,4 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
+#endif // LIBREPCB_PROJECT_BOARDLAYERSTACK_H
