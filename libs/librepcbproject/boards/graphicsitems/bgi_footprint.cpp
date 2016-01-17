@@ -30,6 +30,7 @@
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcbcommon/boardlayer.h>
 #include "../deviceinstance.h"
+#include "../boardlayerstack.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -332,7 +333,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 BoardLayer* BGI_Footprint::getBoardLayer(int id) const noexcept
 {
     if (mFootprint.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mFootprint.getDeviceInstance().getBoard().getProject().getBoardLayer(id);
+    return mFootprint.getDeviceInstance().getBoard().getLayerStack().getBoardLayer(id);
 }
 
 /*****************************************************************************************

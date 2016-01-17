@@ -29,6 +29,7 @@
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
 #include <librepcbcommon/geometry/polygon.h>
+#include "../boardlayerstack.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -62,7 +63,7 @@ void BGI_Polygon::updateCacheAndRepaint() noexcept
 
     int layerId = mPolygon.getLayerId();
     if (mBiPolygon.getIsMirrored()) layerId = BoardLayer::getMirroredLayerId(layerId);
-    mLayer = mBiPolygon.getProject().getBoardLayer(layerId);
+    mLayer = mBiPolygon.getBoard().getLayerStack().getBoardLayer(layerId);
     if (mLayer) {
         if (!mLayer->isVisible())
             mLayer = nullptr;
@@ -103,7 +104,7 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 
 #ifdef QT_DEBUG
     // draw bounding rect
-    const BoardLayer* layer = mBiPolygon.getProject().getBoardLayer(
+    const BoardLayer* layer = mBiPolygon.getBoard().getLayerStack().getBoardLayer(
         BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {

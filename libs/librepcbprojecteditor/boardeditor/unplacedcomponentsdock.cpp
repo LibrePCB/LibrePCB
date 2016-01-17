@@ -41,6 +41,7 @@
 #include "../projecteditor.h"
 #include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcblibrary/pkg/footprintpreviewgraphicsitem.h>
+#include <librepcbproject/boards/boardlayerstack.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -318,8 +319,8 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(const Uuid& uuid) noexcept
         const library::Footprint* fpt = mSelectedPackage->getFootprintByUuid(mSelectedFootprintUuid);
         if (fpt) {
             mFootprintPreviewGraphicsItem = new library::FootprintPreviewGraphicsItem(
-                mProject, mProject.getSettings().getLocaleOrder(), *fpt, mSelectedPackage,
-                &mSelectedComponent->getLibComponent(), mSelectedComponent);
+                mBoard->getLayerStack(), mProject.getSettings().getLocaleOrder(), *fpt,
+                mSelectedPackage, &mSelectedComponent->getLibComponent(), mSelectedComponent);
             mFootprintPreviewGraphicsScene->addItem(*mFootprintPreviewGraphicsItem);
             mUi->graphicsView->zoomAll();
             mUi->btnAdd->setEnabled(true);

@@ -34,8 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayerStack::BoardLayerStack(Project& project) throw (Exception):
-    mProject(project)
+BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
+    mBoard(board)
 {
     // add all required layers
 

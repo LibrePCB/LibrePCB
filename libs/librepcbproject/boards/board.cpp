@@ -38,6 +38,7 @@
 #include "items/bi_footprintpad.h"
 #include <librepcblibrary/cmp/component.h>
 #include "items/bi_polygon.h"
+#include "boardlayerstack.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -52,8 +53,8 @@ namespace project {
 Board::Board(Project& project, const FilePath& filepath, bool restore,
              bool readOnly, bool create, const QString& newName) throw (Exception):
     QObject(nullptr), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
-    mXmlFile(nullptr), mAddedToProject(false), mGraphicsScene(nullptr),
-    mGridProperties(nullptr)
+    mXmlFile(nullptr), mAddedToProject(false), mLayerStack(nullptr),
+    mGraphicsScene(nullptr), mGridProperties(nullptr)
 {
     try
     {
@@ -68,6 +69,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mUuid = Uuid::createRandom();
             mName = newName;
 
+            // load default layer stack
+            mLayerStack = new BoardLayerStack(*this);
+
             // load default grid properties
             mGridProperties = new GridProperties();
         }
@@ -81,6 +85,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
             mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
+
+            // Load layer stack
+            mLayerStack = new BoardLayerStack(*this);
 
             // Load grid properties
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
@@ -130,6 +137,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         foreach (DeviceInstance* dev, mDeviceInstances)
             try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
         delete mGridProperties;         mGridProperties = nullptr;
+        delete mLayerStack;             mLayerStack = nullptr;
         delete mXmlFile;                mXmlFile = nullptr;
         delete mGraphicsScene;          mGraphicsScene = nullptr;
         throw; // ...and rethrow the exception
@@ -146,6 +154,7 @@ Board::~Board() noexcept
 
     qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
     delete mGridProperties;         mGridProperties = nullptr;
+    delete mLayerStack;             mLayerStack = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
     delete mGraphicsScene;          mGraphicsScene = nullptr;
 }

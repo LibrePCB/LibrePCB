@@ -33,6 +33,7 @@
 #include "../../settings/projectsettings.h"
 #include "../deviceinstance.h"
 #include <librepcblibrary/pkg/package.h>
+#include "../boardlayerstack.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -138,7 +139,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 BoardLayer* BGI_FootprintPad::getBoardLayer(int id) const noexcept
 {
     if (mPad.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mPad.getFootprint().getDeviceInstance().getBoard().getProject().getBoardLayer(id);
+    return mPad.getFootprint().getDeviceInstance().getBoard().getLayerStack().getBoardLayer(id);
 }
 
 /*****************************************************************************************

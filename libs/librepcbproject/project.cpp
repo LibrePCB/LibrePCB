@@ -37,7 +37,6 @@
 #include "erc/ercmsglist.h"
 #include "settings/projectsettings.h"
 #include "boards/board.h"
-#include "boards/boardlayerstack.h"
 #include <librepcbcommon/application.h>
 #include "schematics/schematiclayerprovider.h"
 
@@ -56,7 +55,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
     mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
     mIsReadOnly(readOnly), mDescriptionHtmlFile(nullptr), mProjectSettings(nullptr),
     mProjectLibrary(nullptr), mErcMsgList(nullptr), mCircuit(nullptr),
-    mSchematicLayerProvider(nullptr), mBoardLayerProvider(nullptr)
+    mSchematicLayerProvider(nullptr)
 {
     qDebug() << (create ? "create project:" : "open project:") << filepath.toNative();
 
@@ -226,9 +225,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
         }
 
-        // Load all board layers
-        mBoardLayerProvider = new BoardLayerStack(*this);
-
         // Load all boards
         if (create)
         {
@@ -264,7 +260,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             try { removeBoard(board, true); } catch (...) {}
         foreach (Schematic* schematic, mSchematics)
             try { removeSchematic(schematic, true); } catch (...) {}
-        delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
         delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
         delete mCircuit;                mCircuit = nullptr;
         delete mErcMsgList;             mErcMsgList = nullptr;
@@ -291,7 +286,6 @@ Project::~Project() noexcept
         try { removeSchematic(schematic, true); } catch (...) {}
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
-    delete mBoardLayerProvider;     mBoardLayerProvider = nullptr;
     delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
     delete mCircuit;                mCircuit = nullptr;
     delete mErcMsgList;             mErcMsgList = nullptr;
@@ -465,11 +459,6 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
 /*****************************************************************************************
  *  Board Methods
  ****************************************************************************************/
-
-BoardLayer* Project::getBoardLayer(int id) const noexcept
-{
-    return mBoardLayerProvider->getBoardLayer(id);
-}
 
 int Project::getBoardIndex(const Board* board) const noexcept
 {

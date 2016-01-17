@@ -33,7 +33,7 @@
 namespace librepcb {
 namespace project {
 
-class Project;
+class Board;
 
 /*****************************************************************************************
  *  Class BoardLayerStack
@@ -47,11 +47,11 @@ class BoardLayerStack final : public IF_BoardLayerProvider
     public:
 
         // Constructors / Destructor
-        explicit BoardLayerStack(Project& project) throw (Exception);
+        explicit BoardLayerStack(Board& board) throw (Exception);
         ~BoardLayerStack() noexcept;
 
         // Getters
-        Project& getProject() const noexcept {return mProject;}
+        Board& getBoard() const noexcept {return mBoard;}
 
         /**
          * @copydoc IF_BoardLayerProvider#getBoardLayer()
@@ -71,7 +71,7 @@ class BoardLayerStack final : public IF_BoardLayerProvider
 
 
         // General
-        Project& mProject; ///< A reference to the Project object (from the ctor)
+        Board& mBoard; ///< A reference to the Board object (from the ctor)
         QMap<int, BoardLayer*> mLayers;
 };
 
