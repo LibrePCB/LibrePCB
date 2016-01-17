@@ -64,7 +64,6 @@ SOURCES += \
     boards/items/bi_footprint.cpp \
     boards/graphicsitems/bgi_base.cpp \
     boards/graphicsitems/bgi_footprint.cpp \
-    boards/boardlayerprovider.cpp \
     boards/items/bi_footprintpad.cpp \
     boards/graphicsitems/bgi_footprintpad.cpp \
     library/projectlibrary.cpp \
@@ -90,7 +89,8 @@ SOURCES += \
     circuit/cmd/cmdcomponentinstanceremove.cpp \
     circuit/cmd/cmdcompsiginstsetnetsignal.cpp \
     boards/items/bi_polygon.cpp \
-    boards/graphicsitems/bgi_polygon.cpp
+    boards/graphicsitems/bgi_polygon.cpp \
+    boards/boardlayerstack.cpp
 
 HEADERS += \
     project.h \
@@ -136,7 +136,6 @@ HEADERS += \
     boards/items/bi_footprint.h \
     boards/graphicsitems/bgi_base.h \
     boards/graphicsitems/bgi_footprint.h \
-    boards/boardlayerprovider.h \
     boards/items/bi_footprintpad.h \
     boards/graphicsitems/bgi_footprintpad.h \
     library/projectlibrary.h \
@@ -163,6 +162,7 @@ HEADERS += \
     circuit/cmd/cmdcomponentinstanceremove.h \
     circuit/cmd/cmdcompsiginstsetnetsignal.h \
     boards/items/bi_polygon.h \
-    boards/graphicsitems/bgi_polygon.h
+    boards/graphicsitems/bgi_polygon.h \
+    boards/boardlayerstack.h
 
 FORMS +=

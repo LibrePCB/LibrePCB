@@ -37,7 +37,7 @@
 #include "erc/ercmsglist.h"
 #include "settings/projectsettings.h"
 #include "boards/board.h"
-#include "boards/boardlayerprovider.h"
+#include "boards/boardlayerstack.h"
 #include <librepcbcommon/application.h>
 #include "schematics/schematiclayerprovider.h"
 

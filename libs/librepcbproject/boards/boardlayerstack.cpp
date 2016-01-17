@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/boardlayer.h>
-#include "boardlayerprovider.h"
+#include "boardlayerstack.h"
 
 /*****************************************************************************************
  *  Namespace
