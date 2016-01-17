@@ -65,13 +65,9 @@ BGI_FootprintPad::~BGI_FootprintPad() noexcept
 void BGI_FootprintPad::updateCacheAndRepaint() noexcept
 {
     mShape = QPainterPath();
-    mShape.setFillRule(Qt::WindingFill);
     mBoundingRect = QRectF();
 
-    mShape.addRect(mLibPad.getBoundingRectPx());
-    mBoundingRect = mBoundingRect.united(mShape.boundingRect());
-
-    // set Z value and layer
+    // set Z value
     if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
         const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad);
         Q_ASSERT(smt);
@@ -82,8 +78,24 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     } else {
         setZValue(Board::ZValue_FootprintPadsTop);
     }
+
+    // set layer
     mPadLayer = getBoardLayer(mLibPad.getLayerId());
-    Q_ASSERT(mPadLayer);
+    if (mPadLayer) {
+        if (!mPadLayer->isVisible())
+            mPadLayer = nullptr;
+    }
+
+    // set shape and bounding rect
+    if (mPadLayer) {
+        mShape.addRect(mLibPad.getBoundingRectPx());
+        mBoundingRect = mBoundingRect.united(mShape.boundingRect());
+    }
+
+    if (!mShape.isEmpty())
+        mShape.setFillRule(Qt::WindingFill);
+
+    setVisible(!mBoundingRect.isEmpty());
 
     update();
 }
@@ -99,22 +111,22 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     //const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    Q_ASSERT(mPadLayer); if (!mPadLayer) return;
-    if (mPadLayer->isVisible()) {
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(mPadLayer->getColor(mPad.isSelected()));
-        painter->drawPath(mLibPad.toQPainterPathPx());
-    }
+    if (!mPadLayer) return;
+
+    // draw pad
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(mPadLayer->getColor(mPad.isSelected()));
+    painter->drawPath(mLibPad.toQPainterPathPx());
 
 #ifdef QT_DEBUG
     BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
-    Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mBoundingRect);
+    if (layer) {
+        if (layer->isVisible()) {
+            // draw bounding rect
+            painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRect(mBoundingRect);
+        }
     }
 #endif
 }

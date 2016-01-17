@@ -413,8 +413,8 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
 
 void Board::clearSelection() const noexcept
 {
-    foreach (DeviceInstance* component, mDeviceInstances)
-        component->getFootprint().setSelected(false);
+    foreach (DeviceInstance* device, mDeviceInstances)
+        device->getFootprint().setSelected(false);
 }
 
 /*****************************************************************************************

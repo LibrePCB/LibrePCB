@@ -40,15 +40,16 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     // add all required layers
 
     addLayer(BoardLayer::LayerID::Grid);
-    addLayer(BoardLayer::LayerID::OriginCrosses);
     addLayer(BoardLayer::LayerID::Unrouted);
-    addLayer(BoardLayer::LayerID::FootprintGrabAreas);
 
     addLayer(BoardLayer::LayerID::BoardOutline);
     addLayer(BoardLayer::LayerID::Drills);
     addLayer(BoardLayer::LayerID::Vias);
     addLayer(BoardLayer::LayerID::ViaRestrict);
+    addLayer(BoardLayer::LayerID::ThtPads);
 
+    addLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
+    addLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
     addLayer(BoardLayer::LayerID::TopDeviceOutlines);
     addLayer(BoardLayer::LayerID::TopTestPoint);
     addLayer(BoardLayer::LayerID::TopGlue);
@@ -71,6 +72,8 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     addLayer(BoardLayer::LayerID::BottomPaste);
     addLayer(BoardLayer::LayerID::BottomGlue);
     addLayer(BoardLayer::LayerID::BottomTestPoint);
+    addLayer(BoardLayer::LayerID::BottomDeviceGrabAreas);
+    addLayer(BoardLayer::LayerID::BottomDeviceOriginCrosses);
     addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
 
 #ifdef QT_DEBUG

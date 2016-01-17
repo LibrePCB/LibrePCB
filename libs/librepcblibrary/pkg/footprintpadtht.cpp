@@ -63,7 +63,7 @@ FootprintPadTht::~FootprintPadTht() noexcept
 
 int FootprintPadTht::getLayerId() const noexcept
 {
-    return BoardLayer::LayerID::Vias;
+    return BoardLayer::LayerID::ThtPads;
 }
 
 const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept

@@ -139,7 +139,7 @@ int MainWindow::convertBoardLayerId(int eagleLayerId)
         case 43: return BoardLayer::LayerID::ViaRestrict;
         case 46: return BoardLayer::LayerID::BoardOutline; // milling
         case 48: return BoardLayer::LayerID::TopDeviceOutlines; // document
-        case 49: return BoardLayer::LayerID::OriginCrosses; // reference
+        case 49: return BoardLayer::LayerID::TopDeviceOriginCrosses; // reference
         case 51: return BoardLayer::LayerID::TopDeviceOutlines;
         case 52: return BoardLayer::LayerID::BottomDeviceOutlines;
         default: throw Exception(__FILE__, __LINE__, QString("Invalid board layer: %1").arg(eagleLayerId));

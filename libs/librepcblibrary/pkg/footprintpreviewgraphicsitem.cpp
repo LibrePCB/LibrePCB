@@ -220,7 +220,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         if (polygon->isFilled())
             layer = mLayerProvider.getBoardLayer(polygon->getLayerId());
         else if (polygon->isGrabArea())
-            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::FootprintGrabAreas);
+            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -247,7 +247,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         if (ellipse->isFilled())
             layer = mLayerProvider.getBoardLayer(ellipse->getLayerId());
         else if (ellipse->isGrabArea())
-            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::FootprintGrabAreas);
+            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -286,7 +286,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::OriginCrosses);
+        layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
         if (layer)
         {
             qreal width = Length(700000).toPx();

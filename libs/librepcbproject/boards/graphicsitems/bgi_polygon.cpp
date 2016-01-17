@@ -58,14 +58,25 @@ void BGI_Polygon::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
+    setZValue(Board::ZValue_Default);
+
     int layerId = mPolygon.getLayerId();
     if (mBiPolygon.getIsMirrored()) layerId = BoardLayer::getMirroredLayerId(layerId);
     mLayer = mBiPolygon.getProject().getBoardLayer(layerId);
+    if (mLayer) {
+        if (!mLayer->isVisible())
+            mLayer = nullptr;
+    }
 
-    setZValue(Board::ZValue_Default);
+    if (mLayer) {
+        mShape = mPolygon.toQPainterPathPx();
+        mBoundingRect = mShape.boundingRect();
+    } else {
+        mShape = QPainterPath();
+        mBoundingRect = QRectF();
+    }
 
-    mShape = mPolygon.toQPainterPathPx();
-    mBoundingRect = mShape.boundingRect();
+    setVisible(!mBoundingRect.isEmpty());
 
     update();
 }
@@ -83,24 +94,23 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
     Q_UNUSED(option);
 
+    if (!mLayer) return;
+
     // draw polygon outline
-    if (mLayer) {
-        if (mLayer->isVisible()) {
-            painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getWidth().toPx(),
-                                 Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-            painter->drawPath(mPolygon.toQPainterPathPx());
-        }
-    }
+    painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getWidth().toPx(),
+                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->drawPath(mPolygon.toQPainterPathPx());
 
 #ifdef QT_DEBUG
+    // draw bounding rect
     const BoardLayer* layer = mBiPolygon.getProject().getBoardLayer(
-        BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(selected), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mBoundingRect);
+        BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
+    if (layer) {
+        if (layer->isVisible()) {
+            painter->setPen(QPen(layer->getColor(selected), 0));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRect(mBoundingRect);
+        }
     }
 #endif
 }
