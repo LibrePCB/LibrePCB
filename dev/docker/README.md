@@ -33,5 +33,6 @@ Different examples to run the docker container "librepcb:git":
 ./run_container.sh                          # enter the bash
 ./run_container.sh qtcreator librepcb.pro   # open Qt Creator
 ./run_container.sh librepcb                 # run LibrePCB
+./run_container.sh dia                      # run Dia (diagram editor)
 ```
 

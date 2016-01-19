@@ -4,7 +4,7 @@ FROM ubuntu:14.04
 RUN DEBIAN_FRONTEND=noninteractive \
      apt-get -q update \
   && apt-get -qy upgrade \
-  && apt-get -qy install git g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev \
+  && apt-get -qy install git g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev dia \
   && apt-get clean
 
 # checkout librepcb
