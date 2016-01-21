@@ -138,8 +138,8 @@ void DeviceInstance::init() throw (Exception)
         }
     }
 
-    // emit the "attributesChanged" signal when the project has emited it
-    //connect(&mCircuit.getProject(), &Project::attributesChanged, this, &ComponentInstance::attributesChanged);
+    // emit the "attributesChanged" signal when the board has emited it
+    connect(&mBoard, &Board::attributesChanged, this, &DeviceInstance::attributesChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

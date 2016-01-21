@@ -49,7 +49,8 @@ SOURCES += \
     dialogs/projectpropertieseditordialog.cpp \
     dialogs/projectsettingsdialog.cpp \
     docks/ercmsgdock.cpp \
-    dialogs/addcomponentdialog.cpp
+    dialogs/addcomponentdialog.cpp \
+    boardeditor/boardlayersdock.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -80,7 +81,8 @@ HEADERS += \
     dialogs/projectpropertieseditordialog.h \
     dialogs/projectsettingsdialog.h \
     docks/ercmsgdock.h \
-    dialogs/addcomponentdialog.h
+    dialogs/addcomponentdialog.h \
+    boardeditor/boardlayersdock.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \
@@ -92,5 +94,6 @@ FORMS += \
     dialogs/projectpropertieseditordialog.ui \
     dialogs/projectsettingsdialog.ui \
     docks/ercmsgdock.ui \
-    dialogs/addcomponentdialog.ui
+    dialogs/addcomponentdialog.ui \
+    boardeditor/boardlayersdock.ui
 

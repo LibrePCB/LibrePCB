@@ -225,6 +225,7 @@ void BI_Footprint::setSelected(bool selected) noexcept
 void BI_Footprint::deviceInstanceAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
+    emit attributesChanged();
 }
 
 void BI_Footprint::deviceInstanceMoved(const Point& pos)

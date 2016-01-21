@@ -40,6 +40,7 @@
 #include "unplacedcomponentsdock.h"
 #include "fsm/bes_fsm.h"
 #include "../projecteditor.h"
+#include "boardlayersdock.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,7 +56,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     QMainWindow(0), mProjectEditor(projectEditor), mProject(project),
     mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr), mActiveBoardIndex(-1), mBoardListActionGroup(this),
-    mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr), mFsm(nullptr)
+    mErcMsgDock(nullptr), mUnplacedComponentsDock(nullptr), mBoardLayersDock(nullptr),
+    mFsm(nullptr)
 {
     mUi->setupUi(this);
     mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
@@ -70,6 +72,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
     mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
+    mBoardLayersDock = new BoardLayersDock(*this);
+    addDockWidget(Qt::RightDockWidgetArea, mBoardLayersDock, Qt::Vertical);
 
     // add graphics view as central widget
     mGraphicsView = new GraphicsView(nullptr, this);
@@ -199,6 +203,7 @@ BoardEditor::~BoardEditor()
 
     delete mFsm;                    mFsm = nullptr;
     qDeleteAll(mBoardListActions);  mBoardListActions.clear();
+    delete mBoardLayersDock;        mBoardLayersDock = nullptr;
     delete mUnplacedComponentsDock; mUnplacedComponentsDock = nullptr;
     delete mErcMsgDock;             mErcMsgDock = nullptr;
     delete mGraphicsView;           mGraphicsView = nullptr;
@@ -248,6 +253,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
         mGraphicsView->setScene(nullptr);
     }
     mUnplacedComponentsDock->setBoard(board);
+    mBoardLayersDock->setActiveBoard(board);
 
     // active board has changed!
     emit activeBoardChanged(mActiveBoardIndex, index);

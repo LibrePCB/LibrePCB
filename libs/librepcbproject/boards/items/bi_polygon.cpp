@@ -60,6 +60,9 @@ void BI_Polygon::init() throw (Exception)
     mGraphicsItem->setPos(getPosition().toPxQPointF());
     mGraphicsItem->setRotation(Angle::deg0().toDeg());
 
+    // connect to the "attributes changed" signal of the board
+    connect(&mBoard, &Board::attributesChanged, this, &BI_Polygon::boardAttributesChanged);
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -123,6 +126,15 @@ void BI_Polygon::setSelected(bool selected) noexcept
 {
     BI_Base::setSelected(selected);
     mGraphicsItem->update();
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void BI_Polygon::boardAttributesChanged()
+{
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*****************************************************************************************

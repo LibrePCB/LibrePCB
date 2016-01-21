@@ -17,105 +17,84 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_POLYGON_H
-#define LIBREPCB_PROJECT_BI_POLYGON_H
+#ifndef LIBREPCB_PROJECT_BOARDLAYERSTACK_H
+#define LIBREPCB_PROJECT_BOARDLAYERSTACK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "bi_base.h"
+#include <librepcbcommon/if_boardlayerprovider.h>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/if_attributeprovider.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class Polygon;
-
 namespace project {
 
-class Project;
 class Board;
-class BGI_Polygon;
 
 /*****************************************************************************************
- *  Class BI_Polygon
+ *  Class BoardLayerStack
  ****************************************************************************************/
 
 /**
- * @brief The BI_Polygon class
- *
- * @author ubruhin
- * @date 2016-01-12
+ * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
-class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
-                         public IF_AttributeProvider
+class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
+                              public IF_BoardLayerProvider
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
-        explicit BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
-                            bool isGrabArea, const Point& startPos) throw (Exception);
-        ~BI_Polygon() noexcept;
+        explicit BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception);
+        explicit BoardLayerStack(Board& board) throw (Exception);
+        ~BoardLayerStack() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
-        const Polygon& getPolygon() const noexcept {return *mPolygon;}
+
+        /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
+        QList<int> getAllBoardLayerIds() const noexcept {return mLayers.keys();}
+
+        /// @copydoc IF_BoardLayerProvider#getBoardLayer()
+        BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception);
-        void removeFromBoard(GraphicsScene& scene) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
-
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Polygon;}
-        const Point& getPosition() const noexcept override {static Point p(0, 0); return p;}
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
-
 
     private slots:
 
-        void boardAttributesChanged();
-
-
-    signals:
-
-        /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void layerAttributesChanged() noexcept;
+        void boardAttributesChanged() noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        BI_Polygon();
-        BI_Polygon(const BI_Polygon& other);
-        BI_Polygon& operator=(const BI_Polygon& rhs);
+        BoardLayerStack() = delete;
+        BoardLayerStack(const BoardLayerStack& other) = delete;
+        BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
 
         // Private Methods
-        void init() throw (Exception);
+        void addLayer(int id) noexcept;
+        void addLayer(BoardLayer& layer) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
         // General
-        Board& mBoard;
-        Polygon* mPolygon;
-        QScopedPointer<BGI_Polygon> mGraphicsItem;
+        Board& mBoard; ///< A reference to the Board object (from the ctor)
+        QMap<int, BoardLayer*> mLayers;
+        bool mLayersChanged;
 };
 
 /*****************************************************************************************
@@ -125,4 +104,4 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_POLYGON_H
+#endif // LIBREPCB_PROJECT_BOARDLAYERSTACK_H

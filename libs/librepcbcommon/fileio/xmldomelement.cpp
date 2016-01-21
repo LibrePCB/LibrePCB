@@ -21,6 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
 #include "xmldomelement.h"
 #include "xmldomdocument.h"
 #include "../units/all_length_units.h"
@@ -279,6 +280,12 @@ void XmlDomElement::setAttribute(const QString& name, const uint& value) noexcep
 }
 
 template <>
+void XmlDomElement::setAttribute(const QString& name, const QColor& value) noexcept
+{
+    setAttribute<QString>(name, value.isValid() ? value.name(QColor::HexArgb) : "");
+}
+
+template <>
 void XmlDomElement::setAttribute(const QString& name, const Uuid& value) noexcept
 {
     setAttribute<QString>(name, value.isNull() ? "" : value.toStr());
@@ -386,6 +393,22 @@ int XmlDomElement::getAttribute<int>(const QString& name, bool throwIfEmpty, con
     {
         throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
             QString(tr("Invalid integer attribute \"%1\" in node \"%2\".")).arg(name, mName));
+    }
+}
+
+template <>
+QColor XmlDomElement::getAttribute<QColor>(const QString& name, bool throwIfEmpty, const QColor& defaultValue) const throw (Exception)
+{
+    QString attr = getAttribute<QString>(name, throwIfEmpty);
+    QColor obj(attr);
+    if (obj.isValid())
+        return obj;
+    else if ((attr.isEmpty()) && (!throwIfEmpty))
+        return defaultValue;
+    else
+    {
+        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
+            QString(tr("Invalid Color attribute \"%1\" in node \"%2\".")).arg(name, mName));
     }
 }
 

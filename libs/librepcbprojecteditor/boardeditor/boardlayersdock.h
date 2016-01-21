@@ -17,63 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
-#define LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
+#ifndef LIBREPCB_PROJECT_BOARDLAYERDOCK_H
+#define LIBREPCB_PROJECT_BOARDLAYERDOCK_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/if_boardlayerprovider.h>
-#include <librepcbcommon/exceptions.h>
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
 namespace project {
 
 class Project;
+class Board;
+class ComponentInstance;
+class BoardEditor;
+
+namespace Ui {
+class BoardLayersDock;
+}
 
 /*****************************************************************************************
- *  Class BoardLayerProvider
+ *  Class BoardLayersDock
  ****************************************************************************************/
 
 /**
- * @brief The BoardLayerProvider class provides and manages all available board layers
- *        which are used in the #project#BoardEditor class
+ * @brief The BoardLayersDock class
  */
-class BoardLayerProvider final : public IF_BoardLayerProvider
+class BoardLayersDock final : public QDockWidget
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        explicit BoardLayerProvider(Project& project) throw (Exception);
-        ~BoardLayerProvider() noexcept;
+        explicit BoardLayersDock(project::BoardEditor& editor) noexcept;
+        ~BoardLayersDock() noexcept;
 
-        // Getters
-        Project& getProject() const noexcept {return mProject;}
+        // Setters
+        void setActiveBoard(Board* board);
 
-        /**
-         * @copydoc IF_BoardLayerProvider#getBoardLayer()
-         */
-        BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
+
+    private slots:
+
+        void on_listWidget_itemChanged(QListWidgetItem *item);
+        void on_pushButton_clicked();
+        void on_pushButton_2_clicked();
 
 
     private:
 
         // make some methods inaccessible...
-        BoardLayerProvider() = delete;
-        BoardLayerProvider(const BoardLayerProvider& other) = delete;
-        BoardLayerProvider& operator=(const BoardLayerProvider& rhs) = delete;
+        BoardLayersDock();
+        BoardLayersDock(const BoardLayersDock& other);
+        BoardLayersDock& operator=(const BoardLayersDock& rhs);
 
         // Private Methods
-        void addLayer(int id) noexcept;
+        void updateListWidget() noexcept;
 
 
         // General
-        Project& mProject; ///< A reference to the Project object (from the ctor)
-        QMap<int, BoardLayer*> mLayers;
+        QScopedPointer<Ui::BoardLayersDock> mUi;
+        BoardEditor& mBoardEditor;
+        Board* mActiveBoard;
+        QMetaObject::Connection mActiveBoardConnection;
 };
 
 /*****************************************************************************************
@@ -83,4 +95,4 @@ class BoardLayerProvider final : public IF_BoardLayerProvider
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDLAYERPROVIDER_H
+#endif // LIBREPCB_PROJECT_BOARDLAYERDOCK_H

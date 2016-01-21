@@ -49,6 +49,7 @@ class Project;
 class DeviceInstance;
 class BI_Base;
 class BI_Polygon;
+class BoardLayerStack;
 
 /*****************************************************************************************
  *  Class Board
@@ -93,6 +94,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         Project& getProject() const noexcept {return mProject;}
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+        BoardLayerStack& getLayerStack() noexcept {return *mLayerStack;}
         bool isEmpty() const noexcept;
         QList<BI_Base*> getSelectedItems(bool footprintPads
                                          /*bool floatingPoints,
@@ -186,6 +188,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         SmartXmlFile* mXmlFile;
         bool mAddedToProject;
 
+        BoardLayerStack* mLayerStack;
         GraphicsScene* mGraphicsScene;
         QRectF mViewRect;
         GridProperties* mGridProperties;

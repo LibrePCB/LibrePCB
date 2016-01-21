@@ -57,6 +57,11 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
     }
 
     mGraphicsItem = new BGI_FootprintPad(*this);
+
+    // connect to the "attributes changed" signal of the footprint
+    connect(&mFootprint, &BI_Footprint::attributesChanged,
+            this, &BI_FootprintPad::footprintAttributesChanged);
+
     updatePosition();
 }
 
@@ -157,6 +162,15 @@ void BI_FootprintPad::setSelected(bool selected) noexcept
 {
     BI_Base::setSelected(selected);
     mGraphicsItem->update();
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void BI_FootprintPad::footprintAttributesChanged()
+{
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*****************************************************************************************

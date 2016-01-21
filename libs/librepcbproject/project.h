@@ -51,7 +51,6 @@ class Schematic;
 class SchematicLayerProvider;
 class ErcMsgList;
 class Board;
-class BoardLayerProvider;
 
 /*****************************************************************************************
  *  Class Project
@@ -77,8 +76,7 @@ class BoardLayerProvider;
  * @date 2014-06-24
  */
 class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_SchematicLayerProvider, public IF_BoardLayerProvider,
-                      public IF_XmlSerializableObject
+                      public IF_SchematicLayerProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
@@ -349,11 +347,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Board Methods
 
         /**
-         * @copydoc IF_BoardLayerProvider#getBoardLayer()
-         */
-        BoardLayer* getBoardLayer(int id) const noexcept;
-
-        /**
          * @brief Get the index of a specific board
          *
          * @return the board index (-1 if the board does not exist)
@@ -570,7 +563,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
         SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project
-        BoardLayerProvider* mBoardLayerProvider; ///< All board layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
 };

@@ -22,7 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/boardlayer.h>
-#include "boardlayerprovider.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include "boardlayerstack.h"
+#include "board.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -34,8 +36,30 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
-    mProject(project)
+BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
+    QObject(nullptr), mBoard(board), mLayersChanged(false)
+{
+    // load all layers
+    for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
+         node; node = node->getNextSibling())
+    {
+        QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
+        if (!mLayers.contains(layer->getId())) {
+            addLayer(*layer.take());
+        } else {
+            throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                QString(tr("Layer ID \"%1\" is defined multiple times in \"%2\"."))
+                .arg(layer->getId()).arg(domElement.getDocFilePath().toNative()));
+        }
+    }
+
+    connect(&mBoard, &Board::attributesChanged,
+            this, &BoardLayerStack::boardAttributesChanged,
+            Qt::QueuedConnection);
+}
+
+BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
+    QObject(nullptr), mBoard(board), mLayersChanged(false)
 {
     // add all required layers
 
@@ -80,20 +104,71 @@ BoardLayerProvider::BoardLayerProvider(Project& project) throw (Exception):
     addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
     addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
 #endif
+
+    connect(&mBoard, &Board::attributesChanged,
+            this, &BoardLayerStack::boardAttributesChanged,
+            Qt::QueuedConnection);
 }
 
-BoardLayerProvider::~BoardLayerProvider() noexcept
+BoardLayerStack::~BoardLayerStack() noexcept
 {
     qDeleteAll(mLayers);        mLayers.clear();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+XmlDomElement* BoardLayerStack::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer_stack"));
+    XmlDomElement* layers = root->appendChild("layers");
+    foreach (const BoardLayer* layer, mLayers) {
+        layers->appendChild(layer->serializeToXmlDomElement());
+    }
+
+    return root.take();
+}
+
+/*****************************************************************************************
+ *  Private Slots
+ ****************************************************************************************/
+
+void BoardLayerStack::layerAttributesChanged() noexcept
+{
+    if (!mLayersChanged) {
+        emit mBoard.attributesChanged();
+        mLayersChanged = true;
+    }
+}
+
+void BoardLayerStack::boardAttributesChanged() noexcept
+{
+    mLayersChanged = false;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void BoardLayerProvider::addLayer(int id) noexcept
+void BoardLayerStack::addLayer(int id) noexcept
 {
-    mLayers.insert(id, new BoardLayer(id));
+    addLayer(*new BoardLayer(id));
+}
+
+void BoardLayerStack::addLayer(BoardLayer& layer) noexcept
+{
+    connect(&layer, &BoardLayer::attributesChanged,
+            this, &BoardLayerStack::layerAttributesChanged,
+            Qt::QueuedConnection);
+    mLayers.insert(layer.getId(), &layer);
+}
+
+bool BoardLayerStack::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************
