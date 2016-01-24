@@ -667,27 +667,27 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     if (!mCircuit->save(toOriginal, errors))
         success = false;
 
-    // Save all added schematics (*.xml files)
-    foreach (Schematic* schematic, mSchematics)
-    {
-        if (!schematic->save(toOriginal, errors))
-            success = false;
-    }
     // Save all removed schematics (*.xml files)
     foreach (Schematic* schematic, mRemovedSchematics)
     {
         if (!schematic->save(toOriginal, errors))
             success = false;
     }
+    // Save all added schematics (*.xml files)
+    foreach (Schematic* schematic, mSchematics)
+    {
+        if (!schematic->save(toOriginal, errors))
+            success = false;
+    }
 
-    // Save all added boards (*.xml files)
-    foreach (Board* board, mBoards)
+    // Save all removed boards (*.xml files)
+    foreach (Board* board, mRemovedBoards)
     {
         if (!board->save(toOriginal, errors))
             success = false;
     }
-    // Save all removed boards (*.xml files)
-    foreach (Board* board, mRemovedBoards)
+    // Save all added boards (*.xml files)
+    foreach (Board* board, mBoards)
     {
         if (!board->save(toOriginal, errors))
             success = false;
