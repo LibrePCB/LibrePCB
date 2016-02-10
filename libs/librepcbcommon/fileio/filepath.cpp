@@ -213,13 +213,18 @@ FilePath& FilePath::operator=(const FilePath& rhs) noexcept
     return *this;
 }
 
-bool FilePath::operator==(const FilePath& rhs) noexcept
+bool FilePath::operator==(const FilePath& rhs) const noexcept
 {
     if (mIsValid != rhs.mIsValid)
         return false;
     if (mFileInfo.filePath() != rhs.mFileInfo.filePath())
         return false;
     return true;
+}
+
+bool FilePath::operator!=(const FilePath& rhs) const noexcept
+{
+    return !(*this == rhs);
 }
 
 /*****************************************************************************************
@@ -232,6 +237,27 @@ FilePath FilePath::fromRelative(const FilePath& base, const QString& relative) n
         return FilePath();
 
     return FilePath(base.mFileInfo.filePath() % QLatin1Char('/') % relative);
+}
+
+FilePath FilePath::getTempPath() noexcept
+{
+    FilePath tmp(QDir::tempPath());
+
+    if (!tmp.isExistingDir())
+        qWarning() << "Could not determine the system's temporary directory!";
+
+    return tmp;
+}
+
+FilePath FilePath::getApplicationTempPath() noexcept
+{
+    return getTempPath().getPathTo("librepcb");
+}
+
+FilePath FilePath::getRandomTempPath() noexcept
+{
+    QString random = QString("%1_%2").arg(QDateTime::currentMSecsSinceEpoch()).arg(qrand());
+    return getApplicationTempPath().getPathTo(random);
 }
 
 QString FilePath::makeWellFormatted(const QString& filepath) noexcept
