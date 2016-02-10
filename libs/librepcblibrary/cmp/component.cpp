@@ -43,8 +43,8 @@ Component::Component(const Uuid& uuid, const Version& version, const QString& au
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-Component::Component(const FilePath& elementDirectory) throw (Exception) :
-    LibraryElement(elementDirectory, "cmp", "component"),
+Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+    LibraryElement(elementDirectory, "cmp", "component", readOnly),
     mSchematicOnly(false), mDefaultSymbolVariantUuid()
 {
     try

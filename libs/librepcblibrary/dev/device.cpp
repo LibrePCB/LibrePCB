@@ -42,8 +42,8 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-Device::Device(const FilePath& elementDirectory) throw (Exception) :
-    LibraryElement(elementDirectory, "dev", "device")
+Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+    LibraryElement(elementDirectory, "dev", "device", readOnly)
 {
     readFromFile();
 }

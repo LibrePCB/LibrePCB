@@ -138,10 +138,10 @@ void UnplacedComponentsDock::on_cbxSelectedDevice_currentIndexChanged(int index)
     Uuid deviceUuid(mUi->cbxSelectedDevice->itemData(index, Qt::UserRole).toString());
     FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
     if (devFp.isValid()) {
-        const library::Device* device = new library::Device(devFp);
+        const library::Device* device = new library::Device(devFp, true);
         FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(device->getPackageUuid());
         if (pkgFp.isValid()) {
-            const library::Package* package = new library::Package(pkgFp);
+            const library::Package* package = new library::Package(pkgFp, true);
             setSelectedDeviceAndPackage(device, package);
         } else {
             setSelectedDeviceAndPackage(nullptr, nullptr);
@@ -258,12 +258,12 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
             // TODO: use library metadata instead of loading the XML files
             FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
             if (!devFp.isValid()) continue;
-            const library::Device device(devFp);
+            const library::Device device(devFp, true);
 
             Uuid pkgUuid;
             mProjectEditor.getWorkspace().getLibrary().getDeviceMetadata(devFp, &pkgUuid);
             FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(pkgUuid);
-            const library::Package package(pkgFp);
+            const library::Package package(pkgFp, true);
 
             QString devName = device.getName(localeOrder);
             QString pkgName = package.getName(localeOrder);
@@ -350,7 +350,7 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
                     QString(tr("Device not found in library: %1"))
                     .arg(deviceUuid.toStr()));
             }
-            device = new library::Device(devFp);
+            device = new library::Device(devFp, true);
             auto cmd = new CmdProjectLibraryAddElement<library::Device>(mProject.getLibrary(), *device);
             mProjectEditor.getUndoStack().appendToCommand(cmd);
         }
@@ -366,7 +366,7 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
                     QString(tr("Package not found in library: %1"))
                     .arg(device->getPackageUuid().toStr()));
             }
-            pkg = new library::Package(pkgFp);
+            pkg = new library::Package(pkgFp, true);
             auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
             mProjectEditor.getUndoStack().appendToCommand(cmd);
         }

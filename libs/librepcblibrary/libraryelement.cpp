@@ -45,8 +45,8 @@ LibraryElement::LibraryElement(const QString& xmlFileNamePrefix,
 
 LibraryElement::LibraryElement(const FilePath& elementDirectory,
                                const QString& xmlFileNamePrefix,
-                               const QString& xmlRootNodeName) throw (Exception) :
-    LibraryBaseElement(elementDirectory, xmlFileNamePrefix, xmlRootNodeName)
+                               const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
+    LibraryBaseElement(elementDirectory, xmlFileNamePrefix, xmlRootNodeName, readOnly)
 {
 }
 

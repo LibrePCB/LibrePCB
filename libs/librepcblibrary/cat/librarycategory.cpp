@@ -45,8 +45,8 @@ LibraryCategory::LibraryCategory(const QString& xmlFileNamePrefix,
 
 LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
                                  const QString& xmlFileNamePrefix,
-                                 const QString& xmlRootNodeName) throw (Exception) :
-    LibraryBaseElement(elementDirectory, xmlFileNamePrefix, xmlRootNodeName)
+                                 const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
+    LibraryBaseElement(elementDirectory, xmlFileNamePrefix, xmlRootNodeName, readOnly)
 {
 }
 

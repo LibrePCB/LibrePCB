@@ -33,8 +33,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-PackageCategory::PackageCategory(const FilePath& elementDirectory) :
-    LibraryCategory(elementDirectory, "pkgcat", "package_category")
+PackageCategory::PackageCategory(const FilePath& elementDirectory, bool readOnly) :
+    LibraryCategory(elementDirectory, "pkgcat", "package_category", readOnly)
 {
     readFromFile();
 }

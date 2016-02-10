@@ -103,32 +103,32 @@ void MainWindow::on_updateBtn_clicked()
             {
                 if (dirFilePath.getSuffix() == "cmpcat")
                 {
-                    library::ComponentCategory elem(dirFilePath);
+                    library::ComponentCategory elem(dirFilePath, false);
                     elem.save();
                 }
                 else if (dirFilePath.getSuffix() == "pkgcat")
                 {
-                    library::PackageCategory elem(dirFilePath);
+                    library::PackageCategory elem(dirFilePath, false);
                     elem.save();
                 }
                 else if (dirFilePath.getSuffix() == "sym")
                 {
-                    library::Symbol elem(dirFilePath);
+                    library::Symbol elem(dirFilePath, false);
                     elem.save();
                 }
                 else if (dirFilePath.getSuffix() == "pkg")
                 {
-                    library::Package elem(dirFilePath);
+                    library::Package elem(dirFilePath, false);
                     elem.save();
                 }
                 else if (dirFilePath.getSuffix() == "cmp")
                 {
-                    library::Component elem(dirFilePath);
+                    library::Component elem(dirFilePath, false);
                     elem.save();
                 }
                 else if (dirFilePath.getSuffix() == "dev")
                 {
-                    library::Device elem(dirFilePath);
+                    library::Device elem(dirFilePath, false);
                     elem.save();
                 }
                 else

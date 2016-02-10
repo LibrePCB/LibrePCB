@@ -97,7 +97,7 @@ void MainWindow::on_pushButton_2_clicked()
                         QString("missing component: %1").arg(compUuid.toStr()));
                 }
                 // copy component
-                Component latestComp(filepath);
+                Component latestComp(filepath, true);
                 FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
                 latestComp.saveTo(dest);
                 ui->log->addItem(latestComp.getDirectory().toNative());
@@ -113,7 +113,7 @@ void MainWindow::on_pushButton_2_clicked()
                             throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
                                 QString("missing symbol: %1").arg(symbolUuid.toStr()));
                         }
-                        Symbol latestSymbol(filepath);
+                        Symbol latestSymbol(filepath, true);
                         FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
                         latestSymbol.saveTo(dest);
                         ui->log->addItem(latestSymbol.getDirectory().toNative());
@@ -140,7 +140,7 @@ void MainWindow::on_pushButton_2_clicked()
                             QString("missing device: %1").arg(deviceUuid.toStr()));
                     }
                     // copy device
-                    Device latestDevice(filepath);
+                    Device latestDevice(filepath, true);
                     FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
                     latestDevice.saveTo(dest);
                     ui->log->addItem(latestDevice.getDirectory().toNative());
@@ -154,7 +154,7 @@ void MainWindow::on_pushButton_2_clicked()
                             QString("missing package: %1").arg(packUuid.toStr()));
                     }
                     // copy package
-                    Package latestPackage(filepath);
+                    Package latestPackage(filepath, true);
                     dest = projectFilepath.getParentDir().getPathTo("library/pkg");
                     latestPackage.saveTo(dest);
                     ui->log->addItem(latestPackage.getDirectory().toNative());

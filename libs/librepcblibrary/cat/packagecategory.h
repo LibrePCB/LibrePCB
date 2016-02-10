@@ -45,7 +45,7 @@ class PackageCategory final : public LibraryCategory
 
     public:
 
-        explicit PackageCategory(const FilePath& elementDirectory);
+        explicit PackageCategory(const FilePath& elementDirectory, bool readOnly);
         virtual ~PackageCategory();
 
     private:

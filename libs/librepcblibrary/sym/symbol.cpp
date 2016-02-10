@@ -41,8 +41,8 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
 {
 }
 
-Symbol::Symbol(const FilePath& elementDirectory) throw (Exception) :
-    LibraryElement(elementDirectory, "sym", "symbol")
+Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+    LibraryElement(elementDirectory, "sym", "symbol", readOnly)
 {
     try
     {

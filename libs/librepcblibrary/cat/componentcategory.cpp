@@ -33,8 +33,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentCategory::ComponentCategory(const FilePath& elementDirectory) :
-    LibraryCategory(elementDirectory, "cmpcat", "component_category")
+ComponentCategory::ComponentCategory(const FilePath& elementDirectory, bool readOnly) :
+    LibraryCategory(elementDirectory, "cmpcat", "component_category", readOnly)
 {
     readFromFile();
 }

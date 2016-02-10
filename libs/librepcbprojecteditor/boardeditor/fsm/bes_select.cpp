@@ -308,7 +308,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                     {
                         // copy device to project's library
                         FilePath cmpFp = mWorkspace.getLibrary().getLatestDevice(deviceUuid);
-                        device = new library::Device(cmpFp);
+                        device = new library::Device(cmpFp, true);
                         auto cmd = new CmdProjectLibraryAddElement<library::Device>(mProject.getLibrary(), *device);
                         mUndoStack.appendToCommand(cmd);
                     }
@@ -317,7 +317,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                     {
                         // copy package to project's library
                         FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(device->getPackageUuid());
-                        pkg = new library::Package(pkgFp);
+                        pkg = new library::Package(pkgFp, true);
                         auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
                         mUndoStack.appendToCommand(cmd);
                     }

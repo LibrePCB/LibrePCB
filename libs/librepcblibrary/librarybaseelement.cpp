@@ -45,7 +45,7 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
                                        const QString& keywords_en_US) throw (Exception) :
     QObject(nullptr), mVersionFilepath(), mXmlFilepath(),
     mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
-    mDomTreeParsed(false), mUuid(uuid), mVersion(version), mAuthor(author),
+    mDomTreeParsed(false), mOpenedReadOnly(false), mUuid(uuid), mVersion(version), mAuthor(author),
     mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
 {
     mNames.insert("en_US", name_en_US);
@@ -55,10 +55,10 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        const QString& xmlFileNamePrefix,
-                                       const QString& xmlRootNodeName) throw (Exception) :
+                                       const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
     QObject(0), mDirectory(elementDirectory), mVersionFilepath(), mXmlFilepath(),
     mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
-    mDomTreeParsed(false)
+    mDomTreeParsed(false), mOpenedReadOnly(readOnly)
 {
 }
 
@@ -105,6 +105,12 @@ void LibraryBaseElement::save() const throw (Exception)
     Q_ASSERT(mDirectory.isValid());
     Q_ASSERT(mVersionFilepath.isValid());
     Q_ASSERT(mXmlFilepath.isValid());
+
+    if (mOpenedReadOnly) {
+        throw RuntimeError(__FILE__, __LINE__, mDirectory.toStr(),
+            QString(tr("Library element was opened in read-only mode: \"%1\""))
+            .arg(mDirectory.toNative()));
+    }
 
     // save xml file
     XmlDomDocument doc(*serializeToXmlDomElement());

@@ -309,7 +309,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
                 throw UserCanceled(__FILE__, __LINE__); // abort
 
             // open the XML file
-            library::Component* component = new library::Component(mAddComponentDialog->getSelectedComponentFilePath());
+            library::Component* component = new library::Component(mAddComponentDialog->getSelectedComponentFilePath(), true);
             Uuid componentUuid = component->getUuid();
             Version componentVersion = component->getVersion();
             delete component;
@@ -337,7 +337,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
                         QString(tr("Component not found in library: %1"))
                         .arg(componentUuid.toStr()));
                 }
-                mComponent = new library::Component(cmpFp);
+                mComponent = new library::Component(cmpFp, true);
                 auto cmd = new CmdProjectLibraryAddElement<library::Component>(
                     mProject.getLibrary(), *mComponent);
                 mUndoStack.appendToCommand(cmd);
@@ -375,7 +375,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
                     throw RuntimeError(__FILE__, __LINE__, QString(),
                         QString(tr("Symbol not found in library: %1")).arg(symbolUuid.toStr()));
                 }
-                library::Symbol* symbol = new library::Symbol(symbolFp);
+                library::Symbol* symbol = new library::Symbol(symbolFp, true);
                 auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
                     mProject.getLibrary(), *symbol);
                 mUndoStack.appendToCommand(cmd);

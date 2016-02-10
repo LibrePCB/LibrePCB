@@ -265,7 +265,7 @@ int Library::addCategoriesToDb(const QList<FilePath>& dirs, const QString& table
     int count = 0;
     foreach (const FilePath& filepath, dirs)
     {
-        ElementType element(filepath);
+        ElementType element(filepath, true);
 
         QSqlQuery query = prepareQuery(
             "INSERT INTO " % tablename % " "
@@ -302,7 +302,7 @@ int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablena
     int count = 0;
     foreach (const FilePath& filepath, dirs)
     {
-        ElementType element(filepath);
+        ElementType element(filepath, true);
 
         QSqlQuery query = prepareQuery(
             "INSERT INTO " % tablename % " "
@@ -350,7 +350,7 @@ int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablenam
     int count = 0;
     foreach (const FilePath& filepath, dirs)
     {
-        Device element(filepath);
+        Device element(filepath, true);
 
         QSqlQuery query = prepareQuery(
             "INSERT INTO " % tablename % " "

@@ -128,7 +128,7 @@ void AddComponentDialog::on_listComponents_currentItemChanged(QListWidgetItem *c
         if (current)
         {
             library::Component* component = new library::Component(
-                FilePath(current->data(Qt::UserRole).toString())); // ugly...
+                FilePath(current->data(Qt::UserRole).toString()), true); // ugly...
             setSelectedComponent(component);
         }
         else
@@ -171,7 +171,7 @@ void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
     {
         FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(cmpUuid);
         if (!cmpFp.isValid()) continue;
-        library::Component component(cmpFp); // TODO: use library metadata instead of loading the whole component
+        library::Component component(cmpFp, true); // TODO: use library metadata instead of loading the whole component
 
         QListWidgetItem* item = new QListWidgetItem(component.getName(localeOrder));
         item->setData(Qt::UserRole, cmpFp.toStr());
@@ -241,7 +241,7 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
 
             FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(item->getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning
-            const library::Symbol* symbol = new library::Symbol(symbolFp); // TODO: fix memory leak...
+            const library::Symbol* symbol = new library::Symbol(symbolFp, true); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
                 mProject, localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item->getUuid());
             //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());

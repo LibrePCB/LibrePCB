@@ -247,7 +247,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         }
 
         // load the library element --> an exception will be thrown on error
-        ElementType* element = new ElementType(subdirPath);
+        ElementType* element = new ElementType(subdirPath, false);
 
         if (elementList.contains(element->getUuid()))
         {

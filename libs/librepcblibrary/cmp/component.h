@@ -52,7 +52,7 @@ class Component final : public LibraryElement
         explicit Component(const Uuid& uuid, const Version& version, const QString& author,
                            const QString& name_en_US, const QString& description_en_US,
                            const QString& keywords_en_US) throw (Exception);
-        explicit Component(const FilePath& elementDirectory) throw (Exception);
+        explicit Component(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Component() noexcept;
 
         // General

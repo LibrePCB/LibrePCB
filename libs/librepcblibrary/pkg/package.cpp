@@ -42,8 +42,8 @@ Package::Package(const Uuid& uuid, const Version& version, const QString& author
 {
 }
 
-Package::Package(const FilePath& elementDirectory) throw (Exception) :
-    LibraryElement(elementDirectory, "pkg", "package"),
+Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+    LibraryElement(elementDirectory, "pkg", "package", readOnly),
     mDefaultFootprintUuid()
 {
     try

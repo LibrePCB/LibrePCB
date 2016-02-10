@@ -55,7 +55,7 @@ class LibraryCategory : public LibraryBaseElement
                                  const QString& keywords_en_US ) throw (Exception);
         explicit LibraryCategory(const FilePath& elementDirectory,
                                  const QString& xmlFileNamePrefix,
-                                 const QString& xmlRootNodeName) throw (Exception);
+                                 const QString& xmlRootNodeName, bool readOnly) throw (Exception);
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes

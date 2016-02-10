@@ -45,7 +45,7 @@ class ComponentCategory final : public LibraryCategory
 
     public:
 
-        explicit ComponentCategory(const FilePath& elementDirectory);
+        explicit ComponentCategory(const FilePath& elementDirectory, bool readOnly);
         virtual ~ComponentCategory();
 
     private:

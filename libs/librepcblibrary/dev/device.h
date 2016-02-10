@@ -49,7 +49,7 @@ class Device final : public LibraryElement
         explicit Device(const Uuid& uuid, const Version& version, const QString& author,
                         const QString& name_en_US, const QString& description_en_US,
                         const QString& keywords_en_US) throw (Exception);
-        explicit Device(const FilePath& elementDirectory) throw (Exception);
+        explicit Device(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Device() noexcept;
 
         // Getters

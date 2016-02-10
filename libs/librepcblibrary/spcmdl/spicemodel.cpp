@@ -33,8 +33,8 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SpiceModel::SpiceModel(const FilePath& elementDirectory) :
-    LibraryElement(elementDirectory, "spcmdl", "spice_model")
+SpiceModel::SpiceModel(const FilePath& elementDirectory, bool readOnly) :
+    LibraryElement(elementDirectory, "spcmdl", "spice_model", readOnly)
 {
     readFromFile();
 }

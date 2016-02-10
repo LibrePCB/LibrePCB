@@ -45,7 +45,7 @@ class SpiceModel final : public LibraryElement
 
     public:
 
-        explicit SpiceModel(const FilePath& elementDirectory);
+        explicit SpiceModel(const FilePath& elementDirectory, bool readOnly);
         virtual ~SpiceModel();
 
     private:

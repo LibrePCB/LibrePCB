@@ -58,7 +58,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
                                     const QString& keywords_en_US) throw (Exception);
         explicit LibraryBaseElement(const FilePath& elementDirectory,
                                     const QString& xmlFileNamePrefix,
-                                    const QString& xmlRootNodeName) throw (Exception);
+                                    const QString& xmlRootNodeName, bool readOnly) throw (Exception);
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
@@ -210,6 +210,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QString mXmlFileNamePrefix;
         QString mXmlRootNodeName;
         bool mDomTreeParsed;
+        bool mOpenedReadOnly;
 
         // General Library Element Attributes
         Uuid mUuid;

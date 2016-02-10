@@ -46,7 +46,7 @@ CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList loc
         if (!mUuid.isNull())
         {
             FilePath fp = library.getLatestComponentCategory(mUuid);
-            if (fp.isValid()) mCategory = new ComponentCategory(fp);
+            if (fp.isValid()) mCategory = new ComponentCategory(fp, true);
         }
 
         if ((!mUuid.isNull()) || (!mParent))
