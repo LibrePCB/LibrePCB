@@ -29,7 +29,6 @@
 #include <librepcbproject/boards/items/bi_footprintpad.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceadd.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
 #include <librepcbproject/boards/deviceinstance.h>
@@ -40,6 +39,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
+#include "../../cmd/cmdadddevicetoboard.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -301,33 +301,16 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouse
                     mUndoStack.beginCommand(tr("Change Device"));
                     cmdActive = true;
 
-                    // add required elements to project library
+                    // get UUID of device and footprint
                     Uuid deviceUuid(action->data().toString());
-                    const library::Device* device = mProject.getLibrary().getDevice(deviceUuid);
-                    if (!device)
-                    {
-                        // copy device to project's library
-                        FilePath cmpFp = mWorkspace.getLibrary().getLatestDevice(deviceUuid);
-                        device = new library::Device(cmpFp, true);
-                        auto cmd = new CmdProjectLibraryAddElement<library::Device>(mProject.getLibrary(), *device);
-                        mUndoStack.appendToCommand(cmd);
-                    }
-                    const library::Package* pkg = mProject.getLibrary().getPackage(device->getPackageUuid());
-                    if (!pkg)
-                    {
-                        // copy package to project's library
-                        FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(device->getPackageUuid());
-                        pkg = new library::Package(pkgFp, true);
-                        auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
-                        mUndoStack.appendToCommand(cmd);
-                    }
-                    Uuid footprintUuid = pkg->getDefaultFootprintUuid(); // TODO
+                    Uuid footprintUuid = Uuid(); // TODO
 
                     // replace device
                     Point pos = devInst.getPosition();
                     auto cmdRemove = new CmdDeviceInstanceRemove(*board, devInst);
                     mUndoStack.appendToCommand(cmdRemove);
-                    auto cmdAdd = new CmdDeviceInstanceAdd(*board, cmpInst, deviceUuid, footprintUuid, pos);
+                    auto cmdAdd = new CmdAddDeviceToBoard(mWorkspace, *board, cmpInst,
+                                                          deviceUuid, footprintUuid, pos);
                     mUndoStack.appendToCommand(cmdAdd);
 
                     mUndoStack.endCommand();
@@ -367,7 +350,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         if (items.isEmpty()) return PassToParentState;
         // TODO: open the properties editor dialog of the top most item
         qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getDeviceInstance().getComponentInstance().getUuid();
-        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getDeviceInstance().getLibDevice().getDirectory().toNative();
+        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getDeviceInstance().getLibDevice().getFilePath().toNative();
     }
     return PassToParentState;
 }

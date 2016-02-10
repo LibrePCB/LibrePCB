@@ -50,7 +50,10 @@ SOURCES += \
     dialogs/projectsettingsdialog.cpp \
     docks/ercmsgdock.cpp \
     dialogs/addcomponentdialog.cpp \
-    boardeditor/boardlayersdock.cpp
+    boardeditor/boardlayersdock.cpp \
+    cmd/cmdaddcomponenttocircuit.cpp \
+    cmd/cmdaddsymboltoschematic.cpp \
+    cmd/cmdadddevicetoboard.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -82,7 +85,10 @@ HEADERS += \
     dialogs/projectsettingsdialog.h \
     docks/ercmsgdock.h \
     dialogs/addcomponentdialog.h \
-    boardeditor/boardlayersdock.h
+    boardeditor/boardlayersdock.h \
+    cmd/cmdaddcomponenttocircuit.h \
+    cmd/cmdaddsymboltoschematic.h \
+    cmd/cmdadddevicetoboard.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \

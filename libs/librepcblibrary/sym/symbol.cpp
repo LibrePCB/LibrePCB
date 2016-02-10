@@ -148,7 +148,7 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
                 QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                .arg(pin->getUuid().toStr(), mXmlFilepath.toNative()));
+                .arg(pin->getUuid().toStr(), root.getDocFilePath().toNative()));
         }
         mPins.insert(pin->getUuid(), pin);
     }
@@ -173,7 +173,7 @@ void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, node->getName(),
                 QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                .arg(node->getName(), mXmlFilepath.toNative()));
+                .arg(node->getName(), root.getDocFilePath().toNative()));
         }
     }
 }

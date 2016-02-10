@@ -86,9 +86,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
 
     // Component Library Element Attributes
     QString htmlLink("<a href=\"%1\">%2<a>");
-    mUi->lblCompLibUuid->setText(htmlLink.arg(mComponentInstance.getLibComponent().getXmlFilepath().toQUrl().toString(),
-                                                 mComponentInstance.getLibComponent().getUuid().toStr()));
-    mUi->lblCompLibUuid->setToolTip(mComponentInstance.getLibComponent().getXmlFilepath().toNative());
+    mUi->lblCompLibUuid->setText(htmlLink.arg(mComponentInstance.getLibComponent().getFilePath().toQUrl().toString(),
+                                              mComponentInstance.getLibComponent().getUuid().toStr()));
+    mUi->lblCompLibUuid->setToolTip(mComponentInstance.getLibComponent().getFilePath().toNative());
     mUi->lblCompLibName->setText(mComponentInstance.getLibComponent().getName(localeOrder));
     mUi->lblCompLibName->setToolTip(mComponentInstance.getLibComponent().getDescription(localeOrder));
     mUi->lblSymbVarUuid->setText(mComponentInstance.getSymbolVariant().getUuid().toStr());
@@ -103,9 +103,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->spbxSymbInstAngle->setValue(mSymbol.getRotation().toDeg());
 
     // Symbol Library Element Attributes
-    mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getXmlFilepath().toQUrl().toString(),
+    mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getFilePath().toQUrl().toString(),
                                               mSymbol.getLibSymbol().getUuid().toStr()));
-    mUi->lblSymbLibUuid->setToolTip(mSymbol.getLibSymbol().getXmlFilepath().toNative());
+    mUi->lblSymbLibUuid->setToolTip(mSymbol.getLibSymbol().getFilePath().toNative());
     mUi->lblSymbLibName->setText(mSymbol.getLibSymbol().getName(localeOrder));
     mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescription(localeOrder));
 

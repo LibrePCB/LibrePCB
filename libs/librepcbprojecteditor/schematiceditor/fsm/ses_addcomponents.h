@@ -81,10 +81,8 @@ class SES_AddComponents final : public SES_Base
         AddComponentDialog* mAddComponentDialog;
         Angle mLastAngle;
 
-        // information about the current symbol to place
-        const library::Component* mComponent;
-        const library::ComponentSymbolVariant* mCmpSymbVar;
-        const library::ComponentSymbolVariantItem* mCurrentSymbVarItem;
+        // information about the current component/symbol to place
+        ComponentInstance* mCurrentComponent;
         int mCurrentSymbVarItemIndex;
         SI_Symbol* mCurrentSymbolToPlace;
         CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;

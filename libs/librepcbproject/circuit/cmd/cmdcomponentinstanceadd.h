@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,7 +35,6 @@ namespace librepcb {
 
 namespace library {
 class Component;
-class ComponentSymbolVariant;
 }
 
 namespace project {
@@ -54,10 +54,8 @@ class CmdComponentInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdComponentInstanceAdd(Circuit& circuit,
-                                         const library::Component& cmp,
-                                         const library::ComponentSymbolVariant& symbVar,
-                                         UndoCommand* parent = 0) throw (Exception);
+        explicit CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
+                                         const Uuid& symbVar, UndoCommand* parent = 0) throw (Exception);
         ~CmdComponentInstanceAdd() noexcept;
 
         // Getters
@@ -71,8 +69,8 @@ class CmdComponentInstanceAdd final : public UndoCommand
 
         // Attributes from the constructor
         Circuit& mCircuit;
-        const library::Component& mComponent;
-        const library::ComponentSymbolVariant& mSymbVar;
+        Uuid mComponentUuid;
+        Uuid mSymbVarUuid;
 
         /// @brief The created component instance
         ComponentInstance* mComponentInstance;

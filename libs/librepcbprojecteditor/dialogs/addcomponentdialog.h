@@ -27,6 +27,7 @@
 #include <QtWidgets>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -80,7 +81,7 @@ class AddComponentDialog final : public QDialog
         ~AddComponentDialog() noexcept;
 
         // Getters
-        FilePath getSelectedComponentFilePath() const noexcept;
+        Uuid getSelectedComponentUuid() const noexcept;
         Uuid getSelectedSymbVarUuid() const noexcept;
 
 

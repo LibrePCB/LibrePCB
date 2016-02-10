@@ -40,15 +40,17 @@ CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp
                                            const Point& position, const Angle& rotation,
                                            UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add device to board"), parent),
-    mBoard(board), mDeviceInstance(nullptr)
+    mBoard(board), mComponentInstance(&comp), mDeviceUuid(deviceUuid),
+    mFootprintUuid(footprintUuid), mPosition(position), mRotation(rotation),
+    mDeviceInstance(nullptr)
 {
-    mDeviceInstance = new DeviceInstance(board, comp, deviceUuid, footprintUuid, position, rotation);
 }
 
-CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device,
-                                                 UndoCommand* parent) throw (Exception) :
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add device to board"), parent),
-    mBoard(device.getBoard()), mDeviceInstance(&device)
+    mBoard(device.getBoard()), mComponentInstance(nullptr), mDeviceUuid(),
+    mFootprintUuid(), mPosition(), mRotation(),
+    mDeviceInstance(&device)
 {
 }
 
@@ -64,6 +66,11 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 
 void CmdDeviceInstanceAdd::redo() throw (Exception)
 {
+    if (!mDeviceInstance) { // only the first time
+        mDeviceInstance = new DeviceInstance(mBoard, *mComponentInstance, mDeviceUuid,
+                                             mFootprintUuid, mPosition, mRotation); // throws an exception on error
+    }
+
     mBoard.addDeviceInstance(*mDeviceInstance); // throws an exception on error
 
     try

@@ -75,7 +75,7 @@ AddComponentDialog::~AddComponentDialog() noexcept
 {
     qDeleteAll(mPreviewSymbolGraphicsItems);    mPreviewSymbolGraphicsItems.clear();
     mSelectedSymbVar = nullptr;
-    delete mSelectedComponent;                    mSelectedComponent = nullptr;
+    delete mSelectedComponent;                  mSelectedComponent = nullptr;
     delete mCategoryTreeModel;                  mCategoryTreeModel = nullptr;
     delete mPreviewScene;                       mPreviewScene = nullptr;
     delete mUi;                                 mUi = nullptr;
@@ -85,12 +85,12 @@ AddComponentDialog::~AddComponentDialog() noexcept
  *  Getters
  ****************************************************************************************/
 
-FilePath AddComponentDialog::getSelectedComponentFilePath() const noexcept
+Uuid AddComponentDialog::getSelectedComponentUuid() const noexcept
 {
-    if (mSelectedComponent)
-        return mSelectedComponent->getDirectory();
+    if (mSelectedComponent && mSelectedSymbVar)
+        return mSelectedComponent->getUuid();
     else
-        return FilePath();
+        return Uuid();
 }
 
 Uuid AddComponentDialog::getSelectedSymbVarUuid() const noexcept

@@ -345,8 +345,8 @@ ComponentInstance* Circuit::getComponentInstanceByName(const QString& name) cons
 }
 
 ComponentInstance* Circuit::createComponentInstance(const library::Component& cmp,
-                                                const library::ComponentSymbolVariant& symbVar,
-                                                QString name) throw (Exception)
+                                                    const Uuid& symbVar,
+                                                    QString name) throw (Exception)
 {
     if (name.isEmpty())
     {

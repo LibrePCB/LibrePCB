@@ -37,7 +37,7 @@ namespace project {
 
 template <typename ElementType>
 CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                                                      const ElementType& element,
+                                                                      ElementType& element,
                                                                       UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add element to library"), parent),
     mLibrary(library), mElement(element)
@@ -92,31 +92,31 @@ void CmdProjectLibraryAddElement<ElementType>::undo() throw (Exception)
 template <>
 void CmdProjectLibraryAddElement<library::Symbol>::addElement()
 {
-    return mLibrary.addSymbol(mElement);
+    mLibrary.addSymbol(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::SpiceModel>::addElement()
 {
-    return mLibrary.addSpiceModel(mElement);
+    mLibrary.addSpiceModel(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Package>::addElement()
 {
-    return mLibrary.addPackage(mElement);
+    mLibrary.addPackage(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Component>::addElement()
 {
-    return mLibrary.addComponent(mElement);
+    mLibrary.addComponent(mElement);
 }
 
 template <>
 void CmdProjectLibraryAddElement<library::Device>::addElement()
 {
-    return mLibrary.addDevice(mElement);
+    mLibrary.addDevice(mElement);
 }
 
 template <>

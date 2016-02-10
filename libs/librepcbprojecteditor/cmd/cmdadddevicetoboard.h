@@ -17,41 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
-#define LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#ifndef LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
+#define LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+namespace workspace {
+class Workspace;
+}
+
+namespace library {
+class Device;
+}
+
 namespace project {
 
-class ProjectLibrary;
+class Board;
+class ComponentInstance;
+class DeviceInstance;
+class CmdDeviceInstanceAdd;
 
 /*****************************************************************************************
- *  Class CmdProjectLibraryAddElement
+ *  Class CmdAddDeviceToBoard
  ****************************************************************************************/
 
 /**
- * @brief The CmdProjectLibraryAddElement class
+ * @brief The CmdAddDeviceToBoard class
  */
-template <typename ElementType>
-class CmdProjectLibraryAddElement final : public UndoCommand
+class CmdAddDeviceToBoard final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                             ElementType& element,
-                                             UndoCommand* parent = 0) throw (Exception);
-        ~CmdProjectLibraryAddElement() noexcept;
+        explicit CmdAddDeviceToBoard(workspace::Workspace& workspace,
+                                     Board& board, ComponentInstance& cmpInstance,
+                                     const Uuid& deviceUuid, const Uuid& footprintUuid,
+                                     const Point& position = Point(),
+                                     const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
+        ~CmdAddDeviceToBoard() noexcept;
+
+        // Getters
+        DeviceInstance* getDeviceInstance() const noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -59,12 +77,17 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 
     private:
 
-        void addElement();
-        void removeElement();
+        // Attributes from the constructor
+        workspace::Workspace& mWorkspace;
+        Board& mBoard;
+        ComponentInstance& mComponentInstance;
+        Uuid mDeviceUuid;
+        Uuid mFootprintUuid;
+        Point mPosition;
+        Angle mRotation;
 
-
-        ProjectLibrary& mLibrary;
-        ElementType& mElement;
+        // child commands
+        CmdDeviceInstanceAdd* mCmdAddToBoard;
 };
 
 /*****************************************************************************************
@@ -74,4 +97,4 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#endif // LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H

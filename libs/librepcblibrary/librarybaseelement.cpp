@@ -43,11 +43,16 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) throw (Exception) :
-    QObject(nullptr), mVersionFilepath(), mXmlFilepath(),
-    mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
-    mDomTreeParsed(false), mOpenedReadOnly(false), mUuid(uuid), mVersion(version), mAuthor(author),
+    QObject(nullptr), mDirectory(FilePath::getRandomTempPath()),
+    mDirectoryIsTemporary(true), mXmlFileNamePrefix(xmlFileNamePrefix),
+    mXmlRootNodeName(xmlRootNodeName), mDomTreeParsed(false), mOpenedReadOnly(false),
+    mUuid(uuid), mVersion(version), mAuthor(author),
     mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
 {
+    if (!mDirectory.mkPath()) {
+        qWarning() << "Could not create temporary directory:" << mDirectory.toNative();
+    }
+
     mNames.insert("en_US", name_en_US);
     mDescriptions.insert("en_US", description_en_US);
     mKeywords.insert("en_US", keywords_en_US);
@@ -56,7 +61,7 @@ LibraryBaseElement::LibraryBaseElement(const QString& xmlFileNamePrefix,
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        const QString& xmlFileNamePrefix,
                                        const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
-    QObject(0), mDirectory(elementDirectory), mVersionFilepath(), mXmlFilepath(),
+    QObject(nullptr), mDirectory(elementDirectory), mDirectoryIsTemporary(false),
     mXmlFileNamePrefix(xmlFileNamePrefix), mXmlRootNodeName(xmlRootNodeName),
     mDomTreeParsed(false), mOpenedReadOnly(readOnly)
 {
@@ -64,6 +69,11 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
 LibraryBaseElement::~LibraryBaseElement() noexcept
 {
+    if (mDirectoryIsTemporary) {
+        if (!QDir(mDirectory.toStr()).removeRecursively()) {
+            qWarning() << "Could not remove temporary directory:" << mDirectory.toNative();
+        }
+    }
 }
 
 /*****************************************************************************************
@@ -100,12 +110,8 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::save() const throw (Exception)
+void LibraryBaseElement::save() throw (Exception)
 {
-    Q_ASSERT(mDirectory.isValid());
-    Q_ASSERT(mVersionFilepath.isValid());
-    Q_ASSERT(mXmlFilepath.isValid());
-
     if (mOpenedReadOnly) {
         throw RuntimeError(__FILE__, __LINE__, mDirectory.toStr(),
             QString(tr("Library element was opened in read-only mode: \"%1\""))
@@ -114,21 +120,72 @@ void LibraryBaseElement::save() const throw (Exception)
 
     // save xml file
     XmlDomDocument doc(*serializeToXmlDomElement());
-    QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(mXmlFilepath));
+    QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(mDirectory.getPathTo(mXmlFileNamePrefix % ".xml")));
     xmlFile->save(doc, true);
 
     // save version number file
-    QScopedPointer<SmartTextFile> versionFile(SmartTextFile::create(mVersionFilepath));
+    QScopedPointer<SmartTextFile> versionFile(SmartTextFile::create(mDirectory.getPathTo("version")));
     versionFile->setContent(QString("%1\n").arg(APP_VERSION_MAJOR).toUtf8());
     versionFile->save(true);
 }
 
-void LibraryBaseElement::saveTo(const FilePath& parentDir) const throw (Exception)
+void LibraryBaseElement::saveTo(const FilePath& parentDir) throw (Exception)
 {
-    QString dirname = QString("%1.%2").arg(mUuid.toStr()).arg(mXmlFileNamePrefix);
-    mDirectory = parentDir.getPathTo(dirname);
-    mVersionFilepath = mDirectory.getPathTo("version");
-    mXmlFilepath = mDirectory.getPathTo(QString("%1.xml").arg(mXmlFileNamePrefix));
+    if (parentDir != mDirectory.getParentDir()) {
+        QString dirname = QString("%1.%2").arg(mUuid.toStr()).arg(mXmlFileNamePrefix);
+        FilePath destinationDir = parentDir.getPathTo(dirname);
+
+        // remove destination directory
+        if (!QDir(destinationDir.toStr()).removeRecursively()) {
+            throw RuntimeError(__FILE__, __LINE__, destinationDir.toStr(),
+                QString(tr("Could not remove the directory \"%1\"."))
+                .arg(destinationDir.toNative()));
+        }
+
+        // TODO: copy current directory to destination
+
+        // if current directory is temporary, try to remove it
+        if (mDirectoryIsTemporary) {
+            if (!QDir(mDirectory.toStr()).removeRecursively()) {
+                qWarning() << "Could not remove temporary directory:" << mDirectory.toNative();
+            }
+        }
+
+        mDirectory = destinationDir;
+        mDirectoryIsTemporary = false;
+        mOpenedReadOnly = false;
+    }
+
+    save();
+}
+
+void LibraryBaseElement::moveTo(const FilePath& parentDir) throw (Exception)
+{
+    if (parentDir != mDirectory.getParentDir()) {
+        QString dirname = QString("%1.%2").arg(mUuid.toStr()).arg(mXmlFileNamePrefix);
+        FilePath destinationDir = parentDir.getPathTo(dirname);
+
+        // remove destination directory
+        if (!QDir(destinationDir.toStr()).removeRecursively()) {
+            throw RuntimeError(__FILE__, __LINE__, destinationDir.toStr(),
+                QString(tr("Could not remove the directory \"%1\"."))
+                .arg(destinationDir.toNative()));
+        }
+
+        // TODO: copy current directory to destination
+
+        // remove current directory
+        if (!QDir(mDirectory.toStr()).removeRecursively()) {
+            throw RuntimeError(__FILE__, __LINE__, mDirectory.toStr(),
+                QString(tr("Could not remove the directory \"%1\"."))
+                .arg(mDirectory.toNative()));
+        }
+
+        mDirectory = destinationDir;
+        mDirectoryIsTemporary = false;
+        mOpenedReadOnly = false;
+    }
+
     save();
 }
 
@@ -150,10 +207,10 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     }
 
     // read version number from version file
-    mVersionFilepath = mDirectory.getPathTo("version");
+    FilePath versionFilePath = mDirectory.getPathTo("version");
     bool versionNumberValid = false;
     int fileVersion = 0;
-    SmartTextFile versionFile(mVersionFilepath, false, true);
+    SmartTextFile versionFile(versionFilePath, false, true);
     QString versionFileContent = QString(versionFile.getContent());
     QStringList versionFileLines = versionFileContent.split("\n", QString::KeepEmptyParts);
     if (versionFileLines.count() > 0) {
@@ -163,7 +220,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     {
         throw RuntimeError(__FILE__, __LINE__, versionFileContent,
             QString(tr("Invalid version number in file %1."))
-            .arg(mVersionFilepath.toNative()));
+            .arg(versionFilePath.toNative()));
     }
     if (!(fileVersion <= APP_VERSION_MAJOR))
     {
@@ -174,8 +231,8 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     }
 
     // open XML file
-    mXmlFilepath = mDirectory.getPathTo(QString("%1.xml").arg(mXmlFileNamePrefix));
-    SmartXmlFile xmlFile(mXmlFilepath, false, true);
+    FilePath xmlFilePath = mDirectory.getPathTo(mXmlFileNamePrefix % ".xml");
+    SmartXmlFile xmlFile(xmlFilePath, false, true);
     QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(true);
     parseDomTree(doc->getRoot());
 
@@ -185,7 +242,7 @@ void LibraryBaseElement::readFromFile() throw (Exception)
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1/%2").arg(mUuid.toStr(), dirUuid.toStr()),
             QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
-            .arg(mXmlFilepath.toNative()));
+            .arg(xmlFilePath.toNative()));
     }
 
     // check attributes

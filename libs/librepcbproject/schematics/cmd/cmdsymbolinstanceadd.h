@@ -58,7 +58,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         ~CmdSymbolInstanceAdd() noexcept;
 
         // Getters
-        SI_Symbol* getSymbol() const noexcept {return mSymbol;}
+        SI_Symbol* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -68,9 +68,13 @@ class CmdSymbolInstanceAdd final : public UndoCommand
 
         // Attributes from the constructor
         Schematic& mSchematic;
+        ComponentInstance* mComponentInstance;
+        Uuid mSymbolItemUuid;
+        Point mPosition;
+        Angle mAngle;
 
-        /// @brief The created symbol
-        SI_Symbol* mSymbol;
+        /// @brief The created symbol instance
+        SI_Symbol* mSymbolInstance;
 };
 
 /*****************************************************************************************

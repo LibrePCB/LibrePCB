@@ -86,11 +86,11 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
 ProjectLibrary::~ProjectLibrary() noexcept
 {
     // clean up all removed elements
-    cleanupRemovedElements<Symbol>(mRemovedSymbols);
-    cleanupRemovedElements<SpiceModel>(mRemovedSpiceModels);
-    cleanupRemovedElements<Package>(mRemovedPackages);
-    cleanupRemovedElements<Component>(mRemovedComponents);
-    cleanupRemovedElements<Device>(mRemovedDevices);
+    cleanupElements<Symbol>(mAddedSymbols, mRemovedSymbols);
+    cleanupElements<SpiceModel>(mAddedSpiceModels, mRemovedSpiceModels);
+    cleanupElements<Package>(mAddedPackages, mRemovedPackages);
+    cleanupElements<Component>(mAddedComponents, mRemovedComponents);
+    cleanupElements<Device>(mAddedDevices, mRemovedDevices);
 
     // Delete all library elements (in reverse order of their creation)
     qDeleteAll(mDevices);       mDevices.clear();
@@ -104,27 +104,27 @@ ProjectLibrary::~ProjectLibrary() noexcept
  *  Getters: Library Elements
  ****************************************************************************************/
 
-const Symbol* ProjectLibrary::getSymbol(const Uuid& uuid) const noexcept
+Symbol* ProjectLibrary::getSymbol(const Uuid& uuid) const noexcept
 {
     return mSymbols.value(uuid, 0);
 }
 
-const SpiceModel* ProjectLibrary::getSpiceModel(const Uuid& uuid) const noexcept
+SpiceModel* ProjectLibrary::getSpiceModel(const Uuid& uuid) const noexcept
 {
     return mSpiceModels.value(uuid, 0);
 }
 
-const Package* ProjectLibrary::getPackage(const Uuid& uuid) const noexcept
+Package* ProjectLibrary::getPackage(const Uuid& uuid) const noexcept
 {
     return mPackages.value(uuid, 0);
 }
 
-const Component* ProjectLibrary::getComponent(const Uuid& uuid) const noexcept
+Component* ProjectLibrary::getComponent(const Uuid& uuid) const noexcept
 {
     return mComponents.value(uuid, 0);
 }
 
-const Device* ProjectLibrary::getDevice(const Uuid& uuid) const noexcept
+Device* ProjectLibrary::getDevice(const Uuid& uuid) const noexcept
 {
     return mDevices.value(uuid, 0);
 }
@@ -133,10 +133,10 @@ const Device* ProjectLibrary::getDevice(const Uuid& uuid) const noexcept
  *  Getters: Special Queries
  ****************************************************************************************/
 
-QHash<Uuid, const library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& compUuid) const noexcept
+QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& compUuid) const noexcept
 {
-    QHash<Uuid, const library::Device*> list;
-    foreach (const library::Device* device, mDevices)
+    QHash<Uuid, library::Device*> list;
+    foreach (library::Device* device, mDevices)
     {
         if (device->getComponentUuid() == compUuid)
             list.insert(device->getUuid(), device);
@@ -148,54 +148,54 @@ QHash<Uuid, const library::Device*> ProjectLibrary::getDevicesOfComponent(const 
  *  Add/Remove Methods
  ****************************************************************************************/
 
-void ProjectLibrary::addSymbol(const library::Symbol& s) throw (Exception)
+void ProjectLibrary::addSymbol(library::Symbol& s) throw (Exception)
 {
-    addElement<Symbol>(s, mSymbols, mRemovedSymbols);
+    addElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
 }
 
-void ProjectLibrary::addSpiceModel(const library::SpiceModel& m) throw (Exception)
+void ProjectLibrary::addSpiceModel(library::SpiceModel& m) throw (Exception)
 {
-    addElement<SpiceModel>(m, mSpiceModels, mRemovedSpiceModels);
+    addElement<SpiceModel>(m, mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels);
 }
 
-void ProjectLibrary::addPackage(const library::Package& p) throw (Exception)
+void ProjectLibrary::addPackage(library::Package& p) throw (Exception)
 {
-    addElement<Package>(p, mPackages, mRemovedPackages);
+    addElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
 }
 
-void ProjectLibrary::addComponent(const library::Component& c) throw (Exception)
+void ProjectLibrary::addComponent(library::Component& c) throw (Exception)
 {
-    addElement<Component>(c, mComponents, mRemovedComponents);
+    addElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
 }
 
-void ProjectLibrary::addDevice(const library::Device& d) throw (Exception)
+void ProjectLibrary::addDevice(library::Device& d) throw (Exception)
 {
-    addElement<Device>(d, mDevices, mRemovedDevices);
+    addElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
 }
 
-void ProjectLibrary::removeSymbol(const library::Symbol& s) throw (Exception)
+void ProjectLibrary::removeSymbol(library::Symbol& s) throw (Exception)
 {
-    removeElement<Symbol>(s, mSymbols, mRemovedSymbols);
+    removeElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
 }
 
-void ProjectLibrary::removeSpiceModel(const library::SpiceModel& m) throw (Exception)
+void ProjectLibrary::removeSpiceModel(library::SpiceModel& m) throw (Exception)
 {
-    removeElement<SpiceModel>(m, mSpiceModels, mRemovedSpiceModels);
+    removeElement<SpiceModel>(m, mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels);
 }
 
-void ProjectLibrary::removePackage(const library::Package& p) throw (Exception)
+void ProjectLibrary::removePackage(library::Package& p) throw (Exception)
 {
-    removeElement<Package>(p, mPackages, mRemovedPackages);
+    removeElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
 }
 
-void ProjectLibrary::removeComponent(const library::Component& c) throw (Exception)
+void ProjectLibrary::removeComponent(library::Component& c) throw (Exception)
 {
-    removeElement<Component>(c, mComponents, mRemovedComponents);
+    removeElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
 }
 
-void ProjectLibrary::removeDevice(const library::Device& d) throw (Exception)
+void ProjectLibrary::removeDevice(library::Device& d) throw (Exception)
 {
-    removeElement<Device>(d, mDevices, mRemovedDevices);
+    removeElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
 }
 
 
@@ -208,15 +208,15 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
     bool success = true;
 
     // Save all elements
-    if (!saveElements<Symbol>(toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mRemovedSymbols))
+    if (!saveElements<Symbol>(toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mAddedSymbols, mRemovedSymbols))
         success = false;
-    if (!saveElements<SpiceModel>(toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mRemovedSpiceModels))
+    if (!saveElements<SpiceModel>(toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels))
         success = false;
-    if (!saveElements<Package>(toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mRemovedPackages))
+    if (!saveElements<Package>(toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mAddedPackages, mRemovedPackages))
         success = false;
-    if (!saveElements<Component>(toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mRemovedComponents))
+    if (!saveElements<Component>(toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mAddedComponents, mRemovedComponents))
         success = false;
-    if (!saveElements<Device>(toOriginal, errors, mLibraryPath.getPathTo("dev"), mDevices, mRemovedDevices))
+    if (!saveElements<Device>(toOriginal, errors, mLibraryPath.getPathTo("dev"), mDevices, mAddedDevices, mRemovedDevices))
         success = false;
 
     return success;
@@ -228,7 +228,7 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
-                                  QHash<Uuid, const ElementType*>& elementList) throw (Exception)
+                                  QHash<Uuid, ElementType*>& elementList) throw (Exception)
 {
     QDir dir(directory.toStr());
 
@@ -263,55 +263,69 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 }
 
 template <typename ElementType>
-void ProjectLibrary::addElement(const ElementType& element,
-                                QHash<Uuid, const ElementType*>& elementList,
-                                QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception)
+void ProjectLibrary::addElement(ElementType& element,
+                                QHash<Uuid, ElementType*>& elementList,
+                                QList<ElementType*>& addedElementsList,
+                                QList<ElementType*>& removedElementsList) throw (Exception)
 {
-    if (elementList.contains(element.getUuid()))
-    {
+    if (elementList.contains(element.getUuid())) {
         throw LogicError(__FILE__, __LINE__, QString(), QString(tr(
             "There is already an element with the same UUID in the project's library: %1"))
             .arg(element.getUuid().toStr()));
     }
-
-    if (removedElementsList.contains(element.getUuid()))
-    {
-        Q_ASSERT(removedElementsList.value(element.getUuid()) == &element);
-        removedElementsList.remove(element.getUuid());
+    if (removedElementsList.contains(&element)) {
+        removedElementsList.removeOne(&element);
+    } else {
+        element.saveTo(FilePath::getRandomTempPath());
     }
     elementList.insert(element.getUuid(), &element);
+    addedElementsList.append(&element);
 }
 
 template <typename ElementType>
-void ProjectLibrary::removeElement(const ElementType& element,
-                                   QHash<Uuid, const ElementType*>& elementList,
-                                   QHash<Uuid, const ElementType*>& removedElementsList) throw (Exception)
+void ProjectLibrary::removeElement(ElementType& element,
+                                   QHash<Uuid, ElementType*>& elementList,
+                                   QList<ElementType*>& addedElementsList,
+                                   QList<ElementType*>& removedElementsList) throw (Exception)
 {
     Q_ASSERT(elementList.value(element.getUuid()) == &element);
-    Q_ASSERT(!removedElementsList.contains(element.getUuid()));
+    Q_ASSERT(!removedElementsList.contains(&element));
     elementList.remove(element.getUuid());
-    removedElementsList.insert(element.getUuid(), &element);
+    addedElementsList.removeOne(&element);
+    removedElementsList.append(&element);
 }
 
 template <typename ElementType>
 bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
-                                  QHash<Uuid, const ElementType*>& elementList,
-                                  QHash<Uuid, const ElementType*>& removedElementsList) noexcept
+                                  QHash<Uuid, ElementType*>& elementList,
+                                  QList<ElementType*>& addedElementsList,
+                                  QList<ElementType*>& removedElementsList) noexcept
 {
-    Q_UNUSED(toOriginal);
-    Q_UNUSED(removedElementsList);
-
     bool success = true;
 
-    foreach (const ElementType* element, elementList)
-    {
-        try
-        {
-            if (element->getDirectory().getParentDir().getParentDir().toStr() != mLibraryPath.toStr())
-                element->saveTo(parentDir);
+    if (toOriginal) {
+        foreach (ElementType* element, removedElementsList) {
+            try {
+                if (element->getFilePath().getParentDir().getParentDir() == mLibraryPath) {
+                    element->moveTo(FilePath::getRandomTempPath());
+                }
+            }
+            catch (Exception& e) {
+                success = false;
+                errors.append(e.getUserMsg());
+            }
         }
-        catch (Exception& e)
-        {
+    }
+
+    foreach (ElementType* element, elementList) {
+        try {
+            if (element->getFilePath().getParentDir().getParentDir() != mLibraryPath) {
+                element->moveTo(parentDir);
+            }
+            if (toOriginal && addedElementsList.contains(element))
+                addedElementsList.removeOne(element);
+        }
+        catch (Exception& e) {
             success = false;
             errors.append(e.getUserMsg());
         }
@@ -321,17 +335,19 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
 }
 
 template <typename ElementType>
-void ProjectLibrary::cleanupRemovedElements(QHash<Uuid, const ElementType*>& removedElementsList) noexcept
+void ProjectLibrary::cleanupElements(QList<ElementType*>& addedElementsList,
+                                     QList<ElementType*>& removedElementsList) noexcept
 {
-    foreach (const ElementType* element, removedElementsList)
-    {
-        if (element->getDirectory().getParentDir().getParentDir().toStr() == mLibraryPath.toStr())
-        {
-            QDir dir(element->getDirectory().toStr());
+    QList<ElementType*> combined;
+    combined.append(addedElementsList);
+    combined.append(removedElementsList);
+    foreach (ElementType* element, combined) {
+        if (element->getFilePath().getParentDir().getParentDir() == mLibraryPath) {
+            QDir dir(element->getFilePath().toStr());
             dir.removeRecursively();
         }
-        delete removedElementsList.take(element->getUuid());
     }
+    qDeleteAll(removedElementsList);        removedElementsList.clear();
 }
 
 /*****************************************************************************************

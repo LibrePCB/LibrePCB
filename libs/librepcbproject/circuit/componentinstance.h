@@ -69,7 +69,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         explicit ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                   const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception);
+                                   const Uuid& symbVar, const QString& name) throw (Exception);
         ~ComponentInstance() noexcept;
 
         // Getters

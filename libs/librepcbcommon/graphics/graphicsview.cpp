@@ -115,6 +115,18 @@ void GraphicsView::setOriginCrossVisible(bool visible) noexcept
  *  General Methods
  ****************************************************************************************/
 
+Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
+                                           bool mapToGrid) const noexcept
+{
+    QPoint localPosPx = mapFromGlobal(globalPosPx);
+    if (boundToView) {
+        localPosPx.setX(qBound(0, localPosPx.x(), width()));
+        localPosPx.setY(qBound(0, localPosPx.y(), height()));
+    }
+    Length gridInterval = mapToGrid ? mGridProperties->getInterval() : Length(0);
+    return Point::fromPx(mapToScene(localPosPx), gridInterval);
+}
+
 void GraphicsView::handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept
 {
     if(event->modifiers().testFlag(Qt::ShiftModifier))

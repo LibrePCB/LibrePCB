@@ -123,7 +123,7 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
                 QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                .arg(pad->getUuid().toStr(), mXmlFilepath.toNative()));
+                .arg(pad->getUuid().toStr(), root.getDocFilePath().toNative()));
         }
         mPads.insert(pad->getUuid(), pad);
     }
@@ -138,7 +138,7 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
                 QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
-                .arg(footprint->getUuid().toStr(), mXmlFilepath.toNative()));
+                .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
         }
         mFootprints.insert(footprint->getUuid(), footprint);
     }
@@ -148,7 +148,7 @@ void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
     if (!mFootprints.contains(mDefaultFootprintUuid)) {
         throw RuntimeError(__FILE__, __LINE__, mDefaultFootprintUuid.toStr(),
             QString(tr("The package \"%1\" has no valid default footprint set."))
-            .arg(mXmlFilepath.toNative()));
+            .arg(root.getDocFilePath().toNative()));
     }
 }
 

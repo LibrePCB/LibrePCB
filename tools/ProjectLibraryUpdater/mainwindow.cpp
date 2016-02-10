@@ -100,7 +100,7 @@ void MainWindow::on_pushButton_2_clicked()
                 Component latestComp(filepath, true);
                 FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
                 latestComp.saveTo(dest);
-                ui->log->addItem(latestComp.getDirectory().toNative());
+                ui->log->addItem(latestComp.getFilePath().toNative());
 
                 // search all required symbols
                 foreach (const ComponentSymbolVariant* symbvar, latestComp.getSymbolVariants())
@@ -116,7 +116,7 @@ void MainWindow::on_pushButton_2_clicked()
                         Symbol latestSymbol(filepath, true);
                         FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
                         latestSymbol.saveTo(dest);
-                        ui->log->addItem(latestSymbol.getDirectory().toNative());
+                        ui->log->addItem(latestSymbol.getFilePath().toNative());
                     }
                 }
             }
@@ -143,7 +143,7 @@ void MainWindow::on_pushButton_2_clicked()
                     Device latestDevice(filepath, true);
                     FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
                     latestDevice.saveTo(dest);
-                    ui->log->addItem(latestDevice.getDirectory().toNative());
+                    ui->log->addItem(latestDevice.getFilePath().toNative());
 
                     // get package
                     Uuid packUuid = latestDevice.getPackageUuid();
@@ -157,7 +157,7 @@ void MainWindow::on_pushButton_2_clicked()
                     Package latestPackage(filepath, true);
                     dest = projectFilepath.getParentDir().getPathTo("library/pkg");
                     latestPackage.saveTo(dest);
-                    ui->log->addItem(latestPackage.getDirectory().toNative());
+                    ui->log->addItem(latestPackage.getFilePath().toNative());
                 }
             }
         }

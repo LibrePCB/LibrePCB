@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include "../units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -67,6 +68,8 @@ class GraphicsView final : public QGraphicsView
         void setOriginCrossVisible(bool visible) noexcept;
 
         // General Methods
+        Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
+                                     bool mapToGrid) const noexcept;
         void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
 

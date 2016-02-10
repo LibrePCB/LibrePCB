@@ -271,7 +271,7 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
                 QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
-                .arg(attribute->getKey(), mXmlFilepath.toNative()));
+                .arg(attribute->getKey(), root.getDocFilePath().toNative()));
         }
         mAttributes.append(attribute);
     }
@@ -287,15 +287,15 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
                 QString(tr("The prefix \"%1\" exists multiple times in \"%2\"."))
-                .arg(node->getAttribute<QString>("norm", false), mXmlFilepath.toNative()));
+                .arg(node->getAttribute<QString>("norm", false), root.getDocFilePath().toNative()));
         }
         mPrefixes.insert(node->getAttribute<QString>("norm", false), node->getText<QString>(false));
     }
     if (!mPrefixes.contains(QString("")))
     {
-        throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
             QString(tr("The file \"%1\" has no default prefix defined."))
-            .arg(mXmlFilepath.toNative()));
+            .arg(root.getDocFilePath().toNative()));
     }
 
     // Load all signals
@@ -307,7 +307,7 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
                 QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
-                .arg(signal->getUuid().toStr(), mXmlFilepath.toNative()));
+                .arg(signal->getUuid().toStr(), root.getDocFilePath().toNative()));
         }
         mSignals.append(signal);
     }
@@ -322,20 +322,20 @@ void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
         {
             throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
                 QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
-                .arg(variant->getUuid().toStr(), mXmlFilepath.toNative()));
+                .arg(variant->getUuid().toStr(), root.getDocFilePath().toNative()));
         }
         mSymbolVariants.append(variant);
     }
     if (mSymbolVariants.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
             QString(tr("The file \"%1\" has no symbol variants defined."))
-            .arg(mXmlFilepath.toNative()));
+            .arg(root.getDocFilePath().toNative()));
     }
     mDefaultSymbolVariantUuid = symbolVariantsNode->getAttribute<Uuid>("default", true);
     if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid)) {
-        throw RuntimeError(__FILE__, __LINE__, mXmlFilepath.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
             QString(tr("The file \"%1\" has no valid default symbol variant defined."))
-            .arg(mXmlFilepath.toNative()));
+            .arg(root.getDocFilePath().toNative()));
     }
 }
 

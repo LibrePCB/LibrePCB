@@ -38,7 +38,6 @@ class SmartXmlFile;
 
 namespace library {
 class Component;
-class ComponentSymbolVariant;
 }
 
 namespace project {
@@ -104,8 +103,8 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
         ComponentInstance* createComponentInstance(const library::Component& cmp,
-                                                 const library::ComponentSymbolVariant& symbVar,
-                                                 QString name = QString()) throw (Exception);
+                                                   const Uuid& symbVar,
+                                                   QString name = QString()) throw (Exception);
         void addComponentInstance(ComponentInstance& cmp) throw (Exception);
         void removeComponentInstance(ComponentInstance& cmp) throw (Exception);
         void setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception);

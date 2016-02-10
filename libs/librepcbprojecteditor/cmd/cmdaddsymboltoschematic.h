@@ -17,41 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
-#define LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#ifndef LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
+#define LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/uuid.h>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+namespace workspace {
+class Workspace;
+}
+
+namespace library {
+class Symbol;
+}
+
 namespace project {
 
-class ProjectLibrary;
+class Schematic;
+class ComponentInstance;
+class SI_Symbol;
+class CmdSymbolInstanceAdd;
 
 /*****************************************************************************************
- *  Class CmdProjectLibraryAddElement
+ *  Class CmdAddSymbolToSchematic
  ****************************************************************************************/
 
 /**
- * @brief The CmdProjectLibraryAddElement class
+ * @brief The CmdAddSymbolToSchematic class
  */
-template <typename ElementType>
-class CmdProjectLibraryAddElement final : public UndoCommand
+class CmdAddSymbolToSchematic final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                             ElementType& element,
-                                             UndoCommand* parent = 0) throw (Exception);
-        ~CmdProjectLibraryAddElement() noexcept;
+        explicit CmdAddSymbolToSchematic(workspace::Workspace& workspace,
+                                         Schematic& schematic, ComponentInstance& cmpInstance,
+                                         const Uuid& symbolItem, const Point& position = Point(),
+                                         const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
+        ~CmdAddSymbolToSchematic() noexcept;
+
+        // Getters
+        SI_Symbol* getSymbolInstance() const noexcept;
 
         // Inherited from UndoCommand
         void redo() throw (Exception) override;
@@ -59,12 +76,16 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 
     private:
 
-        void addElement();
-        void removeElement();
+        // Attributes from the constructor
+        workspace::Workspace& mWorkspace;
+        Schematic& mSchematic;
+        ComponentInstance& mComponentInstance;
+        Uuid mSymbolItemUuid;
+        Point mPosition;
+        Angle mAngle;
 
-
-        ProjectLibrary& mLibrary;
-        ElementType& mElement;
+        // child commands
+        CmdSymbolInstanceAdd* mCmdAddToSchematic;
 };
 
 /*****************************************************************************************
@@ -74,4 +95,4 @@ class CmdProjectLibraryAddElement final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTLIBRARYADDELEMENT_H
+#endif // LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H

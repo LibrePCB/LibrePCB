@@ -62,8 +62,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
-        const FilePath& getDirectory() const noexcept {return mDirectory;}
-        const FilePath& getXmlFilepath() const noexcept {return mXmlFilepath;}
+        const FilePath& getFilePath() const noexcept {return mDirectory;}
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
@@ -88,8 +87,9 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
 
         // General Methods
-        void save() const throw (Exception);
-        void saveTo(const FilePath& parentDir) const throw (Exception);
+        void save() throw (Exception);
+        void saveTo(const FilePath& parentDir) throw (Exception);
+        void moveTo(const FilePath& parentDir) throw (Exception);
 
         // Static Methods
 
@@ -205,8 +205,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // General Attributes
         mutable FilePath mDirectory;
-        mutable FilePath mVersionFilepath;
-        mutable FilePath mXmlFilepath;
+        mutable bool mDirectoryIsTemporary;
         QString mXmlFileNamePrefix;
         QString mXmlRootNodeName;
         bool mDomTreeParsed;

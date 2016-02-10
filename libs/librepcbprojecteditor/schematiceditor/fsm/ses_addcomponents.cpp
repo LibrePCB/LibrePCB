@@ -29,7 +29,6 @@
 #include <librepcblibrary/cmp/component.h>
 #include <librepcbproject/circuit/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbcommon/undostack.h>
-#include <librepcbproject/schematics/cmd/cmdsymbolinstanceadd.h>
 #include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
@@ -40,6 +39,8 @@
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/sym/symbol.h>
+#include "../../cmd/cmdaddcomponenttocircuit.h"
+#include "../../cmd/cmdaddsymboltoschematic.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,7 +56,7 @@ SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEdito
                                      GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mIsUndoCmdActive(false), mAddComponentDialog(nullptr), mLastAngle(0),
-    mComponent(nullptr), mCmpSymbVar(nullptr), mCurrentSymbVarItem(nullptr),
+    mCurrentComponent(nullptr),
     mCurrentSymbVarItemIndex(-1), mCurrentSymbolToPlace(nullptr),
     mCurrentSymbolEditCommand(nullptr)
 {
@@ -222,16 +223,17 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
 
                         // check if there is a next symbol to add
                         mCurrentSymbVarItemIndex++;
-                        mCurrentSymbVarItem = mCmpSymbVar->getItem(mCurrentSymbVarItemIndex);
+                        auto* currentSymbVarItem = mCurrentComponent->getSymbolVariant().getItem(mCurrentSymbVarItemIndex);
 
-                        if (mCurrentSymbVarItem)
+                        if (currentSymbVarItem)
                         {
                             // create the next symbol instance and add it to the schematic
-                            CmdSymbolInstanceAdd* cmd = new CmdSymbolInstanceAdd(*schematic,
+                            CmdAddSymbolToSchematic* cmd = new CmdAddSymbolToSchematic(
+                                mWorkspace, *schematic,
                                 mCurrentSymbolToPlace->getComponentInstance(),
-                                mCurrentSymbVarItem->getUuid(), pos);
+                                currentSymbVarItem->getUuid(), pos);
                             mUndoStack.appendToCommand(cmd);
-                            mCurrentSymbolToPlace = cmd->getSymbol();
+                            mCurrentSymbolToPlace = cmd->getSymbolInstance();
                             Q_ASSERT(mCurrentSymbolToPlace);
 
                             // add command to move the current symbol
@@ -243,8 +245,8 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                         else
                         {
                             // all symbols placed, start adding the next component
-                            Uuid componentUuid = mComponent->getUuid();
-                            Uuid symbVarUuid = mCmpSymbVar->getUuid();
+                            Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
+                            Uuid symbVarUuid = mCurrentComponent->getSymbolVariant().getUuid();
                             mUndoStack.endCommand();
                             mIsUndoCmdActive = false;
                             abortCommand(false); // reset attributes
@@ -308,105 +310,35 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
             if (mAddComponentDialog->exec() != QDialog::Accepted)
                 throw UserCanceled(__FILE__, __LINE__); // abort
 
-            // open the XML file
-            library::Component* component = new library::Component(mAddComponentDialog->getSelectedComponentFilePath(), true);
-            Uuid componentUuid = component->getUuid();
-            Version componentVersion = component->getVersion();
-            delete component;
-
-            // search the component in the library
-            mComponent = mProject.getLibrary().getComponent(componentUuid);
-            if (mComponent)
-            {
-                if (mComponent->getVersion() != componentVersion)
-                {
-                    QMessageBox::information(&mEditor, tr("Different Version"),
-                        QString(tr("The same component exists already in this project's "
-                        "library but the version is different. The version %1 from "
-                        "the project's library will be used instead of the version %2."))
-                        .arg(mComponent->getVersion().toStr(), componentVersion.toStr()));
-                }
-            }
-            else
-            {
-                // copy the component to the project's library
-                FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(componentUuid);
-                if (!cmpFp.isValid())
-                {
-                    throw RuntimeError(__FILE__, __LINE__, QString(),
-                        QString(tr("Component not found in library: %1"))
-                        .arg(componentUuid.toStr()));
-                }
-                mComponent = new library::Component(cmpFp, true);
-                auto cmd = new CmdProjectLibraryAddElement<library::Component>(
-                    mProject.getLibrary(), *mComponent);
-                mUndoStack.appendToCommand(cmd);
-            }
-            mCmpSymbVar = mComponent->getSymbolVariantByUuid(mAddComponentDialog->getSelectedSymbVarUuid());
+            // add selected component to circuit
+            auto cmd = new CmdAddComponentToCircuit(mWorkspace, mProject,
+                mAddComponentDialog->getSelectedComponentUuid(),
+                mAddComponentDialog->getSelectedSymbVarUuid());
+            mUndoStack.appendToCommand(cmd);
+            mCurrentComponent = cmd->getComponentInstance();
         }
         else
         {
-            // search the component in the library
-            mComponent = mProject.getLibrary().getComponent(cmp);
-            if (mComponent) mCmpSymbVar = mComponent->getSymbolVariantByUuid(symbVar);
+            // add selected component to circuit
+            auto* cmd = new CmdAddComponentToCircuit(mWorkspace, mProject, cmp, symbVar);
+            mUndoStack.appendToCommand(cmd);
+            mCurrentComponent = cmd->getComponentInstance();
         }
-
-        // check pointers
-        if (!mComponent)
-        {
-            throw LogicError(__FILE__, __LINE__, QString(),
-                QString(tr("The component \"%1\" was not found in the project's library."))
-                .arg(cmp.toStr()));
-        }
-        if (!mCmpSymbVar)
-        {
-            throw LogicError(__FILE__, __LINE__, QString(), QString(
-                tr("Invalid symbol variant: \"%1\"")).arg(symbVar.toStr()));
-        }
-
-        // copy all required symbols to the project's library
-        foreach (const Uuid& symbolUuid, mCmpSymbVar->getAllItemSymbolUuids())
-        {
-            if (!mProject.getLibrary().getSymbol(symbolUuid))
-            {
-                FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(symbolUuid);
-                if (!symbolFp.isValid())
-                {
-                    throw RuntimeError(__FILE__, __LINE__, QString(),
-                        QString(tr("Symbol not found in library: %1")).arg(symbolUuid.toStr()));
-                }
-                library::Symbol* symbol = new library::Symbol(symbolFp, true);
-                auto cmd = new CmdProjectLibraryAddElement<library::Symbol>(
-                    mProject.getLibrary(), *symbol);
-                mUndoStack.appendToCommand(cmd);
-            }
-        }
-
-        // get the scene position where the new symbol should be placed
-        QPoint cursorPos = mEditorGraphicsView.mapFromGlobal(QCursor::pos());
-        QPoint boundedCursorPos = QPoint(qBound(0, cursorPos.x(), mEditorGraphicsView.width()),
-                                         qBound(0, cursorPos.y(), mEditorGraphicsView.height()));
-        Point pos = Point::fromPx(mEditorGraphicsView.mapToScene(boundedCursorPos),
-                                  mEditor.getGridProperties().getInterval());
-
-        // create a new component instance and add it to the circuit
-        CmdComponentInstanceAdd* cmd = new CmdComponentInstanceAdd(mCircuit, *mComponent,
-                                                               *mCmpSymbVar);
-        mUndoStack.appendToCommand(cmd);
 
         // create the first symbol instance and add it to the schematic
         mCurrentSymbVarItemIndex = 0;
-        mCurrentSymbVarItem = mCmpSymbVar->getItem(mCurrentSymbVarItemIndex);
-        if (!mCurrentSymbVarItem)
+        auto* currentSymbVarItem = mCurrentComponent->getSymbolVariant().getItem(mCurrentSymbVarItemIndex);
+        if (!currentSymbVarItem)
         {
             throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
                 QString(tr("The component with the UUID \"%1\" does not have any symbol."))
                 .arg(cmp.toStr()));
         }
-        CmdSymbolInstanceAdd* cmd2 = new CmdSymbolInstanceAdd(*schematic,
-            *(cmd->getComponentInstance()), mCurrentSymbVarItem->getUuid(), pos);
+        Point pos = mEditorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+        CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(mWorkspace, *schematic,
+            *mCurrentComponent, currentSymbVarItem->getUuid(), pos);
         mUndoStack.appendToCommand(cmd2);
-        mCurrentSymbolToPlace = cmd2->getSymbol();
+        mCurrentSymbolToPlace = cmd2->getSymbolInstance();
         Q_ASSERT(mCurrentSymbolToPlace);
 
         // add command to move the current symbol
@@ -437,9 +369,7 @@ bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
         }
 
         // reset attributes, go back to idle state
-        mComponent = nullptr;
-        mCmpSymbVar = nullptr;
-        mCurrentSymbVarItem = nullptr;
+        mCurrentComponent = nullptr;
         mCurrentSymbVarItemIndex = -1;
         mCurrentSymbolToPlace = nullptr;
         return true;

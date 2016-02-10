@@ -52,13 +52,13 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
     mName = domElement.getFirstChild("name", true)->getText<QString>(true);
     mValue = domElement.getFirstChild("value", true)->getText<QString>(false);
-    Uuid gcUuid = domElement.getAttribute<Uuid>("component", true);
-    mLibComponent = mCircuit.getProject().getLibrary().getComponent(gcUuid);
+    Uuid cmpUuid = domElement.getAttribute<Uuid>("component", true);
+    mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent)
     {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__, cmpUuid.toStr(),
             QString(tr("The component with the UUID \"%1\" does not exist in the "
-            "project's library!")).arg(gcUuid.toStr()));
+            "project's library!")).arg(cmpUuid.toStr()));
     }
     Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant", true);
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVarUuid);
@@ -109,9 +109,9 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
 }
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                 const library::ComponentSymbolVariant& symbVar, const QString& name) throw (Exception) :
+                                     const Uuid& symbVar, const QString& name) throw (Exception) :
     QObject(nullptr), mCircuit(circuit), mAddedToCircuit(false),
-    mLibComponent(&cmp), mCompSymbVar(&symbVar)
+    mLibComponent(&cmp), mCompSymbVar(nullptr)
 {
     const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
 
@@ -123,6 +123,14 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
             tr("The name of the component must not be empty."));
     }
     mValue = cmp.getDefaultValue(localeOrder);
+
+    mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVar);
+    if (!mCompSymbVar)
+    {
+        throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
+            QString(tr("No symbol variant with the UUID \"%1\" found."))
+            .arg(symbVar.toStr()));
+    }
 
     // add attributes
     for (int i = 0; i < cmp.getAttributeCount(); i++) {

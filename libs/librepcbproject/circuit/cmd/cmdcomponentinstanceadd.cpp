@@ -24,6 +24,8 @@
 #include "cmdcomponentinstanceadd.h"
 #include "../circuit.h"
 #include "../componentinstance.h"
+#include "../../project.h"
+#include "../../library/projectlibrary.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,10 +37,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const library::Component& cmp,
-                                     const library::ComponentSymbolVariant& symbVar, UndoCommand* parent) throw (Exception) :
+CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
+                                                 const Uuid& symbVar, UndoCommand* parent) throw (Exception) :
     UndoCommand(tr("Add component"), parent),
-    mCircuit(circuit), mComponent(cmp), mSymbVar(symbVar), mComponentInstance(nullptr)
+    mCircuit(circuit), mComponentUuid(cmp), mSymbVarUuid(symbVar), mComponentInstance(nullptr)
 {
 }
 
@@ -56,7 +58,13 @@ void CmdComponentInstanceAdd::redo() throw (Exception)
 {
     if (!mComponentInstance) // only the first time
     {
-        mComponentInstance = mCircuit.createComponentInstance(mComponent, mSymbVar); // throws an exception on error
+        library::Component* cmp = mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
+        if (!cmp) {
+            throw RuntimeError(__FILE__, __LINE__, mComponentUuid.toStr(),
+                QString(tr("The component with the UUID \"%1\" does not exist in the "
+                "project's library!")).arg(mComponentUuid.toStr()));
+        }
+        mComponentInstance = mCircuit.createComponentInstance(*cmp, mSymbVarUuid); // throws an exception on error
     }
 
     mCircuit.addComponentInstance(*mComponentInstance); // throws an exception on error

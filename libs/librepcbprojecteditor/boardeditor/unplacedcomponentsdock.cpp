@@ -34,7 +34,6 @@
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbworkspace/workspace.h>
@@ -42,6 +41,7 @@
 #include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcblibrary/pkg/footprintpreviewgraphicsitem.h>
 #include <librepcbproject/boards/boardlayerstack.h>
+#include "../cmd/cmdadddevicetoboard.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -339,43 +339,9 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
         mProjectEditor.getUndoStack().beginCommand(tr("Add device to board"));
         cmdActive = true;
 
-        const library::Device* device = mProject.getLibrary().getDevice(deviceUuid);
-        if (!device)
-        {
-            // copy the device to the project's library
-            FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
-            if (!devFp.isValid())
-            {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("Device not found in library: %1"))
-                    .arg(deviceUuid.toStr()));
-            }
-            device = new library::Device(devFp, true);
-            auto cmd = new CmdProjectLibraryAddElement<library::Device>(mProject.getLibrary(), *device);
-            mProjectEditor.getUndoStack().appendToCommand(cmd);
-        }
-
-        const library::Package* pkg = mProject.getLibrary().getPackage(device->getPackageUuid());
-        if (!pkg)
-        {
-            // copy the package to the project's library
-            FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(device->getPackageUuid());
-            if (!pkgFp.isValid())
-            {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("Package not found in library: %1"))
-                    .arg(device->getPackageUuid().toStr()));
-            }
-            pkg = new library::Package(pkgFp, true);
-            auto cmd = new CmdProjectLibraryAddElement<library::Package>(mProject.getLibrary(), *pkg);
-            mProjectEditor.getUndoStack().appendToCommand(cmd);
-        }
-
-        if (footprintUuid.isNull())
-            footprintUuid = pkg->getDefaultFootprintUuid();
-
         // add device to board
-        CmdDeviceInstanceAdd* cmd = new CmdDeviceInstanceAdd(*mBoard, cmp, deviceUuid, footprintUuid, mNextPosition);
+        auto* cmd = new CmdAddDeviceToBoard(mProjectEditor.getWorkspace(), *mBoard, cmp,
+                                            deviceUuid, footprintUuid, mNextPosition);
         mProjectEditor.getUndoStack().appendToCommand(cmd);
         if (mNextPosition.getX() > Length::fromMm(200))
             mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
