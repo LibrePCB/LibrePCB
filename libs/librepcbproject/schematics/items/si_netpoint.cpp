@@ -50,8 +50,8 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mAttached = domElement.getFirstChild("attached", true)->getText<bool>(true);
-    if (mAttached)
+    bool attached = domElement.getFirstChild("attached", true)->getText<bool>(true);
+    if (attached)
     {
         Uuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<Uuid>(true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
@@ -103,7 +103,6 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     mUuid = Uuid::createRandom(); // generate random UUID
-    mAttached = false;
     mNetSignal = &netsignal;
     mPosition = position;
     init();
@@ -114,7 +113,6 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Excepti
     mGraphicsItem(nullptr), mNetSignal(nullptr), mSymbolPin(&pin)
 {
     mUuid = Uuid::createRandom(); // generate random UUID
-    mAttached = true;
     const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
     if (!compSignal)
     {
@@ -185,16 +183,15 @@ void SI_NetPoint::setPosition(const Point& position) noexcept
 
 void SI_NetPoint::detachFromPin() throw (Exception)
 {
-    if (!mAttached) throw LogicError(__FILE__, __LINE__);
+    if (!isAttached()) throw LogicError(__FILE__, __LINE__);
     mSymbolPin->unregisterNetPoint(*this);
     mSymbolPin = nullptr;
-    mAttached = false;
     mGraphicsItem->updateCacheAndRepaint();
 }
 
 void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
 {
-    if (mAttached) throw LogicError(__FILE__, __LINE__);
+    if (isAttached()) throw LogicError(__FILE__, __LINE__);
     const ComponentSignalInstance* compSignal = pin.getComponentSignalInstance();
     if (!compSignal) throw LogicError(__FILE__, __LINE__);
     const NetSignal* netsignal = compSignal->getNetSignal();
@@ -202,7 +199,6 @@ void SI_NetPoint::attachToPin(SI_SymbolPin& pin) throw (Exception)
     mSymbolPin = &pin;
     mSymbolPin->registerNetPoint(*this);
     mPosition = mSymbolPin->getPosition();
-    mAttached = true;
     mGraphicsItem->updateCacheAndRepaint();
 }
 
@@ -234,7 +230,7 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
-    if (mAttached)
+    if (isAttached())
     {
         // check if mNetSignal is correct (would be a bug if not)
         if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
@@ -242,7 +238,7 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     }
 
     mNetSignal->registerSchematicNetPoint(*this);
-    if (mAttached)
+    if (isAttached())
         mSymbolPin->registerNetPoint(*this);
     scene.addItem(*mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(true);
@@ -252,7 +248,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
     Q_ASSERT(mLines.isEmpty());
 
-    if (mAttached)
+    if (isAttached())
     {
         // check if mNetSignal is correct (would be a bug if not)
         if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
@@ -260,7 +256,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     }
 
     mNetSignal->unregisterSchematicNetPoint(*this);
-    if (mAttached)
+    if (isAttached())
         mSymbolPin->unregisterNetPoint(*this);
     scene.removeItem(*mGraphicsItem);
     mErcMsgDeadNetPoint->setVisible(false);
@@ -272,8 +268,8 @@ XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
     root->setAttribute("uuid", mUuid);
-    root->appendTextChild("attached", mAttached);
-    if (mAttached)
+    root->appendTextChild("attached", isAttached());
+    if (isAttached())
     {
         root->appendTextChild("symbol", mSymbolPin->getSymbol().getUuid());
         root->appendTextChild("pin", mSymbolPin->getLibPinUuid());
@@ -311,7 +307,6 @@ bool SI_NetPoint::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                             return false;
     if (mNetSignal == nullptr)                      return false;
-    if (mAttached && (mSymbolPin == nullptr))       return false;
     return true;
 }
 

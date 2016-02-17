@@ -70,8 +70,8 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         Project& getProject() const noexcept;
         Schematic& getSchematic() const noexcept {return mSchematic;}
         const Uuid& getUuid() const noexcept {return mUuid;}
-        bool isAttached() const noexcept {return mAttached;}
-        bool isVisible() const noexcept {return ((mLines.count() > 1) && mAttached) || (mLines.count() > 2);}
+        bool isAttached() const noexcept {return (mSymbolPin != nullptr);}
+        bool isVisible() const noexcept {return ((mLines.count() > 1) && isAttached()) || (mLines.count() > 2);}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
         const QList<SI_NetLine*>& getLines() const noexcept {return mLines;}
@@ -132,10 +132,9 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
 
         // Attributes
         Uuid mUuid;
-        bool mAttached;
         Point mPosition;
         NetSignal* mNetSignal;
-        SI_SymbolPin* mSymbolPin;    ///< only needed if mAttached == true
+        SI_SymbolPin* mSymbolPin;    ///< only needed if the netpoint is attached to a pin
 
         // Misc
         QList<SI_NetLine*> mLines;    ///< all registered netlines
