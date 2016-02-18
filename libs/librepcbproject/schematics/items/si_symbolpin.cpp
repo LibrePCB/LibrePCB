@@ -117,9 +117,17 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
         case PinDisplayType_t::PIN_NAME:
             text = mSymbolPin->getName(); break;
         case PinDisplayType_t::COMPONENT_SIGNAL:
-            if (mComponentSignal) text = mComponentSignal->getName(); break;
+            if (mComponentSignal) {
+                text = mComponentSignal->getName();
+            }
+            break;
         case PinDisplayType_t::NET_SIGNAL:
-            if (mComponentSignalInstance->getNetSignal()) text = mComponentSignalInstance->getNetSignal()->getName(); break;
+            if (mComponentSignalInstance) {
+                if (mComponentSignalInstance->getNetSignal()) {
+                    text = mComponentSignalInstance->getNetSignal()->getName();
+                }
+            }
+            break;
         default: break;
     }
     if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignal)
@@ -163,7 +171,9 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == false);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mComponentSignalInstance->registerSymbolPin(*this);
+    if (mComponentSignalInstance) {
+        mComponentSignalInstance->registerSymbolPin(*this);
+    }
     scene.addItem(*mGraphicsItem);
     mAddedToSchematic = true;
     updateErcMessages();
@@ -173,7 +183,9 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
 {
     Q_ASSERT(mAddedToSchematic == true);
     Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mComponentSignalInstance->unregisterSymbolPin(*this);
+    if (mComponentSignalInstance) {
+        mComponentSignalInstance->unregisterSymbolPin(*this);
+    }
     scene.removeItem(*mGraphicsItem);
     mAddedToSchematic = false;
     updateErcMessages();
@@ -204,8 +216,9 @@ void SI_SymbolPin::updateErcMessages() noexcept
         QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
         .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
 
-    mErcMsgUnconnectedRequiredPin->setVisible((mAddedToSchematic)
-        && (mComponentSignal->isRequired()) && (!mRegisteredNetPoint));
+    bool isRequired = mComponentSignal ? mComponentSignal->isRequired() : false;
+    mErcMsgUnconnectedRequiredPin->setVisible(mAddedToSchematic && isRequired
+                                              && (!mRegisteredNetPoint));
 }
 
 /*****************************************************************************************

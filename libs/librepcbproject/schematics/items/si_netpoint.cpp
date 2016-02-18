@@ -233,7 +233,9 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (isAttached())
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
+        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
+        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
+        if (mNetSignal != netsignal)
             throw LogicError(__FILE__, __LINE__);
     }
 
@@ -251,7 +253,9 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     if (isAttached())
     {
         // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mSymbolPin->getComponentSignalInstance()->getNetSignal())
+        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
+        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
+        if (mNetSignal != netsignal)
             throw LogicError(__FILE__, __LINE__);
     }
 
