@@ -50,17 +50,16 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    bool attached = domElement.getFirstChild("attached", true)->getText<bool>(true);
-    if (attached)
+    if (domElement.getAttribute<bool>("attached", true))
     {
-        Uuid symbolUuid = domElement.getFirstChild("symbol", true)->getText<Uuid>(true);
+        Uuid symbolUuid = domElement.getAttribute<Uuid>("symbol", true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
         if (!symbol)
         {
             throw RuntimeError(__FILE__, __LINE__, symbolUuid.toStr(),
                 QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toStr()));
         }
-        Uuid pinUuid = domElement.getFirstChild("pin", true)->getText<Uuid>(true);
+        Uuid pinUuid = domElement.getAttribute<Uuid>("pin", true);
         mSymbolPin = symbol->getPin(pinUuid);
         if (!mSymbolPin)
         {
@@ -83,7 +82,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
     }
     else
     {
-        Uuid netSignalUuid = domElement.getFirstChild("netsignal", true)->getText<Uuid>(true);
+        Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal)
         {
@@ -91,8 +90,8 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
                 QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
 
-        mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
-        mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
+        mPosition.setX(domElement.getAttribute<Length>("x", true));
+        mPosition.setY(domElement.getAttribute<Length>("y", true));
     }
 
     init();
@@ -272,18 +271,17 @@ XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
     root->setAttribute("uuid", mUuid);
-    root->appendTextChild("attached", isAttached());
+    root->setAttribute("attached", isAttached());
     if (isAttached())
     {
-        root->appendTextChild("symbol", mSymbolPin->getSymbol().getUuid());
-        root->appendTextChild("pin", mSymbolPin->getLibPinUuid());
+        root->setAttribute("symbol", mSymbolPin->getSymbol().getUuid());
+        root->setAttribute("pin", mSymbolPin->getLibPinUuid());
     }
     else
     {
-        root->appendTextChild("netsignal", mNetSignal->getUuid());
-        XmlDomElement* position = root->appendChild("position");
-        position->setAttribute("x", mPosition.getX());
-        position->setAttribute("y", mPosition.getY());
+        root->setAttribute("netsignal", mNetSignal->getUuid());
+        root->setAttribute("x", mPosition.getX());
+        root->setAttribute("y", mPosition.getY());
     }
     return root.take();
 }
