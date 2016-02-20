@@ -160,8 +160,6 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(BEE_Base* event) 
             {
                 case Qt::LeftButton:
                     return proccessIdleSceneLeftClick(mouseEvent, board);
-                case Qt::RightButton:
-                    return proccessIdleSceneRightClick(mouseEvent, board);
                 default:
                     break;
             }
@@ -171,11 +169,16 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(BEE_Base* event) 
         {
             QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(mouseEvent); if (!mouseEvent) break;
-            if (mouseEvent->button() == Qt::LeftButton)
+            switch (mouseEvent->button())
             {
-                // remove selection rectangle and keep the selection state of all items
-                board->setSelectionRect(Point(), Point(), false);
-                return ForceStayInState;
+                case Qt::LeftButton:
+                    // remove selection rectangle and keep the selection state of all items
+                    board->setSelectionRect(Point(), Point(), false);
+                    return ForceStayInState;
+                case Qt::RightButton:
+                    return proccessIdleSceneRightMouseButtonReleased(mouseEvent, board);
+                default:
+                    break;
             }
             break;
         }
@@ -229,9 +232,12 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
         return PassToParentState;
 }
 
-BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                                             Board* board) noexcept
+BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
+        QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept
 {
+    if (mouseEvent->screenPos() != mouseEvent->buttonDownScreenPos(Qt::RightButton))
+        return PassToParentState; // mouse moved -> don't show context menu!
+
     // handle item selection
     QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;

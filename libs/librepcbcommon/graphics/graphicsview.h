@@ -106,6 +106,7 @@ class GraphicsView final : public QGraphicsView
         GridProperties* mGridProperties;
         bool mOriginCrossVisible;
         bool mUseOpenGl;
+        volatile bool mPanningActive;
 
         // Static Variables
         static constexpr qreal sZoomStepFactor = 1.3;

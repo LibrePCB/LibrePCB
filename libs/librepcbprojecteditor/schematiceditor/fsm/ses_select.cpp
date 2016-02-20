@@ -170,8 +170,6 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(SEE_Base* event) 
             {
                 case Qt::LeftButton:
                     return proccessIdleSceneLeftClick(mouseEvent, schematic);
-                case Qt::RightButton:
-                    return proccessIdleSceneRightClick(mouseEvent, schematic);
                 default:
                     break;
             }
@@ -181,11 +179,16 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(SEE_Base* event) 
         {
             QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(mouseEvent); if (!mouseEvent) break;
-            if (mouseEvent->button() == Qt::LeftButton)
+            switch (mouseEvent->button())
             {
-                // remove selection rectangle and keep the selection state of all items
-                schematic->setSelectionRect(Point(), Point(), false);
-                return ForceStayInState;
+                case Qt::LeftButton:
+                    // remove selection rectangle and keep the selection state of all items
+                    schematic->setSelectionRect(Point(), Point(), false);
+                    return ForceStayInState;
+                case Qt::RightButton:
+                    return proccessIdleSceneRightMouseButtonReleased(mouseEvent, schematic);
+                default:
+                    break;
             }
             break;
         }
@@ -239,9 +242,12 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
         return PassToParentState;
 }
 
-SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                                             Schematic* schematic) noexcept
+SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
+        QGraphicsSceneMouseEvent* mouseEvent, Schematic* schematic) noexcept
 {
+    if (mouseEvent->screenPos() != mouseEvent->buttonDownScreenPos(Qt::RightButton))
+        return PassToParentState; // mouse moved -> don't show context menu!
+
     // handle item selection
     QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;

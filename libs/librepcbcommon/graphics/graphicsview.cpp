@@ -40,7 +40,7 @@ namespace librepcb {
 GraphicsView::GraphicsView(QWidget* parent, IF_GraphicsViewEventHandler* eventHandler) noexcept :
     QGraphicsView(parent), mEventHandlerObject(eventHandler), mScene(nullptr),
     mZoomAnimation(nullptr), mGridProperties(new GridProperties()), mOriginCrossVisible(true),
-    mUseOpenGl(false)
+    mUseOpenGl(false), mPanningActive(false)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -197,10 +197,25 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
 {
     switch (event->type())
     {
+        case QEvent::GraphicsSceneMouseMove:
+        {
+            if (!underMouse()) break;
+            QGraphicsSceneMouseEvent* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            if (e->buttons().testFlag(Qt::RightButton) && (!mPanningActive)) {
+                QPoint diff = mapFromScene(e->scenePos()) - mapFromScene(e->buttonDownScenePos(Qt::RightButton));
+                mPanningActive = true; // avoid recursive calls (=> stack overflow)
+                horizontalScrollBar()->setValue(horizontalScrollBar()->value() - diff.x());
+                verticalScrollBar()->setValue(verticalScrollBar()->value() - diff.y());
+                mPanningActive = false;
+                return true;
+            } else if (mPanningActive) {
+                return true;
+            }
+            // no break here!
+        }
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress:
         case QEvent::GraphicsSceneMouseRelease:
-        case QEvent::GraphicsSceneMouseMove:
         case QEvent::GraphicsSceneContextMenu:
         {
             if (!underMouse()) break;

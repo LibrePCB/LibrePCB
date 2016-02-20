@@ -70,8 +70,8 @@ class BES_Select final : public BES_Base
         ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
         ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
                                               Board* board) noexcept;
-        ProcRetVal proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                               Board* board) noexcept;
+        ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
+                                                             Board* board) noexcept;
         ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                 Board* board) noexcept;
         bool startMovingSelectedItems(Board* board) noexcept;

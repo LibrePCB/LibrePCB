@@ -168,12 +168,12 @@ BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
         {
             QEvent* e = BEE_RedirectedQEvent::getQEventFromBEE(event);
             Q_ASSERT(e); if (!e) return mCurrentState;
-            if ((e->type() == QEvent::GraphicsSceneMousePress) ||
+            if ((e->type() == QEvent::GraphicsSceneMouseRelease) ||
                 (e->type() == QEvent::GraphicsSceneMouseDoubleClick))
             {
                 QGraphicsSceneMouseEvent* e2 = dynamic_cast<QGraphicsSceneMouseEvent*>(e);
                 Q_ASSERT(e2); if (!e2) return mCurrentState;
-                if (e2->buttons() == Qt::RightButton)
+                if ((e2->button() == Qt::RightButton) && (e2->screenPos() == e2->buttonDownScreenPos(Qt::RightButton)))
                     return (mPreviousState != State_NoState) ? mPreviousState : State_Select;
                 else
                     return mCurrentState;

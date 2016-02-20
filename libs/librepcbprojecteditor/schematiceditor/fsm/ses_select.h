@@ -72,8 +72,8 @@ class SES_Select final : public SES_Base
         ProcRetVal processSubStateMovingSceneEvent(SEE_Base* event) noexcept;
         ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
                                               Schematic* schematic) noexcept;
-        ProcRetVal proccessIdleSceneRightClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                               Schematic* schematic) noexcept;
+        ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
+                                                             Schematic* schematic) noexcept;
         ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                 Schematic* schematic) noexcept;
         bool startMovingSelectedItems(Schematic* schematic) noexcept;
