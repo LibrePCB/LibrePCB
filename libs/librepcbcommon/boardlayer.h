@@ -221,6 +221,7 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         const QString& getName() const {return mName;}
         const QColor& getColor(bool highlighted = false) const;
         bool isVisible() const noexcept {return mIsVisible;}
+        bool isCopperLayer() const noexcept {return isCopperLayer(mId);}
         int getMirroredLayerId() const noexcept {return getMirroredLayerId(mId);}
 
         // Setters
@@ -231,6 +232,7 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Static Methods
+        static bool isCopperLayer(int id) noexcept;
         static int getMirroredLayerId(int id) noexcept;
 
 

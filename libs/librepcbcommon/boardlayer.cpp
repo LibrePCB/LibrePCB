@@ -361,6 +361,11 @@ bool BoardLayer::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
+bool BoardLayer::isCopperLayer(int id) noexcept
+{
+    return ((id >= _COPPER_LAYERS_START) && (id <= _COPPER_LAYERS_END));
+}
+
 int BoardLayer::getMirroredLayerId(int id) noexcept
 {
     if ((id >= _TOP_LAYERS_START) && (id <= _TOP_LAYERS_END))
