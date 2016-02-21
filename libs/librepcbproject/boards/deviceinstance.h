@@ -76,6 +76,7 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept {return mBoard;}
+        const Uuid& getComponentInstanceUuid() const noexcept;
         ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
         const library::Device& getLibDevice() const noexcept {return *mLibDevice;}
         const library::Package& getLibPackage() const noexcept {return *mLibPackage;}

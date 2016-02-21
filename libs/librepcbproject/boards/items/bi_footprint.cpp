@@ -126,6 +126,11 @@ Board& BI_Footprint::getBoard() const noexcept
     return mDeviceInstance.getBoard();
 }
 
+const Uuid& BI_Footprint::getComponentInstanceUuid() const noexcept
+{
+    return mDeviceInstance.getComponentInstanceUuid();
+}
+
 const library::Footprint& BI_Footprint::getLibFootprint() const noexcept
 {
     return mDeviceInstance.getLibFootprint();

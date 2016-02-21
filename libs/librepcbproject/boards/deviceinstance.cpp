@@ -159,6 +159,11 @@ Project& DeviceInstance::getProject() const noexcept
     return mBoard.getProject();
 }
 
+const Uuid& DeviceInstance::getComponentInstanceUuid() const noexcept
+{
+    return mCompInstance->getUuid();
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/

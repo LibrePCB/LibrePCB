@@ -69,6 +69,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         // Getters
         Project& getProject() const noexcept;
         Board& getBoard() const noexcept;
+        const Uuid& getComponentInstanceUuid() const noexcept;
         DeviceInstance& getDeviceInstance() const noexcept {return mDeviceInstance;}
         BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {return mPads.value(padUuid);}
         const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
