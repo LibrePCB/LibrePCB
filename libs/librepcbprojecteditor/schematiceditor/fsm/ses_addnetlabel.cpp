@@ -136,9 +136,26 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(SEE_Base* event) noexcep
                     return ForceStayInState;
                 }
                 case Qt::RightButton:
-                {
-                    mEditCmd->rotate(Angle::deg90(), pos, true);
                     return ForceStayInState;
+                default:
+                    break;
+            }
+            break;
+        }
+
+        case QEvent::GraphicsSceneMouseRelease:
+        {
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            switch (sceneEvent->button())
+            {
+                case Qt::RightButton:
+                {
+                    if (sceneEvent->screenPos() == sceneEvent->buttonDownScreenPos(Qt::RightButton)) {
+                        mEditCmd->rotate(Angle::deg90(), pos, true);
+                        return ForceStayInState;
+                    }
+                    break;
                 }
                 default:
                     break;

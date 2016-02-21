@@ -255,13 +255,12 @@ SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(SEE_Base* event) noexce
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
-            Schematic& schematic = *mEditor.getActiveSchematic();
 
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
                     // start adding netpoints/netlines
-                    startPositioning(schematic, pos);
+                    startPositioning(*schematic, pos);
                     return ForceStayInState;
                 default:
                     break;
@@ -310,12 +309,29 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
                     addNextNetPoint(*schematic, pos);
                     return ForceStayInState;
                 case Qt::RightButton:
-                    // switch to next wire mode
-                    mWireMode = static_cast<WireMode>(mWireMode+1);
-                    if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
-                    updateWireModeActionsCheckedState();
-                    updateNetpointPositions(pos);
                     return ForceStayInState;
+                default:
+                    break;
+            }
+            break;
+        }
+
+        case QEvent::GraphicsSceneMouseRelease:
+        {
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            switch (sceneEvent->button())
+            {
+                case Qt::RightButton:
+                    if (sceneEvent->screenPos() == sceneEvent->buttonDownScreenPos(Qt::RightButton)) {
+                        // switch to next wire mode
+                        mWireMode = static_cast<WireMode>(mWireMode+1);
+                        if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
+                        updateWireModeActionsCheckedState();
+                        updateNetpointPositions(pos);
+                        return ForceStayInState;
+                    }
+                    break;
                 default:
                     break;
             }

@@ -264,10 +264,28 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                 }
 
                 case Qt::RightButton:
-                    // rotate symbol
-                    mLastAngle += Angle::deg90();
-                    mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
                     return ForceStayInState;
+
+                default:
+                    break;
+            }
+            break;
+        }
+
+        case QEvent::GraphicsSceneMouseRelease:
+        {
+            QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(sceneEvent);
+            switch (sceneEvent->button())
+            {
+                case Qt::RightButton:
+                    if (sceneEvent->screenPos() == sceneEvent->buttonDownScreenPos(Qt::RightButton)) {
+                        // rotate symbol
+                        mLastAngle += Angle::deg90();
+                        mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+                        return ForceStayInState;
+                    }
+                    break;
 
                 default:
                     break;
