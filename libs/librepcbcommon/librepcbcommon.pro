@@ -65,7 +65,9 @@ HEADERS += \
     geometry/ellipse.h \
     geometry/text.h \
     geometry/hole.h \
-    undocommandgroup.h
+    undocommandgroup.h \
+    scopeguard.h \
+    scopeguardlist.h
 
 SOURCES += \
     attributes/attributetype.cpp \
