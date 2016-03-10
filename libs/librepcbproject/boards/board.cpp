@@ -93,28 +93,19 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
 
             // Load all device instances
-            for (XmlDomElement* node = root.getFirstChild("device_instances/device_instance", true, false);
-                 node; node = node->getNextSibling("device_instance"))
+            for (XmlDomElement* node = root.getFirstChild("devices/device", true, false);
+                 node; node = node->getNextSibling("device"))
             {
                 DeviceInstance* comp = new DeviceInstance(*this, *node);
                 addDeviceInstance(*comp);
             }
 
-            // Load all geometry elements
-            for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
-                 node; node = node->getNextSibling())
+            // Load all polygons
+            for (XmlDomElement* node = root.getFirstChild("polygons/polygon", true, false);
+                 node; node = node->getNextSibling("polygon"))
             {
-                if (node->getName() == "polygon")
-                {
-                    BI_Polygon* polygon = new BI_Polygon(*this, *node);
-                    addPolygon(*polygon);
-                }
-                else
-                {
-                    throw RuntimeError(__FILE__, __LINE__, node->getName(),
-                        QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                        .arg(node->getName(), mFilePath.toNative()));
-                }
+                BI_Polygon* polygon = new BI_Polygon(*this, *node);
+                addPolygon(*polygon);
             }
         }
 
@@ -475,12 +466,12 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
     root->appendChild(mLayerStack->serializeToXmlDomElement());
-    XmlDomElement* device_instances = root->appendChild("device_instances");
+    XmlDomElement* device_instances = root->appendChild("devices");
     foreach (DeviceInstance* device, mDeviceInstances)
         device_instances->appendChild(device->serializeToXmlDomElement());
-    XmlDomElement* geometry = root->appendChild("geometry");
+    XmlDomElement* polygons = root->appendChild("polygons");
     foreach (BI_Polygon* polygon, mPolygons)
-        geometry->appendChild(polygon->serializeToXmlDomElement());
+        polygons->appendChild(polygon->serializeToXmlDomElement());
     return root.take();
 }
 

@@ -47,7 +47,7 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
     mLibDevice(nullptr), mLibFootprint(nullptr), mFootprint(nullptr)
 {
     // get component instance
-    Uuid compInstUuid = domElement.getAttribute<Uuid>("component_instance", true);
+    Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance)
     {
@@ -208,8 +208,8 @@ XmlDomElement* DeviceInstance::serializeToXmlDomElement() const throw (Exception
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("device_instance"));
-    root->setAttribute("component_instance", mCompInstance->getUuid());
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("device"));
+    root->setAttribute("component", mCompInstance->getUuid());
     root->setAttribute("device", mLibDevice->getUuid());
     root->setAttribute("footprint", mLibFootprint->getUuid());
     root->appendChild(mFootprint->serializeToXmlDomElement());
