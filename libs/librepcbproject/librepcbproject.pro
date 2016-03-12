@@ -40,7 +40,6 @@ SOURCES += \
     schematics/cmd/cmdschematicnetlineremove.cpp \
     schematics/cmd/cmdsymbolinstanceadd.cpp \
     schematics/cmd/cmdsymbolinstanceremove.cpp \
-    schematics/cmd/cmdschematicnetpointdetach.cpp \
     schematics/cmd/cmdschematicnetlabeladd.cpp \
     schematics/cmd/cmdschematicnetlabelremove.cpp \
     schematics/cmd/cmdschematicnetlabeledit.cpp \
@@ -112,7 +111,6 @@ HEADERS += \
     schematics/cmd/cmdschematicnetlineremove.h \
     schematics/cmd/cmdsymbolinstanceadd.h \
     schematics/cmd/cmdsymbolinstanceremove.h \
-    schematics/cmd/cmdschematicnetpointdetach.h \
     schematics/cmd/cmdschematicnetlabeladd.h \
     schematics/cmd/cmdschematicnetlabelremove.h \
     schematics/cmd/cmdschematicnetlabeledit.h \
