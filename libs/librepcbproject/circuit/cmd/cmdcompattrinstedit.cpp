@@ -36,10 +36,8 @@ namespace project {
  ****************************************************************************************/
 
 CmdCompAttrInstEdit::CmdCompAttrInstEdit(ComponentInstance& cmp,
-                                               ComponentAttributeInstance& attr,
-                                               const AttributeType& newType,
-                                               const QString& newValue,
-                                               const AttributeUnit* newUnit) noexcept :
+        ComponentAttributeInstance& attr, const AttributeType& newType,
+        const QString& newValue, const AttributeUnit* newUnit) noexcept :
     UndoCommand(tr("Edit component attribute")),
     mComponentInstance(cmp), mAttrInst(attr),
     mOldType(&attr.getType()), mNewType(&newType),
@@ -56,9 +54,11 @@ CmdCompAttrInstEdit::~CmdCompAttrInstEdit() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstEdit::performExecute() throw (Exception)
+bool CmdCompAttrInstEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the attribute was really modified
 }
 
 void CmdCompAttrInstEdit::performUndo() throw (Exception)

@@ -52,9 +52,11 @@ CmdCompAttrInstRemove::~CmdCompAttrInstRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstRemove::performExecute() throw (Exception)
+bool CmdCompAttrInstRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdCompAttrInstRemove::performUndo() throw (Exception)

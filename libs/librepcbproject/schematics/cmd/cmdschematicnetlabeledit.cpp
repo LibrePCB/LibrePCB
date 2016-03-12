@@ -100,9 +100,11 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center, b
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLabelEdit::performExecute() throw (Exception)
+bool CmdSchematicNetLabelEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the netlabel was really modified
 }
 
 void CmdSchematicNetLabelEdit::performUndo() throw (Exception)

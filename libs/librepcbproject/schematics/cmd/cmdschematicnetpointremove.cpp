@@ -52,9 +52,11 @@ CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointRemove::performExecute() throw (Exception)
+bool CmdSchematicNetPointRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetPointRemove::performUndo() throw (Exception)

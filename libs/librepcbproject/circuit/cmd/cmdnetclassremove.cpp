@@ -51,9 +51,11 @@ CmdNetClassRemove::~CmdNetClassRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassRemove::performExecute() throw (Exception)
+bool CmdNetClassRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdNetClassRemove::performUndo() throw (Exception)

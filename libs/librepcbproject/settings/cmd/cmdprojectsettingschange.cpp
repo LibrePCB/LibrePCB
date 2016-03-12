@@ -72,9 +72,11 @@ void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdProjectSettingsChange::performExecute() throw (Exception)
+bool CmdProjectSettingsChange::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the settings were really modified
 }
 
 void CmdProjectSettingsChange::performUndo() throw (Exception)

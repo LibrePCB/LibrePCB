@@ -67,7 +67,7 @@ ComponentInstance* CmdAddComponentToCircuit::getComponentInstance() const noexce
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddComponentToCircuit::performExecute() throw (Exception)
+bool CmdAddComponentToCircuit::performExecute() throw (Exception)
 {
     // if there is no such component in the project's library, copy it from the
     // workspace library to the project's library
@@ -90,7 +90,7 @@ void CmdAddComponentToCircuit::performExecute() throw (Exception)
     appendChild(mCmdAddToCircuit); // can throw
 
     // execute all child commands
-    UndoCommandGroup::performExecute(); // can throw
+    return UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

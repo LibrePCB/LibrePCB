@@ -59,9 +59,11 @@ void CmdNetClassEdit::setName(const QString& name) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassEdit::performExecute() throw (Exception)
+bool CmdNetClassEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdNetClassEdit::performUndo() throw (Exception)

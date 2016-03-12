@@ -53,9 +53,11 @@ CmdProjectLibraryAddElement<ElementType>::~CmdProjectLibraryAddElement() noexcep
  ****************************************************************************************/
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::performExecute() throw (Exception)
+bool CmdProjectLibraryAddElement<ElementType>::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 template <typename ElementType>

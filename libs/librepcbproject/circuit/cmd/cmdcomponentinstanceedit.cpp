@@ -66,9 +66,11 @@ void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceEdit::performExecute() throw (Exception)
+bool CmdComponentInstanceEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the component was really modified
 }
 
 void CmdComponentInstanceEdit::performUndo() throw (Exception)

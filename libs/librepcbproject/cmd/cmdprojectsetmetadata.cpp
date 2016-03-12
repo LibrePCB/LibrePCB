@@ -80,9 +80,11 @@ void CmdProjectSetMetadata::setCreated(const QDateTime& newCreated) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdProjectSetMetadata::performExecute() throw (Exception)
+bool CmdProjectSetMetadata::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the metadata was really modified
 }
 
 void CmdProjectSetMetadata::performUndo() throw (Exception)

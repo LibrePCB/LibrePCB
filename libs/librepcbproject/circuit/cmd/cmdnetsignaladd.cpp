@@ -51,11 +51,13 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalAdd::performExecute() throw (Exception)
+bool CmdNetSignalAdd::performExecute() throw (Exception)
 {
     mNetSignal = mCircuit.createNetSignal(mNetClass, mName); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdNetSignalAdd::performUndo() throw (Exception)

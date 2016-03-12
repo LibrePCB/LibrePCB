@@ -60,7 +60,7 @@ CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointAdd::performExecute() throw (Exception)
+bool CmdSchematicNetPointAdd::performExecute() throw (Exception)
 {
     if (mAttachedToSymbol) {
         mNetPoint = mSchematic.createNetPoint(*mSymbolPin); // can throw
@@ -69,6 +69,8 @@ void CmdSchematicNetPointAdd::performExecute() throw (Exception)
     }
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetPointAdd::performUndo() throw (Exception)

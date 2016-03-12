@@ -51,9 +51,11 @@ CmdSchematicNetLineRemove::~CmdSchematicNetLineRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLineRemove::performExecute() throw (Exception)
+bool CmdSchematicNetLineRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetLineRemove::performUndo() throw (Exception)

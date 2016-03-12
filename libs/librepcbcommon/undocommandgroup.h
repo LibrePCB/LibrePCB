@@ -79,16 +79,20 @@ class UndoCommandGroup : public UndoCommand
     protected:
 
         /// @copydoc UndoCommand::performExecute()
-        virtual void performExecute() throw (Exception) override;
-
-
-    private:
+        virtual bool performExecute() throw (Exception) override;
 
         /// @copydoc UndoCommand::performUndo()
-        virtual void performUndo() throw (Exception) override final;
+        virtual void performUndo() throw (Exception) override;
 
         /// @copydoc UndoCommand::performRedo()
         virtual void performRedo() throw (Exception) override;
+
+        /**
+         * @brief Helper method for derived classes to execute and add new child commands
+         *
+         * @param cmd       The command to execute and add (must not be executed already)
+         */
+        void execNewChildCmd(UndoCommand* cmd) throw (Exception);
 
 
     private:

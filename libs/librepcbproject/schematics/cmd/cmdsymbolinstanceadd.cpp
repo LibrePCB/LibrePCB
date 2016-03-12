@@ -63,12 +63,14 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceAdd::performExecute() throw (Exception)
+bool CmdSymbolInstanceAdd::performExecute() throw (Exception)
 {
     mSymbolInstance = mSchematic.createSymbol(*mComponentInstance, mSymbolItemUuid,
                                               mPosition, mAngle); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSymbolInstanceAdd::performUndo() throw (Exception)

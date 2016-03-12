@@ -50,9 +50,11 @@ CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompSigInstSetNetSignal::performExecute() throw (Exception)
+bool CmdCompSigInstSetNetSignal::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the netsignal was really changed
 }
 
 void CmdCompSigInstSetNetSignal::performUndo() throw (Exception)

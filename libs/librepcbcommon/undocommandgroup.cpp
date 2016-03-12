@@ -46,10 +46,30 @@ UndoCommandGroup::~UndoCommandGroup() noexcept
 }
 
 /*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
+{
+    // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
+    QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+
+    if ((!cmd) || (mChilds.contains(cmd)) || (wasEverReverted())) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    if (wasEverExecuted()) {
+        cmd->execute(); // can throw
+    }
+
+    mChilds.append(cmdScopeGuard.take());
+}
+
+/*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void UndoCommandGroup::performExecute() throw (Exception)
+bool UndoCommandGroup::performExecute() throw (Exception)
 {
     // TODO: use scope guard
 
@@ -77,6 +97,8 @@ void UndoCommandGroup::performExecute() throw (Exception)
         }
         throw;
     }
+
+    return (mChilds.count() > 0);
 }
 
 void UndoCommandGroup::performUndo() throw (Exception)
@@ -140,22 +162,18 @@ void UndoCommandGroup::performRedo() throw (Exception)
 }
 
 /*****************************************************************************************
- *  Internal Methods
+ *  Protected Methods
  ****************************************************************************************/
 
-void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
+void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) throw (Exception)
 {
-    // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
 
-    if ((!cmd) || (mChilds.contains(cmd)) || (wasEverReverted())) {
+    if ((!cmd) || (mChilds.contains(cmd)) || (wasEverExecuted())) {
         throw LogicError(__FILE__, __LINE__);
     }
 
-    if (wasEverExecuted()) {
-        cmd->execute(); // can throw
-    }
-
+    cmdScopeGuard->execute(); // can throw
     mChilds.append(cmdScopeGuard.take());
 }
 

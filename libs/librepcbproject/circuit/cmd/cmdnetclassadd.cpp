@@ -51,11 +51,13 @@ CmdNetClassAdd::~CmdNetClassAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassAdd::performExecute() throw (Exception)
+bool CmdNetClassAdd::performExecute() throw (Exception)
 {
     mNetClass = new NetClass(mCircuit, mName); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdNetClassAdd::performUndo() throw (Exception)

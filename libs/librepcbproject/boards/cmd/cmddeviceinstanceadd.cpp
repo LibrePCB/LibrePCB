@@ -63,12 +63,14 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceAdd::performExecute() throw (Exception)
+bool CmdDeviceInstanceAdd::performExecute() throw (Exception)
 {
     mDeviceInstance = new DeviceInstance(mBoard, *mComponentInstance, mDeviceUuid,
                                          mFootprintUuid, mPosition, mRotation); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdDeviceInstanceAdd::performUndo() throw (Exception)

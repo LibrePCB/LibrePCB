@@ -65,7 +65,7 @@ class UndoCommand
 
         /**
          * @brief This method shows whether that command was ever executed
-         *        (#execute() called)
+         *        (#execute() called successfully)
          */
         bool wasEverExecuted() const noexcept {return (mRedoCount > 0);}
 
@@ -86,8 +86,11 @@ class UndoCommand
 
         /**
          * @brief Execute the command (must only be called once)
+         *
+         * @retval true     If the command has done some changes
+         * @retval false    If the command has done nothing (the command can be deleted)
          */
-        virtual void execute() throw (Exception) final;
+        virtual bool execute() throw (Exception) final;
 
         /**
          * @brief Undo the command
@@ -111,8 +114,11 @@ class UndoCommand
          * @note This method must be implemented in all derived classes. If the first time
          *       execution is exactly identical to an "redo" action, you can simple call
          *       #performRedo() in the implementation of this method.
+         *
+         * @retval true     If the command has done some changes
+         * @retval false    If the command has done nothing (the command can be deleted)
          */
-        virtual void performExecute() throw (Exception) = 0;
+        virtual bool performExecute() throw (Exception) = 0;
 
         /**
          * @brief Undo the command
@@ -132,8 +138,9 @@ class UndoCommand
     private:
 
         QString mText;
-        int mRedoCount; ///< @brief Counter of how often #redo() was called
-        int mUndoCount; ///< @brief Counter of how often #undo() was called
+        bool mIsExecuted;   ///< @brief Shows whether #execute() was called or not
+        int mRedoCount;     ///< @brief Counter of how often #redo() was called
+        int mUndoCount;     ///< @brief Counter of how often #undo() was called
 };
 
 /*****************************************************************************************

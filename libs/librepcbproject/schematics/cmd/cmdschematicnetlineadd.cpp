@@ -52,11 +52,13 @@ CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLineAdd::performExecute() throw (Exception)
+bool CmdSchematicNetLineAdd::performExecute() throw (Exception)
 {
     mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(158750)); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetLineAdd::performUndo() throw (Exception)

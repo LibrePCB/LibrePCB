@@ -152,6 +152,7 @@ class UndoStack final : public QObject
          *                  case of an exception, the command will be deleted directly in
          *                  this method, so you must not make other things with the
          *                  UndoCommand object after passing it to this method.
+         * @param forceKeepCmd  Only for internal use!
          *
          * @throw Exception If the command is not executed successfully, this method
          *                  throws an exception and tries to keep the state of the stack
@@ -160,7 +161,7 @@ class UndoStack final : public QObject
          * @note If you try to execute a command with that method while another command is
          *       active (see #isCommandActive()), this method will throw an exception.
          */
-        void execCmd(UndoCommand* cmd) throw (Exception);
+        void execCmd(UndoCommand* cmd, bool forceKeepCmd = false) throw (Exception);
 
         /**
          * @brief Begin building a new command group that consists of multiple commands

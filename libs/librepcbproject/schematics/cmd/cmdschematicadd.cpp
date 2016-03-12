@@ -49,11 +49,13 @@ CmdSchematicAdd::~CmdSchematicAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicAdd::performExecute() throw (Exception)
+bool CmdSchematicAdd::performExecute() throw (Exception)
 {
     mSchematic = mProject.createSchematic(mName); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicAdd::performUndo() throw (Exception)

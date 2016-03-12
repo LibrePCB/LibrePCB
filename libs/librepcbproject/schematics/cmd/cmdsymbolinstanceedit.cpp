@@ -90,9 +90,11 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceEdit::performExecute() throw (Exception)
+bool CmdSymbolInstanceEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the symbol was really modified
 }
 
 void CmdSymbolInstanceEdit::performUndo() throw (Exception)

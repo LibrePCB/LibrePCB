@@ -71,7 +71,7 @@ SI_Symbol* CmdAddSymbolToSchematic::getSymbolInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddSymbolToSchematic::performExecute() throw (Exception)
+bool CmdAddSymbolToSchematic::performExecute() throw (Exception)
 {
     // get the symbol UUID
     const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);
@@ -103,7 +103,7 @@ void CmdAddSymbolToSchematic::performExecute() throw (Exception)
     appendChild(mCmdAddToSchematic); // can throw
 
     // execute all child commands
-    UndoCommandGroup::performExecute(); // can throw
+    return UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

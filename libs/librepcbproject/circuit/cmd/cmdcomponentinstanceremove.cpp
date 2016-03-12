@@ -52,9 +52,11 @@ CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceRemove::performExecute() throw (Exception)
+bool CmdComponentInstanceRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdComponentInstanceRemove::performUndo() throw (Exception)

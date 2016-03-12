@@ -54,10 +54,13 @@ CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstAdd::performExecute() throw (Exception)
+bool CmdCompAttrInstAdd::performExecute() throw (Exception)
 {
     mAttrInstance = new ComponentAttributeInstance(mKey, mType, mValue, mUnit); // can throw
+
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdCompAttrInstAdd::performUndo() throw (Exception)

@@ -76,9 +76,11 @@ void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool im
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointEdit::performExecute() throw (Exception)
+bool CmdSchematicNetPointEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the netpoint was really modified
 }
 
 void CmdSchematicNetPointEdit::performUndo() throw (Exception)

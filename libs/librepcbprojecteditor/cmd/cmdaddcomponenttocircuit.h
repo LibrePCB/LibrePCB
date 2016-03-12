@@ -70,7 +70,7 @@ class CmdAddComponentToCircuit final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        void performExecute() throw (Exception) override;
+        bool performExecute() throw (Exception) override;
 
 
         // Private Member Variables

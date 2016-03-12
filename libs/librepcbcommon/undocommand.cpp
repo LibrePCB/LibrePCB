@@ -33,7 +33,7 @@ namespace librepcb {
  ****************************************************************************************/
 
 UndoCommand::UndoCommand(const QString& text) noexcept :
-    mText(text), mRedoCount(0), mUndoCount(0)
+    mText(text), mIsExecuted(false), mRedoCount(0), mUndoCount(0)
 {
 }
 
@@ -46,14 +46,17 @@ UndoCommand::~UndoCommand() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void UndoCommand::execute() throw (Exception)
+bool UndoCommand::execute() throw (Exception)
 {
-    if (wasEverExecuted()) {
+    if (mIsExecuted) {
         throw LogicError(__FILE__, __LINE__);
     }
 
-    performExecute(); // can throw
+    mIsExecuted = true; // set this flag BEFORE performing the execution!
+    bool retval = performExecute(); // can throw
     mRedoCount++;
+
+    return retval;
 }
 
 void UndoCommand::undo() throw (Exception)

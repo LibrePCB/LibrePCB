@@ -51,9 +51,11 @@ CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceRemove::performExecute() throw (Exception)
+bool CmdDeviceInstanceRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdDeviceInstanceRemove::performUndo() throw (Exception)

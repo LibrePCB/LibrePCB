@@ -73,7 +73,7 @@ DeviceInstance* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddDeviceToBoard::performExecute() throw (Exception)
+bool CmdAddDeviceToBoard::performExecute() throw (Exception)
 {
     // if there is no such device in the project's library, copy it from the
     // workspace library to the project's library
@@ -121,7 +121,7 @@ void CmdAddDeviceToBoard::performExecute() throw (Exception)
     appendChild(mCmdAddToBoard); // can throw
 
     // execute all child commands
-    UndoCommandGroup::performExecute(); // can throw
+    return UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

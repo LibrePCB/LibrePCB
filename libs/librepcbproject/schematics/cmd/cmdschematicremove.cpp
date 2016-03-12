@@ -49,11 +49,13 @@ CmdSchematicRemove::~CmdSchematicRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicRemove::performExecute() throw (Exception)
+bool CmdSchematicRemove::performExecute() throw (Exception)
 {
     mPageIndex = mProject.getSchematicIndex(mSchematic);
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicRemove::performUndo() throw (Exception)

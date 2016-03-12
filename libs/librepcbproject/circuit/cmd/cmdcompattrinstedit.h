@@ -62,7 +62,7 @@ class CmdCompAttrInstEdit final : public UndoCommand
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        void performExecute() throw (Exception) override;
+        bool performExecute() throw (Exception) override;
 
         /// @copydoc UndoCommand::performUndo()
         void performUndo() throw (Exception) override;

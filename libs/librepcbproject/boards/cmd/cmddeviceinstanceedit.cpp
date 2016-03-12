@@ -120,9 +120,11 @@ void CmdDeviceInstanceEdit::mirror(const Point& center, bool vertical, bool imme
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceEdit::performExecute() throw (Exception)
+bool CmdDeviceInstanceEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true; // TODO: determine if the device was really modified
 }
 
 void CmdDeviceInstanceEdit::performUndo() throw (Exception)

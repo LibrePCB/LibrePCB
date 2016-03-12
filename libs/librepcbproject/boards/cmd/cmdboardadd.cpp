@@ -49,10 +49,13 @@ CmdBoardAdd::~CmdBoardAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdBoardAdd::performExecute() throw (Exception)
+bool CmdBoardAdd::performExecute() throw (Exception)
 {
     mBoard = mProject.createBoard(mName); // can throw
+
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdBoardAdd::performUndo() throw (Exception)

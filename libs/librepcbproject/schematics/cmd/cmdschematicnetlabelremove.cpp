@@ -52,9 +52,11 @@ CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLabelRemove::performExecute() throw (Exception)
+bool CmdSchematicNetLabelRemove::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetLabelRemove::performUndo() throw (Exception)

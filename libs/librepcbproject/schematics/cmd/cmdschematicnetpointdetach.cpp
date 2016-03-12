@@ -49,9 +49,11 @@ CmdSchematicNetPointDetach::~CmdSchematicNetPointDetach() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointDetach::performExecute() throw (Exception)
+bool CmdSchematicNetPointDetach::performExecute() throw (Exception)
 {
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetPointDetach::performUndo() throw (Exception)

@@ -52,11 +52,13 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLabelAdd::performExecute() throw (Exception)
+bool CmdSchematicNetLabelAdd::performExecute() throw (Exception)
 {
     mNetLabel = mSchematic.createNetLabel(*mNetSignal, mPosition); // can throw
 
     performRedo(); // can throw
+
+    return true;
 }
 
 void CmdSchematicNetLabelAdd::performUndo() throw (Exception)

@@ -102,7 +102,7 @@ void UndoStack::setClean() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void UndoStack::execCmd(UndoCommand* cmd) throw (Exception)
+void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) throw (Exception)
 {
     // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -112,30 +112,35 @@ void UndoStack::execCmd(UndoCommand* cmd) throw (Exception)
                            "at the moment. Please finish that command to continue."));
     }
 
-    if (mCleanIndex > mCurrentIndex) {
+    bool commandHasDoneSomething = cmd->execute(); // can throw
+
+    if (commandHasDoneSomething || forceKeepCmd) {
         // the clean state will no longer exist -> make the index invalid
-        mCleanIndex = -1;
+        if (mCleanIndex > mCurrentIndex) {
+            mCleanIndex = -1;
+        }
+
+        // delete all commands above the current index (make redoing them impossible)
+        // --> in reverse order (from top to bottom)!
+        while (mCurrentIndex < mCommands.count()) {
+            delete mCommands.takeLast();
+        }
+        Q_ASSERT(mCurrentIndex == mCommands.count());
+
+        // add command to the command stack and emit signals
+        mCommands.append(cmdScopeGuard.take()); // move ownership of "cmd" to "mCommands"
+        mCurrentIndex++;
+
+        // emit signals
+        emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
+        emit redoTextChanged(tr("Redo"));
+        emit canUndoChanged(true);
+        emit canRedoChanged(false);
+        emit cleanChanged(false);
+    } else {
+        // the command has done nothing, so we will just discard it
+        cmd->undo(); // only to be sure the command has executed nothing...
     }
-
-    // first, delete all commands above the current index (make redo impossible)
-    // --> in reverse order (from top to bottom)!
-    while (mCurrentIndex < mCommands.count()) {
-        delete mCommands.takeLast();
-    }
-    Q_ASSERT(mCurrentIndex == mCommands.count());
-
-    cmd->execute(); // can throw
-
-    // command was not merged --> add it to the command stack and emit signals
-    mCommands.append(cmdScopeGuard.take()); // move ownership of "cmd" to "mCommands"
-    mCurrentIndex++;
-
-    // emit signals
-    emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
-    emit redoTextChanged(tr("Redo"));
-    emit canUndoChanged(true);
-    emit canRedoChanged(false);
-    emit cleanChanged(false);
 }
 
 void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
@@ -146,7 +151,7 @@ void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
     }
 
     UndoCommandGroup* cmd = new UndoCommandGroup(text);
-    execCmd(cmd); // throws an exception on error; emits all signals
+    execCmd(cmd, true); // throws an exception on error; emits all signals
     Q_ASSERT(mCommands.last() == cmd);
     mActiveCommandGroup = cmd;
 
