@@ -36,7 +36,8 @@ namespace project {
 
 CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept :
     UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldNetSignal(point.getNetSignal()), mNewNetSignal(mOldNetSignal),
+    mOldNetSignal(&point.getNetSignal()), mNewNetSignal(mOldNetSignal),
+    mOldSymbolPin(point.getSymbolPin()), mNewSymbolPin(mOldSymbolPin),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
 }
@@ -56,6 +57,12 @@ void CmdSchematicNetPointEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewNetSignal = &netsignal;
+}
+
+void CmdSchematicNetPointEdit::setPinToAttach(SI_SymbolPin* pin) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewSymbolPin = pin;
 }
 
 void CmdSchematicNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
@@ -85,13 +92,17 @@ bool CmdSchematicNetPointEdit::performExecute() throw (Exception)
 
 void CmdSchematicNetPointEdit::performUndo() throw (Exception)
 {
+    // TODO: use scope guard
     mNetPoint.setNetSignal(*mOldNetSignal); // can throw
+    mNetPoint.setPinToAttach(mOldSymbolPin); // can throw
     mNetPoint.setPosition(mOldPos);
 }
 
 void CmdSchematicNetPointEdit::performRedo() throw (Exception)
 {
+    // TODO: use scope guard
     mNetPoint.setNetSignal(*mNewNetSignal); // can throw
+    mNetPoint.setPinToAttach(mNewSymbolPin); // can throw
     mNetPoint.setPosition(mNewPos);
 }
 

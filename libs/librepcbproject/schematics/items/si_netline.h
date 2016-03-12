@@ -52,19 +52,19 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        SI_NetLine() = delete;
+        SI_NetLine(const SI_NetLine& other) = delete;
         explicit SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint,
                             SI_NetPoint& endPoint, const Length& width) throw (Exception);
         ~SI_NetLine() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Schematic& getSchematic() const noexcept {return mSchematic;}
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Length& getWidth() const noexcept {return mWidth;}
         SI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
-        NetSignal* getNetSignal() const noexcept;
+        NetSignal& getNetSignal() const noexcept;
         bool isAttachedToSymbol() const noexcept;
 
         // Setters
@@ -72,8 +72,8 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
 
         // General Methods
         void updateLine() noexcept;
-        void addToSchematic(GraphicsScene& scene) throw (Exception);
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -85,15 +85,12 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 
+        // Operator Overloadings
+        SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
+
 
     private:
 
-        // make some methods inaccessible...
-        SI_NetLine();
-        SI_NetLine(const SI_NetLine& other);
-        SI_NetLine& operator=(const SI_NetLine& rhs);
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -101,8 +98,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
 
 
         // General
-        Schematic& mSchematic;
-        SGI_NetLine* mGraphicsItem;
+        QScopedPointer<SGI_NetLine> mGraphicsItem;
         Point mPosition; ///< the center of startpoint and endpoint
 
         // Attributes

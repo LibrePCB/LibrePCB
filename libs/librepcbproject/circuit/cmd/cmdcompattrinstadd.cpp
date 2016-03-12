@@ -46,8 +46,6 @@ CmdCompAttrInstAdd::CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& ke
 
 CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
 {
-    if (!isCurrentlyExecuted())
-        delete mAttrInstance;
 }
 
 /*****************************************************************************************
@@ -56,7 +54,7 @@ CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
 
 bool CmdCompAttrInstAdd::performExecute() throw (Exception)
 {
-    mAttrInstance = new ComponentAttributeInstance(mKey, mType, mValue, mUnit); // can throw
+    mAttrInstance = new ComponentAttributeInstance(mComponentInstance, mKey, mType, mValue, mUnit); // can throw
 
     performRedo(); // can throw
 

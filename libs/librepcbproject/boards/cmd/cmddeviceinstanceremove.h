@@ -33,7 +33,7 @@ namespace librepcb {
 namespace project {
 
 class Board;
-class DeviceInstance;
+class BI_Device;
 
 /*****************************************************************************************
  *  Class CmdDeviceInstanceRemove
@@ -47,7 +47,7 @@ class CmdDeviceInstanceRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev) noexcept;
+        CmdDeviceInstanceRemove(Board& board, BI_Device& dev) noexcept;
         ~CmdDeviceInstanceRemove() noexcept;
 
 
@@ -69,7 +69,7 @@ class CmdDeviceInstanceRemove final : public UndoCommand
 
         // Attributes from the constructor
         Board& mBoard;
-        DeviceInstance& mDevice;
+        BI_Device& mDevice;
 };
 
 /*****************************************************************************************

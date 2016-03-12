@@ -211,7 +211,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         {
             FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), "main.xml");
             Schematic* schematic = Schematic::create(*this, fp, "Main Page");
-            addSchematic(schematic);
+            addSchematic(*schematic);
         }
         else
         {
@@ -220,7 +220,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
-                addSchematic(schematic);
+                addSchematic(*schematic);
             }
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
         }
@@ -230,7 +230,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         {
             FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), "default.xml");
             Board* board = Board::create(*this, fp, "Default");
-            addBoard(board);
+            addBoard(*board);
         }
         else
         {
@@ -239,7 +239,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
-                addBoard(board);
+                addBoard(*board);
             }
             qDebug() << mBoards.count() << "boards successfully loaded!";
         }
@@ -257,9 +257,9 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
     {
         // free the allocated memory in the reverse order of their allocation...
         foreach (Board* board, mBoards)
-            try { removeBoard(board, true); } catch (...) {}
+            try { removeBoard(*board, true); } catch (...) {}
         foreach (Schematic* schematic, mSchematics)
-            try { removeSchematic(schematic, true); } catch (...) {}
+            try { removeSchematic(*schematic, true); } catch (...) {}
         delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
         delete mCircuit;                mCircuit = nullptr;
         delete mErcMsgList;             mErcMsgList = nullptr;
@@ -280,10 +280,10 @@ Project::~Project() noexcept
 
     // delete all boards and schematics (and catch all throwed exceptions)
     foreach (Board* board, mBoards)
-        try { removeBoard(board, true); } catch (...) {}
+        try { removeBoard(*board, true); } catch (...) {}
     qDeleteAll(mRemovedBoards); mRemovedBoards.clear();
     foreach (Schematic* schematic, mSchematics)
-        try { removeSchematic(schematic, true); } catch (...) {}
+        try { removeSchematic(*schematic, true); } catch (...) {}
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
     delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
@@ -359,15 +359,14 @@ SchematicLayer* Project::getSchematicLayer(int id) const noexcept
     return mSchematicLayerProvider->getSchematicLayer(id);
 }
 
-int Project::getSchematicIndex(const Schematic* schematic) const noexcept
+int Project::getSchematicIndex(const Schematic& schematic) const noexcept
 {
-    return mSchematics.indexOf(const_cast<Schematic*>(schematic));
+    return mSchematics.indexOf(const_cast<Schematic*>(&schematic));
 }
 
 Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (Schematic* schematic, mSchematics)
-    {
+    foreach (Schematic* schematic, mSchematics) {
         if (schematic->getUuid() == uuid)
             return schematic;
     }
@@ -376,8 +375,7 @@ Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
 
 Schematic* Project::getSchematicByName(const QString& name) const noexcept
 {
-    foreach (Schematic* schematic, mSchematics)
-    {
+    foreach (Schematic* schematic, mSchematics) {
         if (schematic->getName() == name)
             return schematic;
     }
@@ -391,61 +389,62 @@ Schematic* Project::createSchematic(const QString& name) throw (Exception)
     return Schematic::create(*this, filepath, name);
 }
 
-void Project::addSchematic(Schematic* schematic, int newIndex) throw (Exception)
+void Project::addSchematic(Schematic& schematic, int newIndex) throw (Exception)
 {
-    Q_ASSERT(schematic);
-
-    if ((newIndex < 0) || (newIndex > mSchematics.count()))
-        newIndex = mSchematics.count();
-
-    if (getSchematicByUuid(schematic->getUuid()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, schematic->getUuid().toStr(),
+    if ((mSchematics.contains(&schematic)) || (&schematic.getProject() != this)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if (getSchematicByUuid(schematic.getUuid())) {
+        throw RuntimeError(__FILE__, __LINE__, schematic.getUuid().toStr(),
             QString(tr("There is already a schematic with the UUID \"%1\"!"))
-            .arg(schematic->getUuid().toStr()));
+            .arg(schematic.getUuid().toStr()));
     }
-
-    if (getSchematicByName(schematic->getName()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, schematic->getName(),
+    if (getSchematicByName(schematic.getName())) {
+        throw RuntimeError(__FILE__, __LINE__, schematic.getName(),
             QString(tr("There is already a schematic with the name \"%1\"!"))
-            .arg(schematic->getName()));
+            .arg(schematic.getName()));
     }
 
-    schematic->addToProject(); // can throw an exception
-    mSchematics.insert(newIndex, schematic);
+    if ((newIndex < 0) || (newIndex > mSchematics.count())) {
+        newIndex = mSchematics.count();
+    }
 
-    if (mRemovedSchematics.contains(schematic))
-        mRemovedSchematics.removeOne(schematic);
+    schematic.addToProject(); // can throw
+    mSchematics.insert(newIndex, &schematic);
+
+    if (mRemovedSchematics.contains(&schematic)) {
+        mRemovedSchematics.removeOne(&schematic);
+    }
 
     emit schematicAdded(newIndex);
     emit attributesChanged();
 }
 
-void Project::removeSchematic(Schematic* schematic, bool deleteSchematic) throw (Exception)
+void Project::removeSchematic(Schematic& schematic, bool deleteSchematic) throw (Exception)
 {
-    Q_ASSERT(schematic);
-    int index = mSchematics.indexOf(schematic);
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(!mRemovedSchematics.contains(schematic));
-
-    if ((!deleteSchematic) && (!schematic->isEmpty()))
-    {
+    if ((!mSchematics.contains(&schematic)) || (mRemovedSchematics.contains(&schematic))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if ((!deleteSchematic) && (!schematic.isEmpty())) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("There are still elements in the schematic \"%1\"!"))
-            .arg(schematic->getName()));
+            .arg(schematic.getName()));
     }
 
-    schematic->removeFromProject(); // can throw an exception
+    int index = getSchematicIndex(schematic);
+    Q_ASSERT(index >= 0);
+
+    schematic.removeFromProject(); // can throw
     mSchematics.removeAt(index);
 
     emit schematicRemoved(index);
     emit attributesChanged();
 
-    if (deleteSchematic)
-        delete schematic;
-    else
-        mRemovedSchematics.append(schematic);
+    if (deleteSchematic) {
+        delete &schematic;
+    } else {
+        mRemovedSchematics.append(&schematic);
+    }
 }
 
 void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
@@ -470,15 +469,14 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
  *  Board Methods
  ****************************************************************************************/
 
-int Project::getBoardIndex(const Board* board) const noexcept
+int Project::getBoardIndex(const Board& board) const noexcept
 {
-    return mBoards.indexOf(const_cast<Board*>(board));
+    return mBoards.indexOf(const_cast<Board*>(&board));
 }
 
 Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (Board* board, mBoards)
-    {
+    foreach (Board* board, mBoards) {
         if (board->getUuid() == uuid)
             return board;
     }
@@ -487,8 +485,7 @@ Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
 
 Board* Project::getBoardByName(const QString& name) const noexcept
 {
-    foreach (Board* board, mBoards)
-    {
+    foreach (Board* board, mBoards) {
         if (board->getName() == name)
             return board;
     }
@@ -502,61 +499,62 @@ Board* Project::createBoard(const QString& name) throw (Exception)
     return Board::create(*this, filepath, name);
 }
 
-void Project::addBoard(Board* board, int newIndex) throw (Exception)
+void Project::addBoard(Board& board, int newIndex) throw (Exception)
 {
-    Q_ASSERT(board);
-
-    if ((newIndex < 0) || (newIndex > mBoards.count()))
-        newIndex = mBoards.count();
-
-    if (getBoardByUuid(board->getUuid()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, board->getUuid().toStr(),
+    if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if (getBoardByUuid(board.getUuid())) {
+        throw RuntimeError(__FILE__, __LINE__, board.getUuid().toStr(),
             QString(tr("There is already a board with the UUID \"%1\"!"))
-            .arg(board->getUuid().toStr()));
+            .arg(board.getUuid().toStr()));
     }
-
-    if (getBoardByName(board->getName()))
-    {
-        throw RuntimeError(__FILE__, __LINE__, board->getName(),
+    if (getBoardByName(board.getName())) {
+        throw RuntimeError(__FILE__, __LINE__, board.getName(),
             QString(tr("There is already a board with the name \"%1\"!"))
-            .arg(board->getName()));
+            .arg(board.getName()));
     }
 
-    board->addToProject(); // can throw an exception
-    mBoards.insert(newIndex, board);
+    if ((newIndex < 0) || (newIndex > mBoards.count())) {
+        newIndex = mBoards.count();
+    }
 
-    if (mRemovedBoards.contains(board))
-        mRemovedBoards.removeOne(board);
+    board.addToProject(); // can throw
+    mBoards.insert(newIndex, &board);
+
+    if (mRemovedBoards.contains(&board)) {
+        mRemovedBoards.removeOne(&board);
+    }
 
     emit boardAdded(newIndex);
     emit attributesChanged();
 }
 
-void Project::removeBoard(Board* board, bool deleteBoard) throw (Exception)
+void Project::removeBoard(Board& board, bool deleteBoard) throw (Exception)
 {
-    Q_ASSERT(board);
-    int index = mBoards.indexOf(board);
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(!mRemovedBoards.contains(board));
-
-    if ((!deleteBoard) && (!board->isEmpty()))
-    {
+    if ((!mBoards.contains(&board)) || (mRemovedBoards.contains(&board))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if ((!deleteBoard) && (!board.isEmpty())) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("There are still elements in the board \"%1\"!"))
-            .arg(board->getName()));
+            .arg(board.getName()));
     }
 
-    board->removeFromProject(); // can throw an exception
+    int index = getBoardIndex(board);
+    Q_ASSERT(index >= 0);
+
+    board.removeFromProject(); // can throw
     mBoards.removeAt(index);
 
     emit boardRemoved(index);
     emit attributesChanged();
 
-    if (deleteBoard)
-        delete board;
-    else
-        mRemovedBoards.append(board);
+    if (deleteBoard) {
+        delete &board;
+    } else {
+        mRemovedBoards.append(&board);
+    }
 }
 
 /*****************************************************************************************

@@ -36,6 +36,11 @@ class GraphicsScene;
 
 namespace project {
 
+class Project;
+class Circuit;
+class Board;
+class BGI_Base;
+
 /*****************************************************************************************
  *  Class BI_Base
  ****************************************************************************************/
@@ -54,34 +59,58 @@ class BI_Base : public QObject
             //NetPoint,       ///< #project#BI_NetPoint
             //NetLine,        ///< #project#BI_NetLine
             //NetLabel,       ///< #project#BI_NetLabel
+            Device,         ///< librepcb#project#BI_Device
             Footprint,      ///< librepcb#project#BI_Footprint
             FootprintPad,   ///< librepcb#project#BI_FootprintPad
             Polygon,        ///< librepcb#project#BI_Polygon
         };
 
         // Constructors / Destructor
-        explicit BI_Base() noexcept;
+        BI_Base() = delete;
+        BI_Base(const BI_Base& other) = delete;
+        BI_Base(Board& board) noexcept;
         virtual ~BI_Base() noexcept;
 
         // Getters
+        Project& getProject() const noexcept;
+        Circuit& getCircuit() const noexcept;
+        Board& getBoard() const noexcept {return mBoard;}
         virtual Type_t getType() const noexcept = 0;
         virtual const Point& getPosition() const noexcept = 0;
         virtual bool getIsMirrored() const noexcept = 0;
-        bool isSelected() const noexcept {return mIsSelected;}
         virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+        virtual bool isAddedToBoard() const noexcept {return mIsAddedToBoard;}
+        virtual bool isSelected() const noexcept {return mIsSelected;}
 
         // Setters
         virtual void setSelected(bool selected) noexcept;
 
+        // General Methods
+        virtual void addToBoard(GraphicsScene& scene) throw (Exception) = 0;
+        virtual void removeFromBoard(GraphicsScene& scene) throw (Exception) = 0;
+
+        // Operator Overloadings
+        BI_Base& operator=(const BI_Base& rhs) = delete;
+
+
+    protected:
+
+        // General Methods
+        void addToBoard() noexcept;
+        void removeFromBoard() noexcept;
+        void addToBoard(GraphicsScene& scene, BGI_Base& item) noexcept;
+        void removeFromBoard(GraphicsScene& scene, BGI_Base& item) noexcept;
+
+
+    protected:
+
+        Board& mBoard;
+
 
     private:
 
-        // make some methods inaccessible...
-        //BI_Base() = delete;
-        BI_Base(const BI_Base& other) = delete;
-        BI_Base& operator=(const BI_Base& rhs) = delete;
-
         // General Attributes
+        bool mIsAddedToBoard;
         bool mIsSelected;
 };
 

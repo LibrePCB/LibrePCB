@@ -59,19 +59,19 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
-        explicit BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
-        explicit BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
-                            bool isGrabArea, const Point& startPos) throw (Exception);
+        BI_Polygon() = delete;
+        BI_Polygon(const BI_Polygon& other) = delete;
+        BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
+                   bool isGrabArea, const Point& startPos) throw (Exception);
         ~BI_Polygon() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Board& getBoard() const noexcept {return mBoard;}
         const Polygon& getPolygon() const noexcept {return *mPolygon;}
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception);
-        void removeFromBoard(GraphicsScene& scene) throw (Exception);
+        void addToBoard(GraphicsScene& scene) throw (Exception) override;
+        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -85,6 +85,9 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         bool getIsMirrored() const noexcept override {return false;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Operator Overloadings
+        BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
 
     private slots:
@@ -100,12 +103,6 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 
     private:
 
-        // make some methods inaccessible...
-        BI_Polygon();
-        BI_Polygon(const BI_Polygon& other);
-        BI_Polygon& operator=(const BI_Polygon& rhs);
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -113,8 +110,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 
 
         // General
-        Board& mBoard;
-        Polygon* mPolygon;
+        QScopedPointer<Polygon> mPolygon;
         QScopedPointer<BGI_Polygon> mGraphicsItem;
 };
 

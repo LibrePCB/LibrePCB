@@ -52,13 +52,13 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        SI_NetLabel() = delete;
+        SI_NetLabel(const SI_NetLabel& other) = delete;
         explicit SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
         ~SI_NetLabel() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Schematic& getSchematic() const noexcept {return mSchematic;}
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Angle& getRotation() const noexcept {return mRotation;}
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
@@ -69,18 +69,20 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         void setRotation(const Angle& rotation) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception);
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
         const Point& getPosition() const noexcept override {return mPosition;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Operator Overloadings
+        SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
 
 
     private slots:
@@ -90,12 +92,6 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
     private:
 
-        // make some methods inaccessible...
-        SI_NetLabel() = delete;
-        SI_NetLabel(const SI_NetLabel& other) = delete;
-        SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -103,8 +99,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
 
         // General
-        Schematic& mSchematic;
-        SGI_NetLabel* mGraphicsItem;
+        QScopedPointer<SGI_NetLabel> mGraphicsItem;
 
         // Attributes
         Uuid mUuid;

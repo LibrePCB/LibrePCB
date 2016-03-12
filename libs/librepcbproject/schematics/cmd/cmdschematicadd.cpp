@@ -60,12 +60,12 @@ bool CmdSchematicAdd::performExecute() throw (Exception)
 
 void CmdSchematicAdd::performUndo() throw (Exception)
 {
-    mProject.removeSchematic(mSchematic); // can throw
+    mProject.removeSchematic(*mSchematic); // can throw
 }
 
 void CmdSchematicAdd::performRedo() throw (Exception)
 {
-    mProject.addSchematic(mSchematic, mPageIndex); // can throw
+    mProject.addSchematic(*mSchematic, mPageIndex); // can throw
 }
 
 /*****************************************************************************************

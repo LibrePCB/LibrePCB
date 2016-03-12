@@ -33,7 +33,7 @@
 namespace librepcb {
 namespace project {
 
-class DeviceInstance;
+class BI_Device;
 
 /*****************************************************************************************
  *  Class CmdDeviceInstanceEdit
@@ -47,7 +47,7 @@ class CmdDeviceInstanceEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdDeviceInstanceEdit(DeviceInstance& dev) noexcept;
+        explicit CmdDeviceInstanceEdit(BI_Device& dev) noexcept;
         ~CmdDeviceInstanceEdit() noexcept;
 
         // General Methods
@@ -56,7 +56,7 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
         void setMirrored(bool mirrored, bool immediate) noexcept;
-        void mirror(const Point& center, bool vertical, bool immediate) noexcept;
+        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept;
 
 
     private:
@@ -76,7 +76,7 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         // Private Member Variables
 
         // Attributes from the constructor
-        DeviceInstance& mDevice;
+        BI_Device& mDevice;
 
         // General Attributes
         Point mOldPos;

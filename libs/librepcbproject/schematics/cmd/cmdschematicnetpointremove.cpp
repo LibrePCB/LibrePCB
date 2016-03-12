@@ -35,17 +35,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
-                                                       SI_NetPoint& netpoint) noexcept :
+CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(SI_NetPoint& netpoint) noexcept :
     UndoCommand(tr("Remove netpoint")),
-    mSchematic(schematic), mNetPoint(netpoint)
+    mSchematic(netpoint.getSchematic()), mNetPoint(netpoint)
 {
 }
 
 CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mNetPoint;
 }
 
 /*****************************************************************************************

@@ -35,17 +35,22 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(SI_NetLine& netline) noexcept :
+    UndoCommand(tr("Add netline")),
+    mSchematic(netline.getSchematic()), mStartPoint(netline.getStartPoint()),
+    mEndPoint(netline.getEndPoint()), mNetLine(&netline)
+{
+}
+
 CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
                                                SI_NetPoint& endPoint) noexcept :
     UndoCommand(tr("Add netline")),
-    mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
+    mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(nullptr)
 {
 }
 
 CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 {
-    if ((mNetLine) && (!isCurrentlyExecuted()))
-        delete mNetLine;
 }
 
 /*****************************************************************************************
@@ -54,7 +59,10 @@ CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 
 bool CmdSchematicNetLineAdd::performExecute() throw (Exception)
 {
-    mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(158750)); // can throw
+    if (!mNetLine) {
+        // create new netline
+        mNetLine = new SI_NetLine(mSchematic, mStartPoint, mEndPoint, Length(158750)); // can throw
+    }
 
     performRedo(); // can throw
 

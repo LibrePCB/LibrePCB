@@ -49,29 +49,28 @@ namespace project {
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName) throw (Exception):
-    QObject(nullptr), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
-    mXmlFile(nullptr), mAddedToProject(false), mGraphicsScene(nullptr),
-    mGridProperties(nullptr)
+    QObject(&project), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
+    mIsAddedToProject(false)
 {
     try
     {
-        mGraphicsScene = new GraphicsScene();
+        mGraphicsScene.reset(new GraphicsScene());
 
         // try to open/create the XML schematic file
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mFilePath);
+            mXmlFile.reset(SmartXmlFile::create(mFilePath));
 
             // set attributes
             mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default grid properties
-            mGridProperties = new GridProperties();
+            mGridProperties.reset(new GridProperties());
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly);
+            mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
             QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
             XmlDomElement& root = doc->getRoot();
 
@@ -81,14 +80,19 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load grid properties
-            mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
+            mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
 
             // Load all symbols
             for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
                  node; node = node->getNextSibling("symbol"))
             {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
-                addSymbol(*symbol);
+                if (getSymbolByUuid(symbol->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
+                        QString(tr("There is already a symbol with the UUID \"%1\"!"))
+                        .arg(symbol->getUuid().toStr()));
+                }
+                mSymbols.append(symbol);
             }
 
             // Load all netpoints
@@ -96,7 +100,12 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                  node; node = node->getNextSibling("netpoint"))
             {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
-                addNetPoint(*netpoint);
+                if (getNetPointByUuid(netpoint->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
+                        QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                        .arg(netpoint->getUuid().toStr()));
+                }
+                mNetPoints.append(netpoint);
             }
 
             // Load all netlines
@@ -104,7 +113,12 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                  node; node = node->getNextSibling("netline"))
             {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
-                addNetLine(*netline);
+                if (getNetLineByUuid(netline->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
+                        QString(tr("There is already a netline with the UUID \"%1\"!"))
+                        .arg(netline->getUuid().toStr()));
+                }
+                mNetLines.append(netline);
             }
 
             // Load all netlabels
@@ -112,11 +126,14 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                  node; node = node->getNextSibling("netlabel"))
             {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
-                addNetLabel(*netlabel);
+                if (getNetLabelByUuid(netlabel->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),
+                        QString(tr("There is already a netlabel with the UUID \"%1\"!"))
+                        .arg(netlabel->getUuid().toStr()));
+                }
+                mNetLabels.append(netlabel);
             }
         }
-
-        updateIcon();
 
         // emit the "attributesChanged" signal when the project has emited it
         connect(&mProject, &Project::attributesChanged, this, &Schematic::attributesChanged);
@@ -126,39 +143,30 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (SI_NetLabel* netlabel, mNetLabels)
-            try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
-        foreach (SI_NetLine* netline, mNetLines)
-            try { removeNetLine(*netline); delete netline; } catch (...) {}
-        foreach (SI_NetPoint* netpoint, mNetPoints)
-            try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
-        foreach (SI_Symbol* symbol, mSymbols)
-            try { removeSymbol(*symbol); delete symbol; } catch (...) {}
-        delete mGridProperties;         mGridProperties = nullptr;
-        delete mXmlFile;                mXmlFile = nullptr;
-        delete mGraphicsScene;          mGraphicsScene = nullptr;
+        qDeleteAll(mNetLabels);         mNetLabels.clear();
+        qDeleteAll(mNetLines);          mNetLines.clear();
+        qDeleteAll(mNetPoints);         mNetPoints.clear();
+        qDeleteAll(mSymbols);           mSymbols.clear();
+        mGridProperties.reset();
+        mXmlFile.reset();
+        mGraphicsScene.reset();
         throw; // ...and rethrow the exception
     }
 }
 
 Schematic::~Schematic() noexcept
 {
-    // delete all netlabels (and catch all throwed exceptions)
-    foreach (SI_NetLabel* netlabel, mNetLabels)
-        try { removeNetLabel(*netlabel); delete netlabel; } catch (...) {}
-    // delete all netlines (and catch all throwed exceptions)
-    foreach (SI_NetLine* netline, mNetLines)
-        try { removeNetLine(*netline); delete netline; } catch (...) {}
-    // delete all netpoints (and catch all throwed exceptions)
-    foreach (SI_NetPoint* netpoint, mNetPoints)
-        try { removeNetPoint(*netpoint); delete netpoint; } catch (...) {}
-    // delete all symbols (and catch all throwed exceptions)
-    foreach (SI_Symbol* symbol, mSymbols)
-        try { removeSymbol(*symbol); delete symbol; } catch (...) {}
+    Q_ASSERT(!mIsAddedToProject);
 
-    delete mGridProperties;         mGridProperties = nullptr;
-    delete mXmlFile;                mXmlFile = nullptr;
-    delete mGraphicsScene;          mGraphicsScene = nullptr;
+    // delete all items
+    qDeleteAll(mNetLabels);         mNetLabels.clear();
+    qDeleteAll(mNetLines);          mNetLines.clear();
+    qDeleteAll(mNetPoints);         mNetPoints.clear();
+    qDeleteAll(mSymbols);           mSymbols.clear();
+
+    mGridProperties.reset();
+    mXmlFile.reset();
+    mGraphicsScene.reset();
 }
 
 /*****************************************************************************************
@@ -167,7 +175,7 @@ Schematic::~Schematic() noexcept
 
 bool Schematic::isEmpty() const noexcept
 {
-    return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty());
+    return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty() && mNetLabels.isEmpty());
 }
 
 QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,
@@ -182,6 +190,8 @@ QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,
                                             bool attachedLines,
                                             bool attachedLinesFromSymbols) const noexcept
 {
+    // TODO: this method is incredible ugly ;)
+
     QList<SI_Base*> list;
     foreach (SI_Symbol* symbol, mSymbols)
     {
@@ -217,8 +227,8 @@ QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,
     {
         if (netpoint->isSelected())
         {
-            if (((!netpoint->isAttached()) && floatingPoints)
-               || (netpoint->isAttached() && attachedPoints))
+            if (((!netpoint->isAttachedToPin()) && floatingPoints)
+               || (netpoint->isAttachedToPin() && attachedPoints))
             {
                 if (!list.contains(netpoint))
                     list.append(netpoint);
@@ -239,18 +249,18 @@ QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,
             // netpoints from netlines
             SI_NetPoint* p1 = &netline->getStartPoint();
             SI_NetPoint* p2 = &netline->getEndPoint();
-            if ( ((!netline->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
-              || ((!netline->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
-              || (( netline->isAttachedToSymbol()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
-              || (( netline->isAttachedToSymbol()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
+            if ( ((!netline->isAttachedToSymbol()) && (!p1->isAttachedToPin()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttachedToSymbol()) && ( p1->isAttachedToPin()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttachedToSymbol()) && (!p1->isAttachedToPin()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttachedToSymbol()) && ( p1->isAttachedToPin()) && attachedPointsFromAttachedLines))
             {
                 if (!list.contains(p1))
                     list.append(p1);
             }
-            if ( ((!netline->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
-              || ((!netline->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
-              || (( netline->isAttachedToSymbol()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
-              || (( netline->isAttachedToSymbol()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
+            if ( ((!netline->isAttachedToSymbol()) && (!p2->isAttachedToPin()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttachedToSymbol()) && ( p2->isAttachedToPin()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttachedToSymbol()) && (!p2->isAttachedToPin()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttachedToSymbol()) && ( p2->isAttachedToPin()) && attachedPointsFromAttachedLines))
             {
                 if (!list.contains(p2))
                     list.append(p2);
@@ -347,6 +357,20 @@ QList<SI_SymbolPin*> Schematic::getPinsAtScenePos(const Point& pos) const noexce
     return list;
 }
 
+QList<SI_Base*> Schematic::getAllItems() const noexcept
+{
+    QList<SI_Base*> items;
+    foreach (SI_Symbol* symbol, mSymbols)
+        items.append(symbol);
+    foreach (SI_NetPoint* netpoint, mNetPoints)
+        items.append(netpoint);
+    foreach (SI_NetLine* netline, mNetLines)
+        items.append(netline);
+    foreach (SI_NetLabel* netlabel, mNetLabels)
+        items.append(netlabel);
+    return items;
+}
+
 /*****************************************************************************************
  *  Setters: General
  ****************************************************************************************/
@@ -362,42 +386,39 @@ void Schematic::setGridProperties(const GridProperties& grid) noexcept
 
 SI_Symbol* Schematic::getSymbolByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (SI_Symbol* symbol, mSymbols)
-    {
+    foreach (SI_Symbol* symbol, mSymbols) {
         if (symbol->getUuid() == uuid)
             return symbol;
     }
     return nullptr;
 }
 
-SI_Symbol* Schematic::createSymbol(ComponentInstance& cmpInstance, const Uuid& symbolItem,
-                                   const Point& position, const Angle& angle) throw (Exception)
-{
-    return new SI_Symbol(*this, cmpInstance, symbolItem, position, angle);
-}
-
 void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
 {
-    // check if there is no symbol with the same uuid in the list
-    if (getSymbolByUuid(symbol.getUuid()))
+    if ((!mIsAddedToProject) || (mSymbols.contains(&symbol))
+        || (&symbol.getSchematic() != this))
     {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no symbol with the same uuid in the list
+    if (getSymbolByUuid(symbol.getUuid())) {
         throw RuntimeError(__FILE__, __LINE__, symbol.getUuid().toStr(),
             QString(tr("There is already a symbol with the UUID \"%1\"!"))
             .arg(symbol.getUuid().toStr()));
     }
-
     // add to schematic
-    symbol.addToSchematic(*mGraphicsScene); // can throw an exception
+    symbol.addToSchematic(*mGraphicsScene); // can throw
     mSymbols.append(&symbol);
 }
 
 void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
 {
-    Q_ASSERT(mSymbols.contains(&symbol) == true);
-
+    if ((!mIsAddedToProject) || (!mSymbols.contains(&symbol))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
     // remove from schematic
-    symbol.removeFromSchematic(*mGraphicsScene); // can throw an exception
-    mSymbols.removeAll(&symbol);
+    symbol.removeFromSchematic(*mGraphicsScene); // can throw
+    mSymbols.removeOne(&symbol);
 }
 
 /*****************************************************************************************
@@ -406,55 +427,39 @@ void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
 
 SI_NetPoint* Schematic::getNetPointByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (SI_NetPoint* netpoint, mNetPoints)
-    {
+    foreach (SI_NetPoint* netpoint, mNetPoints) {
         if (netpoint->getUuid() == uuid)
             return netpoint;
     }
     return nullptr;
 }
 
-SI_NetPoint* Schematic::createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception)
-{
-    return new SI_NetPoint(*this, netsignal, position);
-}
-
-SI_NetPoint* Schematic::createNetPoint(SI_SymbolPin& pin) throw (Exception)
-{
-    return new SI_NetPoint(*this, pin);
-}
-
 void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
-    // check if there is no netpoint with the same uuid in the list
-    if (getNetPointByUuid(netpoint.getUuid()))
+    if ((!mIsAddedToProject) || (mNetPoints.contains(&netpoint))
+        || (&netpoint.getSchematic() != this))
     {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no netpoint with the same uuid in the list
+    if (getNetPointByUuid(netpoint.getUuid())) {
         throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toStr(),
             QString(tr("There is already a netpoint with the UUID \"%1\"!"))
             .arg(netpoint.getUuid().toStr()));
     }
-
     // add to schematic
-    netpoint.addToSchematic(*mGraphicsScene); // can throw an exception
+    netpoint.addToSchematic(*mGraphicsScene); // can throw
     mNetPoints.append(&netpoint);
 }
 
 void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
 {
-    Q_ASSERT(mNetPoints.contains(&netpoint) == true);
-
-    // the netpoint cannot be removed if there are already netlines connected to it!
-    if (netpoint.getLines().count() > 0)
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1:%2")
-            .arg(netpoint.getUuid().toStr()).arg(netpoint.getLines().count()),
-            QString(tr("There are already netlines connected to the netpoint \"%1\"!"))
-            .arg(netpoint.getUuid().toStr()));
+    if ((!mIsAddedToProject) || (!mNetPoints.contains(&netpoint))) {
+        throw LogicError(__FILE__, __LINE__);
     }
-
     // remove from schematic
     netpoint.removeFromSchematic(*mGraphicsScene); // can throw an exception
-    mNetPoints.removeAll(&netpoint);
+    mNetPoints.removeOne(&netpoint);
 }
 
 /*****************************************************************************************
@@ -463,42 +468,39 @@ void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
 
 SI_NetLine* Schematic::getNetLineByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (SI_NetLine* netline, mNetLines)
-    {
+    foreach (SI_NetLine* netline, mNetLines) {
         if (netline->getUuid() == uuid)
             return netline;
     }
     return nullptr;
 }
 
-SI_NetLine* Schematic::createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                                     const Length& width) throw (Exception)
-{
-    return new SI_NetLine(*this, startPoint, endPoint, width);
-}
-
 void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
 {
-    // check if there is no netline with the same uuid in the list
-    if (getNetLineByUuid(netline.getUuid()))
+    if ((!mIsAddedToProject) || (mNetLines.contains(&netline))
+        || (&netline.getSchematic() != this))
     {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no netline with the same uuid in the list
+    if (getNetLineByUuid(netline.getUuid())) {
         throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toStr(),
             QString(tr("There is already a netline with the UUID \"%1\"!"))
             .arg(netline.getUuid().toStr()));
     }
-
     // add to schematic
-    netline.addToSchematic(*mGraphicsScene); // can throw an exception
+    netline.addToSchematic(*mGraphicsScene); // can throw
     mNetLines.append(&netline);
 }
 
 void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
 {
-    Q_ASSERT(mNetLines.contains(&netline) == true);
-
+    if ((!mIsAddedToProject) || (!mNetLines.contains(&netline))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
     // remove from schematic
-    netline.removeFromSchematic(*mGraphicsScene); // can throw an exception
-    mNetLines.removeAll(&netline);
+    netline.removeFromSchematic(*mGraphicsScene); // can throw
+    mNetLines.removeOne(&netline);
 }
 
 /*****************************************************************************************
@@ -507,41 +509,39 @@ void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
 
 SI_NetLabel* Schematic::getNetLabelByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (SI_NetLabel* netlabel, mNetLabels)
-    {
+    foreach (SI_NetLabel* netlabel, mNetLabels) {
         if (netlabel->getUuid() == uuid)
             return netlabel;
     }
     return nullptr;
 }
 
-SI_NetLabel* Schematic::createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception)
-{
-    return new SI_NetLabel(*this, netsignal, position);
-}
-
 void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
-    // check if there is no netlabel with the same uuid in the list
-    if (getNetLabelByUuid(netlabel.getUuid()))
+    if ((!mIsAddedToProject) || (mNetLabels.contains(&netlabel))
+        || (&netlabel.getSchematic() != this))
     {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no netlabel with the same uuid in the list
+    if (getNetLabelByUuid(netlabel.getUuid())) {
         throw RuntimeError(__FILE__, __LINE__, netlabel.getUuid().toStr(),
             QString(tr("There is already a netlabel with the UUID \"%1\"!"))
             .arg(netlabel.getUuid().toStr()));
     }
-
     // add to schematic
-    netlabel.addToSchematic(*mGraphicsScene); // can throw an exception
+    netlabel.addToSchematic(*mGraphicsScene); // can throw
     mNetLabels.append(&netlabel);
 }
 
 void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
 {
-    Q_ASSERT(mNetLabels.contains(&netlabel) == true);
-
+    if ((!mIsAddedToProject) || (!mNetLabels.contains(&netlabel))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
     // remove from schematic
-    netlabel.removeFromSchematic(*mGraphicsScene); // can throw an exception
-    mNetLabels.removeAll(&netlabel);
+    netlabel.removeFromSchematic(*mGraphicsScene); // can throw
+    mNetLabels.removeOne(&netlabel);
 }
 
 /*****************************************************************************************
@@ -550,14 +550,61 @@ void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
 
 void Schematic::addToProject() throw (Exception)
 {
-    Q_ASSERT(mAddedToProject == false);
-    mAddedToProject = true;
+    if (mIsAddedToProject) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    // TODO: use scope guard
+    QList<SI_Base*> items = getAllItems();
+    int i = 0;
+    try {
+        while (i < items.count()) {
+            items.at(i)->addToSchematic(*mGraphicsScene); // can throw
+            i++;
+        }
+    } catch (Exception& e) {
+        try {
+            while (i > 0) {
+                items.at(i-1)->removeFromSchematic(*mGraphicsScene); // can throw
+                i--;
+            }
+        } catch (Exception& e2) {
+            qFatal("Internal Fatal Error");
+        }
+        throw;
+    }
+
+    mIsAddedToProject = true;
+    updateIcon();
 }
 
 void Schematic::removeFromProject() throw (Exception)
 {
-    Q_ASSERT(mAddedToProject == true);
-    mAddedToProject = false;
+    if (!mIsAddedToProject) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    // TODO: use scope guard
+    QList<SI_Base*> items = getAllItems();
+    int i = items.count();
+    try {
+        while (i > 0) {
+            items.at(i-1)->removeFromSchematic(*mGraphicsScene); // can throw
+            i--;
+        }
+    } catch (Exception& e) {
+        try {
+            while (i < items.count()) {
+                items.at(i)->addToSchematic(*mGraphicsScene); // can throw
+                i++;
+            }
+        } catch (Exception& e2) {
+            qFatal("Internal Fatal Error");
+        }
+        throw;
+    }
+
+    mIsAddedToProject = false;
 }
 
 bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
@@ -567,7 +614,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     // save schematic XML file
     try
     {
-        if (mAddedToProject)
+        if (mIsAddedToProject)
         {
             XmlDomDocument doc(*serializeToXmlDomElement());
             doc.setFileVersion(APP_VERSION_MAJOR);
@@ -589,7 +636,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 
 void Schematic::showInView(GraphicsView& view) noexcept
 {
-    view.setScene(mGraphicsScene);
+    view.setScene(mGraphicsScene.data());
 }
 
 void Schematic::setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept
@@ -631,9 +678,7 @@ void Schematic::clearSelection() const noexcept
 
 void Schematic::renderToQPainter(QPainter& painter) const noexcept
 {
-    GraphicsScene* scene = dynamic_cast<GraphicsScene*>(mGraphicsScene);
-    Q_ASSERT(scene);
-    scene->render(&painter, QRectF(), scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    mGraphicsScene->render(&painter, QRectF(), mGraphicsScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 /*****************************************************************************************
@@ -654,7 +699,7 @@ bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
         else if (attrKey == QLatin1String("LAST_MODIFIED"))
             return value = mProject.getLastModified().toString(Qt::SystemLocaleShortDate), true;
         else if (attrKey == QLatin1String("NBR"))
-            return value = QString::number(mProject.getSchematicIndex(this) + 1), true;
+            return value = QString::number(mProject.getSchematicIndex(*this) + 1), true;
         else if (attrKey == QLatin1String("CNT"))
             return value = QString::number(mProject.getSchematics().count()), true;
     }

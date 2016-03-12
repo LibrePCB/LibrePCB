@@ -47,7 +47,7 @@ namespace project {
 class Circuit;
 class ComponentAttributeInstance;
 class ComponentSignalInstance;
-class DeviceInstance;
+class BI_Device;
 class SI_Symbol;
 class ErcMsg;
 
@@ -67,23 +67,29 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
     public:
 
         // Constructors / Destructor
+        ComponentInstance() = delete;
+        ComponentInstance(const ComponentInstance& other) = delete;
         explicit ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
                                    const Uuid& symbVar, const QString& name) throw (Exception);
         ~ComponentInstance() noexcept;
 
-        // Getters
+        // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         QString getValue(bool replaceAttributes = false) const noexcept;
-        int getPlacedSymbolsCount() const noexcept {return mSymbols.count();}
+        const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
+        const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
+        ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
+
+        // Getters: General
+        Circuit& getCircuit() const noexcept {return mCircuit;}
+        int getPlacedSymbolsCount() const noexcept {return mRegisteredSymbols.count();}
         int getUnplacedSymbolsCount() const noexcept;
         int getUnplacedRequiredSymbolsCount() const noexcept;
         int getUnplacedOptionalSymbolsCount() const noexcept;
-        ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
-        const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
-        const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
-
+        int getRegisteredElementsCount() const noexcept;
+        bool isUsed() const noexcept;
 
         // Setters
 
@@ -122,10 +128,10 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // General Methods
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
-        void registerSymbol(const SI_Symbol& symbol) throw (Exception);
-        void unregisterSymbol(const SI_Symbol& symbol) throw (Exception);
-        void registerDevice(const DeviceInstance& device) throw (Exception);
-        void unregisterDevice(const DeviceInstance& device) throw (Exception);
+        void registerSymbol(SI_Symbol& symbol) throw (Exception);
+        void unregisterSymbol(SI_Symbol& symbol) throw (Exception);
+        void registerDevice(BI_Device& device) throw (Exception);
+        void unregisterDevice(BI_Device& device) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -134,6 +140,9 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
+
+        // Operator Overloadings
+        ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
 
 
     signals:
@@ -144,12 +153,6 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
     private:
 
-        // make some methods inaccessible...
-        ComponentInstance();
-        ComponentInstance(const ComponentInstance& other);
-        ComponentInstance& operator=(const ComponentInstance& rhs);
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -160,7 +163,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
         // General
         Circuit& mCircuit;
-        bool mAddedToCircuit;
+        bool mIsAddedToCircuit;
 
 
         // Attributes
@@ -187,7 +190,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         QHash<Uuid, ComponentSignalInstance*> mSignals;
 
 
-        // Misc
+        // Registered Elements
 
         /**
          * @brief All registered symbols
@@ -197,14 +200,17 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
          *
          * @see #registerSymbol(), #unregisterSymbol()
          */
-        QHash<Uuid, const SI_Symbol*> mSymbols;
+        QHash<Uuid, SI_Symbol*> mRegisteredSymbols;
 
         /**
-         * @brief All registered device instances
+         * @brief All registered devices (of all boards)
          *
          * @see #registerDevice(), #unregisterDevice()
          */
-        QList<const DeviceInstance*> mDeviceInstances;
+        QList<BI_Device*> mRegisteredDevices;
+
+
+        // ERC Messages
 
         /// @brief The ERC message for unplaced required symbols of this component
         QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;

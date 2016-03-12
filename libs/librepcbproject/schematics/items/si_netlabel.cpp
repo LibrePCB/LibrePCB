@@ -40,14 +40,13 @@ namespace project {
  ****************************************************************************************/
 
 SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mNetSignal(nullptr)
+    SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
     Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
     mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-    if(!mNetSignal)
-    {
+    if(!mNetSignal) {
         throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
@@ -59,10 +58,9 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) 
 }
 
 SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
-    SI_Base(), mSchematic(schematic), mGraphicsItem(nullptr), mPosition(position),
-    mRotation(0), mNetSignal(&netsignal)
+    SI_Base(schematic), mUuid(Uuid::createRandom()), mPosition(position), mRotation(0),
+    mNetSignal(&netsignal)
 {
-    mUuid = Uuid::createRandom(); // generate random UUID
     init();
 }
 
@@ -71,7 +69,7 @@ void SI_NetLabel::init() throw (Exception)
     connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
 
     // create the graphics item
-    mGraphicsItem = new SGI_NetLabel(*this);
+    mGraphicsItem.reset(new SGI_NetLabel(*this));
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
 
@@ -80,16 +78,7 @@ void SI_NetLabel::init() throw (Exception)
 
 SI_NetLabel::~SI_NetLabel() noexcept
 {
-    delete mGraphicsItem;           mGraphicsItem = nullptr;
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-Project& SI_NetLabel::getProject() const noexcept
-{
-    return mSchematic.getProject();
+    mGraphicsItem.reset();
 }
 
 /*****************************************************************************************
@@ -98,29 +87,37 @@ Project& SI_NetLabel::getProject() const noexcept
 
 void SI_NetLabel::setNetSignal(NetSignal& netsignal) noexcept
 {
-    if (&netsignal == mNetSignal) return;
-
-    disconnect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
-    mNetSignal->unregisterSchematicNetLabel(*this);
-    mNetSignal = &netsignal;
-    mNetSignal->registerSchematicNetLabel(*this);
-    connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
-    mGraphicsItem->updateCacheAndRepaint();
+    if (&netsignal != mNetSignal) {
+        if (netsignal.getCircuit() != getCircuit()) {
+            throw LogicError(__FILE__, __LINE__);
+        }
+        if (isAddedToSchematic()) {
+            // TODO: use scope guard
+            mNetSignal->unregisterSchematicNetLabel(*this); // can throw
+            netsignal.registerSchematicNetLabel(*this); // can throw
+        }
+        disconnect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
+        connect(&netsignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
+        mNetSignal = &netsignal;
+        mGraphicsItem->updateCacheAndRepaint();
+    }
 }
 
 void SI_NetLabel::setPosition(const Point& position) noexcept
 {
-    if (position == mPosition) return;
-    mPosition = position;
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
+    if (position != mPosition) {
+        mPosition = position;
+        mGraphicsItem->setPos(mPosition.toPxQPointF());
+    }
 }
 
 void SI_NetLabel::setRotation(const Angle& rotation) noexcept
 {
-    if (rotation == mRotation) return;
-    mRotation = rotation;
-    mGraphicsItem->setRotation(-mRotation.toDeg());
-    mGraphicsItem->updateCacheAndRepaint();
+    if (rotation != mRotation) {
+        mRotation = rotation;
+        mGraphicsItem->setRotation(-mRotation.toDeg());
+        mGraphicsItem->updateCacheAndRepaint();
+    }
 }
 
 /*****************************************************************************************
@@ -129,14 +126,20 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept
 
 void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
-    mNetSignal->registerSchematicNetLabel(*this);
-    scene.addItem(*mGraphicsItem);
+    if (isAddedToSchematic()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mNetSignal->registerSchematicNetLabel(*this); // can throw
+    SI_Base::addToSchematic(scene, *mGraphicsItem);
 }
 
 void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
 {
-    mNetSignal->unregisterSchematicNetLabel(*this);
-    scene.removeItem(*mGraphicsItem);
+    if (!isAddedToSchematic()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mNetSignal->unregisterSchematicNetLabel(*this); // can throw
+    SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 
 XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)

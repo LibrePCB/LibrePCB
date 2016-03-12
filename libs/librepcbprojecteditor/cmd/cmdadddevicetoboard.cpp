@@ -46,11 +46,11 @@ namespace project {
 
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
         ComponentInstance& cmpInstance, const Uuid& deviceUuid, const Uuid& footprintUuid,
-        const Point& position, const Angle& rotation) noexcept :
+        const Point& position, const Angle& rotation, bool mirror) noexcept :
     UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace), mBoard(board), mComponentInstance(cmpInstance),
     mDeviceUuid(deviceUuid), mFootprintUuid(footprintUuid), mPosition(position),
-    mRotation(rotation),
+    mRotation(rotation), mMirror(mirror),
     mCmdAddToBoard(nullptr)
 {
 }
@@ -63,7 +63,7 @@ CmdAddDeviceToBoard::~CmdAddDeviceToBoard() noexcept
  *  Getters
  ****************************************************************************************/
 
-DeviceInstance* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
+BI_Device* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
 {
     Q_ASSERT(mCmdAddToBoard);
     return mCmdAddToBoard ? mCmdAddToBoard->getDeviceInstance() : nullptr;
@@ -117,7 +117,7 @@ bool CmdAddDeviceToBoard::performExecute() throw (Exception)
 
     // create child command to add a new device instance to the board
     mCmdAddToBoard = new CmdDeviceInstanceAdd(mBoard, mComponentInstance, mDeviceUuid,
-                                              mFootprintUuid, mPosition, mRotation);
+                                              mFootprintUuid, mPosition, mRotation, mMirror);
     appendChild(mCmdAddToBoard); // can throw
 
     // execute all child commands

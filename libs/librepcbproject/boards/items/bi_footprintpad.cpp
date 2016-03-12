@@ -30,7 +30,7 @@
 #include "../../circuit/circuit.h"
 #include "../../settings/projectsettings.h"
 #include <librepcbcommon/graphics/graphicsscene.h>
-#include "../deviceinstance.h"
+#include "bi_device.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -43,20 +43,17 @@ namespace project {
  ****************************************************************************************/
 
 BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
-    BI_Base(), mCircuit(footprint.getDeviceInstance().getBoard().getProject().getCircuit()),
-    mFootprint(footprint), mFootprintPad(nullptr), /*mComponentSignal(nullptr),
-    mComponentSignalInstance(nullptr),*/ mAddedToBoard(false),
-    /*mRegisteredNetPoint(nullptr),*/ mGraphicsItem(nullptr)
+    BI_Base(footprint.getBoard()), mFootprint(footprint), mFootprintPad(nullptr)
+   /*mComponentSignal(nullptr), mComponentSignalInstance(nullptr), mRegisteredNetPoint(nullptr),*/
 {
     // read attributes
     mFootprintPad = mFootprint.getLibFootprint().getPadByUuid(padUuid);
-    if (!mFootprintPad)
-    {
+    if (!mFootprintPad) {
         throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
             QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
     }
 
-    mGraphicsItem = new BGI_FootprintPad(*this);
+    mGraphicsItem.reset(new BGI_FootprintPad(*this));
 
     // connect to the "attributes changed" signal of the footprint
     connect(&mFootprint, &BI_Footprint::attributesChanged,
@@ -68,22 +65,12 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
 BI_FootprintPad::~BI_FootprintPad()
 {
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
-    delete mGraphicsItem;       mGraphicsItem = nullptr;
+    mGraphicsItem.reset();
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-
-Project& BI_FootprintPad::getProject() const noexcept
-{
-    return mFootprint.getProject();
-}
-
-Board& BI_FootprintPad::getBoard() const noexcept
-{
-    return mFootprint.getBoard();
-}
 
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
@@ -126,22 +113,24 @@ void BI_FootprintPad::unregisterNetPoint(SI_NetPoint& netpoint)
     updateErcMessages();
 }*/
 
-void BI_FootprintPad::addToBoard(GraphicsScene& scene) noexcept
+void BI_FootprintPad::addToBoard(GraphicsScene& scene) throw (Exception)
 {
-    Q_ASSERT(mAddedToBoard == false);
+    if (isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
     //mComponentSignalInstance->registerSymbolPin(*this);
-    scene.addItem(*mGraphicsItem);
-    mAddedToBoard = true;
+    BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
-void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) noexcept
+void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) throw (Exception)
 {
-    Q_ASSERT(mAddedToBoard == true);
+    if (!isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
     //Q_ASSERT(mRegisteredNetPoint == nullptr);
     //mComponentSignalInstance->unregisterSymbolPin(*this);
-    scene.removeItem(*mGraphicsItem);
-    mAddedToBoard = false;
+    BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
 /*****************************************************************************************

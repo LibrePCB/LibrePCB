@@ -27,20 +27,19 @@
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
 #include <librepcbproject/boards/items/bi_footprintpad.h>
-#include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
-#include <librepcbcommon/undocommandgroup.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcbproject/boards/deviceinstance.h>
+#include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/project.h>
-#include <librepcbproject/library/projectlibrary.h>
-#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include "../../cmd/cmdadddevicetoboard.h"
+#include "../../cmd/cmdmoveselectedboarditems.h"
+#include "../../cmd/cmdrotateselectedboarditems.h"
+#include "../../cmd/cmdflipselectedboarditems.h"
+#include "../../cmd/cmdremoveselectedboarditems.h"
+#include "../../cmd/cmdreplacedevice.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -54,22 +53,13 @@ namespace project {
 
 BES_Select::BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack) :
-    BES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle),
-    mCommandGroup(nullptr)
+    BES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle)
 {
 }
 
 BES_Select::~BES_Select()
 {
-    try
-    {
-        qDeleteAll(mDeviceEditCmds);    mDeviceEditCmds.clear();
-        delete mCommandGroup;           mCommandGroup = nullptr;
-    }
-    catch (Exception& e)
-    {
-        qWarning() << "Exception catched in the SES_SELECT destructor:" << e.getDebugMsg();
-    }
+    Q_ASSERT(mSelectedItemsMoveCommand.isNull());
 }
 
 /*****************************************************************************************
@@ -123,16 +113,16 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdle(BEE_Base* event) noexcept
             //pasteItems();
             return ForceStayInState;
         case BEE_Base::Edit_RotateCW:
-            rotateSelectedItems(-Angle::deg90(), Point(), true);
+            rotateSelectedItems(-Angle::deg90());
             return ForceStayInState;
         case BEE_Base::Edit_RotateCCW:
-            rotateSelectedItems(Angle::deg90(), Point(), true);
+            rotateSelectedItems(Angle::deg90());
             return ForceStayInState;
         case BEE_Base::Edit_FlipHorizontal:
-            flipSelectedItems(false, Point(), true);
+            flipSelectedItems(Qt::Horizontal);
             return ForceStayInState;
         case BEE_Base::Edit_FlipVertical:
-            flipSelectedItems(true, Point(), true);
+            flipSelectedItems(Qt::Vertical);
             return ForceStayInState;
         case BEE_Base::Edit_Remove:
             removeSelectedItems();
@@ -160,7 +150,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(BEE_Base* event) 
             switch (mouseEvent->button())
             {
                 case Qt::LeftButton:
-                    return proccessIdleSceneLeftClick(mouseEvent, board);
+                    return proccessIdleSceneLeftClick(mouseEvent, *board);
                 default:
                     break;
             }
@@ -210,24 +200,24 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(BEE_Base* event) 
 }
 
 BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                                            Board* board) noexcept
+                                                            Board& board) noexcept
 {
     // handle items selection
-    QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
+    QList<BI_Base*> items = board.getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty())
     {
         // no items under mouse --> start drawing a selection rectangle
-        board->clearSelection();
+        board.clearSelection();
         return ForceStayInState;
     }
     if (!items.first()->isSelected())
     {
         if (!(mouseEvent->modifiers() & Qt::ControlModifier)) // CTRL pressed
-            board->clearSelection(); // select only the top most item under the mouse
+            board.clearSelection(); // select only the top most item under the mouse
         items.first()->setSelected(true);
     }
 
-    if (startMovingSelectedItems(board))
+    if (startMovingSelectedItems(board, Point::fromPx(mouseEvent->scenePos())))
         return ForceStayInState;
     else
         return PassToParentState;
@@ -252,7 +242,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
         case BI_Base::Type_t::Footprint:
         {
             BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first()); Q_ASSERT(footprint);
-            DeviceInstance& devInst = footprint->getDeviceInstance();
+            BI_Device& devInst = footprint->getDeviceInstance();
             ComponentInstance& cmpInst = devInst.getComponentInstance();
 
             // get all available alternative devices
@@ -294,7 +284,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             else if (action == aRotateCCW)
             {
-                rotateSelectedItems(Angle::deg90(), footprint->getPosition());
+                rotateSelectedItems(Angle::deg90());
             }
             else if (action == aFlipH)
             {
@@ -302,31 +292,18 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             else if (!action->data().toUuid().isNull())
             {
-                bool cmdActive = false;
                 try
                 {
-                    mUndoStack.beginCmdGroup(tr("Change Device"));
-                    cmdActive = true;
-
                     // get UUID of device and footprint
                     Uuid deviceUuid(action->data().toString());
                     Uuid footprintUuid = Uuid(); // TODO
-
-                    // replace device
-                    Point pos = devInst.getPosition();
-                    auto cmdRemove = new CmdDeviceInstanceRemove(*board, devInst);
-                    mUndoStack.appendToCmdGroup(cmdRemove);
-                    auto cmdAdd = new CmdAddDeviceToBoard(mWorkspace, *board, cmpInst,
-                                                          deviceUuid, footprintUuid, pos);
-                    mUndoStack.appendToCmdGroup(cmdAdd);
-
-                    mUndoStack.commitCmdGroup();
-                    cmdActive = false;
+                    CmdReplaceDevice* cmd = new CmdReplaceDevice(mWorkspace, *board, devInst,
+                                                                 deviceUuid, footprintUuid);
+                    mUndoStack.execCmd(cmd);
                 }
                 catch (Exception& e)
                 {
                     QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-                    if (cmdActive) try {mUndoStack.abortCmdGroup();} catch (...) {}
                 }
             }
             else if (action == aRemove)
@@ -380,73 +357,32 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
 
     switch (qevent->type())
     {
-        case QEvent::GraphicsSceneMouseRelease:
-        {
+        case QEvent::GraphicsSceneMouseRelease: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Board* board = mEditor.getActiveBoard();
-            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
-            Q_CHECK_PTR(board); if (!board) break;
-            Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
-            delta.mapToGrid(board->getGridProperties().getInterval());
-
-            switch (sceneEvent->button())
-            {
-                case Qt::LeftButton: // stop moving items
-                {
-                    Q_CHECK_PTR(mCommandGroup);
-
-                    // move selected elements
-                    foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds)
-                        cmd->setDeltaToStartPos(delta, false);
-
-                    // set position of all selected elements permanent
-                    try
-                    {
-                        if (delta.isOrigin())
-                        {
-                            // items were not moved, do not execute the commands
-                            delete mCommandGroup; // this will also delete all objects in mSymbolInstanceMoveCommands
-                        }
-                        else
-                        {
-                            // items were moved, add commands to the project's undo stack
-                            mUndoStack.execCmd(mCommandGroup); // can throw an exception
-                        }
-                    }
-                    catch (Exception& e)
-                    {
-                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-                    }
-                    mDeviceEditCmds.clear();
-                    mCommandGroup = nullptr;
-                    mSubState = SubState_Idle;
-                    break;
-                } // case Qt::LeftButton
-
-                default:
-                    break;
-            } // switch (sceneEvent->button())
+            Q_ASSERT(sceneEvent); if (!sceneEvent) break;
+            if (sceneEvent->button() == Qt::LeftButton) {
+                // stop moving items (set position of all selected elements permanent)
+                Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
+                Point pos = Point::fromPx(sceneEvent->scenePos());
+                mSelectedItemsMoveCommand->setCurrentPosition(pos);
+                try {
+                    mUndoStack.execCmd(mSelectedItemsMoveCommand.take()); // can throw
+                } catch (Exception& e) {
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                }
+                mSelectedItemsMoveCommand.reset();
+                mSubState = SubState_Idle;
+            }
             break;
         } // case QEvent::GraphicsSceneMouseRelease
 
-        case QEvent::GraphicsSceneMouseMove:
-        {
+        case QEvent::GraphicsSceneMouseMove: {
+            // move selected elements to cursor position
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Board* board = mEditor.getActiveBoard();
-            Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
-            Q_CHECK_PTR(board); if (!board) break;
-            Q_CHECK_PTR(mCommandGroup);
-
-            // get delta position
-            Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
-            delta.mapToGrid(board->getGridProperties().getInterval());
-            if (delta == mLastMouseMoveDeltaPos) break; // do not move any items
-
-            // move selected elements
-            foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds)
-                cmd->setDeltaToStartPos(delta, true);
-
-            mLastMouseMoveDeltaPos = delta;
+            Q_ASSERT(sceneEvent); if (!sceneEvent) break;
+            Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
+            Point pos = Point::fromPx(sceneEvent->scenePos());
+            mSelectedItemsMoveCommand->setCurrentPosition(pos);
             break;
         } // case QEvent::GraphicsSceneMouseMove
 
@@ -465,164 +401,48 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
     return PassToParentState;
 }
 
-bool BES_Select::startMovingSelectedItems(Board* board) noexcept
+bool BES_Select::startMovingSelectedItems(Board& board, const Point& startPos) noexcept
 {
-    // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
-
-    // abort if no items are selected
-    if (items.isEmpty()) return false;
-
-    // create move commands for all selected items
-    Q_ASSERT(!mCommandGroup);
-    Q_ASSERT(mDeviceEditCmds.isEmpty());
-    mCommandGroup = new UndoCommandGroup(tr("Move Board Items"));
-    foreach (BI_Base* item, items)
-    {
-        switch (item->getType())
-        {
-            case BI_Base::Type_t::Footprint:
-            {
-                BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
-                DeviceInstance& device = footprint->getDeviceInstance();
-                CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
-                mCommandGroup->appendChild(cmd);
-                mDeviceEditCmds.append(cmd);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    // switch to substate SubState_Moving
+    Q_ASSERT(mSelectedItemsMoveCommand.isNull());
+    mSelectedItemsMoveCommand.reset(new CmdMoveSelectedBoardItems(board, startPos));
     mSubState = SubState_Moving;
     return true;
 }
 
-bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool centerOfElements) noexcept
+bool BES_Select::rotateSelectedItems(const Angle& angle) noexcept
 {
     Board* board = mEditor.getActiveBoard();
     Q_ASSERT(board); if (!board) return false;
 
-    // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
-
-    // abort if no items are selected
-    if (items.isEmpty()) return false;
-
-    // find the center of all elements
-    if (centerOfElements)
-    {
-        center = Point(0, 0);
-        foreach (BI_Base* item, items)
-            center += item->getPosition();
-        center /= items.count();
-        center.mapToGrid(board->getGridProperties().getInterval());
-    }
-
-    bool commandActive = false;
     try
     {
-        mUndoStack.beginCmdGroup(tr("Rotate Board Elements"));
-        commandActive = true;
-
-        // rotate all elements
-        foreach (BI_Base* item, items)
-        {
-            switch (item->getType())
-            {
-                case BI_Base::Type_t::Footprint:
-                {
-                    BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
-                    DeviceInstance& device = footprint->getDeviceInstance();
-                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
-                    cmd->rotate(angle, center, false);
-                    mCommandGroup->appendChild(cmd);
-                    mUndoStack.appendToCmdGroup(cmd);
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
-        mUndoStack.commitCmdGroup();
-        commandActive = false;
+        CmdRotateSelectedBoardItems* cmd = new CmdRotateSelectedBoardItems(*board, angle);
+        mUndoStack.execCmd(cmd);
+        return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-        if (commandActive)
-            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
-
-    return true;
 }
 
-bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfElements) noexcept
+bool BES_Select::flipSelectedItems(Qt::Orientation orientation) noexcept
 {
     Board* board = mEditor.getActiveBoard();
     Q_ASSERT(board); if (!board) return false;
 
-    // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
-
-    // abort if no items are selected
-    if (items.isEmpty()) return false;
-
-    // find the center of all elements
-    if (centerOfElements)
-    {
-        center = Point(0, 0);
-        foreach (BI_Base* item, items)
-            center += item->getPosition();
-        center /= items.count();
-        center.mapToGrid(board->getGridProperties().getInterval());
-    }
-
-    bool commandActive = false;
     try
     {
-        mUndoStack.beginCmdGroup(tr("Flip Board Elements"));
-        commandActive = true;
-
-        // flip all elements
-        foreach (BI_Base* item, items)
-        {
-            switch (item->getType())
-            {
-                case BI_Base::Type_t::Footprint:
-                {
-                    BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
-                    DeviceInstance& device = footprint->getDeviceInstance();
-                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
-                    cmd->mirror(center, vertical, false);
-                    mCommandGroup->appendChild(cmd);
-                    mUndoStack.appendToCmdGroup(cmd);
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
-        mUndoStack.commitCmdGroup();
-        commandActive = false;
+        CmdFlipSelectedBoardItems* cmd = new CmdFlipSelectedBoardItems(*board, orientation);
+        mUndoStack.execCmd(cmd);
+        return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-        if (commandActive)
-            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
-
-    return true;
 }
 
 bool BES_Select::removeSelectedItems() noexcept
@@ -630,39 +450,15 @@ bool BES_Select::removeSelectedItems() noexcept
     Board* board = mEditor.getActiveBoard();
     Q_ASSERT(board); if (!board) return false;
 
-    // get all selected items
-    QList<BI_Base*> items = board->getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
-
-    // abort if no items are selected
-    if (items.isEmpty()) return false;
-
-    bool commandActive = false;
     try
     {
-        mUndoStack.beginCmdGroup(tr("Remove Board Elements"));
-        commandActive = true;
-        board->clearSelection();
-
-        // remove all device instances
-        foreach (BI_Base* item, items)
-        {
-            if (item->getType() == BI_Base::Type_t::Footprint)
-            {
-                BI_Footprint* fp = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(fp);
-                auto cmd = new CmdDeviceInstanceRemove(*board, fp->getDeviceInstance());
-                mUndoStack.appendToCmdGroup(cmd);
-            }
-        }
-
-        mUndoStack.commitCmdGroup();
-        commandActive = false;
+        CmdRemoveSelectedBoardItems* cmd = new CmdRemoveSelectedBoardItems(*board);
+        mUndoStack.execCmd(cmd);
         return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-        if (commandActive) try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 }

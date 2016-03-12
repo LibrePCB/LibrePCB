@@ -17,25 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_DEVICEINSTANCE_H
-#define LIBREPCB_PROJECT_DEVICEINSTANCE_H
+#ifndef LIBREPCB_PROJECT_BI_DEVICE_H
+#define LIBREPCB_PROJECT_BI_DEVICE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "bi_base.h"
 #include <librepcbcommon/uuid.h>
-#include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/if_attributeprovider.h>
-#include "../erc/if_ercmsgprovider.h"
+#include "../../erc/if_ercmsgprovider.h"
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include "../graphicsitems/bgi_footprint.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class GraphicsScene;
 
 namespace library {
 class Device;
@@ -51,31 +50,30 @@ class ComponentInstance;
 class BI_Footprint;
 
 /*****************************************************************************************
- *  Class DeviceInstance
+ *  Class BI_Device
  ****************************************************************************************/
 
 /**
- * @brief The DeviceInstance class
+ * @brief The BI_Device class
  */
-class DeviceInstance final : public QObject, public IF_AttributeProvider,
-                             public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class BI_Device final : public BI_Base, public IF_AttributeProvider,
+                        public IF_ErcMsgProvider, public IF_XmlSerializableObject
 {
         Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(DeviceInstance)
+        DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
 
     public:
 
         // Constructors / Destructor
-        explicit DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception);
-        explicit DeviceInstance(Board& board, ComponentInstance& compInstance,
-                                const Uuid& deviceUuid, const Uuid& footprintUuid,
-                                const Point& position = Point(),
-                                const Angle& rotation = Angle()) throw (Exception);
-        ~DeviceInstance() noexcept;
+        BI_Device() = delete;
+        BI_Device(const BI_Device& other) = delete;
+        BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
+                  const Uuid& footprintUuid, const Point& position, const Angle& rotation,
+                  bool mirror) throw (Exception);
+        ~BI_Device() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Board& getBoard() const noexcept {return mBoard;}
         const Uuid& getComponentInstanceUuid() const noexcept;
         ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
         const library::Device& getLibDevice() const noexcept {return *mLibDevice;}
@@ -83,8 +81,6 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         const library::Footprint& getLibFootprint() const noexcept {return *mLibFootprint;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
-        const Point& getPosition() const noexcept {return mPosition;}
-        bool getIsMirrored() const noexcept {return mIsMirrored;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
@@ -92,8 +88,8 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         void setIsMirrored(bool mirror) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception);
-        void removeFromBoard(GraphicsScene& scene) throw (Exception);
+        void addToBoard(GraphicsScene& scene) throw (Exception) override;
+        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -101,6 +97,16 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
+
+        // Inherited from BI_Base
+        Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}
+        const Point& getPosition() const noexcept override {return mPosition;}
+        bool getIsMirrored() const noexcept override {return mIsMirrored;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
+
+        // Operator Overloadings
+        BI_Device& operator=(const BI_Device& rhs);
 
 
     signals:
@@ -115,12 +121,6 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
 
     private:
 
-        // make some methods inaccessible...
-        DeviceInstance();
-        DeviceInstance(const DeviceInstance& other);
-        DeviceInstance& operator=(const DeviceInstance& rhs);
-
-        // Private Methods
         void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
                                               const Uuid& footprintUuid) throw (Exception);
         void init() throw (Exception);
@@ -132,13 +132,11 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
 
 
         // General
-        Board& mBoard;
-        bool mAddedToBoard;
         ComponentInstance* mCompInstance;
         const library::Device* mLibDevice;
         const library::Package* mLibPackage;
         const library::Footprint* mLibFootprint;
-        BI_Footprint* mFootprint;
+        QScopedPointer<BI_Footprint> mFootprint;
 
         // Attributes
         Point mPosition;
@@ -153,4 +151,4 @@ class DeviceInstance final : public QObject, public IF_AttributeProvider,
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_DEVICEINSTANCE_H
+#endif // LIBREPCB_PROJECT_BI_DEVICE_H

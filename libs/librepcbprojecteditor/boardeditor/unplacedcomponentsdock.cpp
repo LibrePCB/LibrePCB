@@ -108,8 +108,8 @@ void UnplacedComponentsDock::setBoard(Board* board)
     mBoard = board;
     if (board)
     {
-        mBoardConnection1 = connect(board, &Board::deviceAdded, [this](DeviceInstance& c){Q_UNUSED(c); updateComponentsList();});
-        mBoardConnection2 = connect(board, &Board::deviceRemoved, [this](DeviceInstance& c){Q_UNUSED(c); updateComponentsList();});
+        mBoardConnection1 = connect(board, &Board::deviceAdded, [this](BI_Device& c){Q_UNUSED(c); updateComponentsList();});
+        mBoardConnection2 = connect(board, &Board::deviceRemoved, [this](BI_Device& c){Q_UNUSED(c); updateComponentsList();});
         mNextPosition = Point::fromMm(0, -20).mappedToGrid(board->getGridProperties().getInterval());
         updateComponentsList();
     }
@@ -225,7 +225,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
     if (mBoard)
     {
         const QMap<Uuid, ComponentInstance*> componentsList = mProject.getCircuit().getComponentInstances();
-        const QMap<Uuid, DeviceInstance*> boardDeviceList = mBoard->getDeviceInstances();
+        const QMap<Uuid, BI_Device*> boardDeviceList = mBoard->getDeviceInstances();
         foreach (ComponentInstance* component, componentsList)
         {
             if (boardDeviceList.contains(component->getUuid())) continue;

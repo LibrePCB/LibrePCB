@@ -50,9 +50,11 @@ class CmdSchematicNetPointAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
+        explicit CmdSchematicNetPointAdd(SI_NetPoint& netpoint) noexcept;
         CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
                                 const Point& position) noexcept;
-        CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin) noexcept;
+        CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
+                                SI_SymbolPin& pin) noexcept;
         ~CmdSchematicNetPointAdd() noexcept;
 
         // Getters

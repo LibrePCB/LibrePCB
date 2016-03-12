@@ -101,7 +101,9 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
 
         // Constructors / Destructor
-        explicit Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        Schematic() = delete;
+        Schematic(const Schematic& other) = delete;
+        Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
             Schematic(project, filepath, restore, readOnly, false, QString()) {}
         ~Schematic() noexcept;
 
@@ -125,6 +127,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
         QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
         QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+        QList<SI_Base*> getAllItems() const noexcept;
 
         // Setters: General
         void setGridProperties(const GridProperties& grid) noexcept;
@@ -136,28 +139,21 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Symbol Methods
         SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
-        SI_Symbol* createSymbol(ComponentInstance& cmpInstance, const Uuid& symbolItem,
-                                const Point& position = Point(), const Angle& angle = Angle()) throw (Exception);
         void addSymbol(SI_Symbol& symbol) throw (Exception);
         void removeSymbol(SI_Symbol& symbol) throw (Exception);
 
         // NetPoint Methods
         SI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-        SI_NetPoint* createNetPoint(NetSignal& netsignal, const Point& position) throw (Exception);
-        SI_NetPoint* createNetPoint(SI_SymbolPin& pin) throw (Exception);
         void addNetPoint(SI_NetPoint& netpoint) throw (Exception);
         void removeNetPoint(SI_NetPoint& netpoint) throw (Exception);
 
         // NetLine Methods
         SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
-        SI_NetLine* createNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                                  const Length& width) throw (Exception);
         void addNetLine(SI_NetLine& netline) throw (Exception);
         void removeNetLine(SI_NetLine& netline) throw (Exception);
 
         // NetLabel Methods
         SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
-        SI_NetLabel* createNetLabel(NetSignal& netsignal, const Point& position) throw (Exception);
         void addNetLabel(SI_NetLabel& netlabel) throw (Exception);
         void removeNetLabel(SI_NetLabel& netlabel) throw (Exception);
 
@@ -176,6 +172,11 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
 
+        // Operator Overloadings
+        Schematic& operator=(const Schematic& rhs) = delete;
+        bool operator==(const Schematic& rhs) noexcept {return (this == &rhs);}
+        bool operator!=(const Schematic& rhs) noexcept {return (this != &rhs);}
+
         // Static Methods
         static Schematic* create(Project& project, const FilePath& filepath,
                                  const QString& name) throw (Exception);
@@ -189,14 +190,8 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
     private:
 
-        // make some methods inaccessible...
-        Schematic();
-        Schematic(const Schematic& other);
-        Schematic& operator=(const Schematic& rhs);
-
-        // Private Methods
-        explicit Schematic(Project& project, const FilePath& filepath, bool restore,
-                           bool readOnly, bool create, const QString& newName) throw (Exception);
+        Schematic(Project& project, const FilePath& filepath, bool restore,
+                  bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -209,12 +204,12 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
         FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
-        SmartXmlFile* mXmlFile;
-        bool mAddedToProject;
+        QScopedPointer<SmartXmlFile> mXmlFile;
+        bool mIsAddedToProject;
 
-        GraphicsScene* mGraphicsScene;
+        QScopedPointer<GraphicsScene> mGraphicsScene;
+        QScopedPointer<GridProperties> mGridProperties;
         QRectF mViewRect;
-        GridProperties* mGridProperties;
 
         // Attributes
         Uuid mUuid;

@@ -75,7 +75,9 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
+        Circuit() = delete;
+        Circuit(const Circuit& other) = delete;
+        Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
         ~Circuit() noexcept;
 
         // Getters
@@ -90,27 +92,30 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
 
         // NetSignal Methods
+        QString generateAutoNetSignalName() const noexcept;
         const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
-        NetSignal* createNetSignal(NetClass& netclass, QString name = QString()) throw (Exception);
         void addNetSignal(NetSignal& netsignal) throw (Exception);
         void removeNetSignal(NetSignal& netsignal) throw (Exception);
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
 
         // ComponentInstance Methods
+        QString generateAutoComponentInstanceName(const QString& cmpPrefix) const noexcept;
         const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
-        ComponentInstance* createComponentInstance(const library::Component& cmp,
-                                                   const Uuid& symbVar,
-                                                   QString name = QString()) throw (Exception);
         void addComponentInstance(ComponentInstance& cmp) throw (Exception);
         void removeComponentInstance(ComponentInstance& cmp) throw (Exception);
         void setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
+
+        // Operator Overloadings
+        Circuit& operator=(const Circuit& rhs) = delete;
+        bool operator==(const Circuit& rhs) noexcept {return (this == &rhs);}
+        bool operator!=(const Circuit& rhs) noexcept {return (this != &rhs);}
 
 
     signals:
@@ -124,13 +129,6 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
 
 
     private:
-
-        // make some methods inaccessible...
-        Circuit();
-        Circuit(const Circuit& other);
-        Circuit& operator=(const Circuit& rhs);
-
-        // Private Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;

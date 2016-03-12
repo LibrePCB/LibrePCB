@@ -40,17 +40,17 @@ namespace project {
  ****************************************************************************************/
 
 BI_Polygon::BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception) :
-    BI_Base(), mBoard(board), mPolygon(nullptr), mGraphicsItem(nullptr)
+    BI_Base(board)
 {
-    mPolygon = new Polygon(domElement);
+    mPolygon.reset(new Polygon(domElement));
     init();
 }
 
 BI_Polygon::BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
                        bool isGrabArea, const Point& startPos) throw (Exception) :
-    BI_Base(), mBoard(board), mPolygon(nullptr), mGraphicsItem(nullptr)
+    BI_Base(board)
 {
-    mPolygon = new Polygon(layerId, lineWidth, fill, isGrabArea, startPos);
+    mPolygon.reset(new Polygon(layerId, lineWidth, fill, isGrabArea, startPos));
     init();
 }
 
@@ -69,15 +69,7 @@ void BI_Polygon::init() throw (Exception)
 BI_Polygon::~BI_Polygon() noexcept
 {
     mGraphicsItem.reset();
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-Project& BI_Polygon::getProject() const noexcept
-{
-    return mBoard.getProject();
+    mPolygon.reset();
 }
 
 /*****************************************************************************************
@@ -86,12 +78,18 @@ Project& BI_Polygon::getProject() const noexcept
 
 void BI_Polygon::addToBoard(GraphicsScene& scene) throw (Exception)
 {
-    scene.addItem(*mGraphicsItem);
+    if (isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
 void BI_Polygon::removeFromBoard(GraphicsScene& scene) throw (Exception)
 {
-    scene.removeItem(*mGraphicsItem);
+    if (!isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
 XmlDomElement* BI_Polygon::serializeToXmlDomElement() const throw (Exception)
@@ -99,7 +97,6 @@ XmlDomElement* BI_Polygon::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(mPolygon->serializeToXmlDomElement());
-
     return root.take();
 }
 

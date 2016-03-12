@@ -60,12 +60,12 @@ bool CmdBoardAdd::performExecute() throw (Exception)
 
 void CmdBoardAdd::performUndo() throw (Exception)
 {
-    mProject.removeBoard(mBoard); // can throw
+    mProject.removeBoard(*mBoard); // can throw
 }
 
 void CmdBoardAdd::performRedo() throw (Exception)
 {
-    mProject.addBoard(mBoard, mPageIndex); // can throw
+    mProject.addBoard(*mBoard, mPageIndex); // can throw
 }
 
 /*****************************************************************************************

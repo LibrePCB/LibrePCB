@@ -44,8 +44,6 @@ CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 {
-    if ((mNetLabel) && (!isCurrentlyExecuted()))
-        delete mNetLabel;
 }
 
 /*****************************************************************************************
@@ -54,7 +52,7 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 
 bool CmdSchematicNetLabelAdd::performExecute() throw (Exception)
 {
-    mNetLabel = mSchematic.createNetLabel(*mNetSignal, mPosition); // can throw
+    mNetLabel = new SI_NetLabel(mSchematic, *mNetSignal, mPosition); // can throw
 
     performRedo(); // can throw
 

@@ -40,7 +40,7 @@ namespace project {
  ****************************************************************************************/
 
 ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
-    QObject(0), mProject(project),
+    QObject(&project), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/erc.xml")), mXmlFile(nullptr)
 {
     try

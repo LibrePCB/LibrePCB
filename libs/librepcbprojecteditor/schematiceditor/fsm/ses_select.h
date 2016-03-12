@@ -35,9 +35,7 @@ class UndoCommandGroup;
 
 namespace project {
 
-class CmdSymbolInstanceEdit;
-class CmdSchematicNetPointEdit;
-class CmdSchematicNetLabelEdit;
+class CmdMoveSelectedSchematicItems;
 
 /*****************************************************************************************
  *  Class SES_Select
@@ -71,14 +69,13 @@ class SES_Select final : public SES_Base
         ProcRetVal processSubStateMoving(SEE_Base* event) noexcept;
         ProcRetVal processSubStateMovingSceneEvent(SEE_Base* event) noexcept;
         ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                              Schematic* schematic) noexcept;
+                                              Schematic& schematic) noexcept;
         ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
                                                              Schematic* schematic) noexcept;
         ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                 Schematic* schematic) noexcept;
-        bool startMovingSelectedItems(Schematic* schematic) noexcept;
-        bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
-                                 bool centerOfElements = false) noexcept;
+        bool startMovingSelectedItems(Schematic& schematic, const Point& startPos) noexcept;
+        bool rotateSelectedItems(const Angle& angle) noexcept;
         bool removeSelectedItems() noexcept;
         bool cutSelectedItems() noexcept;
         bool copySelectedItems() noexcept;
@@ -95,12 +92,7 @@ class SES_Select final : public SES_Base
 
         // Attributes
         SubState mSubState;     ///< the current substate
-        Point mLastMouseMoveDeltaPos;   ///< used in the moving substate (mapped to grid)
-        UndoCommandGroup* mCommandGroup; ///< the command group for all moving commands
-                                         ///< (nullptr if no command is active)
-        QList<CmdSymbolInstanceEdit*> mSymbolEditCmds; ///< all symbol move commands
-        QList<CmdSchematicNetPointEdit*> mNetPointEditCmds; ///< all netpoint edit commands
-        QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
+        QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
 };
 
 /*****************************************************************************************

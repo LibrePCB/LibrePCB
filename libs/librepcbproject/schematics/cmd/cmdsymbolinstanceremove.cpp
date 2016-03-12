@@ -43,8 +43,6 @@ CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol
 
 CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mSymbol;
 }
 
 /*****************************************************************************************

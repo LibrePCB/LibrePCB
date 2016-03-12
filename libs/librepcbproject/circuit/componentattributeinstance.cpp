@@ -26,6 +26,7 @@
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/attributes/attributetype.h>
 #include <librepcbcommon/attributes/attributeunit.h>
+#include "componentinstance.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -37,8 +38,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentAttributeInstance::ComponentAttributeInstance(const XmlDomElement& domElement) throw (Exception) :
-    mKey(), mType(nullptr), mValue(), mUnit(nullptr)
+ComponentAttributeInstance::ComponentAttributeInstance(ComponentInstance& cmp,
+        const XmlDomElement& domElement) throw (Exception) :
+    QObject(&cmp), mComponentInstance(cmp), mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
     mKey = domElement.getAttribute<QString>("key", true);
     mType = &AttributeType::fromString(domElement.getFirstChild("type", true)->getText<QString>(true));
@@ -48,11 +50,11 @@ ComponentAttributeInstance::ComponentAttributeInstance(const XmlDomElement& domE
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-ComponentAttributeInstance::ComponentAttributeInstance(const QString& key,
-                                                   const AttributeType& type,
-                                                   const QString& value,
-                                                   const AttributeUnit* unit) throw (Exception) :
-    mKey(key), mType(&type), mValue(value), mUnit(unit)
+ComponentAttributeInstance::ComponentAttributeInstance(ComponentInstance& cmp,
+        const QString& key, const AttributeType& type, const QString& value,
+        const AttributeUnit* unit) throw (Exception) :
+    QObject(&cmp), mComponentInstance(cmp), mKey(key), mType(&type), mValue(value),
+    mUnit(unit)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

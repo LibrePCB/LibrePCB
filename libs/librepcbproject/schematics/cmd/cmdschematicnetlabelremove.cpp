@@ -44,8 +44,6 @@ CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(Schematic& schematic,
 
 CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mNetLabel;
 }
 
 /*****************************************************************************************

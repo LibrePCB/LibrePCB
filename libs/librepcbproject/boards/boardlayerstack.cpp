@@ -37,7 +37,7 @@ namespace project {
  ****************************************************************************************/
 
 BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
-    QObject(nullptr), mBoard(board), mLayersChanged(false)
+    QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // load all layers
     for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
@@ -59,7 +59,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) 
 }
 
 BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
-    QObject(nullptr), mBoard(board), mLayersChanged(false)
+    QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // add all required layers
 

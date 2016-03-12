@@ -63,6 +63,8 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
+        SI_Symbol() = delete;
+        SI_Symbol(const SI_Symbol& other) = delete;
         explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
@@ -70,8 +72,6 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         ~SI_Symbol() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Schematic& getSchematic() const noexcept {return mSchematic;}
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Angle& getRotation() const noexcept {return mRotation;}
         QString getName() const noexcept;
@@ -82,12 +82,12 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         const library::ComponentSymbolVariantItem& getCompSymbVarItem() const noexcept {return *mSymbVarItem;}
 
         // Setters
-        void setPosition(const Point& newPos) throw (Exception);
-        void setRotation(const Angle& newRotation) throw (Exception);
+        void setPosition(const Point& newPos) noexcept;
+        void setRotation(const Angle& newRotation) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception);
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -104,6 +104,9 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 
+        // Operator Overloadings
+        SI_Symbol& operator=(const SI_Symbol& rhs) = delete;
+
 
     private slots:
 
@@ -118,12 +121,6 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
     private:
 
-        // make some methods inaccessible...
-        SI_Symbol();
-        SI_Symbol(const SI_Symbol& other);
-        SI_Symbol& operator=(const SI_Symbol& rhs);
-
-        // Private Methods
         void init(const Uuid& symbVarItemUuid) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -131,12 +128,11 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
 
         // General
-        Schematic& mSchematic;
         ComponentInstance* mComponentInstance;
         const library::ComponentSymbolVariantItem* mSymbVarItem;
         const library::Symbol* mSymbol;
         QHash<Uuid, SI_SymbolPin*> mPins; ///< key: symbol pin UUID
-        SGI_Symbol* mGraphicsItem;
+        QScopedPointer<SGI_Symbol> mGraphicsItem;
 
         // Attributes
         Uuid mUuid;

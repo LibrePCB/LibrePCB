@@ -41,7 +41,7 @@ class Footprint;
 namespace project {
 
 class Board;
-class DeviceInstance;
+class BI_Device;
 class BI_FootprintPad;
 
 /*****************************************************************************************
@@ -62,23 +62,23 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
-        explicit BI_Footprint(DeviceInstance& device, const XmlDomElement& domElement) throw (Exception);
-        explicit BI_Footprint(DeviceInstance& device) throw (Exception);
+        BI_Footprint() = delete;
+        BI_Footprint(const BI_Footprint& other) = delete;
+        BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception);
+        explicit BI_Footprint(BI_Device& device) throw (Exception);
         ~BI_Footprint() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Board& getBoard() const noexcept;
         const Uuid& getComponentInstanceUuid() const noexcept;
-        DeviceInstance& getDeviceInstance() const noexcept {return mDeviceInstance;}
+        BI_Device& getDeviceInstance() const noexcept {return mDevice;}
         BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {return mPads.value(padUuid);}
         const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept;
         const Angle& getRotation() const noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception);
-        void removeFromBoard(GraphicsScene& scene) throw (Exception);
+        void addToBoard(GraphicsScene& scene) throw (Exception) override;
+        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -94,6 +94,9 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         bool getIsMirrored() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Operator Overloadings
+        BI_Footprint& operator=(const BI_Footprint& rhs) = delete;
 
 
     private slots:
@@ -112,12 +115,6 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
     private:
 
-        // make some methods inaccessible...
-        BI_Footprint();
-        BI_Footprint(const BI_Footprint& other);
-        BI_Footprint& operator=(const BI_Footprint& rhs);
-
-        // Private Methods
         void init() throw (Exception);
         void updateGraphicsItemTransform() noexcept;
 
@@ -126,9 +123,9 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
 
         // General
-        DeviceInstance& mDeviceInstance;
+        BI_Device& mDevice;
+        QScopedPointer<BGI_Footprint> mGraphicsItem;
         QHash<Uuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
-        BGI_Footprint* mGraphicsItem;
 };
 
 /*****************************************************************************************

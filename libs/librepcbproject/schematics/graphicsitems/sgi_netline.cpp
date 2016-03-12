@@ -108,7 +108,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setPixelSize(3);
         painter->setFont(font);
         painter->setPen(QPen(layer->getColor(mNetLine.isSelected()), 0));
-        painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal()->getName());
+        painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal().getName());
     }
     layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
     if (layer->isVisible())

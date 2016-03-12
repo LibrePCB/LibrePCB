@@ -44,8 +44,6 @@ CmdComponentInstanceRemove::CmdComponentInstanceRemove(Circuit& circuit,
 
 CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mComponentInstance;
 }
 
 /*****************************************************************************************

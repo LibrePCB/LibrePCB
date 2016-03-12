@@ -44,8 +44,6 @@ CmdCompAttrInstRemove::CmdCompAttrInstRemove(ComponentInstance& cmp,
 
 CmdCompAttrInstRemove::~CmdCompAttrInstRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mAttrInstance;
 }
 
 /*****************************************************************************************

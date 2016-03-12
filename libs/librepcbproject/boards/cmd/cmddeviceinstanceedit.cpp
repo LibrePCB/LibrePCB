@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmddeviceinstanceedit.h"
-#include "../deviceinstance.h"
+#include "../items/bi_device.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -34,7 +34,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(DeviceInstance& dev) noexcept :
+CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept :
     UndoCommand(tr("Edit device instance")), mDevice(dev),
     mOldPos(mDevice.getPosition()), mNewPos(mOldPos),
     mOldRotation(mDevice.getRotation()), mNewRotation(mOldRotation),
@@ -95,21 +95,28 @@ void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
     if (immediate) mDevice.setIsMirrored(mNewMirrored);
 }
 
-void CmdDeviceInstanceEdit::mirror(const Point& center, bool vertical, bool immediate) noexcept
+void CmdDeviceInstanceEdit::mirror(const Point& center, Qt::Orientation orientation,
+                                   bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewMirrored = !mNewMirrored;
-    if (vertical)
+    switch (orientation)
     {
-        mNewPos.setY(mNewPos.getY() + Length(2) * (center.getY() - mNewPos.getY()));
-        mNewRotation += Angle::deg180();
+        case Qt::Vertical: {
+            mNewPos.setY(mNewPos.getY() + Length(2) * (center.getY() - mNewPos.getY()));
+            mNewRotation += Angle::deg180();
+            break;
+        }
+        case Qt::Horizontal: {
+            mNewPos.setX(mNewPos.getX() + Length(2) * (center.getX() - mNewPos.getX()));
+            break;
+        }
+        default: {
+            qCritical() << "Invalid orientation:" << orientation;
+            break;
+        }
     }
-    else
-    {
-        mNewPos.setX(mNewPos.getX() + Length(2) * (center.getX() - mNewPos.getX()));
-    }
-    if (immediate)
-    {
+    if (immediate) {
         mDevice.setIsMirrored(mNewMirrored);
         mDevice.setPosition(mNewPos);
         mDevice.setRotation(mNewRotation);

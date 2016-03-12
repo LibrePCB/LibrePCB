@@ -26,6 +26,8 @@
 #include "../componentinstance.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
+#include <librepcblibrary/cmp/component.h>
+#include "../../settings/projectsettings.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -46,8 +48,6 @@ CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& c
 
 CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
 {
-    if (!isCurrentlyExecuted())
-        delete mComponentInstance;
 }
 
 /*****************************************************************************************
@@ -62,7 +62,9 @@ bool CmdComponentInstanceAdd::performExecute() throw (Exception)
             QString(tr("The component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(mComponentUuid.toStr()));
     }
-    mComponentInstance = mCircuit.createComponentInstance(*cmp, mSymbVarUuid); // can throw
+    const QStringList& normOrder = mCircuit.getProject().getSettings().getNormOrder();
+    QString name = mCircuit.generateAutoComponentInstanceName(cmp->getPrefix(normOrder));
+    mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid, name); // can throw
 
     performRedo(); // can throw
 

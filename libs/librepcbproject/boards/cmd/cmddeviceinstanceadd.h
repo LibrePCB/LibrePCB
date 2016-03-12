@@ -41,7 +41,7 @@ namespace project {
 
 class Board;
 class ComponentInstance;
-class DeviceInstance;
+class BI_Device;
 
 /*****************************************************************************************
  *  Class CmdDeviceInstanceAdd
@@ -57,12 +57,12 @@ class CmdDeviceInstanceAdd final : public UndoCommand
         // Constructors / Destructor
         CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp, const Uuid& deviceUuid,
                              const Uuid& footprintUuid, const Point& position = Point(),
-                             const Angle& rotation = Angle()) noexcept;
-        explicit CmdDeviceInstanceAdd(DeviceInstance& device) noexcept;
+                             const Angle& rotation = Angle(), bool mirror = false) noexcept;
+        explicit CmdDeviceInstanceAdd(BI_Device& device) noexcept;
         ~CmdDeviceInstanceAdd() noexcept;
 
         // Getters
-        DeviceInstance* getDeviceInstance() const noexcept {return mDeviceInstance;}
+        BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
 
     private:
@@ -88,9 +88,10 @@ class CmdDeviceInstanceAdd final : public UndoCommand
         Uuid mFootprintUuid;
         Point mPosition;
         Angle mRotation;
+        bool mMirror;
 
         /// @brief The created device instance
-        DeviceInstance* mDeviceInstance;
+        BI_Device* mDeviceInstance;
 };
 
 /*****************************************************************************************

@@ -55,8 +55,6 @@ CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept :
 
 CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 {
-    if (!isCurrentlyExecuted())
-        delete mSymbolInstance;
 }
 
 /*****************************************************************************************
@@ -65,8 +63,11 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 
 bool CmdSymbolInstanceAdd::performExecute() throw (Exception)
 {
-    mSymbolInstance = mSchematic.createSymbol(*mComponentInstance, mSymbolItemUuid,
-                                              mPosition, mAngle); // can throw
+    if (!mSymbolInstance) {
+        // create new symbol instance
+        mSymbolInstance = new SI_Symbol(mSchematic, *mComponentInstance, mSymbolItemUuid,
+                                        mPosition, mAngle); // can throw
+    }
 
     performRedo(); // can throw
 

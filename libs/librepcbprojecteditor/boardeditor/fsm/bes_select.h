@@ -35,7 +35,7 @@ class UndoCommandGroup;
 
 namespace project {
 
-class CmdDeviceInstanceEdit;
+class CmdMoveSelectedBoardItems;
 
 /*****************************************************************************************
  *  Class BES_Select
@@ -69,16 +69,14 @@ class BES_Select final : public BES_Base
         ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
         ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
         ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                              Board* board) noexcept;
+                                              Board& board) noexcept;
         ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
                                                              Board* board) noexcept;
         ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                 Board* board) noexcept;
-        bool startMovingSelectedItems(Board* board) noexcept;
-        bool rotateSelectedItems(const Angle& angle, Point center = Point(0, 0),
-                                 bool centerOfElements = false) noexcept;
-        bool flipSelectedItems(bool vertical, Point center = Point(0, 0),
-                               bool centerOfElements = false) noexcept;
+        bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
+        bool rotateSelectedItems(const Angle& angle) noexcept;
+        bool flipSelectedItems(Qt::Orientation orientation) noexcept;
         bool removeSelectedItems() noexcept;
 
 
@@ -92,10 +90,7 @@ class BES_Select final : public BES_Base
 
         // Attributes
         SubState mSubState;     ///< the current substate
-        Point mLastMouseMoveDeltaPos;   ///< used in the moving substate (mapped to grid)
-        UndoCommandGroup* mCommandGroup; ///< the command group for all moving commands
-                                         ///< (nullptr if no command is active)
-        QList<CmdDeviceInstanceEdit*> mDeviceEditCmds; ///< all footprint move commands
+        QScopedPointer<CmdMoveSelectedBoardItems> mSelectedItemsMoveCommand;
 };
 
 /*****************************************************************************************

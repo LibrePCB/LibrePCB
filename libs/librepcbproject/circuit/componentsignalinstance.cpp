@@ -31,6 +31,7 @@
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../project.h"
 #include "../settings/projectsettings.h"
+#include "../schematics/items/si_symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -44,23 +45,20 @@ namespace project {
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                                  const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), mCircuit(circuit), mComponentInstance(cmpInstance),
-    mComponentSignal(nullptr), mNetSignal(nullptr), mAddedToCircuit(false)
+    QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
+    mComponentSignal(nullptr), mIsAddedToCircuit(false), mNetSignal(nullptr)
 {
     // read attributes
     Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal", true);
     mComponentSignal = mComponentInstance.getLibComponent().getSignalByUuid(compSignalUuid);
-    if(!mComponentSignal)
-    {
+    if(!mComponentSignal) {
         throw RuntimeError(__FILE__, __LINE__, compSignalUuid.toStr(), QString(
             tr("Invalid component signal UUID: \"%1\"")).arg(compSignalUuid.toStr()));
     }
     Uuid netsignalUuid = domElement.getAttribute<Uuid>("netsignal", false, Uuid());
-    if (!netsignalUuid.isNull())
-    {
+    if (!netsignalUuid.isNull()) {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
-        if(!mNetSignal)
-        {
+        if(!mNetSignal) {
             throw RuntimeError(__FILE__, __LINE__, netsignalUuid.toStr(),
                 QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toStr()));
         }
@@ -72,8 +70,8 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                                  const library::ComponentSignal& cmpSignal,
                                                  NetSignal* netsignal) throw (Exception) :
-    QObject(nullptr), mCircuit(circuit), mComponentInstance(cmpInstance),
-    mComponentSignal(&cmpSignal), mNetSignal(netsignal), mAddedToCircuit(false)
+    QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
+    mComponentSignal(&cmpSignal), mIsAddedToCircuit(false), mNetSignal(netsignal)
 {
     init();
 }
@@ -94,15 +92,19 @@ void ComponentSignalInstance::init() throw (Exception)
             this, &ComponentSignalInstance::updateErcMessages);
 
     // register to net signal name changed
-    if (mNetSignal) connect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
+    if (mNetSignal) {
+        connect(mNetSignal, &NetSignal::nameChanged, this,
+                &ComponentSignalInstance::netSignalNameChanged);
+    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSignalInstance::~ComponentSignalInstance() noexcept
 {
-    Q_ASSERT(!mAddedToCircuit);
-    Q_ASSERT(mRegisteredSymbolPins.isEmpty());
+    Q_ASSERT(!mIsAddedToCircuit);
+    Q_ASSERT(!isUsed());
+    Q_ASSERT(!arePinsOrPadsUsed());
 }
 
 /*****************************************************************************************
@@ -121,29 +123,74 @@ QString ComponentSignalInstance::getForcedNetSignalName() const noexcept
     return name;
 }
 
+int ComponentSignalInstance::getRegisteredElementsCount() const noexcept
+{
+    int count = 0;
+    count += mRegisteredSymbolPins.count();
+    return count;
+}
+
+bool ComponentSignalInstance::arePinsOrPadsUsed() const noexcept
+{
+    foreach (const auto* pin, mRegisteredSymbolPins) {
+        if (pin->getNetPoint()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
 
 void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
 {
-    if (!mAddedToCircuit)
+    if (netsignal == mNetSignal) {
+        return;
+    }
+    if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
-
-    if (mNetSignal)
-    {
-        disconnect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
-        mNetSignal->unregisterComponentSignal(*this);
+    }
+    if (arePinsOrPadsUsed()) {
+        throw LogicError(__FILE__, __LINE__, QString(), QString(tr("The net signal of the "
+            "component signal \"%1:%2\" cannot be changed because it is still in use!"))
+            .arg(mComponentInstance.getName(), mComponentSignal->getName()));
     }
 
+    // TODO: use scope guard
+
+    // change signal
+    if (mNetSignal) {
+        mNetSignal->unregisterComponentSignal(*this); // can throw
+        disconnect(mNetSignal, &NetSignal::nameChanged,
+                   this, &ComponentSignalInstance::netSignalNameChanged);
+    }
+    if (netsignal) {
+        try
+        {
+            netsignal->registerComponentSignal(*this); // can throw
+            connect(netsignal, &NetSignal::nameChanged,
+                    this, &ComponentSignalInstance::netSignalNameChanged);
+        }
+        catch (Exception&)
+        {
+            if (mNetSignal) {
+                try
+                {
+                    mNetSignal->registerComponentSignal(*this); // can throw
+                    connect(mNetSignal, &NetSignal::nameChanged,
+                            this, &ComponentSignalInstance::netSignalNameChanged);
+                }
+                catch (Exception&)
+                {
+                    qFatal("Internal Fatal Error");
+                }
+            }
+            throw;
+        }
+    }
     mNetSignal = netsignal;
-
-    if (mNetSignal)
-    {
-        mNetSignal->registerComponentSignal(*this);
-        connect(mNetSignal, &NetSignal::nameChanged, this, &ComponentSignalInstance::netSignalNameChanged);
-    }
-
     updateErcMessages();
 }
 
@@ -151,48 +198,51 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exceptio
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
-{
-    if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__);
-    if (mRegisteredSymbolPins.contains(&pin))
-        throw LogicError(__FILE__, __LINE__);
-
-    mRegisteredSymbolPins.append(&pin);
-}
-
-void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
-{
-    if (!mAddedToCircuit)
-        throw LogicError(__FILE__, __LINE__);
-    if (!mRegisteredSymbolPins.contains(&pin))
-        throw LogicError(__FILE__, __LINE__);
-
-    mRegisteredSymbolPins.removeAll(&pin);
-}
-
 void ComponentSignalInstance::addToCircuit() throw (Exception)
 {
-    if (!mRegisteredSymbolPins.isEmpty())
+    if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
-
-    if (mNetSignal)
-        mNetSignal->registerComponentSignal(*this);
-
-    mAddedToCircuit = true;
+    }
+    if (mNetSignal) {
+        mNetSignal->registerComponentSignal(*this); // can throw
+    }
+    mIsAddedToCircuit = true;
     updateErcMessages();
 }
 
 void ComponentSignalInstance::removeFromCircuit() throw (Exception)
 {
-    if (!mRegisteredSymbolPins.isEmpty())
+    if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
-
-    if (mNetSignal)
-        mNetSignal->unregisterComponentSignal(*this);
-
-    mAddedToCircuit = false;
+    }
+    if (isUsed()) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("The component \"%1\" cannot be removed because it is still in use!"))
+            .arg(mComponentInstance.getName()));
+    }
+    if (mNetSignal) {
+        mNetSignal->unregisterComponentSignal(*this); // can throw
+    }
+    mIsAddedToCircuit = false;
     updateErcMessages();
+}
+
+void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (pin.getCircuit() != mCircuit)
+        || (mRegisteredSymbolPins.contains(&pin)))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredSymbolPins.append(&pin);
+}
+
+void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (!mRegisteredSymbolPins.contains(&pin))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredSymbolPins.removeOne(&pin);
 }
 
 XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (Exception)
@@ -235,9 +285,9 @@ void ComponentSignalInstance::updateErcMessages() noexcept
         .arg((mNetSignal ? mNetSignal->getName() : QString()), getForcedNetSignalName(),
         mComponentSignal->getName(), mComponentInstance.getName()));
 
-    mErcMsgUnconnectedRequiredSignal->setVisible((mAddedToCircuit) && (!mNetSignal)
+    mErcMsgUnconnectedRequiredSignal->setVisible((mIsAddedToCircuit) && (!mNetSignal)
         && (mComponentSignal->isRequired()));
-    mErcMsgForcedNetSignalNameConflict->setVisible((mAddedToCircuit) && (isNetSignalNameForced())
+    mErcMsgForcedNetSignalNameConflict->setVisible((mIsAddedToCircuit) && (isNetSignalNameForced())
         && (mNetSignal ? (getForcedNetSignalName() != mNetSignal->getName()) : false));
 }
 

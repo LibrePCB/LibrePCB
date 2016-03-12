@@ -33,7 +33,7 @@
 #include "../circuit/circuit.h"
 #include "../erc/ercmsg.h"
 #include "../circuit/componentinstance.h"
-#include "deviceinstance.h"
+#include "items/bi_device.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include <librepcblibrary/cmp/component.h>
@@ -52,32 +52,30 @@ namespace project {
 
 Board::Board(Project& project, const FilePath& filepath, bool restore,
              bool readOnly, bool create, const QString& newName) throw (Exception):
-    QObject(nullptr), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
-    mXmlFile(nullptr), mAddedToProject(false), mLayerStack(nullptr),
-    mGraphicsScene(nullptr), mGridProperties(nullptr)
+    QObject(&project), mProject(project), mFilePath(filepath), mIsAddedToProject(false)
 {
     try
     {
-        mGraphicsScene = new GraphicsScene();
+        mGraphicsScene.reset(new GraphicsScene());
 
         // try to open/create the XML board file
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mFilePath);
+            mXmlFile.reset(SmartXmlFile::create(mFilePath));
 
             // set attributes
             mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default layer stack
-            mLayerStack = new BoardLayerStack(*this);
+            mLayerStack.reset(new BoardLayerStack(*this));
 
             // load default grid properties
-            mGridProperties = new GridProperties();
+            mGridProperties.reset(new GridProperties());
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mFilePath, restore, readOnly);
+            mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
             QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
             XmlDomElement& root = doc->getRoot();
 
@@ -87,17 +85,17 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
 
             // Load layer stack
-            mLayerStack = new BoardLayerStack(*this, *root.getFirstChild("layer_stack", true));
+            mLayerStack.reset(new BoardLayerStack(*this, *root.getFirstChild("layer_stack", true)));
 
             // Load grid properties
-            mGridProperties = new GridProperties(*root.getFirstChild("properties/grid_properties", true, true));
+            mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
 
             // Load all device instances
             for (XmlDomElement* node = root.getFirstChild("devices/device", true, false);
                  node; node = node->getNextSibling("device"))
             {
-                DeviceInstance* comp = new DeviceInstance(*this, *node);
-                addDeviceInstance(*comp);
+                BI_Device* device = new BI_Device(*this, *node);
+                mDeviceInstances.insert(device->getComponentInstanceUuid(), device);
             }
 
             // Load all polygons
@@ -105,7 +103,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                  node; node = node->getNextSibling("polygon"))
             {
                 BI_Polygon* polygon = new BI_Polygon(*this, *node);
-                addPolygon(*polygon);
+                mPolygons.append(polygon);
             }
         }
 
@@ -123,31 +121,31 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (BI_Polygon* polygon, mPolygons)
-            try { removePolygon(*polygon); delete polygon; } catch (...) {}
-        foreach (DeviceInstance* dev, mDeviceInstances)
-            try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
-        delete mGridProperties;         mGridProperties = nullptr;
-        delete mLayerStack;             mLayerStack = nullptr;
-        delete mXmlFile;                mXmlFile = nullptr;
-        delete mGraphicsScene;          mGraphicsScene = nullptr;
+        qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mPolygons);          mPolygons.clear();
+        qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mGridProperties.reset();
+        mLayerStack.reset();
+        mXmlFile.reset();
+        mGraphicsScene.reset();
         throw; // ...and rethrow the exception
     }
 }
 
 Board::~Board() noexcept
 {
-    // delete all component instances (and catch all throwed exceptions)
-    foreach (BI_Polygon* polygon, mPolygons)
-        try { removePolygon(*polygon); delete polygon; } catch (...) {}
-    foreach (DeviceInstance* dev, mDeviceInstances)
-        try { removeDeviceInstance(*dev); delete dev; } catch (...) {}
+    Q_ASSERT(!mIsAddedToProject);
 
     qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
-    delete mGridProperties;         mGridProperties = nullptr;
-    delete mLayerStack;             mLayerStack = nullptr;
-    delete mXmlFile;                mXmlFile = nullptr;
-    delete mGraphicsScene;          mGraphicsScene = nullptr;
+
+    // delete all items
+    qDeleteAll(mPolygons);          mPolygons.clear();
+    qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+
+    mGridProperties.reset();
+    mLayerStack.reset();
+    mXmlFile.reset();
+    mGraphicsScene.reset();
 }
 
 /*****************************************************************************************
@@ -171,8 +169,10 @@ QList<BI_Base*> Board::getSelectedItems(bool footprintPads
                                         bool attachedLines,
                                         bool attachedLinesFromFootprints*/) const noexcept
 {
+    // TODO: this method is incredible ugly ;)
+
     QList<BI_Base*> list;
-    foreach (DeviceInstance* component, mDeviceInstances)
+    foreach (BI_Device* component, mDeviceInstances)
     {
         BI_Footprint& footprint = component->getFootprint();
 
@@ -197,7 +197,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
                             // top most item must appear as the first item in the list)!
     // footprints & pads
-    foreach (DeviceInstance* device, mDeviceInstances)
+    foreach (BI_Device* device, mDeviceInstances)
     {
         BI_Footprint& footprint = device->getFootprint();
         if (footprint.getGrabAreaScenePx().contains(scenePosPx)) {
@@ -255,6 +255,16 @@ QList<SI_SymbolPin*> Board::getPinsAtScenePos(const Point& pos) const noexcept
     return list;
 }*/
 
+QList<BI_Base*> Board::getAllItems() const noexcept
+{
+    QList<BI_Base*> items;
+    foreach (BI_Device* device, mDeviceInstances)
+        items.append(device);
+    foreach (BI_Polygon* polygon, mPolygons)
+        items.append(polygon);
+    return items;
+}
+
 /*****************************************************************************************
  *  Setters: General
  ****************************************************************************************/
@@ -268,46 +278,37 @@ void Board::setGridProperties(const GridProperties& grid) noexcept
  *  DeviceInstance Methods
  ****************************************************************************************/
 
-DeviceInstance* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept
+BI_Device* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept
 {
     return mDeviceInstances.value(uuid, nullptr);
 }
 
-/*DeviceInstance* Board::createDeviceInstance() throw (Exception)
+void Board::addDeviceInstance(BI_Device& instance) throw (Exception)
 {
-    if (getComponentInstanceByName(name))
-    {
-        throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
-            "name \"%1\" does already exist in the circuit.")).arg(name));
+    if ((!mIsAddedToProject) || (&instance.getBoard() != this)) {
+        throw LogicError(__FILE__, __LINE__);
     }
-    return new ComponentInstance(*this, cmp, symbVar, name);
-    return nullptr; // TODO
-}*/
-
-void Board::addDeviceInstance(DeviceInstance& instance) throw (Exception)
-{
     // check if there is no device with the same component instance in the list
-    if (getDeviceInstanceByComponentUuid(instance.getComponentInstance().getUuid()))
-    {
+    if (getDeviceInstanceByComponentUuid(instance.getComponentInstance().getUuid())) {
         throw RuntimeError(__FILE__, __LINE__, instance.getComponentInstance().getUuid().toStr(),
             QString(tr("There is already a device with the component instance \"%1\"!"))
             .arg(instance.getComponentInstance().getUuid().toStr()));
     }
-
-    // add to circuit
-    instance.addToBoard(*mGraphicsScene);
-    mDeviceInstances.insert(instance.getComponentInstance().getUuid(), &instance);
+    // add to board
+    instance.addToBoard(*mGraphicsScene); // can throw
+    mDeviceInstances.insert(instance.getComponentInstanceUuid(), &instance);
     updateErcMessages();
     emit deviceAdded(instance);
 }
 
-void Board::removeDeviceInstance(DeviceInstance& instance) throw (Exception)
+void Board::removeDeviceInstance(BI_Device& instance) throw (Exception)
 {
-    Q_ASSERT(mDeviceInstances.contains(instance.getComponentInstance().getUuid()) == true);
-
-    // remove from circuit
-    instance.removeFromBoard(*mGraphicsScene);
-    mDeviceInstances.remove(instance.getComponentInstance().getUuid());
+    if ((!mIsAddedToProject) || (!mDeviceInstances.contains(instance.getComponentInstanceUuid()))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // remove from board
+    instance.removeFromBoard(*mGraphicsScene); // can throw
+    mDeviceInstances.remove(instance.getComponentInstanceUuid());
     updateErcMessages();
     emit deviceRemoved(instance);
 }
@@ -316,29 +317,22 @@ void Board::removeDeviceInstance(DeviceInstance& instance) throw (Exception)
  *  Polygon Methods
  ****************************************************************************************/
 
-/*BI_Polygon* Board::createPolygon() throw (Exception)
-{
-    if (getComponentInstanceByName(name))
-    {
-        throw RuntimeError(__FILE__, __LINE__, name, QString(tr("The component "
-            "name \"%1\" does already exist in the circuit.")).arg(name));
-    }
-    return new ComponentInstance(*this, cmp, symbVar, name);
-    return nullptr; // TODO
-}*/
-
 void Board::addPolygon(BI_Polygon& polygon) throw (Exception)
 {
-    Q_ASSERT(!mPolygons.contains(&polygon));
-    polygon.addToBoard(*mGraphicsScene);
+    if ((!mIsAddedToProject) || (mPolygons.contains(&polygon)) || (&polygon.getBoard() != this)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    polygon.addToBoard(*mGraphicsScene); // can throw
     mPolygons.append(&polygon);
 }
 
 void Board::removePolygon(BI_Polygon& polygon) throw (Exception)
 {
-    Q_ASSERT(mPolygons.contains(&polygon));
-    polygon.removeFromBoard(*mGraphicsScene);
-    mPolygons.removeAll(&polygon);
+    if ((!mIsAddedToProject) || (!mPolygons.contains(&polygon))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    polygon.removeFromBoard(*mGraphicsScene); // can throw
+    mPolygons.removeOne(&polygon);
 }
 
 /*****************************************************************************************
@@ -347,15 +341,61 @@ void Board::removePolygon(BI_Polygon& polygon) throw (Exception)
 
 void Board::addToProject() throw (Exception)
 {
-    Q_ASSERT(mAddedToProject == false);
-    mAddedToProject = true;
+    if (mIsAddedToProject) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    // TODO: use scope guard
+    QList<BI_Base*> items = getAllItems();
+    int i = 0;
+    try {
+        while (i < items.count()) {
+            items.at(i)->addToBoard(*mGraphicsScene); // can throw
+            i++;
+        }
+    } catch (Exception& e) {
+        try {
+            while (i > 0) {
+                items.at(i-1)->removeFromBoard(*mGraphicsScene); // can throw
+                i--;
+            }
+        } catch (Exception& e2) {
+            qFatal("Internal Fatal Error");
+        }
+        throw;
+    }
+
+    mIsAddedToProject = true;
     updateErcMessages();
 }
 
 void Board::removeFromProject() throw (Exception)
 {
-    Q_ASSERT(mAddedToProject == true);
-    mAddedToProject = false;
+    if (!mIsAddedToProject) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    // TODO: use scope guard
+    QList<BI_Base*> items = getAllItems();
+    int i = items.count();
+    try {
+        while (i > 0) {
+            items.at(i-1)->removeFromBoard(*mGraphicsScene); // can throw
+            i--;
+        }
+    } catch (Exception& e) {
+        try {
+            while (i < items.count()) {
+                items.at(i)->addToBoard(*mGraphicsScene); // can throw
+                i++;
+            }
+        } catch (Exception& e2) {
+            qFatal("Internal Fatal Error");
+        }
+        throw;
+    }
+
+    mIsAddedToProject = false;
     updateErcMessages();
 }
 
@@ -366,7 +406,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     // save board XML file
     try
     {
-        if (mAddedToProject)
+        if (mIsAddedToProject)
         {
             XmlDomDocument doc(*serializeToXmlDomElement());
             doc.setFileVersion(APP_VERSION_MAJOR);
@@ -388,7 +428,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
 
 void Board::showInView(GraphicsView& view) noexcept
 {
-    view.setScene(mGraphicsScene);
+    view.setScene(mGraphicsScene.data());
 }
 
 void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept
@@ -397,7 +437,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
     if (updateItems)
     {
         QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-        foreach (DeviceInstance* component, mDeviceInstances)
+        foreach (BI_Device* component, mDeviceInstances)
         {
             BI_Footprint& footprint = component->getFootprint();
             bool selectFootprint = footprint.getGrabAreaScenePx().intersects(rectPx);
@@ -413,7 +453,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
 
 void Board::clearSelection() const noexcept
 {
-    foreach (DeviceInstance* device, mDeviceInstances)
+    foreach (BI_Device* device, mDeviceInstances)
         device->getFootprint().setSelected(false);
 }
 
@@ -466,9 +506,9 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
     root->appendChild(mLayerStack->serializeToXmlDomElement());
-    XmlDomElement* device_instances = root->appendChild("devices");
-    foreach (DeviceInstance* device, mDeviceInstances)
-        device_instances->appendChild(device->serializeToXmlDomElement());
+    XmlDomElement* devices = root->appendChild("devices");
+    foreach (BI_Device* device, mDeviceInstances)
+        devices->appendChild(device->serializeToXmlDomElement());
     XmlDomElement* polygons = root->appendChild("polygons");
     foreach (BI_Polygon* polygon, mPolygons)
         polygons->appendChild(polygon->serializeToXmlDomElement());
@@ -478,13 +518,13 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
 void Board::updateErcMessages() noexcept
 {
     // type: UnplacedComponent (ComponentInstances without DeviceInstance)
-    if (mAddedToProject)
+    if (mIsAddedToProject)
     {
         const QMap<Uuid, ComponentInstance*>& componentInstances = mProject.getCircuit().getComponentInstances();
         foreach (const ComponentInstance* component, componentInstances)
         {
             if (component->getLibComponent().isSchematicOnly()) continue;
-            DeviceInstance* device = mDeviceInstances.value(component->getUuid());
+            BI_Device* device = mDeviceInstances.value(component->getUuid());
             ErcMsg* ercMsg = mErcMsgListUnplacedComponentInstances.value(component->getUuid());
             if ((!device) && (!ercMsg))
             {
@@ -515,8 +555,7 @@ void Board::updateErcMessages() noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Board* Board::create(Project& project, const FilePath& filepath,
-                         const QString& name) throw (Exception)
+Board* Board::create(Project& project, const FilePath& filepath, const QString& name) throw (Exception)
 {
     return new Board(project, filepath, false, false, true, name);
 }

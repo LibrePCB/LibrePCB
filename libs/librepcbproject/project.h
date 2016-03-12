@@ -259,7 +259,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return the schematic index (-1 if the schematic does not exist)
          */
-        int getSchematicIndex(const Schematic* schematic) const noexcept;
+        int getSchematicIndex(const Schematic& schematic) const noexcept;
 
         /**
          * @brief Get all schematics
@@ -316,7 +316,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdSchematicAdd}
          */
-        void addSchematic(Schematic* schematic, int newIndex = -1) throw (Exception);
+        void addSchematic(Schematic& schematic, int newIndex = -1) throw (Exception);
 
         /**
          * @brief Remove a schematic from this project
@@ -329,7 +329,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdSchematicRemove}
          */
-        void removeSchematic(Schematic* schematic, bool deleteSchematic = false) throw (Exception);
+        void removeSchematic(Schematic& schematic, bool deleteSchematic = false) throw (Exception);
 
         /**
          * @brief Export the schematic pages as a PDF
@@ -351,7 +351,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @return the board index (-1 if the board does not exist)
          */
-        int getBoardIndex(const Board* board) const noexcept;
+        int getBoardIndex(const Board& board) const noexcept;
 
         /**
          * @brief Get all boards
@@ -408,7 +408,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdBoardAdd}
          */
-        void addBoard(Board* board, int newIndex = -1) throw (Exception);
+        void addBoard(Board& board, int newIndex = -1) throw (Exception);
 
         /**
          * @brief Remove a board from this project
@@ -421,7 +421,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdBoardRemove}
          */
-        void removeBoard(Board* board, bool deleteBoard = false) throw (Exception);
+        void removeBoard(Board& board, bool deleteBoard = false) throw (Exception);
 
 
         // General Methods

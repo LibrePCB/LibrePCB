@@ -22,6 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
+#include <librepcbcommon/graphics/graphicsscene.h>
+#include "../graphicsitems/sgi_base.h"
+#include "../schematic.h"
+#include "../../project.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,13 +37,29 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_Base::SI_Base() noexcept :
-    QObject(nullptr), mIsSelected(false)
+SI_Base::SI_Base(Schematic& schematic) noexcept :
+    QObject(&schematic), mSchematic(schematic),
+    mIsAddedToSchematic(false), mIsSelected(false)
 {
 }
 
 SI_Base::~SI_Base() noexcept
 {
+    Q_ASSERT(!mIsAddedToSchematic);
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+Project& SI_Base::getProject() const noexcept
+{
+    return mSchematic.getProject();
+}
+
+Circuit& SI_Base::getCircuit() const noexcept
+{
+    return mSchematic.getProject().getCircuit();
 }
 
 /*****************************************************************************************
@@ -49,6 +69,24 @@ SI_Base::~SI_Base() noexcept
 void SI_Base::setSelected(bool selected) noexcept
 {
     mIsSelected = selected;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void SI_Base::addToSchematic(GraphicsScene& scene, SGI_Base& item) noexcept
+{
+    Q_ASSERT(!mIsAddedToSchematic);
+    scene.addItem(item);
+    mIsAddedToSchematic = true;
+}
+
+void SI_Base::removeFromSchematic(GraphicsScene& scene, SGI_Base& item) noexcept
+{
+    Q_ASSERT(mIsAddedToSchematic);
+    scene.removeItem(item);
+    mIsAddedToSchematic = false;
 }
 
 /*****************************************************************************************

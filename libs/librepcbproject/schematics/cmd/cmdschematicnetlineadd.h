@@ -48,6 +48,7 @@ class CmdSchematicNetLineAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
+        explicit CmdSchematicNetLineAdd(SI_NetLine& netline) noexcept;
         CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
                                SI_NetPoint& endPoint) noexcept;
         ~CmdSchematicNetLineAdd() noexcept;

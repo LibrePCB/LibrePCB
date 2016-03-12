@@ -61,20 +61,21 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
+        SI_NetPoint() = delete;
+        SI_NetPoint(const SI_NetPoint& other) = delete;
         explicit SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
         explicit SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
-        explicit SI_NetPoint(Schematic& schematic, SI_SymbolPin& pin) throw (Exception);
+        explicit SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
         ~SI_NetPoint() noexcept;
 
         // Getters
-        Project& getProject() const noexcept;
-        Schematic& getSchematic() const noexcept {return mSchematic;}
         const Uuid& getUuid() const noexcept {return mUuid;}
-        bool isAttached() const noexcept {return (mSymbolPin != nullptr);}
-        bool isVisible() const noexcept {return ((mLines.count() > 1) && isAttached()) || (mLines.count() > 2);}
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+        bool isAttachedToPin() const noexcept {return (mSymbolPin ? true : false);}
+        bool isVisible() const noexcept;
+        NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
         SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
-        const QList<SI_NetLine*>& getLines() const noexcept {return mLines;}
+        const QList<SI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}
+        bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
 
         // Setters
 
@@ -89,16 +90,15 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
          * @throw Exception     This method throws an exception in case of an error
          */
         void setNetSignal(NetSignal& netsignal) throw (Exception);
+        void setPinToAttach(SI_SymbolPin* pin) throw (Exception);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
-        void detachFromPin() throw (Exception);
-        void attachToPin(SI_SymbolPin& pin) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
+        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
+        void registerNetLine(SI_NetLine& netline) throw (Exception);
+        void unregisterNetLine(SI_NetLine& netline) throw (Exception);
         void updateLines() const noexcept;
-        void registerNetLine(SI_NetLine& netline) noexcept;
-        void unregisterNetLine(SI_NetLine& netline) noexcept;
-        void addToSchematic(GraphicsScene& scene) throw (Exception);
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -110,15 +110,14 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
 
+        // Operator Overloadings
+        SI_NetPoint& operator=(const SI_NetPoint& rhs) = delete;
+        bool operator==(const SI_NetPoint& rhs) noexcept {return (this == &rhs);}
+        bool operator!=(const SI_NetPoint& rhs) noexcept {return (this != &rhs);}
+
 
     private:
 
-        // make some methods inaccessible...
-        SI_NetPoint();
-        SI_NetPoint(const SI_NetPoint& other);
-        SI_NetPoint& operator=(const SI_NetPoint& rhs);
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -126,19 +125,18 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
 
 
         // General
-        Circuit& mCircuit;
-        Schematic& mSchematic;
-        SGI_NetPoint* mGraphicsItem;
+        QScopedPointer<SGI_NetPoint> mGraphicsItem;
 
         // Attributes
         Uuid mUuid;
         Point mPosition;
         NetSignal* mNetSignal;
-        SI_SymbolPin* mSymbolPin;    ///< only needed if the netpoint is attached to a pin
+        SI_SymbolPin* mSymbolPin;   ///< only needed if the netpoint is attached to a pin
 
-        // Misc
-        QList<SI_NetLine*> mLines;    ///< all registered netlines
+        // Registered Elements
+        QList<SI_NetLine*> mRegisteredLines;    ///< all registered netlines
 
+        // ERC Messages
         /// @brief The ERC message for dead netpoints
         QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
 };

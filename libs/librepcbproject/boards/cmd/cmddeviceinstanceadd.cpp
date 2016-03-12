@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmddeviceinstanceadd.h"
-#include "../deviceinstance.h"
+#include "../items/bi_device.h"
 #include "../board.h"
 
 /*****************************************************************************************
@@ -36,27 +36,25 @@ namespace project {
  ****************************************************************************************/
 
 CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-                                           const Uuid& deviceUuid, const Uuid& footprintUuid,
-                                           const Point& position, const Angle& rotation) noexcept :
+        const Uuid& deviceUuid, const Uuid& footprintUuid, const Point& position,
+        const Angle& rotation, bool mirror) noexcept :
     UndoCommand(tr("Add device to board")),
     mBoard(board), mComponentInstance(&comp), mDeviceUuid(deviceUuid),
     mFootprintUuid(footprintUuid), mPosition(position), mRotation(rotation),
-    mDeviceInstance(nullptr)
+    mMirror(mirror), mDeviceInstance(nullptr)
 {
 }
 
-CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device) noexcept :
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(BI_Device& device) noexcept :
     UndoCommand(tr("Add device to board")),
     mBoard(device.getBoard()), mComponentInstance(nullptr), mDeviceUuid(),
-    mFootprintUuid(), mPosition(), mRotation(),
+    mFootprintUuid(), mPosition(), mRotation(), mMirror(),
     mDeviceInstance(&device)
 {
 }
 
 CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 {
-    if (!isCurrentlyExecuted())
-        delete mDeviceInstance;
 }
 
 /*****************************************************************************************
@@ -65,8 +63,8 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 
 bool CmdDeviceInstanceAdd::performExecute() throw (Exception)
 {
-    mDeviceInstance = new DeviceInstance(mBoard, *mComponentInstance, mDeviceUuid,
-                                         mFootprintUuid, mPosition, mRotation); // can throw
+    mDeviceInstance = new BI_Device(mBoard, *mComponentInstance, mDeviceUuid,
+                                    mFootprintUuid, mPosition, mRotation, mMirror); // can throw
 
     performRedo(); // can throw
 

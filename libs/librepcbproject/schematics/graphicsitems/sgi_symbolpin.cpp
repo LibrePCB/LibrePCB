@@ -122,7 +122,6 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
     const ComponentSignalInstance* cmpSignal = mPin.getComponentSignalInstance();
     const NetSignal* netsignal = (cmpSignal ? cmpSignal->getNetSignal() : nullptr);
-    bool requiredPin = mPin.getComponentSignal() ? mPin.getComponentSignal()->isRequired() : false;
 
     // draw line
     SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);
@@ -136,7 +135,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     layer = getSchematicLayer(SchematicLayer::SymbolPinCircles); Q_ASSERT(layer);
     if ((layer->isVisible()) && (!deviceIsPrinter) && (!netsignal))
     {
-        painter->setPen(QPen(layer->getColor(requiredPin), 0));
+        painter->setPen(QPen(layer->getColor(mPin.isRequired()), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }

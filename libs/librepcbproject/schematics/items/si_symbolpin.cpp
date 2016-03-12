@@ -49,34 +49,30 @@ namespace project {
  ****************************************************************************************/
 
 SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
-    SI_Base(), mCircuit(symbol.getSchematic().getProject().getCircuit()),
-    mSymbol(symbol), mSymbolPin(nullptr), mComponentSignal(nullptr),
+    SI_Base(symbol.getSchematic()), mSymbol(symbol), mSymbolPin(nullptr),
     mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr),
-    mAddedToSchematic(false), mRegisteredNetPoint(nullptr), mGraphicsItem(nullptr)
+    mRegisteredNetPoint(nullptr)
 {
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
-    if (!mSymbolPin)
-    {
+    if (!mSymbolPin) {
         throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
             QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
     mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMapItemOfPin(pinUuid);
-    if (!mPinSignalMapItem)
-    {
+    if (!mPinSignalMapItem) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("Pin \"%1\" not found in pin-signal-map of symbol instance \"%2\"."))
             .arg(pinUuid.toStr(), symbol.getUuid().toStr()));
     }
     Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
     mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
-    mComponentSignal = mSymbol.getComponentInstance().getLibComponent().getSignalByUuid(cmpSignalUuid);
 
-    mGraphicsItem = new SGI_SymbolPin(*this);
+    mGraphicsItem.reset(new SGI_SymbolPin(*this));
     updatePosition();
 
     // create ERC messages
-    mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mCircuit.getProject(), *this,
+    mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mSchematic.getProject(), *this,
         QString("%1/%2").arg(mSymbol.getUuid().toStr()).arg(mSymbolPin->getUuid().toStr()),
         "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
     updateErcMessages();
@@ -84,23 +80,13 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
 
 SI_SymbolPin::~SI_SymbolPin()
 {
-    Q_ASSERT(mRegisteredNetPoint == nullptr);
-    delete mGraphicsItem;       mGraphicsItem = nullptr;
+    Q_ASSERT(!isUsed());
+    mGraphicsItem.reset();
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-
-Project& SI_SymbolPin::getProject() const noexcept
-{
-    return mSymbol.getProject();
-}
-
-Schematic& SI_SymbolPin::getSchematic() const noexcept
-{
-    return mSymbol.getSchematic();
-}
 
 const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept
 {
@@ -117,8 +103,8 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
         case PinDisplayType_t::PIN_NAME:
             text = mSymbolPin->getName(); break;
         case PinDisplayType_t::COMPONENT_SIGNAL:
-            if (mComponentSignal) {
-                text = mComponentSignal->getName();
+            if (mComponentSignalInstance) {
+                text = mComponentSignalInstance->getCompSignal().getName();
             }
             break;
         case PinDisplayType_t::NET_SIGNAL:
@@ -130,16 +116,73 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
             break;
         default: break;
     }
-    if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignal)
-        text = mComponentSignal->getName();
+    if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
+        text = mComponentSignalInstance->getCompSignal().getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
         text = mSymbolPin->getName();
     return text;
 }
 
+bool SI_SymbolPin::isRequired() const noexcept
+{
+    if (mComponentSignalInstance) {
+        return mComponentSignalInstance->getCompSignal().isRequired();
+    } else {
+        return false;
+    }
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void SI_SymbolPin::addToSchematic(GraphicsScene& scene) throw (Exception)
+{
+    if (isAddedToSchematic() || isUsed()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if (mComponentSignalInstance) {
+        mComponentSignalInstance->registerSymbolPin(*this); // can throw
+    }
+    SI_Base::addToSchematic(scene, *mGraphicsItem);
+    updateErcMessages();
+}
+
+void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+{
+    if ((!isAddedToSchematic()) || isUsed()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if (mComponentSignalInstance) {
+        mComponentSignalInstance->unregisterSymbolPin(*this); // can throw
+    }
+    SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    updateErcMessages();
+}
+
+void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!isAddedToSchematic()) || (!mComponentSignalInstance) || (mRegisteredNetPoint)
+        || (netpoint.getSchematic() != mSchematic)
+        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredNetPoint = &netpoint;
+    updateErcMessages();
+}
+
+void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!isAddedToSchematic()) || (!mComponentSignalInstance)
+        || (mRegisteredNetPoint != &netpoint)
+        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredNetPoint = nullptr;
+    updateErcMessages();
+}
 
 void SI_SymbolPin::updatePosition() noexcept
 {
@@ -148,47 +191,9 @@ void SI_SymbolPin::updatePosition() noexcept
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
-    if (mRegisteredNetPoint)
+    if (mRegisteredNetPoint) {
         mRegisteredNetPoint->setPosition(mPosition);
-}
-
-void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint)
-{
-    Q_ASSERT(mRegisteredNetPoint == nullptr);
-    mRegisteredNetPoint = &netpoint;
-    updateErcMessages();
-}
-
-void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint)
-{
-    Q_UNUSED(netpoint); // to avoid compiler warning in release mode
-    Q_ASSERT(mRegisteredNetPoint == &netpoint);
-    mRegisteredNetPoint = nullptr;
-    updateErcMessages();
-}
-
-void SI_SymbolPin::addToSchematic(GraphicsScene& scene) noexcept
-{
-    Q_ASSERT(mAddedToSchematic == false);
-    Q_ASSERT(mRegisteredNetPoint == nullptr);
-    if (mComponentSignalInstance) {
-        mComponentSignalInstance->registerSymbolPin(*this);
     }
-    scene.addItem(*mGraphicsItem);
-    mAddedToSchematic = true;
-    updateErcMessages();
-}
-
-void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) noexcept
-{
-    Q_ASSERT(mAddedToSchematic == true);
-    Q_ASSERT(mRegisteredNetPoint == nullptr);
-    if (mComponentSignalInstance) {
-        mComponentSignalInstance->unregisterSymbolPin(*this);
-    }
-    scene.removeItem(*mGraphicsItem);
-    mAddedToSchematic = false;
-    updateErcMessages();
 }
 
 /*****************************************************************************************
@@ -216,8 +221,7 @@ void SI_SymbolPin::updateErcMessages() noexcept
         QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
         .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
 
-    bool isRequired = mComponentSignal ? mComponentSignal->isRequired() : false;
-    mErcMsgUnconnectedRequiredPin->setVisible(mAddedToSchematic && isRequired
+    mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() && isRequired()
                                               && (!mRegisteredNetPoint));
 }
 

@@ -73,7 +73,7 @@ SOURCES += \
     settings/cmd/cmdprojectsettingschange.cpp \
     schematics/schematiclayerprovider.cpp \
     library/cmd/cmdprojectlibraryaddelement.cpp \
-    boards/deviceinstance.cpp \
+    boards/items/bi_device.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
     boards/cmd/cmddeviceinstanceedit.cpp \
     boards/cmd/cmddeviceinstanceremove.cpp \
@@ -145,7 +145,7 @@ HEADERS += \
     settings/cmd/cmdprojectsettingschange.h \
     schematics/schematiclayerprovider.h \
     library/cmd/cmdprojectlibraryaddelement.h \
-    boards/deviceinstance.h \
+    boards/items/bi_device.h \
     boards/cmd/cmddeviceinstanceadd.h \
     boards/cmd/cmddeviceinstanceremove.h \
     boards/cmd/cmddeviceinstanceedit.h \

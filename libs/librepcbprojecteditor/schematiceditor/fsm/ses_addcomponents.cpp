@@ -25,9 +25,7 @@
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include <librepcbproject/project.h>
-#include <librepcbproject/library/projectlibrary.h>
 #include <librepcblibrary/cmp/component.h>
-#include <librepcbproject/circuit/cmd/cmdcomponentinstanceadd.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
@@ -35,7 +33,6 @@
 #include <librepcbproject/schematics/schematic.h>
 #include "../../dialogs/addcomponentdialog.h"
 #include <librepcbcommon/gridproperties.h>
-#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/sym/symbol.h>

@@ -63,6 +63,8 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
     public:
 
         // Constructors / Destructor
+        ComponentSignalInstance() = delete;
+        ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const XmlDomElement& domElement) throw (Exception);
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
@@ -71,10 +73,14 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ~ComponentSignalInstance() noexcept;
 
         // Getters
+        Circuit& getCircuit() const noexcept {return mCircuit;}
         const library::ComponentSignal& getCompSignal() const noexcept {return *mComponentSignal;}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         bool isNetSignalNameForced() const noexcept;
         QString getForcedNetSignalName() const noexcept;
+        int getRegisteredElementsCount() const noexcept;
+        bool isUsed() const noexcept {return (getRegisteredElementsCount() > 0);}
+        bool arePinsOrPadsUsed() const noexcept;
 
 
         // Setters
@@ -93,13 +99,16 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
 
         // General Methods
-        void registerSymbolPin(SI_SymbolPin& pin) throw (Exception);
-        void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
         void addToCircuit() throw (Exception);
         void removeFromCircuit() throw (Exception);
+        void registerSymbolPin(SI_SymbolPin& pin) throw (Exception);
+        void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
 
 
     private slots:
@@ -110,12 +119,6 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
     private:
 
-        // make some methods inaccessible...
-        ComponentSignalInstance();
-        ComponentSignalInstance(const ComponentSignalInstance& other);
-        ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs);
-
-        // Private Methods
         void init() throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -125,15 +128,16 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         // General
         Circuit& mCircuit;
         ComponentInstance& mComponentInstance;
+        const library::ComponentSignal* mComponentSignal;
+        bool mIsAddedToCircuit;
 
         // Attributes
-        const library::ComponentSignal* mComponentSignal;
-        QList<SI_SymbolPin*> mRegisteredSymbolPins;
         NetSignal* mNetSignal;
-        bool mAddedToCircuit;
 
-        // Misc
+        // Registered Elements
+        QList<SI_SymbolPin*> mRegisteredSymbolPins;
 
+        // ERC Messages
         /// @brief The ERC message for an unconnected required component signal
         QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
         /// @brief The ERC message for a global net signal name mismatch

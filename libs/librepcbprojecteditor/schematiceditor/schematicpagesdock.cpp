@@ -138,7 +138,7 @@ void SchematicPagesDock::on_btnRemoveSchematic_clicked()
 
     try
     {
-        CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, schematic);
+        CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
         mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)

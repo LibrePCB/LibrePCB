@@ -31,7 +31,7 @@
 #include <librepcbcommon/boardlayer.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
-#include "../deviceinstance.h"
+#include "../items/bi_device.h"
 #include <librepcblibrary/pkg/package.h>
 #include "../boardlayerstack.h"
 

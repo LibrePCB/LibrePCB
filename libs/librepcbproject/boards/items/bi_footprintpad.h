@@ -55,12 +55,12 @@ class BI_FootprintPad final : public BI_Base
     public:
 
         // Constructors / Destructor
-        explicit BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
+        BI_FootprintPad() = delete;
+        BI_FootprintPad(const BI_FootprintPad& other) = delete;
+        BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
         ~BI_FootprintPad();
 
         // Getters
-        Project& getProject() const noexcept;
-        Board& getBoard() const noexcept;
         const Uuid& getLibPadUuid() const noexcept;
         //QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
         //                       bool returnPinNameIfEmpty = false) const noexcept;
@@ -74,8 +74,8 @@ class BI_FootprintPad final : public BI_Base
         void updatePosition() noexcept;
         //void registerNetPoint(SI_NetPoint& netpoint);
         //void unregisterNetPoint(SI_NetPoint& netpoint);
-        void addToBoard(GraphicsScene& scene) noexcept;
-        void removeFromBoard(GraphicsScene& scene) noexcept;
+        void addToBoard(GraphicsScene& scene) throw (Exception) override;
+        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
@@ -83,6 +83,9 @@ class BI_FootprintPad final : public BI_Base
         bool getIsMirrored() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Operator Overloadings
+        BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
 
 
     private slots:
@@ -92,17 +95,10 @@ class BI_FootprintPad final : public BI_Base
 
     private:
 
-        // make some methods inaccessible...
-        BI_FootprintPad();
-        BI_FootprintPad(const BI_FootprintPad& other);
-        BI_FootprintPad& operator=(const BI_FootprintPad& rhs);
-
-        // Private Methods
         void updateGraphicsItemTransform() noexcept;
 
 
         // General
-        Circuit& mCircuit;
         BI_Footprint& mFootprint;
         const library::FootprintPad* mFootprintPad;
         //const library::ComponentSignal* mComponentSignal;
@@ -111,9 +107,8 @@ class BI_FootprintPad final : public BI_Base
         Angle mRotation;
 
         // Misc
-        bool mAddedToBoard;
         //SI_NetPoint* mRegisteredNetPoint;
-        BGI_FootprintPad* mGraphicsItem;
+        QScopedPointer<BGI_FootprintPad> mGraphicsItem;
 };
 
 /*****************************************************************************************

@@ -29,7 +29,7 @@
 #include "../../project.h"
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcbcommon/boardlayer.h>
-#include "../deviceinstance.h"
+#include "../items/bi_device.h"
 #include "../boardlayerstack.h"
 
 /*****************************************************************************************

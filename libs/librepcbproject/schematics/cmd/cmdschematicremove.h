@@ -47,7 +47,7 @@ class CmdSchematicRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdSchematicRemove(Project& project, Schematic* schematic) noexcept;
+        CmdSchematicRemove(Project& project, Schematic& schematic) noexcept;
         ~CmdSchematicRemove() noexcept;
 
 
@@ -68,7 +68,7 @@ class CmdSchematicRemove final : public UndoCommand
         // Private Member Variables
 
         Project& mProject;
-        Schematic* mSchematic;
+        Schematic& mSchematic;
         int mPageIndex;
 };
 

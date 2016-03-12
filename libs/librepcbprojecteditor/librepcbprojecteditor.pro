@@ -53,7 +53,20 @@ SOURCES += \
     boardeditor/boardlayersdock.cpp \
     cmd/cmdaddcomponenttocircuit.cpp \
     cmd/cmdaddsymboltoschematic.cpp \
-    cmd/cmdadddevicetoboard.cpp
+    cmd/cmdadddevicetoboard.cpp \
+    cmd/cmdcombinenetsignals.cpp \
+    cmd/cmdremoveselectedschematicitems.cpp \
+    cmd/cmdcombineschematicnetpoints.cpp \
+    cmd/cmdrotateselectedschematicitems.cpp \
+    cmd/cmdmoveselectedschematicitems.cpp \
+    cmd/cmdmoveselectedboarditems.cpp \
+    cmd/cmdrotateselectedboarditems.cpp \
+    cmd/cmdflipselectedboarditems.cpp \
+    cmd/cmdremoveselectedboarditems.cpp \
+    cmd/cmdreplacedevice.cpp \
+    cmd/cmdplaceschematicnetpoint.cpp \
+    cmd/cmdcombineallnetsignalsunderschematicnetpoint.cpp \
+    cmd/cmdremoveunusednetsignals.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -88,7 +101,20 @@ HEADERS += \
     boardeditor/boardlayersdock.h \
     cmd/cmdaddcomponenttocircuit.h \
     cmd/cmdaddsymboltoschematic.h \
-    cmd/cmdadddevicetoboard.h
+    cmd/cmdadddevicetoboard.h \
+    cmd/cmdcombinenetsignals.h \
+    cmd/cmdremoveselectedschematicitems.h \
+    cmd/cmdcombineschematicnetpoints.h \
+    cmd/cmdrotateselectedschematicitems.h \
+    cmd/cmdmoveselectedschematicitems.h \
+    cmd/cmdmoveselectedboarditems.h \
+    cmd/cmdrotateselectedboarditems.h \
+    cmd/cmdflipselectedboarditems.h \
+    cmd/cmdremoveselectedboarditems.h \
+    cmd/cmdreplacedevice.h \
+    cmd/cmdplaceschematicnetpoint.h \
+    cmd/cmdcombineallnetsignalsunderschematicnetpoint.h \
+    cmd/cmdremoveunusednetsignals.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \

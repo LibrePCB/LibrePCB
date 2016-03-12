@@ -21,16 +21,16 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "deviceinstance.h"
-#include "board.h"
-#include "../project.h"
-#include "../library/projectlibrary.h"
+#include "bi_device.h"
+#include "../board.h"
+#include "../../project.h"
+#include "../../library/projectlibrary.h"
 #include <librepcblibrary/elements.h>
-#include "../erc/ercmsg.h"
+#include "../../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
-#include "../circuit/circuit.h"
-#include "../circuit/componentinstance.h"
-#include "items/bi_footprint.h"
+#include "../../circuit/circuit.h"
+#include "../../circuit/componentinstance.h"
+#include "bi_footprint.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -42,15 +42,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) throw (Exception) :
-    QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(nullptr),
-    mLibDevice(nullptr), mLibFootprint(nullptr), mFootprint(nullptr)
+BI_Device::BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception) :
+    BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibFootprint(nullptr)
 {
     // get component instance
     Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
-    if (!mCompInstance)
-    {
+    if (!mCompInstance) {
         throw RuntimeError(__FILE__, __LINE__, compInstUuid.toStr(),
             QString(tr("Could not find the component instance with UUID \"%1\"!"))
             .arg(compInstUuid.toStr()));
@@ -67,40 +65,36 @@ DeviceInstance::DeviceInstance(Board& board, const XmlDomElement& domElement) th
     mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror", true);
 
     // load footprint
-    mFootprint = new BI_Footprint(*this, *domElement.getFirstChild("footprint", true));
+    mFootprint.reset(new BI_Footprint(*this, *domElement.getFirstChild("footprint", true)));
 
     init();
 }
 
-DeviceInstance::DeviceInstance(Board& board, ComponentInstance& compInstance,
-                               const Uuid& deviceUuid, const Uuid& footprintUuid,
-                               const Point& position, const Angle& rotation) throw (Exception) :
-    QObject(nullptr), mBoard(board), mAddedToBoard(false), mCompInstance(&compInstance),
-    mLibDevice(nullptr), mLibFootprint(nullptr), mFootprint(nullptr), mPosition(position),
-    mRotation(rotation), mIsMirrored(false)
+BI_Device::BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
+        const Uuid& footprintUuid, const Point& position, const Angle& rotation, bool mirror) throw (Exception) :
+    BI_Base(board), mCompInstance(&compInstance), mLibDevice(nullptr),
+    mLibFootprint(nullptr), mPosition(position), mRotation(rotation), mIsMirrored(mirror)
 {
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // create footprint
-    mFootprint = new BI_Footprint(*this);
+    mFootprint.reset(new BI_Footprint(*this));
 
     init();
 }
 
-void DeviceInstance::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                                      const Uuid& footprintUuid) throw (Exception)
+void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
+                                                 const Uuid& footprintUuid) throw (Exception)
 {
     // get device from library
     mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
-    if (!mLibDevice)
-    {
+    if (!mLibDevice) {
         throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
             QString(tr("No device with the UUID \"%1\" found in the project's library."))
             .arg(deviceUuid.toStr()));
     }
     // check if the device matches with the component
-    if (mLibDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid())
-    {
+    if (mLibDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The device \"%1\" does not match with the component"
             "instance \"%2\".")).arg(mLibDevice->getUuid().toStr(),
@@ -109,29 +103,25 @@ void DeviceInstance::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
     // get package from library
     Uuid packageUuid = mLibDevice->getPackageUuid();
     mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
-    if (!mLibPackage)
-    {
+    if (!mLibPackage) {
         throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
             QString(tr("No package with the UUID \"%1\" found in the project's library."))
             .arg(packageUuid.toStr()));
     }
     // get footprint from package
     mLibFootprint = mLibPackage->getFootprintByUuid(footprintUuid);
-    if (!mLibFootprint)
-    {
+    if (!mLibFootprint) {
         throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
             QString(tr("The package \"%1\" does not have a footprint with the UUID \"%2\"."))
             .arg(packageUuid.toStr()).arg(footprintUuid.toStr()));
     }
 }
 
-void DeviceInstance::init() throw (Exception)
+void BI_Device::init() throw (Exception)
 {
     // check pad-signal-map
-    foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap())
-    {
-        if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid)))
-        {
+    foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap()) {
+        if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid))) {
             throw RuntimeError(__FILE__, __LINE__, signalUuid.toStr(),
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
                 .arg(signalUuid.toStr(), mLibDevice->getUuid().toStr()));
@@ -139,27 +129,21 @@ void DeviceInstance::init() throw (Exception)
     }
 
     // emit the "attributesChanged" signal when the board has emited it
-    connect(&mBoard, &Board::attributesChanged, this, &DeviceInstance::attributesChanged);
+    connect(&mBoard, &Board::attributesChanged, this, &BI_Device::attributesChanged);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-DeviceInstance::~DeviceInstance() noexcept
+BI_Device::~BI_Device() noexcept
 {
-    Q_ASSERT(!mAddedToBoard);
-    delete mFootprint;          mFootprint = nullptr;
+    mFootprint.reset();
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
-Project& DeviceInstance::getProject() const noexcept
-{
-    return mBoard.getProject();
-}
-
-const Uuid& DeviceInstance::getComponentInstanceUuid() const noexcept
+const Uuid& BI_Device::getComponentInstanceUuid() const noexcept
 {
     return mCompInstance->getUuid();
 }
@@ -168,43 +152,55 @@ const Uuid& DeviceInstance::getComponentInstanceUuid() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void DeviceInstance::setPosition(const Point& pos) noexcept
+void BI_Device::setPosition(const Point& pos) noexcept
 {
-    mPosition = pos;
-    emit moved(mPosition);
+    if (pos != mPosition) {
+        mPosition = pos;
+        emit moved(mPosition);
+    }
 }
 
-void DeviceInstance::setRotation(const Angle& rot) noexcept
+void BI_Device::setRotation(const Angle& rot) noexcept
 {
-    mRotation = rot;
-    emit rotated(mRotation);
+    if (rot != mRotation) {
+        mRotation = rot;
+        emit rotated(mRotation);
+    }
 }
 
-void DeviceInstance::setIsMirrored(bool mirror) noexcept
+void BI_Device::setIsMirrored(bool mirror) noexcept
 {
-    mIsMirrored = mirror;
-    emit mirrored(mIsMirrored);
+    if (mirror != mIsMirrored) {
+        mIsMirrored = mirror;
+        emit mirrored(mIsMirrored);
+    }
 }
 
-void DeviceInstance::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_Device::addToBoard(GraphicsScene& scene) throw (Exception)
 {
-    if (mAddedToBoard) throw LogicError(__FILE__, __LINE__);
-    mCompInstance->registerDevice(*this);
-    mFootprint->addToBoard(scene);
-    mAddedToBoard = true;
+    if (isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // TODO: use scope guard
+    mCompInstance->registerDevice(*this); // can throw
+    mFootprint->addToBoard(scene); // can throw
+    BI_Base::addToBoard();
     updateErcMessages();
 }
 
-void DeviceInstance::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_Device::removeFromBoard(GraphicsScene& scene) throw (Exception)
 {
-    if (!mAddedToBoard) throw LogicError(__FILE__, __LINE__);
-    mCompInstance->unregisterDevice(*this);
-    mFootprint->removeFromBoard(scene);
-    mAddedToBoard = false;
+    if (!isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // TODO: use scope guard
+    mFootprint->removeFromBoard(scene); // can throw
+    mCompInstance->unregisterDevice(*this); // can throw
+    BI_Base::removeFromBoard();
     updateErcMessages();
 }
 
-XmlDomElement* DeviceInstance::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* BI_Device::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -225,13 +221,12 @@ XmlDomElement* DeviceInstance::serializeToXmlDomElement() const throw (Exception
  *  Helper Methods
  ****************************************************************************************/
 
-bool DeviceInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
+bool BI_Device::getAttributeValue(const QString& attrNS, const QString& attrKey,
                                         bool passToParents, QString& value) const noexcept
 {
     // no local attributes available
 
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && passToParents)
-    {
+    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && passToParents) {
         if (mCompInstance->getAttributeValue(attrNS, attrKey, false, value))
             return true;
     }
@@ -243,18 +238,33 @@ bool DeviceInstance::getAttributeValue(const QString& attrNS, const QString& att
 }
 
 /*****************************************************************************************
+ *  Inherited from SI_Base
+ ****************************************************************************************/
+
+QPainterPath BI_Device::getGrabAreaScenePx() const noexcept
+{
+    return mFootprint->getGrabAreaScenePx();
+}
+
+void BI_Device::setSelected(bool selected) noexcept
+{
+    BI_Base::setSelected(selected);
+    mFootprint->setSelected(selected);
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool DeviceInstance::checkAttributesValidity() const noexcept
+bool BI_Device::checkAttributesValidity() const noexcept
 {
     if (mCompInstance == nullptr)            return false;
-    if (mLibDevice == nullptr)                  return false;
-    if (mLibPackage == nullptr)                    return false;
+    if (mLibDevice == nullptr)               return false;
+    if (mLibPackage == nullptr)              return false;
     return true;
 }
 
-void DeviceInstance::updateErcMessages() noexcept
+void BI_Device::updateErcMessages() noexcept
 {
 }
 

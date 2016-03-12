@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmddeviceinstanceremove.h"
-#include "../deviceinstance.h"
+#include "../items/bi_device.h"
 #include "../board.h"
 
 /*****************************************************************************************
@@ -35,7 +35,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev) noexcept :
+CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, BI_Device& dev) noexcept :
     UndoCommand(tr("Remove device instance")),
     mBoard(board), mDevice(dev)
 {
@@ -43,8 +43,6 @@ CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, DeviceInstance& d
 
 CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
 {
-    if (isCurrentlyExecuted())
-        delete &mDevice;
 }
 
 /*****************************************************************************************

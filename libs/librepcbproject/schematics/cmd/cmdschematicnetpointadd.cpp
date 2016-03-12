@@ -35,6 +35,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(SI_NetPoint& netpoint) noexcept :
+    UndoCommand(tr("Add netpoint")),
+    mSchematic(netpoint.getSchematic()), mNetSignal(nullptr), mAttachedToSymbol(false),
+    mPosition(), mSymbolPin(nullptr), mNetPoint(&netpoint)
+{
+}
+
 CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
                                                  const Point& position) noexcept :
     UndoCommand(tr("Add netpoint")),
@@ -43,17 +50,16 @@ CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal
 {
 }
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin) noexcept :
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
+                                                 SI_SymbolPin& pin) noexcept :
     UndoCommand(tr("Add netpoint")),
-    mSchematic(schematic), mNetSignal(nullptr), mAttachedToSymbol(true),
+    mSchematic(schematic), mNetSignal(&netsignal), mAttachedToSymbol(true),
     mPosition(), mSymbolPin(&pin), mNetPoint(nullptr)
 {
 }
 
 CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 {
-    if ((mNetPoint) && (!isCurrentlyExecuted()))
-        delete mNetPoint;
 }
 
 /*****************************************************************************************
@@ -62,10 +68,13 @@ CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 
 bool CmdSchematicNetPointAdd::performExecute() throw (Exception)
 {
-    if (mAttachedToSymbol) {
-        mNetPoint = mSchematic.createNetPoint(*mSymbolPin); // can throw
-    } else {
-        mNetPoint = mSchematic.createNetPoint(*mNetSignal, mPosition); // can throw
+    if (!mNetPoint) {
+        // create new netpoint
+        if (mAttachedToSymbol) {
+            mNetPoint = new SI_NetPoint(mSchematic, *mNetSignal, *mSymbolPin); // can throw
+        } else {
+            mNetPoint = new SI_NetPoint(mSchematic, *mNetSignal, mPosition); // can throw
+        }
     }
 
     performRedo(); // can throw

@@ -46,46 +46,45 @@ class ErcMsg;
 /**
  * @brief The NetClass class
  */
-class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class NetClass final : public QObject, public IF_ErcMsgProvider,
+                       public IF_XmlSerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(NetClass)
+        Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
     public:
 
         // Constructors / Destructor
-        explicit NetClass(const Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
-        explicit NetClass(const Circuit& circuit, const QString& name) throw (Exception);
+        NetClass() = delete;
+        NetClass(const NetClass& other) = delete;
+        explicit NetClass(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit NetClass(Circuit& circuit, const QString& name) throw (Exception);
         ~NetClass() noexcept;
 
         // Getters
+        Circuit& getCircuit() const noexcept {return mCircuit;}
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
-        int getNetSignalCount() const noexcept {return mNetSignals.count();}
+        int getNetSignalCount() const noexcept {return mRegisteredNetSignals.count();}
+        bool isUsed() const noexcept {return (getNetSignalCount() > 0);}
 
         // Setters
         void setName(const QString& name) throw (Exception);
 
-        // NetSignal Methods
-        void registerNetSignal(NetSignal& signal) noexcept;
-        void unregisterNetSignal(NetSignal& signal) noexcept;
-
         // General Methods
-        void addToCircuit() noexcept;
-        void removeFromCircuit() noexcept;
+        void addToCircuit() throw (Exception);
+        void removeFromCircuit() throw (Exception);
+        void registerNetSignal(NetSignal& signal) throw (Exception);
+        void unregisterNetSignal(NetSignal& signal) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Operator Overloadings
+        NetClass& operator=(const NetClass& rhs) = delete;
+
 
     private:
-
-        // make some methods inaccessible...
-        NetClass();
-        NetClass(const NetClass& other);
-        NetClass& operator=(const NetClass& rhs);
-
-        // Private Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
@@ -94,18 +93,20 @@ class NetClass final : public IF_ErcMsgProvider, public IF_XmlSerializableObject
 
 
         // General
-        const Circuit& mCircuit;
-        bool mAddedToCircuit;
-
-        // Misc
-        /// @brief the ERC message for unused netclasses
-        ErcMsg* mErcMsgUnusedNetClass;
-        /// @brief all registered netsignals
-        QHash<Uuid, NetSignal*> mNetSignals;
+        Circuit& mCircuit;
+        bool mIsAddedToCircuit;
 
         // Attributes
         Uuid mUuid;
         QString mName;
+
+        // Registered Elements
+        /// @brief all registered netsignals
+        QHash<Uuid, NetSignal*> mRegisteredNetSignals;
+
+        // ERC Messages
+        /// @brief the ERC message for unused netclasses
+        QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
 };
 
 /*****************************************************************************************

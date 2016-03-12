@@ -46,7 +46,7 @@ class SmartXmlFile;
 namespace project {
 
 class Project;
-class DeviceInstance;
+class BI_Device;
 class BI_Base;
 class BI_Polygon;
 class BoardLayerStack;
@@ -86,7 +86,9 @@ class Board final : public QObject, public IF_AttributeProvider,
         };
 
         // Constructors / Destructor
-        explicit Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        Board() = delete;
+        Board(const Board& other) = delete;
+        Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
             Board(project, filepath, restore, readOnly, false, QString()) {}
         ~Board() noexcept;
 
@@ -111,6 +113,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         //QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
         //QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
         //QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+        QList<BI_Base*> getAllItems() const noexcept;
 
         // Setters: General
         void setGridProperties(const GridProperties& grid) noexcept;
@@ -121,15 +124,13 @@ class Board final : public QObject, public IF_AttributeProvider,
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // DeviceInstance Methods
-        const QMap<Uuid, DeviceInstance*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
-        DeviceInstance* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
-        //DeviceInstance* createDeviceInstance() throw (Exception);
-        void addDeviceInstance(DeviceInstance& instance) throw (Exception);
-        void removeDeviceInstance(DeviceInstance& instance) throw (Exception);
+        const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
+        BI_Device* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
+        void addDeviceInstance(BI_Device& instance) throw (Exception);
+        void removeDeviceInstance(BI_Device& instance) throw (Exception);
 
         // Polygon Methods
         const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
-        //BI_Polygon* createPolygon() throw (Exception);
         void addPolygon(BI_Polygon& polygon) throw (Exception);
         void removePolygon(BI_Polygon& polygon) throw (Exception);
 
@@ -147,6 +148,11 @@ class Board final : public QObject, public IF_AttributeProvider,
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept;
 
+        // Operator Overloadings
+        Board& operator=(const Board& rhs) = delete;
+        bool operator==(const Board& rhs) noexcept {return (this == &rhs);}
+        bool operator!=(const Board& rhs) noexcept {return (this != &rhs);}
+
         // Static Methods
         static Board* create(Project& project, const FilePath& filepath,
                              const QString& name) throw (Exception);
@@ -157,20 +163,14 @@ class Board final : public QObject, public IF_AttributeProvider,
         /// @copydoc IF_AttributeProvider#attributesChanged()
         void attributesChanged();
 
-        void deviceAdded(DeviceInstance& comp);
-        void deviceRemoved(DeviceInstance& comp);
+        void deviceAdded(BI_Device& comp);
+        void deviceRemoved(BI_Device& comp);
 
 
     private:
 
-        // make some methods inaccessible...
-        Board() = delete;
-        Board(const Board& other) = delete;
-        Board& operator=(const Board& rhs) = delete;
-
-        // Private Methods
-        explicit Board(Project& project, const FilePath& filepath, bool restore,
-                       bool readOnly, bool create, const QString& newName) throw (Exception);
+        Board(Project& project, const FilePath& filepath, bool restore,
+              bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
@@ -185,25 +185,25 @@ class Board final : public QObject, public IF_AttributeProvider,
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
         FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
-        SmartXmlFile* mXmlFile;
-        bool mAddedToProject;
+        QScopedPointer<SmartXmlFile> mXmlFile;
+        bool mIsAddedToProject;
 
-        BoardLayerStack* mLayerStack;
-        GraphicsScene* mGraphicsScene;
+        QScopedPointer<GraphicsScene> mGraphicsScene;
+        QScopedPointer<BoardLayerStack> mLayerStack;
+        QScopedPointer<GridProperties> mGridProperties;
         QRectF mViewRect;
-        GridProperties* mGridProperties;
 
         // Attributes
         Uuid mUuid;
         QString mName;
         QIcon mIcon;
 
+        // items
+        QMap<Uuid, BI_Device*> mDeviceInstances;
+        QList<BI_Polygon*> mPolygons;
+
         // ERC messages
         QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
-
-        // items
-        QMap<Uuid, DeviceInstance*> mDeviceInstances;
-        QList<BI_Polygon*> mPolygons;
 };
 
 /*****************************************************************************************

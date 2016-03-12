@@ -22,6 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
+#include <librepcbcommon/graphics/graphicsscene.h>
+#include "../graphicsitems/bgi_base.h"
+#include "../board.h"
+#include "../../project.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,13 +37,28 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Base::BI_Base() noexcept :
-    QObject(nullptr), mIsSelected(false)
+BI_Base::BI_Base(Board& board) noexcept :
+    QObject(&board), mBoard(board), mIsAddedToBoard(false), mIsSelected(false)
 {
 }
 
 BI_Base::~BI_Base() noexcept
 {
+    Q_ASSERT(!mIsAddedToBoard);
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+Project& BI_Base::getProject() const noexcept
+{
+    return mBoard.getProject();
+}
+
+Circuit& BI_Base::getCircuit() const noexcept
+{
+    return mBoard.getProject().getCircuit();
 }
 
 /*****************************************************************************************
@@ -49,6 +68,36 @@ BI_Base::~BI_Base() noexcept
 void BI_Base::setSelected(bool selected) noexcept
 {
     mIsSelected = selected;
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void BI_Base::addToBoard() noexcept
+{
+    Q_ASSERT(!mIsAddedToBoard);
+    mIsAddedToBoard = true;
+}
+
+void BI_Base::removeFromBoard() noexcept
+{
+    Q_ASSERT(mIsAddedToBoard);
+    mIsAddedToBoard = false;
+}
+
+void BI_Base::addToBoard(GraphicsScene& scene, BGI_Base& item) noexcept
+{
+    Q_ASSERT(!mIsAddedToBoard);
+    scene.addItem(item);
+    mIsAddedToBoard = true;
+}
+
+void BI_Base::removeFromBoard(GraphicsScene& scene, BGI_Base& item) noexcept
+{
+    Q_ASSERT(mIsAddedToBoard);
+    scene.removeItem(item);
+    mIsAddedToBoard = false;
 }
 
 /*****************************************************************************************
