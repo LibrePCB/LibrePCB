@@ -35,16 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
-                                 const QString& name, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netsignal"), parent),
+CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass, const QString& name) noexcept :
+    UndoCommand(tr("Add netsignal")),
     mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(nullptr)
 {
 }
 
 CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 {
-    if (!isExecuted())
+    if (!isCurrentlyExecuted())
         delete mNetSignal;
 }
 
@@ -52,37 +51,21 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalAdd::redo() throw (Exception)
+void CmdNetSignalAdd::performExecute() throw (Exception)
 {
-    if (!mNetSignal) // only the first time
-        mNetSignal = mCircuit.createNetSignal(mNetClass, mName); // throws an exception on error
+    mNetSignal = mCircuit.createNetSignal(mNetClass, mName); // can throw
 
-    mCircuit.addNetSignal(*mNetSignal); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.removeNetSignal(*mNetSignal);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdNetSignalAdd::undo() throw (Exception)
+void CmdNetSignalAdd::performUndo() throw (Exception)
 {
-    mCircuit.removeNetSignal(*mNetSignal); // throws an exception on error
+    mCircuit.removeNetSignal(*mNetSignal); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.addNetSignal(*mNetSignal);
-        throw;
-    }
+void CmdNetSignalAdd::performRedo() throw (Exception)
+{
+    mCircuit.addNetSignal(*mNetSignal); // can throw
 }
 
 /*****************************************************************************************

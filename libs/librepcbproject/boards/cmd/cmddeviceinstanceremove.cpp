@@ -35,16 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev,
-                                                 UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove device instance"), parent),
+CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, DeviceInstance& dev) noexcept :
+    UndoCommand(tr("Remove device instance")),
     mBoard(board), mDevice(dev)
 {
 }
 
 CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mDevice;
 }
 
@@ -52,34 +51,19 @@ CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceRemove::redo() throw (Exception)
+void CmdDeviceInstanceRemove::performExecute() throw (Exception)
 {
-    mBoard.removeDeviceInstance(mDevice); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mBoard.addDeviceInstance(mDevice); // throws an exception on error
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdDeviceInstanceRemove::undo() throw (Exception)
+void CmdDeviceInstanceRemove::performUndo() throw (Exception)
 {
-    mBoard.addDeviceInstance(mDevice); // throws an exception on error
+    mBoard.addDeviceInstance(mDevice); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception &e)
-    {
-        mBoard.removeDeviceInstance(mDevice); // throws an exception on error
-        throw;
-    }
+void CmdDeviceInstanceRemove::performRedo() throw (Exception)
+{
+    mBoard.removeDeviceInstance(mDevice); // can throw
 }
 
 /*****************************************************************************************

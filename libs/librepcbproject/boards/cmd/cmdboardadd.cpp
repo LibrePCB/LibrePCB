@@ -35,9 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const QString& name,
-                         UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add board"), parent),
+CmdBoardAdd::CmdBoardAdd(Project& project, const QString& name) noexcept :
+    UndoCommand(tr("Add board")),
     mProject(project), mName(name), mBoard(nullptr), mPageIndex(-1)
 {
 }
@@ -50,37 +49,20 @@ CmdBoardAdd::~CmdBoardAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdBoardAdd::redo() throw (Exception)
+void CmdBoardAdd::performExecute() throw (Exception)
 {
-    if (!mBoard) // only the first time
-        mBoard = mProject.createBoard(mName); // throws an exception on error
-
-    mProject.addBoard(mBoard, mPageIndex); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mProject.removeBoard(mBoard);
-        throw;
-    }
+    mBoard = mProject.createBoard(mName); // can throw
+    performRedo(); // can throw
 }
 
-void CmdBoardAdd::undo() throw (Exception)
+void CmdBoardAdd::performUndo() throw (Exception)
 {
-    mProject.removeBoard(mBoard); // throws an exception on error
+    mProject.removeBoard(mBoard); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mProject.addBoard(mBoard, mPageIndex);
-        throw;
-    }
+void CmdBoardAdd::performRedo() throw (Exception)
+{
+    mProject.addBoard(mBoard, mPageIndex); // can throw
 }
 
 /*****************************************************************************************

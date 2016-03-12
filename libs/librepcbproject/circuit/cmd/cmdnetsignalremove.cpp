@@ -35,16 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal,
-                                     UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove netsignal"), parent),
+CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal) noexcept :
+    UndoCommand(tr("Remove netsignal")),
     mCircuit(circuit), mNetSignal(netsignal)
 {
 }
 
 CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mNetSignal;
 }
 
@@ -52,34 +51,19 @@ CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalRemove::redo() throw (Exception)
+void CmdNetSignalRemove::performExecute() throw (Exception)
 {
-    mCircuit.removeNetSignal(mNetSignal); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.addNetSignal(mNetSignal);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdNetSignalRemove::undo() throw (Exception)
+void CmdNetSignalRemove::performUndo() throw (Exception)
 {
-    mCircuit.addNetSignal(mNetSignal); // throws an exception on error
+    mCircuit.addNetSignal(mNetSignal); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.removeNetSignal(mNetSignal);
-        throw;
-    }
+void CmdNetSignalRemove::performRedo() throw (Exception)
+{
+    mCircuit.removeNetSignal(mNetSignal); // can throw
 }
 
 /*****************************************************************************************

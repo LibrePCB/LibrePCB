@@ -34,8 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit symbol instance"), parent), mSymbol(symbol),
+CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept :
+    UndoCommand(tr("Edit symbol instance")), mSymbol(symbol),
     mOldPos(symbol.getPosition()), mNewPos(mOldPos),
     mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation)
 {
@@ -43,8 +43,7 @@ CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol, UndoCommand* par
 
 CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
 {
-    if ((mRedoCount == 0) && (mUndoCount == 0))
-    {
+    if (!wasEverExecuted()) {
         mSymbol.setPosition(mOldPos);
         mSymbol.setRotation(mOldRotation);
     }
@@ -56,28 +55,28 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
 
 void CmdSymbolInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = pos;
     if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = mOldPos + deltaPos;
     if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewRotation = angle;
     if (immediate) mSymbol.setRotation(mNewRotation);
 }
 
 void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos.rotate(angle, center);
     mNewRotation += angle;
     if (immediate)
@@ -91,36 +90,21 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceEdit::redo() throw (Exception)
+void CmdSymbolInstanceEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mSymbol.setPosition(mNewPos);
-        mSymbol.setRotation(mNewRotation);
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mSymbol.setPosition(mOldPos);
-        mSymbol.setRotation(mOldRotation);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSymbolInstanceEdit::undo() throw (Exception)
+void CmdSymbolInstanceEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mSymbol.setPosition(mOldPos);
-        mSymbol.setRotation(mOldRotation);
-        UndoCommand::undo();
-    }
-    catch (Exception &e)
-    {
-        mSymbol.setPosition(mNewPos);
-        mSymbol.setRotation(mNewRotation);
-        throw;
-    }
+    mSymbol.setPosition(mOldPos);
+    mSymbol.setRotation(mOldRotation);
+}
+
+void CmdSymbolInstanceEdit::performRedo() throw (Exception)
+{
+    mSymbol.setPosition(mNewPos);
+    mSymbol.setRotation(mNewRotation);
 }
 
 /*****************************************************************************************

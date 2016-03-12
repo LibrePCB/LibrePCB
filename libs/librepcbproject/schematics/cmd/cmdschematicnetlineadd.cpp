@@ -36,15 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetLineAdd::CmdSchematicNetLineAdd(Schematic& schematic, SI_NetPoint& startPoint,
-                                               SI_NetPoint& endPoint, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netline"), parent),
+                                               SI_NetPoint& endPoint) noexcept :
+    UndoCommand(tr("Add netline")),
     mSchematic(schematic), mStartPoint(startPoint), mEndPoint(endPoint), mNetLine(0)
 {
 }
 
 CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
 {
-    if ((mNetLine) && (!isExecuted()))
+    if ((mNetLine) && (!isCurrentlyExecuted()))
         delete mNetLine;
 }
 
@@ -52,37 +52,21 @@ CmdSchematicNetLineAdd::~CmdSchematicNetLineAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLineAdd::redo() throw (Exception)
+void CmdSchematicNetLineAdd::performExecute() throw (Exception)
 {
-    if (!mNetLine) // only the first time
-        mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(158750)); // throws an exception on error
+    mNetLine = mSchematic.createNetLine(mStartPoint, mEndPoint, Length(158750)); // can throw
 
-    mSchematic.addNetLine(*mNetLine); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mSchematic.removeNetLine(*mNetLine);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetLineAdd::undo() throw (Exception)
+void CmdSchematicNetLineAdd::performUndo() throw (Exception)
 {
-    mSchematic.removeNetLine(*mNetLine); // throws an exception on error
+    mSchematic.removeNetLine(*mNetLine); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addNetLine(*mNetLine);
-        throw;
-    }
+void CmdSchematicNetLineAdd::performRedo() throw (Exception)
+{
+    mSchematic.addNetLine(*mNetLine); // can throw
 }
 
 /*****************************************************************************************

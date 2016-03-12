@@ -37,17 +37,16 @@ namespace project {
 
 CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
                                            const Uuid& deviceUuid, const Uuid& footprintUuid,
-                                           const Point& position, const Angle& rotation,
-                                           UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add device to board"), parent),
+                                           const Point& position, const Angle& rotation) noexcept :
+    UndoCommand(tr("Add device to board")),
     mBoard(board), mComponentInstance(&comp), mDeviceUuid(deviceUuid),
     mFootprintUuid(footprintUuid), mPosition(position), mRotation(rotation),
     mDeviceInstance(nullptr)
 {
 }
 
-CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add device to board"), parent),
+CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device) noexcept :
+    UndoCommand(tr("Add device to board")),
     mBoard(device.getBoard()), mComponentInstance(nullptr), mDeviceUuid(),
     mFootprintUuid(), mPosition(), mRotation(),
     mDeviceInstance(&device)
@@ -56,7 +55,7 @@ CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* 
 
 CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 {
-    if (!isExecuted())
+    if (!isCurrentlyExecuted())
         delete mDeviceInstance;
 }
 
@@ -64,39 +63,22 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceAdd::redo() throw (Exception)
+void CmdDeviceInstanceAdd::performExecute() throw (Exception)
 {
-    if (!mDeviceInstance) { // only the first time
-        mDeviceInstance = new DeviceInstance(mBoard, *mComponentInstance, mDeviceUuid,
-                                             mFootprintUuid, mPosition, mRotation); // throws an exception on error
-    }
+    mDeviceInstance = new DeviceInstance(mBoard, *mComponentInstance, mDeviceUuid,
+                                         mFootprintUuid, mPosition, mRotation); // can throw
 
-    mBoard.addDeviceInstance(*mDeviceInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mBoard.removeDeviceInstance(*mDeviceInstance);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdDeviceInstanceAdd::undo() throw (Exception)
+void CmdDeviceInstanceAdd::performUndo() throw (Exception)
 {
-    mBoard.removeDeviceInstance(*mDeviceInstance); // throws an exception on error
+    mBoard.removeDeviceInstance(*mDeviceInstance);
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mBoard.addDeviceInstance(*mDeviceInstance);
-        throw;
-    }
+void CmdDeviceInstanceAdd::performRedo() throw (Exception)
+{
+    mBoard.addDeviceInstance(*mDeviceInstance);
 }
 
 /*****************************************************************************************

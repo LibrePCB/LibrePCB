@@ -92,7 +92,7 @@ bool SES_AddNetLabel::exit(SEE_Base* event) noexcept
     {
         try
         {
-            mUndoStack.abortCommand();
+            mUndoStack.abortCmdGroup();
             mUndoCmdActive = false;
         }
         catch (Exception& e)
@@ -188,10 +188,10 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
         if (!signal)
             throw RuntimeError(__FILE__, __LINE__, QString(), tr("No net signal found."));
 
-        mUndoStack.beginCommand(tr("Add net label to schematic"));
+        mUndoStack.beginCmdGroup(tr("Add net label to schematic"));
         mUndoCmdActive = true;
         CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(schematic, *signal, Point());
-        mUndoStack.appendToCommand(cmdAdd);
+        mUndoStack.appendToCmdGroup(cmdAdd);
         mCurrentNetLabel = cmdAdd->getNetLabel();
         mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
         return true;
@@ -200,7 +200,7 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
     {
         if (mUndoCmdActive)
         {
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
@@ -234,8 +234,8 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
     try
     {
         mEditCmd->setPosition(pos, false);
-        mUndoStack.appendToCommand(mEditCmd);
-        mUndoStack.endCommand();
+        mUndoStack.appendToCmdGroup(mEditCmd);
+        mUndoStack.commitCmdGroup();
         mUndoCmdActive = false;
         return true;
     }
@@ -243,7 +243,7 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
     {
         if (mUndoCmdActive)
         {
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());

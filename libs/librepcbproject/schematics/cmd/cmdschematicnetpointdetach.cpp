@@ -34,8 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SI_NetPoint& point, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Detach netpoint"), parent),
+CmdSchematicNetPointDetach::CmdSchematicNetPointDetach(SI_NetPoint& point) noexcept :
+    UndoCommand(tr("Detach netpoint")),
     mNetPoint(point), mSymbolPin(point.getSymbolPin())
 {
     Q_ASSERT(mSymbolPin);
@@ -49,34 +49,19 @@ CmdSchematicNetPointDetach::~CmdSchematicNetPointDetach() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointDetach::redo() throw (Exception)
+void CmdSchematicNetPointDetach::performExecute() throw (Exception)
 {
-    mNetPoint.detachFromPin(); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mNetPoint.attachToPin(*mSymbolPin);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetPointDetach::undo() throw (Exception)
+void CmdSchematicNetPointDetach::performUndo() throw (Exception)
 {
-    mNetPoint.attachToPin(*mSymbolPin); // throws an exception on error
+    mNetPoint.attachToPin(*mSymbolPin); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mNetPoint.detachFromPin();
-        throw;
-    }
+void CmdSchematicNetPointDetach::performRedo() throw (Exception)
+{
+    mNetPoint.detachFromPin(); // can throw
 }
 
 /*****************************************************************************************

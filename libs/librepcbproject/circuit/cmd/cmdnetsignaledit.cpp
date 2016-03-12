@@ -35,9 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalEdit::CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal,
-                                         UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit netsignal"), parent), mCircuit(circuit), mNetSignal(netsignal),
+CmdNetSignalEdit::CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal) noexcept :
+    UndoCommand(tr("Edit netsignal")), mCircuit(circuit), mNetSignal(netsignal),
     mOldName(netsignal.getName()), mNewName(mOldName),
     mOldIsAutoName(netsignal.hasAutoName()), mNewIsAutoName(mOldIsAutoName)
 {
@@ -53,7 +52,7 @@ CmdNetSignalEdit::~CmdNetSignalEdit() noexcept
 
 void CmdNetSignalEdit::setName(const QString& name, bool isAutoName) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewName = name;
     mNewIsAutoName = isAutoName;
 }
@@ -62,32 +61,19 @@ void CmdNetSignalEdit::setName(const QString& name, bool isAutoName) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetSignalEdit::redo() throw (Exception)
+void CmdNetSignalEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName);
-        UndoCommand::redo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdNetSignalEdit::undo() throw (Exception)
+void CmdNetSignalEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName);
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName);
-        throw;
-    }
+    mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName); // can throw
+}
+
+void CmdNetSignalEdit::performRedo() throw (Exception)
+{
+    mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName); // can throw
 }
 
 /*****************************************************************************************

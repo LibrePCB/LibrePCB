@@ -45,8 +45,8 @@ namespace project {
 
 CmdAddSymbolToSchematic::CmdAddSymbolToSchematic(workspace::Workspace& workspace,
         Schematic& schematic, ComponentInstance& cmpInstance, const Uuid& symbolItem,
-        const Point& position, const Angle& angle, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add symbol"), parent),
+        const Point& position, const Angle& angle) noexcept :
+    UndoCommandGroup(tr("Add symbol")),
     mWorkspace(workspace), mSchematic(schematic), mComponentInstance(cmpInstance),
     mSymbolItemUuid(symbolItem), mPosition(position), mAngle(angle),
     mCmdAddToSchematic(nullptr)
@@ -71,46 +71,39 @@ SI_Symbol* CmdAddSymbolToSchematic::getSymbolInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddSymbolToSchematic::redo() throw (Exception)
+void CmdAddSymbolToSchematic::performExecute() throw (Exception)
 {
-    if (!mCmdAddToSchematic) // only the first time
-    {
-        // get the symbol UUID
-        const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);
-        if (!item) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
-                QString(tr("The component instance \"%1\" has no symbol variant item with "
-                "the uuid \"%2\"!")).arg(mComponentInstance.getUuid().toStr(), mSymbolItemUuid.toStr()));
-        }
-        Uuid symbolUuid = item->getSymbolUuid();
-
-        // if there is no such symbol in the project's library, copy it from the
-        // workspace library to the project's library
-        if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
-            FilePath symFp = mWorkspace.getLibrary().getLatestSymbol(symbolUuid);
-            if (!symFp.isValid()) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("The symbol with the UUID \"%1\" does not exist in the "
-                    "workspace library!")).arg(symbolUuid.toStr()));
-            }
-            library::Symbol* sym = new library::Symbol(symFp, true);
-            auto* cmdAddToLibrary = new CmdProjectLibraryAddElement<library::Symbol>(
-                                    mSchematic.getProject().getLibrary(), *sym);
-            appendChild(cmdAddToLibrary);
-        }
-
-        // create child command to add a new symbol instance to the schematic
-        mCmdAddToSchematic = new CmdSymbolInstanceAdd(mSchematic, mComponentInstance,
-                                                      mSymbolItemUuid, mPosition, mAngle);
-        appendChild(mCmdAddToSchematic);
+    // get the symbol UUID
+    const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);
+    if (!item) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("The component instance \"%1\" has no symbol variant item with "
+            "the uuid \"%2\"!")).arg(mComponentInstance.getUuid().toStr(), mSymbolItemUuid.toStr()));
     }
 
-    UndoCommand::redo(); // throws an exception on error
-}
+    // if there is no such symbol in the project's library, copy it from the
+    // workspace library to the project's library
+    Uuid symbolUuid = item->getSymbolUuid();
+    if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
+        FilePath symFp = mWorkspace.getLibrary().getLatestSymbol(symbolUuid);
+        if (!symFp.isValid()) {
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                QString(tr("The symbol with the UUID \"%1\" does not exist in the "
+                "workspace library!")).arg(symbolUuid.toStr()));
+        }
+        library::Symbol* sym = new library::Symbol(symFp, true);
+        CmdProjectLibraryAddElement<library::Symbol>* cmdAddToLibrary =
+            new CmdProjectLibraryAddElement<library::Symbol>(mSchematic.getProject().getLibrary(), *sym);
+        appendChild(cmdAddToLibrary); // can throw
+    }
 
-void CmdAddSymbolToSchematic::undo() throw (Exception)
-{
-    UndoCommand::undo(); // throws an exception on error
+    // create child command to add a new symbol instance to the schematic
+    mCmdAddToSchematic = new CmdSymbolInstanceAdd(mSchematic, mComponentInstance,
+                                                  mSymbolItemUuid, mPosition, mAngle);
+    appendChild(mCmdAddToSchematic); // can throw
+
+    // execute all child commands
+    UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

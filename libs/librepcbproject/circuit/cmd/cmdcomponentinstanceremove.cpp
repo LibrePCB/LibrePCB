@@ -36,16 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdComponentInstanceRemove::CmdComponentInstanceRemove(Circuit& circuit,
-                                                       ComponentInstance& cmp,
-                                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove component"), parent),
+                                                       ComponentInstance& cmp) noexcept :
+    UndoCommand(tr("Remove component")),
     mCircuit(circuit), mComponentInstance(cmp)
 {
 }
 
 CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mComponentInstance;
 }
 
@@ -53,34 +52,19 @@ CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceRemove::redo() throw (Exception)
+void CmdComponentInstanceRemove::performExecute() throw (Exception)
 {
-    mCircuit.removeComponentInstance(mComponentInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mCircuit.addComponentInstance(mComponentInstance);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdComponentInstanceRemove::undo() throw (Exception)
+void CmdComponentInstanceRemove::performUndo() throw (Exception)
 {
-    mCircuit.addComponentInstance(mComponentInstance); // throws an exception on error
+    mCircuit.addComponentInstance(mComponentInstance); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.removeComponentInstance(mComponentInstance);
-        throw;
-    }
+void CmdComponentInstanceRemove::performRedo() throw (Exception)
+{
+    mCircuit.removeComponentInstance(mComponentInstance); // can throw
 }
 
 /*****************************************************************************************

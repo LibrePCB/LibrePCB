@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -48,18 +47,28 @@ class CmdSchematicAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicAdd(Project& project, const QString& name,
-                                UndoCommand* parent = 0) throw (Exception);
+        CmdSchematicAdd(Project& project, const QString& name) noexcept;
         ~CmdSchematicAdd() noexcept;
 
         // Getters
         Schematic* getSchematic() const noexcept {return mSchematic;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         Project& mProject;
         QString mName;

@@ -214,11 +214,11 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                     {
                         // place the current symbol finally
                         mCurrentSymbolEditCommand->setPosition(pos, false);
-                        mUndoStack.appendToCommand(mCurrentSymbolEditCommand);
+                        mUndoStack.appendToCmdGroup(mCurrentSymbolEditCommand);
                         mCurrentSymbolEditCommand = nullptr;
-                        mUndoStack.endCommand();
+                        mUndoStack.commitCmdGroup();
                         mIsUndoCmdActive = false;
-                        mUndoStack.beginCommand(tr("Add Symbol to Schematic"));
+                        mUndoStack.beginCmdGroup(tr("Add Symbol to Schematic"));
                         mIsUndoCmdActive = true;
 
                         // check if there is a next symbol to add
@@ -232,7 +232,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                                 mWorkspace, *schematic,
                                 mCurrentSymbolToPlace->getComponentInstance(),
                                 currentSymbVarItem->getUuid(), pos);
-                            mUndoStack.appendToCommand(cmd);
+                            mUndoStack.appendToCmdGroup(cmd);
                             mCurrentSymbolToPlace = cmd->getSymbolInstance();
                             Q_ASSERT(mCurrentSymbolToPlace);
 
@@ -247,7 +247,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
                             // all symbols placed, start adding the next component
                             Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
                             Uuid symbVarUuid = mCurrentComponent->getSymbolVariant().getUuid();
-                            mUndoStack.endCommand();
+                            mUndoStack.commitCmdGroup();
                             mIsUndoCmdActive = false;
                             abortCommand(false); // reset attributes
                             startAddingComponent(componentUuid, symbVarUuid);
@@ -317,7 +317,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
     {
         // start a new command
         Q_ASSERT(!mIsUndoCmdActive);
-        mUndoStack.beginCommand(tr("Add Component to Schematic"));
+        mUndoStack.beginCmdGroup(tr("Add Component to Schematic"));
         mIsUndoCmdActive = true;
 
         if (cmp.isNull() || symbVar.isNull())
@@ -332,14 +332,14 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
             auto cmd = new CmdAddComponentToCircuit(mWorkspace, mProject,
                 mAddComponentDialog->getSelectedComponentUuid(),
                 mAddComponentDialog->getSelectedSymbVarUuid());
-            mUndoStack.appendToCommand(cmd);
+            mUndoStack.appendToCmdGroup(cmd);
             mCurrentComponent = cmd->getComponentInstance();
         }
         else
         {
             // add selected component to circuit
             auto* cmd = new CmdAddComponentToCircuit(mWorkspace, mProject, cmp, symbVar);
-            mUndoStack.appendToCommand(cmd);
+            mUndoStack.appendToCmdGroup(cmd);
             mCurrentComponent = cmd->getComponentInstance();
         }
 
@@ -355,7 +355,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
         Point pos = mEditorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
         CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(mWorkspace, *schematic,
             *mCurrentComponent, currentSymbVarItem->getUuid(), pos);
-        mUndoStack.appendToCommand(cmd2);
+        mUndoStack.appendToCmdGroup(cmd2);
         mCurrentSymbolToPlace = cmd2->getSymbolInstance();
         Q_ASSERT(mCurrentSymbolToPlace);
 
@@ -366,7 +366,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
     }
     catch (Exception& e)
     {
-        if (mIsUndoCmdActive) {try {mUndoStack.abortCommand(); mIsUndoCmdActive = false;} catch (...) {}}
+        if (mIsUndoCmdActive) {try {mUndoStack.abortCmdGroup(); mIsUndoCmdActive = false;} catch (...) {}}
         throw;
     }
 }
@@ -382,7 +382,7 @@ bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
         // abort the undo command
         if (mIsUndoCmdActive)
         {
-            mUndoStack.abortCommand();
+            mUndoStack.abortCmdGroup();
             mIsUndoCmdActive = false;
         }
 

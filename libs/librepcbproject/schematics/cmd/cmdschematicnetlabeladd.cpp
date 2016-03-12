@@ -36,15 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal& netsignal,
-                                                 const Point& position, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netlabel"), parent),
+                                                 const Point& position) noexcept :
+    UndoCommand(tr("Add netlabel")),
     mSchematic(schematic), mNetSignal(&netsignal), mPosition(position), mNetLabel(nullptr)
 {
 }
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 {
-    if ((mNetLabel) && (!isExecuted()))
+    if ((mNetLabel) && (!isCurrentlyExecuted()))
         delete mNetLabel;
 }
 
@@ -52,39 +52,21 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLabelAdd::redo() throw (Exception)
+void CmdSchematicNetLabelAdd::performExecute() throw (Exception)
 {
-    if (!mNetLabel) // only the first time
-    {
-        mNetLabel = mSchematic.createNetLabel(*mNetSignal, mPosition); // throws an exception on error
-    }
+    mNetLabel = mSchematic.createNetLabel(*mNetSignal, mPosition); // can throw
 
-    mSchematic.addNetLabel(*mNetLabel); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mSchematic.removeNetLabel(*mNetLabel);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetLabelAdd::undo() throw (Exception)
+void CmdSchematicNetLabelAdd::performUndo() throw (Exception)
 {
-    mSchematic.removeNetLabel(*mNetLabel); // throws an exception on error
+    mSchematic.removeNetLabel(*mNetLabel); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addNetLabel(*mNetLabel);
-        throw;
-    }
+void CmdSchematicNetLabelAdd::performRedo() throw (Exception)
+{
+    mSchematic.addNetLabel(*mNetLabel); // can throw
 }
 
 /*****************************************************************************************

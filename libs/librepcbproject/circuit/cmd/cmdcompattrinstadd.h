@@ -51,19 +51,30 @@ class CmdCompAttrInstAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
-                                    const AttributeType& type, const QString& value,
-                                    const AttributeUnit* unit, UndoCommand* parent = 0) throw (Exception);
+        CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
+                           const AttributeType& type, const QString& value,
+                           const AttributeUnit* unit) noexcept;
         ~CmdCompAttrInstAdd() noexcept;
 
         // Getters
         ComponentAttributeInstance* getAttrInstance() const noexcept {return mAttrInstance;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         ComponentInstance& mComponentInstance;
         QString mKey;

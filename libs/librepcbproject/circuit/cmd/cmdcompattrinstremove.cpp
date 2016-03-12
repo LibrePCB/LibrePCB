@@ -36,16 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdCompAttrInstRemove::CmdCompAttrInstRemove(ComponentInstance& cmp,
-                                                   ComponentAttributeInstance& attr,
-                                                   UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove component attribute"), parent),
+                                             ComponentAttributeInstance& attr) noexcept :
+    UndoCommand(tr("Remove component attribute")),
     mComponentInstance(cmp), mAttrInstance(attr)
 {
 }
 
 CmdCompAttrInstRemove::~CmdCompAttrInstRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mAttrInstance;
 }
 
@@ -53,34 +52,19 @@ CmdCompAttrInstRemove::~CmdCompAttrInstRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstRemove::redo() throw (Exception)
+void CmdCompAttrInstRemove::performExecute() throw (Exception)
 {
-    mComponentInstance.removeAttribute(mAttrInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mComponentInstance.addAttribute(mAttrInstance);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdCompAttrInstRemove::undo() throw (Exception)
+void CmdCompAttrInstRemove::performUndo() throw (Exception)
 {
-    mComponentInstance.addAttribute(mAttrInstance); // throws an exception on error
+    mComponentInstance.addAttribute(mAttrInstance); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mComponentInstance.removeAttribute(mAttrInstance);
-        throw;
-    }
+void CmdCompAttrInstRemove::performRedo() throw (Exception)
+{
+    mComponentInstance.removeAttribute(mAttrInstance); // can throw
 }
 
 /*****************************************************************************************

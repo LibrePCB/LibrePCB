@@ -39,9 +39,8 @@ CmdCompAttrInstEdit::CmdCompAttrInstEdit(ComponentInstance& cmp,
                                                ComponentAttributeInstance& attr,
                                                const AttributeType& newType,
                                                const QString& newValue,
-                                               const AttributeUnit* newUnit,
-                                               UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit component attribute"), parent),
+                                               const AttributeUnit* newUnit) noexcept :
+    UndoCommand(tr("Edit component attribute")),
     mComponentInstance(cmp), mAttrInst(attr),
     mOldType(&attr.getType()), mNewType(&newType),
     mOldValue(attr.getValue()), mNewValue(newValue),
@@ -57,34 +56,21 @@ CmdCompAttrInstEdit::~CmdCompAttrInstEdit() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstEdit::redo() throw (Exception)
+void CmdCompAttrInstEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
-        UndoCommand::redo();
-        emit mComponentInstance.attributesChanged();
-    }
-    catch (Exception &e)
-    {
-        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdCompAttrInstEdit::undo() throw (Exception)
+void CmdCompAttrInstEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
-        UndoCommand::undo();
-        emit mComponentInstance.attributesChanged();
-    }
-    catch (Exception& e)
-    {
-        mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
-        throw;
-    }
+    mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit); // can throw
+    emit mComponentInstance.attributesChanged();
+}
+
+void CmdCompAttrInstEdit::performRedo() throw (Exception)
+{
+    mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit); // can throw
+    emit mComponentInstance.attributesChanged();
 }
 
 /*****************************************************************************************

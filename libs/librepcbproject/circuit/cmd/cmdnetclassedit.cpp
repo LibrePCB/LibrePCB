@@ -35,8 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassEdit::CmdNetClassEdit(Circuit& circuit, NetClass& netclass, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit netclass"), parent), mCircuit(circuit), mNetClass(netclass),
+CmdNetClassEdit::CmdNetClassEdit(Circuit& circuit, NetClass& netclass) noexcept :
+    UndoCommand(tr("Edit netclass")), mCircuit(circuit), mNetClass(netclass),
     mOldName(netclass.getName()), mNewName(mOldName)
 {
 }
@@ -51,7 +51,7 @@ CmdNetClassEdit::~CmdNetClassEdit() noexcept
 
 void CmdNetClassEdit::setName(const QString& name) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewName = name;
 }
 
@@ -59,32 +59,19 @@ void CmdNetClassEdit::setName(const QString& name) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassEdit::redo() throw (Exception)
+void CmdNetClassEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mCircuit.setNetClassName(mNetClass, mNewName);
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mCircuit.setNetClassName(mNetClass, mOldName);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdNetClassEdit::undo() throw (Exception)
+void CmdNetClassEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mCircuit.setNetClassName(mNetClass, mOldName);
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.setNetClassName(mNetClass, mNewName);
-        throw;
-    }
+    mCircuit.setNetClassName(mNetClass, mOldName); // can throw
+}
+
+void CmdNetClassEdit::performRedo() throw (Exception)
+{
+    mCircuit.setNetClassName(mNetClass, mNewName); // can throw
 }
 
 /*****************************************************************************************

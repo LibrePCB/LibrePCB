@@ -46,8 +46,7 @@ class CmdProjectSettingsChange final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdProjectSettingsChange(ProjectSettings& settings,
-                                          UndoCommand* parent = 0) throw (Exception);
+        explicit CmdProjectSettingsChange(ProjectSettings& settings) noexcept;
         ~CmdProjectSettingsChange() noexcept;
 
         // Setters
@@ -55,13 +54,20 @@ class CmdProjectSettingsChange final : public UndoCommand
         void setLocaleOrder(const QStringList& locales) noexcept;
         void setNormOrder(const QStringList& norms) noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
 
         // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
         void applyNewSettings() throw (Exception);
         void applyOldSettings() throw (Exception);
 

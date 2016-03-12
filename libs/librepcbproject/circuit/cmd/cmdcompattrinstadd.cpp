@@ -37,8 +37,8 @@ namespace project {
 
 CmdCompAttrInstAdd::CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
                                        const AttributeType& type, const QString& value,
-                                       const AttributeUnit* unit, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add component attribute"), parent),
+                                       const AttributeUnit* unit) noexcept :
+    UndoCommand(tr("Add component attribute")),
     mComponentInstance(cmp), mKey(key), mType(type), mValue(value), mUnit(unit),
     mAttrInstance(nullptr)
 {
@@ -46,7 +46,7 @@ CmdCompAttrInstAdd::CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& ke
 
 CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
 {
-    if (!isExecuted())
+    if (!isCurrentlyExecuted())
         delete mAttrInstance;
 }
 
@@ -54,37 +54,20 @@ CmdCompAttrInstAdd::~CmdCompAttrInstAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompAttrInstAdd::redo() throw (Exception)
+void CmdCompAttrInstAdd::performExecute() throw (Exception)
 {
-    if (!mAttrInstance) // only the first time
-        mAttrInstance = new ComponentAttributeInstance(mKey, mType, mValue, mUnit); // throws an exception on error
-
-    mComponentInstance.addAttribute(*mAttrInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mComponentInstance.removeAttribute(*mAttrInstance);
-        throw;
-    }
+    mAttrInstance = new ComponentAttributeInstance(mKey, mType, mValue, mUnit); // can throw
+    performRedo(); // can throw
 }
 
-void CmdCompAttrInstAdd::undo() throw (Exception)
+void CmdCompAttrInstAdd::performUndo() throw (Exception)
 {
-    mComponentInstance.removeAttribute(*mAttrInstance); // throws an exception on error
+    mComponentInstance.removeAttribute(*mAttrInstance); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mComponentInstance.addAttribute(*mAttrInstance);
-        throw;
-    }
+void CmdCompAttrInstAdd::performRedo() throw (Exception)
+{
+    mComponentInstance.addAttribute(*mAttrInstance); // can throw
 }
 
 /*****************************************************************************************

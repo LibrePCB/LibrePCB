@@ -38,14 +38,14 @@ namespace librepcb {
 /**
  * @brief The UndoCommand class represents a command which you can undo/redo
  *
- * See description of #UndoStack for more details.
+ * See description of librepcb::UndoStack for more details about the whole concept.
  *
- * @see #UndoStack
+ * @see librepcb::UndoStack
  *
  * @author ubruhin
  * @date 2014-08-20
  *
- * @todo this class is not yet tested
+ * @todo Write unit tests
  */
 class UndoCommand
 {
@@ -54,94 +54,86 @@ class UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit UndoCommand(const QString &text, UndoCommand* parent = 0) throw (Exception);
+        UndoCommand() = delete;
+        UndoCommand(const UndoCommand& other) = delete;
+        explicit UndoCommand(const QString& text) noexcept;
         virtual ~UndoCommand() noexcept;
 
 
         // Getters
-        virtual int getId() const {return -1;}
         const QString& getText() const noexcept {return mText;}
-        int getChildCount() const noexcept {return mChilds.count();}
 
         /**
-         * @brief This method shows whether that command is executed (#redo() called one
-         *        time more than #undo())
-         *
-         * @warning This method works only if the derived class overrides #redo() and #undo()!
+         * @brief This method shows whether that command was ever executed
+         *        (#execute() called)
          */
-        bool isExecuted() const noexcept;
+        bool wasEverExecuted() const noexcept {return (mRedoCount > 0);}
+
+        /**
+         * @brief This method shows whether that command was ever reverted
+         *        (#undo() called at least one time)
+         */
+        bool wasEverReverted() const noexcept {return (mUndoCount > 0);}
+
+        /**
+         * @brief This method shows whether that command is currently executed
+         *        (#redo() called one time more than #undo())
+         */
+        bool isCurrentlyExecuted() const noexcept {return mRedoCount > mUndoCount;}
 
 
         // General Methods
 
         /**
-         * @brief Undo the command (and all child commands in reverse order)
-         *
-         * @note If you need the method #isExecuted() or want support for child commands,
-         *       you must call this method from the base class in all your derived classes!
-         *       It's recommended to make this call AFTER executing any other code as
-         *       this makes the exception handling more reliable.
+         * @brief Execute the command (must only be called once)
          */
-        virtual void undo() throw (Exception);
+        virtual void execute() throw (Exception) final;
 
         /**
-         * @brief Redo/execute the command (and all child commands in normal order)
-         *
-         * @note If you need the method #isExecuted() or want support for child commands,
-         *       you must call this method from the base class in all your derived classes!
-         *       It's recommended to make this call AFTER executing any other code as
-         *       this makes the exception handling more reliable.
+         * @brief Undo the command
          */
-        virtual void redo() throw (Exception);
+        virtual void undo() throw (Exception) final;
 
-        virtual bool mergeWith(const UndoCommand* other) noexcept;
+        /**
+         * @brief Redo the command
+         */
+        virtual void redo() throw (Exception) final;
 
-
-        // Internal Methods
-        void appendChild(UndoCommand* child) noexcept;
-        void removeChild(UndoCommand* child) noexcept;
+        // Operator Overloadings
+        UndoCommand& operator=(const UndoCommand& rhs) = delete;
 
 
     protected:
 
         /**
-         * @brief Counter of how often #redo() was called
+         * @brief Execute the command the first time
          *
-         * You can read this attribute from a derived class, but you must not write to
-         * it. To make this attribute work properly, you must call #redo() of this class
-         * from your derived class!
+         * @note This method must be implemented in all derived classes. If the first time
+         *       execution is exactly identical to an "redo" action, you can simple call
+         *       #performRedo() in the implementation of this method.
          */
-        int mRedoCount;
+        virtual void performExecute() throw (Exception) = 0;
 
         /**
-         * @brief Counter of how often #undo() was called
+         * @brief Undo the command
          *
-         * You can read this attribute from a derived class, but you must not write to
-         * it. To make this attribute work properly, you must call #undo() of this class
-         * from your derived class!
+         * @note This method must be implemented in all derived classes.
          */
-        int mUndoCount;
+        virtual void performUndo() throw (Exception) = 0;
+
+        /**
+         * @brief Redo the command
+         *
+         * @note This method must be implemented in all derived classes.
+         */
+        virtual void performRedo() throw (Exception) = 0;
 
 
     private:
 
-        // make some methods inaccessible...
-        UndoCommand() = delete;
-        UndoCommand(const UndoCommand& other) = delete;
-        UndoCommand& operator=(const UndoCommand& rhs) = delete;
-
-
-        // Attributes
-        UndoCommand* mParent;
         QString mText;
-
-        /**
-         * @brief All child commands
-         *
-         * The child which is executed first is at index zero, the last executed command
-         * is at the top of the list.
-         */
-        QList<UndoCommand*> mChilds;
+        int mRedoCount; ///< @brief Counter of how often #redo() was called
+        int mUndoCount; ///< @brief Counter of how often #undo() was called
 };
 
 /*****************************************************************************************

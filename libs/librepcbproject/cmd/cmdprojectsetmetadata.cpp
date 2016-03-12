@@ -34,9 +34,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Change Project Metadata"), parent),
-    mProject(project), mRedoOrUndoCalled(false),
+CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project) noexcept :
+    UndoCommand(tr("Change Project Metadata")),
+    mProject(project),
     mOldName(mProject.getName()),               mNewName(mProject.getName()),
     mOldDescription(mProject.getDescription()), mNewDescription(mProject.getDescription()),
     mOldAuthor(mProject.getAuthor()),           mNewAuthor(mProject.getAuthor()),
@@ -54,25 +54,25 @@ CmdProjectSetMetadata::~CmdProjectSetMetadata() noexcept
 
 void CmdProjectSetMetadata::setName(const QString& newName) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
+    Q_ASSERT(!wasEverExecuted());
     mNewName = newName;
 }
 
 void CmdProjectSetMetadata::setDescription(const QString& newDescription) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
+    Q_ASSERT(!wasEverExecuted());
     mNewDescription = newDescription;
 }
 
 void CmdProjectSetMetadata::setAuthor(const QString& newAuthor) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
+    Q_ASSERT(!wasEverExecuted());
     mNewAuthor = newAuthor;
 }
 
 void CmdProjectSetMetadata::setCreated(const QDateTime& newCreated) noexcept
 {
-    Q_ASSERT(mRedoOrUndoCalled == false);
+    Q_ASSERT(!wasEverExecuted());
     mNewCreated = newCreated;
 }
 
@@ -80,66 +80,25 @@ void CmdProjectSetMetadata::setCreated(const QDateTime& newCreated) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdProjectSetMetadata::redo() throw (Exception)
+void CmdProjectSetMetadata::performExecute() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
-
-    if (mNewName != mOldName)
-        mProject.setName(mNewName);
-    if (mNewDescription != mOldDescription)
-        mProject.setDescription(mNewDescription);
-    if (mNewAuthor != mOldAuthor)
-        mProject.setAuthor(mNewAuthor);
-    if (mNewCreated != mOldCreated)
-        mProject.setCreated(mNewCreated);
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        if (mNewName != mOldName)
-            mProject.setName(mOldName);
-        if (mNewDescription != mOldDescription)
-            mProject.setDescription(mOldDescription);
-        if (mNewAuthor != mOldAuthor)
-            mProject.setAuthor(mOldAuthor);
-        if (mNewCreated != mOldCreated)
-            mProject.setCreated(mOldCreated);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdProjectSetMetadata::undo() throw (Exception)
+void CmdProjectSetMetadata::performUndo() throw (Exception)
 {
-    mRedoOrUndoCalled = true;
+    mProject.setName(mOldName);
+    mProject.setDescription(mOldDescription);
+    mProject.setAuthor(mOldAuthor);
+    mProject.setCreated(mOldCreated);
+}
 
-    if (mNewName != mOldName)
-        mProject.setName(mOldName);
-    if (mNewDescription != mOldDescription)
-        mProject.setDescription(mOldDescription);
-    if (mNewAuthor != mOldAuthor)
-        mProject.setAuthor(mOldAuthor);
-    if (mNewCreated != mOldCreated)
-        mProject.setCreated(mOldCreated);
-
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        if (mNewName != mOldName)
-            mProject.setName(mNewName);
-        if (mNewDescription != mOldDescription)
-            mProject.setDescription(mNewDescription);
-        if (mNewAuthor != mOldAuthor)
-            mProject.setAuthor(mNewAuthor);
-        if (mNewCreated != mOldCreated)
-            mProject.setCreated(mNewCreated);
-        throw;
-    }
+void CmdProjectSetMetadata::performRedo() throw (Exception)
+{
+    mProject.setName(mNewName);
+    mProject.setDescription(mNewDescription);
+    mProject.setAuthor(mNewAuthor);
+    mProject.setCreated(mNewCreated);
 }
 
 /*****************************************************************************************

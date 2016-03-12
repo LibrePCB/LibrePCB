@@ -32,6 +32,7 @@
 namespace librepcb {
 
 class UndoCommand;
+class UndoCommandGroup;
 
 /*****************************************************************************************
  *  Class UndoStack
@@ -59,7 +60,7 @@ class UndoCommand;
  *    is a good way, we need some tests first... If the tests are successful, we should
  *    complete this documentation (explain how this feature works).
  *
- * @see #UndoCommand
+ * @see #UndoCommand, #UndoCommandGroup
  *
  * @author ubruhin
  * @date 2014-08-20
@@ -74,11 +75,13 @@ class UndoStack final : public QObject
     public:
 
         // Constructors / Destructor
+        UndoStack(const UndoStack& other) = delete;
+        UndoStack& operator=(const UndoStack& rhs) = delete;
 
         /**
          * @brief The default constructor
          */
-        explicit UndoStack() noexcept;
+        UndoStack() noexcept;
 
         /**
          * @brief The destructor (will also call #clear())
@@ -123,10 +126,11 @@ class UndoStack final : public QObject
         bool isClean() const noexcept;
 
         /**
-         * @brief Check if a command is active at the moment (see #mCommandActive)
-         * @return see #mCommandActive
+         * @brief Check if a command group is active at the moment (see #mActiveCommandGroup)
+         *
+         * @return True if a command group is currently active
          */
-        bool isCommandActive() const noexcept;
+        bool isCommandGroupActive() const noexcept;
 
 
         // Setters
@@ -144,12 +148,10 @@ class UndoStack final : public QObject
          *
          * @param cmd       The command to execute (must NOT be executed already). The
          *                  stack will ALWAYS take the ownership over this command, even
-         *                  if this method throwes an exception because of an error! In
+         *                  if this method throws an exception because of an error. In
          *                  case of an exception, the command will be deleted directly in
          *                  this method, so you must not make other things with the
-         *                  UndoCommand object after passing it to this method!
-         * @param autoMerge If true, the stack tries to merge the new command with the
-         *                  last executed command.
+         *                  UndoCommand object after passing it to this method.
          *
          * @throw Exception If the command is not executed successfully, this method
          *                  throws an exception and tries to keep the state of the stack
@@ -158,53 +160,57 @@ class UndoStack final : public QObject
          * @note If you try to execute a command with that method while another command is
          *       active (see #isCommandActive()), this method will throw an exception.
          */
-        void execCmd(UndoCommand* cmd, bool autoMerge = true) throw (Exception);
+        void execCmd(UndoCommand* cmd) throw (Exception);
 
         /**
-         * @brief Begin building a new command that consists of multiple commands step by
-         *        step (over a "long" time)
+         * @brief Begin building a new command group that consists of multiple commands
+         *        step by step (over a "long" time)
          *
-         * @param text The text of the whole command (see UndoCommand#getText())
+         * @param text      The text of the whole command group (see UndoCommand#getText())
          *
          * @throw Exception This method throws an exception if there is already another
-         *                  command active (#isCommandActive()) or if an error occurs.
+         *                  command group active (#isCommandGroupActive()) or if an error
+         *                  occurs.
          */
-        void beginCommand(const QString& text) throw (Exception);
+        void beginCmdGroup(const QString& text) throw (Exception);
 
         /**
-         * @brief Append a new command to the currently active command
+         * @brief Append a new command to the currently active command group
          *
-         * This method must only be called between #beginCommand() and #endCommand() or
-         * #abortCommand().
+         * This method must only be called between #beginCmdGroup() and #commitCmdGroup()
+         * or #abortCmdGroup().
          *
-         * @param cmd   The command to execute (same conditions as for #execCmd()!)
+         * @param cmd       The command to execute (same conditions as for #execCmd()!)
          *
-         * @throw Exception This method throws an exception if there is no command active
-         *                  at the moment (#isCommandActive()) or if an error occurs.
+         * @throw Exception This method throws an exception if there is no command group
+         *                  active at the moment (#isCommandGroupActive()) or if an error
+         *                  occurs.
          */
-        void appendToCommand(UndoCommand* cmd) throw (Exception);
+        void appendToCmdGroup(UndoCommand* cmd) throw (Exception);
 
         /**
-         * @brief End the currently active command and keep the changes
+         * @brief End the currently active command group and keep the changes
          *
-         * @throw Exception This method throws an exception if there is no command active
-         *                  at the moment (#isCommandActive()) or if an error occurs.
+         * @throw Exception This method throws an exception if there is no command group
+         *                  active at the moment (#isCommandGroupActive()) or if an error
+         *                  occurs.
          */
-        void endCommand() throw (Exception);
+        void commitCmdGroup() throw (Exception);
 
         /**
-         * @brief End the currently active command and revert the changes
+         * @brief End the currently active command group and revert the changes
          *
-         * @throw Exception This method throws an exception if there is no command active
-         *                  at the moment (#isCommandActive()) or if an error occurs.
+         * @throw Exception This method throws an exception if there is no command group
+         *                  active at the moment (#isCommandGroupActive()) or if an error
+         *                  occurs.
          */
-        void abortCommand() throw (Exception);
+        void abortCmdGroup() throw (Exception);
 
         /**
          * @brief Undo the last command
          *
-         * @note If you call this method while another command is currently active
-         *       (#isCommandActive()), this method will do nothing.
+         * @note If you call this method while another command group is currently active
+         *       (#isCommandGroupActive()), this method will do nothing.
          *
          * @throw Exception If an error occurs, this class tries to revert all changes
          *                  to restore the state of BEFORE calling this method. But there
@@ -237,18 +243,11 @@ class UndoStack final : public QObject
         void canUndoChanged(bool canUndo);
         void canRedoChanged(bool canRedo);
         void cleanChanged(bool clean);
-        void commandEnded();
-        void commandAborted();
+        void commandGroupEnded();
+        void commandGroupAborted();
 
 
     private:
-
-        // make some methods inaccessible...
-        UndoStack(const UndoStack& other);
-        UndoStack& operator=(const UndoStack& rhs);
-
-
-        // Attributes
 
         /**
          * @brief This list holds all commands of the undo stack
@@ -273,12 +272,12 @@ class UndoStack final : public QObject
         int mCleanIndex;
 
         /**
-         * @brief This attribute is to determine if a command is active at the moment
+         * @brief If a command group is active at the moment, this is the pointer to it
          *
-         * The value of this variable is true between calls to #beginCommand() and
-         * #endCommand() or #abortCommand(). Otherwise, the value is always false.
+         * This pointer is only valid between calls to #beginCmdGroup() and #commitCmdGroup()
+         * or #abortCmdGroup(). Otherwise, the variable contains the nullptr.
          */
-        bool mCommandActive;
+        UndoCommandGroup* mActiveCommandGroup;
 };
 
 /*****************************************************************************************

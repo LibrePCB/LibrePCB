@@ -35,16 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol& symbol,
-                                                 UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove symbol"), parent),
+CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol& symbol) noexcept :
+    UndoCommand(tr("Remove symbol")),
     mSchematic(schematic), mSymbol(symbol)
 {
 }
 
 CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mSymbol;
 }
 
@@ -52,34 +51,19 @@ CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceRemove::redo() throw (Exception)
+void CmdSymbolInstanceRemove::performExecute() throw (Exception)
 {
-    mSchematic.removeSymbol(mSymbol); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addSymbol(mSymbol);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSymbolInstanceRemove::undo() throw (Exception)
+void CmdSymbolInstanceRemove::performUndo() throw (Exception)
 {
-    mSchematic.addSymbol(mSymbol); // throws an exception on error
+    mSchematic.addSymbol(mSymbol); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.removeSymbol(mSymbol);
-        throw;
-    }
+void CmdSymbolInstanceRemove::performRedo() throw (Exception)
+{
+    mSchematic.removeSymbol(mSymbol); // can throw
 }
 
 /*****************************************************************************************

@@ -36,16 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointRemove::CmdSchematicNetPointRemove(Schematic& schematic,
-                                                       SI_NetPoint& netpoint,
-                                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove netpoint"), parent),
+                                                       SI_NetPoint& netpoint) noexcept :
+    UndoCommand(tr("Remove netpoint")),
     mSchematic(schematic), mNetPoint(netpoint)
 {
 }
 
 CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mNetPoint;
 }
 
@@ -53,34 +52,19 @@ CmdSchematicNetPointRemove::~CmdSchematicNetPointRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointRemove::redo() throw (Exception)
+void CmdSchematicNetPointRemove::performExecute() throw (Exception)
 {
-    mSchematic.removeNetPoint(mNetPoint); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addNetPoint(mNetPoint);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetPointRemove::undo() throw (Exception)
+void CmdSchematicNetPointRemove::performUndo() throw (Exception)
 {
-    mSchematic.addNetPoint(mNetPoint); // throws an exception on error
+    mSchematic.addNetPoint(mNetPoint); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.removeNetPoint(mNetPoint);
-        throw;
-    }
+void CmdSchematicNetPointRemove::performRedo() throw (Exception)
+{
+    mSchematic.removeNetPoint(mNetPoint); // can throw
 }
 
 /*****************************************************************************************

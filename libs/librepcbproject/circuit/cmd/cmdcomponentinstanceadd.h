@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
@@ -54,18 +53,28 @@ class CmdComponentInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
-                                         const Uuid& symbVar, UndoCommand* parent = 0) throw (Exception);
+        CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp, const Uuid& symbVar) noexcept;
         ~CmdComponentInstanceAdd() noexcept;
 
         // Getters
         ComponentInstance* getComponentInstance() const noexcept {return mComponentInstance;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         Circuit& mCircuit;

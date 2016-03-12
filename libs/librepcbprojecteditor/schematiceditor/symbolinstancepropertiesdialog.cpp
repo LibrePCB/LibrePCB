@@ -397,18 +397,18 @@ void SymbolInstancePropertiesDialog::execCmd(UndoCommand* cmd)
 {
     if (!mCommandActive)
     {
-        mUndoStack.beginCommand(QString(tr("Change properties of %1")).arg(mSymbol.getName()));
+        mUndoStack.beginCmdGroup(QString(tr("Change properties of %1")).arg(mSymbol.getName()));
         mCommandActive = true;
     }
 
-    mUndoStack.appendToCommand(cmd);
+    mUndoStack.appendToCmdGroup(cmd);
 }
 
 void SymbolInstancePropertiesDialog::endCmd()
 {
     if (mCommandActive)
     {
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         mCommandActive = false;
     }
 }
@@ -417,7 +417,7 @@ void SymbolInstancePropertiesDialog::abortCmd()
 {
     if (mCommandActive)
     {
-        mUndoStack.abortCommand();
+        mUndoStack.abortCmdGroup();
         mCommandActive = false;
     }
 }

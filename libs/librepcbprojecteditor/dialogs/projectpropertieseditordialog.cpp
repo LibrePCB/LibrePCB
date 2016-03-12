@@ -88,7 +88,7 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 {
     try
     {
-        mUndoStack.beginCommand(tr("Change project properties"));
+        mUndoStack.beginCmdGroup(tr("Change project properties"));
         mCommandActive = true;
 
         // Metadata
@@ -97,16 +97,16 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
         cmd->setDescription(mUi->edtDescription->toPlainText());
         cmd->setAuthor(mUi->edtAuthor->text());
         cmd->setCreated(mUi->edtCreated->dateTime());
-        mUndoStack.appendToCommand(cmd);
+        mUndoStack.appendToCmdGroup(cmd);
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         mCommandActive = false;
         return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-        try {if (mCommandActive) mUndoStack.abortCommand();} catch (...) {}
+        try {if (mCommandActive) mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 }

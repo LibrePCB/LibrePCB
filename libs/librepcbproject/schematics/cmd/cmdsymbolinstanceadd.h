@@ -27,7 +27,6 @@
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -51,20 +50,31 @@ class CmdSymbolInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& cmpInstance,
-                                      const Uuid& symbolItem, const Point& position = Point(),
-                                      const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent = 0) throw (Exception);
+        CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& cmpInstance,
+                             const Uuid& symbolItem, const Point& position = Point(),
+                             const Angle& angle = Angle()) noexcept;
+        explicit CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept;
         ~CmdSymbolInstanceAdd() noexcept;
 
         // Getters
         SI_Symbol* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         Schematic& mSchematic;

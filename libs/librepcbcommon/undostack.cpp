@@ -23,8 +23,8 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "undostack.h"
-#include "exceptions.h"
 #include "undocommand.h"
+#include "undocommandgroup.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,7 +36,7 @@ namespace librepcb {
  ****************************************************************************************/
 
 UndoStack::UndoStack() noexcept :
-    QObject(0), mCurrentIndex(0), mCleanIndex(0), mCommandActive(false)
+    QObject(nullptr), mCurrentIndex(0), mCleanIndex(0), mActiveCommandGroup(nullptr)
 {
 }
 
@@ -80,9 +80,9 @@ bool UndoStack::isClean() const noexcept
     return (mCurrentIndex == mCleanIndex);
 }
 
-bool UndoStack::isCommandActive() const noexcept
+bool UndoStack::isCommandGroupActive() const noexcept
 {
-    return mCommandActive;
+    return (mActiveCommandGroup != nullptr);
 }
 
 /*****************************************************************************************
@@ -91,8 +91,7 @@ bool UndoStack::isCommandActive() const noexcept
 
 void UndoStack::setClean() noexcept
 {
-    if (isClean())
-        return;
+    if (isClean()) return;
 
     mCleanIndex = mCurrentIndex;
 
@@ -103,133 +102,110 @@ void UndoStack::setClean() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void UndoStack::execCmd(UndoCommand* cmd, bool autoMerge) throw (Exception)
+void UndoStack::execCmd(UndoCommand* cmd) throw (Exception)
 {
-    Q_CHECK_PTR(cmd);
+    // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
+    QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
 
-    if (mCommandActive)
-    {
-        delete cmd;
+    if (isCommandGroupActive()) {
         throw RuntimeError(__FILE__, __LINE__, QString(), tr("Another command is active "
                            "at the moment. Please finish that command to continue."));
     }
 
-    if (mCleanIndex > mCurrentIndex)
-        mCleanIndex = -1; // the clean state will no longer exist -> make the index invalid
+    if (mCleanIndex > mCurrentIndex) {
+        // the clean state will no longer exist -> make the index invalid
+        mCleanIndex = -1;
+    }
 
     // first, delete all commands above the current index (make redo impossible)
     // --> in reverse order (from top to bottom)!
-    while (mCurrentIndex < mCommands.count())
+    while (mCurrentIndex < mCommands.count()) {
         delete mCommands.takeLast();
-
+    }
     Q_ASSERT(mCurrentIndex == mCommands.count());
 
-    try
-    {
-        cmd->redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        // delete the command because this UndoStack object will NOT take the ownership
-        // over the failed command! and then rethrow the exception...
-        delete cmd;
-        throw;
-    }
+    cmd->execute(); // can throw
 
-    // command successfully executed, try to merge it with the last executed command
-    bool merged = false;
-    if ((autoMerge) && (mCurrentIndex > 0))
-        merged = mCommands[mCurrentIndex-1]->mergeWith(cmd); // try merging the commands
+    // command was not merged --> add it to the command stack and emit signals
+    mCommands.append(cmdScopeGuard.take()); // move ownership of "cmd" to "mCommands"
+    mCurrentIndex++;
 
-    if (!merged)
-    {
-        // command was not merged --> add it to the command stack and emit signals
-        mCommands.append(cmd);
-        mCurrentIndex++;
-
-        // emit signals
-        emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
-        emit redoTextChanged(tr("Redo"));
-        emit canUndoChanged(true);
-        emit canRedoChanged(false);
-        emit cleanChanged(false);
-    }
+    // emit signals
+    emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
+    emit redoTextChanged(tr("Redo"));
+    emit canUndoChanged(true);
+    emit canRedoChanged(false);
+    emit cleanChanged(false);
 }
 
-void UndoStack::beginCommand(const QString& text) throw (Exception)
+void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
 {
-    if (mCommandActive)
-    {
+    if (isCommandGroupActive()) {
         throw RuntimeError(__FILE__, __LINE__, QString(), tr("Another command is active "
                            "at the moment. Please finish that command to continue."));
     }
 
-    UndoCommand* cmd = new UndoCommand(text);
-    execCmd(cmd, false); // throws an exception on error; emits all signals; does NOT merge
-    mCommandActive = true;
+    UndoCommandGroup* cmd = new UndoCommandGroup(text);
+    execCmd(cmd); // throws an exception on error; emits all signals
+    Q_ASSERT(mCommands.last() == cmd);
+    mActiveCommandGroup = cmd;
 
     // emit signals
     emit canUndoChanged(false);
 }
 
-void UndoStack::appendToCommand(UndoCommand* cmd) throw (Exception)
+void UndoStack::appendToCmdGroup(UndoCommand* cmd) throw (Exception)
 {
-    Q_ASSERT(cmd != nullptr);
+    // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
+    QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+
+    if (!isCommandGroupActive()) {
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+    }
     Q_ASSERT(mCurrentIndex == mCommands.count());
+    Q_ASSERT(mActiveCommandGroup);
 
-    if (!mCommandActive)
-    {
-        delete cmd;
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
-    }
-
-    try
-    {
-        cmd->redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        // delete the command because this UndoStack object will NOT take the ownership
-        // over the failed command! and then rethrow the exception...
-        delete cmd;
-        throw;
-    }
-
-    mCommands.last()->appendChild(cmd); // append new command as a child of active command
+    // append new command as a child of active command group
+    // note: this will also execute the new command!
+    mActiveCommandGroup->appendChild(cmdScopeGuard.take()); // can throw
 }
 
-void UndoStack::endCommand() throw (Exception)
+void UndoStack::commitCmdGroup() throw (Exception)
 {
+    if (!isCommandGroupActive()) {
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+    }
     Q_ASSERT(mCurrentIndex == mCommands.count());
+    Q_ASSERT(mActiveCommandGroup);
 
-    if (!mCommandActive)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
-
-    if (mCommands.last()->getChildCount() == 0)
-    {
+    if (mActiveCommandGroup->getChildCount() == 0) {
         // the last command is empty --> remove it from the stack!
-        abortCommand();
+        abortCmdGroup();
         return;
     }
 
-    mCommandActive = false;
+    // To finish the active command group, we only need to reset the pointer to the
+    // currently active command group
+    mActiveCommandGroup = nullptr;
 
     // emit signals
     emit canUndoChanged(canUndo());
-    emit commandEnded();
+    emit commandGroupEnded();
 }
 
-void UndoStack::abortCommand() throw (Exception)
+void UndoStack::abortCmdGroup() throw (Exception)
 {
+    if (!isCommandGroupActive()) {
+        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+    }
     Q_ASSERT(mCurrentIndex == mCommands.count());
+    Q_ASSERT(mActiveCommandGroup);
+    Q_ASSERT(mCommands.last() == mActiveCommandGroup);
 
-    if (!mCommandActive)
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command active!"));
-
-    mCommands.last()->undo(); // throws an exception on error
+    mActiveCommandGroup->undo(); // can throw
+    mActiveCommandGroup = nullptr;
     mCurrentIndex--;
-    mCommandActive = false;
-    delete mCommands.takeLast(); // delete and remove the aborted command from the stack
+    delete mCommands.takeLast(); // delete and remove the aborted command group from the stack
 
     // emit signals
     emit undoTextChanged(getUndoText());
@@ -237,15 +213,16 @@ void UndoStack::abortCommand() throw (Exception)
     emit canUndoChanged(canUndo());
     emit canRedoChanged(false);
     emit cleanChanged(isClean());
-    emit commandAborted(); // this is important!
+    emit commandGroupAborted(); // this is important!
 }
 
 void UndoStack::undo() throw (Exception)
 {
-    if ((!canUndo()) || (mCommandActive)) // if a command is active, undo() is not allowed
-        return;
+    if ((!canUndo()) || (isCommandGroupActive())) {
+        return; // if a command group is active, undo() is not allowed
+    }
 
-    mCommands[mCurrentIndex-1]->undo(); // throws an exception on error
+    mCommands[mCurrentIndex-1]->undo(); // can throw
     mCurrentIndex--;
 
     // emit signals
@@ -258,10 +235,11 @@ void UndoStack::undo() throw (Exception)
 
 void UndoStack::redo() throw (Exception)
 {
-    if (!canRedo())
+    if (!canRedo()) {
         return;
+    }
 
-    mCommands[mCurrentIndex]->redo(); // throws an exception on error
+    mCommands[mCurrentIndex]->redo(); // can throw
     mCurrentIndex++;
 
     // emit signals
@@ -274,19 +252,26 @@ void UndoStack::redo() throw (Exception)
 
 void UndoStack::clear() noexcept
 {
-    if (mCommands.isEmpty())
+    if (mCommands.isEmpty()) {
         return;
+    }
 
-    if (mCommandActive)
-        try {abortCommand();} catch (...) {}
+    if (isCommandGroupActive()) {
+        try {
+            abortCmdGroup();
+        } catch (...) {
+            qCritical() << "Could not abort the currently active command group!";
+        }
+    }
 
     // delete all commands in the stack from top to bottom (newest first, oldest last)!
-    while (!mCommands.isEmpty())
+    while (!mCommands.isEmpty()) {
         delete mCommands.takeLast();
+    }
 
     mCurrentIndex = 0;
     mCleanIndex = 0;
-    mCommandActive = false;
+    mActiveCommandGroup = nullptr;
 
     // emit signals
     emit undoTextChanged(tr("Undo"));

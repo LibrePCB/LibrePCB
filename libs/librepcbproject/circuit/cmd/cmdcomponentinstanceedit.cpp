@@ -35,9 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdComponentInstanceEdit::CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp,
-                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit Component"), parent), mCircuit(circuit), mComponentInstance(cmp),
+CmdComponentInstanceEdit::CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept :
+    UndoCommand(tr("Edit Component")), mCircuit(circuit), mComponentInstance(cmp),
     mOldName(cmp.getName()), mNewName(mOldName),
     mOldValue(cmp.getValue()), mNewValue(mOldValue)
 {
@@ -53,13 +52,13 @@ CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
 
 void CmdComponentInstanceEdit::setName(const QString& name) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewName = name;
 }
 
 void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewValue = value;
 }
 
@@ -67,36 +66,21 @@ void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceEdit::redo() throw (Exception)
+void CmdComponentInstanceEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mCircuit.setComponentInstanceName(mComponentInstance, mNewName);
-        mComponentInstance.setValue(mNewValue);
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mCircuit.setComponentInstanceName(mComponentInstance, mOldName);
-        mComponentInstance.setValue(mOldValue);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdComponentInstanceEdit::undo() throw (Exception)
+void CmdComponentInstanceEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mCircuit.setComponentInstanceName(mComponentInstance, mOldName);
-        mComponentInstance.setValue(mOldValue);
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.setComponentInstanceName(mComponentInstance, mNewName);
-        mComponentInstance.setValue(mNewValue);
-        throw;
-    }
+    mCircuit.setComponentInstanceName(mComponentInstance, mOldName); // can throw
+    mComponentInstance.setValue(mOldValue);
+}
+
+void CmdComponentInstanceEdit::performRedo() throw (Exception)
+{
+    mCircuit.setComponentInstanceName(mComponentInstance, mNewName); // can throw
+    mComponentInstance.setValue(mNewValue);
 }
 
 /*****************************************************************************************

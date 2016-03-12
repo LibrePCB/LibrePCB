@@ -36,16 +36,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
-                                                 const Point& position, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netpoint"), parent),
+                                                 const Point& position) noexcept :
+    UndoCommand(tr("Add netpoint")),
     mSchematic(schematic), mNetSignal(&netsignal), mAttachedToSymbol(false),
     mPosition(position), mSymbolPin(nullptr), mNetPoint(nullptr)
 {
 }
 
-CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin,
-                                                 UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add netpoint"), parent),
+CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin) noexcept :
+    UndoCommand(tr("Add netpoint")),
     mSchematic(schematic), mNetSignal(nullptr), mAttachedToSymbol(true),
     mPosition(), mSymbolPin(&pin), mNetPoint(nullptr)
 {
@@ -53,7 +52,7 @@ CmdSchematicNetPointAdd::CmdSchematicNetPointAdd(Schematic& schematic, SI_Symbol
 
 CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
 {
-    if ((mNetPoint) && (!isExecuted()))
+    if ((mNetPoint) && (!isCurrentlyExecuted()))
         delete mNetPoint;
 }
 
@@ -61,42 +60,25 @@ CmdSchematicNetPointAdd::~CmdSchematicNetPointAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointAdd::redo() throw (Exception)
+void CmdSchematicNetPointAdd::performExecute() throw (Exception)
 {
-    if (!mNetPoint) // only the first time
-    {
-        if (mAttachedToSymbol)
-            mNetPoint = mSchematic.createNetPoint(*mSymbolPin); // throws an exception on error
-        else
-            mNetPoint = mSchematic.createNetPoint(*mNetSignal, mPosition); // throws an exception on error
+    if (mAttachedToSymbol) {
+        mNetPoint = mSchematic.createNetPoint(*mSymbolPin); // can throw
+    } else {
+        mNetPoint = mSchematic.createNetPoint(*mNetSignal, mPosition); // can throw
     }
 
-    mSchematic.addNetPoint(*mNetPoint); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mSchematic.removeNetPoint(*mNetPoint);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetPointAdd::undo() throw (Exception)
+void CmdSchematicNetPointAdd::performUndo() throw (Exception)
 {
-    mSchematic.removeNetPoint(*mNetPoint); // throws an exception on error
+    mSchematic.removeNetPoint(*mNetPoint); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addNetPoint(*mNetPoint);
-        throw;
-    }
+void CmdSchematicNetPointAdd::performRedo() throw (Exception)
+{
+    mSchematic.addNetPoint(*mNetPoint); // can throw
 }
 
 /*****************************************************************************************

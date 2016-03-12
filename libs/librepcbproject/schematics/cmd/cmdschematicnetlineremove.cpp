@@ -35,17 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic,
-                                                     SI_NetLine& netline,
-                                                     UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove netline"), parent),
+CmdSchematicNetLineRemove::CmdSchematicNetLineRemove(Schematic& schematic, SI_NetLine& netline) noexcept :
+    UndoCommand(tr("Remove netline")),
     mSchematic(schematic), mNetLine(netline)
 {
 }
 
 CmdSchematicNetLineRemove::~CmdSchematicNetLineRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mNetLine;
 }
 
@@ -53,34 +51,19 @@ CmdSchematicNetLineRemove::~CmdSchematicNetLineRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetLineRemove::redo() throw (Exception)
+void CmdSchematicNetLineRemove::performExecute() throw (Exception)
 {
-    mSchematic.removeNetLine(mNetLine); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addNetLine(mNetLine);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetLineRemove::undo() throw (Exception)
+void CmdSchematicNetLineRemove::performUndo() throw (Exception)
 {
-    mSchematic.addNetLine(mNetLine); // throws an exception on error
+    mSchematic.addNetLine(mNetLine); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mSchematic.removeNetLine(mNetLine);
-        throw;
-    }
+void CmdSchematicNetLineRemove::performRedo() throw (Exception)
+{
+    mSchematic.removeNetLine(mNetLine); // can throw
 }
 
 /*****************************************************************************************

@@ -35,9 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic* schematic,
-                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove schematic"), parent),
+CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic* schematic) noexcept :
+    UndoCommand(tr("Remove schematic")),
     mProject(project), mSchematic(schematic), mPageIndex(-1)
 {
 }
@@ -50,35 +49,21 @@ CmdSchematicRemove::~CmdSchematicRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicRemove::redo() throw (Exception)
+void CmdSchematicRemove::performExecute() throw (Exception)
 {
     mPageIndex = mProject.getSchematicIndex(mSchematic);
-    mProject.removeSchematic(mSchematic); // throws an exception on error
 
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mProject.addSchematic(mSchematic, mPageIndex);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicRemove::undo() throw (Exception)
+void CmdSchematicRemove::performUndo() throw (Exception)
 {
-    mProject.addSchematic(mSchematic, mPageIndex); // throws an exception on error
+    mProject.addSchematic(mSchematic, mPageIndex); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mProject.removeSchematic(mSchematic);
-        throw;
-    }
+void CmdSchematicRemove::performRedo() throw (Exception)
+{
+    mProject.removeSchematic(mSchematic); // can throw
 }
 
 /*****************************************************************************************

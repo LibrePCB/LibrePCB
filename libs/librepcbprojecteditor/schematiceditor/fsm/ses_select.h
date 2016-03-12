@@ -31,7 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class UndoCommand;
+class UndoCommandGroup;
 
 namespace project {
 
@@ -96,8 +96,8 @@ class SES_Select final : public SES_Base
         // Attributes
         SubState mSubState;     ///< the current substate
         Point mLastMouseMoveDeltaPos;   ///< used in the moving substate (mapped to grid)
-        UndoCommand* mParentCommand;    ///< the parent command for all moving commands
-                                        ///< (nullptr if no command is active)
+        UndoCommandGroup* mCommandGroup; ///< the command group for all moving commands
+                                         ///< (nullptr if no command is active)
         QList<CmdSymbolInstanceEdit*> mSymbolEditCmds; ///< all symbol move commands
         QList<CmdSchematicNetPointEdit*> mNetPointEditCmds; ///< all netpoint edit commands
         QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;

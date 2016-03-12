@@ -34,8 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(DeviceInstance& dev, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit device instance"), parent), mDevice(dev),
+CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(DeviceInstance& dev) noexcept :
+    UndoCommand(tr("Edit device instance")), mDevice(dev),
     mOldPos(mDevice.getPosition()), mNewPos(mOldPos),
     mOldRotation(mDevice.getRotation()), mNewRotation(mOldRotation),
     mOldMirrored(mDevice.getIsMirrored()), mNewMirrored(mOldMirrored)
@@ -44,8 +44,7 @@ CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(DeviceInstance& dev, UndoCommand* p
 
 CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
 {
-    if ((mRedoCount == 0) && (mUndoCount == 0))
-    {
+    if (!wasEverExecuted()) {
         mDevice.setPosition(mOldPos);
         mDevice.setRotation(mOldRotation);
         mDevice.setIsMirrored(mOldMirrored);
@@ -58,28 +57,28 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
 
 void CmdDeviceInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = pos;
     if (immediate) mDevice.setPosition(mNewPos);
 }
 
 void CmdDeviceInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = mOldPos + deltaPos;
     if (immediate) mDevice.setPosition(mNewPos);
 }
 
 void CmdDeviceInstanceEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewRotation = angle;
     if (immediate) mDevice.setRotation(mNewRotation);
 }
 
 void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos.rotate(angle, center);
     mNewRotation += mNewMirrored ? -angle : angle; // mirror --> rotation direction is inverted!
     if (immediate)
@@ -91,14 +90,14 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool
 
 void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewMirrored = mirrored;
     if (immediate) mDevice.setIsMirrored(mNewMirrored);
 }
 
 void CmdDeviceInstanceEdit::mirror(const Point& center, bool vertical, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewMirrored = !mNewMirrored;
     if (vertical)
     {
@@ -121,40 +120,23 @@ void CmdDeviceInstanceEdit::mirror(const Point& center, bool vertical, bool imme
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdDeviceInstanceEdit::redo() throw (Exception)
+void CmdDeviceInstanceEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mDevice.setPosition(mNewPos);
-        mDevice.setRotation(mNewRotation);
-        mDevice.setIsMirrored(mNewMirrored);
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mDevice.setPosition(mOldPos);
-        mDevice.setRotation(mOldRotation);
-        mDevice.setIsMirrored(mOldMirrored);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdDeviceInstanceEdit::undo() throw (Exception)
+void CmdDeviceInstanceEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mDevice.setPosition(mOldPos);
-        mDevice.setRotation(mOldRotation);
-        mDevice.setIsMirrored(mOldMirrored);
-        UndoCommand::undo();
-    }
-    catch (Exception &e)
-    {
-        mDevice.setPosition(mNewPos);
-        mDevice.setRotation(mNewRotation);
-        mDevice.setIsMirrored(mNewMirrored);
-        throw;
-    }
+    mDevice.setPosition(mOldPos);
+    mDevice.setRotation(mOldRotation);
+    mDevice.setIsMirrored(mOldMirrored);
+}
+
+void CmdDeviceInstanceEdit::performRedo() throw (Exception)
+{
+    mDevice.setPosition(mNewPos);
+    mDevice.setRotation(mNewRotation);
+    mDevice.setIsMirrored(mNewMirrored);
 }
 
 /*****************************************************************************************

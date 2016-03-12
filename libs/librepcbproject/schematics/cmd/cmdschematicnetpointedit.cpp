@@ -34,9 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point,
-                                                   UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Edit netpoint"), parent), mNetPoint(point),
+CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept :
+    UndoCommand(tr("Edit netpoint")), mNetPoint(point),
     mOldNetSignal(point.getNetSignal()), mNewNetSignal(mOldNetSignal),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
@@ -44,8 +43,7 @@ CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point,
 
 CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
 {
-    if ((mRedoCount == 0) && (mUndoCount == 0))
-    {
+    if (!wasEverExecuted()) {
         mNetPoint.setPosition(mOldPos);
     }
 }
@@ -56,20 +54,20 @@ CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
 
 void CmdSchematicNetPointEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewNetSignal = &netsignal;
 }
 
 void CmdSchematicNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = pos;
     if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
 void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNewPos = mOldPos + deltaPos;
     if (immediate) mNetPoint.setPosition(mNewPos);
 }
@@ -78,36 +76,21 @@ void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool im
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSchematicNetPointEdit::redo() throw (Exception)
+void CmdSchematicNetPointEdit::performExecute() throw (Exception)
 {
-    try
-    {
-        mNetPoint.setNetSignal(*mNewNetSignal);
-        mNetPoint.setPosition(mNewPos);
-        UndoCommand::redo();
-    }
-    catch (Exception &e)
-    {
-        mNetPoint.setNetSignal(*mOldNetSignal);
-        mNetPoint.setPosition(mOldPos);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSchematicNetPointEdit::undo() throw (Exception)
+void CmdSchematicNetPointEdit::performUndo() throw (Exception)
 {
-    try
-    {
-        mNetPoint.setNetSignal(*mOldNetSignal);
-        mNetPoint.setPosition(mOldPos);
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mNetPoint.setNetSignal(*mNewNetSignal);
-        mNetPoint.setPosition(mNewPos);
-        throw;
-    }
+    mNetPoint.setNetSignal(*mOldNetSignal); // can throw
+    mNetPoint.setPosition(mOldPos);
+}
+
+void CmdSchematicNetPointEdit::performRedo() throw (Exception)
+{
+    mNetPoint.setNetSignal(*mNewNetSignal); // can throw
+    mNetPoint.setPosition(mNewPos);
 }
 
 /*****************************************************************************************

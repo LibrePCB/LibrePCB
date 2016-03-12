@@ -64,7 +64,8 @@ HEADERS += \
     geometry/polygon.h \
     geometry/ellipse.h \
     geometry/text.h \
-    geometry/hole.h
+    geometry/hole.h \
+    undocommandgroup.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -106,7 +107,8 @@ SOURCES += \
     geometry/polygon.cpp \
     geometry/ellipse.cpp \
     geometry/text.cpp \
-    geometry/hole.cpp
+    geometry/hole.cpp \
+    undocommandgroup.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui

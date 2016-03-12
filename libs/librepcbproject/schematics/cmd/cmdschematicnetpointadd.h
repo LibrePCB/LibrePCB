@@ -26,7 +26,6 @@
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
 #include <librepcbcommon/units/point.h>
-#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -51,20 +50,30 @@ class CmdSchematicNetPointAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
-                                         const Point& position, UndoCommand* parent = 0) throw (Exception);
-        explicit CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin,
-                                         UndoCommand* parent = 0) throw (Exception);
+        CmdSchematicNetPointAdd(Schematic& schematic, NetSignal& netsignal,
+                                const Point& position) noexcept;
+        CmdSchematicNetPointAdd(Schematic& schematic, SI_SymbolPin& pin) noexcept;
         ~CmdSchematicNetPointAdd() noexcept;
 
         // Getters
         SI_NetPoint* getNetPoint() const noexcept {return mNetPoint;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         Schematic& mSchematic;
         NetSignal* mNetSignal;

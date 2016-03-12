@@ -336,25 +336,25 @@ void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& devic
 
     try
     {
-        mProjectEditor.getUndoStack().beginCommand(tr("Add device to board"));
+        mProjectEditor.getUndoStack().beginCmdGroup(tr("Add device to board"));
         cmdActive = true;
 
         // add device to board
         auto* cmd = new CmdAddDeviceToBoard(mProjectEditor.getWorkspace(), *mBoard, cmp,
                                             deviceUuid, footprintUuid, mNextPosition);
-        mProjectEditor.getUndoStack().appendToCommand(cmd);
+        mProjectEditor.getUndoStack().appendToCmdGroup(cmd);
         if (mNextPosition.getX() > Length::fromMm(200))
             mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
         else
             mNextPosition += Point::fromMm(10, 0);
         mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
 
-        mProjectEditor.getUndoStack().endCommand();
+        mProjectEditor.getUndoStack().commitCmdGroup();
         cmdActive = false;
     }
     catch (Exception& e)
     {
-        try {if (cmdActive) mProjectEditor.getUndoStack().abortCommand();} catch (...) {}
+        try {if (cmdActive) mProjectEditor.getUndoStack().abortCmdGroup();} catch (...) {}
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
     }
 }

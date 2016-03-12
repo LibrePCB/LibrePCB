@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
@@ -49,7 +48,7 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLabelEdit(SI_NetLabel& netlabel, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdSchematicNetLabelEdit(SI_NetLabel& netlabel) noexcept;
         ~CmdSchematicNetLabelEdit() noexcept;
 
         // Setters
@@ -59,12 +58,22 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
-
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         SI_NetLabel& mNetLabel;

@@ -29,6 +29,7 @@
 #include <librepcbproject/boards/items/bi_footprintpad.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbcommon/undostack.h>
+#include <librepcbcommon/undocommandgroup.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
 #include <librepcbproject/boards/deviceinstance.h>
@@ -54,7 +55,7 @@ namespace project {
 BES_Select::BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     BES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle),
-    mParentCommand(nullptr)
+    mCommandGroup(nullptr)
 {
 }
 
@@ -63,7 +64,7 @@ BES_Select::~BES_Select()
     try
     {
         qDeleteAll(mDeviceEditCmds);    mDeviceEditCmds.clear();
-        delete mParentCommand;          mParentCommand = nullptr;
+        delete mCommandGroup;           mCommandGroup = nullptr;
     }
     catch (Exception& e)
     {
@@ -304,7 +305,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 bool cmdActive = false;
                 try
                 {
-                    mUndoStack.beginCommand(tr("Change Device"));
+                    mUndoStack.beginCmdGroup(tr("Change Device"));
                     cmdActive = true;
 
                     // get UUID of device and footprint
@@ -314,18 +315,18 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                     // replace device
                     Point pos = devInst.getPosition();
                     auto cmdRemove = new CmdDeviceInstanceRemove(*board, devInst);
-                    mUndoStack.appendToCommand(cmdRemove);
+                    mUndoStack.appendToCmdGroup(cmdRemove);
                     auto cmdAdd = new CmdAddDeviceToBoard(mWorkspace, *board, cmpInst,
                                                           deviceUuid, footprintUuid, pos);
-                    mUndoStack.appendToCommand(cmdAdd);
+                    mUndoStack.appendToCmdGroup(cmdAdd);
 
-                    mUndoStack.endCommand();
+                    mUndoStack.commitCmdGroup();
                     cmdActive = false;
                 }
                 catch (Exception& e)
                 {
                     QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-                    if (cmdActive) try {mUndoStack.abortCommand();} catch (...) {}
+                    if (cmdActive) try {mUndoStack.abortCmdGroup();} catch (...) {}
                 }
             }
             else if (action == aRemove)
@@ -392,7 +393,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
             {
                 case Qt::LeftButton: // stop moving items
                 {
-                    Q_CHECK_PTR(mParentCommand);
+                    Q_CHECK_PTR(mCommandGroup);
 
                     // move selected elements
                     foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds)
@@ -404,12 +405,12 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
                         if (delta.isOrigin())
                         {
                             // items were not moved, do not execute the commands
-                            delete mParentCommand; // this will also delete all objects in mSymbolInstanceMoveCommands
+                            delete mCommandGroup; // this will also delete all objects in mSymbolInstanceMoveCommands
                         }
                         else
                         {
                             // items were moved, add commands to the project's undo stack
-                            mUndoStack.execCmd(mParentCommand); // can throw an exception
+                            mUndoStack.execCmd(mCommandGroup); // can throw an exception
                         }
                     }
                     catch (Exception& e)
@@ -417,7 +418,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
                         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
                     }
                     mDeviceEditCmds.clear();
-                    mParentCommand = nullptr;
+                    mCommandGroup = nullptr;
                     mSubState = SubState_Idle;
                     break;
                 } // case Qt::LeftButton
@@ -434,7 +435,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
             Board* board = mEditor.getActiveBoard();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(board); if (!board) break;
-            Q_CHECK_PTR(mParentCommand);
+            Q_CHECK_PTR(mCommandGroup);
 
             // get delta position
             Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
@@ -474,9 +475,9 @@ bool BES_Select::startMovingSelectedItems(Board* board) noexcept
     if (items.isEmpty()) return false;
 
     // create move commands for all selected items
-    Q_ASSERT(!mParentCommand);
+    Q_ASSERT(!mCommandGroup);
     Q_ASSERT(mDeviceEditCmds.isEmpty());
-    mParentCommand = new UndoCommand(tr("Move Board Items"));
+    mCommandGroup = new UndoCommandGroup(tr("Move Board Items"));
     foreach (BI_Base* item, items)
     {
         switch (item->getType())
@@ -485,7 +486,9 @@ bool BES_Select::startMovingSelectedItems(Board* board) noexcept
             {
                 BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
                 DeviceInstance& device = footprint->getDeviceInstance();
-                mDeviceEditCmds.append(new CmdDeviceInstanceEdit(device, mParentCommand));
+                CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
+                mCommandGroup->appendChild(cmd);
+                mDeviceEditCmds.append(cmd);
                 break;
             }
             default:
@@ -523,7 +526,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     bool commandActive = false;
     try
     {
-        mUndoStack.beginCommand(tr("Rotate Board Elements"));
+        mUndoStack.beginCmdGroup(tr("Rotate Board Elements"));
         commandActive = true;
 
         // rotate all elements
@@ -535,9 +538,10 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                 {
                     BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
                     DeviceInstance& device = footprint->getDeviceInstance();
-                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device, mParentCommand);
+                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
                     cmd->rotate(angle, center, false);
-                    mUndoStack.appendToCommand(cmd);
+                    mCommandGroup->appendChild(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     break;
                 }
                 default:
@@ -545,14 +549,14 @@ bool BES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
             }
         }
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         commandActive = false;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 
@@ -584,7 +588,7 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
     bool commandActive = false;
     try
     {
-        mUndoStack.beginCommand(tr("Flip Board Elements"));
+        mUndoStack.beginCmdGroup(tr("Flip Board Elements"));
         commandActive = true;
 
         // flip all elements
@@ -596,9 +600,10 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
                 {
                     BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
                     DeviceInstance& device = footprint->getDeviceInstance();
-                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device, mParentCommand);
+                    CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
                     cmd->mirror(center, vertical, false);
-                    mUndoStack.appendToCommand(cmd);
+                    mCommandGroup->appendChild(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     break;
                 }
                 default:
@@ -606,14 +611,14 @@ bool BES_Select::flipSelectedItems(bool vertical, Point center, bool centerOfEle
             }
         }
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         commandActive = false;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 
@@ -635,7 +640,7 @@ bool BES_Select::removeSelectedItems() noexcept
     bool commandActive = false;
     try
     {
-        mUndoStack.beginCommand(tr("Remove Board Elements"));
+        mUndoStack.beginCmdGroup(tr("Remove Board Elements"));
         commandActive = true;
         board->clearSelection();
 
@@ -646,18 +651,18 @@ bool BES_Select::removeSelectedItems() noexcept
             {
                 BI_Footprint* fp = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(fp);
                 auto cmd = new CmdDeviceInstanceRemove(*board, fp->getDeviceInstance());
-                mUndoStack.appendToCommand(cmd);
+                mUndoStack.appendToCmdGroup(cmd);
             }
         }
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         commandActive = false;
         return true;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
-        if (commandActive) try {mUndoStack.abortCommand();} catch (...) {}
+        if (commandActive) try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 }

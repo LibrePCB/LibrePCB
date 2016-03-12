@@ -55,22 +55,31 @@ class CmdDeviceInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-                                      const Uuid& deviceUuid, const Uuid& footprintUuid,
-                                      const Point& position = Point(),
-                                      const Angle& rotation = Angle(),
-                                      UndoCommand* parent = 0) throw (Exception);
-        explicit CmdDeviceInstanceAdd(DeviceInstance& device, UndoCommand* parent = 0) throw (Exception);
+        CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp, const Uuid& deviceUuid,
+                             const Uuid& footprintUuid, const Point& position = Point(),
+                             const Angle& rotation = Angle()) noexcept;
+        explicit CmdDeviceInstanceAdd(DeviceInstance& device) noexcept;
         ~CmdDeviceInstanceAdd() noexcept;
 
         // Getters
         DeviceInstance* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         Board& mBoard;

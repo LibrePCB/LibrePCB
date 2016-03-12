@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "undocommand.h"
-#include "exceptions.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,105 +32,48 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-UndoCommand::UndoCommand(const QString &text, UndoCommand* parent) throw (Exception) :
-    mRedoCount(0), mUndoCount(0), mParent(parent), mText(text)
+UndoCommand::UndoCommand(const QString& text) noexcept :
+    mText(text), mRedoCount(0), mUndoCount(0)
 {
-    if (mParent)
-        mParent->appendChild(this);
 }
 
 UndoCommand::~UndoCommand() noexcept
 {
-    for (int i = mChilds.count()-1; i >= 0; i--) // reverse
-        delete mChilds[i]; // this will call removeChild() to remove the entry in the list
-
-    if (mParent)
-        mParent->removeChild(this);
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool UndoCommand::isExecuted() const noexcept
-{
-    Q_ASSERT(mRedoCount >= mUndoCount);
-    Q_ASSERT(mRedoCount <= mUndoCount+1);
-    return mRedoCount > mUndoCount;
+    Q_ASSERT(qAbs(mRedoCount - mUndoCount) <= 1);
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
+void UndoCommand::execute() throw (Exception)
+{
+    if (wasEverExecuted()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    performExecute(); // can throw
+    mRedoCount++;
+}
+
 void UndoCommand::undo() throw (Exception)
 {
-    Q_ASSERT(isExecuted());
-
-    int i;
-
-    try
-    {
-        for (i = mChilds.count()-1; i >= 0; i--) // from top to bottom
-            mChilds[i]->undo();
-
-        mUndoCount++;
+    if (!isCurrentlyExecuted()) {
+        throw LogicError(__FILE__, __LINE__);
     }
-    catch (Exception& e)
-    {
-        // could not undo the child with index "i"!
-        // try to revert the whole action --> redo the undoed commands
-        for (; i < mChilds.count(); i++) // from "i" to top
-            mChilds[i]->redo();
 
-        throw;
-    }
+    performUndo(); // can throw
+    mUndoCount++;
 }
 
 void UndoCommand::redo() throw (Exception)
 {
-    Q_ASSERT(!isExecuted());
-
-    int i;
-
-    try
-    {
-        for (i = 0; i < mChilds.count(); i++) // from bottom to top
-            mChilds[i]->redo();
-
-        mRedoCount++;
+    if ((!wasEverExecuted()) || (isCurrentlyExecuted())) {
+        throw LogicError(__FILE__, __LINE__);
     }
-    catch (Exception& e)
-    {
-        // could not undo the child with index "i"!
-        // try to revert the whole action --> undo the redoed commands
-        for (; i >= 0; i--) // from "i" to bottom
-            mChilds[i]->undo();
 
-        throw;
-    }
-}
-
-bool UndoCommand::mergeWith(const UndoCommand* other) noexcept
-{
-    Q_UNUSED(other);
-    return false;
-}
-
-/*****************************************************************************************
- *  Internal Methods
- ****************************************************************************************/
-
-void UndoCommand::appendChild(UndoCommand* child) noexcept
-{
-    Q_ASSERT(!mChilds.contains(child)); // check if the child is not in the list already
-    mChilds.append(child);
-}
-
-void UndoCommand::removeChild(UndoCommand* child) noexcept
-{
-    Q_ASSERT(child == mChilds.last()); // check if the order of append/remove is correct
-    mChilds.removeOne(child);
+    performRedo(); // can throw
+    mRedoCount++;
 }
 
 /*****************************************************************************************

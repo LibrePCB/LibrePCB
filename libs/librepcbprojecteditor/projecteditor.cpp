@@ -80,7 +80,7 @@ ProjectEditor::~ProjectEditor() noexcept
     // abort all active commands!
     mSchematicEditor->abortAllCommands();
     mBoardEditor->abortAllCommands();
-    Q_ASSERT(mUndoStack->isCommandActive() == false);
+    Q_ASSERT(!mUndoStack->isCommandGroupActive());
 
     // delete all command objects in the undo stack (must be done before other important
     // objects are deleted, as undo command objects can hold pointers/references to them!)
@@ -183,7 +183,7 @@ bool ProjectEditor::autosaveProject() noexcept
     if ((!mProject.isRestored()) && (mUndoStack->isClean()))
         return false; // do not save if there are no changes
 
-    if (mUndoStack->isCommandActive())
+    if (mUndoStack->isCommandGroupActive())
     {
         // the user is executing a command at the moment, so we should not save now,
         // try it a few seconds later instead...

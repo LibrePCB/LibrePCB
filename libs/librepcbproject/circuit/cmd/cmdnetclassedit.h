@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -48,18 +47,28 @@ class CmdNetClassEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdNetClassEdit(Circuit& circuit, NetClass& netclass,
-                                 UndoCommand* parent = 0) throw (Exception);
+        CmdNetClassEdit(Circuit& circuit, NetClass& netclass) noexcept;
         ~CmdNetClassEdit() noexcept;
 
         // Setters
         void setName(const QString& name) noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         Circuit& mCircuit;

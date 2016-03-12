@@ -41,9 +41,8 @@ namespace project {
  ****************************************************************************************/
 
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(workspace::Workspace& workspace,
-        Project& project, const Uuid& component, const Uuid& symbolVariant,
-        UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add component"), parent),
+        Project& project, const Uuid& component, const Uuid& symbolVariant) noexcept :
+    UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace), mProject(project),
     mComponentUuid(component), mSymbVarUuid(symbolVariant),
     mCmdAddToCircuit(nullptr)
@@ -68,37 +67,30 @@ ComponentInstance* CmdAddComponentToCircuit::getComponentInstance() const noexce
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddComponentToCircuit::redo() throw (Exception)
+void CmdAddComponentToCircuit::performExecute() throw (Exception)
 {
-    if (!mCmdAddToCircuit) // only the first time
-    {
-        // if there is no such component in the project's library, copy it from the
-        // workspace library to the project's library
-        if (!mProject.getLibrary().getComponent(mComponentUuid)) {
-            FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(mComponentUuid);
-            if (!cmpFp.isValid()) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("The component with the UUID \"%1\" does not exist in the "
-                    "workspace library!")).arg(mComponentUuid.toStr()));
-            }
-            library::Component* cmp = new library::Component(cmpFp, true);
-            auto* cmdAddToLibrary = new CmdProjectLibraryAddElement<library::Component>(
-                                    mProject.getLibrary(), *cmp);
-            appendChild(cmdAddToLibrary);
+    // if there is no such component in the project's library, copy it from the
+    // workspace library to the project's library
+    if (!mProject.getLibrary().getComponent(mComponentUuid)) {
+        FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(mComponentUuid);
+        if (!cmpFp.isValid()) {
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                QString(tr("The component with the UUID \"%1\" does not exist in the "
+                "workspace library!")).arg(mComponentUuid.toStr()));
         }
-
-        // create child command to add a new component instance to the circuit
-        mCmdAddToCircuit = new CmdComponentInstanceAdd(mProject.getCircuit(),
-                                                       mComponentUuid, mSymbVarUuid);
-        appendChild(mCmdAddToCircuit);
+        library::Component* cmp = new library::Component(cmpFp, true);
+        CmdProjectLibraryAddElement<library::Component>* cmdAddToLibrary =
+            new CmdProjectLibraryAddElement<library::Component>(mProject.getLibrary(), *cmp);
+        appendChild(cmdAddToLibrary); // can throw
     }
 
-    UndoCommand::redo(); // throws an exception on error
-}
+    // create child command to add a new component instance to the circuit
+    mCmdAddToCircuit = new CmdComponentInstanceAdd(mProject.getCircuit(),
+                                                   mComponentUuid, mSymbVarUuid);
+    appendChild(mCmdAddToCircuit); // can throw
 
-void CmdAddComponentToCircuit::undo() throw (Exception)
-{
-    UndoCommand::undo(); // throws an exception on error
+    // execute all child commands
+    UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

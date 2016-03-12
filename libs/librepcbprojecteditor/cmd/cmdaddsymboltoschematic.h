@@ -24,8 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/undocommandgroup.h>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 
@@ -56,25 +55,29 @@ class CmdSymbolInstanceAdd;
 /**
  * @brief The CmdAddSymbolToSchematic class
  */
-class CmdAddSymbolToSchematic final : public UndoCommand
+class CmdAddSymbolToSchematic final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdAddSymbolToSchematic(workspace::Workspace& workspace,
-                                         Schematic& schematic, ComponentInstance& cmpInstance,
-                                         const Uuid& symbolItem, const Point& position = Point(),
-                                         const Angle& angle = Angle(), UndoCommand* parent = 0) throw (Exception);
+        CmdAddSymbolToSchematic(workspace::Workspace& workspace, Schematic& schematic,
+                                ComponentInstance& cmpInstance, const Uuid& symbolItem,
+                                const Point& position = Point(), const Angle& angle = Angle()) noexcept;
         ~CmdAddSymbolToSchematic() noexcept;
 
         // Getters
         SI_Symbol* getSymbolInstance() const noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         workspace::Workspace& mWorkspace;

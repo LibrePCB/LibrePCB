@@ -29,6 +29,7 @@
 #include <librepcbproject/schematics/schematic.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcbcommon/undostack.h>
+#include <librepcbcommon/undocommandgroup.h>
 #include <librepcbproject/schematics/items/si_netline.h>
 #include <librepcbproject/schematics/items/si_symbol.h>
 #include <librepcbproject/schematics/cmd/cmdsymbolinstanceremove.h>
@@ -69,7 +70,7 @@ namespace project {
 SES_Select::SES_Select(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     SES_Base(editor, editorUi, editorGraphicsView, undoStack), mSubState(SubState_Idle),
-    mParentCommand(nullptr)
+    mCommandGroup(nullptr)
 {
 }
 
@@ -79,7 +80,7 @@ SES_Select::~SES_Select()
     {
         qDeleteAll(mSymbolEditCmds);    mSymbolEditCmds.clear();
         qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
-        delete mParentCommand;          mParentCommand = nullptr;
+        delete mCommandGroup;           mCommandGroup = nullptr;
     }
     catch (Exception& e)
     {
@@ -350,28 +351,28 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                         NetSignal* newSignal = mCircuit.getNetSignalByName(name);
                         if (newSignal)
                         {
-                            mUndoStack.beginCommand(tr("Combine Net Signals"));
+                            mUndoStack.beginCmdGroup(tr("Combine Net Signals"));
                             foreach (ComponentSignalInstance* signal, netsignal.getComponentSignals())
                             {
                                 auto cmd = new CmdCompSigInstSetNetSignal(*signal, newSignal);
-                                mUndoStack.appendToCommand(cmd);
+                                mUndoStack.appendToCmdGroup(cmd);
                             }
                             foreach (SI_NetPoint* point, netsignal.getNetPoints())
                             {
                                 auto cmd = new CmdSchematicNetPointEdit(*point);
                                 cmd->setNetSignal(*newSignal);
-                                mUndoStack.appendToCommand(cmd);
+                                mUndoStack.appendToCmdGroup(cmd);
                             }
                             foreach (SI_NetLabel* label, netsignal.getNetLabels())
                             {
                                 auto cmd = new CmdSchematicNetLabelEdit(*label);
                                 cmd->setNetSignal(*newSignal, false);
-                                mUndoStack.appendToCommand(cmd);
+                                mUndoStack.appendToCmdGroup(cmd);
                             }
                             auto cmd = new CmdNetSignalRemove(mProject.getCircuit(), netsignal);
-                            mUndoStack.appendToCommand(cmd);
+                            mUndoStack.appendToCmdGroup(cmd);
 
-                            mUndoStack.endCommand();
+                            mUndoStack.commitCmdGroup();
                         }
                         else
                         {
@@ -425,7 +426,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             {
                 case Qt::LeftButton: // stop moving items
                 {
-                    Q_CHECK_PTR(mParentCommand);
+                    Q_CHECK_PTR(mCommandGroup);
 
                     // move selected elements
                     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds)
@@ -441,12 +442,12 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                         if (delta.isOrigin())
                         {
                             // items were not moved, do not execute the commands
-                            delete mParentCommand; // this will also delete all objects in mSymbolInstanceMoveCommands
+                            delete mCommandGroup; // this will also delete all objects in mSymbolInstanceMoveCommands
                         }
                         else
                         {
                             // items were moved, add commands to the project's undo stack
-                            mUndoStack.execCmd(mParentCommand); // can throw an exception
+                            mUndoStack.execCmd(mCommandGroup); // can throw an exception
                         }
                     }
                     catch (Exception& e)
@@ -456,7 +457,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                     mSymbolEditCmds.clear();
                     mNetPointEditCmds.clear();
                     mNetLabelEditCmds.clear();
-                    mParentCommand = nullptr;
+                    mCommandGroup = nullptr;
                     mSubState = SubState_Idle;
                     break;
                 } // case Qt::LeftButton
@@ -473,7 +474,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             Schematic* schematic = mEditor.getActiveSchematic();
             Q_CHECK_PTR(sceneEvent); if (!sceneEvent) break;
             Q_CHECK_PTR(schematic); if (!schematic) break;
-            Q_CHECK_PTR(mParentCommand);
+            Q_CHECK_PTR(mCommandGroup);
 
             // get delta position
             Point delta = Point::fromPx(sceneEvent->scenePos() - sceneEvent->buttonDownScenePos(Qt::LeftButton));
@@ -517,11 +518,11 @@ bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
     if (items.isEmpty()) return false;
 
     // create move commands for all selected items
-    Q_ASSERT(!mParentCommand);
+    Q_ASSERT(!mCommandGroup);
     Q_ASSERT(mSymbolEditCmds.isEmpty());
     Q_ASSERT(mNetPointEditCmds.isEmpty());
     Q_ASSERT(mNetLabelEditCmds.isEmpty());
-    mParentCommand = new UndoCommand(tr("Move Schematic Items"));
+    mCommandGroup = new UndoCommandGroup(tr("Move Schematic Items"));
     foreach (SI_Base* item, items)
     {
         switch (item->getType())
@@ -529,19 +530,25 @@ bool SES_Select::startMovingSelectedItems(Schematic* schematic) noexcept
             case SI_Base::Type_t::Symbol:
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
-                mSymbolEditCmds.append(new CmdSymbolInstanceEdit(*symbol, mParentCommand));
+                CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
+                mCommandGroup->appendChild(cmd);
+                mSymbolEditCmds.append(cmd);
                 break;
             }
             case SI_Base::Type_t::NetPoint:
             {
                 SI_NetPoint* point = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(point);
-                mNetPointEditCmds.append(new CmdSchematicNetPointEdit(*point, mParentCommand));
+                CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*point);
+                mCommandGroup->appendChild(cmd);
+                mNetPointEditCmds.append(cmd);
                 break;
             }
             case SI_Base::Type_t::NetLabel:
             {
                 SI_NetLabel* label = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(label);
-                mNetLabelEditCmds.append(new CmdSchematicNetLabelEdit(*label, mParentCommand));
+                CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*label);
+                mCommandGroup->appendChild(cmd);
+                mNetLabelEditCmds.append(cmd);
                 break;
             }
             default:
@@ -579,7 +586,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
     bool commandActive = false;
     try
     {
-        mUndoStack.beginCommand(tr("Rotate Schematic Elements"));
+        mUndoStack.beginCmdGroup(tr("Rotate Schematic Elements"));
         commandActive = true;
 
         // rotate all elements
@@ -592,7 +599,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
                     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
                     cmd->rotate(angle, center, false);
-                    mUndoStack.appendToCommand(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     break;
                 }
                 case SI_Base::Type_t::NetPoint:
@@ -600,7 +607,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
                     CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
                     cmd->setPosition(netpoint->getPosition().rotated(angle, center), false);
-                    mUndoStack.appendToCommand(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     break;
                 }
                 case SI_Base::Type_t::NetLabel:
@@ -608,7 +615,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
                     SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
                     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
                     cmd->rotate(angle, center, false);
-                    mUndoStack.appendToCommand(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     break;
                 }
                 default:
@@ -616,14 +623,14 @@ bool SES_Select::rotateSelectedItems(const Angle& angle, Point center, bool cent
             }
         }
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         commandActive = false;
     }
     catch (Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 
@@ -657,7 +664,7 @@ bool SES_Select::removeSelectedItems() noexcept
     bool commandActive = false;
     try
     {
-        mUndoStack.beginCommand(tr("Remove Schematic Elements"));
+        mUndoStack.beginCmdGroup(tr("Remove Schematic Elements"));
         commandActive = true;
         schematic->clearSelection();
 
@@ -668,7 +675,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
                 auto cmd = new CmdSchematicNetLabelRemove(*schematic, *netlabel);
-                mUndoStack.appendToCommand(cmd);
+                mUndoStack.appendToCmdGroup(cmd);
             }
         }
 
@@ -679,7 +686,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_NetLine* netline = dynamic_cast<SI_NetLine*>(item); Q_ASSERT(netline);
                 auto cmd = new CmdSchematicNetLineRemove(*schematic, *netline);
-                mUndoStack.appendToCommand(cmd);
+                mUndoStack.appendToCmdGroup(cmd);
             }
         }
 
@@ -693,13 +700,13 @@ bool SES_Select::removeSelectedItems() noexcept
                 if (netpoint->getLines().count() == 0)
                 {
                     CmdSchematicNetPointRemove* cmd = new CmdSchematicNetPointRemove(*schematic, *netpoint);
-                    mUndoStack.appendToCommand(cmd);
+                    mUndoStack.appendToCmdGroup(cmd);
                     if (netpoint->isAttached())
                     {
                         ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
                         Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                         CmdCompSigInstSetNetSignal* cmd = new CmdCompSigInstSetNetSignal(*signal, nullptr);
-                        mUndoStack.appendToCommand(cmd);
+                        mUndoStack.appendToCmdGroup(cmd);
                     }
                 }
                 else if (netpoint->isAttached())
@@ -707,9 +714,9 @@ bool SES_Select::removeSelectedItems() noexcept
                     ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
                     Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
                     CmdSchematicNetPointDetach* cmd1 = new CmdSchematicNetPointDetach(*netpoint);
-                    mUndoStack.appendToCommand(cmd1);
+                    mUndoStack.appendToCmdGroup(cmd1);
                     CmdCompSigInstSetNetSignal* cmd2 = new CmdCompSigInstSetNetSignal(*signal, nullptr);
-                    mUndoStack.appendToCommand(cmd2);
+                    mUndoStack.appendToCmdGroup(cmd2);
                 }
             }
         }
@@ -721,7 +728,7 @@ bool SES_Select::removeSelectedItems() noexcept
             {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
                 auto cmd = new CmdSymbolInstanceRemove(*schematic, *symbol);
-                mUndoStack.appendToCommand(cmd);
+                mUndoStack.appendToCmdGroup(cmd);
             }
         }
 
@@ -734,15 +741,15 @@ bool SES_Select::removeSelectedItems() noexcept
                     DeviceInstance* dev = board->getDeviceInstanceByComponentUuid(component->getUuid());
                     if (dev) {
                         CmdDeviceInstanceRemove* cmd = new CmdDeviceInstanceRemove(*board, *dev);
-                        mUndoStack.appendToCommand(cmd);
+                        mUndoStack.appendToCmdGroup(cmd);
                     }
                 }
                 CmdComponentInstanceRemove* cmd = new CmdComponentInstanceRemove(mCircuit, *component);
-                mUndoStack.appendToCommand(cmd);
+                mUndoStack.appendToCmdGroup(cmd);
             }
         }
 
-        mUndoStack.endCommand();
+        mUndoStack.commitCmdGroup();
         commandActive = false;
         return true;
     }
@@ -750,7 +757,7 @@ bool SES_Select::removeSelectedItems() noexcept
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
         if (commandActive)
-            try {mUndoStack.abortCommand();} catch (...) {}
+            try {mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 }

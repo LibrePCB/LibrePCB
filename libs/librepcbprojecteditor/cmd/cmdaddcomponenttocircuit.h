@@ -24,8 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/undocommandgroup.h>
 #include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
@@ -54,24 +53,27 @@ class CmdComponentInstanceAdd;
 /**
  * @brief The CmdAddComponentToCircuit class
  */
-class CmdAddComponentToCircuit final : public UndoCommand
+class CmdAddComponentToCircuit final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdAddComponentToCircuit(workspace::Workspace& workspace, Project& project,
-                                          const Uuid& component, const Uuid& symbolVariant,
-                                          UndoCommand* parent = 0) throw (Exception);
+        CmdAddComponentToCircuit(workspace::Workspace& workspace, Project& project,
+                                 const Uuid& component, const Uuid& symbolVariant) noexcept;
         ~CmdAddComponentToCircuit() noexcept;
 
         // Getters
         ComponentInstance* getComponentInstance() const noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
-
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         workspace::Workspace& mWorkspace;

@@ -35,16 +35,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass& netclass,
-                                     UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Remove netclass"), parent),
+CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass& netclass) noexcept :
+    UndoCommand(tr("Remove netclass")),
     mCircuit(circuit), mNetClass(netclass)
 {
 }
 
 CmdNetClassRemove::~CmdNetClassRemove() noexcept
 {
-    if (isExecuted())
+    if (isCurrentlyExecuted())
         delete &mNetClass;
 }
 
@@ -52,34 +51,19 @@ CmdNetClassRemove::~CmdNetClassRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdNetClassRemove::redo() throw (Exception)
+void CmdNetClassRemove::performExecute() throw (Exception)
 {
-    mCircuit.removeNetClass(mNetClass); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.addNetClass(mNetClass);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdNetClassRemove::undo() throw (Exception)
+void CmdNetClassRemove::performUndo() throw (Exception)
 {
-    mCircuit.addNetClass(mNetClass); // throws an exception on error
+    mCircuit.addNetClass(mNetClass); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        mCircuit.removeNetClass(mNetClass);
-        throw;
-    }
+void CmdNetClassRemove::performRedo() throw (Exception)
+{
+    mCircuit.removeNetClass(mNetClass); // can throw
 }
 
 /*****************************************************************************************

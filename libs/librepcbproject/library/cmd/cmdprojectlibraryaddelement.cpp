@@ -37,9 +37,8 @@ namespace project {
 
 template <typename ElementType>
 CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                                                      ElementType& element,
-                                                                      UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add element to library"), parent),
+                                                                      ElementType& element) noexcept :
+    UndoCommand(tr("Add element to library")),
     mLibrary(library), mElement(element)
 {
 }
@@ -54,35 +53,21 @@ CmdProjectLibraryAddElement<ElementType>::~CmdProjectLibraryAddElement() noexcep
  ****************************************************************************************/
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::redo() throw (Exception)
+void CmdProjectLibraryAddElement<ElementType>::performExecute() throw (Exception)
 {
-    addElement(); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        removeElement(); // throws an exception on error
-        throw;
-    }
+    performRedo(); // can throw
 }
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::undo() throw (Exception)
+void CmdProjectLibraryAddElement<ElementType>::performUndo() throw (Exception)
 {
-    removeElement(); // throws an exception on error
+    removeElement(); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo(); // throws an exception on error
-    }
-    catch (Exception& e)
-    {
-        addElement(); // throws an exception on error
-        throw;
-    }
+template <typename ElementType>
+void CmdProjectLibraryAddElement<ElementType>::performRedo() throw (Exception)
+{
+    addElement(); // can throw
 }
 
 /*****************************************************************************************

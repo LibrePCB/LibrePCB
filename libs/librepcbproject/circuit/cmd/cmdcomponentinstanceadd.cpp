@@ -38,15 +38,15 @@ namespace project {
  ****************************************************************************************/
 
 CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
-                                                 const Uuid& symbVar, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add component"), parent),
+                                                 const Uuid& symbVar) noexcept :
+    UndoCommand(tr("Add component")),
     mCircuit(circuit), mComponentUuid(cmp), mSymbVarUuid(symbVar), mComponentInstance(nullptr)
 {
 }
 
 CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
 {
-    if (!isExecuted())
+    if (!isCurrentlyExecuted())
         delete mComponentInstance;
 }
 
@@ -54,45 +54,27 @@ CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdComponentInstanceAdd::redo() throw (Exception)
+void CmdComponentInstanceAdd::performExecute() throw (Exception)
 {
-    if (!mComponentInstance) // only the first time
-    {
-        library::Component* cmp = mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
-        if (!cmp) {
-            throw RuntimeError(__FILE__, __LINE__, mComponentUuid.toStr(),
-                QString(tr("The component with the UUID \"%1\" does not exist in the "
-                "project's library!")).arg(mComponentUuid.toStr()));
-        }
-        mComponentInstance = mCircuit.createComponentInstance(*cmp, mSymbVarUuid); // throws an exception on error
+    library::Component* cmp = mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
+    if (!cmp) {
+        throw RuntimeError(__FILE__, __LINE__, mComponentUuid.toStr(),
+            QString(tr("The component with the UUID \"%1\" does not exist in the "
+            "project's library!")).arg(mComponentUuid.toStr()));
     }
+    mComponentInstance = mCircuit.createComponentInstance(*cmp, mSymbVarUuid); // can throw
 
-    mCircuit.addComponentInstance(*mComponentInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mCircuit.removeComponentInstance(*mComponentInstance);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdComponentInstanceAdd::undo() throw (Exception)
+void CmdComponentInstanceAdd::performUndo() throw (Exception)
 {
-    mCircuit.removeComponentInstance(*mComponentInstance); // throws an exception on error
+    mCircuit.removeComponentInstance(*mComponentInstance); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mCircuit.addComponentInstance(*mComponentInstance);
-        throw;
-    }
+void CmdComponentInstanceAdd::performRedo() throw (Exception)
+{
+    mCircuit.addComponentInstance(*mComponentInstance); // can throw
 }
 
 /*****************************************************************************************

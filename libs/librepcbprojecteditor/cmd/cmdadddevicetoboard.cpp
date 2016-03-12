@@ -46,8 +46,8 @@ namespace project {
 
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
         ComponentInstance& cmpInstance, const Uuid& deviceUuid, const Uuid& footprintUuid,
-        const Point& position, const Angle& rotation, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add device to board"), parent),
+        const Point& position, const Angle& rotation) noexcept :
+    UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace), mBoard(board), mComponentInstance(cmpInstance),
     mDeviceUuid(deviceUuid), mFootprintUuid(footprintUuid), mPosition(position),
     mRotation(rotation),
@@ -73,64 +73,55 @@ DeviceInstance* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdAddDeviceToBoard::redo() throw (Exception)
+void CmdAddDeviceToBoard::performExecute() throw (Exception)
 {
-    if (!mCmdAddToBoard) // only the first time
-    {
-        // if there is no such device in the project's library, copy it from the
-        // workspace library to the project's library
-        library::Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
-        if (!dev) {
-            FilePath devFp = mWorkspace.getLibrary().getLatestDevice(mDeviceUuid);
-            if (!devFp.isValid()) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("The device with the UUID \"%1\" does not exist in the "
-                    "workspace library!")).arg(mDeviceUuid.toStr()));
-            }
-            dev = new library::Device(devFp, true);
-            auto* cmdAddToLibrary = new CmdProjectLibraryAddElement<library::Device>(
-                                    mBoard.getProject().getLibrary(), *dev);
-            appendChild(cmdAddToLibrary);
+    // if there is no such device in the project's library, copy it from the
+    // workspace library to the project's library
+    library::Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
+    if (!dev) {
+        FilePath devFp = mWorkspace.getLibrary().getLatestDevice(mDeviceUuid);
+        if (!devFp.isValid()) {
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                QString(tr("The device with the UUID \"%1\" does not exist in the "
+                "workspace library!")).arg(mDeviceUuid.toStr()));
         }
+        dev = new library::Device(devFp, true);
+        CmdProjectLibraryAddElement<library::Device>* cmdAddToLibrary =
+            new CmdProjectLibraryAddElement<library::Device>(mBoard.getProject().getLibrary(), *dev);
+        appendChild(cmdAddToLibrary); // can throw
+    }
+    Q_ASSERT(dev);
 
-        // get the package UUID
-        Q_ASSERT(dev);
-        Uuid pkgUuid = dev->getPackageUuid();
-
-        // if there is no such package in the project's library, copy it from the
-        // workspace library to the project's library
-        library::Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
-        if (!pkg) {
-            FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
-            if (!pkgFp.isValid()) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
-                    QString(tr("The package with the UUID \"%1\" does not exist in the "
-                    "workspace library!")).arg(pkgUuid.toStr()));
-            }
-            pkg = new library::Package(pkgFp, true);
-            auto* cmdAddToLibrary = new CmdProjectLibraryAddElement<library::Package>(
-                                    mBoard.getProject().getLibrary(), *pkg);
-            appendChild(cmdAddToLibrary);
+    // if there is no such package in the project's library, copy it from the
+    // workspace library to the project's library
+    Uuid pkgUuid = dev->getPackageUuid();
+    library::Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
+    if (!pkg) {
+        FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
+        if (!pkgFp.isValid()) {
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                QString(tr("The package with the UUID \"%1\" does not exist in the "
+                "workspace library!")).arg(pkgUuid.toStr()));
         }
+        pkg = new library::Package(pkgFp, true);
+        CmdProjectLibraryAddElement<library::Package>* cmdAddToLibrary =
+            new CmdProjectLibraryAddElement<library::Package>(mBoard.getProject().getLibrary(), *pkg);
+        appendChild(cmdAddToLibrary); // can throw
+    }
+    Q_ASSERT(pkg);
 
-        // TODO: remove this!
-        if (mFootprintUuid.isNull()) {
-            Q_ASSERT(pkg);
-            mFootprintUuid = pkg->getDefaultFootprintUuid();
-        }
-
-        // create child command to add a new device instance to the board
-        mCmdAddToBoard = new CmdDeviceInstanceAdd(mBoard, mComponentInstance, mDeviceUuid,
-                                                  mFootprintUuid, mPosition, mRotation);
-        appendChild(mCmdAddToBoard);
+    // TODO: remove this!
+    if (mFootprintUuid.isNull()) {
+        mFootprintUuid = pkg->getDefaultFootprintUuid();
     }
 
-    UndoCommand::redo(); // throws an exception on error
-}
+    // create child command to add a new device instance to the board
+    mCmdAddToBoard = new CmdDeviceInstanceAdd(mBoard, mComponentInstance, mDeviceUuid,
+                                              mFootprintUuid, mPosition, mRotation);
+    appendChild(mCmdAddToBoard); // can throw
 
-void CmdAddDeviceToBoard::undo() throw (Exception)
-{
-    UndoCommand::undo(); // throws an exception on error
+    // execute all child commands
+    UndoCommandGroup::performExecute(); // can throw
 }
 
 /*****************************************************************************************

@@ -38,18 +38,16 @@ namespace project {
  ****************************************************************************************/
 
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
-                                           ComponentInstance& cmpInstance,
-                                           const Uuid& symbolItem, const Point& position,
-                                           const Angle& angle,
-                                           UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add symbol instance"), parent),
+        ComponentInstance& cmpInstance, const Uuid& symbolItem, const Point& position,
+        const Angle& angle) noexcept :
+    UndoCommand(tr("Add symbol instance")),
     mSchematic(schematic), mComponentInstance(&cmpInstance), mSymbolItemUuid(symbolItem),
     mPosition(position), mAngle(angle), mSymbolInstance(nullptr)
 {
 }
 
-CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Add symbol instance"), parent),
+CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept :
+    UndoCommand(tr("Add symbol instance")),
     mSchematic(symbol.getSchematic()), mComponentInstance(nullptr), mSymbolItemUuid(),
     mPosition(), mAngle(), mSymbolInstance(&symbol)
 {
@@ -57,7 +55,7 @@ CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol, UndoCommand* paren
 
 CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 {
-    if (!isExecuted())
+    if (!isCurrentlyExecuted())
         delete mSymbolInstance;
 }
 
@@ -65,39 +63,22 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdSymbolInstanceAdd::redo() throw (Exception)
+void CmdSymbolInstanceAdd::performExecute() throw (Exception)
 {
-    if (!mSymbolInstance) { // only the first time
-        mSymbolInstance = mSchematic.createSymbol(*mComponentInstance, mSymbolItemUuid,
-                                                  mPosition, mAngle); // throws an exception on error
-    }
+    mSymbolInstance = mSchematic.createSymbol(*mComponentInstance, mSymbolItemUuid,
+                                              mPosition, mAngle); // can throw
 
-    mSchematic.addSymbol(*mSymbolInstance); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mSchematic.removeSymbol(*mSymbolInstance);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdSymbolInstanceAdd::undo() throw (Exception)
+void CmdSymbolInstanceAdd::performUndo() throw (Exception)
 {
-    mSchematic.removeSymbol(*mSymbolInstance);  // throws an exception on error
+    mSchematic.removeSymbol(*mSymbolInstance); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mSchematic.addSymbol(*mSymbolInstance);
-        throw;
-    }
+void CmdSymbolInstanceAdd::performRedo() throw (Exception)
+{
+    mSchematic.addSymbol(*mSymbolInstance); // can throw
 }
 
 /*****************************************************************************************

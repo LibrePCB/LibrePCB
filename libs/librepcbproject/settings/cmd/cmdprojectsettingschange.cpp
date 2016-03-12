@@ -34,9 +34,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdProjectSettingsChange::CmdProjectSettingsChange(ProjectSettings& settings,
-                                                   UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Change Project Settings"), parent), mSettings(settings),
+CmdProjectSettingsChange::CmdProjectSettingsChange(ProjectSettings& settings) noexcept :
+    UndoCommand(tr("Change Project Settings")), mSettings(settings),
     mRestoreDefaults(false),
     mLocaleOrderOld(settings.getLocaleOrder()), mLocaleOrderNew(mLocaleOrderOld),
     mNormOrderOld(settings.getNormOrder()), mNormOrderNew(mNormOrderOld)
@@ -53,19 +52,19 @@ CmdProjectSettingsChange::~CmdProjectSettingsChange() noexcept
 
 void CmdProjectSettingsChange::restoreDefaults() noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mRestoreDefaults = true;
 }
 
 void CmdProjectSettingsChange::setLocaleOrder(const QStringList& locales) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mLocaleOrderNew = locales;
 }
 
 void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept
 {
-    Q_ASSERT((mRedoCount == 0) && (mUndoCount == 0));
+    Q_ASSERT(!wasEverExecuted());
     mNormOrderNew = norms;
 }
 
@@ -73,34 +72,21 @@ void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdProjectSettingsChange::redo() throw (Exception)
+void CmdProjectSettingsChange::performExecute() throw (Exception)
 {
-    try
-    {
-        applyNewSettings();
-        UndoCommand::redo();
-        mSettings.triggerSettingsChanged();
-    }
-    catch (Exception &e)
-    {
-        applyOldSettings();
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdProjectSettingsChange::undo() throw (Exception)
+void CmdProjectSettingsChange::performUndo() throw (Exception)
 {
-    try
-    {
-        applyOldSettings();
-        UndoCommand::undo();
-        mSettings.triggerSettingsChanged();
-    }
-    catch (Exception& e)
-    {
-        applyNewSettings();
-        throw;
-    }
+    applyOldSettings(); // can throw
+    mSettings.triggerSettingsChanged();
+}
+
+void CmdProjectSettingsChange::performRedo() throw (Exception)
+{
+    applyNewSettings(); // can throw
+    mSettings.triggerSettingsChanged();
 }
 
 /*****************************************************************************************

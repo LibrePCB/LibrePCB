@@ -24,8 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommand.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/undocommandgroup.h>
 #include <librepcbcommon/uuid.h>
 #include <librepcbcommon/units/all_length_units.h>
 
@@ -56,26 +55,30 @@ class CmdDeviceInstanceAdd;
 /**
  * @brief The CmdAddDeviceToBoard class
  */
-class CmdAddDeviceToBoard final : public UndoCommand
+class CmdAddDeviceToBoard final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdAddDeviceToBoard(workspace::Workspace& workspace,
-                                     Board& board, ComponentInstance& cmpInstance,
-                                     const Uuid& deviceUuid, const Uuid& footprintUuid,
-                                     const Point& position = Point(),
-                                     const Angle& rotation = Angle(), UndoCommand* parent = 0) throw (Exception);
+        CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
+                            ComponentInstance& cmpInstance, const Uuid& deviceUuid,
+                            const Uuid& footprintUuid, const Point& position = Point(),
+                            const Angle& rotation = Angle()) noexcept;
         ~CmdAddDeviceToBoard() noexcept;
 
         // Getters
         DeviceInstance* getDeviceInstance() const noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         workspace::Workspace& mWorkspace;

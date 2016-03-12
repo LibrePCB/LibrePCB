@@ -47,7 +47,7 @@ class CmdDeviceInstanceEdit final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        explicit CmdDeviceInstanceEdit(DeviceInstance& dev, UndoCommand* parent = 0) throw (Exception);
+        explicit CmdDeviceInstanceEdit(DeviceInstance& dev) noexcept;
         ~CmdDeviceInstanceEdit() noexcept;
 
         // General Methods
@@ -58,12 +58,22 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         void setMirrored(bool mirrored, bool immediate) noexcept;
         void mirror(const Point& center, bool vertical, bool immediate) noexcept;
 
-        // Inherited from UndoCommand
-        void redo() throw (Exception) override;
-        void undo() throw (Exception) override;
-
 
     private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        void performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
         DeviceInstance& mDevice;

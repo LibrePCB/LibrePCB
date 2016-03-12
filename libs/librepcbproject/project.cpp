@@ -312,32 +312,42 @@ QString Project::getDescription() const noexcept
 
 void Project::setName(const QString& newName) noexcept
 {
-    mName = newName;
-    emit attributesChanged();
+    if (newName != mName) {
+        mName = newName;
+        emit attributesChanged();
+    }
 }
 
 void Project::setDescription(const QString& newDescription) noexcept
 {
-    mDescriptionHtmlFile->setContent(newDescription.toUtf8());
-    emit attributesChanged();
+    if (newDescription != mDescriptionHtmlFile->getContent()) {
+        mDescriptionHtmlFile->setContent(newDescription.toUtf8());
+        emit attributesChanged();
+    }
 }
 
 void Project::setAuthor(const QString& newAuthor) noexcept
 {
-    mAuthor = newAuthor;
-    emit attributesChanged();
+    if (newAuthor != mAuthor) {
+        mAuthor = newAuthor;
+        emit attributesChanged();
+    }
 }
 
 void Project::setCreated(const QDateTime& newCreated) noexcept
 {
-    mCreated = newCreated;
-    emit attributesChanged();
+    if (newCreated != mCreated) {
+        mCreated = newCreated;
+        emit attributesChanged();
+    }
 }
 
 void Project::setLastModified(const QDateTime& newLastModified) noexcept
 {
-    mLastModified = newLastModified;
-    emit attributesChanged();
+    if (newLastModified != mLastModified) {
+        mLastModified = newLastModified;
+        emit attributesChanged();
+    }
 }
 
 /*****************************************************************************************

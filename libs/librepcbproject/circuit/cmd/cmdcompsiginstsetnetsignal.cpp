@@ -35,9 +35,8 @@ namespace project {
  ****************************************************************************************/
 
 CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
-                                                       NetSignal* netsignal,
-                                                       UndoCommand* parent) throw (Exception) :
-    UndoCommand(tr("Change component signal net"), parent),
+                                                       NetSignal* netsignal) noexcept :
+    UndoCommand(tr("Change component signal net")),
     mComponentSignalInstance(cmpSigInstance), mNetSignal(netsignal),
     mOldNetSignal(cmpSigInstance.getNetSignal())
 {
@@ -51,34 +50,19 @@ CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-void CmdCompSigInstSetNetSignal::redo() throw (Exception)
+void CmdCompSigInstSetNetSignal::performExecute() throw (Exception)
 {
-    mComponentSignalInstance.setNetSignal(mNetSignal); // throws an exception on error
-
-    try
-    {
-        UndoCommand::redo(); // throws an exception on error
-    }
-    catch (Exception &e)
-    {
-        mComponentSignalInstance.setNetSignal(mOldNetSignal);
-        throw;
-    }
+    performRedo(); // can throw
 }
 
-void CmdCompSigInstSetNetSignal::undo() throw (Exception)
+void CmdCompSigInstSetNetSignal::performUndo() throw (Exception)
 {
-    mComponentSignalInstance.setNetSignal(mOldNetSignal); // throws an exception on error
+    mComponentSignalInstance.setNetSignal(mOldNetSignal); // can throw
+}
 
-    try
-    {
-        UndoCommand::undo();
-    }
-    catch (Exception& e)
-    {
-        mComponentSignalInstance.setNetSignal(mNetSignal);
-        throw;
-    }
+void CmdCompSigInstSetNetSignal::performRedo() throw (Exception)
+{
+    mComponentSignalInstance.setNetSignal(mNetSignal); // can throw
 }
 
 /*****************************************************************************************
