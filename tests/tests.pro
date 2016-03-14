@@ -41,6 +41,7 @@ PRE_TARGETDEPS += \
 
 SOURCES += main.cpp \
     common/filepathtest.cpp \
-    common/pointtest.cpp
+    common/pointtest.cpp \
+    common/scopeguardtest.cpp
 
 HEADERS +=
