@@ -184,10 +184,10 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
 
     try
     {
-        NetSignal* signal = mCircuit.getNetSignals().values().first();
-        if (!signal)
+        if (mCircuit.getNetSignals().isEmpty()) {
             throw RuntimeError(__FILE__, __LINE__, QString(), tr("No net signal found."));
-
+        }
+        NetSignal* signal = mCircuit.getNetSignals().values().first();
         mUndoStack.beginCmdGroup(tr("Add net label to schematic"));
         mUndoCmdActive = true;
         CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(schematic, *signal, Point());
