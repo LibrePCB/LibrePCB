@@ -25,6 +25,7 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/scopeguardlist.h>
 #include "../project.h"
 #include <librepcblibrary/sym/symbolpin.h>
 #include "items/si_symbol.h"
@@ -553,29 +554,15 @@ void Schematic::addToProject() throw (Exception)
     if (mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
     QList<SI_Base*> items = getAllItems();
-    int i = 0;
-    try {
-        while (i < items.count()) {
-            items.at(i)->addToSchematic(*mGraphicsScene); // can throw
-            i++;
-        }
-    } catch (Exception& e) {
-        try {
-            while (i > 0) {
-                items.at(i-1)->removeFromSchematic(*mGraphicsScene); // can throw
-                i--;
-            }
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(items.count());
+    for (int i = 0; i < items.count(); ++i) {
+        items.at(i)->addToSchematic(*mGraphicsScene); // can throw
+        sgl.add([&](){items.at(i)->removeFromSchematic(*mGraphicsScene);});
     }
-
     mIsAddedToProject = true;
     updateIcon();
+    sgl.dismiss();
 }
 
 void Schematic::removeFromProject() throw (Exception)
@@ -583,28 +570,14 @@ void Schematic::removeFromProject() throw (Exception)
     if (!mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
     QList<SI_Base*> items = getAllItems();
-    int i = items.count();
-    try {
-        while (i > 0) {
-            items.at(i-1)->removeFromSchematic(*mGraphicsScene); // can throw
-            i--;
-        }
-    } catch (Exception& e) {
-        try {
-            while (i < items.count()) {
-                items.at(i)->addToSchematic(*mGraphicsScene); // can throw
-                i++;
-            }
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(items.count());
+    for (int i = items.count()-1; i >= 0; --i) {
+        items.at(i)->removeFromSchematic(*mGraphicsScene); // can throw
+        sgl.add([&](){items.at(i)->addToSchematic(*mGraphicsScene);});
     }
-
     mIsAddedToProject = false;
+    sgl.dismiss();
 }
 
 bool Schematic::save(bool toOriginal, QStringList& errors) noexcept

@@ -33,6 +33,7 @@
 #include "../../erc/ercmsg.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcbcommon/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -148,22 +149,14 @@ void SI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
     if ((isUsed()) || (netsignal.getCircuit() != getCircuit())) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
     if (isAddedToSchematic()) {
         if (isAttachedToPin()) {
             throw LogicError(__FILE__, __LINE__);
         }
         mNetSignal->unregisterSchematicNetPoint(*this); // can throw
-        try {
-            netsignal.registerSchematicNetPoint(*this); // can throw
-        } catch (Exception&) {
-            try {
-                mNetSignal->registerSchematicNetPoint(*this); // can throw
-            } catch (Exception&) {
-                qFatal("Internal Fatal Error");
-            }
-            throw;
-        }
+        auto sg = scopeGuard([&](){mNetSignal->registerSchematicNetPoint(*this);});
+        netsignal.registerSchematicNetPoint(*this); // can throw
+        sg.dismiss();
     }
     mNetSignal = &netsignal;
 }
@@ -176,32 +169,24 @@ void SI_NetPoint::setPinToAttach(SI_SymbolPin* pin) throw (Exception)
     if ((isUsed()) || ((pin) && (pin->getCircuit() != getCircuit()))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
     if (isAddedToSchematic()) {
-        if (isAttachedToPin()) {
+        ScopeGuardList sgl;
+        if (mSymbolPin) {
             // detach from current pin
             mSymbolPin->unregisterNetPoint(*this); // can throw
+            sgl.add([&](){mSymbolPin->registerNetPoint(*this);});
         }
         if (pin) {
             // attach to new pin
-            try {
-                const ComponentSignalInstance* compSignal = pin->getComponentSignalInstance();
-                if (!compSignal) throw LogicError(__FILE__, __LINE__);
-                const NetSignal* netsignal = compSignal->getNetSignal();
-                if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
-                pin->registerNetPoint(*this); // can throw
-                setPosition(pin->getPosition());
-            } catch (Exception&) {
-                if (isAttachedToPin()) {
-                    try {
-                        mSymbolPin->registerNetPoint(*this); // can throw
-                    } catch (Exception&) {
-                        qFatal("Internal Fatal Error");
-                    }
-                }
-                throw;
-            }
+            const ComponentSignalInstance* compSignal = pin->getComponentSignalInstance();
+            if (!compSignal) throw LogicError(__FILE__, __LINE__);
+            const NetSignal* netsignal = compSignal->getNetSignal();
+            if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
+            pin->registerNetPoint(*this); // can throw
+            sgl.add([&](){pin->unregisterNetPoint(*this);});
+            setPosition(pin->getPosition());
         }
+        sgl.dismiss();
     }
     mSymbolPin = pin;
     mGraphicsItem->updateCacheAndRepaint();
@@ -225,29 +210,22 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (isAddedToSchematic() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
+    ScopeGuardList sgl;
     mNetSignal->registerSchematicNetPoint(*this); // can throw
+    sgl.add([&](){mNetSignal->unregisterSchematicNetPoint(*this);});
     if (isAttachedToPin()) {
-        try {
-            // check if mNetSignal is correct (would be a bug if not)
-            const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
-            const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
-            if (mNetSignal != netsignal) {
-                throw LogicError(__FILE__, __LINE__);
-            }
-            mSymbolPin->registerNetPoint(*this); // can throw
-        } catch (Exception&) {
-            try {
-                mNetSignal->unregisterSchematicNetPoint(*this); // can throw
-            } catch (Exception&) {
-                qFatal("Internal Fatal Error");
-            }
-            throw;
+        // check if mNetSignal is correct (would be a bug if not)
+        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
+        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
+        if (mNetSignal != netsignal) {
+            throw LogicError(__FILE__, __LINE__);
         }
+        mSymbolPin->registerNetPoint(*this); // can throw
+        sgl.add([&](){mSymbolPin->unregisterNetPoint(*this);});
     }
     mErcMsgDeadNetPoint->setVisible(true);
     SI_Base::addToSchematic(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
@@ -256,7 +234,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
 
-    // TODO: use scope guard
+    ScopeGuardList sgl;
     if (isAttachedToPin()) {
         // check if mNetSignal is correct (would be a bug if not)
         const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
@@ -265,21 +243,13 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
             throw LogicError(__FILE__, __LINE__);
         }
         mSymbolPin->unregisterNetPoint(*this); // can throw
+        sgl.add([&](){mSymbolPin->registerNetPoint(*this);});
     }
-    try {
-        mNetSignal->unregisterSchematicNetPoint(*this); // can throw
-    } catch (Exception&) {
-        if (isAttachedToPin()) {
-            try {
-                mSymbolPin->registerNetPoint(*this); // can throw
-            } catch (Exception&) {
-                qFatal("Internal Fatal Error");
-            }
-        }
-        throw;
-    }
+    mNetSignal->unregisterSchematicNetPoint(*this); // can throw
+    sgl.add([&](){mNetSignal->registerSchematicNetPoint(*this);});
     mErcMsgDeadNetPoint->setVisible(false);
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 void SI_NetPoint::registerNetLine(SI_NetLine& netline) throw (Exception)

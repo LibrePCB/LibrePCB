@@ -32,6 +32,7 @@
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcbcommon/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -164,30 +165,15 @@ void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
-
+    ScopeGuardList sgl(mPins.count()+1);
     mComponentInstance->registerSymbol(*this); // can throw
-
-    // TODO: use scope guard
-    QList<SI_SymbolPin*> addedPins;
-    try {
-        foreach (SI_SymbolPin* pin, mPins) {
-            pin->addToSchematic(scene); // can throw
-            addedPins.prepend(pin);
-        }
-    } catch (Exception& e) {
-        try {
-            foreach (SI_SymbolPin* pin, addedPins) {
-                pin->removeFromSchematic(scene); // can throw
-                addedPins.removeOne(pin);
-            }
-            mComponentInstance->unregisterSymbol(*this); // can throw
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    sgl.add([&](){mComponentInstance->unregisterSymbol(*this);});
+    foreach (SI_SymbolPin* pin, mPins) {
+        pin->addToSchematic(scene); // can throw
+        sgl.add([&](){pin->removeFromSchematic(scene);});
     }
-
     SI_Base::addToSchematic(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
@@ -195,28 +181,15 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     if (!isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
-    QList<SI_SymbolPin*> removedPins;
-    try {
-        foreach (SI_SymbolPin* pin, mPins) {
-            pin->removeFromSchematic(scene); // can throw
-            removedPins.prepend(pin);
-        }
-        mComponentInstance->unregisterSymbol(*this); // can throw
-    } catch (Exception& e) {
-        try {
-            foreach (SI_SymbolPin* pin, removedPins) {
-                pin->addToSchematic(scene); // can throw
-                removedPins.removeOne(pin);
-            }
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(mPins.count()+1);
+    foreach (SI_SymbolPin* pin, mPins) {
+        pin->removeFromSchematic(scene); // can throw
+        sgl.add([&](){pin->addToSchematic(scene);});
     }
-
+    mComponentInstance->unregisterSymbol(*this); // can throw
+    sgl.add([&](){mComponentInstance->registerSymbol(*this);});
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)

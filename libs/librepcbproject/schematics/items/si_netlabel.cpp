@@ -28,6 +28,7 @@
 #include "../../project.h"
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcbcommon/scopeguard.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -92,9 +93,10 @@ void SI_NetLabel::setNetSignal(NetSignal& netsignal) noexcept
             throw LogicError(__FILE__, __LINE__);
         }
         if (isAddedToSchematic()) {
-            // TODO: use scope guard
             mNetSignal->unregisterSchematicNetLabel(*this); // can throw
+            auto sg = scopeGuard([&](){mNetSignal->registerSchematicNetLabel(*this);});
             netsignal.registerSchematicNetLabel(*this); // can throw
+            sg.dismiss();
         }
         disconnect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
         connect(&netsignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);

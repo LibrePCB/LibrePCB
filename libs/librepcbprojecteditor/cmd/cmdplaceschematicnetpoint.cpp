@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdplaceschematicnetpoint.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbproject/circuit/netclass.h>
@@ -70,32 +71,9 @@ CmdPlaceSchematicNetPoint::~CmdPlaceSchematicNetPoint() noexcept
 
 bool CmdPlaceSchematicNetPoint::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdPlaceSchematicNetPoint::buildAndExecuteChildCommands() throw (Exception)
-{
     // get all netpoints at the specified position
     QList<SI_NetPoint*> netpointsUnderCursor = mSchematic.getNetPointsAtScenePos(mPosition);
 
@@ -111,8 +89,13 @@ bool CmdPlaceSchematicNetPoint::buildAndExecuteChildCommands() throw (Exception)
     // merge all net items under the resulting netpoint together
     execNewChildCmd(new CmdCombineAllNetSignalsUnderSchematicNetPoint(*mNetPoint)); // can throw
 
+    undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
 }
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
 
 NetSignal* CmdPlaceSchematicNetPoint::getOrCreateNewNetSignal() throw (Exception)
 {

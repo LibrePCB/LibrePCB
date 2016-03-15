@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcombineallnetsignalsunderschematicnetpoint.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbproject/circuit/netclass.h>
@@ -69,32 +70,9 @@ CmdCombineAllNetSignalsUnderSchematicNetPoint::~CmdCombineAllNetSignalsUnderSche
 
 bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdCombineAllNetSignalsUnderSchematicNetPoint::buildAndExecuteChildCommands() throw (Exception)
-{
     // TODO:
     // - Add a more sophisticated algorithm to determine the resulting netsignal
     // - Maybe a callback is required to let the user choose the resulting netsignal if
@@ -250,9 +228,12 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::buildAndExecuteChildCommands
         }
     }
 
-    // remove netsignals which are no longer required
-    execNewChildCmd(new CmdRemoveUnusedNetSignals(mCircuit)); // can throw
+    if (getChildCount() > 0) {
+        // remove netsignals which are no longer required
+        execNewChildCmd(new CmdRemoveUnusedNetSignals(mSchematic.getProject().getCircuit())); // can throw
+    }
 
+    undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
 }
 

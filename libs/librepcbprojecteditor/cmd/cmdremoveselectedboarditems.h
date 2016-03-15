@@ -57,9 +57,6 @@ class CmdRemoveSelectedBoardItems final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() throw (Exception) override;
 
-        bool buildAndExecuteChildCommands() throw (Exception);
-
-        // Private Member Variables
 
         // Attributes from the constructor
         Board& mBoard;

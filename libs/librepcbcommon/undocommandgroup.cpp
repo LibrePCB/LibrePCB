@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "undocommandgroup.h"
+#include "scopeguardlist.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -71,94 +72,33 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
 
 bool UndoCommandGroup::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-
-    int i;
-
-    try
-    {
-        for (i = 0; i < mChilds.count(); i++) { // from bottom to top
-            mChilds[i]->execute();
-        }
+    ScopeGuardList sgl(mChilds.count());
+    for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
+        mChilds.at(i)->execute();
+        sgl.add([&](){mChilds.at(i)->undo();});
     }
-    catch (Exception&)
-    {
-        try
-        {
-            // could not execute the child with index "i"!
-            // try to revert the whole action --> undo the executed commands
-            for (; i >= 0; i--) { // from "i" to bottom
-                mChilds[i]->undo();
-            }
-        }
-        catch (Exception&)
-        {
-            qFatal("UndoCommandGroup: Internal Fatal Error");
-        }
-        throw;
-    }
-
+    sgl.dismiss();
     return (mChilds.count() > 0);
 }
 
 void UndoCommandGroup::performUndo() throw (Exception)
 {
-    // TODO: use scope guard
-
-    int i;
-
-    try
-    {
-        for (i = mChilds.count()-1; i >= 0; i--) { // from top to bottom
-            mChilds[i]->undo();
-        }
+    ScopeGuardList sgl(mChilds.count());
+    for (int i = mChilds.count()-1; i >= 0; --i) { // from top to bottom
+        mChilds.at(i)->undo();
+        sgl.add([&](){mChilds.at(i)->redo();});
     }
-    catch (Exception&)
-    {
-        try
-        {
-            // could not undo the child with index "i"!
-            // try to revert the whole action --> redo the undoed commands
-            for (; i < mChilds.count(); i++) { // from "i" to top
-                mChilds[i]->redo();
-            }
-        }
-        catch (Exception&)
-        {
-            qFatal("UndoCommandGroup: Internal Fatal Error");
-        }
-        throw;
-    }
+    sgl.dismiss();
 }
 
 void UndoCommandGroup::performRedo() throw (Exception)
 {
-    // TODO: use scope guard
-
-    int i;
-
-    try
-    {
-        for (i = 0; i < mChilds.count(); i++) { // from bottom to top
-            mChilds[i]->redo();
-        }
+    ScopeGuardList sgl(mChilds.count());
+    for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
+        mChilds.at(i)->redo();
+        sgl.add([&](){mChilds.at(i)->undo();});
     }
-    catch (Exception&)
-    {
-        try
-        {
-            // could not undo the child with index "i"!
-            // try to revert the whole action --> undo the redoed commands
-            for (; i >= 0; i--) { // from "i" to bottom
-                mChilds[i]->undo();
-            }
-        }
-        catch (Exception&)
-        {
-            qFatal("UndoCommandGroup: Internal Fatal Error");
-        }
-        throw;
-    }
+    sgl.dismiss();
 }
 
 /*****************************************************************************************

@@ -26,6 +26,7 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/scopeguardlist.h>
 #include "../project.h"
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -344,29 +345,15 @@ void Board::addToProject() throw (Exception)
     if (mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
     QList<BI_Base*> items = getAllItems();
-    int i = 0;
-    try {
-        while (i < items.count()) {
-            items.at(i)->addToBoard(*mGraphicsScene); // can throw
-            i++;
-        }
-    } catch (Exception& e) {
-        try {
-            while (i > 0) {
-                items.at(i-1)->removeFromBoard(*mGraphicsScene); // can throw
-                i--;
-            }
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(items.count());
+    for (int i = 0; i < items.count(); ++i) {
+        items.at(i)->addToBoard(*mGraphicsScene); // can throw
+        sgl.add([&](){items.at(i)->removeFromBoard(*mGraphicsScene);});
     }
-
     mIsAddedToProject = true;
     updateErcMessages();
+    sgl.dismiss();
 }
 
 void Board::removeFromProject() throw (Exception)
@@ -374,29 +361,15 @@ void Board::removeFromProject() throw (Exception)
     if (!mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
     QList<BI_Base*> items = getAllItems();
-    int i = items.count();
-    try {
-        while (i > 0) {
-            items.at(i-1)->removeFromBoard(*mGraphicsScene); // can throw
-            i--;
-        }
-    } catch (Exception& e) {
-        try {
-            while (i < items.count()) {
-                items.at(i)->addToBoard(*mGraphicsScene); // can throw
-                i++;
-            }
-        } catch (Exception& e2) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(items.count());
+    for (int i = items.count()-1; i >= 0; --i) {
+        items.at(i)->removeFromBoard(*mGraphicsScene); // can throw
+        sgl.add([&](){items.at(i)->addToBoard(*mGraphicsScene);});
     }
-
     mIsAddedToProject = false;
     updateErcMessages();
+    sgl.dismiss();
 }
 
 bool Board::save(bool toOriginal, QStringList& errors) noexcept

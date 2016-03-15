@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/scopeguardlist.h>
 #include "componentsignalinstance.h"
 #include "componentinstance.h"
 #include "circuit.h"
@@ -157,41 +158,26 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exceptio
             "component signal \"%1:%2\" cannot be changed because it is still in use!"))
             .arg(mComponentInstance.getName(), mComponentSignal->getName()));
     }
-
-    // TODO: use scope guard
-
-    // change signal
+    ScopeGuardList sgl;
     if (mNetSignal) {
         mNetSignal->unregisterComponentSignal(*this); // can throw
         disconnect(mNetSignal, &NetSignal::nameChanged,
                    this, &ComponentSignalInstance::netSignalNameChanged);
+        sgl.add([&](){mNetSignal->registerComponentSignal(*this);
+                      connect(mNetSignal, &NetSignal::nameChanged,
+                      this, &ComponentSignalInstance::netSignalNameChanged);});
     }
     if (netsignal) {
-        try
-        {
-            netsignal->registerComponentSignal(*this); // can throw
-            connect(netsignal, &NetSignal::nameChanged,
-                    this, &ComponentSignalInstance::netSignalNameChanged);
-        }
-        catch (Exception&)
-        {
-            if (mNetSignal) {
-                try
-                {
-                    mNetSignal->registerComponentSignal(*this); // can throw
-                    connect(mNetSignal, &NetSignal::nameChanged,
-                            this, &ComponentSignalInstance::netSignalNameChanged);
-                }
-                catch (Exception&)
-                {
-                    qFatal("Internal Fatal Error");
-                }
-            }
-            throw;
-        }
+        netsignal->registerComponentSignal(*this); // can throw
+        connect(netsignal, &NetSignal::nameChanged,
+                this, &ComponentSignalInstance::netSignalNameChanged);
+        sgl.add([&](){netsignal->unregisterComponentSignal(*this);
+                      disconnect(netsignal, &NetSignal::nameChanged,
+                      this, &ComponentSignalInstance::netSignalNameChanged);});
     }
     mNetSignal = netsignal;
     updateErcMessages();
+    sgl.dismiss();
 }
 
 /*****************************************************************************************

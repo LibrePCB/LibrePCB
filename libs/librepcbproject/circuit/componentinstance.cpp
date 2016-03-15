@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "componentinstance.h"
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/scopeguardlist.h>
 #include "circuit.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
@@ -305,28 +306,14 @@ void ComponentInstance::addToCircuit() throw (Exception)
     if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-
-    // TODO: use scope guard
-    QList<ComponentSignalInstance*> addedSignals;
-    try {
-        foreach (ComponentSignalInstance* signal, mSignals) {
-            signal->addToCircuit(); // can throw
-            addedSignals.prepend(signal);
-        }
-    } catch (Exception&) {
-        try {
-            foreach (ComponentSignalInstance* signal, addedSignals) {
-                signal->removeFromCircuit(); // can throw
-                addedSignals.removeOne(signal);
-            }
-        } catch (Exception&) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(mSignals.count());
+    foreach (ComponentSignalInstance* signal, mSignals) {
+        signal->addToCircuit(); // can throw
+        sgl.add([&](){signal->removeFromCircuit();});
     }
-
     mIsAddedToCircuit = true;
     updateErcMessages();
+    sgl.dismiss();
 }
 
 void ComponentInstance::removeFromCircuit() throw (Exception)
@@ -339,28 +326,14 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
             QString(tr("The component \"%1\" cannot be removed because it is still in use!"))
             .arg(mName));
     }
-
-    // TODO: use scope guard
-    QList<ComponentSignalInstance*> removedSignals;
-    try {
-        foreach (ComponentSignalInstance* signal, mSignals) {
-            signal->removeFromCircuit(); // can throw
-            removedSignals.prepend(signal);
-        }
-    } catch (Exception&) {
-        try {
-            foreach (ComponentSignalInstance* signal, removedSignals) {
-                signal->addToCircuit(); // can throw
-                removedSignals.removeOne(signal);
-            }
-        } catch (Exception&) {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
+    ScopeGuardList sgl(mSignals.count());
+    foreach (ComponentSignalInstance* signal, mSignals) {
+        signal->removeFromCircuit(); // can throw
+        sgl.add([&](){signal->addToCircuit();});
     }
-
     mIsAddedToCircuit = false;
     updateErcMessages();
+    sgl.dismiss();
 }
 
 void ComponentInstance::registerSymbol(SI_Symbol& symbol) throw (Exception)

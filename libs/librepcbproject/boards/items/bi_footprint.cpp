@@ -32,6 +32,7 @@
 #include <librepcblibrary/dev/device.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcbcommon/scopeguardlist.h>
 #include "bi_device.h"
 
 /*****************************************************************************************
@@ -136,11 +137,13 @@ void BI_Footprint::addToBoard(GraphicsScene& scene) throw (Exception)
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
+    ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
         pad->addToBoard(scene); // can throw
+        sgl.add([&](){pad->removeFromBoard(scene);});
     }
     BI_Base::addToBoard(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
@@ -148,11 +151,13 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
+    ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
         pad->removeFromBoard(scene); // can throw
+        sgl.add([&](){pad->addToBoard(scene);});
     }
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
+    sgl.dismiss();
 }
 
 XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdschematicnetpointedit.h"
+#include <librepcbcommon/scopeguardlist.h>
 #include "../items/si_netpoint.h"
 
 /*****************************************************************************************
@@ -92,18 +93,24 @@ bool CmdSchematicNetPointEdit::performExecute() throw (Exception)
 
 void CmdSchematicNetPointEdit::performUndo() throw (Exception)
 {
-    // TODO: use scope guard
+    ScopeGuardList sgl;
     mNetPoint.setNetSignal(*mOldNetSignal); // can throw
+    sgl.add([&](){mNetPoint.setNetSignal(*mNewNetSignal);});
     mNetPoint.setPinToAttach(mOldSymbolPin); // can throw
+    sgl.add([&](){mNetPoint.setPinToAttach(mNewSymbolPin);});
     mNetPoint.setPosition(mOldPos);
+    sgl.dismiss();
 }
 
 void CmdSchematicNetPointEdit::performRedo() throw (Exception)
 {
-    // TODO: use scope guard
+    ScopeGuardList sgl;
     mNetPoint.setNetSignal(*mNewNetSignal); // can throw
+    sgl.add([&](){mNetPoint.setNetSignal(*mOldNetSignal);});
     mNetPoint.setPinToAttach(mNewSymbolPin); // can throw
+    sgl.add([&](){mNetPoint.setPinToAttach(mOldSymbolPin);});
     mNetPoint.setPosition(mNewPos);
+    sgl.dismiss();
 }
 
 /*****************************************************************************************

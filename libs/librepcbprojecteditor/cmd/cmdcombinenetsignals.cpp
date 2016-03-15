@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcombinenetsignals.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/schematics/items/si_netpoint.h>
 #include <librepcbproject/schematics/items/si_netline.h>
@@ -61,32 +62,9 @@ CmdCombineNetSignals::~CmdCombineNetSignals() noexcept
 
 bool CmdCombineNetSignals::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdCombineNetSignals::buildAndExecuteChildCommands() throw (Exception)
-{
     // change netsignal of all netlabels
     foreach (SI_NetLabel* label, mNetSignalToRemove.getNetLabels()) {
         auto* cmd = new CmdSchematicNetLabelEdit(*label);
@@ -127,6 +105,7 @@ bool CmdCombineNetSignals::buildAndExecuteChildCommands() throw (Exception)
     // remove the old netsignal
     execNewChildCmd(new CmdNetSignalRemove(mCircuit, mNetSignalToRemove)); // can throw
 
+    undoScopeGuard.dismiss(); // no undo required
     return true;
 }
 

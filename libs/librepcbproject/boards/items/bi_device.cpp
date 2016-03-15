@@ -31,6 +31,7 @@
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "bi_footprint.h"
+#include <librepcbcommon/scopeguard.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -181,9 +182,10 @@ void BI_Device::addToBoard(GraphicsScene& scene) throw (Exception)
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
     mCompInstance->registerDevice(*this); // can throw
+    auto sg = scopeGuard([&](){mCompInstance->unregisterDevice(*this);});
     mFootprint->addToBoard(scene); // can throw
+    sg.dismiss();
     BI_Base::addToBoard();
     updateErcMessages();
 }
@@ -193,9 +195,10 @@ void BI_Device::removeFromBoard(GraphicsScene& scene) throw (Exception)
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    // TODO: use scope guard
     mFootprint->removeFromBoard(scene); // can throw
+    auto sg = scopeGuard([&](){mFootprint->addToBoard(scene);});
     mCompInstance->unregisterDevice(*this); // can throw
+    sg.dismiss();
     BI_Base::removeFromBoard();
     updateErcMessages();
 }

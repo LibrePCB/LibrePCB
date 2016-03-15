@@ -22,11 +22,11 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremoveselectedboarditems.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
-#include "cmdremoveunusednetsignals.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -53,40 +53,12 @@ CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept
 
 bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdRemoveSelectedBoardItems::buildAndExecuteChildCommands() throw (Exception)
-{
     // get all selected items
     QList<BI_Base*> items = mBoard.getSelectedItems(false /*true, false, true, false, false,
                                                     false, false, false, false, false*/);
-
-    // no items selected --> nothing to do here
-    if (items.isEmpty()) {
-        return false;
-    }
 
     // clear selection because these items will be removed now
     mBoard.clearSelection();
@@ -100,9 +72,7 @@ bool CmdRemoveSelectedBoardItems::buildAndExecuteChildCommands() throw (Exceptio
         }
     }
 
-    // remove netsignals which are no longer required
-    execNewChildCmd(new CmdRemoveUnusedNetSignals(mBoard.getProject().getCircuit())); // can throw
-
+    undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
 }
 

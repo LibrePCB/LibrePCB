@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremoveselectedschematicitems.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/circuit/componentinstance.h>
@@ -69,40 +70,12 @@ CmdRemoveSelectedSchematicItems::~CmdRemoveSelectedSchematicItems() noexcept
 
 bool CmdRemoveSelectedSchematicItems::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdRemoveSelectedSchematicItems::buildAndExecuteChildCommands() throw (Exception)
-{
     // get all selected items
     QList<SI_Base*> items = mSchematic.getSelectedItems(false, true, true, true, true, true,
                                                         true, true, true, true, false);
-
-    // no items selected --> nothing to do here
-    if (items.isEmpty()) {
-        return false;
-    }
 
     // clear selection because these items will be removed now
     mSchematic.clearSelection();
@@ -178,9 +151,12 @@ bool CmdRemoveSelectedSchematicItems::buildAndExecuteChildCommands() throw (Exce
         }
     }
 
-    // remove netsignals which are no longer required
-    execNewChildCmd(new CmdRemoveUnusedNetSignals(mSchematic.getProject().getCircuit())); // can throw
+    if (getChildCount() > 0) {
+        // remove netsignals which are no longer required
+        execNewChildCmd(new CmdRemoveUnusedNetSignals(mSchematic.getProject().getCircuit())); // can throw
+    }
 
+    undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
 }
 

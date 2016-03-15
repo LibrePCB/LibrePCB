@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcombineschematicnetpoints.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/schematics/items/si_netpoint.h>
 #include <librepcbproject/schematics/items/si_netline.h>
@@ -56,32 +57,9 @@ CmdCombineSchematicNetPoints::~CmdCombineSchematicNetPoints() noexcept
 
 bool CmdCombineSchematicNetPoints::performExecute() throw (Exception)
 {
-    // TODO: use scope guard
-    try
-    {
-        return buildAndExecuteChildCommands(); // can throw
-    }
-    catch (Exception&)
-    {
-        try
-        {
-            // undo all already executed child commands
-            UndoCommandGroup::performUndo(); // can throw
-        }
-        catch (Exception&)
-        {
-            qFatal("Internal Fatal Error");
-        }
-        throw;
-    }
-}
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool CmdCombineSchematicNetPoints::buildAndExecuteChildCommands() throw (Exception)
-{
     // TODO: do not create redundant netlines!
 
     // change netpoint of all affected netlines
@@ -105,6 +83,7 @@ bool CmdCombineSchematicNetPoints::buildAndExecuteChildCommands() throw (Excepti
     // remove the unused netpoint
     execNewChildCmd(new CmdSchematicNetPointRemove(mNetPointToBeRemoved)); // can throw
 
+    undoScopeGuard.dismiss(); // no undo required
     return true;
 }
 
