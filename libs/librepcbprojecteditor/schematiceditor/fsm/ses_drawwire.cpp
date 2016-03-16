@@ -443,9 +443,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
 
         try
         {
-            // remove p1 if p1 == p0
+            // remove p1 if p1 == p0 || p1 == p2
             if (mPositioningNetPoint1->getPosition() == mFixedNetPoint->getPosition()) {
                 mUndoStack.appendToCmdGroup(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mFixedNetPoint));
+            } else if (mPositioningNetPoint1->getPosition() == mPositioningNetPoint2->getPosition()) {
+                mUndoStack.appendToCmdGroup(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mPositioningNetPoint2));
             }
 
             // combine all schematic items under "mPositioningNetPoint2" together
