@@ -50,8 +50,10 @@ class ScopeGuardList final : public ScopeGuardBase
 
         ScopeGuardList(size_t size) noexcept :
             ScopeGuardBase(),
-            mScopeGuards(size)
-        { }
+            mScopeGuards()
+        {
+            mScopeGuards.reserve(size);
+        }
 
         ScopeGuardList(ScopeGuardList&& rhs) noexcept :
             ScopeGuardBase(std::move(rhs)),
@@ -68,6 +70,8 @@ class ScopeGuardList final : public ScopeGuardBase
         {
             if (mActive) {
                 for (auto scopeGuard = mScopeGuards.rbegin(); scopeGuard != mScopeGuards.rend(); ++scopeGuard) {
+                    // skip empty functions
+                    if (! *scopeGuard) continue;
                     try{ (*scopeGuard)(); } catch(...) {
                         qFatal("Cleanup function threw an exception!");
                     }
