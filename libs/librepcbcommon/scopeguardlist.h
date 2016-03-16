@@ -72,8 +72,8 @@ class ScopeGuardList final : public ScopeGuardBase
                 for (auto scopeGuard = mScopeGuards.rbegin(); scopeGuard != mScopeGuards.rend(); ++scopeGuard) {
                     // skip empty functions
                     if (! *scopeGuard) continue;
-                    try{ (*scopeGuard)(); } catch(...) {
-                        qFatal("Cleanup function threw an exception!");
+                    try { (*scopeGuard)(); } catch(const std::exception& e) {
+                        qFatal("Cleanup function threw an exception: %s", e.what());
                     }
                 }
             }

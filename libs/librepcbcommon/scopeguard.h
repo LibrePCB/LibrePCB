@@ -73,7 +73,7 @@ class ScopeGuardBase
  *  Class ScopeGuard
  ****************************************************************************************/
 /**
- * Implementation of a ScopeGuard based on 
+ * Implementation of a ScopeGuard based on
  * https://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C
  */
 template<class Fun>
@@ -99,8 +99,8 @@ class ScopeGuard final : public ScopeGuardBase
         ~ScopeGuard() noexcept
         {
             if (mActive) {
-                try { mF(); } catch(...) {
-                    qFatal("Cleanup function threw an exception!");
+                try { mF(); } catch(const std::exception& e) {
+                    qFatal("Cleanup function threw an exception: %s", e.what());
                 }
             }
         }
