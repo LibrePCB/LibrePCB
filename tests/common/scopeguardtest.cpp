@@ -113,6 +113,33 @@ TEST(ScopeGuardTest, testScopeGuardListDismiss)
     EXPECT_FALSE(setByGuard1);
 }
 
+// check if entries are executed in reverse order
+TEST(ScopeGuardTest, testScopeGuardListOrder)
+{
+    int i = 0;
+    {
+        auto guardList = ScopeGuardList();
+
+        guardList.add([&]{ i*=2; });
+        guardList.add([&]{ i+=1; });
+    }
+    // if the order of execution is correct: (0+1)*2 == 2
+    EXPECT_EQ(2, i);
+}
+
+// check if presized scopeGuardList works
+TEST(ScopeGuardTest, testScopeGuardListSizedConstructor)
+{
+    auto guardList = ScopeGuardList(5);
+}
+
+// check if presized scopeGuardList works
+TEST(ScopeGuardTest, testScopeGuardListEmptyCallback)
+{
+    auto guardList = ScopeGuardList(2);
+    guardList.add(std::function<void()>());
+}
+
 TEST(ScopeGuardTest, testScopeGuardListPerformance)
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
