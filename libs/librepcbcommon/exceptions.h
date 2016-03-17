@@ -54,21 +54,22 @@ class FilePath;
  *  - a user message (#mUserMsg): error message in the user's language (can be printed
  *    directly to a QMessageBox or similar)
  *  - the filename of the source file where the exception was thrown (#mFile)
- *  - the number of the line where the exception was thrown (#mLine)
+ *  - the line number where the exception was thrown (#mLine)
  *
- * @note Every exception will automatically print a debug message (see #Debug) of type
- *       Debug#Exception (see Debug#DebugLevel).
+ * @note Every exception will automatically print a debug message (see ::Debug) of type
+ *       Debug::DebugLevel::Exception (see Debug::DebugLevel).
  *
  * Example how to use exceptions:
  *
  * @code
- * void foo(int i)
+ * void foo(int i) throw (Exception)
  * {
- *     if (i < 0)
+ *     if (i < 0) {
  *         throw Exception(__FILE__, __LINE__, QString("i=%1").arg(i), tr("Invalid argument!"));
+ *      }
  * }
  *
- * void bar()
+ * void bar() noexcept
  * {
  *     try
  *     {
@@ -82,14 +83,24 @@ class FilePath;
  * @endcode
  *
  * @warning Please read the "Exception Safety" notes from the Qt Project documentation
- * before writing source code which throws exceptions! There are some important things
- * to know! http://qt-project.org/doc/qt-5/exceptionsafety.html
+ * before writing source code which throws exceptions, there are some important things
+ * to know: http://qt-project.org/doc/qt-5/exceptionsafety.html
  */
 class Exception : public QException
 {
     public:
 
-        // Constructor
+        // Constructors / Destructor
+
+        /**
+         * @brief The default constructor
+         */
+        Exception() = delete;
+
+        /**
+         * @brief The copy constructor (needed for #clone())
+         */
+        Exception(const Exception& other) noexcept;
 
         /**
          * @brief The constructor which is used to throw an exception
@@ -97,44 +108,48 @@ class Exception : public QException
          * @param file      The source file where the exception was thrown (use __FILE__)
          * @param line      The line number where the exception was thrown (use __LINE__)
          * @param debugMsg  Debugging information which will be written only to the debug
-         *                  log (see class Debug). The user will never see this
-         *                  information, so it should be always in english!
-         * @param userMsg   An error message in the user's language (use QObject::tr()!).
+         *                  log (see class ::Debug). The user will normally not see this
+         *                  information, so it should be always in english.
+         * @param userMsg   An error message in the user's language (use QObject::tr()).
          *                  This message can be used in message boxes. Do not include too
          *                  much technical information about the exception here, use the
          *                  parameter debugMsg instead.
          */
         Exception(const char* file, int line, const QString& debugMsg = QString(),
-                  const QString& userMsg = QString("Exception"));
+                  const QString& userMsg = QString("Exception")) noexcept;
 
         /**
-         * @brief The copy constructor (needed for #clone())
+         * @brief The destructor
          */
-        Exception(const Exception& other);
+        virtual ~Exception() noexcept {}
 
 
         // Getters
 
         /**
          * @brief Get the debug error message (always in english)
+         *
          * @return The debug error message / technical information about the exception
          */
         const QString&  getDebugMsg()   const {return mDebugMsg;}
 
         /**
          * @brief Get the user error message (translated)
+         *
          * @return The user error message in the user's language
          */
         const QString&  getUserMsg()    const {return mUserMsg;}
 
         /**
          * @brief Get the source file where the exception was thrown
+         *
          * @return The filename
          */
         const QString&  getFile()       const {return mFile;}
 
         /**
          * @brief Get the line number where the exception was thrown
+         *
          * @return The line number
          */
         int             getLine()       const {return mLine;}
@@ -144,7 +159,9 @@ class Exception : public QException
          *
          * @warning This method is only for compatibility reasons with the base class
          *          std::exception. Normally, you should not use this method. Use
-         *          #getDebugMsg() or #getUserMsg() instead!
+         *          #getDebugMsg() or #getUserMsg() instead.
+         *
+         * @note The returned pointer is valid as long as the exception object exists
          *
          * @return the user error message as a C-string (const char*) in the local encoding
          */
@@ -152,10 +169,11 @@ class Exception : public QException
 
 
         // Inherited from QException (see QException documentation for more details)
-        virtual void raise() const {throw *this;}
-        virtual Exception* clone() const {return new Exception(*this);}
+        virtual void raise() const override {throw *this;}
+        virtual Exception* clone() const override {return new Exception(*this);}
 
-    protected:
+
+    private:
 
         // Attributes
         QString mDebugMsg;  ///< the debug message (in english)
@@ -163,12 +181,8 @@ class Exception : public QException
         QString mFile;      ///< the source filename where the exception was thrown
         int mLine;          ///< the line number where the exception was thrown
 
-    private:
-
-        /**
-         * @brief The default constructor
-         */
-        Exception();
+        // Cached Attributes
+        mutable QByteArray mUserMsgUtf8;    ///< the user message as an UTF8 byte array
 };
 
 /*****************************************************************************************
@@ -179,33 +193,33 @@ class Exception : public QException
  * @brief The LogicError class
  *
  * This exception class is used for exceptions related to the internal logic of the
- * program (a throwed LogicError means that there is a bug in the source code!).
+ * program (a throwed LogicError means that there is a bug in the source code).
  *
  * @see Exception
  */
-class LogicError : public Exception
+class LogicError final : public Exception
 {
     public:
+
+        /**
+         * @brief Default Constructor
+         */
+        LogicError() = delete;
 
         /**
          * @copydoc Exception::Exception
          */
         LogicError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString("Logic Error"));
+                   const QString& userMsg = QString("Logic Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
          */
-        LogicError(const LogicError& other);
+        LogicError(const LogicError& other) noexcept;
 
         // Inherited from Exception
-        virtual void raise() const {throw *this;}
-        virtual LogicError* clone() const {return new LogicError(*this);}
-
-    private:
-
-        /// @brief make the default constructor inaccessible
-        LogicError();
+        virtual void raise() const override {throw *this;}
+        virtual LogicError* clone() const override {return new LogicError(*this);}
 };
 
 /*****************************************************************************************
@@ -226,24 +240,29 @@ class RuntimeError : public Exception
     public:
 
         /**
+         * @brief Default Constructor
+         */
+        RuntimeError() = delete;
+
+        /**
          * @copydoc Exception::Exception
          */
         RuntimeError(const char* file, int line, const QString& debugMsg = QString(),
-                     const QString& userMsg = QString("Runtime Error"));
+                     const QString& userMsg = QString("Runtime Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
          */
-        RuntimeError(const RuntimeError& other);
+        RuntimeError(const RuntimeError& other) noexcept;
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~RuntimeError() noexcept {}
 
         // Inherited from Exception
-        virtual void raise() const {throw *this;}
-        virtual RuntimeError* clone() const {return new RuntimeError(*this);}
-
-    private:
-
-        /// @brief make the default constructor inaccessible
-        RuntimeError();
+        virtual void raise() const override {throw *this;}
+        virtual RuntimeError* clone() const override {return new RuntimeError(*this);}
 };
 
 /*****************************************************************************************
@@ -257,29 +276,29 @@ class RuntimeError : public Exception
  *
  * @see Exception
  */
-class RangeError : public RuntimeError
+class RangeError final : public RuntimeError
 {
     public:
+
+        /**
+         * @brief Default Constructor
+         */
+        RangeError() = delete;
 
         /**
          * @copydoc Exception::Exception
          */
         RangeError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString("Range Error"));
+                   const QString& userMsg = QString("Range Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
          */
-        RangeError(const RangeError& other);
+        RangeError(const RangeError& other) noexcept;
 
         // Inherited from RuntimeError
-        virtual void raise() const {throw *this;}
-        virtual RangeError* clone() const {return new RangeError(*this);}
-
-    private:
-
-        /// @brief make the default constructor inaccessible
-        RangeError();
+        virtual void raise() const override {throw *this;}
+        virtual RangeError* clone() const override {return new RangeError(*this);}
 };
 
 /*****************************************************************************************
@@ -294,9 +313,14 @@ class RangeError : public RuntimeError
  *
  * @see Exception
  */
-class FileParseError : public RuntimeError
+class FileParseError final : public RuntimeError
 {
     public:
+
+        /**
+         * @brief Default Constructor
+         */
+        FileParseError() = delete;
 
         /**
          * @brief The constructor which is used to throw an exception
@@ -312,21 +336,16 @@ class FileParseError : public RuntimeError
         FileParseError(const char* file, int line, const FilePath& filePath,
                        int fileLine = -1, int fileColumn = -1,
                        const QString& invalidFileContent = QString(),
-                       const QString& userMsg = QString("File Parse Error"));
+                       const QString& userMsg = QString("File Parse Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
          */
-        FileParseError(const FileParseError& other);
+        FileParseError(const FileParseError& other) noexcept;
 
         // Inherited from RuntimeError
-        virtual void raise() const {throw *this;}
-        virtual FileParseError* clone() const {return new FileParseError(*this);}
-
-    private:
-
-        /// @brief make the default constructor inaccessible
-        FileParseError();
+        virtual void raise() const override {throw *this;}
+        virtual FileParseError* clone() const override {return new FileParseError(*this);}
 };
 
 /*****************************************************************************************
@@ -353,29 +372,29 @@ class FileParseError : public RuntimeError
  *
  * @see Exception
  */
-class UserCanceled : public Exception
+class UserCanceled final : public Exception
 {
     public:
+
+        /**
+         * @brief Default Constructor
+         */
+        UserCanceled() = delete;
 
         /**
          * @copydoc Exception::Exception
          */
         UserCanceled(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString("User Canceled"));
+                    const QString& userMsg = QString("User Canceled")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
          */
-        UserCanceled(const UserCanceled& other);
+        UserCanceled(const UserCanceled& other) noexcept;
 
         // Inherited from Exception
-        virtual void raise() const {throw *this;}
-        virtual UserCanceled* clone() const {return new UserCanceled(*this);}
-
-    private:
-
-        /// @brief make the default constructor inaccessible
-        UserCanceled();
+        virtual void raise() const override {throw *this;}
+        virtual UserCanceled* clone() const override {return new UserCanceled(*this);}
 };
 
 /*****************************************************************************************

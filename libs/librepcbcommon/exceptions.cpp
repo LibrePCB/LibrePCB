@@ -35,15 +35,15 @@ namespace librepcb {
  ****************************************************************************************/
 
 Exception::Exception(const char* file, int line, const QString& debugMsg,
-                     const QString& userMsg) :
+                     const QString& userMsg) noexcept :
     mDebugMsg(debugMsg), mUserMsg(userMsg), mFile(file), mLine(line)
 {
-    // the filename and line number will be added in the Debug class, not here!
+    // print out the exception to the console/log output
     Debug::instance()->print(Debug::DebugLevel_t::Exception,
                              QString("%1 {%2}").arg(mUserMsg, mDebugMsg), file, line);
 }
 
-Exception::Exception(const Exception& other) :
+Exception::Exception(const Exception& other) noexcept :
     mDebugMsg(other.mDebugMsg), mUserMsg(other.mUserMsg), mFile(other.mFile),
     mLine(other.mLine)
 {
@@ -51,9 +51,10 @@ Exception::Exception(const Exception& other) :
 
 const char* Exception::what() const noexcept
 {
-    static QByteArray localMsg;
-    localMsg = mUserMsg.toLocal8Bit();
-    return localMsg.constData();
+    if (mUserMsgUtf8.isNull()) {
+        mUserMsgUtf8 = mUserMsg.toUtf8();
+    }
+    return mUserMsgUtf8.constData();
 }
 
 /*****************************************************************************************
@@ -61,12 +62,12 @@ const char* Exception::what() const noexcept
  ****************************************************************************************/
 
 LogicError::LogicError(const char* file, int line, const QString& debugMsg,
-                       const QString& userMsg) :
+                       const QString& userMsg) noexcept :
     Exception(file, line, debugMsg, userMsg)
 {
 }
 
-LogicError::LogicError(const LogicError& other) :
+LogicError::LogicError(const LogicError& other) noexcept :
     Exception(other)
 {
 }
@@ -76,12 +77,12 @@ LogicError::LogicError(const LogicError& other) :
  ****************************************************************************************/
 
 RuntimeError::RuntimeError(const char* file, int line, const QString& debugMsg,
-                           const QString& userMsg) :
+                           const QString& userMsg) noexcept :
     Exception(file, line, debugMsg, userMsg)
 {
 }
 
-RuntimeError::RuntimeError(const RuntimeError& other) :
+RuntimeError::RuntimeError(const RuntimeError& other) noexcept :
     Exception(other)
 {
 }
@@ -91,12 +92,12 @@ RuntimeError::RuntimeError(const RuntimeError& other) :
  ****************************************************************************************/
 
 RangeError::RangeError(const char* file, int line, const QString& debugMsg,
-                       const QString& userMsg) :
+                       const QString& userMsg) noexcept :
     RuntimeError(file, line, debugMsg, userMsg)
 {
 }
 
-RangeError::RangeError(const RangeError& other) :
+RangeError::RangeError(const RangeError& other) noexcept :
     RuntimeError(other)
 {
 }
@@ -107,14 +108,14 @@ RangeError::RangeError(const RangeError& other) :
 
 FileParseError::FileParseError(const char* file, int line, const FilePath& filePath,
                                int fileLine, int fileColumn,
-                               const QString& invalidFileContent, const QString& userMsg) :
+                               const QString& invalidFileContent, const QString& userMsg) noexcept :
     RuntimeError(file, line, invalidFileContent,
         QString("File parse error: %1\n\nFile: %2\nLine,Column: %3,%4\nInvalid Content: \"%5\"")
         .arg(userMsg).arg(filePath.toNative()).arg(fileLine).arg(fileColumn).arg(invalidFileContent))
 {
 }
 
-FileParseError::FileParseError(const FileParseError& other) :
+FileParseError::FileParseError(const FileParseError& other) noexcept :
     RuntimeError(other)
 {
 }
@@ -124,12 +125,12 @@ FileParseError::FileParseError(const FileParseError& other) :
  ****************************************************************************************/
 
 UserCanceled::UserCanceled(const char* file, int line, const QString& debugMsg,
-                           const QString& userMsg) :
+                           const QString& userMsg) noexcept :
     Exception(file, line, debugMsg, userMsg)
 {
 }
 
-UserCanceled::UserCanceled(const UserCanceled& other) :
+UserCanceled::UserCanceled(const UserCanceled& other) noexcept :
     Exception(other)
 {
 }

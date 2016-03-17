@@ -51,10 +51,6 @@ static int appExec() noexcept
     {
         return Application::exec();
     }
-    catch (Exception& e)
-    {
-        qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", qPrintable(e.getUserMsg()));
-    }
     catch (std::exception& e)
     {
         qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
