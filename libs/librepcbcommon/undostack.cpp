@@ -207,10 +207,15 @@ void UndoStack::abortCmdGroup() throw (Exception)
     Q_ASSERT(mActiveCommandGroup);
     Q_ASSERT(mCommands.last() == mActiveCommandGroup);
 
-    mActiveCommandGroup->undo(); // can throw
-    mActiveCommandGroup = nullptr;
-    mCurrentIndex--;
-    delete mCommands.takeLast(); // delete and remove the aborted command group from the stack
+    try {
+        mActiveCommandGroup->undo(); // can throw (but should usually not)
+        mActiveCommandGroup = nullptr;
+        mCurrentIndex--;
+        delete mCommands.takeLast(); // delete and remove the aborted command group from the stack
+    } catch (Exception& e) {
+        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getUserMsg();
+        throw;
+    }
 
     // emit signals
     emit undoTextChanged(getUndoText());
@@ -227,8 +232,13 @@ void UndoStack::undo() throw (Exception)
         return; // if a command group is active, undo() is not allowed
     }
 
-    mCommands[mCurrentIndex-1]->undo(); // can throw
-    mCurrentIndex--;
+    try {
+        mCommands[mCurrentIndex-1]->undo(); // can throw (but should usually not)
+        mCurrentIndex--;
+    } catch (Exception& e) {
+        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getUserMsg();
+        throw;
+    }
 
     // emit signals
     emit undoTextChanged(getUndoText());
@@ -244,8 +254,13 @@ void UndoStack::redo() throw (Exception)
         return;
     }
 
-    mCommands[mCurrentIndex]->redo(); // can throw
-    mCurrentIndex++;
+    try {
+        mCommands[mCurrentIndex]->redo(); // can throw (but should usually not)
+        mCurrentIndex++;
+    } catch (Exception& e) {
+        qCritical() << "UndoCommand::redo() has thrown an exception:" << e.getUserMsg();
+        throw;
+    }
 
     // emit signals
     emit undoTextChanged(getUndoText());
