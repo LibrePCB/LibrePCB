@@ -132,6 +132,8 @@ void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     mNetSignal->registerSchematicNetLabel(*this); // can throw
+    mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
     SI_Base::addToSchematic(scene, *mGraphicsItem);
 }
 
@@ -141,6 +143,7 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     mNetSignal->unregisterSchematicNetLabel(*this); // can throw
+    disconnect(mHighlightChangedConnection);
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 

@@ -120,14 +120,14 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    const ComponentSignalInstance* cmpSignal = mPin.getComponentSignalInstance();
-    const NetSignal* netsignal = (cmpSignal ? cmpSignal->getNetSignal() : nullptr);
+    const NetSignal* netsignal = mPin.getCompSigInstNetSignal();
+    bool highlight = mPin.isSelected() || (netsignal && netsignal->isHighlighted());
 
     // draw line
     SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);
     if (layer->isVisible())
     {
-        painter->setPen(QPen(layer->getColor(mPin.isSelected()), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
+        painter->setPen(QPen(layer->getColor(highlight), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
         painter->drawLine(QPointF(0, 0), Point(mLibPin.getLength(), 0).toPxQPointF());
     }
 
@@ -149,7 +149,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             // draw text
             painter->save();
             if (mRotate180) painter->rotate(180);
-            painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
+            painter->setPen(QPen(layer->getColor(highlight), 0));
             painter->setFont(mFont);
             painter->drawStaticText(mTextOrigin, mStaticText);
             painter->restore();
@@ -158,7 +158,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         {
             // draw filled rect
             painter->setPen(Qt::NoPen);
-            painter->setBrush(QBrush(layer->getColor(mPin.isSelected()), Qt::Dense5Pattern));
+            painter->setBrush(QBrush(layer->getColor(highlight), Qt::Dense5Pattern));
             painter->drawRect(mTextBoundingRect);
         }
     }
@@ -174,7 +174,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         font.setFamily("Monospace");
         font.setPixelSize(3);
         painter->setFont(font);
-        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->save();
         if (mRotate180) painter->rotate(180);
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
@@ -184,7 +184,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
@@ -192,7 +192,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     if (layer->isVisible())
     {
         // draw text bounding rect
-        painter->setPen(QPen(layer->getColor(mPin.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mTextBoundingRect);
     }

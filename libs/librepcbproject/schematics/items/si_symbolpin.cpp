@@ -123,6 +123,15 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
     return text;
 }
 
+NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept
+{
+    if (mComponentSignalInstance) {
+        return mComponentSignalInstance->getNetSignal();
+    } else {
+        return nullptr;
+    }
+}
+
 bool SI_SymbolPin::isRequired() const noexcept
 {
     if (mComponentSignalInstance) {
@@ -144,6 +153,10 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene) throw (Exception)
     if (mComponentSignalInstance) {
         mComponentSignalInstance->registerSymbolPin(*this); // can throw
     }
+    if (getCompSigInstNetSignal()) {
+        mHighlightChangedConnection = connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
+                                              [this](){mGraphicsItem->update();});
+    }
     SI_Base::addToSchematic(scene, *mGraphicsItem);
     updateErcMessages();
 }
@@ -155,6 +168,9 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     }
     if (mComponentSignalInstance) {
         mComponentSignalInstance->unregisterSymbolPin(*this); // can throw
+    }
+    if (getCompSigInstNetSignal()) {
+        disconnect(mHighlightChangedConnection);
     }
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
     updateErcMessages();

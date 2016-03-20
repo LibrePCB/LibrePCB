@@ -63,15 +63,10 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) 
             throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
                 QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
         }
-        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
-        if (!compSignal) {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
-                QString(tr("The symbol pin instance \"%1\" has no signal.")).arg(pinUuid.toStr()));
-        }
-        mNetSignal = compSignal->getNetSignal();
+        mNetSignal = mSymbolPin->getCompSigInstNetSignal();
         if (!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(), QString(tr("The pin of the "
-                "netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
+            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(), QString(tr("The pin "
+                "of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
         }
         mPosition = mSymbolPin->getPosition();
     } else {
@@ -178,10 +173,9 @@ void SI_NetPoint::setPinToAttach(SI_SymbolPin* pin) throw (Exception)
         }
         if (pin) {
             // attach to new pin
-            const ComponentSignalInstance* compSignal = pin->getComponentSignalInstance();
-            if (!compSignal) throw LogicError(__FILE__, __LINE__);
-            const NetSignal* netsignal = compSignal->getNetSignal();
-            if (netsignal != mNetSignal) throw LogicError(__FILE__, __LINE__);
+            if (pin->getCompSigInstNetSignal() != mNetSignal) {
+                throw LogicError(__FILE__, __LINE__);
+            }
             pin->registerNetPoint(*this); // can throw
             sgl.add([&](){pin->unregisterNetPoint(*this);});
             setPosition(pin->getPosition());
@@ -215,14 +209,14 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     sgl.add([&](){mNetSignal->unregisterSchematicNetPoint(*this);});
     if (isAttachedToPin()) {
         // check if mNetSignal is correct (would be a bug if not)
-        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
-        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
-        if (mNetSignal != netsignal) {
+        if (mSymbolPin->getCompSigInstNetSignal() != mNetSignal) {
             throw LogicError(__FILE__, __LINE__);
         }
         mSymbolPin->registerNetPoint(*this); // can throw
         sgl.add([&](){mSymbolPin->unregisterNetPoint(*this);});
     }
+    mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
     mErcMsgDeadNetPoint->setVisible(true);
     SI_Base::addToSchematic(scene, *mGraphicsItem);
     sgl.dismiss();
@@ -237,9 +231,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     ScopeGuardList sgl;
     if (isAttachedToPin()) {
         // check if mNetSignal is correct (would be a bug if not)
-        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
-        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
-        if (mNetSignal != netsignal) {
+        if (mSymbolPin->getCompSigInstNetSignal() != mNetSignal) {
             throw LogicError(__FILE__, __LINE__);
         }
         mSymbolPin->unregisterNetPoint(*this); // can throw
@@ -247,6 +239,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     }
     mNetSignal->unregisterSchematicNetPoint(*this); // can throw
     sgl.add([&](){mNetSignal->registerSchematicNetPoint(*this);});
+    disconnect(mHighlightChangedConnection);
     mErcMsgDeadNetPoint->setVisible(false);
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
     sgl.dismiss();
@@ -324,11 +317,7 @@ bool SI_NetPoint::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                             return false;
     if (mNetSignal == nullptr)                      return false;
-    if (isAttachedToPin()) {
-        const ComponentSignalInstance* compSignal = mSymbolPin->getComponentSignalInstance();
-        const NetSignal* netsignal = compSignal ? compSignal->getNetSignal() : nullptr;
-        if (mNetSignal != netsignal)                return false;
-    }
+    if (isAttachedToPin() && (mNetSignal != mSymbolPin->getCompSigInstNetSignal())) return false;
     return true;
 }
 

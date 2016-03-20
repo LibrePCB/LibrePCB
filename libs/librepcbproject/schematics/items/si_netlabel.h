@@ -100,6 +100,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
         // General
         QScopedPointer<SGI_NetLabel> mGraphicsItem;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;

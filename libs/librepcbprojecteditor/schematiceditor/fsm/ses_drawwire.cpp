@@ -418,6 +418,9 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         // properly place the new netpoints/netlines according the current wire mode
         updateNetpointPositions(pos);
 
+        // highlight all elements of the current netsignal
+        mCircuit.setHighlightedNetSignal(netsignal);
+
         return true;
     }
     catch (Exception e)
@@ -495,6 +498,7 @@ bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept
 {
     try
     {
+        mCircuit.setHighlightedNetSignal(nullptr);
         mSubState = SubState_Idle;
         mFixedNetPoint = nullptr;
         mPositioningNetLine1 = nullptr;

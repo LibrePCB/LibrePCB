@@ -152,6 +152,8 @@ void SI_NetLine::addToSchematic(GraphicsScene& scene) throw (Exception)
     mStartPoint->registerNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mStartPoint->unregisterNetLine(*this);});
     mEndPoint->registerNetLine(*this); // can throw
+    mHighlightChangedConnection = connect(&getNetSignal(), &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
     SI_Base::addToSchematic(scene, *mGraphicsItem);
     sg.dismiss();
 }
@@ -164,6 +166,7 @@ void SI_NetLine::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     mEndPoint->unregisterNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mEndPoint->registerNetLine(*this);});
     mStartPoint->unregisterNetLine(*this); // can throw
+    disconnect(mHighlightChangedConnection);
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
     sg.dismiss();
 }

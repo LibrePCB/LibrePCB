@@ -126,6 +126,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
 
         // General
         QScopedPointer<SGI_NetPoint> mGraphicsItem;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;

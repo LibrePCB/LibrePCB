@@ -42,7 +42,7 @@ namespace project {
  ****************************************************************************************/
 
 NetSignal::NetSignal(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
+    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
     mName = domElement.getAttribute<QString>("name", true);
@@ -60,7 +60,7 @@ NetSignal::NetSignal(Circuit& circuit, const XmlDomElement& domElement) throw (E
 
 NetSignal::NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
                      bool autoName) throw (Exception) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
+    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false),
     mUuid(Uuid::createRandom()), mName(name), mHasAutoName(autoName), mNetClass(&netclass)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -117,6 +117,14 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
     mHasAutoName = isAutoName;
     updateErcMessages();
     emit nameChanged(mName);
+}
+
+void NetSignal::setHighlighted(bool hl) noexcept
+{
+    if (hl != mIsHighlighted) {
+        mIsHighlighted = hl;
+        emit highlightedChanged(mIsHighlighted);
+    }
 }
 
 /*****************************************************************************************

@@ -69,6 +69,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         const QString& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mHasAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
+        bool isHighlighted() const noexcept {return mIsHighlighted;}
 
         // Getters: General
         Circuit& getCircuit() const noexcept {return mCircuit;}
@@ -81,6 +82,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
 
         // Setters
         void setName(const QString& name, bool isAutoName) throw (Exception);
+        void setHighlighted(bool hl) noexcept;
 
         // General Methods
         void addToCircuit() throw (Exception);
@@ -102,6 +104,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
     signals:
 
         void nameChanged(const QString& newName);
+        void highlightedChanged(bool isHighlighted);
 
 
     private:
@@ -115,6 +118,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         // General
         Circuit& mCircuit;
         bool mIsAddedToCircuit;
+        bool mIsHighlighted;
 
         // Attributes
         Uuid mUuid;

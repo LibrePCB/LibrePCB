@@ -99,6 +99,7 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
         void addNetSignal(NetSignal& netsignal) throw (Exception);
         void removeNetSignal(NetSignal& netsignal) throw (Exception);
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
+        void setHighlightedNetSignal(NetSignal* signal) noexcept;
 
         // ComponentInstance Methods
         QString generateAutoComponentInstanceName(const QString& cmpPrefix) const noexcept;

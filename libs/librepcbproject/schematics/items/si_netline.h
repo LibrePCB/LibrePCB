@@ -100,6 +100,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         // General
         QScopedPointer<SGI_NetLine> mGraphicsItem;
         Point mPosition; ///< the center of startpoint and endpoint
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;

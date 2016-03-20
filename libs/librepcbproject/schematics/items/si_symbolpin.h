@@ -75,8 +75,8 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
         SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
-        //const library::ComponentSignal* getComponentSignal() const noexcept {return mComponentSignal;}
         ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
+        NetSignal* getCompSigInstNetSignal() const noexcept;
         bool isRequired() const noexcept;
         bool isUsed() const noexcept {return mRegisteredNetPoint ? true : false;}
 
@@ -109,6 +109,7 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         const library::SymbolPin* mSymbolPin;
         const library::ComponentPinSignalMapItem* mPinSignalMapItem;
         ComponentSignalInstance* mComponentSignalInstance;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Misc
         Point mPosition;

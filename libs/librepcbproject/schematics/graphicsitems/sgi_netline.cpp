@@ -88,10 +88,12 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    bool highlight = mNetLine.isSelected() || mNetLine.getNetSignal().isHighlighted();
+
     // draw line
     if (mLayer->isVisible())
     {
-        QPen pen(mLayer->getColor(mNetLine.isSelected()), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
+        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
         painter->setPen(pen);
         painter->drawLine(mLineF);
     }
@@ -107,14 +109,14 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setFamily("Monospace");
         font.setPixelSize(3);
         painter->setFont(font);
-        painter->setPen(QPen(layer->getColor(mNetLine.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal().getName());
     }
     layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(layer->getColor(mNetLine.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }

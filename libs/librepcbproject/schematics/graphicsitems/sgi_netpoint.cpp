@@ -27,6 +27,7 @@
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
 #include "../../project.h"
+#include "../../circuit/netsignal.h"
 #include <librepcbcommon/schematiclayer.h>
 
 /*****************************************************************************************
@@ -83,10 +84,12 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
+
     if (mLayer->isVisible() && mPointVisible)
     {
         painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mLayer->getColor(mNetPoint.isSelected()), Qt::SolidPattern));
+        painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
         painter->drawEllipse(sBoundingRect);
     }
 
@@ -95,7 +98,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     if ((layer->isVisible()) && (!mPointVisible))
     {
         // draw circle
-        painter->setPen(QPen(layer->getColor(mNetPoint.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(sBoundingRect);
     }
@@ -103,7 +106,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     if (layer->isVisible())
     {
         // draw bounding rect
-        painter->setPen(QPen(layer->getColor(mNetPoint.isSelected()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(sBoundingRect);
     }
