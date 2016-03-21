@@ -26,6 +26,9 @@ matrix:
     - os: osx
       compiler: clang
       env: BUILD_DOXYGEN=false
+  allow_failures:
+    - os: osx
+  fast_finish: true
 
 env:
   global:
