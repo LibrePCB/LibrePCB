@@ -33,6 +33,8 @@ namespace librepcb {
 namespace project {
 
 class Schematic;
+class SI_NetPoint;
+class ComponentSignalInstance;
 
 /*****************************************************************************************
  *  Class CmdRemoveSelectedSchematicItems
@@ -56,6 +58,9 @@ class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() throw (Exception) override;
+
+        void detachNetPointFromSymbolPin(SI_NetPoint& netpoint) throw (Exception);
+        void disconnectComponentSignalInstance(ComponentSignalInstance& signal) throw (Exception);
 
 
         // Attributes from the constructor

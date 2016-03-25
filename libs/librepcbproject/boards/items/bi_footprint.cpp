@@ -45,6 +45,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (Exception) :
+    BI_Base(device.getBoard()), mDevice(device)
+{
+    Q_UNUSED(other);
+    init();
+}
+
 BI_Footprint::BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception) :
     BI_Base(device.getBoard()), mDevice(device)
 {
@@ -128,6 +135,14 @@ const Angle& BI_Footprint::getRotation() const noexcept
     return mDevice.getRotation();
 }
 
+bool BI_Footprint::isUsed() const noexcept
+{
+    foreach (const BI_FootprintPad* pad, mPads) {
+        if (pad->isUsed()) return true;
+    }
+    return false;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
@@ -198,7 +213,7 @@ bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrK
 }
 
 /*****************************************************************************************
- *  Inherited from SI_Base
+ *  Inherited from BI_Base
  ****************************************************************************************/
 
 const Point& BI_Footprint::getPosition() const noexcept
@@ -214,6 +229,11 @@ bool BI_Footprint::getIsMirrored() const noexcept
 QPainterPath BI_Footprint::getGrabAreaScenePx() const noexcept
 {
     return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+}
+
+bool BI_Footprint::isSelectable() const noexcept
+{
+    return mGraphicsItem->isSelectable();
 }
 
 void BI_Footprint::setSelected(bool selected) noexcept

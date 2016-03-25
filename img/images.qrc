@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/img">
+        <file>actions/add_via.png</file>
         <file>actions/apply.png</file>
         <file>actions/bookmark.png</file>
         <file>actions/bookmark_gray.png</file>
@@ -40,6 +41,9 @@
         <file>actions/drawWire.png</file>
         <file>actions/schematic.png</file>
         <file>actions/recent.png</file>
+        <file>command_toolbars/via_round.png</file>
+        <file>command_toolbars/via_square.png</file>
+        <file>command_toolbars/via_octagon.png</file>
         <file>command_toolbars/wire4590.png</file>
         <file>command_toolbars/wire9045.png</file>
         <file>command_toolbars/wireHV.png</file>

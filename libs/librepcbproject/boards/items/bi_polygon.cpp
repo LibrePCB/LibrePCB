@@ -39,6 +39,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception) :
+    BI_Base(board)
+{
+    mPolygon.reset(new Polygon(*other.mPolygon));
+    init();
+}
+
 BI_Polygon::BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception) :
     BI_Base(board)
 {
@@ -117,6 +124,11 @@ bool BI_Polygon::getAttributeValue(const QString& attrNS, const QString& attrKey
 QPainterPath BI_Polygon::getGrabAreaScenePx() const noexcept
 {
     return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+}
+
+bool BI_Polygon::isSelectable() const noexcept
+{
+    return mGraphicsItem->isSelectable();
 }
 
 void BI_Polygon::setSelected(bool selected) noexcept

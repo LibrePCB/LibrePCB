@@ -28,6 +28,9 @@
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 #include "bes_select.h"
+#include "bes_drawtrace.h"
+#include "bes_addvia.h"
+#include "bes_adddevice.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -46,6 +49,9 @@ BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
 {
     // create all substates
     mSubStates.insert(State_Select, new BES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawTrace, new BES_DrawTrace(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddVia, new BES_AddVia(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddDevice, new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr))
@@ -134,36 +140,15 @@ BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
         case BEE_Base::StartSelect:
             event->setAccepted(true);
             return State_Select;
-        /*case SEE_Base::StartMove:
+        case BEE_Base::StartDrawTrace:
             event->setAccepted(true);
-            return State_Move;
-        case SEE_Base::StartDrawText:
+            return State_DrawTrace;
+        case BEE_Base::StartAddVia:
             event->setAccepted(true);
-            return State_DrawText;
-        case SEE_Base::StartDrawRect:
+            return State_AddVia;
+        case BEE_Base::StartAddDevice:
             event->setAccepted(true);
-            return State_DrawRect;
-        case SEE_Base::StartDrawPolygon:
-            event->setAccepted(true);
-            return State_DrawPolygon;
-        case SEE_Base::StartDrawCircle:
-            event->setAccepted(true);
-            return State_DrawCircle;
-        case SEE_Base::StartDrawEllipse:
-            event->setAccepted(true);
-            return State_DrawEllipse;
-        case SEE_Base::StartDrawWire:
-            event->setAccepted(true);
-            return State_DrawWire;
-        case SEE_Base::StartAddNetLabel:
-            event->setAccepted(true);
-            return State_AddNetLabel;
-        case SEE_Base::StartAddComponent:
-            event->setAccepted(true);
-            return State_AddComponent;
-        case SEE_Base::SwitchToSchematicPage:
-            event->setAccepted(true);
-            return mCurrentState;*/
+            return State_AddDevice;
         case BEE_Base::GraphicsViewEvent:
         {
             QEvent* e = BEE_RedirectedQEvent::getQEventFromBEE(event);

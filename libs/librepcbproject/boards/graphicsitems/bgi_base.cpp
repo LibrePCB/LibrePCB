@@ -22,6 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bgi_base.h"
+#include <librepcbcommon/boardlayer.h>
+#include "../board.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -41,6 +43,23 @@ BGI_Base::BGI_Base() noexcept
 BGI_Base::~BGI_Base() noexcept
 {
 
+}
+
+/*****************************************************************************************
+ *  Protected Methods
+ ****************************************************************************************/
+
+qreal BGI_Base::getZValueOfCopperLayer(int layerId) noexcept
+{
+    if (BoardLayer::isCopperLayer(layerId)) {
+        // 0.0 => TOP
+        // 1.0 => BOTTOM
+        qreal valueNormalized = qreal(layerId - BoardLayer::LayerID::TopCopper) /
+                                qreal(BoardLayer::LayerID::BottomCopper - BoardLayer::LayerID::TopCopper);
+        return (Board::ItemZValue::ZValue_CopperTop - valueNormalized);
+    } else {
+        return Board::ItemZValue::ZValue_Default;
+    }
 }
 
 /*****************************************************************************************

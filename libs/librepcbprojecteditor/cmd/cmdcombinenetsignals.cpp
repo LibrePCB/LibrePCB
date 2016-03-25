@@ -66,7 +66,7 @@ bool CmdCombineNetSignals::performExecute() throw (Exception)
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
     // change netsignal of all netlabels
-    foreach (SI_NetLabel* label, mNetSignalToRemove.getNetLabels()) {
+    foreach (SI_NetLabel* label, mNetSignalToRemove.getSchematicNetLabels()) {
         auto* cmd = new CmdSchematicNetLabelEdit(*label);
         cmd->setNetSignal(mResultingNetSignal, false);
         execNewChildCmd(cmd); // can throw
@@ -75,7 +75,7 @@ bool CmdCombineNetSignals::performExecute() throw (Exception)
     // disconnect all schematic netlines and netpoints
     QList<SI_NetLine*> removedNetLines;
     QList<SI_NetPoint*> removedNetPoints;
-    foreach (SI_NetPoint* point, mNetSignalToRemove.getNetPoints()) {
+    foreach (SI_NetPoint* point, mNetSignalToRemove.getSchematicNetPoints()) {
         foreach (SI_NetLine* line, point->getLines()) {
             execNewChildCmd(new CmdSchematicNetLineRemove(*line)); // can throw
             removedNetLines.append(line);

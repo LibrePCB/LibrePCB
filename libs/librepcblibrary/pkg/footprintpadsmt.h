@@ -57,6 +57,7 @@ class FootprintPadSmt final : public FootprintPad
         // Getters
         BoardSide_t getBoardSide() const noexcept {return mBoardSide;}
         int getLayerId() const noexcept override;
+        bool isOnLayer(int id) const noexcept override;
         const QPainterPath& toQPainterPathPx() const noexcept override;
 
         // Setters

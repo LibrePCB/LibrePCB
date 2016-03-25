@@ -42,12 +42,18 @@ class GridProperties;
 class GraphicsView;
 class GraphicsScene;
 class SmartXmlFile;
+class BoardLayer;
 
 namespace project {
 
+class NetSignal;
 class Project;
 class BI_Device;
 class BI_Base;
+class BI_FootprintPad;
+class BI_Via;
+class BI_NetPoint;
+class BI_NetLine;
 class BI_Polygon;
 class BoardLayerStack;
 
@@ -81,13 +87,17 @@ class Board final : public QObject, public IF_AttributeProvider,
             ZValue_Default = 0,         ///< this is the default value (behind all other items)
             ZValue_FootprintsBottom,    ///< Z value for #project#BI_Footprint items
             ZValue_FootprintPadsBottom, ///< Z value for #project#BI_FootprintPad items
+            ZValue_CopperBottom,
+            ZValue_CopperTop,
             ZValue_FootprintPadsTop,    ///< Z value for #project#BI_FootprintPad items
             ZValue_FootprintsTop,       ///< Z value for #project#BI_Footprint items
+            ZValue_Vias,                ///< Z value for #project#BI_Via items
         };
 
         // Constructors / Destructor
         Board() = delete;
         Board(const Board& other) = delete;
+        Board(const Board& other, const FilePath& filepath, const QString& name) throw (Exception);
         Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
             Board(project, filepath, restore, readOnly, false, QString()) {}
         ~Board() noexcept;
@@ -98,21 +108,26 @@ class Board final : public QObject, public IF_AttributeProvider,
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         BoardLayerStack& getLayerStack() noexcept {return *mLayerStack;}
         bool isEmpty() const noexcept;
-        QList<BI_Base*> getSelectedItems(bool footprintPads
-                                         /*bool floatingPoints,
+        QList<BI_Base*> getSelectedItems(bool vias,
+                                         bool footprintPads,
+                                         bool floatingPoints,
                                          bool attachedPoints,
                                          bool floatingPointsFromFloatingLines,
                                          bool attachedPointsFromFloatingLines,
                                          bool floatingPointsFromAttachedLines,
                                          bool attachedPointsFromAttachedLines,
-                                         bool attachedPointsFromSymbols,
+                                         bool attachedPointsFromFootprints,
                                          bool floatingLines,
                                          bool attachedLines,
-                                         bool attachedLinesFromFootprints*/) const noexcept;
+                                         bool attachedLinesFromFootprints) const noexcept;
         QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-        //QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
-        //QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
-        //QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+        QList<BI_Via*> getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept;
+        QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                   const NetSignal* netsignal) const noexcept;
+        QList<BI_NetLine*> getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                 const NetSignal* netsignal) const noexcept;
+        QList<BI_FootprintPad*> getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                  const NetSignal* netsignal) const noexcept;
         QList<BI_Base*> getAllItems() const noexcept;
 
         // Setters: General
@@ -128,6 +143,21 @@ class Board final : public QObject, public IF_AttributeProvider,
         BI_Device* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
         void addDeviceInstance(BI_Device& instance) throw (Exception);
         void removeDeviceInstance(BI_Device& instance) throw (Exception);
+
+        // Via Methods
+        BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
+        void addVia(BI_Via& via) throw (Exception);
+        void removeVia(BI_Via& via) throw (Exception);
+
+        // NetPoint Methods
+        BI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
+        void addNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void removeNetPoint(BI_NetPoint& netpoint) throw (Exception);
+
+        // NetLine Methods
+        BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
+        void addNetLine(BI_NetLine& netline) throw (Exception);
+        void removeNetLine(BI_NetLine& netline) throw (Exception);
 
         // Polygon Methods
         const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
@@ -200,6 +230,9 @@ class Board final : public QObject, public IF_AttributeProvider,
 
         // items
         QMap<Uuid, BI_Device*> mDeviceInstances;
+        QList<BI_Via*> mVias;
+        QList<BI_NetPoint*> mNetPoints;
+        QList<BI_NetLine*> mNetLines;
         QList<BI_Polygon*> mPolygons;
 
         // ERC messages

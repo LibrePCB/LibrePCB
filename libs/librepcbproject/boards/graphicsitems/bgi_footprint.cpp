@@ -57,6 +57,16 @@ BGI_Footprint::~BGI_Footprint() noexcept
 }
 
 /*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+bool BGI_Footprint::isSelectable() const noexcept
+{
+    BoardLayer* layer = getBoardLayer(BoardLayer::TopDeviceOriginCrosses);
+    return layer && layer->isVisible();
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 

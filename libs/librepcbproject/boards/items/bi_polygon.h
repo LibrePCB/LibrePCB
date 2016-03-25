@@ -61,6 +61,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         BI_Polygon() = delete;
         BI_Polygon(const BI_Polygon& other) = delete;
+        BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception);
         BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
         BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
                    bool isGrabArea, const Point& startPos) throw (Exception);
@@ -68,6 +69,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 
         // Getters
         const Polygon& getPolygon() const noexcept {return *mPolygon;}
+        bool isSelectable() const noexcept override;
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception) override;

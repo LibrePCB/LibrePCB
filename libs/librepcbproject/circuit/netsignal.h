@@ -40,6 +40,8 @@ class NetClass;
 class ComponentSignalInstance;
 class SI_NetPoint;
 class SI_NetLabel;
+class BI_NetPoint;
+class BI_Via;
 class ErcMsg;
 
 /*****************************************************************************************
@@ -74,8 +76,10 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         // Getters: General
         Circuit& getCircuit() const noexcept {return mCircuit;}
         const QList<ComponentSignalInstance*>& getComponentSignals() const noexcept {return mRegisteredComponentSignals;}
-        const QList<SI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredSchematicNetPoints;}
-        const QList<SI_NetLabel*>& getNetLabels() const noexcept {return mRegisteredSchematicNetLabels;}
+        const QList<SI_NetPoint*>& getSchematicNetPoints() const noexcept {return mRegisteredSchematicNetPoints;}
+        const QList<SI_NetLabel*>& getSchematicNetLabels() const noexcept {return mRegisteredSchematicNetLabels;}
+        const QList<BI_NetPoint*>& getBoardNetPoints() const noexcept {return mRegisteredBoardNetPoints;}
+        const QList<BI_Via*>& getBoardVias() const noexcept {return mRegisteredBoardVias;}
         int getRegisteredElementsCount() const noexcept;
         bool isUsed() const noexcept;
         bool isNameForced() const noexcept;
@@ -93,6 +97,10 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         void unregisterSchematicNetPoint(SI_NetPoint& netpoint) throw (Exception);
         void registerSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception);
         void unregisterSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception);
+        void registerBoardNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void unregisterBoardNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void registerBoardVia(BI_Via& via) throw (Exception);
+        void unregisterBoardVia(BI_Via& via) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -126,10 +134,12 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         bool mHasAutoName;
         NetClass* mNetClass;
 
-        // Registered Elements of this Netclass
+        // Registered Elements of this NetSignal
         QList<ComponentSignalInstance*> mRegisteredComponentSignals;
         QList<SI_NetPoint*> mRegisteredSchematicNetPoints;
         QList<SI_NetLabel*> mRegisteredSchematicNetLabels;
+        QList<BI_NetPoint*> mRegisteredBoardNetPoints;
+        QList<BI_Via*> mRegisteredBoardVias;
 
         // ERC Messages
         /// @brief the ERC message for unused netsignals

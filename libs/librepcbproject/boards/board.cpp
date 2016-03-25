@@ -37,6 +37,9 @@
 #include "items/bi_device.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
+#include "items/bi_via.h"
+#include "items/bi_netpoint.h"
+#include "items/bi_netline.h"
 #include <librepcblibrary/cmp/component.h>
 #include "items/bi_polygon.h"
 #include "boardlayerstack.h"
@@ -51,8 +54,109 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+Board::Board(const Board& other, const FilePath& filepath, const QString& name) throw (Exception) :
+    QObject(&other.getProject()), mProject(other.getProject()), mFilePath(filepath),
+    mIsAddedToProject(false)
+{
+    try
+    {
+        mGraphicsScene.reset(new GraphicsScene());
+
+        // copy the other board
+        mXmlFile.reset(SmartXmlFile::create(mFilePath));
+
+        // set attributes
+        mUuid = Uuid::createRandom();
+        mName = name;
+
+        // copy layer stack
+        mLayerStack.reset(new BoardLayerStack(*this, *other.mLayerStack));
+
+        // copy grid properties
+        mGridProperties.reset(new GridProperties(*other.mGridProperties));
+
+        // copy device instances
+        QHash<const BI_Device*, BI_Device*> copiedDeviceInstances;
+        foreach (const BI_Device* device, other.mDeviceInstances) {
+            BI_Device* copy = new BI_Device(*this, *device);
+            Q_ASSERT(!getDeviceInstanceByComponentUuid(copy->getComponentInstanceUuid()));
+            mDeviceInstances.insert(copy->getComponentInstanceUuid(), copy);
+            copiedDeviceInstances.insert(device, copy);
+        }
+
+        // copy vias
+        QHash<const BI_Via*, BI_Via*> copiedVias;
+        foreach (const BI_Via* via, other.mVias) {
+            BI_Via* copy = new BI_Via(*this, *via);
+            Q_ASSERT(!getViaByUuid(copy->getUuid()));
+            mVias.append(copy);
+            copiedVias.insert(via, copy);
+        }
+
+        // copy netpoints
+        QHash<const BI_NetPoint*, BI_NetPoint*> copiedNetPoints;
+        foreach (const BI_NetPoint* netpoint, other.mNetPoints) {
+            BI_FootprintPad* pad = nullptr;
+            if (netpoint->getFootprintPad()) {
+                const BI_Device* oldDevice = &netpoint->getFootprintPad()->getFootprint().getDeviceInstance();
+                const BI_Device* newDevice = copiedDeviceInstances.value(oldDevice, nullptr);
+                Q_ASSERT(newDevice);
+                pad = newDevice->getFootprint().getPad(netpoint->getFootprintPad()->getLibPadUuid());
+                Q_ASSERT(pad);
+            }
+            BI_Via* via = copiedVias.value(netpoint->getVia(), nullptr);
+            BI_NetPoint* copy = new BI_NetPoint(*this, *netpoint, pad, via);
+            Q_ASSERT(!getNetPointByUuid(copy->getUuid()));
+            mNetPoints.append(copy);
+            copiedNetPoints.insert(netpoint, copy);
+        }
+
+        // copy netlines
+        foreach (const BI_NetLine* netline, other.mNetLines) {
+            BI_NetPoint* start = copiedNetPoints.value(&netline->getStartPoint());
+            BI_NetPoint* end = copiedNetPoints.value(&netline->getEndPoint());
+            Q_ASSERT(start && end);
+            BI_NetLine* copy = new BI_NetLine(*this, *netline, *start, *end);
+            Q_ASSERT(!getNetLineByUuid(copy->getUuid()));
+            mNetLines.append(copy);
+        }
+
+        // copy polygons
+        foreach (const BI_Polygon* polygon, other.mPolygons) {
+            BI_Polygon* copy = new BI_Polygon(*this, *polygon);
+            mPolygons.append(copy);
+        }
+
+        updateErcMessages();
+        updateIcon();
+
+        // emit the "attributesChanged" signal when the project has emited it
+        connect(&mProject, &Project::attributesChanged, this, &Board::attributesChanged);
+
+        connect(&mProject.getCircuit(), &Circuit::componentAdded, this, &Board::updateErcMessages);
+        connect(&mProject.getCircuit(), &Circuit::componentRemoved, this, &Board::updateErcMessages);
+
+        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+    }
+    catch (...)
+    {
+        // free the allocated memory in the reverse order of their allocation...
+        qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mPolygons);          mPolygons.clear();
+        qDeleteAll(mNetLines);          mNetLines.clear();
+        qDeleteAll(mNetPoints);         mNetPoints.clear();
+        qDeleteAll(mVias);              mVias.clear();
+        qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mGridProperties.reset();
+        mLayerStack.reset();
+        mXmlFile.reset();
+        mGraphicsScene.reset();
+        throw; // ...and rethrow the exception
+    }
+}
+
 Board::Board(Project& project, const FilePath& filepath, bool restore,
-             bool readOnly, bool create, const QString& newName) throw (Exception):
+             bool readOnly, bool create, const QString& newName) throw (Exception) :
     QObject(&project), mProject(project), mFilePath(filepath), mIsAddedToProject(false)
 {
     try
@@ -96,7 +200,51 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                  node; node = node->getNextSibling("device"))
             {
                 BI_Device* device = new BI_Device(*this, *node);
+                if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, QString(),
+                        QString(tr("There is already a device of the component instance \"%1\"!"))
+                        .arg(device->getComponentInstanceUuid().toStr()));
+                }
                 mDeviceInstances.insert(device->getComponentInstanceUuid(), device);
+            }
+
+            // Load all vias
+            for (XmlDomElement* node = root.getFirstChild("vias/via", true, false);
+                 node; node = node->getNextSibling("via"))
+            {
+                BI_Via* via = new BI_Via(*this, *node);
+                if (getViaByUuid(via->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, via->getUuid().toStr(),
+                        QString(tr("There is already a via with the UUID \"%1\"!"))
+                        .arg(via->getUuid().toStr()));
+                }
+                mVias.append(via);
+            }
+
+            // Load all netpoints
+            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
+                 node; node = node->getNextSibling("netpoint"))
+            {
+                BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
+                if (getNetPointByUuid(netpoint->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
+                        QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                        .arg(netpoint->getUuid().toStr()));
+                }
+                mNetPoints.append(netpoint);
+            }
+
+            // Load all netlines
+            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
+                 node; node = node->getNextSibling("netline"))
+            {
+                BI_NetLine* netline = new BI_NetLine(*this, *node);
+                if (getNetLineByUuid(netline->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
+                        QString(tr("There is already a netline with the UUID \"%1\"!"))
+                        .arg(netline->getUuid().toStr()));
+                }
+                mNetLines.append(netline);
             }
 
             // Load all polygons
@@ -124,6 +272,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
+        qDeleteAll(mNetLines);          mNetLines.clear();
+        qDeleteAll(mNetPoints);         mNetPoints.clear();
+        qDeleteAll(mVias);              mVias.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
         mGridProperties.reset();
         mLayerStack.reset();
@@ -141,6 +292,9 @@ Board::~Board() noexcept
 
     // delete all items
     qDeleteAll(mPolygons);          mPolygons.clear();
+    qDeleteAll(mNetLines);          mNetLines.clear();
+    qDeleteAll(mNetPoints);         mNetPoints.clear();
+    qDeleteAll(mVias);              mVias.clear();
     qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
 
     mGridProperties.reset();
@@ -155,20 +309,24 @@ Board::~Board() noexcept
 
 bool Board::isEmpty() const noexcept
 {
-    return false;
+    return (mDeviceInstances.isEmpty() &&
+            mVias.isEmpty() &&
+            mNetPoints.isEmpty() &&
+            mNetLines.isEmpty());
 }
 
-QList<BI_Base*> Board::getSelectedItems(bool footprintPads
-                                        /*bool floatingPoints,
+QList<BI_Base*> Board::getSelectedItems(bool vias,
+                                        bool footprintPads,
+                                        bool floatingPoints,
                                         bool attachedPoints,
                                         bool floatingPointsFromFloatingLines,
                                         bool attachedPointsFromFloatingLines,
                                         bool floatingPointsFromAttachedLines,
                                         bool attachedPointsFromAttachedLines,
-                                        bool attachedPointsFromSymbols,
+                                        bool attachedPointsFromFootprints,
                                         bool floatingLines,
                                         bool attachedLines,
-                                        bool attachedLinesFromFootprints*/) const noexcept
+                                        bool attachedLinesFromFootprints) const noexcept
 {
     // TODO: this method is incredible ugly ;)
 
@@ -184,8 +342,76 @@ QList<BI_Base*> Board::getSelectedItems(bool footprintPads
         // pads
         foreach (BI_FootprintPad* pad, footprint.getPads())
         {
+            // pad
             if (pad->isSelected() && footprintPads)
                 list.append(pad);
+
+            // attached netpoints & netlines
+            foreach (BI_NetPoint* attachedNetPoint, pad->getNetPoints()) {
+                if (footprint.isSelected() && attachedPointsFromFootprints && attachedNetPoint)
+                {
+                    if (!list.contains(attachedNetPoint))
+                        list.append(attachedNetPoint);
+                }
+                if (footprint.isSelected() && attachedLinesFromFootprints && attachedNetPoint)
+                {
+                    foreach (BI_NetLine* attachedNetLine, attachedNetPoint->getLines())
+                    {
+                        if (!list.contains(attachedNetLine))
+                            list.append(attachedNetLine);
+                    }
+                }
+            }
+        }
+    }
+    foreach (BI_Via* via, mVias)
+    {
+        if (via->isSelected() && vias) {
+            list.append(via);
+        }
+    }
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->isSelected())
+        {
+            if (((!netpoint->isAttached()) && floatingPoints)
+               || (netpoint->isAttached() && attachedPoints))
+            {
+                if (!list.contains(netpoint))
+                    list.append(netpoint);
+            }
+        }
+    }
+    foreach (BI_NetLine* netline, mNetLines)
+    {
+        if (netline->isSelected())
+        {
+            // netline
+            if (((!netline->isAttached()) && floatingLines)
+               || (netline->isAttached() && attachedLines))
+            {
+                if (!list.contains(netline))
+                    list.append(netline);
+            }
+            // netpoints from netlines
+            BI_NetPoint* p1 = &netline->getStartPoint();
+            BI_NetPoint* p2 = &netline->getEndPoint();
+            if ( ((!netline->isAttached()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttached()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttached()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttached()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
+            {
+                if (!list.contains(p1))
+                    list.append(p1);
+            }
+            if ( ((!netline->isAttached()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
+              || ((!netline->isAttached()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
+              || (( netline->isAttached()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
+              || (( netline->isAttached()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
+            {
+                if (!list.contains(p2))
+                    list.append(p2);
+            }
         }
     }
 
@@ -197,70 +423,128 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     QPointF scenePosPx = pos.toPxQPointF();
     QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
                             // top most item must appear as the first item in the list)!
+    // vias
+    foreach (BI_Via* via, mVias)
+    {
+        if (via->isSelectable() && via->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(via);
+        }
+    }
+    // netpoints
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->isSelectable() && netpoint->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(netpoint);
+        }
+    }
+    // netlines
+    foreach (BI_NetLine* netline, mNetLines)
+    {
+        if (netline->isSelectable() && netline->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(netline);
+        }
+    }
     // footprints & pads
     foreach (BI_Device* device, mDeviceInstances)
     {
         BI_Footprint& footprint = device->getFootprint();
-        if (footprint.getGrabAreaScenePx().contains(scenePosPx)) {
-            if (footprint.getIsMirrored())
+        if (footprint.isSelectable() && footprint.getGrabAreaScenePx().contains(scenePosPx)) {
+            if (footprint.getIsMirrored()) {
                 list.append(&footprint);
-            else
+            } else {
                 list.prepend(&footprint);
+            }
         }
         foreach (BI_FootprintPad* pad, footprint.getPads())
         {
-            if (pad->getGrabAreaScenePx().contains(scenePosPx)) {
-                if (pad->getIsMirrored())
+            if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(scenePosPx)) {
+                if (pad->getIsMirrored()) {
                     list.append(pad);
-                else
+                } else {
                     list.insert(1, pad);
+                }
             }
         }
     }
     return list;
 }
 
-/*QList<SI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos) const noexcept
+QList<BI_Via*> Board::getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept
 {
-    QList<SI_NetPoint*> list;
-    foreach (SI_NetPoint* netpoint, mNetPoints)
+    QList<BI_Via*> list;
+    foreach (BI_Via* via, mVias)
     {
-        if (netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF()))
-            list.append(netpoint);
-    }
-    return list;
-}
-
-QList<SI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos) const noexcept
-{
-    QList<SI_NetLine*> list;
-    foreach (SI_NetLine* netline, mNetLines)
-    {
-        if (netline->getGrabAreaScenePx().contains(pos.toPxQPointF()))
-            list.append(netline);
-    }
-    return list;
-}
-
-QList<SI_SymbolPin*> Board::getPinsAtScenePos(const Point& pos) const noexcept
-{
-    QList<SI_SymbolPin*> list;
-    foreach (SI_Symbol* symbol, mSymbols)
-    {
-        foreach (SI_SymbolPin* pin, symbol->getPins())
+        if (via->isSelectable() && via->getGrabAreaScenePx().contains(pos.toPxQPointF())
+            && ((!netsignal) || (via->getNetSignal() == netsignal)))
         {
-            if (pin->getGrabAreaScenePx().contains(pos.toPxQPointF()))
-                list.append(pin);
+            list.append(via);
         }
     }
     return list;
-}*/
+}
+
+QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                  const NetSignal* netsignal) const noexcept
+{
+    QList<BI_NetPoint*> list;
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+    {
+        if (netpoint->isSelectable() && netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF())
+            && ((!layer) || (&netpoint->getLayer() == layer))
+            && ((!netsignal) || (&netpoint->getNetSignal() == netsignal)))
+        {
+            list.append(netpoint);
+        }
+    }
+    return list;
+}
+
+QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                const NetSignal* netsignal) const noexcept
+{
+    QList<BI_NetLine*> list;
+    foreach (BI_NetLine* netline, mNetLines)
+    {
+        if (netline->isSelectable() && netline->getGrabAreaScenePx().contains(pos.toPxQPointF())
+            && ((!layer) || (&netline->getLayer() == layer))
+            && ((!netsignal) || (&netline->getNetSignal() == netsignal)))
+        {
+            list.append(netline);
+        }
+    }
+    return list;
+}
+
+QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+                                                 const NetSignal* netsignal) const noexcept
+{
+    QList<BI_FootprintPad*> list;
+    foreach (BI_Device* device, mDeviceInstances)
+    {
+        foreach (BI_FootprintPad* pad, device->getFootprint().getPads())
+        {
+            if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(pos.toPxQPointF())
+                && ((!layer) || (pad->isOnLayer(*layer)))
+                && ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal)))
+            {
+                list.append(pad);
+            }
+        }
+    }
+    return list;
+}
 
 QList<BI_Base*> Board::getAllItems() const noexcept
 {
     QList<BI_Base*> items;
     foreach (BI_Device* device, mDeviceInstances)
         items.append(device);
+    foreach (BI_Via* via, mVias)
+        items.append(via);
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+        items.append(netpoint);
+    foreach (BI_NetLine* netline, mNetLines)
+        items.append(netline);
     foreach (BI_Polygon* polygon, mPolygons)
         items.append(polygon);
     return items;
@@ -315,12 +599,135 @@ void Board::removeDeviceInstance(BI_Device& instance) throw (Exception)
 }
 
 /*****************************************************************************************
+ *  NetPoint Methods
+ ****************************************************************************************/
+
+BI_Via* Board::getViaByUuid(const Uuid& uuid) const noexcept
+{
+    foreach (BI_Via* via, mVias) {
+        if (via->getUuid() == uuid)
+            return via;
+    }
+    return nullptr;
+}
+
+void Board::addVia(BI_Via& via) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (mVias.contains(&via)) || (&via.getBoard() != this)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no via with the same uuid in the list
+    if (getViaByUuid(via.getUuid())) {
+        throw RuntimeError(__FILE__, __LINE__, via.getUuid().toStr(),
+            QString(tr("There is already a via with the UUID \"%1\"!"))
+            .arg(via.getUuid().toStr()));
+    }
+    // add to board
+    via.addToBoard(*mGraphicsScene); // can throw
+    mVias.append(&via);
+}
+
+void Board::removeVia(BI_Via& via) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (!mVias.contains(&via))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // remove from board
+    via.removeFromBoard(*mGraphicsScene); // can throw
+    mVias.removeOne(&via);
+}
+
+/*****************************************************************************************
+ *  NetPoint Methods
+ ****************************************************************************************/
+
+BI_NetPoint* Board::getNetPointByUuid(const Uuid& uuid) const noexcept
+{
+    foreach (BI_NetPoint* netpoint, mNetPoints) {
+        if (netpoint->getUuid() == uuid)
+            return netpoint;
+    }
+    return nullptr;
+}
+
+void Board::addNetPoint(BI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (mNetPoints.contains(&netpoint))
+        || (&netpoint.getBoard() != this))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no netpoint with the same uuid in the list
+    if (getNetPointByUuid(netpoint.getUuid())) {
+        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toStr(),
+            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+            .arg(netpoint.getUuid().toStr()));
+    }
+    // add to board
+    netpoint.addToBoard(*mGraphicsScene); // can throw
+    mNetPoints.append(&netpoint);
+}
+
+void Board::removeNetPoint(BI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (!mNetPoints.contains(&netpoint))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // remove from board
+    netpoint.removeFromBoard(*mGraphicsScene); // can throw
+    mNetPoints.removeOne(&netpoint);
+}
+
+/*****************************************************************************************
+ *  NetLine Methods
+ ****************************************************************************************/
+
+BI_NetLine* Board::getNetLineByUuid(const Uuid& uuid) const noexcept
+{
+    foreach (BI_NetLine* netline, mNetLines) {
+        if (netline->getUuid() == uuid)
+            return netline;
+    }
+    return nullptr;
+}
+
+void Board::addNetLine(BI_NetLine& netline) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (mNetLines.contains(&netline))
+        || (&netline.getBoard() != this))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // check if there is no netline with the same uuid in the list
+    if (getNetLineByUuid(netline.getUuid())) {
+        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toStr(),
+            QString(tr("There is already a netline with the UUID \"%1\"!"))
+            .arg(netline.getUuid().toStr()));
+    }
+    // add to board
+    netline.addToBoard(*mGraphicsScene); // can throw
+    mNetLines.append(&netline);
+}
+
+void Board::removeNetLine(BI_NetLine& netline) throw (Exception)
+{
+    if ((!mIsAddedToProject) || (!mNetLines.contains(&netline))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    // remove from board
+    netline.removeFromBoard(*mGraphicsScene); // can throw
+    mNetLines.removeOne(&netline);
+}
+
+/*****************************************************************************************
  *  Polygon Methods
  ****************************************************************************************/
 
 void Board::addPolygon(BI_Polygon& polygon) throw (Exception)
 {
-    if ((!mIsAddedToProject) || (mPolygons.contains(&polygon)) || (&polygon.getBoard() != this)) {
+    if ((!mIsAddedToProject) || (mPolygons.contains(&polygon))
+        || (&polygon.getBoard() != this))
+    {
         throw LogicError(__FILE__, __LINE__);
     }
     polygon.addToBoard(*mGraphicsScene); // can throw
@@ -415,14 +822,20 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
         foreach (BI_Device* component, mDeviceInstances)
         {
             BI_Footprint& footprint = component->getFootprint();
-            bool selectFootprint = footprint.getGrabAreaScenePx().intersects(rectPx);
+            bool selectFootprint = footprint.isSelectable() && footprint.getGrabAreaScenePx().intersects(rectPx);
             footprint.setSelected(selectFootprint);
             foreach (BI_FootprintPad* pad, footprint.getPads())
             {
-                bool selectPad = pad->getGrabAreaScenePx().intersects(rectPx);
+                bool selectPad = pad->isSelectable() && pad->getGrabAreaScenePx().intersects(rectPx);
                 pad->setSelected(selectFootprint || selectPad);
             }
         }
+        foreach (BI_Via* via, mVias)
+            via->setSelected(via->isSelectable() && via->getGrabAreaScenePx().intersects(rectPx));
+        foreach (BI_NetPoint* netpoint, mNetPoints)
+            netpoint->setSelected(netpoint->isSelectable() && netpoint->getGrabAreaScenePx().intersects(rectPx));
+        foreach (BI_NetLine* netline, mNetLines)
+            netline->setSelected(netline->isSelectable() && netline->getGrabAreaScenePx().intersects(rectPx));
     }
 }
 
@@ -430,6 +843,12 @@ void Board::clearSelection() const noexcept
 {
     foreach (BI_Device* device, mDeviceInstances)
         device->getFootprint().setSelected(false);
+    foreach (BI_Via* via, mVias)
+        via->setSelected(false);
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+        netpoint->setSelected(false);
+    foreach (BI_NetLine* netline, mNetLines)
+        netline->setSelected(false);
 }
 
 /*****************************************************************************************
@@ -484,6 +903,15 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* devices = root->appendChild("devices");
     foreach (BI_Device* device, mDeviceInstances)
         devices->appendChild(device->serializeToXmlDomElement());
+    XmlDomElement* vias = root->appendChild("vias");
+    foreach (BI_Via* via, mVias)
+        vias->appendChild(via->serializeToXmlDomElement());
+    XmlDomElement* netpoints = root->appendChild("netpoints");
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+        netpoints->appendChild(netpoint->serializeToXmlDomElement());
+    XmlDomElement* netlines = root->appendChild("netlines");
+    foreach (BI_NetLine* netline, mNetLines)
+        netlines->appendChild(netline->serializeToXmlDomElement());
     XmlDomElement* polygons = root->appendChild("polygons");
     foreach (BI_Polygon* polygon, mPolygons)
         polygons->appendChild(polygon->serializeToXmlDomElement());

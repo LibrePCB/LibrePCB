@@ -34,6 +34,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BoardLayer::BoardLayer(const BoardLayer& other) throw (Exception) :
+    QObject(0), mId(other.mId), mName(other.mName), mColor(other.mColor),
+    mColorHighlighted(other.mColorHighlighted), mIsVisible(other.mIsVisible)
+{
+}
+
 BoardLayer::BoardLayer(const XmlDomElement& domElement) throw (Exception) :
     QObject(0), mId(-1), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
@@ -186,7 +192,7 @@ BoardLayer::BoardLayer(int id) :
 
         case TopCopper:
             mName = tr("Top Copper");
-            mColor = QColor(255, 0, 0, 150);
+            mColor = QColor(255, 0, 0, 130);
             mColorHighlighted = QColor(255, 0, 0, 220);
             mIsVisible = true;
             break;
@@ -277,7 +283,7 @@ BoardLayer::BoardLayer(int id) :
 
         case BottomCopper:
             mName = tr("Bottom Copper");
-            mColor = QColor(0, 0, 255, 150);
+            mColor = QColor(0, 0, 255, 130);
             mColorHighlighted = QColor(0, 0, 255, 220);
             mIsVisible = true;
             break;

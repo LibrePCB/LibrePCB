@@ -35,7 +35,6 @@ namespace librepcb {
 namespace project {
 
 class NetSignal;
-class Schematic;
 class SI_NetPoint;
 
 /*****************************************************************************************
@@ -54,9 +53,9 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         // Constructors / Destructor
         SI_NetLine() = delete;
         SI_NetLine(const SI_NetLine& other) = delete;
-        explicit SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
-        explicit SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint,
-                            SI_NetPoint& endPoint, const Length& width) throw (Exception);
+        SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+                   const Length& width) throw (Exception);
         ~SI_NetLine() noexcept;
 
         // Getters
@@ -71,9 +70,9 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         void setWidth(const Length& width) noexcept;
 
         // General Methods
-        void updateLine() noexcept;
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
+        void updateLine() noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;

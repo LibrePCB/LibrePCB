@@ -37,6 +37,9 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QTabBar" name="tabBar" native="true"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -74,6 +77,8 @@
     <addaction name="separator"/>
     <addaction name="actionRotate_CCW"/>
     <addaction name="actionRotate_CW"/>
+    <addaction name="actionFlipHorizontal"/>
+    <addaction name="actionFlipVertical"/>
     <addaction name="actionCopy"/>
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
@@ -104,6 +109,8 @@
      <string>Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
+    <addaction name="actionToolAddVia"/>
+    <addaction name="actionToolDrawTrace"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -118,6 +125,7 @@
      <string>Board</string>
     </property>
     <addaction name="actionNewBoard"/>
+    <addaction name="actionCopyBoard"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
@@ -197,6 +205,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionToolSelect"/>
+   <addaction name="actionToolAddVia"/>
+   <addaction name="actionToolDrawTrace"/>
+   <addaction name="actionToolAddDevice"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
    <property name="windowTitle">
@@ -539,7 +550,53 @@
     <string>Shift+F</string>
    </property>
   </action>
+  <action name="actionToolDrawTrace">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/drawWire.png</normaloff>:/img/actions/drawWire.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Trace</string>
+   </property>
+  </action>
+  <action name="actionToolAddVia">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_via.png</normaloff>:/img/actions/add_via.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Via</string>
+   </property>
+  </action>
+  <action name="actionCopyBoard">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Board</string>
+   </property>
+  </action>
+  <action name="actionToolAddDevice">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Device</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QTabBar</class>
+   <extends>QWidget</extends>
+   <header>qtabbar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../img/images.qrc"/>
  </resources>

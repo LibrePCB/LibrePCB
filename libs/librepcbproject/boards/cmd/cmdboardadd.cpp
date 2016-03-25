@@ -37,7 +37,14 @@ namespace project {
 
 CmdBoardAdd::CmdBoardAdd(Project& project, const QString& name) noexcept :
     UndoCommand(tr("Add board")),
-    mProject(project), mName(name), mBoard(nullptr), mPageIndex(-1)
+    mProject(project), mBoardToCopy(nullptr), mName(name), mBoard(nullptr), mPageIndex(-1)
+{
+}
+
+CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy, const QString& name) noexcept :
+    UndoCommand(tr("Copy board")),
+    mProject(project), mBoardToCopy(&boardToCopy), mName(name), mBoard(nullptr),
+    mPageIndex(-1)
 {
 }
 
@@ -51,7 +58,11 @@ CmdBoardAdd::~CmdBoardAdd() noexcept
 
 bool CmdBoardAdd::performExecute() throw (Exception)
 {
-    mBoard = mProject.createBoard(mName); // can throw
+    if (mBoardToCopy) {
+        mBoard = mProject.createBoard(*mBoardToCopy, mName); // can throw
+    } else {
+        mBoard = mProject.createBoard(mName); // can throw
+    }
 
     performRedo(); // can throw
 

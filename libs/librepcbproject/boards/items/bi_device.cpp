@@ -43,8 +43,19 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BI_Device::BI_Device(Board& board, const BI_Device& other) throw (Exception) :
+    BI_Base(board), mCompInstance(other.mCompInstance), mLibDevice(other.mLibDevice),
+    mLibPackage(other.mLibPackage), mLibFootprint(other.mLibFootprint),
+    mPosition(other.mPosition), mRotation(other.mRotation), mIsMirrored(other.mIsMirrored)
+{
+    mFootprint.reset(new BI_Footprint(*this, *other.mFootprint));
+
+    init();
+}
+
 BI_Device::BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception) :
-    BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibFootprint(nullptr)
+    BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibPackage(nullptr),
+    mLibFootprint(nullptr)
 {
     // get component instance
     Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
@@ -73,7 +84,7 @@ BI_Device::BI_Device(Board& board, const XmlDomElement& domElement) throw (Excep
 
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
         const Uuid& footprintUuid, const Point& position, const Angle& rotation, bool mirror) throw (Exception) :
-    BI_Base(board), mCompInstance(&compInstance), mLibDevice(nullptr),
+    BI_Base(board), mCompInstance(&compInstance), mLibDevice(nullptr), mLibPackage(nullptr),
     mLibFootprint(nullptr), mPosition(position), mRotation(rotation), mIsMirrored(mirror)
 {
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
@@ -149,6 +160,11 @@ const Uuid& BI_Device::getComponentInstanceUuid() const noexcept
     return mCompInstance->getUuid();
 }
 
+bool BI_Device::isUsed() const noexcept
+{
+    return mFootprint->isUsed();
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
@@ -169,9 +185,12 @@ void BI_Device::setRotation(const Angle& rot) noexcept
     }
 }
 
-void BI_Device::setIsMirrored(bool mirror) noexcept
+void BI_Device::setIsMirrored(bool mirror) throw (Exception)
 {
     if (mirror != mIsMirrored) {
+        if (isUsed()) {
+            throw LogicError(__FILE__, __LINE__);
+        }
         mIsMirrored = mirror;
         emit mirrored(mIsMirrored);
     }
@@ -241,12 +260,17 @@ bool BI_Device::getAttributeValue(const QString& attrNS, const QString& attrKey,
 }
 
 /*****************************************************************************************
- *  Inherited from SI_Base
+ *  Inherited from BI_Base
  ****************************************************************************************/
 
 QPainterPath BI_Device::getGrabAreaScenePx() const noexcept
 {
     return mFootprint->getGrabAreaScenePx();
+}
+
+bool BI_Device::isSelectable() const noexcept
+{
+    return mFootprint->isSelectable();
 }
 
 void BI_Device::setSelected(bool selected) noexcept

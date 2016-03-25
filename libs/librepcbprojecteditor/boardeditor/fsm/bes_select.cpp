@@ -27,6 +27,7 @@
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
 #include <librepcbproject/boards/items/bi_footprintpad.h>
+#include <librepcbproject/boards/items/bi_via.h>
 #include <librepcbcommon/undostack.h>
 #include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/circuit/componentinstance.h>
@@ -34,6 +35,7 @@
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/project.h>
+#include "../boardviapropertiesdialog.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdmoveselectedboarditems.h"
 #include "../../cmd/cmdrotateselectedboarditems.h"
@@ -139,7 +141,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(BEE_Base* event) 
     QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
     Board* board = mEditor.getActiveBoard();
-    Q_ASSERT(board); if (!board) return PassToParentState;
+    if (!board) return PassToParentState;
 
     switch (qevent->type())
     {
@@ -288,7 +290,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             else if (action == aFlipH)
             {
-                // TODO
+                flipSelectedItems(Qt::Horizontal);
             }
             else if (!action->data().toUuid().isNull())
             {
@@ -327,14 +329,22 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
 BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                               Board* board) noexcept
 {
-    if (mouseEvent->buttons() == Qt::LeftButton)
-    {
+    if (mouseEvent->buttons() == Qt::LeftButton) {
         // check if there is an element under the mouse
         QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
         if (items.isEmpty()) return PassToParentState;
-        // TODO: open the properties editor dialog of the top most item
-        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getDeviceInstance().getComponentInstance().getUuid();
-        qDebug() << dynamic_cast<BI_Footprint*>(items.first())->getDeviceInstance().getLibDevice().getFilePath().toNative();
+        switch (items.first()->getType())
+        {
+            case BI_Base::Type_t::Via: {
+                BI_Via* via = dynamic_cast<BI_Via*>(items.first()); Q_ASSERT(via);
+                BoardViaPropertiesDialog dialog(mProject, *via, mUndoStack, &mEditor);
+                dialog.exec();
+                return ForceStayInState;
+            }
+            default: {
+                break;
+            }
+        }
     }
     return PassToParentState;
 }

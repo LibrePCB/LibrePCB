@@ -66,6 +66,11 @@ int FootprintPadTht::getLayerId() const noexcept
     return BoardLayer::LayerID::ThtPads;
 }
 
+bool FootprintPadTht::isOnLayer(int id) const noexcept
+{
+    return BoardLayer::isCopperLayer(id);
+}
+
 const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept
 {
     if (mPainterPathPx.isEmpty()) {

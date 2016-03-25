@@ -50,6 +50,11 @@ class BGI_Base : public GraphicsItem
         virtual ~BGI_Base() noexcept;
 
 
+    protected:
+
+        static qreal getZValueOfCopperLayer(int layerId) noexcept;
+
+
     private:
 
         // make some methods inaccessible...

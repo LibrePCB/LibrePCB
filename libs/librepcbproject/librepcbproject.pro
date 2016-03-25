@@ -89,7 +89,21 @@ SOURCES += \
     circuit/cmd/cmdcompsiginstsetnetsignal.cpp \
     boards/items/bi_polygon.cpp \
     boards/graphicsitems/bgi_polygon.cpp \
-    boards/boardlayerstack.cpp
+    boards/boardlayerstack.cpp \
+    boards/items/bi_netpoint.cpp \
+    boards/items/bi_netline.cpp \
+    boards/graphicsitems/bgi_netpoint.cpp \
+    boards/graphicsitems/bgi_netline.cpp \
+    boards/cmd/cmdboardnetlineadd.cpp \
+    boards/cmd/cmdboardnetlineremove.cpp \
+    boards/cmd/cmdboardnetpointadd.cpp \
+    boards/cmd/cmdboardnetpointedit.cpp \
+    boards/cmd/cmdboardnetpointremove.cpp \
+    boards/items/bi_via.cpp \
+    boards/graphicsitems/bgi_via.cpp \
+    boards/cmd/cmdboardviaadd.cpp \
+    boards/cmd/cmdboardviaremove.cpp \
+    boards/cmd/cmdboardviaedit.cpp
 
 HEADERS += \
     project.h \
@@ -161,6 +175,20 @@ HEADERS += \
     circuit/cmd/cmdcompsiginstsetnetsignal.h \
     boards/items/bi_polygon.h \
     boards/graphicsitems/bgi_polygon.h \
-    boards/boardlayerstack.h
+    boards/boardlayerstack.h \
+    boards/items/bi_netpoint.h \
+    boards/items/bi_netline.h \
+    boards/graphicsitems/bgi_netpoint.h \
+    boards/graphicsitems/bgi_netline.h \
+    boards/cmd/cmdboardnetlineadd.h \
+    boards/cmd/cmdboardnetlineremove.h \
+    boards/cmd/cmdboardnetpointadd.h \
+    boards/cmd/cmdboardnetpointedit.h \
+    boards/cmd/cmdboardnetpointremove.h \
+    boards/items/bi_via.h \
+    boards/graphicsitems/bgi_via.h \
+    boards/cmd/cmdboardviaadd.h \
+    boards/cmd/cmdboardviaremove.h \
+    boards/cmd/cmdboardviaedit.h
 
 FORMS +=

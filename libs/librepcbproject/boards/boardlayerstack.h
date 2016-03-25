@@ -51,7 +51,10 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
     public:
 
         // Constructors / Destructor
-        explicit BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BoardLayerStack() = delete;
+        BoardLayerStack(const BoardLayerStack& other) = delete;
+        BoardLayerStack(Board& board, const BoardLayerStack& other) throw (Exception);
+        BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception);
         explicit BoardLayerStack(Board& board) throw (Exception);
         ~BoardLayerStack() noexcept;
 
@@ -69,6 +72,9 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Operator Overloadings
+        BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
+
 
     private slots:
 
@@ -78,12 +84,6 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
     private:
 
-        // make some methods inaccessible...
-        BoardLayerStack() = delete;
-        BoardLayerStack(const BoardLayerStack& other) = delete;
-        BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
-
-        // Private Methods
         void addLayer(int id) noexcept;
         void addLayer(BoardLayer& layer) noexcept;
 

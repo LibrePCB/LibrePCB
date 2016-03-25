@@ -34,6 +34,7 @@
 #include "../items/bi_device.h"
 #include <librepcblibrary/pkg/package.h>
 #include "../boardlayerstack.h"
+#include "../../circuit/netsignal.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -46,17 +47,29 @@ namespace project {
  ****************************************************************************************/
 
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
-    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad()), mLibPkgPad(nullptr)
+    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
 {
-    mLibPkgPad = mPad.getFootprint().getDeviceInstance().getLibPackage().getPadByUuid(pad.getLibPadUuid());
-    Q_ASSERT(mLibPkgPad);
-    setToolTip(mLibPkgPad->getName());
+    setToolTip(mPad.getDisplayText());
+
+    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    mFont.setStyleHint(QFont::SansSerif);
+    mFont.setFamily("Helvetica");
+    mFont.setPixelSize(1);
 
     updateCacheAndRepaint();
 }
 
 BGI_FootprintPad::~BGI_FootprintPad() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+bool BGI_FootprintPad::isSelectable() const noexcept
+{
+    return mPadLayer && mPadLayer->isVisible();
 }
 
 /*****************************************************************************************
@@ -114,17 +127,25 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 
     if (!mPadLayer) return;
 
+    const NetSignal* netsignal = mPad.getCompSigInstNetSignal();
+    bool highlight = mPad.isSelected() || (netsignal && netsignal->isHighlighted());
+
     // draw pad
     painter->setPen(Qt::NoPen);
-    painter->setBrush(mPadLayer->getColor(mPad.isSelected()));
+    painter->setBrush(mPadLayer->getColor(highlight));
     painter->drawPath(mLibPad.toQPainterPathPx());
+
+    // draw pad text
+    painter->setFont(mFont);
+    painter->setPen(mPadLayer->getColor(highlight).lighter(150));
+    painter->drawText(mLibPad.getBoundingRectPx(), Qt::AlignCenter, mPad.getDisplayText());
 
 #ifdef QT_DEBUG
     BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             // draw bounding rect
-            painter->setPen(QPen(layer->getColor(mPad.isSelected()), 0));
+            painter->setPen(QPen(layer->getColor(highlight), 0));
             painter->setBrush(Qt::NoBrush);
             painter->drawRect(mBoundingRect);
         }

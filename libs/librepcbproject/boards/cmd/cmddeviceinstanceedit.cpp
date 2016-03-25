@@ -45,9 +45,13 @@ CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept :
 CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
 {
     if (!wasEverExecuted()) {
-        mDevice.setPosition(mOldPos);
-        mDevice.setRotation(mOldRotation);
-        mDevice.setIsMirrored(mOldMirrored);
+        try {
+            mDevice.setPosition(mOldPos);
+            mDevice.setRotation(mOldRotation);
+            mDevice.setIsMirrored(mOldMirrored); // can throw
+        } catch (Exception& e) {
+            qCritical() << "Could not revert all changes:" << e.getUserMsg();
+        }
     }
 }
 
@@ -81,34 +85,37 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool
     Q_ASSERT(!wasEverExecuted());
     mNewPos.rotate(angle, center);
     mNewRotation += mNewMirrored ? -angle : angle; // mirror --> rotation direction is inverted!
-    if (immediate)
-    {
+    if (immediate) {
         mDevice.setPosition(mNewPos);
         mDevice.setRotation(mNewRotation);
     }
 }
 
-void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) throw (Exception)
 {
     Q_ASSERT(!wasEverExecuted());
+    if (immediate) {
+        mDevice.setIsMirrored(mirrored); // can throw
+    }
     mNewMirrored = mirrored;
-    if (immediate) mDevice.setIsMirrored(mNewMirrored);
 }
 
 void CmdDeviceInstanceEdit::mirror(const Point& center, Qt::Orientation orientation,
-                                   bool immediate) noexcept
+                                   bool immediate) throw (Exception)
 {
     Q_ASSERT(!wasEverExecuted());
-    mNewMirrored = !mNewMirrored;
+    bool mirror = !mNewMirrored;
+    Point position = mNewPos;
+    Angle rotation = mNewRotation;
     switch (orientation)
     {
         case Qt::Vertical: {
-            mNewPos.setY(mNewPos.getY() + Length(2) * (center.getY() - mNewPos.getY()));
-            mNewRotation += Angle::deg180();
+            position.setY(position.getY() + Length(2) * (center.getY() - position.getY()));
+            rotation += Angle::deg180();
             break;
         }
         case Qt::Horizontal: {
-            mNewPos.setX(mNewPos.getX() + Length(2) * (center.getX() - mNewPos.getX()));
+            position.setX(position.getX() + Length(2) * (center.getX() - position.getX()));
             break;
         }
         default: {
@@ -117,10 +124,13 @@ void CmdDeviceInstanceEdit::mirror(const Point& center, Qt::Orientation orientat
         }
     }
     if (immediate) {
-        mDevice.setIsMirrored(mNewMirrored);
-        mDevice.setPosition(mNewPos);
-        mDevice.setRotation(mNewRotation);
+        mDevice.setIsMirrored(mirror); // can throw
+        mDevice.setPosition(position);
+        mDevice.setRotation(rotation);
     }
+    mNewMirrored = mirror;
+    mNewPos = position;
+    mNewRotation = rotation;
 }
 
 /*****************************************************************************************
@@ -136,16 +146,16 @@ bool CmdDeviceInstanceEdit::performExecute() throw (Exception)
 
 void CmdDeviceInstanceEdit::performUndo() throw (Exception)
 {
+    mDevice.setIsMirrored(mOldMirrored); // can throw
     mDevice.setPosition(mOldPos);
     mDevice.setRotation(mOldRotation);
-    mDevice.setIsMirrored(mOldMirrored);
 }
 
 void CmdDeviceInstanceEdit::performRedo() throw (Exception)
 {
+    mDevice.setIsMirrored(mNewMirrored); // can throw
     mDevice.setPosition(mNewPos);
     mDevice.setRotation(mNewRotation);
-    mDevice.setIsMirrored(mNewMirrored);
 }
 
 /*****************************************************************************************

@@ -27,7 +27,11 @@
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
+#include <librepcbproject/boards/items/bi_netpoint.h>
+#include <librepcbproject/boards/items/bi_via.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -55,8 +59,8 @@ CmdRotateSelectedBoardItems::~CmdRotateSelectedBoardItems() noexcept
 bool CmdRotateSelectedBoardItems::performExecute() throw (Exception)
 {
     // get all selected items
-    QList<BI_Base*> items = mBoard.getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
+    QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, false, true, false,
+                                                    false, false, false, false, false, false);
 
     // no items selected --> nothing to do here
     if (items.isEmpty()) {
@@ -80,6 +84,20 @@ bool CmdRotateSelectedBoardItems::performExecute() throw (Exception)
                 BI_Device& device = footprint->getDeviceInstance();
                 CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
                 cmd->rotate(mAngle, center, false);
+                appendChild(cmd);
+                break;
+            }
+            case BI_Base::Type_t::Via: {
+                BI_Via* via = dynamic_cast<BI_Via*>(item); Q_ASSERT(via);
+                CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
+                cmd->setPosition(via->getPosition().rotated(mAngle, center), false);
+                appendChild(cmd);
+                break;
+            }
+            case BI_Base::Type_t::NetPoint: {
+                BI_NetPoint* point = dynamic_cast<BI_NetPoint*>(item); Q_ASSERT(point);
+                CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*point);
+                cmd->setPosition(point->getPosition().rotated(mAngle, center), false);
                 appendChild(cmd);
                 break;
             }

@@ -33,6 +33,7 @@
 #include "../project.h"
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbolpin.h"
+#include "../boards/items/bi_footprintpad.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -128,13 +129,19 @@ int ComponentSignalInstance::getRegisteredElementsCount() const noexcept
 {
     int count = 0;
     count += mRegisteredSymbolPins.count();
+    count += mRegisteredFootprintPads.count();
     return count;
 }
 
 bool ComponentSignalInstance::arePinsOrPadsUsed() const noexcept
 {
-    foreach (const auto* pin, mRegisteredSymbolPins) {
+    foreach (const SI_SymbolPin* pin, mRegisteredSymbolPins) {
         if (pin->getNetPoint()) {
+            return true;
+        }
+    }
+    foreach (const BI_FootprintPad* pad, mRegisteredFootprintPads) {
+        if (pad->isUsed()) {
             return true;
         }
     }
@@ -229,6 +236,24 @@ void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exce
         throw LogicError(__FILE__, __LINE__);
     }
     mRegisteredSymbolPins.removeOne(&pin);
+}
+
+void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (pad.getCircuit() != mCircuit)
+        || (mRegisteredFootprintPads.contains(&pad)))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredFootprintPads.append(&pad);
+}
+
+void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (!mRegisteredFootprintPads.contains(&pad))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredFootprintPads.removeOne(&pad);
 }
 
 XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (Exception)

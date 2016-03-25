@@ -71,6 +71,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     mErcMsgDock = new ErcMsgDock(mProject);
     addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
     mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
+    connect(mUnplacedComponentsDock, &UnplacedComponentsDock::addDeviceTriggered,
+            [this](ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt)
+            {mFsm->processEvent(new BEE_StartAddDevice(cmp, dev, fpt), true);});
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
     mBoardLayersDock = new BoardLayersDock(*this);
     addDockWidget(Qt::RightDockWidgetArea, mBoardLayersDock, Qt::Vertical);
@@ -129,30 +132,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     connect(mUi->actionToolSelect, &QAction::triggered,
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartSelect), true);
                      mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
-    /*connect(mUi->actionToolMove, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartMove), true);
-                     mUi->actionToolMove->setChecked(mUi->actionToolMove->isCheckable());});
-    connect(mUi->actionToolDrawText, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawText), true);
-                     mUi->actionToolDrawText->setChecked(mUi->actionToolDrawText->isCheckable());});
-    connect(mUi->actionToolDrawRectangle, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawRect), true);
-                     mUi->actionToolDrawRectangle->setChecked(mUi->actionToolDrawRectangle->isCheckable());});
-    connect(mUi->actionToolDrawPolygon, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawPolygon), true);
-                     mUi->actionToolDrawPolygon->setChecked(mUi->actionToolDrawPolygon->isCheckable());});
-    connect(mUi->actionToolDrawCircle, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawCircle), true);
-                     mUi->actionToolDrawCircle->setChecked(mUi->actionToolDrawCircle->isCheckable());});
-    connect(mUi->actionToolDrawEllipse, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawEllipse), true);
-                     mUi->actionToolDrawEllipse->setChecked(mUi->actionToolDrawEllipse->isCheckable());});
-    connect(mUi->actionToolDrawWire, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartDrawWire), true);
-                     mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
-    connect(mUi->actionToolAddNetLabel, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(SEE_Base::StartAddNetLabel), true);
-                     mUi->actionToolAddNetLabel->setChecked(mUi->actionToolAddNetLabel->isCheckable());});*/
+    connect(mUi->actionToolDrawTrace, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawTrace), true);
+                     mUi->actionToolDrawTrace->setChecked(mUi->actionToolDrawTrace->isCheckable());});
+    connect(mUi->actionToolAddVia, &QAction::triggered,
+            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);
+                     mUi->actionToolAddVia->setChecked(mUi->actionToolAddVia->isCheckable());});
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
@@ -252,12 +237,14 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
     {
         mGraphicsView->setScene(nullptr);
     }
-    mUnplacedComponentsDock->setBoard(board);
-    mBoardLayersDock->setActiveBoard(board);
 
     // active board has changed!
-    emit activeBoardChanged(mActiveBoardIndex, index);
+    int oldIndex = mActiveBoardIndex;
     mActiveBoardIndex = index;
+    mUnplacedComponentsDock->setBoard(board);
+    mBoardLayersDock->setActiveBoard(board);
+    mUi->tabBar->setCurrentIndex(index);
+    emit activeBoardChanged(oldIndex, index);
     return true;
 }
 
@@ -301,13 +288,22 @@ void BoardEditor::boardAdded(int newIndex)
     mUi->menuBoard->insertAction(actionBefore, newAction);
     mBoardListActions.insert(newIndex, newAction);
     mBoardListActionGroup.addAction(newAction);
+
+    mUi->tabBar->insertTab(newIndex, board->getName());
 }
 
 void BoardEditor::boardRemoved(int oldIndex)
 {
+    mUi->tabBar->removeTab(oldIndex);
     QAction* action = mBoardListActions.takeAt(oldIndex); Q_ASSERT(action);
     mBoardListActionGroup.removeAction(action);
     delete action;
+
+    if (oldIndex == mActiveBoardIndex) {
+        setActiveBoardIndex(0);
+    } else if (oldIndex < mActiveBoardIndex) {
+        mActiveBoardIndex--;
+    }
 }
 
 /*****************************************************************************************
@@ -322,14 +318,38 @@ void BoardEditor::on_actionProjectClose_triggered()
 void BoardEditor::on_actionNewBoard_triggered()
 {
     bool ok = false;
-    QString name = QInputDialog::getText(this, tr("Add board"),
-                       tr("Choose a name:"), QLineEdit::Normal, tr("default"), &ok);
+    QString name = QInputDialog::getText(this, tr("Add New Board"),
+                       tr("Choose a name:"), QLineEdit::Normal, tr("new_board"), &ok);
     if (!ok) return;
 
     try
     {
         CmdBoardAdd* cmd = new CmdBoardAdd(mProject, name);
         mProjectEditor.getUndoStack().execCmd(cmd);
+        setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+    }
+}
+
+void BoardEditor::on_actionCopyBoard_triggered()
+{
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    bool ok = false;
+    QString name = QInputDialog::getText(this, tr("Copy Board"),
+                       tr("Choose a name:"), QLineEdit::Normal,
+                       QString(tr("copy_of_%1")).arg(board->getName()), &ok);
+    if (!ok) return;
+
+    try
+    {
+        CmdBoardAdd* cmd = new CmdBoardAdd(mProject, *board, name);
+        mProjectEditor.getUndoStack().execCmd(cmd);
+        setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
     }
     catch (Exception& e)
     {
@@ -400,6 +420,11 @@ void BoardEditor::on_actionProjectProperties_triggered()
 {
     ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
+}
+
+void BoardEditor::on_tabBar_currentChanged(int index)
+{
+    setActiveBoardIndex(index);
 }
 
 void BoardEditor::boardListActionGroupTriggered(QAction* action)

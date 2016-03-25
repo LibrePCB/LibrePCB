@@ -60,15 +60,9 @@ class BES_FSM final : public BES_Base
         enum State {
             State_NoState,      ///< no state active
             State_Select,       ///< @see #project#BES_Select
-            //State_Move,         ///< @see #project#BES_Move
-            //State_DrawText,     ///< @see #project#BES_DrawText
-            //State_DrawRect,     ///< @see #project#BES_DrawRect
-            //State_DrawPolygon,  ///< @see #project#BES_DrawPolygon
-            //State_DrawCircle,   ///< @see #project#BES_DrawCircle
-            //State_DrawEllipse,  ///< @see #project#BES_DrawEllipse
-            //State_DrawWire,     ///< @see #project#BES_DrawWire
-            //State_AddNetLabel,  ///< @see #project#BES_AddNetLabel
-            //State_AddComponent  ///< @see #project#BES_AddComponents
+            State_DrawTrace,    ///< @see #project#BES_DrawTrace
+            State_AddVia,       ///< @see librepcb#project#BES_AddVia
+            State_AddDevice,    ///< @see librepcb#project#BES_AddDevice
         };
 
 

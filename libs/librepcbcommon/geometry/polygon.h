@@ -47,6 +47,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        explicit PolygonSegment(const PolygonSegment& other) noexcept;
         explicit PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
         explicit PolygonSegment(const XmlDomElement& domElement) throw (Exception);
@@ -70,7 +71,6 @@ class PolygonSegment final : public IF_XmlSerializableObject
 
         // make some methods inaccessible...
         PolygonSegment();
-        PolygonSegment(const PolygonSegment& other);
         PolygonSegment& operator=(const PolygonSegment& rhs);
 
         // Private Methods
@@ -98,6 +98,7 @@ class Polygon final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        explicit Polygon(const Polygon& other) noexcept;
         explicit Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                          const Point& startPos) noexcept;
         explicit Polygon(const XmlDomElement& domElement) throw (Exception);
@@ -141,7 +142,6 @@ class Polygon final : public IF_XmlSerializableObject
 
         // make some methods inaccessible...
         Polygon() = delete;
-        Polygon(const Polygon& other) = delete;
         Polygon& operator=(const Polygon& rhs) = delete;
 
         // Private Methods

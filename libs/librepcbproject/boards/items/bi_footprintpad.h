@@ -34,12 +34,15 @@ namespace librepcb {
 
 namespace library {
 class FootprintPad;
+class ComponentSignal;
 }
 
 namespace project {
 
 class BI_Footprint;
+class BI_NetPoint;
 class Circuit;
+class ComponentSignalInstance;
 
 /*****************************************************************************************
  *  Class BI_FootprintPad
@@ -62,20 +65,25 @@ class BI_FootprintPad final : public BI_Base
 
         // Getters
         const Uuid& getLibPadUuid() const noexcept;
-        //QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
-        //                       bool returnPinNameIfEmpty = false) const noexcept;
+        QString getDisplayText() const noexcept;
         BI_Footprint& getFootprint() const noexcept {return mFootprint;}
-        //SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
+        const QMap<int, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
+        BI_NetPoint* getNetPointOfLayer(int layerId) const noexcept {return mRegisteredNetPoints.value(layerId, nullptr);}
+        int getLayerId() const noexcept;
+        bool isOnLayer(const BoardLayer& layer) const noexcept;
         const library::FootprintPad& getLibPad() const noexcept {return *mFootprintPad;}
-        //const library::ComponentSignal* getComponentSignal() const noexcept {return mComponentSignal;}
-        //ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
+        ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
+        NetSignal* getCompSigInstNetSignal() const noexcept;
+        bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
+        bool isSelectable() const noexcept override;
 
         // General Methods
-        void updatePosition() noexcept;
-        //void registerNetPoint(SI_NetPoint& netpoint);
-        //void unregisterNetPoint(SI_NetPoint& netpoint);
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
+        void registerNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void updatePosition() noexcept;
+
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
@@ -101,13 +109,13 @@ class BI_FootprintPad final : public BI_Base
         // General
         BI_Footprint& mFootprint;
         const library::FootprintPad* mFootprintPad;
-        //const library::ComponentSignal* mComponentSignal;
-        //ComponentSignalInstance* mComponentSignalInstance;
-        Point mPosition;
-        Angle mRotation;
+        const library::PackagePad* mPackagePad;
+        ComponentSignalInstance* mComponentSignalInstance;
 
         // Misc
-        //SI_NetPoint* mRegisteredNetPoint;
+        Point mPosition;
+        Angle mRotation;
+        QMap<int, BI_NetPoint*> mRegisteredNetPoints; ///< key: layer ID
         QScopedPointer<BGI_FootprintPad> mGraphicsItem;
 };
 

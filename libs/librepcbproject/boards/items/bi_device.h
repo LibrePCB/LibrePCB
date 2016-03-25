@@ -67,6 +67,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         // Constructors / Destructor
         BI_Device() = delete;
         BI_Device(const BI_Device& other) = delete;
+        BI_Device(Board& board, const BI_Device& other) throw (Exception);
         BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception);
         BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
                   const Uuid& footprintUuid, const Point& position, const Angle& rotation,
@@ -81,11 +82,13 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         const library::Footprint& getLibFootprint() const noexcept {return *mLibFootprint;}
         BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
         const Angle& getRotation() const noexcept {return mRotation;}
+        bool isSelectable() const noexcept override;
+        bool isUsed() const noexcept;
 
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
-        void setIsMirrored(bool mirror) noexcept;
+        void setIsMirrored(bool mirror) throw (Exception);
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception) override;

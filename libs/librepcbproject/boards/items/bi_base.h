@@ -56,9 +56,9 @@ class BI_Base : public QObject
 
         // Types
         enum class Type_t {
-            //NetPoint,       ///< #project#BI_NetPoint
-            //NetLine,        ///< #project#BI_NetLine
-            //NetLabel,       ///< #project#BI_NetLabel
+            NetPoint,       ///< librepcb#project#BI_NetPoint
+            NetLine,        ///< librepcb#project#BI_NetLine
+            Via,            ///< librepcb#project#BI_Via
             Device,         ///< librepcb#project#BI_Device
             Footprint,      ///< librepcb#project#BI_Footprint
             FootprintPad,   ///< librepcb#project#BI_FootprintPad
@@ -80,6 +80,7 @@ class BI_Base : public QObject
         virtual bool getIsMirrored() const noexcept = 0;
         virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
         virtual bool isAddedToBoard() const noexcept {return mIsAddedToBoard;}
+        virtual bool isSelectable() const noexcept = 0;
         virtual bool isSelected() const noexcept {return mIsSelected;}
 
         // Setters

@@ -34,6 +34,7 @@
 namespace librepcb {
 
 class GraphicsScene;
+class UndoCommandGroup;
 
 namespace library {
 class Device;
@@ -76,6 +77,11 @@ class UnplacedComponentsDock final : public QDockWidget
         void setBoard(Board* board);
 
 
+    signals:
+
+        void addDeviceTriggered(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid);
+
+
     private slots:
 
         void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
@@ -99,7 +105,10 @@ class UnplacedComponentsDock final : public QDockWidget
         void setSelectedDeviceAndPackage(const library::Device* device,
                                          const library::Package* package) noexcept;
         void setSelectedFootprintUuid(const Uuid& uuid) noexcept;
-        void addDevice(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
+        void beginUndoCmdGroup() noexcept;
+        void addNextDeviceToCmdGroup(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
+        void commitUndoCmdGroup() noexcept;
+        void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
 
 
         // General
@@ -119,6 +128,9 @@ class UnplacedComponentsDock final : public QDockWidget
         QMetaObject::Connection mBoardConnection2;
         Point mNextPosition;
         bool mDisableListUpdate;
+        QHash<Uuid, Uuid> mLastDeviceOfComponent;
+        QHash<Uuid, Uuid> mLastFootprintOfDevice;
+        QScopedPointer<UndoCommandGroup> mCurrentUndoCmdGroup;
 };
 
 /*****************************************************************************************

@@ -43,6 +43,7 @@ namespace project {
 
 class ComponentInstance;
 class SI_SymbolPin;
+class BI_FootprintPad;
 class NetSignal;
 class Circuit;
 class ErcMsg;
@@ -78,6 +79,8 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         bool isNetSignalNameForced() const noexcept;
         QString getForcedNetSignalName() const noexcept;
+        const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {return mRegisteredSymbolPins;}
+        const QList<BI_FootprintPad*>& getRegisteredFootprintPads() const noexcept {return mRegisteredFootprintPads;}
         int getRegisteredElementsCount() const noexcept;
         bool isUsed() const noexcept {return (getRegisteredElementsCount() > 0);}
         bool arePinsOrPadsUsed() const noexcept;
@@ -103,6 +106,8 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void removeFromCircuit() throw (Exception);
         void registerSymbolPin(SI_SymbolPin& pin) throw (Exception);
         void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
+        void registerFootprintPad(BI_FootprintPad& pad) throw (Exception);
+        void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -136,6 +141,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         // Registered Elements
         QList<SI_SymbolPin*> mRegisteredSymbolPins;
+        QList<BI_FootprintPad*> mRegisteredFootprintPads;
 
         // ERC Messages
         /// @brief The ERC message for an unconnected required component signal

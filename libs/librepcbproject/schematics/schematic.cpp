@@ -176,7 +176,10 @@ Schematic::~Schematic() noexcept
 
 bool Schematic::isEmpty() const noexcept
 {
-    return (mSymbols.isEmpty() && mNetPoints.isEmpty() && mNetLines.isEmpty() && mNetLabels.isEmpty());
+    return (mSymbols.isEmpty() &&
+            mNetPoints.isEmpty() &&
+            mNetLines.isEmpty() &&
+            mNetLabels.isEmpty());
 }
 
 QList<SI_Base*> Schematic::getSelectedItems(bool symbolPins,

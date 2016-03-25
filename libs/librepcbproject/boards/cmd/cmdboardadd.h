@@ -48,6 +48,7 @@ class CmdBoardAdd final : public UndoCommand
 
         // Constructors / Destructor
         CmdBoardAdd(Project& project, const QString& name) noexcept;
+        CmdBoardAdd(Project& project, const Board& boardToCopy, const QString& name) noexcept;
         ~CmdBoardAdd() noexcept;
 
         // Getters
@@ -71,6 +72,7 @@ class CmdBoardAdd final : public UndoCommand
         // Private Member Variables
 
         Project& mProject;
+        const Board* mBoardToCopy;
         QString mName;
         Board* mBoard;
         int mPageIndex;

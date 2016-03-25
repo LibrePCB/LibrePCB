@@ -212,6 +212,8 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         };
 
         // Constructors / Destructor
+        BoardLayer() = delete;
+        explicit BoardLayer(const BoardLayer& other) throw (Exception);
         explicit BoardLayer(const XmlDomElement& domElement) throw (Exception);
         explicit BoardLayer(int id);
         ~BoardLayer();
@@ -231,6 +233,9 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Operator Overloadings
+        BoardLayer& operator=(const BoardLayer& rhs) = delete;
+
         // Static Methods
         static bool isCopperLayer(int id) noexcept;
         static int getMirroredLayerId(int id) noexcept;
@@ -243,12 +248,6 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
 
     private:
 
-        // make some methods inaccessible...
-        BoardLayer();
-        BoardLayer(const BoardLayer& other);
-        BoardLayer& operator=(const BoardLayer& rhs);
-
-        // Private Methods
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 

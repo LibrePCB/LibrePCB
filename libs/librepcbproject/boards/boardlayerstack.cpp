@@ -36,6 +36,18 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) throw (Exception) :
+    QObject(&board), mBoard(board), mLayersChanged(false)
+{
+    foreach (const BoardLayer* layer, other.mLayers) {
+        addLayer(*new BoardLayer(*layer));
+    }
+
+    connect(&mBoard, &Board::attributesChanged,
+            this, &BoardLayerStack::boardAttributesChanged,
+            Qt::QueuedConnection);
+}
+
 BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
     QObject(&board), mBoard(board), mLayersChanged(false)
 {

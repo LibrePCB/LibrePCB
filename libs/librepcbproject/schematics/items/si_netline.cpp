@@ -138,12 +138,6 @@ void SI_NetLine::setWidth(const Length& width) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetLine::updateLine() noexcept
-{
-    mPosition = (mStartPoint->getPosition() + mEndPoint->getPosition()) / 2;
-    mGraphicsItem->updateCacheAndRepaint();
-}
-
 void SI_NetLine::addToSchematic(GraphicsScene& scene) throw (Exception)
 {
     if (isAddedToSchematic() || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())) {
@@ -169,6 +163,12 @@ void SI_NetLine::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     disconnect(mHighlightChangedConnection);
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
     sg.dismiss();
+}
+
+void SI_NetLine::updateLine() noexcept
+{
+    mPosition = (mStartPoint->getPosition() + mEndPoint->getPosition()) / 2;
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 XmlDomElement* SI_NetLine::serializeToXmlDomElement() const throw (Exception)

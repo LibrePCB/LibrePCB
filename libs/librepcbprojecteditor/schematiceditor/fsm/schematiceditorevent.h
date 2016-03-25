@@ -141,7 +141,7 @@ class SEE_RedirectedQEvent final : public SEE_Base
 };
 
 /*****************************************************************************************
- *  Class SEE_SetAddComponentParams
+ *  Class SEE_StartAddComponent
  ****************************************************************************************/
 
 /**

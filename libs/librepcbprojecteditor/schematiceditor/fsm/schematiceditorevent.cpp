@@ -46,7 +46,7 @@ SEE_Base::~SEE_Base()
 }
 
 /*****************************************************************************************
- *  Class SEE_SetAddComponentParams
+ *  Class SEE_StartAddComponent
  ****************************************************************************************/
 
 SEE_StartAddComponent::SEE_StartAddComponent() :

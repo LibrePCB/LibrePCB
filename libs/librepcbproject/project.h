@@ -399,6 +399,18 @@ class Project final : public QObject, public IF_AttributeProvider,
         Board* createBoard(const QString& name) throw (Exception);
 
         /**
+         * @brief Create a new board as a copy of an existing board
+         *
+         * @param other The board to copy
+         * @param name  The board name
+         *
+         * @return A pointer to the new board
+         *
+         * @throw Exception This method throws an exception on error.
+         */
+        Board* createBoard(const Board& other, const QString& name) throw (Exception);
+
+        /**
          * @brief Add an existing board to this project
          *
          * @param board         The board to add

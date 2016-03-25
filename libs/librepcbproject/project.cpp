@@ -499,6 +499,13 @@ Board* Project::createBoard(const QString& name) throw (Exception)
     return Board::create(*this, filepath, name);
 }
 
+Board* Project::createBoard(const Board& other, const QString& name) throw (Exception)
+{
+    QString basename = name; /// @todo remove special characters to create a valid filename!
+    FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    return new Board(other, filepath, name);
+}
+
 void Project::addBoard(Board& board, int newIndex) throw (Exception)
 {
     if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
@@ -534,11 +541,6 @@ void Project::removeBoard(Board& board, bool deleteBoard) throw (Exception)
 {
     if ((!mBoards.contains(&board)) || (mRemovedBoards.contains(&board))) {
         throw LogicError(__FILE__, __LINE__);
-    }
-    if ((!deleteBoard) && (!board.isEmpty())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("There are still elements in the board \"%1\"!"))
-            .arg(board.getName()));
     }
 
     int index = getBoardIndex(board);

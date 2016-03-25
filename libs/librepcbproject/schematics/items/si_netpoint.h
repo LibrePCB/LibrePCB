@@ -37,8 +37,6 @@ class QGraphicsItem;
 namespace librepcb {
 namespace project {
 
-class Circuit;
-class Schematic;
 class NetSignal;
 class SI_NetLine;
 class SI_Symbol;
@@ -63,9 +61,9 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         SI_NetPoint() = delete;
         SI_NetPoint(const SI_NetPoint& other) = delete;
-        explicit SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
-        explicit SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
-        explicit SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
+        SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
+        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
         ~SI_NetPoint() noexcept;
 
         // Getters
@@ -78,17 +76,6 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
 
         // Setters
-
-        /**
-         * @brief Change the netsignal of this netpoint
-         *
-         * @warning - This method must always be called from inside an UndoCommand!
-         *          - This method must be called also on attached netpoints
-         *
-         * @param netsignal     A reference to the new netsignal
-         *
-         * @throw Exception     This method throws an exception in case of an error
-         */
         void setNetSignal(NetSignal& netsignal) throw (Exception);
         void setPinToAttach(SI_SymbolPin* pin) throw (Exception);
         void setPosition(const Point& position) noexcept;

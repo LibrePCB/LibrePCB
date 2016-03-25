@@ -22,10 +22,18 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdreplacedevice.h"
+#include <librepcbcommon/scopeguard.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_device.h>
+#include <librepcbproject/boards/items/bi_footprint.h>
+#include <librepcbproject/boards/items/bi_footprintpad.h>
+#include <librepcbproject/boards/items/bi_netpoint.h>
+#include <librepcbproject/boards/items/bi_netline.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
 #include "cmdadddevicetoboard.h"
 
 /*****************************************************************************************
@@ -56,16 +64,67 @@ CmdReplaceDevice::~CmdReplaceDevice() noexcept
 
 bool CmdReplaceDevice::performExecute() throw (Exception)
 {
-    appendChild(new CmdDeviceInstanceRemove(mBoard, mDeviceInstance));
-    appendChild(new CmdAddDeviceToBoard(mWorkspace, mBoard,
-                                        mDeviceInstance.getComponentInstance(),
-                                        mNewDeviceUuid, mNewFootprintUuid,
-                                        mDeviceInstance.getPosition(),
-                                        mDeviceInstance.getRotation(),
-                                        mDeviceInstance.getIsMirrored()));
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+    // remember which netpoints are connected to which component signal instance
+    QList<BI_NetPoint*> attachedNetPoints;
+    QHash<BI_NetPoint*, ComponentSignalInstance*> netpointSignalMapping;
+    foreach (BI_FootprintPad* pad, mDeviceInstance.getFootprint().getPads()) {
+        foreach (BI_NetPoint* netpoint, pad->getNetPoints()) {
+            if (!attachedNetPoints.contains(netpoint)) {
+                attachedNetPoints.append(netpoint);
+                netpointSignalMapping.insert(netpoint, pad->getComponentSignalInstance());
+            }
+        }
+    }
+
+    // disconnect all netpoints/netlines
+    QList<BI_NetLine*> attachedNetLines;
+    foreach (BI_NetPoint* netpoint, attachedNetPoints) {
+        foreach (BI_NetLine* netline, netpoint->getLines()) {
+            execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
+            if (!attachedNetLines.contains(netline)) {
+                attachedNetLines.append(netline);
+            }
+        }
+        CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
+        cmd->setPadToAttach(nullptr);
+        execNewChildCmd(cmd); // can throw
+    }
+
+    // replace the device instance
+    execNewChildCmd(new CmdDeviceInstanceRemove(mBoard, mDeviceInstance)); // can throw
+    CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(mWorkspace, mBoard,
+                                                       mDeviceInstance.getComponentInstance(),
+                                                       mNewDeviceUuid, mNewFootprintUuid,
+                                                       mDeviceInstance.getPosition(),
+                                                       mDeviceInstance.getRotation(),
+                                                       mDeviceInstance.getIsMirrored());
+    execNewChildCmd(cmd); // can throw
+    BI_Device* newDevice = cmd->getDeviceInstance();
+    Q_ASSERT(newDevice);
+
+    // reconnect all netpoints/netlines
+    foreach (BI_NetPoint* netpoint, attachedNetPoints) {
+        ComponentSignalInstance* cmpSig = netpointSignalMapping.value(netpoint);
+        BI_FootprintPad* newPad = nullptr;
+        foreach (BI_FootprintPad* pad, newDevice->getFootprint().getPads()) {
+            if (pad->getComponentSignalInstance() == cmpSig) {
+                newPad = pad;
+                break;
+            }
+        }
+        CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
+        cmd->setPadToAttach(newPad);
+        execNewChildCmd(cmd); // can throw
+    }
+    foreach (BI_NetLine* netline, attachedNetLines) {
+        execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
+    }
+
+    undoScopeGuard.dismiss(); // no undo required
+    return (getChildCount() > 0);
 }
 
 /*****************************************************************************************

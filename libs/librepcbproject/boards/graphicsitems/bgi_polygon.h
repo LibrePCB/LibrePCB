@@ -57,6 +57,9 @@ class BGI_Polygon final : public BGI_Base
         explicit BGI_Polygon(BI_Polygon& polygon) noexcept;
         ~BGI_Polygon() noexcept;
 
+        // Getters
+        bool isSelectable() const noexcept;
+
         // General Methods
         void updateCacheAndRepaint() noexcept;
 

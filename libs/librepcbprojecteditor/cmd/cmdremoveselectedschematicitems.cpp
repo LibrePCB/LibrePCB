@@ -26,6 +26,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/circuit/componentinstance.h>
+#include <librepcbproject/circuit/componentsignalinstance.h>
 #include <librepcbproject/circuit/cmd/cmdcomponentinstanceremove.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
@@ -42,7 +43,12 @@
 #include <librepcbproject/schematics/cmd/cmdschematicnetlabelremove.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
 #include <librepcbproject/boards/board.h>
+#include <librepcbproject/boards/items/bi_footprintpad.h>
+#include <librepcbproject/boards/items/bi_netpoint.h>
+#include <librepcbproject/boards/items/bi_netline.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
 #include "cmdremoveunusednetsignals.h"
 
 /*****************************************************************************************
@@ -100,32 +106,11 @@ bool CmdRemoveSelectedSchematicItems::performExecute() throw (Exception)
     foreach (SI_Base* item, items) {
         if (item->getType() == SI_Base::Type_t::NetPoint) {
             SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
-            // TODO: this code does not work correctly in all possible cases!
+            if (netpoint->isAttachedToPin()) {
+                detachNetPointFromSymbolPin(*netpoint); // can throw
+            }
             if (netpoint->getLines().count() == 0) {
                 execNewChildCmd(new CmdSchematicNetPointRemove(*netpoint)); // can throw
-                if (netpoint->isAttachedToPin()) {
-                    ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
-                    Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                    execNewChildCmd(new CmdCompSigInstSetNetSignal(*signal, nullptr)); // can throw
-                }
-            } else if (netpoint->isAttachedToPin()) {
-                ComponentSignalInstance* signal = netpoint->getSymbolPin()->getComponentSignalInstance();
-                Q_ASSERT(signal); if (!signal) throw LogicError(__FILE__, __LINE__);
-                // disconnect all netlines
-                QList<SI_NetLine*> netlines = netpoint->getLines();
-                foreach (SI_NetLine* netline, netlines) {
-                    execNewChildCmd(new CmdSchematicNetLineRemove(*netline)); // can throw
-                }
-                // detach netpoint from symbol pin
-                CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
-                cmd->setPinToAttach(nullptr);
-                execNewChildCmd(cmd); // can throw
-                // reconnect all netlines
-                foreach (SI_NetLine* netline, netlines) {
-                    execNewChildCmd(new CmdSchematicNetLineAdd(*netline)); // can throw
-                }
-                // disconnect component signal instance from netsignal
-                execNewChildCmd(new CmdCompSigInstSetNetSignal(*signal, nullptr)); // can throw
             }
         }
     }
@@ -158,6 +143,60 @@ bool CmdRemoveSelectedSchematicItems::performExecute() throw (Exception)
 
     undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
+}
+
+void CmdRemoveSelectedSchematicItems::detachNetPointFromSymbolPin(SI_NetPoint& netpoint) throw (Exception)
+{
+    SI_SymbolPin* pin = netpoint.getSymbolPin();
+    if (!pin) throw LogicError(__FILE__, __LINE__);
+    ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
+    if (!cmpSig) throw LogicError(__FILE__, __LINE__);
+
+    // disconnect all netlines
+    QList<SI_NetLine*> netlines = netpoint.getLines();
+    foreach (SI_NetLine* netline, netlines) {
+        execNewChildCmd(new CmdSchematicNetLineRemove(*netline)); // can throw
+    }
+
+    // detach netpoint from symbol pin
+    CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(netpoint);
+    cmd->setPinToAttach(nullptr);
+    execNewChildCmd(cmd); // can throw
+
+    // reconnect all netlines
+    foreach (SI_NetLine* netline, netlines) {
+        execNewChildCmd(new CmdSchematicNetLineAdd(*netline)); // can throw
+    }
+
+    // check if this was the last symbol pin of the component signal
+    bool componentSignalMustBeDisconnected = true;
+    foreach (const SI_SymbolPin* pin, cmpSig->getRegisteredSymbolPins()) {
+        if (pin->getNetPoint()) {
+            componentSignalMustBeDisconnected = false;
+            break;
+        }
+    }
+
+    // if required, disconnect the component signal from the net signal now
+    if (componentSignalMustBeDisconnected) {
+        disconnectComponentSignalInstance(*cmpSig); // can throw
+    }
+}
+
+void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(ComponentSignalInstance& signal) throw (Exception)
+{
+    // disconnect board items
+    foreach (BI_FootprintPad* pad, signal.getRegisteredFootprintPads()) {
+        foreach (BI_NetPoint* netpoint, pad->getNetPoints()) {
+            foreach (BI_NetLine* netline, netpoint->getLines()) {
+                execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
+            }
+            execNewChildCmd(new CmdBoardNetPointRemove(*netpoint)); // can throw
+        }
+    }
+
+    // disconnect the component signal instance from the net signal
+    execNewChildCmd(new CmdCompSigInstSetNetSignal(signal, nullptr)); // can throw
 }
 
 /*****************************************************************************************

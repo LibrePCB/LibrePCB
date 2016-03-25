@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/uuid.h>
 #include <librepcbcommon/graphics/if_graphicsvieweventhandler.h>
 
 /*****************************************************************************************
@@ -44,6 +45,7 @@ class ErcMsgDock;
 class UnplacedComponentsDock;
 class BoardLayersDock;
 class BES_FSM;
+class ComponentInstance;
 
 namespace Ui {
 class BoardEditor;
@@ -95,11 +97,13 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         // Actions
         void on_actionProjectClose_triggered();
         void on_actionNewBoard_triggered();
+        void on_actionCopyBoard_triggered();
         void on_actionUndo_triggered();
         void on_actionRedo_triggered();
         void on_actionGrid_triggered();
         void on_actionExportAsPdf_triggered();
         void on_actionProjectProperties_triggered();
+        void on_tabBar_currentChanged(int index);
         void boardListActionGroupTriggered(QAction* action);
 
 

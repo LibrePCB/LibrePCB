@@ -61,6 +61,9 @@ class BGI_FootprintPad final : public BGI_Base
         explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
         ~BGI_FootprintPad() noexcept;
 
+        // Getters
+        bool isSelectable() const noexcept;
+
         // General Methods
         void updateCacheAndRepaint() noexcept;
 
@@ -84,12 +87,12 @@ class BGI_FootprintPad final : public BGI_Base
         // General Attributes
         BI_FootprintPad& mPad;
         const library::FootprintPad& mLibPad;
-        const library::PackagePad* mLibPkgPad;
 
         // Cached Attributes
         BoardLayer* mPadLayer;
         QRectF mBoundingRect;
         QPainterPath mShape;
+        QFont mFont;
 };
 
 /*****************************************************************************************

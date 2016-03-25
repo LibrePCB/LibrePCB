@@ -68,6 +68,7 @@ class FootprintPad : public IF_XmlSerializableObject
         const Length& getWidth() const noexcept {return mWidth;}
         const Length& getHeight() const noexcept {return mHeight;}
         virtual int getLayerId() const noexcept = 0;
+        virtual bool isOnLayer(int id) const noexcept = 0;
         QRectF getBoundingRectPx() const noexcept;
         virtual const QPainterPath& toQPainterPathPx() const noexcept = 0;
 

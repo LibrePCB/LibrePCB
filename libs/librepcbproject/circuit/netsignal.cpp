@@ -30,6 +30,8 @@
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include "../schematics/items/si_netlabel.h"
 #include "../schematics/items/si_netpoint.h"
+#include "../boards/items/bi_netpoint.h"
+#include "../boards/items/bi_via.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -82,6 +84,8 @@ int NetSignal::getRegisteredElementsCount() const noexcept
     count += mRegisteredComponentSignals.count();
     count += mRegisteredSchematicNetPoints.count();
     count += mRegisteredSchematicNetLabels.count();
+    count += mRegisteredBoardNetPoints.count();
+    count += mRegisteredBoardVias.count();
     return count;
 }
 
@@ -213,6 +217,46 @@ void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel) throw (Except
         throw LogicError(__FILE__, __LINE__);
     }
     mRegisteredSchematicNetLabels.removeOne(&netlabel);
+    updateErcMessages();
+}
+
+void NetSignal::registerBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (mRegisteredBoardNetPoints.contains(&netpoint))
+        || (netpoint.getCircuit() != mCircuit))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardNetPoints.append(&netpoint);
+    updateErcMessages();
+}
+
+void NetSignal::unregisterBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (!mRegisteredBoardNetPoints.contains(&netpoint))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardNetPoints.removeOne(&netpoint);
+    updateErcMessages();
+}
+
+void NetSignal::registerBoardVia(BI_Via& via) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (mRegisteredBoardVias.contains(&via))
+        || (via.getCircuit() != mCircuit))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardVias.append(&via);
+    updateErcMessages();
+}
+
+void NetSignal::unregisterBoardVia(BI_Via& via) throw (Exception)
+{
+    if ((!mIsAddedToCircuit) || (!mRegisteredBoardVias.contains(&via))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardVias.removeOne(&via);
     updateErcMessages();
 }
 

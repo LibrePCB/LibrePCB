@@ -64,6 +64,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         BI_Footprint() = delete;
         BI_Footprint(const BI_Footprint& other) = delete;
+        BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (Exception);
         BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception);
         explicit BI_Footprint(BI_Device& device) throw (Exception);
         ~BI_Footprint() noexcept;
@@ -75,6 +76,8 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept;
         const Angle& getRotation() const noexcept;
+        bool isSelectable() const noexcept override;
+        bool isUsed() const noexcept;
 
         // General Methods
         void addToBoard(GraphicsScene& scene) throw (Exception) override;

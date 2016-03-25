@@ -61,6 +61,9 @@ class BGI_Footprint final : public BGI_Base
         explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
         ~BGI_Footprint() noexcept;
 
+        // Getters
+        bool isSelectable() const noexcept;
+
         // General Methods
         void updateCacheAndRepaint() noexcept;
 

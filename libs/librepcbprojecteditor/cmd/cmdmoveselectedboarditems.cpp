@@ -27,7 +27,11 @@
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/boards/items/bi_footprint.h>
+#include <librepcbproject/boards/items/bi_netpoint.h>
+#include <librepcbproject/boards/items/bi_via.h>
 #include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -44,8 +48,8 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     mBoard(board), mStartPos(startPos), mDeltaPos(0, 0)
 {
     // get all selected items
-    QList<BI_Base*> items = mBoard.getSelectedItems(false /*true, false, true, false, false,
-                                                    false, false, false, false, false*/);
+    QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, false, true, false,
+                                                    false, false, false, false, false, false);
 
     foreach (BI_Base* item, items) {
         switch (item->getType())
@@ -55,6 +59,18 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
                 BI_Device& device = footprint->getDeviceInstance();
                 CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
                 mDeviceEditCmds.append(cmd);
+                break;
+            }
+            case BI_Base::Type_t::Via: {
+                BI_Via* via = dynamic_cast<BI_Via*>(item); Q_ASSERT(via);
+                CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
+                mViaEditCmds.append(cmd);
+                break;
+            }
+            case BI_Base::Type_t::NetPoint: {
+                BI_NetPoint* point = dynamic_cast<BI_NetPoint*>(item); Q_ASSERT(point);
+                CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*point);
+                mNetPointEditCmds.append(cmd);
                 break;
             }
             default: {
@@ -83,6 +99,12 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
+        foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
+        foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
         mDeltaPos = delta;
     }
 }
@@ -96,10 +118,18 @@ bool CmdMoveSelectedBoardItems::performExecute() throw (Exception)
     if (mDeltaPos.isOrigin()) {
         // no movement required --> discard all move commands
         qDeleteAll(mDeviceEditCmds);    mDeviceEditCmds.clear();
+        qDeleteAll(mViaEditCmds);       mViaEditCmds.clear();
+        qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
         return false;
     }
 
     foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+        appendChild(cmd); // can throw
+    }
+    foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
+        appendChild(cmd); // can throw
+    }
+    foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
         appendChild(cmd); // can throw
     }
 

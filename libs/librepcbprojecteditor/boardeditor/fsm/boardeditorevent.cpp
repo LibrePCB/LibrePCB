@@ -44,6 +44,21 @@ BEE_Base::~BEE_Base()
 {
 }
 
+
+/*****************************************************************************************
+ *  Class BEE_StartAddDevice
+ ****************************************************************************************/
+
+BEE_StartAddDevice::BEE_StartAddDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) :
+    BEE_Base(EventType_t::StartAddDevice), mComponentInstance(cmp), mDeviceUuid(dev),
+    mFootprintUuid(fpt)
+{
+}
+
+BEE_StartAddDevice::~BEE_StartAddDevice()
+{
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

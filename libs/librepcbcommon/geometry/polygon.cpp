@@ -33,6 +33,11 @@ namespace librepcb {
  *  Class PolygonSegment
  ****************************************************************************************/
 
+PolygonSegment::PolygonSegment(const PolygonSegment& other) noexcept :
+    mEndPos(other.mEndPos), mAngle(other.mAngle)
+{
+}
+
 PolygonSegment::PolygonSegment(const XmlDomElement& domElement) throw (Exception)
 {
     mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
@@ -61,6 +66,15 @@ bool PolygonSegment::checkAttributesValidity() const noexcept
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
+
+Polygon::Polygon(const Polygon& other) noexcept :
+    mLayerId(other.mLayerId), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea), mStartPos(other.mStartPos)
+{
+    foreach (const PolygonSegment* segment, other.mSegments) {
+        mSegments.append(new PolygonSegment(*segment));
+    }
+}
 
 Polygon::Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                  const Point& startPos) noexcept :

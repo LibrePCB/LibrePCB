@@ -38,7 +38,6 @@
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbworkspace/workspace.h>
 #include "../projecteditor.h"
-#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcblibrary/pkg/footprintpreviewgraphicsitem.h>
 #include <librepcbproject/boards/boardlayerstack.h>
 #include "../cmd/cmdadddevicetoboard.h"
@@ -161,7 +160,7 @@ void UnplacedComponentsDock::on_cbxSelectedFootprint_currentIndexChanged(int ind
 void UnplacedComponentsDock::on_btnAdd_clicked()
 {
     if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage && (!mSelectedFootprintUuid.isNull())) {
-        addDevice(*mSelectedComponent, mSelectedDevice->getUuid(), mSelectedFootprintUuid);
+        addDeviceManually(*mSelectedComponent, mSelectedDevice->getUuid(), mSelectedFootprintUuid);
     }
     updateComponentsList();
 }
@@ -173,17 +172,16 @@ void UnplacedComponentsDock::on_pushButton_clicked()
     Uuid componentLibUuid = mSelectedComponent->getLibComponent().getUuid();
     Uuid deviceLibUuid = mSelectedDevice->getUuid();
 
-    mDisableListUpdate = true;
-    for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
-    {
+    beginUndoCmdGroup();
+    for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++) {
         Uuid componentUuid(mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toString());
         Q_ASSERT(componentUuid.isNull() == false);
         ComponentInstance* component = mProject.getCircuit().getComponentInstanceByUuid(componentUuid);
         if (!component) continue;
         if (component->getLibComponent().getUuid() != componentLibUuid) continue;
-        addDevice(*component, deviceLibUuid, mSelectedFootprintUuid);
+        addNextDeviceToCmdGroup(*component, deviceLibUuid, mSelectedFootprintUuid);
     }
-    mDisableListUpdate = false;
+    commitUndoCmdGroup();
 
     updateComponentsList();
 }
@@ -192,7 +190,7 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
 {
     if (!mBoard) return;
 
-    mDisableListUpdate = true;
+    beginUndoCmdGroup();
     for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++)
     {
         Uuid componentUuid(mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toString());
@@ -203,10 +201,10 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
             QList<Uuid> devices = mProjectEditor.getWorkspace().getLibrary().
                 getDevicesOfComponent(component->getLibComponent().getUuid()).toList();
             if (devices.count() > 0)
-                addDevice(*component, devices.first(), Uuid());
+                addNextDeviceToCmdGroup(*component, devices.first(), Uuid());
         }
     }
-    mDisableListUpdate = false;
+    commitUndoCmdGroup();
 
     updateComponentsList();
 }
@@ -219,6 +217,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
 {
     if (mDisableListUpdate) return;
 
+    int selectedIndex = mUi->lstUnplacedComponents->currentRow();
     setSelectedComponentInstance(nullptr);
     mUi->lstUnplacedComponents->clear();
 
@@ -240,7 +239,14 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, component->getUuid().toStr());
         }
+
+        if (mUi->lstUnplacedComponents->count() > 0) {
+            int index = qMin(selectedIndex, mUi->lstUnplacedComponents->count()-1);
+            mUi->lstUnplacedComponents->setCurrentRow(index);
+        }
     }
+
+    setWindowTitle(QString(tr("Place Devices [%1]")).arg(mUi->lstUnplacedComponents->count()));
 }
 
 void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp) noexcept
@@ -270,8 +276,11 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
             QString text = QString("%1 [%2]").arg(devName, pkgName);
             mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
         }
-        if (mUi->cbxSelectedDevice->count() > 0)
-            mUi->cbxSelectedDevice->setCurrentIndex(0);
+        if (mUi->cbxSelectedDevice->count() > 0) {
+            Uuid deviceUuid = mLastDeviceOfComponent.value(mSelectedComponent->getLibComponent().getUuid());
+            int index = deviceUuid.isNull() ? 0 : mUi->cbxSelectedDevice->findData(deviceUuid.toStr());
+            mUi->cbxSelectedDevice->setCurrentIndex(index);
+        }
     }
 }
 
@@ -299,8 +308,11 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(const library::Device* 
                 }
                 mUi->cbxSelectedFootprint->addItem(name, uuid.toStr());
             }
-            if (mUi->cbxSelectedFootprint->count() > 0)
-                mUi->cbxSelectedFootprint->setCurrentIndex(defaultFootprintIndex);
+            if (mUi->cbxSelectedFootprint->count() > 0) {
+                Uuid footprintUuid = mLastFootprintOfDevice.value(mSelectedDevice->getUuid());
+                int index = footprintUuid.isNull() ? defaultFootprintIndex : mUi->cbxSelectedFootprint->findData(footprintUuid.toStr());
+                mUi->cbxSelectedFootprint->setCurrentIndex(index);
+            }
         }
     }
 }
@@ -328,35 +340,50 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(const Uuid& uuid) noexcept
     }
 }
 
-void UnplacedComponentsDock::addDevice(ComponentInstance& cmp, const Uuid& deviceUuid,
-                                       Uuid footprintUuid) noexcept
+void UnplacedComponentsDock::beginUndoCmdGroup() noexcept
+{
+    mCurrentUndoCmdGroup.reset(new UndoCommandGroup(tr("Add device to board")));
+}
+
+void UnplacedComponentsDock::addNextDeviceToCmdGroup(ComponentInstance& cmp,
+                                                     const Uuid& deviceUuid,
+                                                     Uuid footprintUuid) noexcept
 {
     Q_ASSERT(mBoard);
-    bool cmdActive = false;
+    mLastDeviceOfComponent[cmp.getLibComponent().getUuid()] = deviceUuid;
+    mLastFootprintOfDevice[deviceUuid] = footprintUuid;
+    mCurrentUndoCmdGroup->appendChild(new CmdAddDeviceToBoard(mProjectEditor.getWorkspace(),
+                                      *mBoard, cmp, deviceUuid, footprintUuid, mNextPosition));
 
+    // update current position
+    if (mNextPosition.getX() > Length::fromMm(200))
+        mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
+    else
+        mNextPosition += Point::fromMm(10, 0);
+    mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
+}
+
+void UnplacedComponentsDock::commitUndoCmdGroup() noexcept
+{
+    mDisableListUpdate = true;
     try
     {
-        mProjectEditor.getUndoStack().beginCmdGroup(tr("Add device to board"));
-        cmdActive = true;
-
-        // add device to board
-        auto* cmd = new CmdAddDeviceToBoard(mProjectEditor.getWorkspace(), *mBoard, cmp,
-                                            deviceUuid, footprintUuid, mNextPosition);
-        mProjectEditor.getUndoStack().appendToCmdGroup(cmd);
-        if (mNextPosition.getX() > Length::fromMm(200))
-            mNextPosition = Point::fromMm(0, mNextPosition.getY().toMm() - 10);
-        else
-            mNextPosition += Point::fromMm(10, 0);
-        mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
-
-        mProjectEditor.getUndoStack().commitCmdGroup();
-        cmdActive = false;
+        mProjectEditor.getUndoStack().execCmd(mCurrentUndoCmdGroup.take());
     }
     catch (Exception& e)
     {
-        try {if (cmdActive) mProjectEditor.getUndoStack().abortCmdGroup();} catch (...) {}
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
     }
+    mDisableListUpdate = false;
+}
+
+void UnplacedComponentsDock::addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid,
+                                               Uuid footprintUuid) noexcept
+{
+    Q_ASSERT(mBoard);
+    mLastDeviceOfComponent[cmp.getLibComponent().getUuid()] = deviceUuid;
+    mLastFootprintOfDevice[deviceUuid] = footprintUuid;
+    addDeviceTriggered(cmp, deviceUuid, footprintUuid);
 }
 
 /*****************************************************************************************

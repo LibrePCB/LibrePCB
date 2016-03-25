@@ -98,7 +98,7 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exce
     }
     foreach (SI_SymbolPin* pin, pinsUnderCursor) {
         ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
-        NetSignal* signal = cmpSig ? cmpSig->getNetSignal() : nullptr;
+        NetSignal* signal = pin->getCompSigInstNetSignal();
         if ((signal) && (!netSignalsUnderCursor.contains(signal))) {
             netSignalsUnderCursor.append(signal);
         }

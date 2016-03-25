@@ -161,7 +161,7 @@ void SI_NetPoint::setPinToAttach(SI_SymbolPin* pin) throw (Exception)
     if (pin == mSymbolPin) {
         return;
     }
-    if ((isUsed()) || ((pin) && (pin->getCircuit() != getCircuit()))) {
+    if ((isUsed()) || ((pin) && (pin->getSchematic() != getSchematic()))) {
         throw LogicError(__FILE__, __LINE__);
     }
     if (isAddedToSchematic()) {
@@ -227,7 +227,6 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     if ((!isAddedToSchematic()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-
     ScopeGuardList sgl;
     if (isAttachedToPin()) {
         // check if mNetSignal is correct (would be a bug if not)

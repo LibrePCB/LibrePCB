@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/undocommandgroup.h>
-#include <librepcbcommon/units/angle.h>
+#include <librepcbcommon/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,6 +34,7 @@ namespace librepcb {
 namespace project {
 
 class Board;
+class BI_Device;
 
 /*****************************************************************************************
  *  Class CmdFlipSelectedBoardItems
@@ -57,6 +58,7 @@ class CmdFlipSelectedBoardItems final : public UndoCommandGroup
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() throw (Exception) override;
+        void flipDevice(BI_Device& device, const Point& center) throw (Exception);
 
 
         // Private Member Variables

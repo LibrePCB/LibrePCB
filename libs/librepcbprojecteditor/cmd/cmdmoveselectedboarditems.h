@@ -35,6 +35,8 @@ namespace project {
 
 class Board;
 class CmdDeviceInstanceEdit;
+class CmdBoardViaEdit;
+class CmdBoardNetPointEdit;
 
 /*****************************************************************************************
  *  Class CmdMoveSelectedBoardItems
@@ -70,6 +72,8 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
 
         // Move commands
         QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
+        QList<CmdBoardViaEdit*> mViaEditCmds;
+        QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
 };
 
 /*****************************************************************************************

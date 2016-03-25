@@ -233,8 +233,7 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
 
 bool ControlPanel::closeProject(ProjectEditor& editor, bool askForSave) noexcept
 {
-    const FilePath& filepath = editor.getProject().getFilepath().toUnique();
-    Q_ASSERT(mOpenProjectEditors.contains(filepath.toStr()));
+    Q_ASSERT(mOpenProjectEditors.contains(editor.getProject().getFilepath().toUnique().toStr()));
     return editor.closeAndDestroy(askForSave, this); // this will implicitly call the slot "projectEditorClosed()"!
 }
 

@@ -69,6 +69,11 @@ int FootprintPadSmt::getLayerId() const noexcept
     }
 }
 
+bool FootprintPadSmt::isOnLayer(int id) const noexcept
+{
+    return (id == getLayerId());
+}
+
 const QPainterPath& FootprintPadSmt::toQPainterPathPx() const noexcept
 {
     if (mPainterPathPx.isEmpty()) {
