@@ -74,8 +74,9 @@ bool UndoCommandGroup::performExecute() throw (Exception)
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
-        mChilds.at(i)->execute();
-        sgl.add([&](){mChilds.at(i)->undo();});
+        UndoCommand* cmd = mChilds.at(i);
+        cmd->execute();
+        sgl.add([cmd](){cmd->undo();});
     }
     sgl.dismiss();
     return (mChilds.count() > 0);
@@ -85,8 +86,9 @@ void UndoCommandGroup::performUndo() throw (Exception)
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = mChilds.count()-1; i >= 0; --i) { // from top to bottom
-        mChilds.at(i)->undo();
-        sgl.add([&](){mChilds.at(i)->redo();});
+        UndoCommand* cmd = mChilds.at(i);
+        cmd->undo();
+        sgl.add([cmd](){cmd->redo();});
     }
     sgl.dismiss();
 }
@@ -95,8 +97,9 @@ void UndoCommandGroup::performRedo() throw (Exception)
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
-        mChilds.at(i)->redo();
-        sgl.add([&](){mChilds.at(i)->undo();});
+        UndoCommand* cmd = mChilds.at(i);
+        cmd->redo();
+        sgl.add([cmd](){cmd->undo();});
     }
     sgl.dismiss();
 }

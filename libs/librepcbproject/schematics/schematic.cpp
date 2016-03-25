@@ -557,8 +557,9 @@ void Schematic::addToProject() throw (Exception)
     QList<SI_Base*> items = getAllItems();
     ScopeGuardList sgl(items.count());
     for (int i = 0; i < items.count(); ++i) {
-        items.at(i)->addToSchematic(*mGraphicsScene); // can throw
-        sgl.add([&](){items.at(i)->removeFromSchematic(*mGraphicsScene);});
+        SI_Base* item = items.at(i);
+        item->addToSchematic(*mGraphicsScene); // can throw
+        sgl.add([this, item](){item->removeFromSchematic(*mGraphicsScene);});
     }
     mIsAddedToProject = true;
     updateIcon();
@@ -573,8 +574,9 @@ void Schematic::removeFromProject() throw (Exception)
     QList<SI_Base*> items = getAllItems();
     ScopeGuardList sgl(items.count());
     for (int i = items.count()-1; i >= 0; --i) {
-        items.at(i)->removeFromSchematic(*mGraphicsScene); // can throw
-        sgl.add([&](){items.at(i)->addToSchematic(*mGraphicsScene);});
+        SI_Base* item = items.at(i);
+        item->removeFromSchematic(*mGraphicsScene); // can throw
+        sgl.add([this, item](){item->addToSchematic(*mGraphicsScene);});
     }
     mIsAddedToProject = false;
     sgl.dismiss();

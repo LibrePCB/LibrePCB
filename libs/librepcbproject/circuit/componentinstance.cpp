@@ -309,7 +309,7 @@ void ComponentInstance::addToCircuit() throw (Exception)
     ScopeGuardList sgl(mSignals.count());
     foreach (ComponentSignalInstance* signal, mSignals) {
         signal->addToCircuit(); // can throw
-        sgl.add([&](){signal->removeFromCircuit();});
+        sgl.add([signal](){signal->removeFromCircuit();});
     }
     mIsAddedToCircuit = true;
     updateErcMessages();
@@ -329,7 +329,7 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
     ScopeGuardList sgl(mSignals.count());
     foreach (ComponentSignalInstance* signal, mSignals) {
         signal->removeFromCircuit(); // can throw
-        sgl.add([&](){signal->addToCircuit();});
+        sgl.add([signal](){signal->addToCircuit();});
     }
     mIsAddedToCircuit = false;
     updateErcMessages();

@@ -348,8 +348,9 @@ void Board::addToProject() throw (Exception)
     QList<BI_Base*> items = getAllItems();
     ScopeGuardList sgl(items.count());
     for (int i = 0; i < items.count(); ++i) {
-        items.at(i)->addToBoard(*mGraphicsScene); // can throw
-        sgl.add([&](){items.at(i)->removeFromBoard(*mGraphicsScene);});
+        BI_Base* item = items.at(i);
+        item->addToBoard(*mGraphicsScene); // can throw
+        sgl.add([this, item](){item->removeFromBoard(*mGraphicsScene);});
     }
     mIsAddedToProject = true;
     updateErcMessages();
@@ -364,8 +365,9 @@ void Board::removeFromProject() throw (Exception)
     QList<BI_Base*> items = getAllItems();
     ScopeGuardList sgl(items.count());
     for (int i = items.count()-1; i >= 0; --i) {
-        items.at(i)->removeFromBoard(*mGraphicsScene); // can throw
-        sgl.add([&](){items.at(i)->addToBoard(*mGraphicsScene);});
+        BI_Base* item = items.at(i);
+        item->removeFromBoard(*mGraphicsScene); // can throw
+        sgl.add([this, item](){item->addToBoard(*mGraphicsScene);});
     }
     mIsAddedToProject = false;
     updateErcMessages();

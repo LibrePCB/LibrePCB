@@ -170,7 +170,7 @@ void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
     sgl.add([&](){mComponentInstance->unregisterSymbol(*this);});
     foreach (SI_SymbolPin* pin, mPins) {
         pin->addToSchematic(scene); // can throw
-        sgl.add([&](){pin->removeFromSchematic(scene);});
+        sgl.add([pin, &scene](){pin->removeFromSchematic(scene);});
     }
     SI_Base::addToSchematic(scene, *mGraphicsItem);
     sgl.dismiss();
@@ -184,7 +184,7 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     ScopeGuardList sgl(mPins.count()+1);
     foreach (SI_SymbolPin* pin, mPins) {
         pin->removeFromSchematic(scene); // can throw
-        sgl.add([&](){pin->addToSchematic(scene);});
+        sgl.add([pin, &scene](){pin->addToSchematic(scene);});
     }
     mComponentInstance->unregisterSymbol(*this); // can throw
     sgl.add([&](){mComponentInstance->registerSymbol(*this);});

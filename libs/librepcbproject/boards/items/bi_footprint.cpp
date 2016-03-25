@@ -140,7 +140,7 @@ void BI_Footprint::addToBoard(GraphicsScene& scene) throw (Exception)
     ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
         pad->addToBoard(scene); // can throw
-        sgl.add([&](){pad->removeFromBoard(scene);});
+        sgl.add([pad, &scene](){pad->removeFromBoard(scene);});
     }
     BI_Base::addToBoard(scene, *mGraphicsItem);
     sgl.dismiss();
@@ -154,7 +154,7 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
         pad->removeFromBoard(scene); // can throw
-        sgl.add([&](){pad->addToBoard(scene);});
+        sgl.add([pad, &scene](){pad->addToBoard(scene);});
     }
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
     sgl.dismiss();
