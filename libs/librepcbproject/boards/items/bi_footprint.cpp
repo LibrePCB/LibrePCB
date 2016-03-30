@@ -89,13 +89,6 @@ void BI_Footprint::init() throw (Exception)
         }
         mPads.insert(libPad->getUuid(), pad);
     }
-    if (mPads.count() != libDev.getPadSignalMap().count()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString("%1!=%2").arg(mPads.count()).arg(libDev.getPadSignalMap().count()),
-            QString(tr("The pad count of the footprint \"%1\" does not match with "
-            "the pad-signal-map of device \"%2\".")).arg(getLibFootprint().getUuid().toStr(),
-            libDev.getUuid().toStr()));
-    }
 
     // connect to the "attributes changed" signal of device instance
     connect(&mDevice, &BI_Device::attributesChanged,
