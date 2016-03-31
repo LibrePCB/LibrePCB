@@ -1,4 +1,4 @@
-version: 1.0.{build}-{branch}
+version: 0.1.{build}-{branch}
 os: Windows Server 2012
 configuration: Debug
 build: off
