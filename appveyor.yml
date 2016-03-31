@@ -13,7 +13,7 @@ environment:
 
 init:
   - git config --global core.autocrlf input
-  - set PATH=%PATH%;%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin
+  - set PATH=%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin;%PATH%
 
 build_script:
   - mkdir build
