@@ -177,6 +177,24 @@ bool XmlDomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) c
 }
 
 template <>
+qreal XmlDomElement::getText<qreal>(bool throwIfEmpty, const qreal& defaultValue) const throw (Exception)
+{
+    QString text = getText<QString>(throwIfEmpty);
+    bool ok = false;
+    static_assert(sizeof(qreal) == sizeof(double), "Unsupported size of qreal type!");
+    qreal value = text.toDouble(&ok);
+    if (ok)
+        return value;
+    else if ((text.isEmpty()) && (!throwIfEmpty))
+        return defaultValue;
+    else
+    {
+        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                             QString(tr("Invalid number in node \"%1\".")).arg(mName));
+    }
+}
+
+template <>
 QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
@@ -582,6 +600,12 @@ XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const bool& v
 }
 
 template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const qreal& value) noexcept
+{
+    return appendTextChild<QString>(name, QString::number(value, 'g', 6));
+}
+
+template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QDateTime& value) noexcept
 {
     return appendTextChild<QString>(name, value.toUTC().toString(Qt::ISODate));
@@ -597,6 +621,12 @@ template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Version& value) noexcept
 {
     return appendTextChild<QString>(name, value.toStr());
+}
+
+template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Length& value) noexcept
+{
+    return appendTextChild<QString>(name, value.toMmString());
 }
 
 XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)

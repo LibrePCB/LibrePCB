@@ -114,22 +114,24 @@ BI_Via::~BI_Via() noexcept
  *  Getters
  ****************************************************************************************/
 
-QPainterPath BI_Via::toQPainterPathPx() const noexcept
+QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const noexcept
 {
     QPainterPath p;
     p.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
     switch (mShape)
     {
         case Shape::Round: {
-            p.addEllipse(-mSize.toPx()/2, -mSize.toPx()/2, mSize.toPx(), mSize.toPx());
+            qreal dia = (mSize + clearance*2).toPx();
+            p.addEllipse(-dia/2, -dia/2, dia, dia);
             break;
         }
         case Shape::Square: {
-            p.addRect(-mSize.toPx()/2, -mSize.toPx()/2, mSize.toPx(), mSize.toPx());
+            qreal size = (mSize + clearance*2).toPx();
+            p.addRect(-size/2, -size/2, size, size);
             break;
         }
         case Shape::Octagon: {
-            qreal r = mSize.toPx()/2;
+            qreal r = (mSize/2 + clearance).toPx();
             qreal a = r * (2 - qSqrt(2));
             QPolygonF octagon;
             octagon.append(QPointF(r, r-a));
@@ -145,8 +147,10 @@ QPainterPath BI_Via::toQPainterPathPx() const noexcept
         }
         default: Q_ASSERT(false); break;
     }
-    // remove hole
-    p.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
+    if (hole) {
+        // remove hole
+        p.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
+    }
     return p;
 }
 

@@ -30,6 +30,7 @@
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
 #include <librepcbcommon/boardlayer.h>
+#include <librepcbcommon/boarddesignrules.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -42,7 +43,8 @@ namespace project {
  ****************************************************************************************/
 
 BGI_Via::BGI_Via(BI_Via& via) noexcept :
-    BGI_Base(), mVia(via), mLayer(nullptr)
+    BGI_Base(), mVia(via), mViaLayer(nullptr), mTopStopMaskLayer(nullptr),
+    mBottomStopMaskLayer(nullptr)
 {
     setZValue(Board::ZValue_Vias);
 
@@ -64,7 +66,7 @@ BGI_Via::~BGI_Via() noexcept
 
 bool BGI_Via::isSelectable() const noexcept
 {
-    return mLayer && mLayer->isVisible();
+    return mViaLayer && mViaLayer->isVisible();
 }
 
 /*****************************************************************************************
@@ -77,24 +79,20 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 
     setToolTip(mVia.getNetSignal() ? mVia.getNetSignal()->getName() : QString());
 
-    mLayer = getBoardLayer(BoardLayer::Vias);
-    Q_ASSERT(mLayer);
-    if (!mLayer->isVisible()) {
-        mLayer = nullptr;
-    }
+    mViaLayer = getBoardLayer(BoardLayer::Vias);
+    mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
+    mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+
+    // determine stop mask clearance
+    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(mVia.getDrillDiameter());
+    mStopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(mVia.getSize());
 
     // set shape and bounding rect
-    if (mLayer) {
-        qreal radius = mVia.getSize().toPx() / 2;
-        mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
-        mShape = QPainterPath();
-        mShape.addEllipse(mBoundingRect);
-    } else {
-        mBoundingRect = QRectF(0, 0, 0, 0);
-        mShape = QPainterPath();
-    }
-
-    setVisible(!mBoundingRect.isEmpty());
+    qreal shapeRadius = (mVia.getSize()/2).toPx();
+    qreal stopMaskRadius = ((mVia.getSize() + mStopMaskClearance*2) / 2).toPx();
+    mBoundingRect = QRectF(-stopMaskRadius, -stopMaskRadius, 2*stopMaskRadius, 2*stopMaskRadius);
+    mShape = QPainterPath();
+    mShape.addEllipse(QRectF(-shapeRadius, -shapeRadius, 2*shapeRadius, 2*shapeRadius));
 
     update();
 }
@@ -108,27 +106,40 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if (!mLayer) return;
-
     NetSignal* netsignal = mVia.getNetSignal();
     bool highlight = mVia.isSelected() || (netsignal && netsignal->isHighlighted());
 
-    // draw via
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mLayer->getColor(highlight));
-    painter->drawPath(mVia.toQPainterPathPx());
+    if (mDrawStopMask && mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
+        // draw bottom stop mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
+        painter->drawPath(mVia.toQPainterPathPx(mStopMaskClearance, false));
+    }
 
-    // draw netsignal name
-    if (netsignal) {
-        painter->setFont(mFont);
-        painter->setPen(mLayer->getColor(highlight).lighter(150));
-        painter->drawText(mBoundingRect, Qt::AlignCenter, netsignal->getName());
+    if (mViaLayer && mViaLayer->isVisible()) {
+        // draw via
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mViaLayer->getColor(highlight));
+        painter->drawPath(mVia.toQPainterPathPx(Length(0), true));
+
+        // draw netsignal name
+        if (netsignal) {
+            painter->setFont(mFont);
+            painter->setPen(mViaLayer->getColor(highlight).lighter(150));
+            painter->drawText(mBoundingRect, Qt::AlignCenter, netsignal->getName());
+        }
+    }
+
+    if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
+        // draw top stop mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mTopStopMaskLayer->getColor(highlight));
+        painter->drawPath(mVia.toQPainterPathPx(mStopMaskClearance, false));
     }
 
 #ifdef QT_DEBUG
     BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
+    if (layer->isVisible()) {
         // draw bounding rect
         painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);

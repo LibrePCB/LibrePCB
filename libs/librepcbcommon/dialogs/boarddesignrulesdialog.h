@@ -17,95 +17,77 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
-#define LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_BOARDDESIGNRULESDIALOG_H
+#define LIBREPCB_BOARDDESIGNRULESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "bgi_base.h"
+#include "../boarddesignrules.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
-
-namespace library {
-class FootprintPad;
-class PackagePad;
+namespace Ui {
+class BoardDesignRulesDialog;
 }
 
-namespace project {
-
-class BI_FootprintPad;
-
 /*****************************************************************************************
- *  Class BGI_FootprintPad
+ *  Class BoardDesignRulesDialog
  ****************************************************************************************/
 
 /**
- * @brief The BGI_FootprintPad class
+ * @brief The BoardDesignRulesDialog class
  *
  * @author ubruhin
- * @date 2015-06-07
+ * @date 2016-04-01
  */
-class BGI_FootprintPad final : public BGI_Base
+class BoardDesignRulesDialog final : public QDialog
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
-        ~BGI_FootprintPad() noexcept;
+        BoardDesignRulesDialog() = delete;
+        BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
+        explicit BoardDesignRulesDialog(const BoardDesignRules& rules, QWidget* parent = 0);
+        ~BoardDesignRulesDialog();
 
         // Getters
-        bool isSelectable() const noexcept;
+        const BoardDesignRules& getDesignRules() const noexcept {return mDesignRules;}
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+        // Operator Overloadings
+        BoardDesignRulesDialog& operator=(const BoardDesignRulesDialog& rhs) = delete;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+
+    signals:
+
+        void rulesChanged(const BoardDesignRules& newRules);
+
+
+    private slots:
+
+        void on_buttonBox_clicked(QAbstractButton *button);
 
 
     private:
 
-        // make some methods inaccessible...
-        BGI_FootprintPad() = delete;
-        BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
-        BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
+        void updateWidgets() noexcept;
+        void applyRules() noexcept;
 
-        // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
-
-
-        // General Attributes
-        BI_FootprintPad& mPad;
-        const library::FootprintPad& mLibPad;
-
-        // Cached Attributes
-        BoardLayer* mPadLayer;
-        BoardLayer* mTopStopMaskLayer;
-        BoardLayer* mBottomStopMaskLayer;
-        BoardLayer* mTopCreamMaskLayer;
-        BoardLayer* mBottomCreamMaskLayer;
-        Length mStopMaskClearance;
-        Length mCreamMaskClearance;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QFont mFont;
+        Ui::BoardDesignRulesDialog* mUi;
+        BoardDesignRules mDesignRules;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#endif // LIBREPCB_BOARDDESIGNRULESDIALOG_H

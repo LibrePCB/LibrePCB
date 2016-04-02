@@ -31,11 +31,13 @@
 #include <librepcbproject/boards/board.h>
 #include <librepcbproject/circuit/circuit.h>
 #include <librepcbcommon/dialogs/gridsettingsdialog.h>
+#include <librepcbcommon/dialogs/boarddesignrulesdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
 #include <librepcbproject/settings/projectsettings.h>
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbproject/boards/cmd/cmdboardadd.h>
+#include <librepcbproject/boards/cmd/cmdboarddesignrulesmodify.h>
 #include "../docks/ercmsgdock.h"
 #include "unplacedcomponentsdock.h"
 #include "fsm/bes_fsm.h"
@@ -420,6 +422,29 @@ void BoardEditor::on_actionProjectProperties_triggered()
 {
     ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
+}
+
+void BoardEditor::on_actionModifyDesignRules_triggered()
+{
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    try {
+        BoardDesignRules originalRules = board->getDesignRules();
+        BoardDesignRulesDialog dialog(board->getDesignRules(), this);
+        connect(&dialog, &BoardDesignRulesDialog::rulesChanged,
+                [&](const BoardDesignRules& rules){
+                board->getDesignRules() = rules;
+                emit board->attributesChanged();});
+        int result = dialog.exec();
+        board->getDesignRules() = originalRules; // important hack ;)
+        if (result == QDialog::Accepted) {
+            CmdBoardDesignRulesModify* cmd = new CmdBoardDesignRulesModify(*board, dialog.getDesignRules());
+            mProjectEditor.getUndoStack().execCmd(cmd);
+        }
+    } catch (Exception& e) {
+        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+    }
 }
 
 void BoardEditor::on_tabBar_currentChanged(int index)

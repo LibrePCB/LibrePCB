@@ -124,6 +124,8 @@
     <property name="title">
      <string>Board</string>
     </property>
+    <addaction name="actionModifyDesignRules"/>
+    <addaction name="separator"/>
     <addaction name="actionNewBoard"/>
     <addaction name="actionCopyBoard"/>
     <addaction name="separator"/>
@@ -587,6 +589,11 @@
    </property>
    <property name="text">
     <string>Add Device</string>
+   </property>
+  </action>
+  <action name="actionModifyDesignRules">
+   <property name="text">
+    <string>Design Rules</string>
    </property>
   </action>
  </widget>

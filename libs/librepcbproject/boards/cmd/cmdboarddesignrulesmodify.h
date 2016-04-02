@@ -17,88 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
-#define LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H
+#define LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "bgi_base.h"
+#include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/boarddesignrules.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class BoardLayer;
-
-namespace library {
-class FootprintPad;
-class PackagePad;
-}
-
 namespace project {
 
-class BI_FootprintPad;
+class Board;
 
 /*****************************************************************************************
- *  Class BGI_FootprintPad
+ *  Class CmdBoardDesignRulesModify
  ****************************************************************************************/
 
 /**
- * @brief The BGI_FootprintPad class
- *
- * @author ubruhin
- * @date 2015-06-07
+ * @brief The CmdBoardDesignRulesModify class
  */
-class BGI_FootprintPad final : public BGI_Base
+class CmdBoardDesignRulesModify final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
-        ~BGI_FootprintPad() noexcept;
-
-        // Getters
-        bool isSelectable() const noexcept;
-
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
-
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+        CmdBoardDesignRulesModify() = delete;
+        CmdBoardDesignRulesModify(const CmdBoardDesignRulesModify& other) = delete;
+        CmdBoardDesignRulesModify(Board& board, const BoardDesignRules& newRules) noexcept;
+        ~CmdBoardDesignRulesModify() noexcept;
 
 
     private:
 
-        // make some methods inaccessible...
-        BGI_FootprintPad() = delete;
-        BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
-        BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
-
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
 
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Attributes from the constructor
+        Board& mBoard;
 
         // General Attributes
-        BI_FootprintPad& mPad;
-        const library::FootprintPad& mLibPad;
-
-        // Cached Attributes
-        BoardLayer* mPadLayer;
-        BoardLayer* mTopStopMaskLayer;
-        BoardLayer* mBottomStopMaskLayer;
-        BoardLayer* mTopCreamMaskLayer;
-        BoardLayer* mBottomCreamMaskLayer;
-        Length mStopMaskClearance;
-        Length mCreamMaskClearance;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QFont mFont;
+        BoardDesignRules mOldRules;
+        BoardDesignRules mNewRules;
 };
 
 /*****************************************************************************************
@@ -108,4 +82,4 @@ class BGI_FootprintPad final : public BGI_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#endif // LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H

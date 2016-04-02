@@ -60,6 +60,7 @@ class FootprintPadTht final : public FootprintPad
         int getLayerId() const noexcept override;
         bool isOnLayer(int id) const noexcept override;
         const QPainterPath& toQPainterPathPx() const noexcept override;
+        QPainterPath toMaskQPainterPathPx(const Length& clearance) const noexcept override;
 
         // Setters
         void setShape(Shape_t shape) noexcept;

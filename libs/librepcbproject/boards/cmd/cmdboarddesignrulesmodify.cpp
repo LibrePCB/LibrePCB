@@ -17,77 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_POLYGON_H
-#define LIBREPCB_PROJECT_BGI_POLYGON_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "bgi_base.h"
+#include "cmdboarddesignrulesmodify.h"
+#include "../board.h"
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-
-class Polygon;
-class BoardLayer;
-
 namespace project {
 
-class BI_Polygon;
-
 /*****************************************************************************************
- *  Class BGI_Polygon
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The BGI_Polygon class
- *
- * @author ubruhin
- * @date 2016-01-12
- */
-class BGI_Polygon final : public BGI_Base
+CmdBoardDesignRulesModify::CmdBoardDesignRulesModify(Board& board, const BoardDesignRules& newRules) noexcept :
+    UndoCommand(tr("Modify board design rules")), mBoard(board),
+    mOldRules(), mNewRules(newRules)
 {
-    public:
+}
 
-        // Constructors / Destructor
-        explicit BGI_Polygon(BI_Polygon& polygon) noexcept;
-        ~BGI_Polygon() noexcept;
+CmdBoardDesignRulesModify::~CmdBoardDesignRulesModify() noexcept
+{
+}
 
-        // Getters
-        bool isSelectable() const noexcept;
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+bool CmdBoardDesignRulesModify::performExecute() throw (Exception)
+{
+    mOldRules = mBoard.getDesignRules(); // memorize current design rules
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+    performRedo(); // can throw
 
+    return true; // TODO: determine if the design rules were really modified
+}
 
-    private:
+void CmdBoardDesignRulesModify::performUndo() throw (Exception)
+{
+    mBoard.getDesignRules() = mOldRules;
+    emit mBoard.attributesChanged();
+}
 
-        // make some methods inaccessible...
-        BGI_Polygon() = delete;
-        BGI_Polygon(const BGI_Polygon& other) = delete;
-        BGI_Polygon& operator=(const BGI_Polygon& rhs) = delete;
-
-        // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
-
-        // General Attributes
-        BI_Polygon& mBiPolygon;
-        const Polygon& mPolygon;
-
-        // Cached Attributes
-        BoardLayer* mLayer;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-};
+void CmdBoardDesignRulesModify::performRedo() throw (Exception)
+{
+    mBoard.getDesignRules() = mNewRules;
+    emit mBoard.attributesChanged();
+}
 
 /*****************************************************************************************
  *  End of File
@@ -96,4 +76,3 @@ class BGI_Polygon final : public BGI_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_POLYGON_H

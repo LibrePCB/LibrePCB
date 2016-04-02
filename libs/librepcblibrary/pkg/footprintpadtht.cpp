@@ -111,6 +111,44 @@ const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept
     return mPainterPathPx;
 }
 
+QPainterPath FootprintPadTht::toMaskQPainterPathPx(const Length& clearance) const noexcept
+{
+    qreal w = qMax(mWidth + clearance*2, Length(0)).toPx();
+    qreal h = qMax(mHeight + clearance*2, Length(0)).toPx();
+    QRectF rect(-w/2, -h/2, w, h);
+    QPainterPath p;
+    switch (mShape)
+    {
+        case Shape_t::ROUND: {
+            qreal radius = qMin(w, h)/2;
+            p.addRoundedRect(rect, radius, radius);
+            break;
+        }
+        case Shape_t::RECT: {
+            p.addRect(rect);
+            break;
+        }
+        case Shape_t::OCTAGON: {
+            qreal rx = w/2;
+            qreal ry = h/2;
+            qreal a = qMin(rx, ry) * (2 - qSqrt(2));
+            QPolygonF octagon;
+            octagon.append(QPointF(rx, ry-a));
+            octagon.append(QPointF(rx-a, ry));
+            octagon.append(QPointF(a-rx, ry));
+            octagon.append(QPointF(-rx, ry-a));
+            octagon.append(QPointF(-rx, a-ry));
+            octagon.append(QPointF(a-rx, -ry));
+            octagon.append(QPointF(rx-a, -ry));
+            octagon.append(QPointF(rx, a-ry));
+            p.addPolygon(octagon);
+            break;
+        }
+        default: Q_ASSERT(false); break;
+    }
+    return p;
+}
+
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/

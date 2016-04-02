@@ -29,6 +29,7 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcbcommon/boardlayer.h>
+#include <librepcbcommon/boarddesignrules.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
 #include "../items/bi_device.h"
@@ -47,7 +48,9 @@ namespace project {
  ****************************************************************************************/
 
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
-    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad())
+    BGI_Base(), mPad(pad), mLibPad(pad.getLibPad()), mPadLayer(nullptr),
+    mTopStopMaskLayer(nullptr), mBottomStopMaskLayer(nullptr),
+    mTopCreamMaskLayer(nullptr), mBottomCreamMaskLayer(nullptr)
 {
     setToolTip(mPad.getDisplayText());
 
@@ -78,38 +81,54 @@ bool BGI_FootprintPad::isSelectable() const noexcept
 
 void BGI_FootprintPad::updateCacheAndRepaint() noexcept
 {
-    mShape = QPainterPath();
-    mBoundingRect = QRectF();
+    prepareGeometryChange();
 
     // set Z value
     if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
-        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad);
-        Q_ASSERT(smt);
-        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) != mPad.getIsMirrored())
+        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad); Q_ASSERT(smt);
+        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) != mPad.getIsMirrored()) {
             setZValue(Board::ZValue_FootprintPadsBottom);
-        else
+        } else {
             setZValue(Board::ZValue_FootprintPadsTop);
+        }
     } else {
         setZValue(Board::ZValue_FootprintPadsTop);
     }
 
-    // set layer
+    // set layers
     mPadLayer = getBoardLayer(mLibPad.getLayerId());
-    if (mPadLayer) {
-        if (!mPadLayer->isVisible())
-            mPadLayer = nullptr;
+    if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
+        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad); Q_ASSERT(smt);
+        if (smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) {
+            mTopStopMaskLayer = nullptr;
+            mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+            mTopCreamMaskLayer = nullptr;
+            mBottomCreamMaskLayer = getBoardLayer(BoardLayer::BottomPaste);
+        } else {
+            mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
+            mBottomStopMaskLayer = nullptr;
+            mTopCreamMaskLayer = getBoardLayer(BoardLayer::TopPaste);
+            mBottomCreamMaskLayer = nullptr;
+        }
+    } else {
+        mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
+        mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+        mTopCreamMaskLayer = nullptr;
+        mBottomCreamMaskLayer = nullptr;
     }
+
+    // determine stop/cream mask clearance
+    Length size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
+    mStopMaskClearance = mPad.getBoard().getDesignRules().calcStopMaskClearance(size);
+    mCreamMaskClearance = -mPad.getBoard().getDesignRules().calcCreamMaskClearance(size);
 
     // set shape and bounding rect
-    if (mPadLayer) {
-        mShape.addRect(mLibPad.getBoundingRectPx());
-        mBoundingRect = mBoundingRect.united(mShape.boundingRect());
-    }
-
-    if (!mShape.isEmpty())
-        mShape.setFillRule(Qt::WindingFill);
-
-    setVisible(!mBoundingRect.isEmpty());
+    mShape = QPainterPath();
+    mShape.setFillRule(Qt::WindingFill);
+    qreal w = (mLibPad.getWidth() + mStopMaskClearance*2).toPx();
+    qreal h = (mLibPad.getHeight() + mStopMaskClearance*2).toPx();
+    mShape.addRect(mLibPad.getBoundingRectPx());
+    mBoundingRect = QRectF(-w/2, -h/2, w, h);
 
     update();
 }
@@ -125,20 +144,47 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     //const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    if (!mPadLayer) return;
-
     const NetSignal* netsignal = mPad.getCompSigInstNetSignal();
     bool highlight = mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
-    // draw pad
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mPadLayer->getColor(highlight));
-    painter->drawPath(mLibPad.toQPainterPathPx());
+    if (mBottomCreamMaskLayer && mBottomCreamMaskLayer->isVisible()) {
+        // draw bottom cream mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mBottomCreamMaskLayer->getColor(highlight));
+        painter->drawPath(mLibPad.toMaskQPainterPathPx(mCreamMaskClearance));
+    }
 
-    // draw pad text
-    painter->setFont(mFont);
-    painter->setPen(mPadLayer->getColor(highlight).lighter(150));
-    painter->drawText(mLibPad.getBoundingRectPx(), Qt::AlignCenter, mPad.getDisplayText());
+    if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
+        // draw bottom stop mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
+        painter->drawPath(mLibPad.toMaskQPainterPathPx(mStopMaskClearance));
+    }
+
+    if (mPadLayer && mPadLayer->isVisible()) {
+        // draw pad
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mPadLayer->getColor(highlight));
+        painter->drawPath(mLibPad.toQPainterPathPx());
+        // draw pad text
+        painter->setFont(mFont);
+        painter->setPen(mPadLayer->getColor(highlight).lighter(150));
+        painter->drawText(mLibPad.getBoundingRectPx(), Qt::AlignCenter, mPad.getDisplayText());
+    }
+
+    if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
+        // draw top stop mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mTopStopMaskLayer->getColor(highlight));
+        painter->drawPath(mLibPad.toMaskQPainterPathPx(mStopMaskClearance));
+    }
+
+    if (mTopCreamMaskLayer && mTopCreamMaskLayer->isVisible()) {
+        // draw top cream mask
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
+        painter->drawPath(mLibPad.toMaskQPainterPathPx(mCreamMaskClearance));
+    }
 
 #ifdef QT_DEBUG
     BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);

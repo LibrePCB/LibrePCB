@@ -83,6 +83,15 @@ const QPainterPath& FootprintPadSmt::toQPainterPathPx() const noexcept
     return mPainterPathPx;
 }
 
+QPainterPath FootprintPadSmt::toMaskQPainterPathPx(const Length& clearance) const noexcept
+{
+    qreal w = qMax(mWidth + clearance*2, Length(0)).toPx();
+    qreal h = qMax(mHeight + clearance*2, Length(0)).toPx();
+    QPainterPath p;
+    p.addRect(QRectF(-w/2, -h/2, w, h));
+    return p;
+}
+
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/

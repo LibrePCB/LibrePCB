@@ -70,23 +70,11 @@ void BGI_Polygon::updateCacheAndRepaint() noexcept
 
     setZValue(Board::ZValue_Default);
 
-    int layerId = mPolygon.getLayerId();
-    if (mBiPolygon.getIsMirrored()) layerId = BoardLayer::getMirroredLayerId(layerId);
-    mLayer = mBiPolygon.getBoard().getLayerStack().getBoardLayer(layerId);
-    if (mLayer) {
-        if (!mLayer->isVisible())
-            mLayer = nullptr;
-    }
+    mLayer = getBoardLayer(mPolygon.getLayerId());
 
-    if (mLayer) {
-        mShape = mPolygon.toQPainterPathPx();
-        mBoundingRect = mShape.boundingRect();
-    } else {
-        mShape = QPainterPath();
-        mBoundingRect = QRectF();
-    }
-
-    setVisible(!mBoundingRect.isEmpty());
+    // set shape and bounding rect
+    mShape = mPolygon.toQPainterPathPx();
+    mBoundingRect = mShape.boundingRect();
 
     update();
 }
@@ -104,12 +92,13 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     //const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
     Q_UNUSED(option);
 
-    if (!mLayer) return;
-
-    // draw polygon outline
-    painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getWidth().toPx(),
-                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter->drawPath(mPolygon.toQPainterPathPx());
+    if (mLayer && mLayer->isVisible()) {
+        // draw polygon outline
+        painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getWidth().toPx(),
+                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(mPolygon.toQPainterPathPx());
+    }
 
 #ifdef QT_DEBUG
     // draw bounding rect
@@ -123,6 +112,16 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         }
     }
 #endif
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+BoardLayer* BGI_Polygon::getBoardLayer(int id) const noexcept
+{
+    if (mBiPolygon.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
+    return mBiPolygon.getBoard().getLayerStack().getBoardLayer(id);
 }
 
 /*****************************************************************************************

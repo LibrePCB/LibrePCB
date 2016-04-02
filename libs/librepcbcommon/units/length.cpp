@@ -58,6 +58,18 @@ Length& Length::mapToGrid(const Length& gridInterval) noexcept
     return *this;
 }
 
+Length Length::scaled(qreal factor) const noexcept
+{
+    Length length(*this);
+    return length.scale(factor);
+}
+
+Length& Length::scale(qreal factor) noexcept
+{
+    mNanometers *= factor;
+    return *this;
+}
+
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/

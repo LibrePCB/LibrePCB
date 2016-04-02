@@ -171,7 +171,7 @@ BoardLayer::BoardLayer(int id) :
 
         case TopStopMask:
             mName = tr("Top Stop Mask");
-            mColor = QColor(255, 0, 0, 100);
+            mColor = QColor(255, 255, 255, 100);
             mColorHighlighted = QColor(255, 0, 0, 150);
             mIsVisible = false;
             break;
@@ -262,7 +262,7 @@ BoardLayer::BoardLayer(int id) :
 
         case BottomStopMask:
             mName = tr("Bottom Stop Mask");
-            mColor = QColor(255, 0, 0, 100);
+            mColor = QColor(255, 255, 255, 100);
             mColorHighlighted = QColor(255, 0, 0, 150);
             mIsVisible = false;
             break;

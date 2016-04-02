@@ -103,7 +103,8 @@ SOURCES += \
     boards/graphicsitems/bgi_via.cpp \
     boards/cmd/cmdboardviaadd.cpp \
     boards/cmd/cmdboardviaremove.cpp \
-    boards/cmd/cmdboardviaedit.cpp
+    boards/cmd/cmdboardviaedit.cpp \
+    boards/cmd/cmdboarddesignrulesmodify.cpp
 
 HEADERS += \
     project.h \
@@ -189,6 +190,7 @@ HEADERS += \
     boards/graphicsitems/bgi_via.h \
     boards/cmd/cmdboardviaadd.h \
     boards/cmd/cmdboardviaremove.h \
-    boards/cmd/cmdboardviaedit.h
+    boards/cmd/cmdboardviaedit.h \
+    boards/cmd/cmdboarddesignrulesmodify.h
 
 FORMS +=

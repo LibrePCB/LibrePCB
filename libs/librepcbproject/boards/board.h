@@ -43,6 +43,7 @@ class GraphicsView;
 class GraphicsScene;
 class SmartXmlFile;
 class BoardLayer;
+class BoardDesignRules;
 
 namespace project {
 
@@ -107,6 +108,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         BoardLayerStack& getLayerStack() noexcept {return *mLayerStack;}
+        BoardDesignRules& getDesignRules() noexcept {return *mDesignRules;}
+        const BoardDesignRules& getDesignRules() const noexcept {return *mDesignRules;}
         bool isEmpty() const noexcept;
         QList<BI_Base*> getSelectedItems(bool vias,
                                          bool footprintPads,
@@ -221,6 +224,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         QScopedPointer<GraphicsScene> mGraphicsScene;
         QScopedPointer<BoardLayerStack> mLayerStack;
         QScopedPointer<GridProperties> mGridProperties;
+        QScopedPointer<BoardDesignRules> mDesignRules;
         QRectF mViewRect;
 
         // Attributes

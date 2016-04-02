@@ -78,9 +78,13 @@ class BGI_Via final : public BGI_Base
 
         // General Attributes
         BI_Via& mVia;
-        BoardLayer* mLayer;
+        BoardLayer* mViaLayer;
+        BoardLayer* mTopStopMaskLayer;
+        BoardLayer* mBottomStopMaskLayer;
 
         // Cached Attributes
+        bool mDrawStopMask;
+        Length mStopMaskClearance;
         QRectF mBoundingRect;
         QPainterPath mShape;
         QFont mFont;

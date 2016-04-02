@@ -27,6 +27,7 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/scopeguardlist.h>
+#include <librepcbcommon/boarddesignrules.h>
 #include "../project.h"
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -74,6 +75,9 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
 
         // copy grid properties
         mGridProperties.reset(new GridProperties(*other.mGridProperties));
+
+        // copy design rules
+        mDesignRules.reset(new BoardDesignRules(*other.mDesignRules));
 
         // copy device instances
         QHash<const BI_Device*, BI_Device*> copiedDeviceInstances;
@@ -147,6 +151,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
         qDeleteAll(mNetPoints);         mNetPoints.clear();
         qDeleteAll(mVias);              mVias.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
         mXmlFile.reset();
@@ -177,6 +182,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // load default grid properties
             mGridProperties.reset(new GridProperties());
+
+            // load default design rules
+            mDesignRules.reset(new BoardDesignRules());
         }
         else
         {
@@ -194,6 +202,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // Load grid properties
             mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
+
+            // load design rules
+            mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("board_design_rules", true)));
 
             // Load all device instances
             for (XmlDomElement* node = root.getFirstChild("devices/device", true, false);
@@ -276,6 +287,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         qDeleteAll(mNetPoints);         mNetPoints.clear();
         qDeleteAll(mVias);              mVias.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
         mXmlFile.reset();
@@ -297,6 +309,7 @@ Board::~Board() noexcept
     qDeleteAll(mVias);              mVias.clear();
     qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
 
+    mDesignRules.reset();
     mGridProperties.reset();
     mLayerStack.reset();
     mXmlFile.reset();
@@ -894,27 +907,38 @@ XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("board"));
+    // meta data
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
+    // properties: grid
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendChild(mGridProperties->serializeToXmlDomElement());
+    // layer stack
     root->appendChild(mLayerStack->serializeToXmlDomElement());
+    // design rules
+    root->appendChild(mDesignRules->serializeToXmlDomElement());
+    // devices
     XmlDomElement* devices = root->appendChild("devices");
     foreach (BI_Device* device, mDeviceInstances)
         devices->appendChild(device->serializeToXmlDomElement());
+    // vias
     XmlDomElement* vias = root->appendChild("vias");
     foreach (BI_Via* via, mVias)
         vias->appendChild(via->serializeToXmlDomElement());
+    // netpoints
     XmlDomElement* netpoints = root->appendChild("netpoints");
     foreach (BI_NetPoint* netpoint, mNetPoints)
         netpoints->appendChild(netpoint->serializeToXmlDomElement());
+    // netlines
     XmlDomElement* netlines = root->appendChild("netlines");
     foreach (BI_NetLine* netline, mNetLines)
         netlines->appendChild(netline->serializeToXmlDomElement());
+    // polygons
     XmlDomElement* polygons = root->appendChild("polygons");
     foreach (BI_Polygon* polygon, mPolygons)
         polygons->appendChild(polygon->serializeToXmlDomElement());
+    // end
     return root.take();
 }
 

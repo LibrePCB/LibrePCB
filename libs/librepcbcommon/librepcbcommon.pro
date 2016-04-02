@@ -67,7 +67,9 @@ HEADERS += \
     geometry/hole.h \
     undocommandgroup.h \
     scopeguard.h \
-    scopeguardlist.h
+    scopeguardlist.h \
+    boarddesignrules.h \
+    dialogs/boarddesignrulesdialog.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -110,7 +112,10 @@ SOURCES += \
     geometry/ellipse.cpp \
     geometry/text.cpp \
     geometry/hole.cpp \
-    undocommandgroup.cpp
+    undocommandgroup.cpp \
+    boarddesignrules.cpp \
+    dialogs/boarddesignrulesdialog.cpp
 
 FORMS += \
-    dialogs/gridsettingsdialog.ui
+    dialogs/gridsettingsdialog.ui \
+    dialogs/boarddesignrulesdialog.ui

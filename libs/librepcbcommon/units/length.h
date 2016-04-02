@@ -298,6 +298,34 @@ class Length
          */
         Length& mapToGrid(const Length& gridInterval) noexcept;
 
+        /**
+         * @brief Get a Length object which is scaled with a specific factor
+         *
+         * @param factor        The scale factor (1.0 does nothing)
+         *
+         * @return A new Length object which is scaled
+         *
+         * @warning Be careful with this method, as it can decrease the precision!
+         *          To scale with an integer factor, use #operator*() instead.
+         *
+         * @see scale()
+         */
+        Length scaled(qreal factor) const noexcept;
+
+        /**
+         * @brief Scale this Length object with a specific factor
+         *
+         * @param factor        The scale factor (1.0 does nothing)
+         *
+         * @return A reference to the modified object
+         *
+         * @warning Be careful with this method, as it can decrease the precision!
+         *          To scale with an integer factor, use #operator*=() instead.
+         *
+         * @see scaled()
+         */
+        Length& scale(qreal factor) noexcept;
+
 
         // Static Functions
 
