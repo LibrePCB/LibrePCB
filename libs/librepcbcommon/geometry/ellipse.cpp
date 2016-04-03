@@ -33,6 +33,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+Ellipse::Ellipse(const Ellipse& other) noexcept :
+    mLayerId(other.mLayerId), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea), mCenter(other.mCenter), mRadiusX(other.mRadiusX),
+    mRadiusY(other.mRadiusY), mRotation(other.mRotation)
+{
+}
+
 Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                  const Point& center, const Length& radiusX, const Length& radiusY,
                  const Angle& rotation) noexcept :
@@ -110,6 +117,33 @@ void Ellipse::setRadiusY(const Length& radius) noexcept
 void Ellipse::setRotation(const Angle& rotation) noexcept
 {
     mRotation = rotation;
+}
+
+/*****************************************************************************************
+ *  Transformations
+ ****************************************************************************************/
+
+Ellipse& Ellipse::translate(const Point& offset) noexcept
+{
+    mCenter += offset;
+    return *this;
+}
+
+Ellipse Ellipse::translated(const Point& offset) const noexcept
+{
+    return Ellipse(*this).translate(offset);
+}
+
+Ellipse& Ellipse::rotate(const Angle& angle, const Point& center) noexcept
+{
+    mCenter.rotate(angle, center);
+    mRotation += angle;
+    return *this;
+}
+
+Ellipse Ellipse::rotated(const Angle& angle, const Point& center) const noexcept
+{
+    return Ellipse(*this).rotate(angle, center);
 }
 
 /*****************************************************************************************

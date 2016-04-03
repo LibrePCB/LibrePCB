@@ -66,11 +66,12 @@ class BI_FootprintPad final : public BI_Base
         // Getters
         const Uuid& getLibPadUuid() const noexcept;
         QString getDisplayText() const noexcept;
+        const Angle& getRotation() const noexcept {return mRotation;}
         BI_Footprint& getFootprint() const noexcept {return mFootprint;}
         const QMap<int, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
         BI_NetPoint* getNetPointOfLayer(int layerId) const noexcept {return mRegisteredNetPoints.value(layerId, nullptr);}
         int getLayerId() const noexcept;
-        bool isOnLayer(const BoardLayer& layer) const noexcept;
+        bool isOnLayer(int layerId) const noexcept;
         const library::FootprintPad& getLibPad() const noexcept {return *mFootprintPad;}
         ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
         NetSignal* getCompSigInstNetSignal() const noexcept;
@@ -85,7 +86,7 @@ class BI_FootprintPad final : public BI_Base
         void updatePosition() noexcept;
 
 
-        // Inherited from SI_Base
+        // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
         const Point& getPosition() const noexcept override {return mPosition;}
         bool getIsMirrored() const noexcept override;

@@ -73,7 +73,8 @@ SOURCES += \
     cmd/cmdcombineboardnetpoints.cpp \
     cmd/cmdcombineallitemsunderboardnetpoint.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
-    boardeditor/fsm/bes_adddevice.cpp
+    boardeditor/fsm/bes_adddevice.cpp \
+    boardeditor/fabricationoutputdialog.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -128,7 +129,8 @@ HEADERS += \
     cmd/cmdcombineboardnetpoints.h \
     cmd/cmdcombineallitemsunderboardnetpoint.h \
     boardeditor/boardviapropertiesdialog.h \
-    boardeditor/fsm/bes_adddevice.h
+    boardeditor/fsm/bes_adddevice.h \
+    boardeditor/fabricationoutputdialog.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \
@@ -142,5 +144,6 @@ FORMS += \
     docks/ercmsgdock.ui \
     dialogs/addcomponentdialog.ui \
     boardeditor/boardlayersdock.ui \
-    boardeditor/boardviapropertiesdialog.ui
+    boardeditor/boardviapropertiesdialog.ui \
+    boardeditor/fabricationoutputdialog.ui
 

@@ -104,7 +104,8 @@ SOURCES += \
     boards/cmd/cmdboardviaadd.cpp \
     boards/cmd/cmdboardviaremove.cpp \
     boards/cmd/cmdboardviaedit.cpp \
-    boards/cmd/cmdboarddesignrulesmodify.cpp
+    boards/cmd/cmdboarddesignrulesmodify.cpp \
+    boards/boardgerberexport.cpp
 
 HEADERS += \
     project.h \
@@ -191,6 +192,7 @@ HEADERS += \
     boards/cmd/cmdboardviaadd.h \
     boards/cmd/cmdboardviaremove.h \
     boards/cmd/cmdboardviaedit.h \
-    boards/cmd/cmdboarddesignrulesmodify.h
+    boards/cmd/cmdboarddesignrulesmodify.h \
+    boards/boardgerberexport.h
 
 FORMS +=

@@ -28,6 +28,7 @@
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/scopeguardlist.h>
 #include <librepcbcommon/boarddesignrules.h>
+#include <librepcbcommon/boardlayer.h>
 #include "../project.h"
 #include <librepcbcommon/graphics/graphicsview.h>
 #include <librepcbcommon/graphics/graphicsscene.h>
@@ -537,7 +538,7 @@ QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLa
         foreach (BI_FootprintPad* pad, device->getFootprint().getPads())
         {
             if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(pos.toPxQPointF())
-                && ((!layer) || (pad->isOnLayer(*layer)))
+                && ((!layer) || (pad->isOnLayer(layer->getId())))
                 && ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal)))
             {
                 list.append(pad);

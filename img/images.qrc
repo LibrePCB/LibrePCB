@@ -39,6 +39,7 @@
         <file>actions/refresh.png</file>
         <file>actions/text.png</file>
         <file>actions/drawWire.png</file>
+        <file>actions/export_gerber.png</file>
         <file>actions/schematic.png</file>
         <file>actions/recent.png</file>
         <file>command_toolbars/via_round.png</file>

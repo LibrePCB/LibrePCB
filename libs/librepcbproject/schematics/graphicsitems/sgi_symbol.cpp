@@ -82,7 +82,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
         Q_ASSERT(polygon); if (!polygon) continue;
 
         QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getWidth().toPx() / 2;
+        qreal w = polygon->getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
     }
@@ -165,7 +165,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         layer = getSchematicLayer(polygon->getLayerId());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
-            painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
         if (polygon->isFilled())

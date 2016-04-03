@@ -43,6 +43,7 @@
 #include "fsm/bes_fsm.h"
 #include "../projecteditor.h"
 #include "boardlayersdock.h"
+#include "fabricationoutputdialog.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -416,6 +417,15 @@ void BoardEditor::on_actionExportAsPdf_triggered()
     {
         QMessageBox::warning(this, tr("Error"), e.getUserMsg());
     }
+}
+
+void BoardEditor::on_actionGenerateFabricationData_triggered()
+{
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    FabricationOutputDialog dialog(*board, this);
+    dialog.exec();
 }
 
 void BoardEditor::on_actionProjectProperties_triggered()

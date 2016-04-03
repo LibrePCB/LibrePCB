@@ -55,15 +55,11 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuExport_As">
-     <property name="title">
-      <string>Export</string>
-     </property>
-     <addaction name="actionExportAsPdf"/>
-    </widget>
     <addaction name="actionProjectSave"/>
     <addaction name="actionPrint"/>
-    <addaction name="menuExport_As"/>
+    <addaction name="actionExportAsPdf"/>
+    <addaction name="separator"/>
+    <addaction name="actionGenerateFabricationData"/>
     <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
     <addaction name="actionQuit"/>
@@ -589,6 +585,18 @@
    </property>
    <property name="text">
     <string>Add Device</string>
+   </property>
+  </action>
+  <action name="actionGenerateFabricationData">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/export_gerber.png</normaloff>:/img/actions/export_gerber.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate Fabrication Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Generate Fabrication Data</string>
    </property>
   </action>
   <action name="actionModifyDesignRules">

@@ -109,12 +109,12 @@ int BI_FootprintPad::getLayerId() const noexcept
         return mFootprintPad->getLayerId();
 }
 
-bool BI_FootprintPad::isOnLayer(const BoardLayer& layer) const noexcept
+bool BI_FootprintPad::isOnLayer(int layerId) const noexcept
 {
     if (getIsMirrored()) {
-        return mFootprintPad->isOnLayer(layer.getMirroredLayerId());
+        return mFootprintPad->isOnLayer(BoardLayer::getMirroredLayerId(layerId));
     } else {
-        return mFootprintPad->isOnLayer(layer.getId());
+        return mFootprintPad->isOnLayer(layerId);
     }
 }
 

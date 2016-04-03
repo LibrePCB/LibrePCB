@@ -69,7 +69,10 @@ HEADERS += \
     scopeguard.h \
     scopeguardlist.h \
     boarddesignrules.h \
-    dialogs/boarddesignrulesdialog.h
+    dialogs/boarddesignrulesdialog.h \
+    cam/gerbergenerator.h \
+    cam/gerberaperturelist.h \
+    cam/excellongenerator.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -114,7 +117,10 @@ SOURCES += \
     geometry/hole.cpp \
     undocommandgroup.cpp \
     boarddesignrules.cpp \
-    dialogs/boarddesignrulesdialog.cpp
+    dialogs/boarddesignrulesdialog.cpp \
+    cam/gerbergenerator.cpp \
+    cam/gerberaperturelist.cpp \
+    cam/excellongenerator.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \

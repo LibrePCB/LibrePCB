@@ -202,6 +202,13 @@ class Length
         LengthBase_t toNm() const noexcept {return mNanometers;}
 
         /**
+         * @brief Get the length in nanometers as a QString
+         *
+         * @return The length in nanometers as a QString. The used locale is always "C".
+         */
+        QString toNmString() const noexcept {return QString::number(toNm());}
+
+        /**
          * @brief Get the length in millimeters
          *
          * @return The length in millimeters

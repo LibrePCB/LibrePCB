@@ -59,10 +59,10 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
 
             // General Layers
             BoardOutlines               = 10,
-            Drills                      = 20,
-            Vias                        = 30,
+            Drills                      = 20, // NPTH
+            Vias                        = 30, // PTH
             ViaRestrict                 = 40,
-            ThtPads                     = 50,
+            ThtPads                     = 50, // PTH
 
             // Top Layers (Note: Layer IDs must be mirrored from bottom layers!)
             _TOP_LAYERS_START           = 200, ///< required for mirroring layers

@@ -121,7 +121,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         Q_ASSERT(polygon); if (!polygon) continue;
 
         QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getWidth().toPx() / 2;
+        qreal w = polygon->getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
     }
@@ -222,7 +222,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else

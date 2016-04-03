@@ -148,6 +148,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         void removeDeviceInstance(BI_Device& instance) throw (Exception);
 
         // Via Methods
+        const QList<BI_Via*>& getVias() const noexcept {return mVias;}
         BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
         void addVia(BI_Via& via) throw (Exception);
         void removeVia(BI_Via& via) throw (Exception);
@@ -158,6 +159,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         void removeNetPoint(BI_NetPoint& netpoint) throw (Exception);
 
         // NetLine Methods
+        const QList<BI_NetLine*>& getNetLines() const noexcept {return mNetLines;}
         BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
         void addNetLine(BI_NetLine& netline) throw (Exception);
         void removeNetLine(BI_NetLine& netline) throw (Exception);

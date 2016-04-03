@@ -46,9 +46,10 @@ class Ellipse final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
-                         const Point& center, const Length& radiusX, const Length& radiusY,
-                         const Angle& rotation) noexcept;
+        Ellipse(const Ellipse& other) noexcept;
+        Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                const Point& center, const Length& radiusX, const Length& radiusY,
+                const Angle& rotation) noexcept;
         explicit Ellipse(const XmlDomElement& domElement) throw (Exception);
         ~Ellipse() noexcept;
 
@@ -72,6 +73,12 @@ class Ellipse final : public IF_XmlSerializableObject
         void setRadiusY(const Length& radius) noexcept;
         void setRotation(const Angle& rotation) noexcept;
 
+        // Transformations
+        Ellipse& translate(const Point& offset) noexcept;
+        Ellipse translated(const Point& offset) const noexcept;
+        Ellipse& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
+        Ellipse rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
+
         // General Methods
 
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
@@ -82,7 +89,6 @@ class Ellipse final : public IF_XmlSerializableObject
 
         // make some methods inaccessible...
         Ellipse() = delete;
-        Ellipse(const Ellipse& other) = delete;
         Ellipse& operator=(const Ellipse& rhs) = delete;
 
         // Private Methods

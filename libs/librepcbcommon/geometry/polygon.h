@@ -56,6 +56,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
         // Getters
         const Point& getEndPos() const noexcept {return mEndPos;}
         const Angle& getAngle() const noexcept {return mAngle;}
+        Point calcArcCenter(const Point& startPos) const noexcept;
 
         // Setters
         void setEndPos(const Point& pos) noexcept {mEndPos = pos;}
@@ -98,22 +99,25 @@ class Polygon final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Polygon(const Polygon& other) noexcept;
-        explicit Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
-                         const Point& startPos) noexcept;
+        Polygon(const Polygon& other) noexcept;
+        Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+                const Point& startPos) noexcept;
         explicit Polygon(const XmlDomElement& domElement) throw (Exception);
         ~Polygon() noexcept;
 
         // Getters
         int getLayerId() const noexcept {return mLayerId;}
-        const Length& getWidth() const noexcept {return mLineWidth;}
+        const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
+        bool isClosed() const noexcept;
         const Point& getStartPos() const noexcept {return mStartPos;}
         const QList<PolygonSegment*>& getSegments() noexcept {return mSegments;}
         int getSegmentCount() const noexcept {return mSegments.count();}
         PolygonSegment* getSegment(int index) noexcept {return mSegments.value(index);}
         const PolygonSegment* getSegment(int index) const noexcept {return mSegments.value(index);}
+        Point getStartPointOfSegment(int index) const noexcept;
+        Point calcCenterOfArcSegment(int index) const noexcept;
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
@@ -122,6 +126,12 @@ class Polygon final : public IF_XmlSerializableObject
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
         void setStartPos(const Point& pos) noexcept;
+
+        // Transformations
+        Polygon& translate(const Point& offset) noexcept;
+        Polygon translated(const Point& offset) const noexcept;
+        Polygon& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
+        Polygon rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
         PolygonSegment* close() noexcept;

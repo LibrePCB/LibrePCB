@@ -102,6 +102,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         void on_actionRedo_triggered();
         void on_actionGrid_triggered();
         void on_actionExportAsPdf_triggered();
+        void on_actionGenerateFabricationData_triggered();
         void on_actionProjectProperties_triggered();
         void on_actionModifyDesignRules_triggered();
         void on_tabBar_currentChanged(int index);

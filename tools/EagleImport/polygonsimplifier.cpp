@@ -73,7 +73,7 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
 
         // create the new polygon
         int layerId = lines.first()->getLayerId();
-        Length lineWidth = lines.first()->getWidth();
+        Length lineWidth = lines.first()->getLineWidth();
 
         Polygon* rect = new Polygon(layerId, lineWidth, fillArea, isGrabArea, p1);
         rect->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
@@ -113,7 +113,7 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
         if (findHLine(linePolygons, p, nullptr, &line))
         {
             lines.append(line);
-            width = line->getWidth();
+            width = line->getLineWidth();
             if (findVLine(linePolygons, p, &width, &line))
             {
                 lines.append(line);
@@ -140,7 +140,7 @@ bool PolygonSimplifier<LibElemType>::findHLine(const QList<Polygon*>& lines, Poi
 {
     foreach (Polygon* polygon, lines)
     {
-        if (width) {if (polygon->getWidth() != *width) continue;}
+        if (width) {if (polygon->getLineWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
         Point p2 = polygon->getSegment(0)->getEndPos();
         if ((p1 == p) && (p2.getY() == p.getY()))
@@ -165,7 +165,7 @@ bool PolygonSimplifier<LibElemType>::findVLine(const QList<Polygon*>& lines, Poi
 {
     foreach (Polygon* polygon, lines)
     {
-        if (width) {if (polygon->getWidth() != *width) continue;}
+        if (width) {if (polygon->getLineWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
         Point p2 = polygon->getSegment(0)->getEndPos();
         if ((p1 == p) && (p2.getX() == p.getX()))

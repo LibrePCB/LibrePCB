@@ -114,6 +114,11 @@ BI_Via::~BI_Via() noexcept
  *  Getters
  ****************************************************************************************/
 
+bool BI_Via::isOnLayer(int layerId) const noexcept
+{
+    return BoardLayer::isCopperLayer(layerId);
+}
+
 QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const noexcept
 {
     QPainterPath p;

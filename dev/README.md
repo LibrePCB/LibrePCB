@@ -6,3 +6,8 @@ This directory contains various resources for developers:
 - Docker containers
 - [Doxygen documentation](http://librepcb.github.io/LibrePCB-Doxygen/master/)
 - and more...
+
+Useful Links:
+- [Gerber File Format:](https://www.ucamco.com/en/guest/downloads) [Specifications](https://www.ucamco.com/files/downloads/file/81/the_gerber_file_format_specification.pdf) | [PCB Fabrication Data Guide](https://www.ucamco.com/files/downloads/file/130/pcb%20fabrication%20data%20-%20a%20guide.pdf)
+- Excellon File Format: http://web.archive.org/web/20071030075236/http://www.excellon.com/manuals/program.htm
+- Online 3D PCB Viewer: http://mayhewlabs.com/webGerber/

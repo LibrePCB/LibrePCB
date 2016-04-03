@@ -94,7 +94,7 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 
     if (mLayer && mLayer->isVisible()) {
         // draw polygon outline
-        painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getWidth().toPx(),
+        painter->setPen(QPen(mLayer->getColor(selected), mPolygon.getLineWidth().toPx(),
                              Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         painter->setBrush(Qt::NoBrush);
         painter->drawPath(mPolygon.toQPainterPathPx());

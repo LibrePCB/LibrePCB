@@ -78,6 +78,7 @@ class BI_Via final : public BI_Base, public IF_XmlSerializableObject
         const QMap<int, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
         BI_NetPoint* getNetPointOfLayer(int layerId) const noexcept {return mRegisteredNetPoints.value(layerId, nullptr);}
         bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
+        bool isOnLayer(int layerId) const noexcept;
         QPainterPath toQPainterPathPx(const Length& clearance, bool hole) const noexcept;
         bool isSelectable() const noexcept override;
 

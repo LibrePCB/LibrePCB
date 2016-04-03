@@ -47,6 +47,30 @@ PolygonSegment::PolygonSegment(const XmlDomElement& domElement) throw (Exception
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
+Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
+{
+    if (mAngle == 0) {
+        // there is no arc center...just return the middle of start- and endpoint
+        return (startPos + mEndPos) / 2;
+    } else {
+        // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
+        qreal x0 = startPos.getX().toMm();
+        qreal y0 = startPos.getY().toMm();
+        qreal x1 = mEndPos.getX().toMm();
+        qreal y1 = mEndPos.getY().toMm();
+        qreal angle = mAngle.mappedTo180deg().toRad();
+        qreal angleSgn = (angle >= 0) ? 1 : -1;
+        qreal d = qSqrt((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0));
+        qreal r = d / (2 * qSin(angle / 2));
+        qreal h = qSqrt(r*r - d*d/4);
+        qreal u = (x1 - x0) / d;
+        qreal v = (y1 - y0) / d;
+        qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
+        qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
+        return Point::fromMm(a, b);
+    }
+}
+
 XmlDomElement* PolygonSegment::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -113,6 +137,41 @@ Polygon::~Polygon() noexcept
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
+
+bool Polygon::isClosed() const noexcept
+{
+    if (mSegments.count() > 0) {
+        return (mSegments.last()->getEndPos() == mStartPos);
+    } else {
+        return false;
+    }
+}
+
+Point Polygon::getStartPointOfSegment(int index) const noexcept
+{
+    if (index == 0) {
+        return mStartPos;
+    } else if (index > 0 && index < mSegments.count()) {
+        const PolygonSegment* segmentBefore = mSegments.at(index-1);
+        Q_ASSERT(segmentBefore);
+        return segmentBefore->getEndPos();
+    } else {
+        qCritical() << "Invalid polygon segment index:" << index;
+        return Point();
+    }
+}
+
+Point Polygon::calcCenterOfArcSegment(int index) const noexcept
+{
+    if (index >= 0 && index < mSegments.count()) {
+        const PolygonSegment* segment = mSegments.at(index);
+        Q_ASSERT(segment);
+        return segment->calcArcCenter(getStartPointOfSegment(index));
+    } else {
+        qCritical() << "Invalid polygon segment index:" << index;
+        return Point();
+    }
+}
 
 const QPainterPath& Polygon::toQPainterPathPx() const noexcept
 {
@@ -187,6 +246,39 @@ void Polygon::setStartPos(const Point& pos) noexcept
     mStartPos = pos;
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
+
+/*****************************************************************************************
+ *  Transformations
+ ****************************************************************************************/
+
+Polygon& Polygon::translate(const Point& offset) noexcept
+{
+    mStartPos += offset;
+    foreach (PolygonSegment* segment, mSegments) {
+        segment->setEndPos(segment->getEndPos() + offset);
+    }
+    return *this;
+}
+
+Polygon Polygon::translated(const Point& offset) const noexcept
+{
+    return Polygon(*this).translate(offset);
+}
+
+Polygon& Polygon::rotate(const Angle& angle, const Point& center) noexcept
+{
+    mStartPos.rotate(angle, center);
+    foreach (PolygonSegment* segment, mSegments) {
+        segment->setEndPos(segment->getEndPos().rotated(angle, center));
+    }
+    return *this;
+}
+
+Polygon Polygon::rotated(const Angle& angle, const Point& center) const noexcept
+{
+    return Polygon(*this).rotate(angle, center);
+}
+
 
 /*****************************************************************************************
  *  General Methods

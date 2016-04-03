@@ -104,7 +104,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         if (!layer->isVisible()) continue;
 
         QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getWidth().toPx() / 2;
+        qreal w = polygon->getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (!polygon->isGrabArea()) continue;
         layer = getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
@@ -189,8 +189,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw all polygons
-    int polygonCount = mLibFootprint.getPolygonCount();
-    for (int i = 0; i < polygonCount; i++) {
+    for (int i = 0; i < mLibFootprint.getPolygonCount(); i++) {
         const Polygon* polygon = mLibFootprint.getPolygon(i);
         Q_ASSERT(polygon); if (!polygon) continue;
 
@@ -200,8 +199,8 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         if (!layer->isVisible()) continue;
 
         // set pen
-        if (polygon->getWidth() > 0)
-            painter->setPen(QPen(layer->getColor(selected), polygon->getWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        if (polygon->getLineWidth() > 0)
+            painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
 
@@ -226,8 +225,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw all ellipses
-    int ellipseCount = mLibFootprint.getEllipseCount();
-    for (int i = 0; i < ellipseCount; i++) {
+    for (int i = 0; i < mLibFootprint.getEllipseCount(); i++) {
         const Ellipse* ellipse = mLibFootprint.getEllipse(i);
         Q_ASSERT(ellipse); if (!ellipse) continue;
 
@@ -265,8 +263,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw all texts
-    int textCount = mLibFootprint.getTextCount();
-    for (int i = 0; i < textCount; i++) {
+    for (int i = 0; i < mLibFootprint.getTextCount(); i++) {
         const Text* text = mLibFootprint.getText(i);
         Q_ASSERT(text); if (!text) continue;
 
@@ -310,6 +307,25 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
 #endif
         painter->restore();
+    }
+
+    // draw all holes
+    for (int i = 0; i < mLibFootprint.getHoleCount(); i++) {
+        const Hole* hole = mLibFootprint.getHole(i);
+        Q_ASSERT(hole); if (!hole) continue;
+
+        // get layer
+        layer = getBoardLayer(BoardLayer::LayerID::Drills);
+        if (!layer) continue;
+        if (!layer->isVisible()) continue;
+
+        // set pen/brush
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
+
+        // draw hole
+        qreal radius = (hole->getDiameter() / 2).toPx();
+        painter->drawEllipse(hole->getPosition().toPxQPointF(), radius, radius);
     }
 
     // draw origin cross
