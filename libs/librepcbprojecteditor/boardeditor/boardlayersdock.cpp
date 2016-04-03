@@ -83,24 +83,38 @@ void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem *item)
     layer->setVisible(item->checkState() == Qt::Checked);
 }
 
-void BoardLayersDock::on_pushButton_clicked()
+void BoardLayersDock::on_btnTop_clicked()
 {
-    if (!mActiveBoard) return;
-    foreach (int layerId, mActiveBoard->getLayerStack().getAllBoardLayerIds()) {
-        BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
-        Q_ASSERT(layer); if (!layer) continue;
-        layer->setVisible(true);
-    }
+    QList<int> layers = getCommonLayers();
+    layers.append(getTopLayers());
+    setVisibleLayers(layers);
 }
 
-void BoardLayersDock::on_pushButton_2_clicked()
+void BoardLayersDock::on_btnBottom_clicked()
 {
-    if (!mActiveBoard) return;
-    foreach (int layerId, mActiveBoard->getLayerStack().getAllBoardLayerIds()) {
-        BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
-        Q_ASSERT(layer); if (!layer) continue;
-        layer->setVisible(false);
-    }
+    QList<int> layers = getCommonLayers();
+    layers.append(getBottomLayers());
+    setVisibleLayers(layers);
+}
+
+void BoardLayersDock::on_btnTopBottom_clicked()
+{
+    QList<int> layers = getCommonLayers();
+    layers.append(getTopLayers());
+    layers.append(getBottomLayers());
+    setVisibleLayers(layers);
+}
+
+void BoardLayersDock::on_btnAll_clicked()
+{
+    QList<int> layers = mActiveBoard->getLayerStack().getAllBoardLayerIds();
+    setVisibleLayers(layers);
+}
+
+void BoardLayersDock::on_btnNone_clicked()
+{
+    QList<int> layers;
+    setVisibleLayers(layers);
 }
 
 /*****************************************************************************************
@@ -141,6 +155,61 @@ void BoardLayersDock::updateListWidget() noexcept
         }
     }
     mUi->listWidget->setUpdatesEnabled(true);
+}
+
+void BoardLayersDock::setVisibleLayers(const QList<int>& layers) noexcept
+{
+    if (!mActiveBoard) return;
+    foreach (int layerId, mActiveBoard->getLayerStack().getAllBoardLayerIds()) {
+        BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
+        Q_ASSERT(layer); if (!layer) continue;
+        layer->setVisible(layers.contains(layerId));
+    }
+}
+
+QList<int> BoardLayersDock::getCommonLayers() const noexcept
+{
+    QList<int> layers;
+    layers.append(BoardLayer::LayerID::Grid);
+    layers.append(BoardLayer::LayerID::Unrouted);
+    layers.append(BoardLayer::LayerID::BoardOutlines);
+    layers.append(BoardLayer::LayerID::Drills);
+    layers.append(BoardLayer::LayerID::Vias);
+    layers.append(BoardLayer::LayerID::ViaRestrict);
+    layers.append(BoardLayer::LayerID::ThtPads);
+    return layers;
+}
+
+QList<int> BoardLayersDock::getTopLayers() const noexcept
+{
+    QList<int> layers;
+    layers.append(BoardLayer::LayerID::TopDeviceOutlines);
+    layers.append(BoardLayer::LayerID::TopDeviceOriginCrosses);
+    layers.append(BoardLayer::LayerID::TopDeviceGrabAreas);
+    layers.append(BoardLayer::LayerID::TopTestPoints);
+    //layers.append(BoardLayer::LayerID::TopOverlayNames);
+    //layers.append(BoardLayer::LayerID::TopOverlayValues);
+    layers.append(BoardLayer::LayerID::TopOverlay);
+    layers.append(BoardLayer::LayerID::TopDeviceKeepout);
+    layers.append(BoardLayer::LayerID::TopCopperRestrict);
+    layers.append(BoardLayer::LayerID::TopCopper);
+    return layers;
+}
+
+QList<int> BoardLayersDock::getBottomLayers() const noexcept
+{
+    QList<int> layers;
+    layers.append(BoardLayer::LayerID::BottomDeviceOutlines);
+    layers.append(BoardLayer::LayerID::BottomDeviceOriginCrosses);
+    layers.append(BoardLayer::LayerID::BottomDeviceGrabAreas);
+    layers.append(BoardLayer::LayerID::BottomTestPoints);
+    //layers.append(BoardLayer::LayerID::BottomOverlayNames);
+    //layers.append(BoardLayer::LayerID::BottomOverlayValues);
+    layers.append(BoardLayer::LayerID::BottomOverlay);
+    layers.append(BoardLayer::LayerID::BottomDeviceKeepout);
+    layers.append(BoardLayer::LayerID::BottomCopperRestrict);
+    layers.append(BoardLayer::LayerID::BottomCopper);
+    return layers;
 }
 
 /*****************************************************************************************

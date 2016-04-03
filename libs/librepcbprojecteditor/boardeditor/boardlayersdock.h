@@ -66,8 +66,11 @@ class BoardLayersDock final : public QDockWidget
     private slots:
 
         void on_listWidget_itemChanged(QListWidgetItem *item);
-        void on_pushButton_clicked();
-        void on_pushButton_2_clicked();
+        void on_btnTop_clicked();
+        void on_btnBottom_clicked();
+        void on_btnTopBottom_clicked();
+        void on_btnAll_clicked();
+        void on_btnNone_clicked();
 
 
     private:
@@ -79,6 +82,10 @@ class BoardLayersDock final : public QDockWidget
 
         // Private Methods
         void updateListWidget() noexcept;
+        void setVisibleLayers(const QList<int>& layers) noexcept;
+        QList<int> getCommonLayers() const noexcept;
+        QList<int> getTopLayers() const noexcept;
+        QList<int> getBottomLayers() const noexcept;
 
 
         // General
