@@ -35,6 +35,7 @@
 #include <librepcblibrary/library.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/project.h>
+#include <librepcbproject/settings/projectsettings.h>
 #include "../boardviapropertiesdialog.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdmoveselectedboarditems.h"
@@ -246,19 +247,20 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first()); Q_ASSERT(footprint);
             BI_Device& devInst = footprint->getDeviceInstance();
             ComponentInstance& cmpInst = devInst.getComponentInstance();
+            const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-            // get all available alternative devices
+            // get all available alternative devices and footprints
             QSet<Uuid> devicesList = mWorkspace.getLibrary().getDevicesOfComponent(cmpInst.getLibComponent().getUuid());
-            //compList.remove(compInst.getLibComponent().getUuid());
+            QList<Uuid> footprintsList = devInst.getLibPackage().getFootprintUuids();
 
             // build the context menu
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
             QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove %1")).arg(cmpInst.getName()));
             menu.addSeparator();
             QMenu* aChangeDeviceMenu = menu.addMenu(tr("Change Device"));
             aChangeDeviceMenu->setEnabled(devicesList.count() > 0);
-            foreach (const Uuid& deviceUuid, devicesList)
-            {
+            foreach (const Uuid& deviceUuid, devicesList) {
                 Uuid pkgUuid;
                 QString devName, pkgName;
                 FilePath devFp = mWorkspace.getLibrary().getLatestDevice(deviceUuid);
@@ -267,14 +269,24 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 mWorkspace.getLibrary().getPackageMetadata(pkgFp, &pkgName);
                 QAction* a = aChangeDeviceMenu->addAction(QString("%1 [%2]").arg(devName).arg(pkgName));
                 a->setData(deviceUuid.toStr());
-                if (deviceUuid == devInst.getLibDevice().getUuid())
-                {
+                if (deviceUuid == devInst.getLibDevice().getUuid()) {
                     a->setCheckable(true);
                     a->setChecked(true);
                     a->setEnabled(false);
                 }
             }
-            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove %1")).arg(cmpInst.getName()));
+            QMenu* aChangeFootprintMenu = menu.addMenu(tr("Change Footprint"));
+            aChangeFootprintMenu->setEnabled(footprintsList.count() > 0);
+            foreach (const Uuid& footprintUuid, footprintsList) {
+                const library::Footprint* footprint = devInst.getLibPackage().getFootprintByUuid(footprintUuid); Q_ASSERT(footprint);
+                QAction* a = aChangeFootprintMenu->addAction(footprint->getName(localeOrder));
+                a->setData(footprintUuid.toStr());
+                if (footprintUuid == devInst.getFootprint().getLibFootprint().getUuid()) {
+                    a->setCheckable(true);
+                    a->setChecked(true);
+                    a->setEnabled(false);
+                }
+            }
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
@@ -292,13 +304,24 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             {
                 flipSelectedItems(Qt::Horizontal);
             }
+            else if (action == aRemove)
+            {
+                removeSelectedItems();
+            }
             else if (!action->data().toUuid().isNull())
             {
                 try
                 {
-                    // get UUID of device and footprint
-                    Uuid deviceUuid(action->data().toString());
+                    Uuid uuid(action->data().toString());
+                    Uuid deviceUuid = devInst.getLibDevice().getUuid();
                     Uuid footprintUuid = Uuid(); // TODO
+                    if (footprintsList.contains(uuid)) {
+                        // change footprint
+                        footprintUuid = uuid;
+                    } else {
+                        // change device
+                        deviceUuid = uuid;
+                    }
                     CmdReplaceDevice* cmd = new CmdReplaceDevice(mWorkspace, *board, devInst,
                                                                  deviceUuid, footprintUuid);
                     mUndoStack.execCmd(cmd);
@@ -307,10 +330,6 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 {
                     QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
                 }
-            }
-            else if (action == aRemove)
-            {
-                removeSelectedItems();
             }
             else if (action == aProperties)
             {
