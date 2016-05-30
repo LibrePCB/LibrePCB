@@ -183,9 +183,9 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
 {
     if (cmp == mSelectedComponent) return;
 
-    mUi->lblCompUuid->clear();
-    mUi->lblCompName->clear();
-    mUi->lblCompDescription->clear();
+    mUi->lblCompUuid->setText(QString("00000000-0000-0000-0000-000000000000"));
+    mUi->lblCompName->setText(QString("-"));
+    mUi->lblCompDescription->setText(QString("-"));
     mUi->gbxComponent->setEnabled(false);
     mUi->gbxSymbVar->setEnabled(false);
     setSelectedSymbVar(nullptr);
@@ -222,9 +222,9 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
     if (symbVar == mSelectedSymbVar) return;
     qDeleteAll(mPreviewSymbolGraphicsItems);
     mPreviewSymbolGraphicsItems.clear();
-    mUi->lblSymbVarUuid->clear();
-    mUi->lblSymbVarNorm->clear();
-    mUi->lblSymbVarDescription->clear();
+    mUi->lblSymbVarUuid->setText(QString("00000000-0000-0000-0000-000000000000"));
+    mUi->lblSymbVarNorm->setText(QString("-"));
+    mUi->lblSymbVarDescription->setText(QString("-"));
     mSelectedSymbVar = symbVar;
 
     if (mSelectedComponent && symbVar)

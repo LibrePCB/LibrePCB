@@ -73,7 +73,7 @@
             <item row="0" column="1">
              <widget class="QLabel" name="lblCompName">
               <property name="text">
-               <string>TextLabel</string>
+               <string>-</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -92,8 +92,13 @@
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="lblCompUuid">
+              <property name="font">
+               <font>
+                <family>Liberation Mono</family>
+               </font>
+              </property>
               <property name="text">
-               <string>TextLabel</string>
+               <string>00000000-0000-0000-0000-000000000000</string>
               </property>
               <property name="textInteractionFlags">
                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -110,7 +115,7 @@
             <item row="2" column="1">
              <widget class="QLabel" name="lblCompDescription">
               <property name="text">
-               <string>TextLabel</string>
+               <string>-</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -153,8 +158,13 @@
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="lblSymbVarUuid">
+                <property name="font">
+                 <font>
+                  <family>Liberation Mono</family>
+                 </font>
+                </property>
                 <property name="text">
-                 <string>TextLabel</string>
+                 <string>00000000-0000-0000-0000-000000000000</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -174,7 +184,7 @@
               <item row="3" column="1">
                <widget class="QLabel" name="lblSymbVarDescription">
                 <property name="text">
-                 <string>TextLabel</string>
+                 <string>-</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -194,7 +204,7 @@
               <item row="2" column="1">
                <widget class="QLabel" name="lblSymbVarNorm">
                 <property name="text">
-                 <string>TextLabel</string>
+                 <string>-</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
