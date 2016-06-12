@@ -28,4 +28,4 @@ build/
 i18n/*.qm
 
 # Vim
-.swp
+*.swp
