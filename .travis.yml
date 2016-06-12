@@ -26,8 +26,6 @@ matrix:
     - os: osx
       compiler: clang
       env: BUILD_DOXYGEN=false
-  allow_failures:
-    - os: osx
   fast_finish: true
 
 env:
@@ -60,7 +58,7 @@ install:
       sudo apt-get install -qq libglu1-mesa-dev
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]
     then 
-      brew update && brew install qt5 && brew link --force qt5
+      brew update && curl -LO https://github.com/The-Compiler/homebrew-qt5-webkit/releases/download/v5.6.1-1/qt5-5.6.1.el_capitan.bottle.1.tar.gz && brew install qt5-*.bottle.1.tar.gz && brew link --force qt5
     fi
 
 script:
