@@ -218,7 +218,7 @@ bool ProjectEditor::closeAndDestroy(bool askForSave, QWidget* msgBoxParent) noex
     }
 
     QString msg1 = tr("You have unsaved changes in the project.\n"
-                      "Do you want to save them bevore closing the project?");
+                      "Do you want to save them before closing the project?");
     QString msg2 = tr("Attention: The project was restored from a backup, so if you "
                       "don't save the project now the current state of the project (and "
                       "the backup) will be lost forever!");
