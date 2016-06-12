@@ -24,6 +24,11 @@
 #include <QHostInfo>
 #include "systeminfo.h"
 
+#if (defined(Q_OS_UNIX) || defined(Q_OS_LINUX)) && (!defined(Q_OS_MACX)) // For UNIX and Linux
+#include <unistd.h>
+#include <pwd.h>
+#endif
+
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
@@ -55,11 +60,13 @@ QString SystemInfo::getFullUsername() noexcept
     QString username("");
 
 #if (defined(Q_OS_UNIX) || defined(Q_OS_LINUX)) && (!defined(Q_OS_MACX)) // For UNIX and Linux
-    QString command("grep \"^$USER:\" /etc/passwd | awk -F: '{print $5}'");
-    QProcess process;
-    process.start("sh", QStringList() << "-c" << command);
-    process.waitForFinished(500);
-    username = QString(process.readAllStandardOutput()).remove("\n").remove("\r").trimmed();
+    struct passwd* uid = getpwuid(getuid());
+    QString gecosString = QString::fromLocal8Bit(uid->pw_gecos);
+    QStringList gecosParts = gecosString.split(',', QString::SkipEmptyParts);
+    if (gecosParts.size() >= 1) {
+        username = gecosParts.at(0);
+    }
+
 #elif defined(Q_OS_MACX) // For Mac OS X
     QString command("finger `whoami` | awk -F: '{ print $3 }' | head -n1 | sed 's/^ //'");
     QProcess process;
