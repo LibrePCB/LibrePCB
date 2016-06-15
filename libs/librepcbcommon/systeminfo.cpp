@@ -60,11 +60,15 @@ QString SystemInfo::getFullUsername() noexcept
     QString username("");
 
 #if (defined(Q_OS_UNIX) || defined(Q_OS_LINUX)) && (!defined(Q_OS_MACX)) // For UNIX and Linux
-    struct passwd* uid = getpwuid(getuid());
-    QString gecosString = QString::fromLocal8Bit(uid->pw_gecos);
-    QStringList gecosParts = gecosString.split(',', QString::SkipEmptyParts);
-    if (gecosParts.size() >= 1) {
-        username = gecosParts.at(0);
+    passwd* userinfo = getpwuid(getuid());
+    if (userinfo == NULL) {
+        qWarning() << "Could not fetch user info via getpwuid!";
+    } else {
+        QString gecosString = QString::fromLocal8Bit(userinfo->pw_gecos);
+        QStringList gecosParts = gecosString.split(',', QString::SkipEmptyParts);
+        if (gecosParts.size() >= 1) {
+            username = gecosParts.at(0);
+        }
     }
 
 #elif defined(Q_OS_MACX) // For Mac OS X
