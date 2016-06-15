@@ -70,7 +70,6 @@ QString SystemInfo::getFullUsername() noexcept
             username = gecosParts.at(0);
         }
     }
-
 #elif defined(Q_OS_MACX) // For Mac OS X
     QString command("finger `whoami` | awk -F: '{ print $3 }' | head -n1 | sed 's/^ //'");
     QProcess process;
