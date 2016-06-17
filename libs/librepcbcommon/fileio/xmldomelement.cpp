@@ -560,10 +560,11 @@ void XmlDomElement::removeChild(XmlDomElement* child, bool deleteChild) noexcept
     Q_ASSERT(child);
     Q_ASSERT(mChilds.contains(child) == true);
     mChilds.removeOne(child);
-    child->mDocument = nullptr;
-    child->mParent = nullptr;
-    if (deleteChild)
+    if (deleteChild) {
         delete child;
+    } else {
+        child->mParent = nullptr;
+    }
 }
 
 void XmlDomElement::appendChild(XmlDomElement* child) noexcept
@@ -573,24 +574,23 @@ void XmlDomElement::appendChild(XmlDomElement* child) noexcept
     Q_ASSERT(mChilds.contains(child) == false);
     Q_ASSERT(child->mDocument == nullptr);
     Q_ASSERT(child->mParent == nullptr);
+    child->mParent = this;
     mChilds.append(child);
 }
 
 XmlDomElement* XmlDomElement::appendChild(const QString& name) noexcept
 {
-    XmlDomElement* child = new XmlDomElement(name);
-    appendChild(child);
-    return child;
+    QScopedPointer<XmlDomElement> child(new XmlDomElement(name));
+    appendChild(child.data());
+    return child.take();
 }
 
 template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QString& value) noexcept
 {
-    Q_ASSERT(mText.isNull() == true);
-    XmlDomElement* child = new XmlDomElement(name, value);
-    mChilds.append(child);
-    child->mParent = this;
-    return child;
+    QScopedPointer<XmlDomElement> child(new XmlDomElement(name, value));
+    appendChild(child.data());
+    return child.take();
 }
 
 template <>
