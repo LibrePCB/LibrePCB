@@ -65,6 +65,9 @@ BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) 
         }
     }
 
+    // load also all layers which are missing in the XML file
+    addAllRequiredLayers();
+
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
             Qt::QueuedConnection);
@@ -73,49 +76,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) 
 BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
-    // add all required layers
-
-    addLayer(BoardLayer::LayerID::Grid);
-    addLayer(BoardLayer::LayerID::Unrouted);
-
-    addLayer(BoardLayer::LayerID::BoardOutlines);
-    addLayer(BoardLayer::LayerID::Drills);
-    addLayer(BoardLayer::LayerID::Vias);
-    addLayer(BoardLayer::LayerID::ViaRestrict);
-    addLayer(BoardLayer::LayerID::ThtPads);
-
-    addLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
-    addLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
-    addLayer(BoardLayer::LayerID::TopDeviceOutlines);
-    addLayer(BoardLayer::LayerID::TopTestPoints);
-    addLayer(BoardLayer::LayerID::TopGlue);
-    addLayer(BoardLayer::LayerID::TopPaste);
-    addLayer(BoardLayer::LayerID::TopOverlayNames);
-    addLayer(BoardLayer::LayerID::TopOverlayValues);
-    addLayer(BoardLayer::LayerID::TopOverlay);
-    addLayer(BoardLayer::LayerID::TopStopMask);
-    addLayer(BoardLayer::LayerID::TopDeviceKeepout);
-    addLayer(BoardLayer::LayerID::TopCopperRestrict);
-    addLayer(BoardLayer::LayerID::TopCopper);
-    addLayer(BoardLayer::LayerID::BottomCopper);
-
-    addLayer(BoardLayer::LayerID::BottomCopperRestrict);
-    addLayer(BoardLayer::LayerID::BottomDeviceKeepout);
-    addLayer(BoardLayer::LayerID::BottomStopMask);
-    addLayer(BoardLayer::LayerID::BottomOverlay);
-    addLayer(BoardLayer::LayerID::BottomOverlayValues);
-    addLayer(BoardLayer::LayerID::BottomOverlayNames);
-    addLayer(BoardLayer::LayerID::BottomPaste);
-    addLayer(BoardLayer::LayerID::BottomGlue);
-    addLayer(BoardLayer::LayerID::BottomTestPoints);
-    addLayer(BoardLayer::LayerID::BottomDeviceGrabAreas);
-    addLayer(BoardLayer::LayerID::BottomDeviceOriginCrosses);
-    addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
-
-#ifdef QT_DEBUG
-    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
-    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
-#endif
+    addAllRequiredLayers();
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
@@ -165,9 +126,58 @@ void BoardLayerStack::boardAttributesChanged() noexcept
  *  Private Methods
  ****************************************************************************************/
 
+void BoardLayerStack::addAllRequiredLayers() noexcept
+{
+    addLayer(BoardLayer::LayerID::Grid);
+    addLayer(BoardLayer::LayerID::Unrouted);
+
+    addLayer(BoardLayer::LayerID::BoardOutlines);
+    addLayer(BoardLayer::LayerID::Drills);
+    addLayer(BoardLayer::LayerID::Vias);
+    addLayer(BoardLayer::LayerID::ViaRestrict);
+    addLayer(BoardLayer::LayerID::ThtPads);
+
+    addLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
+    addLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+    addLayer(BoardLayer::LayerID::TopDeviceOutlines);
+    addLayer(BoardLayer::LayerID::TopTestPoints);
+    addLayer(BoardLayer::LayerID::TopGlue);
+    addLayer(BoardLayer::LayerID::TopPaste);
+    addLayer(BoardLayer::LayerID::TopOverlayNames);
+    addLayer(BoardLayer::LayerID::TopOverlayValues);
+    addLayer(BoardLayer::LayerID::TopOverlay);
+    addLayer(BoardLayer::LayerID::TopStopMask);
+    addLayer(BoardLayer::LayerID::TopDeviceKeepout);
+    addLayer(BoardLayer::LayerID::TopCopperRestrict);
+    addLayer(BoardLayer::LayerID::TopCopper);
+    addLayer(BoardLayer::LayerID::BottomCopper);
+
+    addLayer(BoardLayer::LayerID::BottomCopperRestrict);
+    addLayer(BoardLayer::LayerID::BottomDeviceKeepout);
+    addLayer(BoardLayer::LayerID::BottomStopMask);
+    addLayer(BoardLayer::LayerID::BottomOverlay);
+    addLayer(BoardLayer::LayerID::BottomOverlayValues);
+    addLayer(BoardLayer::LayerID::BottomOverlayNames);
+    addLayer(BoardLayer::LayerID::BottomPaste);
+    addLayer(BoardLayer::LayerID::BottomGlue);
+    addLayer(BoardLayer::LayerID::BottomTestPoints);
+    addLayer(BoardLayer::LayerID::BottomDeviceGrabAreas);
+    addLayer(BoardLayer::LayerID::BottomDeviceOriginCrosses);
+    addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
+
+#ifdef QT_DEBUG
+    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
+    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
+#endif
+}
+
 void BoardLayerStack::addLayer(int id) noexcept
 {
-    addLayer(*new BoardLayer(id));
+    if (!mLayers.contains(id)) {
+        BoardLayer* layer = new BoardLayer(id);
+        Q_ASSERT(layer);
+        addLayer(*layer);
+    }
 }
 
 void BoardLayerStack::addLayer(BoardLayer& layer) noexcept

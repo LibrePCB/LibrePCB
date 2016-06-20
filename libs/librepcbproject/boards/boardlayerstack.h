@@ -84,6 +84,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
     private:
 
+        void addAllRequiredLayers() noexcept;
         void addLayer(int id) noexcept;
         void addLayer(BoardLayer& layer) noexcept;
 
