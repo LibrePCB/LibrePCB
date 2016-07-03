@@ -45,6 +45,7 @@ unix:!macx {
 # Another order could end up in "undefined reference" errors!
 LIBS += \
     -L$${DESTDIR} \
+    -lhoedown \
     -llibrepcbprojecteditor \
     -llibrepcblibraryeditor \
     -llibrepcbworkspace \
@@ -53,9 +54,11 @@ LIBS += \
     -llibrepcbcommon
 
 INCLUDEPATH += \
+    ../3rdparty \
     ../libs
 
 DEPENDPATH += \
+    ../3rdparty/hoedown \
     ../libs/librepcbprojecteditor \
     ../libs/librepcblibraryeditor \
     ../libs/librepcbworkspace \
@@ -64,6 +67,7 @@ DEPENDPATH += \
     ../libs/librepcbcommon
 
 PRE_TARGETDEPS += \
+    $${DESTDIR}/libhoedown.a \
     $${DESTDIR}/liblibrepcbprojecteditor.a \
     $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcbworkspace.a \
