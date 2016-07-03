@@ -51,7 +51,6 @@ class CmdProjectSetMetadata final : public UndoCommand
 
         // Setters
         void setName(const QString& newName) noexcept;
-        void setDescription(const QString& newDescription) noexcept;
         void setAuthor(const QString& newAuthor) noexcept;
         void setCreated(const QDateTime& newCreated) noexcept;
 
@@ -78,8 +77,6 @@ class CmdProjectSetMetadata final : public UndoCommand
         // Misc
         QString mOldName;
         QString mNewName;
-        QString mOldDescription;
-        QString mNewDescription;
         QString mOldAuthor;
         QString mNewAuthor;
         QDateTime mOldCreated;

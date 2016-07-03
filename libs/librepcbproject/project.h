@@ -171,13 +171,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         const QString& getName() const noexcept {return mName;}
 
         /**
-         * @brief Get the description (in HTML) of the project
-         *
-         * @return The description of the project (HTML)
-         */
-        QString getDescription() const noexcept;
-
-        /**
          * @brief Get the author of the project
          *
          * @return The author of the project
@@ -209,15 +202,6 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @undocmd{project#CmdProjectSetMetadata}
          */
         void setName(const QString& newName) noexcept;
-
-        /**
-         * @brief Set the description (in HTML) of the project
-         *
-         * @param newDescription    The new description (HTML)
-         *
-         * @undocmd{project#CmdProjectSetMetadata}
-         */
-        void setDescription(const QString& newDescription) noexcept;
 
         /**
          * @brief Set the author of the project
@@ -557,9 +541,6 @@ class Project final : public QObject, public IF_AttributeProvider,
         FileLock mFileLock; ///< See @ref doc_project_lock
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
-
-        // Other Files
-        SmartTextFile* mDescriptionHtmlFile; ///< description/index.html
 
         // Attributes
         QString mName;              ///< the name of the project

@@ -38,7 +38,6 @@ CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project) noexcept :
     UndoCommand(tr("Change Project Metadata")),
     mProject(project),
     mOldName(mProject.getName()),               mNewName(mProject.getName()),
-    mOldDescription(mProject.getDescription()), mNewDescription(mProject.getDescription()),
     mOldAuthor(mProject.getAuthor()),           mNewAuthor(mProject.getAuthor()),
     mOldCreated(mProject.getCreated()),         mNewCreated(mProject.getCreated())
 {
@@ -56,12 +55,6 @@ void CmdProjectSetMetadata::setName(const QString& newName) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = newName;
-}
-
-void CmdProjectSetMetadata::setDescription(const QString& newDescription) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewDescription = newDescription;
 }
 
 void CmdProjectSetMetadata::setAuthor(const QString& newAuthor) noexcept
@@ -90,7 +83,6 @@ bool CmdProjectSetMetadata::performExecute() throw (Exception)
 void CmdProjectSetMetadata::performUndo() throw (Exception)
 {
     mProject.setName(mOldName);
-    mProject.setDescription(mOldDescription);
     mProject.setAuthor(mOldAuthor);
     mProject.setCreated(mOldCreated);
 }
@@ -98,7 +90,6 @@ void CmdProjectSetMetadata::performUndo() throw (Exception)
 void CmdProjectSetMetadata::performRedo() throw (Exception)
 {
     mProject.setName(mNewName);
-    mProject.setDescription(mNewDescription);
     mProject.setAuthor(mNewAuthor);
     mProject.setCreated(mNewCreated);
 }
