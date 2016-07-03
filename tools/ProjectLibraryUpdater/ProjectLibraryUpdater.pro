@@ -13,7 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets opengl webkitwidgets xml printsupport sql
+QT += core widgets xml sql
 
 LIBS += \
     -L$${DESTDIR} \

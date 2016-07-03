@@ -13,6 +13,8 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
+QT -= core gui widgets
+
 CONFIG -= qt app_bundle
 CONFIG += staticlib thread
 

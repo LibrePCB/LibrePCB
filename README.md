@@ -37,7 +37,7 @@ To compile LibrePCB, you need the following software components:
 #### Installation on Ubuntu 14.04 and later
 
 ```bash
-sudo apt-get install g++ qt5-default libqt5webkit5 libqt5webkit5-dev qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev
+sudo apt-get install g++ qt5-default qttools5-dev-tools qt5-doc qtcreator libglu1-mesa-dev
 ```
 
 #### Installation on ArchLinux

@@ -50,10 +50,10 @@ install:
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
       if [ "$CXX" = "g++" ];    then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; fi
-      if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools qt52webkit-examples libxslt-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev; source /opt/qt52/bin/qt52-env.sh; fi
-      if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools qt53webkit-examples; source /opt/qt53/bin/qt53-env.sh; fi
-      if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools qt54webkit-examples; source /opt/qt54/bin/qt54-env.sh; fi
-      if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools qt55webkit-examples; source /opt/qt55/bin/qt55-env.sh; fi
+      if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools libxslt-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev; source /opt/qt52/bin/qt52-env.sh; fi
+      if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools; source /opt/qt53/bin/qt53-env.sh; fi
+      if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools; source /opt/qt54/bin/qt54-env.sh; fi
+      if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools; source /opt/qt55/bin/qt55-env.sh; fi
       if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
       sudo apt-get install -qq libglu1-mesa-dev
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]
