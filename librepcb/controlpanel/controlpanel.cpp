@@ -33,6 +33,7 @@
 #include <librepcblibrary/library.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbcommon/application.h>
+#include "../markdown/markdownconverter.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -69,10 +70,6 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     mUi->projectTreeView->setModel(&mWorkspace.getProjectTreeModel());
     mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
     mUi->favoriteProjectsListView->setModel(&mWorkspace.getFavoriteProjectsModel());
-
-    mUi->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(mUi->webView, &QWebView::linkClicked,
-            [](const QUrl& url){QDesktopServices::openUrl(url);});
 
     loadSettings();
 
@@ -169,13 +166,25 @@ void ControlPanel::loadSettings()
         {
             FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), item);
             QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole,
-                QVariant::fromValue(filepath.toStr()), 1, Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive);
+                QVariant::fromValue(filepath.toStr()), 1,
+                Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
             if (!items.isEmpty())
                 mUi->projectTreeView->setExpanded(items.first(), true);
         }
     }
 
     clientSettings.endGroup();
+}
+
+void ControlPanel::showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept
+{
+    if (projectFilePath.isValid()) {
+        FilePath readmeFilePath = projectFilePath.getParentDir().getPathTo("README.md");
+        mUi->textBrowser->setSearchPaths(QStringList(projectFilePath.getParentDir().toStr()));
+        mUi->textBrowser->setHtml(MarkdownConverter::convertMarkdownToHtml(readmeFilePath));
+    } else {
+        mUi->textBrowser->clear();
+    }
 }
 
 /*****************************************************************************************
@@ -348,15 +357,13 @@ void ControlPanel::on_actionSwitch_Workspace_triggered()
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 {
     ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
-    if (!item)
-        return;
+    if (!item) return;
 
-    FilePath htmlFilepath;
-
-    if ((item->getType() == ProjectTreeItem::ProjectFolder) || (item->getType() == ProjectTreeItem::ProjectFile))
-        htmlFilepath = item->getFilePath().getParentDir().getPathTo("description/index.html");
-
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
+    if ((item->getType() == ProjectTreeItem::ProjectFolder) || (item->getType() == ProjectTreeItem::ProjectFile)) {
+        showProjectReadmeInBrowser(item->getFilePath());
+    } else {
+        showProjectReadmeInBrowser(FilePath());
+    }
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
@@ -471,15 +478,13 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
 void ControlPanel::on_recentProjectsListView_entered(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    FilePath htmlFilepath = filepath.getParentDir().getPathTo("description/index.html");
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
+    showProjectReadmeInBrowser(filepath);
 }
 
 void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    FilePath htmlFilepath = filepath.getParentDir().getPathTo("description/index.html");
-    mUi->webView->setUrl(QUrl::fromLocalFile(htmlFilepath.toStr()));
+    showProjectReadmeInBrowser(filepath);
 }
 
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)
