@@ -89,13 +89,15 @@ SOURCES += \
     controlpanel/controlpanel.cpp \
     firstrunwizard/firstrunwizard.cpp \
     firstrunwizard/firstrunwizardpage_welcome.cpp \
-    firstrunwizard/firstrunwizardpage_workspacepath.cpp
+    firstrunwizard/firstrunwizardpage_workspacepath.cpp \
+    markdown/markdownconverter.cpp
 
 HEADERS += \
     controlpanel/controlpanel.h \
     firstrunwizard/firstrunwizard.h \
     firstrunwizard/firstrunwizardpage_welcome.h \
-    firstrunwizard/firstrunwizardpage_workspacepath.h
+    firstrunwizard/firstrunwizardpage_workspacepath.h \
+    markdown/markdownconverter.h
 
 FORMS += \
     controlpanel/controlpanel.ui \
