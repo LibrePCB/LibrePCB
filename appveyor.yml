@@ -15,6 +15,9 @@ init:
   - git config --global core.autocrlf input
   - set PATH=%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin;%PATH%
 
+install:
+  - git submodule update --init --recursive
+
 build_script:
   - mkdir build
   - cd build

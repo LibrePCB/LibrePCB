@@ -334,20 +334,15 @@ QListView::item
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QWebView" name="webView">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QTextBrowser" name="textBrowser">
               <property name="styleSheet">
-               <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+               <string notr="true">background-color: transparent;</string>
               </property>
-              <property name="url">
-               <url>
-                <string>about:blank</string>
-               </url>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="openExternalLinks">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -367,7 +362,7 @@ QListView::item
      <x>0</x>
      <y>0</y>
      <width>873</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -498,13 +493,6 @@ QListView::item
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../img/images.qrc"/>
  </resources>

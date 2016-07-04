@@ -112,6 +112,7 @@ class ControlPanel final : public QMainWindow
         // General private methods
         void saveSettings();
         void loadSettings();
+        void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
 
         // Project Management
 

@@ -2,3 +2,6 @@
 	path = dev/demo-workspace
 	url = https://github.com/LibrePCB/demo-workspace.git
 	branch = library_refactoring
+[submodule "3rdparty/hoedown"]
+	path = 3rdparty/hoedown
+	url = https://github.com/LibrePCB/hoedown.git

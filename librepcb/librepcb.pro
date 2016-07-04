@@ -13,7 +13,7 @@ GENERATED_DIR = ../generated
 # Use common project definitions
 include(../common.pri)
 
-QT += core widgets opengl webkitwidgets xml printsupport sql
+QT += core widgets opengl network xml printsupport sql
 
 exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
@@ -45,6 +45,7 @@ unix:!macx {
 # Another order could end up in "undefined reference" errors!
 LIBS += \
     -L$${DESTDIR} \
+    -lhoedown \
     -llibrepcbprojecteditor \
     -llibrepcblibraryeditor \
     -llibrepcbworkspace \
@@ -53,9 +54,11 @@ LIBS += \
     -llibrepcbcommon
 
 INCLUDEPATH += \
+    ../3rdparty \
     ../libs
 
 DEPENDPATH += \
+    ../3rdparty/hoedown \
     ../libs/librepcbprojecteditor \
     ../libs/librepcblibraryeditor \
     ../libs/librepcbworkspace \
@@ -64,6 +67,7 @@ DEPENDPATH += \
     ../libs/librepcbcommon
 
 PRE_TARGETDEPS += \
+    $${DESTDIR}/libhoedown.a \
     $${DESTDIR}/liblibrepcbprojecteditor.a \
     $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcbworkspace.a \
@@ -85,13 +89,15 @@ SOURCES += \
     controlpanel/controlpanel.cpp \
     firstrunwizard/firstrunwizard.cpp \
     firstrunwizard/firstrunwizardpage_welcome.cpp \
-    firstrunwizard/firstrunwizardpage_workspacepath.cpp
+    firstrunwizard/firstrunwizardpage_workspacepath.cpp \
+    markdown/markdownconverter.cpp
 
 HEADERS += \
     controlpanel/controlpanel.h \
     firstrunwizard/firstrunwizard.h \
     firstrunwizard/firstrunwizardpage_welcome.h \
-    firstrunwizard/firstrunwizardpage_workspacepath.h
+    firstrunwizard/firstrunwizardpage_workspacepath.h \
+    markdown/markdownconverter.h
 
 FORMS += \
     controlpanel/controlpanel.ui \

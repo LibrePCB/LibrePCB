@@ -47,7 +47,6 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
     mUi->setupUi(this);
 
     mUi->edtName->setText(mProject.getName());
-    mUi->edtDescription->setPlainText(mProject.getDescription());
     mUi->edtAuthor->setText(mProject.getAuthor());
     mUi->edtCreated->setDateTime(mProject.getCreated());
 }
@@ -94,7 +93,6 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
         // Metadata
         CmdProjectSetMetadata* cmd = new CmdProjectSetMetadata(mProject);
         cmd->setName(mUi->edtName->text());
-        cmd->setDescription(mUi->edtDescription->toPlainText());
         cmd->setAuthor(mUi->edtAuthor->text());
         cmd->setCreated(mUi->edtCreated->dateTime());
         mUndoStack.appendToCmdGroup(cmd);

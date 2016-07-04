@@ -17,7 +17,7 @@ include(../../common.pri)
 isEmpty(UUID_LIST_FILEPATH):UUID_LIST_FILEPATH = $$absolute_path("UUID_List.ini")
 DEFINES += UUID_LIST_FILEPATH=\\\"$${UUID_LIST_FILEPATH}\\\"
 
-QT += core widgets opengl webkitwidgets xml printsupport sql
+QT += core widgets xml
 
 LIBS += \
     -L$${DESTDIR} \

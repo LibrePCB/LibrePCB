@@ -53,7 +53,7 @@ namespace project {
 Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception) :
     QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(readOnly), mDescriptionHtmlFile(nullptr), mProjectSettings(nullptr),
+    mIsReadOnly(readOnly), mProjectSettings(nullptr),
     mProjectLibrary(nullptr), mErcMsgList(nullptr), mCircuit(nullptr),
     mSchematicLayerProvider(nullptr)
 {
@@ -190,13 +190,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
         }
 
-        // Load description HTML file
-        if (create)
-            mDescriptionHtmlFile = SmartTextFile::create(mPath.getPathTo("description/index.html"));
-        else
-            mDescriptionHtmlFile = new SmartTextFile(mPath.getPathTo("description/index.html"),
-                                                     mIsRestored, mIsReadOnly);
-
         // Create all needed objects
         mProjectSettings = new ProjectSettings(*this, mIsRestored, mIsReadOnly, create);
         mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
@@ -265,7 +258,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         delete mErcMsgList;             mErcMsgList = nullptr;
         delete mProjectLibrary;         mProjectLibrary = nullptr;
         delete mProjectSettings;        mProjectSettings = nullptr;
-        delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
         delete mXmlFile;                mXmlFile = nullptr;
         throw; // ...and rethrow the exception
     }
@@ -291,19 +283,9 @@ Project::~Project() noexcept
     delete mErcMsgList;             mErcMsgList = nullptr;
     delete mProjectLibrary;         mProjectLibrary = nullptr;
     delete mProjectSettings;        mProjectSettings = nullptr;
-    delete mDescriptionHtmlFile;    mDescriptionHtmlFile = nullptr;
     delete mXmlFile;                mXmlFile = nullptr;
 
     qDebug() << "closed project:" << mFilepath.toNative();
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QString Project::getDescription() const noexcept
-{
-    return mDescriptionHtmlFile->getContent();
 }
 
 /*****************************************************************************************
@@ -314,14 +296,6 @@ void Project::setName(const QString& newName) noexcept
 {
     if (newName != mName) {
         mName = newName;
-        emit attributesChanged();
-    }
-}
-
-void Project::setDescription(const QString& newDescription) noexcept
-{
-    if (newDescription != mDescriptionHtmlFile->getContent()) {
-        mDescriptionHtmlFile->setContent(newDescription.toUtf8());
         emit attributesChanged();
     }
 }
@@ -655,17 +629,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         XmlDomDocument doc(*serializeToXmlDomElement());
         doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
-    }
-    catch (Exception& e)
-    {
-        success = false;
-        errors.append(e.getUserMsg());
-    }
-
-    // Save "description/index.html"
-    try
-    {
-        mDescriptionHtmlFile->save(toOriginal);
     }
     catch (Exception& e)
     {

@@ -16,78 +16,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
-#define LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
+#ifndef LIBREPCB_MARKDOWNCONVERTER_H
+#define LIBREPCB_MARKDOWNCONVERTER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommand.h>
+#include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace project {
-
-class Project;
 
 /*****************************************************************************************
- *  Class CmdProjectSetMetadata
+ *  Class MarkdownConverter
  ****************************************************************************************/
 
 /**
- * @brief The CmdProjectSetMetadata class
+ * @brief The MarkdownConverter class
  */
-class CmdProjectSetMetadata final : public UndoCommand
+class MarkdownConverter final
 {
     public:
 
-        // Constructors / Destructor
-        explicit CmdProjectSetMetadata(Project& project) noexcept;
-        ~CmdProjectSetMetadata() noexcept;
-
-        // Setters
-        void setName(const QString& newName) noexcept;
-        void setAuthor(const QString& newAuthor) noexcept;
-        void setCreated(const QDateTime& newCreated) noexcept;
-
+        // Static Methods
+        static QString convertMarkdownToHtml(const FilePath& markdownFile) noexcept;
+        static QString convertMarkdownToHtml(const QString& markdown) noexcept;
 
     private:
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
-
-
-        // Private Member Variables
-
-        // General
-        Project& mProject;
-
-        // Misc
-        QString mOldName;
-        QString mNewName;
-        QString mOldAuthor;
-        QString mNewAuthor;
-        QDateTime mOldCreated;
-        QDateTime mNewCreated;
+        // Constructors / Destructor
+        MarkdownConverter() = delete;
+        MarkdownConverter(const MarkdownConverter& other) = delete;
+        ~MarkdownConverter() = delete;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
+#endif // LIBREPCB_MARKDOWNCONVERTER_H
