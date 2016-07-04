@@ -1,6 +1,6 @@
 /*
  * LibrePCB - Professional EDA for everyone!
- * Copyright (C) 2013 Urban Bruhin
+ * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
  * http://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
