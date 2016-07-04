@@ -82,6 +82,16 @@ Select the run configuration `librepcb` and click on the `Run` button:
 ./generated/unix/librepcb
 ```
 
+#### Workspace
+
+At the first startup, LibrePCB asks for a workspace directory where the library
+elements and projects will be saved.  For developers there is a demo workspace
+inclusive library and projects in the submodule "dev/demo-workspace/".
+
+*Note: As LibrePCB is still in developement, it's highly recommended to use this 
+demo workspace. Otherwise you won't be able to create/use any components and some 
+parts of the application will not work properly.*
+
 ### Installation
 
 To install LibrePCB on a Linux/UNIX system, just execute the following command after building:
@@ -89,18 +99,6 @@ To install LibrePCB on a Linux/UNIX system, just execute the following command a
 ```bash
 sudo make install
 ```
-
-### Documentation
-
-- Doxygen: http://librepcb.github.io/LibrePCB-Doxygen/master/
-- Some diagrams (partially outdated): https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
-
-### Workspace
-
-At the first startup, LibrePCB asks for a workspace directory where the library
-elements and projects will be saved.  For developers there is a demo workspace
-inclusive library and projects in the submodule "dev/demo-workspace/".
-
 
 ## License
 
