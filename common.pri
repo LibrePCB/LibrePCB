@@ -37,6 +37,8 @@ CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
 
+DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
+
 # Define the application version
 DEFINES += APP_VERSION_MAJOR=0
 DEFINES += APP_VERSION_MINOR=1
