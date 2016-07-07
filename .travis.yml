@@ -2,6 +2,8 @@ language: cpp
 
 cache: ccache
 
+dist: trusty
+
 matrix:
   include:
     - os: linux
