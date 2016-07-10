@@ -3,7 +3,8 @@
 rm -r svg
 mkdir svg
 
-for f in *.dia
+find . -type f -name "*.dia" | while read f
 do
-  dia -e "svg/`basename "$f" .dia`.svg" "$f"
+  mkdir -p "svg/"`dirname "$f"`
+  dia -e "svg/${f%.dia}.svg" "$f"
 done

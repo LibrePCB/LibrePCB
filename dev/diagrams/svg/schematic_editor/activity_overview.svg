@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="57cm" height="92cm" viewBox="665 244 1126 1827" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <ellipse style="fill: #000000" cx="850" cy="338" rx="10" ry="10"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="1095" cy="565" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1095" cy="565" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="1095" cy="565" rx="10" ry="10"/>
+  </g>
+  <text font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="260">
+    <tspan x="680" y="260">Schematic Editor Activity Overview</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="760" y="342">
+    <tspan x="760" y="342">Open Schematic Editor</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="850,349.005 850,384.503 850.15,384.503 850.15,415.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="845.15,407.764 850.15,417.764 855.15,407.764 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1000" y="566">
+    <tspan x="1000" y="566">Close Schematic Editor</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffff94" x="800" y="420" width="100.3" height="36" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="420" width="100.3" height="36" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="850.15" y="441.9">
+      <tspan x="850.15" y="441.9">Tool "Select"</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="850.15,456 850.15,520 1095,520 1095,545.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1090,537.764 1095,547.764 1100,537.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="932" y="512">[CloseWindowTriggered]</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1280" y="420" width="99.9" height="36" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="420" width="99.9" height="36" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1329.95" y="441.9">
+      <tspan x="1329.95" y="441.9">Another Tool</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="900.3,420 992,420 992,420 1275.53,420 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1267.76,425 1277.76,420 1267.76,415 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1092" y="412">[ToolSwitchRequest]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1379.9,456 1379.9,486 1440,486 1440,438 1384.37,438 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1392.14,433 1382.14,438 1392.14,443 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1512" y="468">[ToolSwitchRequest]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1280,456 990.15,456 990.15,456 904.772,456 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="912.536,451 902.536,456 912.536,461 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1092" y="448">[ToolAborted/Finished]</text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="1380,280 1488,280 1500,292 1500,368.556 1380,368.556 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #7f7f7f" points="1380,280 1488,280 1500,292 1500,368.556 1380,368.556 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 0.5; stroke: #7f7f7f" points="1488,280 1488,292 1500,292 "/>
+    <text font-size="11.2889" style="fill: #7f7f7f;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1386.5" y="303">
+      <tspan x="1386.5" y="303">Tools:</tspan>
+      <tspan x="1386.5" y="317.111">- Draw Wire</tspan>
+      <tspan x="1386.5" y="331.222">- Add Netlabel</tspan>
+      <tspan x="1386.5" y="345.333">- Add Component</tspan>
+      <tspan x="1386.5" y="359.444">- ...</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #7f7f7f" x1="1380" y1="368.556" x2="1331.51" y2="418.397"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #7f7f7f" points="1334.12,408.544 1330.73,419.199 1341.29,415.518 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="680" y="640">
+    <tspan x="680" y="640">By default, the "Select" tool is active. It allows to perform many edit actions in the schematic and thus it's probably the most important tool in the schematic editor. </tspan>
+    <tspan x="680" y="656">With this tool, the user can...</tspan>
+    <tspan x="680" y="672">  - select single schematic objects by clicking on them with the left mouse button.</tspan>
+    <tspan x="680" y="688">  - select multiple schematic objects either by drawing a selection rect or by clicking on them with the left mouse button while the "Ctrl" key is pressed.</tspan>
+    <tspan x="680" y="704">  - modify all selected objects by triggering an edit action like move, rotate or mirror (from various toolbars, menus and keyboard shortcuts).</tspan>
+    <tspan x="680" y="720">  - click on the right mouse button to open a context menu of the schematic object(s) under the cursor (if there are any objects).</tspan>
+    <tspan x="680" y="736">  - click on the right mouse button to switch back to the last active tool (only if there are no schematic objects under the cursor and thus no context menu is required).</tspan>
+    <tspan x="680" y="752"></tspan>
+    <tspan x="680" y="768"></tspan>
+    <tspan x="680" y="784">To draw wires, add netlabels, add components and so on, the user needs to switch to the corresponding tool. While these tools are active, modifications on already</tspan>
+    <tspan x="680" y="800">existing schematic objects are typically not possible (for example moving/rotating/mirroring symbols). If a tool (except "Select") is in some kind of an "idle state", </tspan>
+    <tspan x="680" y="816">the tool can be leaved with the "abort" action (shortcut "Esc") or with a click on the right mouse button (only if there are no schematic objects under the cursor and </tspan>
+    <tspan x="680" y="832">thus no context menu is required). After leaving a tool, the schematic editor will always switch back to the "Select" tool.</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="1000">
+    <tspan x="680" y="1000">This (very incomplete) state diagram shows the concept a little bit more detailed:</tspan>
+  </text>
+  <ellipse style="fill: #000000" cx="1130" cy="1046" rx="10" ry="10"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="1775" cy="2055" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1775" cy="2055" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="1775" cy="2055" rx="10" ry="10"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1040" y="1050">
+    <tspan x="1040" y="1050">Open Schematic Editor</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1670" y="2060">
+    <tspan x="1670" y="2060">Close Schematic Editor</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1540,1400 1540,1400 1775,1400 1775,2035.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1770,2027.76 1775,2037.76 1780,2027.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1680" y="1390">[CloseWindowTriggered]</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffeb" x="720" y="1120" width="820" height="280"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1120" width="820" height="280"/>
+    <rect style="fill: #ffffeb" x="720" y="1100" width="104.1" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1100" width="104.1" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="722" y="1114">Tool "Select"</text>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="940" y="1200" width="80" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="940" y="1200" width="80" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="1221.9">
+      <tspan x="980" y="1221.9">Idle</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1130,1057.01 1130,1067.01 1130,1110 1130,1115.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1125,1107.76 1130,1117.76 1135,1107.76 "/>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="1280" y="1200" width="178.4" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="1200" width="178.4" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1369.2" y="1221.9">
+      <tspan x="1369.2" y="1221.9">Moving Selected Objects</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1020,1200 1030,1200 1270,1200 1275.53,1200 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1267.76,1205 1277.76,1200 1267.76,1195 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1146" y="1196">[LeftMouseButtonPressed]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1280,1236 1270,1236 1030,1236 1024.47,1236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1032.24,1231 1022.24,1236 1032.24,1241 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1158" y="1232">[LeftMouseButtonReleased]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="940,1218 780,1218 780,1170 940,1170 940,1195.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="935,1187.76 940,1197.76 945,1187.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860" y="1210">[EditActionTriggered]</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860" y="1164">(Rotate/Mirror/...)</text>
+  </g>
+  <g>
+    <polygon style="fill: #ffd8db" points="960,1320 980,1300 1000,1320 980,1340 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="960,1320 980,1300 1000,1320 980,1340 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="980,1236 980,1268 980,1268 980,1295.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="975,1287.76 980,1297.76 985,1287.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1070" y="1270">[RightMouseButtonClicked]</text>
+  </g>
+  <text font-size="11.2889" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:italic;font-weight:normal" x="912" y="1352">
+    <tspan x="912" y="1352">Are there any schematic</tspan>
+    <tspan x="912" y="1366.11">objects under the cursor?</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="960,1320 910,1320 910,1236 935.528,1236 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="927.764,1241 937.764,1236 927.764,1231 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="936" y="1316">[yes]</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="830" y="1280">(Show context menu)</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffeb" x="720" y="1480" width="820" height="220"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1480" width="820" height="220"/>
+    <rect style="fill: #ffffeb" x="720" y="1460" width="127.2" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1460" width="127.2" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="722" y="1474">Tool "Draw Wire"</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="800,1596 800,1628 799,1628 799,1650.52 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="794,1642.76 799,1652.76 804,1642.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="949.5" y="1630">[RightMouseButtonClicked || EscapePressed]</text>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="760" y="1560" width="80" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="1560" width="80" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="800" y="1581.9">
+      <tspan x="800" y="1581.9">Idle</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="1120" y="1560" width="167.7" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1120" y="1560" width="167.7" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1203.85" y="1581.9">
+      <tspan x="1203.85" y="1581.9">Drawing Wire Segment</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1120,1596 1110,1596 850,1596 844.472,1596 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="852.236,1591 842.236,1596 852.236,1601 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="988" y="1592">[SegmentFinished || EscapePressed]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,1560 850,1560 1110,1560 1115.53,1560 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1107.76,1565 1117.76,1560 1107.76,1555 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="976" y="1556">[LeftMouseButtonClicked]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1287.7,1578 1340,1578 1340,1530 1287.7,1530 1287.7,1555.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1282.7,1547.76 1287.7,1557.76 1292.7,1547.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1430" y="1560">[LeftMouseButtonClicked]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1287.7,1578 1340,1578 1340,1626 1287.7,1626 1287.7,1600.47 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1292.7,1608.24 1287.7,1598.24 1282.7,1608.24 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1430" y="1610">[RightMouseButtonClicked]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1000,1320 1570,1320 1570,1590 1544.47,1590 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1552.24,1585 1542.24,1590 1552.24,1595 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1016" y="1316">[no]</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1416" y="1316">(Switch back to the last active tool)</text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="799" cy="1671" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="799" cy="1671" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="799" cy="1671" rx="10" ry="10"/>
+  </g>
+  <ellipse style="fill: #000000" cx="800" cy="1500" rx="10" ry="10"/>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="800,1510 800,1520 800,1550 800,1555.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="795,1547.76 800,1557.76 805,1547.76 "/>
+  </g>
+  <ellipse style="fill: #000000" cx="980" cy="1140" rx="10" ry="10"/>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="980,1151.01 980,1161.01 980,1188.99 980,1194.52 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="975,1186.75 980,1196.75 985,1186.75 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="720,1590 680,1590 680,1260 715.528,1260 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="707.764,1265 717.764,1260 707.764,1255 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffeb" x="720" y="1780" width="820" height="220"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1780" width="820" height="220"/>
+    <rect style="fill: #ffffeb" x="720" y="1760" width="96.4" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="1760" width="96.4" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="722" y="1774">Another Tool</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1289.75,1878 1340,1878 1340,1830 1289.75,1830 1289.75,1855.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1284.75,1847.76 1289.75,1857.76 1294.75,1847.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1420" y="1860">[SomeActionTriggered]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="800,1810 800,1820 800,1850 800,1855.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="795,1847.76 800,1857.76 805,1847.76 "/>
+  </g>
+  <ellipse style="fill: #000000" cx="800" cy="1800" rx="10" ry="10"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="799" cy="1971" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="799" cy="1971" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="799" cy="1971" rx="10" ry="10"/>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="760" y="1860" width="80" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="1860" width="80" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="800" y="1881.9">
+      <tspan x="800" y="1881.9">Idle</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="800,1896 800,1928 799,1928 799,1950.52 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="794,1942.76 799,1952.76 804,1942.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="949.5" y="1930">[RightMouseButtonClicked || EscapePressed]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,1860 850,1860 1130,1860 1135.53,1860 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1127.76,1865 1137.76,1860 1127.76,1855 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="986" y="1856">[StartSomethingTriggered]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1140,1896 1130,1896 850,1896 844.472,1896 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="852.236,1891 842.236,1896 852.236,1901 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="998" y="1892">[SomethingFinished || EscapePressed]</text>
+  </g>
+  <g>
+    <rect style="fill: #e7e9ff" x="1140" y="1860" width="149.75" height="36" rx="10" ry="10"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1140" y="1860" width="149.75" height="36" rx="10" ry="10"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1214.88" y="1881.9">
+      <tspan x="1214.88" y="1881.9">Do-Something State</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="720,1890 680,1890 680,1260 715.528,1260 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="707.764,1265 717.764,1260 707.764,1255 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1000,1320 1570,1320 1570,1890 1544.47,1890 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1552.24,1885 1542.24,1890 1552.24,1895 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1130,1404.47 1130,1440 1130,1440 1130,1475.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1138,1418.24 1130,1402.24 1122,1418.24 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1122,1461.76 1130,1477.76 1138,1461.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1132" y="1436"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1412"> DrawWireToolTriggered</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1428"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1460"> SelectToolTriggered</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1476"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1130,1704.47 1130,1740 1130,1740 1130,1775.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1138,1718.24 1130,1702.24 1122,1718.24 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1122,1761.76 1130,1777.76 1138,1761.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1132" y="1736"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1712"> AnotherToolTriggered</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1728"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1760"> DrawWireToolTriggered</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141" y="1776"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:italic;font-weight:normal" x="680" y="880">
+    <tspan x="680" y="880">Note about the right mouse button click:</tspan>
+    <tspan x="680" y="896">Depending on the current state of the active tool, the right mouse button click has a very special role to increase the efficienty when drawing schematics.</tspan>
+    <tspan x="680" y="912">In the "idle state" of the currently active tool, the right mouse button can be clicked to switch between that tool and the "Select" tool.</tspan>
+    <tspan x="680" y="928">Example workflow: Draw wire segment -&gt; right click -&gt; move a symbol -&gt; right click -&gt; draw next wire segment -&gt; right click -&gt; move a wire segment -&gt; ...</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1329.95,456 1329.95,520 1095,520 1095,545.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1090,537.764 1095,547.764 1100,537.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1248" y="512">[CloseWindowTriggered]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1540,1700 1540,1700 1775,1700 1775,2035.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1770,2027.76 1775,2037.76 1780,2027.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1680" y="1690">[CloseWindowTriggered]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1540,2000 1775,2000 1775,2035.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1770,2027.76 1775,2037.76 1780,2027.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1680" y="1990">[CloseWindowTriggered]</text>
+  </g>
+</svg>

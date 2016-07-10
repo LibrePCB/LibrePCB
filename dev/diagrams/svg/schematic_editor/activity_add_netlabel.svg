@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="31cm" height="45cm" viewBox="678 284 602 887" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <ellipse style="fill: #000000" cx="860" cy="360" rx="10" ry="10"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="861" cy="1155" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="861" cy="1155" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="861" cy="1155" rx="10" ry="10"/>
+  </g>
+  <text font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="300">
+    <tspan x="680" y="300">Schematic Editor Activity: Add Netlabel</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="790" y="360">
+    <tspan x="790" y="360">Enter Tool </tspan>
+    <tspan x="790" y="376">"Add Netlabel"</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffff94" x="1060" y="920" width="182" height="52" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1060" y="920" width="182" height="52" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1151" y="941.9">
+      <tspan x="1151" y="941.9">Place current netlabel</tspan>
+      <tspan x="1151" y="957.9">at current cursor position</tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffce8e" points="840,748 860,728 880,748 860,768 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,748 860,728 880,748 860,768 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1060" y="850" width="133.35" height="52" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1060" y="850" width="133.35" height="52" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1126.67" y="871.9">
+      <tspan x="1126.67" y="871.9">Rotate current </tspan>
+      <tspan x="1126.67" y="887.9">netlabel 90° CCW</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="1060" y="780" width="160.65" height="52" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1060" y="780" width="160.65" height="52" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1140.33" y="801.9">
+      <tspan x="1140.33" y="801.9">Move current netlabel</tspan>
+      <tspan x="1140.33" y="817.9">to cursor position</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,768 860,876 1055.53,876 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1047.76,881 1057.76,876 1047.76,871 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="956" y="868">[RightMouseButtonClicked]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,370 860,380 860,410 860,415.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="855,407.764 860,417.764 865,407.764 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1220.65,806 1240,806 1240,748 884.472,748 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="892.236,743 882.236,748 892.236,753 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,768 860,806 1055.53,806 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1047.76,811 1057.76,806 1047.76,801 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="960" y="800">[MouseMoved]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="880,540 1280,540 1280,440 884.472,440 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="892.236,435 882.236,440 892.236,445 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="904" y="532">[no]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,768 860,946 1055.53,946 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1047.76,951 1057.76,946 1047.76,941 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="956" y="940">[LeftMouseButtonClicked]</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="776" y="1016" width="168.35" height="52" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="776" y="1016" width="168.35" height="52" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860.175" y="1037.9">
+      <tspan x="860.175" y="1037.9">Delete current netlabel</tspan>
+      <tspan x="860.175" y="1053.9">(undo creating it)</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,768 860,892 860.175,892 860.175,1011.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="855.175,1003.76 860.175,1013.76 865.175,1003.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="915.999" y="984">[EscapePressed]</text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="930" y="1152">
+    <tspan x="930" y="1152">Leave Tool</tspan>
+    <tspan x="930" y="1168">"Add Netlabel"</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1193.35,876 1240,876 1240,748 884.472,748 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="892.236,743 882.236,748 892.236,753 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,560 860,586 858.55,586 858.55,607.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="853.55,599.764 858.55,609.764 863.55,599.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="880" y="580">[yes]</text>
+  </g>
+  <g>
+    <rect style="fill: #ffff94" x="784" y="612" width="149.1" height="68" rx="20" ry="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="784" y="612" width="149.1" height="68" rx="20" ry="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="858.55" y="633.9">
+      <tspan x="858.55" y="633.9">Create new netlabel</tspan>
+      <tspan x="858.55" y="649.9">in the setsegment</tspan>
+      <tspan x="858.55" y="665.9">under the cursor</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="858.55,680 858.55,704 860,704 860,723.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="855,715.764 860,725.764 865,715.764 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,460 860,470 860,510 860,515.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="855,507.764 860,517.764 865,507.764 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="950" y="490">[LeftMouseButtonClicked]</text>
+  </g>
+  <g>
+    <polygon style="fill: #ffce8e" points="840,540 860,520 880,540 860,560 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,540 860,520 880,540 860,560 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="764" y="536">
+    <tspan x="764" y="536">Is there a netsegment</tspan>
+    <tspan x="764" y="552">under the cursor?</tspan>
+  </text>
+  <g>
+    <polygon style="fill: #ffce8e" points="840,440 860,420 880,440 860,460 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,440 860,420 880,440 860,460 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,440 680,440 680,1104 861,1104 861,1135.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="856,1127.76 861,1137.76 866,1127.76 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="760" y="432">[EscapePressed]</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860.175,1068 860.175,1104 861,1104 861,1135.53 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="856,1127.76 861,1137.76 866,1127.76 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1242,946 1280,946 1280,440 884.472,440 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="892.236,435 882.236,440 892.236,445 "/>
+  </g>
+</svg>
