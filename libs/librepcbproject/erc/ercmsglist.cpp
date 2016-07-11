@@ -43,28 +43,19 @@ ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool creat
     QObject(&project), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/erc.xml")), mXmlFile(nullptr)
 {
-    try
-    {
-        // try to create/open the XML file "erc.xml"
-        if (create)
-            mXmlFile = SmartXmlFile::create(mXmlFilepath);
-        else
-            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
+    // try to create/open the XML file "erc.xml"
+    if (create) {
+        mXmlFile.reset(SmartXmlFile::create(mXmlFilepath));
+    } else {
+        mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
+    }
 
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    }
-    catch (...)
-    {
-        // free allocated memory and rethrow the exception
-        delete mXmlFile;            mXmlFile = nullptr;
-        throw;
-    }
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ErcMsgList::~ErcMsgList() noexcept
 {
     Q_ASSERT(mItems.isEmpty());
-    delete mXmlFile;            mXmlFile = nullptr;
 }
 
 /*****************************************************************************************

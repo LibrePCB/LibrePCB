@@ -96,7 +96,7 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
 
         // File "core/erc.xml"
         FilePath mXmlFilepath;
-        SmartXmlFile* mXmlFile;
+        QScopedPointer<SmartXmlFile> mXmlFile;
 
         // Misc
         QList<ErcMsg*> mItems; ///< contains all visible ERC messages
