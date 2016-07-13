@@ -4,7 +4,10 @@
 
 - **Before spending lots of time on something, ask for feedback on your idea first!**
 - Please search issues and pull requests before adding something new to avoid duplicating efforts and conversations.
-- Issues which are considered to be easy to solve are marked with the label `easy`: [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
+- Issues which are considered to be easy to solve are marked with the label `easy`:
+  [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
+  Some issues even have a mentor assigned:
+  [Browse all mentored issues](https://github.com/LibrePCB/LibrePCB/labels/mentored).
 
 ## Getting Started
 
