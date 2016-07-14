@@ -54,6 +54,8 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        ErcMsgList() = delete;
+        ErcMsgList(const ErcMsgList& other) = delete;
         explicit ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
         ~ErcMsgList() noexcept;
 
@@ -66,6 +68,10 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
         void update(ErcMsg* ercMsg) noexcept;
         void restoreIgnoreState() noexcept;
         bool save(bool toOriginal, QStringList& errors) noexcept;
+        
+        // Operator Overloadings
+        ErcMsgList& operator=(const ErcMsgList& rhs) = delete;
+
 
     signals:
 
@@ -75,11 +81,6 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
 
 
     private:
-
-        // make some methods inaccessible...
-        ErcMsgList();
-        ErcMsgList(const ErcMsgList& other);
-        ErcMsgList& operator=(const ErcMsgList& rhs);
 
         // Private Methods
 
@@ -95,7 +96,7 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
 
         // File "core/erc.xml"
         FilePath mXmlFilepath;
-        SmartXmlFile* mXmlFile;
+        QScopedPointer<SmartXmlFile> mXmlFile;
 
         // Misc
         QList<ErcMsg*> mItems; ///< contains all visible ERC messages
