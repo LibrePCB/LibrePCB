@@ -179,6 +179,8 @@ void BI_NetLine::addToBoard(GraphicsScene& scene) throw (Exception)
     mStartPoint->registerNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mStartPoint->unregisterNetLine(*this);});
     mEndPoint->registerNetLine(*this); // can throw
+    mHighlightChangedConnection = connect(&getNetSignal(), &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
     BI_Base::addToBoard(scene, *mGraphicsItem);
     sg.dismiss();
 }
@@ -194,6 +196,7 @@ void BI_NetLine::removeFromBoard(GraphicsScene& scene) throw (Exception)
     mStartPoint->unregisterNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mEndPoint->registerNetLine(*this);});
     mEndPoint->unregisterNetLine(*this); // can throw
+    disconnect(mHighlightChangedConnection);
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
     sg.dismiss();
 }

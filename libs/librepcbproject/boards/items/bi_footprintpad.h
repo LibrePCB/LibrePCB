@@ -112,6 +112,7 @@ class BI_FootprintPad final : public BI_Base
         const library::FootprintPad* mFootprintPad;
         const library::PackagePad* mPackagePad;
         ComponentSignalInstance* mComponentSignalInstance;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Misc
         Point mPosition;

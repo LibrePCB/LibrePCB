@@ -325,6 +325,8 @@ void BI_NetPoint::addToBoard(GraphicsScene& scene) throw (Exception)
         mVia->registerNetPoint(*this); // can throw
         sgl.add([&](){mVia->unregisterNetPoint(*this);});
     }
+    mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
     mErcMsgDeadNetPoint->setVisible(true);
     BI_Base::addToBoard(scene, *mGraphicsItem);
     sgl.dismiss();
@@ -353,6 +355,7 @@ void BI_NetPoint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     }
     mNetSignal->unregisterBoardNetPoint(*this); // can throw
     sgl.add([&](){mNetSignal->registerBoardNetPoint(*this);});
+    disconnect(mHighlightChangedConnection);
     mErcMsgDeadNetPoint->setVisible(false);
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
     sgl.dismiss();

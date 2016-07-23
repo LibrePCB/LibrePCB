@@ -124,6 +124,7 @@ class BI_Via final : public BI_Base, public IF_XmlSerializableObject
 
         // General
         QScopedPointer<BGI_Via> mGraphicsItem;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;

@@ -139,6 +139,10 @@ void BI_FootprintPad::addToBoard(GraphicsScene& scene) throw (Exception)
     if (mComponentSignalInstance) {
         mComponentSignalInstance->registerFootprintPad(*this); // can throw
     }
+    if (getCompSigInstNetSignal()) {
+        mHighlightChangedConnection = connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
+                                              [this](){mGraphicsItem->update();});
+    }
     BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
@@ -149,6 +153,9 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) throw (Exception)
     }
     if (mComponentSignalInstance) {
         mComponentSignalInstance->unregisterFootprintPad(*this); // can throw
+    }
+    if (getCompSigInstNetSignal()) {
+        disconnect(mHighlightChangedConnection);
     }
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }

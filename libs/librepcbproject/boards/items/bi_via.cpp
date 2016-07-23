@@ -231,6 +231,8 @@ void BI_Via::addToBoard(GraphicsScene& scene) throw (Exception)
     }
     if (mNetSignal) {
         mNetSignal->registerBoardVia(*this); // can throw
+        mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+                                              [this](){mGraphicsItem->update();});
     }
     BI_Base::addToBoard(scene, *mGraphicsItem);
 }
@@ -242,6 +244,7 @@ void BI_Via::removeFromBoard(GraphicsScene& scene) throw (Exception)
     }
     if (mNetSignal) {
         mNetSignal->unregisterBoardVia(*this); // can throw
+        disconnect(mHighlightChangedConnection);
     }
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }

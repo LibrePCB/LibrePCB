@@ -134,6 +134,7 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
 
         // General
         QScopedPointer<BGI_NetPoint> mGraphicsItem;
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;

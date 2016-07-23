@@ -110,6 +110,7 @@ class BI_NetLine final : public BI_Base, public IF_XmlSerializableObject
         // General
         QScopedPointer<BGI_NetLine> mGraphicsItem;
         Point mPosition; ///< the center of startpoint and endpoint
+        QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;
