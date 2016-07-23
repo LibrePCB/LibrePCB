@@ -74,7 +74,10 @@ SOURCES += \
     cmd/cmdcombineallitemsunderboardnetpoint.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
     boardeditor/fsm/bes_adddevice.cpp \
-    boardeditor/fabricationoutputdialog.cpp
+    boardeditor/fabricationoutputdialog.cpp \
+    cmd/cmdremovedevicefromboard.cpp \
+    cmd/cmdremoveviafromboard.cpp \
+    cmd/cmddetachboardnetpointfromviaorpad.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -130,7 +133,10 @@ HEADERS += \
     cmd/cmdcombineallitemsunderboardnetpoint.h \
     boardeditor/boardviapropertiesdialog.h \
     boardeditor/fsm/bes_adddevice.h \
-    boardeditor/fabricationoutputdialog.h
+    boardeditor/fabricationoutputdialog.h \
+    cmd/cmdremovedevicefromboard.h \
+    cmd/cmdremoveviafromboard.h \
+    cmd/cmddetachboardnetpointfromviaorpad.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \

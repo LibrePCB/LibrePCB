@@ -30,12 +30,10 @@
 #include <librepcbproject/boards/items/bi_via.h>
 #include <librepcbproject/boards/items/bi_netline.h>
 #include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcbproject/boards/cmd/cmdboardviaremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
 #include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
 #include <librepcbproject/boards/cmd/cmdboardnetpointremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
+#include "cmdremoveviafromboard.h"
+#include "cmdremovedevicefromboard.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -67,7 +65,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
 
     // get all selected items
     QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, true, true, true,
-                                                    true, true, true, true, true, false);
+                                                    true, true, false, true, true, false);
 
     // clear selection because these items will be removed now
     mBoard.clearSelection();
@@ -84,24 +82,8 @@ bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
     foreach (BI_Base* item, items) {
         if (item->getType() == BI_Base::Type_t::NetPoint) {
             BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(item); Q_ASSERT(netpoint);
-            // TODO: this code does not work correctly in all possible cases!
             if (netpoint->getLines().count() == 0) {
                 execNewChildCmd(new CmdBoardNetPointRemove(*netpoint)); // can throw
-            } else if (netpoint->isAttached()) {
-                // disconnect all netlines
-                QList<BI_NetLine*> netlines = netpoint->getLines();
-                foreach (BI_NetLine* netline, netlines) {
-                    execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
-                }
-                // detach netpoint from footprint pad
-                CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
-                cmd->setPadToAttach(nullptr);
-                cmd->setViaToAttach(nullptr);
-                execNewChildCmd(cmd); // can throw
-                // reconnect all netlines
-                foreach (BI_NetLine* netline, netlines) {
-                    execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
-                }
             }
         }
     }
@@ -110,7 +92,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
     foreach (BI_Base* item, items) {
         if (item->getType() == BI_Base::Type_t::Via) {
             BI_Via* via = dynamic_cast<BI_Via*>(item); Q_ASSERT(via);
-            execNewChildCmd(new CmdBoardViaRemove(*via)); // can throw
+            execNewChildCmd(new CmdRemoveViaFromBoard(*via)); // can throw
         }
     }
 
@@ -119,7 +101,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
         if (item->getType() == BI_Base::Type_t::Footprint) {
             BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
             BI_Device& device = footprint->getDeviceInstance();
-            execNewChildCmd(new CmdDeviceInstanceRemove(mBoard, device)); // can throw
+            execNewChildCmd(new CmdRemoveDeviceFromBoard(device)); // can throw
         }
     }
 
