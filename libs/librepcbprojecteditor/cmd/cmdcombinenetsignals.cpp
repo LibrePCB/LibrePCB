@@ -26,6 +26,15 @@
 #include <librepcbproject/circuit/netsignal.h>
 #include <librepcbproject/schematics/items/si_netpoint.h>
 #include <librepcbproject/schematics/items/si_netline.h>
+#include <librepcbproject/boards/items/bi_netpoint.h>
+#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointadd.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointremove.h>
+#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcbproject/boards/cmd/cmdboardviaadd.h>
+#include <librepcbproject/boards/cmd/cmdboardviaremove.h>
+#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
 #include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcbproject/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
@@ -72,16 +81,48 @@ bool CmdCombineNetSignals::performExecute() throw (Exception)
         execNewChildCmd(cmd); // can throw
     }
 
-    // disconnect all schematic netlines and netpoints
-    QList<SI_NetLine*> removedNetLines;
-    QList<SI_NetPoint*> removedNetPoints;
-    foreach (SI_NetPoint* point, mNetSignalToRemove.getSchematicNetPoints()) {
+    // determine all schematic elements which need to be removed temporary
+    QList<SI_NetPoint*> schematicNetPoints = mNetSignalToRemove.getSchematicNetPoints();
+    QSet<SI_NetLine*> schematicNetLines;
+    foreach (SI_NetPoint* point, schematicNetPoints) {
         foreach (SI_NetLine* line, point->getLines()) {
-            execNewChildCmd(new CmdSchematicNetLineRemove(*line)); // can throw
-            removedNetLines.append(line);
+            schematicNetLines.insert(line);
         }
-        execNewChildCmd(new CmdSchematicNetPointRemove(*point)); // can throw
-        removedNetPoints.append(point);
+    }
+
+    // determine all board elements which need to be removed temporary
+    QList<BI_Via*> boardVias = mNetSignalToRemove.getBoardVias();
+    QList<BI_NetPoint*> boardNetPoints = mNetSignalToRemove.getBoardNetPoints();
+    QSet<BI_NetLine*> boardNetLines;
+    foreach (BI_NetPoint* netpoint, boardNetPoints) { Q_ASSERT(netpoint);
+        foreach (BI_NetLine* netline, netpoint->getLines()) { Q_ASSERT(netline);
+            boardNetLines.insert(netline);
+        }
+    }
+
+    // remove all schematic netlines
+    foreach (SI_NetLine* netline, schematicNetLines) {
+        execNewChildCmd(new CmdSchematicNetLineRemove(*netline)); // can throw
+    }
+
+    // remove all schematic netpoints
+    foreach (SI_NetPoint* netpoint, schematicNetPoints) {
+        execNewChildCmd(new CmdSchematicNetPointRemove(*netpoint)); // can throw
+    }
+
+    // remove all board netlines
+    foreach (BI_NetLine* netline, boardNetLines) {
+        execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
+    }
+
+    // remove all board netpoints
+    foreach (BI_NetPoint* netpoint, boardNetPoints) {
+        execNewChildCmd(new CmdBoardNetPointRemove(*netpoint)); // can throw
+    }
+
+    // remove all board vias
+    foreach (BI_Via* via, boardVias) {
+        execNewChildCmd(new CmdBoardViaRemove(*via)); // can throw
     }
 
     // change netsignal of all component signal instances
@@ -89,17 +130,38 @@ bool CmdCombineNetSignals::performExecute() throw (Exception)
         execNewChildCmd(new CmdCompSigInstSetNetSignal(*signal, &mResultingNetSignal)); // can throw
     }
 
-    // reconnect all disconnected schematic netpoints
-    foreach (SI_NetPoint* point, removedNetPoints) {
-        CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*point);
-        cmd->setNetSignal(mResultingNetSignal);
+    // re-add all board vias
+    foreach (BI_Via* via, boardVias) {
+        CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
+        cmd->setNetSignal(&mResultingNetSignal, false);
         execNewChildCmd(cmd); // can throw
-        execNewChildCmd(new CmdSchematicNetPointAdd(*point)); // can throw
+        execNewChildCmd(new CmdBoardViaAdd(*via)); // can throw
     }
 
-    // reconnect all disconnected schematic netlines
-    foreach (SI_NetLine* line, removedNetLines) {
-        execNewChildCmd(new CmdSchematicNetLineAdd(*line)); // can throw
+    // re-add all board netpoints
+    foreach (BI_NetPoint* netpoint, boardNetPoints) {
+        CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
+        cmd->setNetSignal(mResultingNetSignal);
+        execNewChildCmd(cmd); // can throw
+        execNewChildCmd(new CmdBoardNetPointAdd(*netpoint)); // can throw
+    }
+
+    // re-add all board netlines
+    foreach (BI_NetLine* netline, boardNetLines) {
+        execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
+    }
+
+    // re-add all schematic netpoints
+    foreach (SI_NetPoint* netpoint, schematicNetPoints) {
+        CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
+        cmd->setNetSignal(mResultingNetSignal);
+        execNewChildCmd(cmd); // can throw
+        execNewChildCmd(new CmdSchematicNetPointAdd(*netpoint)); // can throw
+    }
+
+    // re-add all schematic netlines
+    foreach (SI_NetLine* netline, schematicNetLines) {
+        execNewChildCmd(new CmdSchematicNetLineAdd(*netline)); // can throw
     }
 
     // remove the old netsignal
