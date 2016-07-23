@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_DRAWTEXT_H
-#define LIBREPCB_PROJECT_SES_DRAWTEXT_H
+#ifndef LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
+#define LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
 
 /*****************************************************************************************
  *  Includes
@@ -30,30 +30,62 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+namespace library {
+class Component;
+class ComponentSymbolVariant;
+class ComponentSymbolVariantItem;
+}
+
 namespace project {
 
+class ComponentInstance;
+class SI_Symbol;
+class CmdSymbolInstanceEdit;
+class AddComponentDialog;
+
 /*****************************************************************************************
- *  Class SES_DrawText
+ *  Class SES_AddComponent
  ****************************************************************************************/
 
 /**
- * @brief The SES_DrawText class
+ * @brief The SES_AddComponent class
  */
-class SES_DrawText final : public SES_Base
+class SES_AddComponent final : public SES_Base
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit SES_DrawText(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                              GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~SES_DrawText();
+        explicit SES_AddComponent(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                  GraphicsView& editorGraphicsView, UndoStack& undoStack);
+        ~SES_AddComponent();
 
         // General Methods
         ProcRetVal process(SEE_Base* event) noexcept override;
         bool entry(SEE_Base* event) noexcept override;
         bool exit(SEE_Base* event) noexcept override;
+
+
+    private:
+
+        // Private Methods
+        ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+        void startAddingComponent(const Uuid& cmp = Uuid(), const Uuid& symbVar = Uuid()) throw (Exception);
+        bool abortCommand(bool showErrMsgBox) noexcept;
+
+
+        // Attributes
+        bool mIsUndoCmdActive;
+        AddComponentDialog* mAddComponentDialog;
+        Angle mLastAngle;
+
+        // information about the current component/symbol to place
+        ComponentInstance* mCurrentComponent;
+        int mCurrentSymbVarItemIndex;
+        SI_Symbol* mCurrentSymbolToPlace;
+        CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };
 
 /*****************************************************************************************
@@ -63,4 +95,4 @@ class SES_DrawText final : public SES_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_DRAWTEXT_H
+#endif // LIBREPCB_PROJECT_SES_ADDCOMPONENT_H

@@ -26,14 +26,8 @@ SOURCES += \
     schematiceditor/schematicpagesdock.cpp \
     schematiceditor/fsm/schematiceditorevent.cpp \
     schematiceditor/fsm/ses_select.cpp \
-    schematiceditor/fsm/ses_move.cpp \
-    schematiceditor/fsm/ses_drawtext.cpp \
-    schematiceditor/fsm/ses_drawrect.cpp \
-    schematiceditor/fsm/ses_drawpolygon.cpp \
-    schematiceditor/fsm/ses_drawcircle.cpp \
-    schematiceditor/fsm/ses_drawellipse.cpp \
     schematiceditor/fsm/ses_drawwire.cpp \
-    schematiceditor/fsm/ses_addcomponents.cpp \
+    schematiceditor/fsm/ses_addcomponent.cpp \
     schematiceditor/fsm/ses_base.cpp \
     schematiceditor/fsm/ses_fsm.cpp \
     schematiceditor/symbolinstancepropertiesdialog.cpp \
@@ -85,14 +79,8 @@ HEADERS += \
     schematiceditor/schematicpagesdock.h \
     schematiceditor/fsm/schematiceditorevent.h \
     schematiceditor/fsm/ses_select.h \
-    schematiceditor/fsm/ses_move.h \
-    schematiceditor/fsm/ses_drawtext.h \
-    schematiceditor/fsm/ses_drawrect.h \
-    schematiceditor/fsm/ses_drawpolygon.h \
-    schematiceditor/fsm/ses_drawcircle.h \
-    schematiceditor/fsm/ses_drawellipse.h \
     schematiceditor/fsm/ses_drawwire.h \
-    schematiceditor/fsm/ses_addcomponents.h \
+    schematiceditor/fsm/ses_addcomponent.h \
     schematiceditor/fsm/ses_base.h \
     schematiceditor/fsm/ses_fsm.h \
     schematiceditor/symbolinstancepropertiesdialog.h \

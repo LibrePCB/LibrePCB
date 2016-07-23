@@ -28,15 +28,9 @@
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include "ses_select.h"
-#include "ses_move.h"
-#include "ses_drawtext.h"
-#include "ses_drawrect.h"
-#include "ses_drawpolygon.h"
-#include "ses_drawcircle.h"
-#include "ses_drawellipse.h"
 #include "ses_drawwire.h"
 #include "ses_addnetlabel.h"
-#include "ses_addcomponents.h"
+#include "ses_addcomponent.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,15 +49,9 @@ SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
 {
     // create all substates
     mSubStates.insert(State_Select, new SES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_Move, new SES_Move(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawText, new SES_DrawText(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawRect, new SES_DrawRect(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawPolygon, new SES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawCircle, new SES_DrawCircle(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawEllipse, new SES_DrawEllipse(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_DrawWire, new SES_DrawWire(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_AddNetLabel, new SES_AddNetLabel(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_AddComponent, new SES_AddComponents(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddComponent, new SES_AddComponent(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr))
@@ -152,24 +140,6 @@ SES_FSM::State SES_FSM::processEventFromChild(SEE_Base* event) noexcept
         case SEE_Base::StartSelect:
             event->setAccepted(true);
             return State_Select;
-        case SEE_Base::StartMove:
-            event->setAccepted(true);
-            return State_Move;
-        case SEE_Base::StartDrawText:
-            event->setAccepted(true);
-            return State_DrawText;
-        case SEE_Base::StartDrawRect:
-            event->setAccepted(true);
-            return State_DrawRect;
-        case SEE_Base::StartDrawPolygon:
-            event->setAccepted(true);
-            return State_DrawPolygon;
-        case SEE_Base::StartDrawCircle:
-            event->setAccepted(true);
-            return State_DrawCircle;
-        case SEE_Base::StartDrawEllipse:
-            event->setAccepted(true);
-            return State_DrawEllipse;
         case SEE_Base::StartDrawWire:
             event->setAccepted(true);
             return State_DrawWire;

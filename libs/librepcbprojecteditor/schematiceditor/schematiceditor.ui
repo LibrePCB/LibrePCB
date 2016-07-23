@@ -39,7 +39,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -100,12 +100,6 @@
      <string>Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
-    <addaction name="actionToolMove"/>
-    <addaction name="actionToolDrawText"/>
-    <addaction name="actionToolDrawRectangle"/>
-    <addaction name="actionToolDrawPolygon"/>
-    <addaction name="actionToolDrawCircle"/>
-    <addaction name="actionToolDrawEllipse"/>
     <addaction name="actionToolDrawWire"/>
     <addaction name="actionToolAddNetLabel"/>
     <addaction name="actionToolAddComponent"/>
@@ -215,12 +209,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionToolSelect"/>
-   <addaction name="actionToolDrawText"/>
-   <addaction name="actionToolMove"/>
-   <addaction name="actionToolDrawRectangle"/>
-   <addaction name="actionToolDrawPolygon"/>
-   <addaction name="actionToolDrawCircle"/>
-   <addaction name="actionToolDrawEllipse"/>
    <addaction name="actionToolDrawWire"/>
    <addaction name="actionToolAddNetLabel"/>
    <addaction name="actionToolAddComponent"/>
@@ -513,81 +501,6 @@
    </property>
    <property name="text">
     <string>Draw Wire</string>
-   </property>
-  </action>
-  <action name="actionToolMove">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/move.png</normaloff>:/img/actions/move.png</iconset>
-   </property>
-   <property name="text">
-    <string>Move</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionToolDrawText">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_text.png</normaloff>:/img/actions/draw_text.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Text</string>
-   </property>
-   <property name="toolTip">
-    <string>Draw Text</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionToolDrawPolygon">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Polygon</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionToolDrawRectangle">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_rectangle.png</normaloff>:/img/actions/draw_rectangle.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Rectangle</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionToolDrawCircle">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_circle.png</normaloff>:/img/actions/draw_circle.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Circle</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionToolDrawEllipse">
-   <property name="icon">
-    <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Ellipse</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actionCommandAbort">

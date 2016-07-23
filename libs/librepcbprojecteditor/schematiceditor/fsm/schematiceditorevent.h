@@ -56,12 +56,6 @@ class SEE_Base
             // Triggered Actions (SEE_Base objects, no additional parameters)
             AbortCommand,       ///< abort the currently active command (esc)
             StartSelect,        ///< start command: select elements
-            StartMove,          ///< start command: move elements
-            StartDrawText,      ///< start command: draw text
-            StartDrawRect,      ///< start command: draw rect
-            StartDrawPolygon,   ///< start command: draw polygon
-            StartDrawCircle,    ///< start command: draw circle
-            StartDrawEllipse,   ///< start command: draw ellipse
             StartDrawWire,      ///< start command: draw wire
             StartAddNetLabel,   ///< start command: add netlabel
             Edit_Copy,          ///< copy the selected elements to clipboard (ctrl+c)
@@ -147,7 +141,7 @@ class SEE_RedirectedQEvent final : public SEE_Base
 /**
  * @brief The SEE_StartAddComponent class
  *
- * @see #project#SES_AddComponents
+ * @see #project#SES_AddComponent
  */
 class SEE_StartAddComponent final : public SEE_Base
 {

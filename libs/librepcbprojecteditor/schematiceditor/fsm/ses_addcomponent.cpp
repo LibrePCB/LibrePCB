@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "ses_addcomponents.h"
+#include "ses_addcomponent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include <librepcbproject/project.h>
@@ -49,8 +49,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                     GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+SES_AddComponent::SES_AddComponent(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                                   GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     SES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mIsUndoCmdActive(false), mAddComponentDialog(nullptr), mLastAngle(0),
     mCurrentComponent(nullptr),
@@ -59,7 +59,7 @@ SES_AddComponents::SES_AddComponents(SchematicEditor& editor, Ui::SchematicEdito
 {
 }
 
-SES_AddComponents::~SES_AddComponents()
+SES_AddComponent::~SES_AddComponent()
 {
 }
 
@@ -67,7 +67,7 @@ SES_AddComponents::~SES_AddComponents()
  *  General Methods
  ****************************************************************************************/
 
-SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
+SES_Base::ProcRetVal SES_AddComponent::process(SEE_Base* event) noexcept
 {
     switch (event->getType())
     {
@@ -126,7 +126,7 @@ SES_Base::ProcRetVal SES_AddComponents::process(SEE_Base* event) noexcept
     }
 }
 
-bool SES_AddComponents::entry(SEE_Base* event) noexcept
+bool SES_AddComponent::entry(SEE_Base* event) noexcept
 {
     // only accept events of type SEE_StartAddComponent
     if (!event) return false;
@@ -161,7 +161,7 @@ bool SES_AddComponents::entry(SEE_Base* event) noexcept
     return true;
 }
 
-bool SES_AddComponents::exit(SEE_Base* event) noexcept
+bool SES_AddComponent::exit(SEE_Base* event) noexcept
 {
     Q_UNUSED(event);
     if (!abortCommand(true)) return false;
@@ -176,7 +176,7 @@ bool SES_AddComponents::exit(SEE_Base* event) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexcept
+SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexcept
 {
     QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
@@ -305,7 +305,7 @@ SES_Base::ProcRetVal SES_AddComponents::processSceneEvent(SEE_Base* event) noexc
     return PassToParentState;
 }
 
-void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVar) throw (Exception)
+void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar) throw (Exception)
 {
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) throw LogicError(__FILE__, __LINE__);
@@ -368,7 +368,7 @@ void SES_AddComponents::startAddingComponent(const Uuid& cmp, const Uuid& symbVa
     }
 }
 
-bool SES_AddComponents::abortCommand(bool showErrMsgBox) noexcept
+bool SES_AddComponent::abortCommand(bool showErrMsgBox) noexcept
 {
     try
     {

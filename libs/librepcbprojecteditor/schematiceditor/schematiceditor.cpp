@@ -118,24 +118,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     connect(mUi->actionToolSelect, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartSelect), true);
                      mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
-    connect(mUi->actionToolMove, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartMove), true);
-                     mUi->actionToolMove->setChecked(mUi->actionToolMove->isCheckable());});
-    connect(mUi->actionToolDrawText, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawText), true);
-                     mUi->actionToolDrawText->setChecked(mUi->actionToolDrawText->isCheckable());});
-    connect(mUi->actionToolDrawRectangle, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawRect), true);
-                     mUi->actionToolDrawRectangle->setChecked(mUi->actionToolDrawRectangle->isCheckable());});
-    connect(mUi->actionToolDrawPolygon, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawPolygon), true);
-                     mUi->actionToolDrawPolygon->setChecked(mUi->actionToolDrawPolygon->isCheckable());});
-    connect(mUi->actionToolDrawCircle, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawCircle), true);
-                     mUi->actionToolDrawCircle->setChecked(mUi->actionToolDrawCircle->isCheckable());});
-    connect(mUi->actionToolDrawEllipse, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawEllipse), true);
-                     mUi->actionToolDrawEllipse->setChecked(mUi->actionToolDrawEllipse->isCheckable());});
     connect(mUi->actionToolDrawWire, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
                      mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
