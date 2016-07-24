@@ -121,7 +121,7 @@ SI_NetPoint::~SI_NetPoint() noexcept
  *  Getters
  ****************************************************************************************/
 
-bool SI_NetPoint::isVisible() const noexcept
+bool SI_NetPoint::isVisibleJunction() const noexcept
 {
     if (mRegisteredLines.count() > 2) {
         return true;
@@ -130,6 +130,11 @@ bool SI_NetPoint::isVisible() const noexcept
     } else {
         return false;
     }
+}
+
+bool SI_NetPoint::isOpenLineEnd() const noexcept
+{
+    return ((mRegisteredLines.count() <= 1) && (!isAttachedToPin()));
 }
 
 /*****************************************************************************************

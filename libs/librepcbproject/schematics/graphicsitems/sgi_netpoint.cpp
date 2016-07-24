@@ -70,8 +70,9 @@ SGI_NetPoint::~SGI_NetPoint() noexcept
 void SGI_NetPoint::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
-    mPointVisible = mNetPoint.isVisible();
-    setZValue(mPointVisible ? Schematic::ZValue_VisibleNetPoints : Schematic::ZValue_HiddenNetPoints);
+    mIsVisibleJunction = mNetPoint.isVisibleJunction();
+    mIsOpenLineEnd = mNetPoint.isOpenLineEnd();
+    setZValue(mIsVisibleJunction ? Schematic::ZValue_VisibleNetPoints : Schematic::ZValue_HiddenNetPoints);
     update();
 }
 
@@ -84,18 +85,23 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
 
-    if (mLayer->isVisible() && mPointVisible)
-    {
+    if (mLayer->isVisible() && mIsVisibleJunction) {
         painter->setPen(Qt::NoPen);
         painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
         painter->drawEllipse(sBoundingRect);
+    } else if (mLayer->isVisible() && mIsOpenLineEnd && !deviceIsPrinter) {
+        painter->setPen(QPen(mLayer->getColor(highlight), 0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawLine(sBoundingRect.topLeft()/2, sBoundingRect.bottomRight()/2);
+        painter->drawLine(sBoundingRect.topRight()/2, sBoundingRect.bottomLeft()/2);
     }
 
 #ifdef QT_DEBUG
     SchematicLayer* layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints); Q_ASSERT(layer);
-    if ((layer->isVisible()) && (!mPointVisible))
+    if ((layer->isVisible()) && (!mIsVisibleJunction))
     {
         // draw circle
         painter->setPen(QPen(layer->getColor(highlight), 0));

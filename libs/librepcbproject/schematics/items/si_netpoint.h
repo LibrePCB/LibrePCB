@@ -69,7 +69,8 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
         bool isAttachedToPin() const noexcept {return (mSymbolPin ? true : false);}
-        bool isVisible() const noexcept;
+        bool isVisibleJunction() const noexcept;
+        bool isOpenLineEnd() const noexcept;
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
         SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
         const QList<SI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}

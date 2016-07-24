@@ -288,14 +288,14 @@ QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept
     // visible netpoints
     foreach (SI_NetPoint* netpoint, mNetPoints)
     {
-        if (!netpoint->isVisible()) continue;
+        if (!netpoint->isVisibleJunction()) continue;
         if (netpoint->getGrabAreaScenePx().contains(scenePosPx))
             list.append(netpoint);
     }
     // hidden netpoints
     foreach (SI_NetPoint* netpoint, mNetPoints)
     {
-        if (netpoint->isVisible()) continue;
+        if (netpoint->isVisibleJunction()) continue;
         if (netpoint->getGrabAreaScenePx().contains(scenePosPx))
             list.append(netpoint);
     }

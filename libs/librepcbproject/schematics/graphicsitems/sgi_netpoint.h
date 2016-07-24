@@ -77,7 +77,8 @@ class SGI_NetPoint final : public SGI_Base
         SchematicLayer* mLayer;
 
         // Cached Attributes
-        bool mPointVisible;
+        bool mIsVisibleJunction;
+        bool mIsOpenLineEnd;
 
         // Static Stuff
         static QRectF sBoundingRect;
