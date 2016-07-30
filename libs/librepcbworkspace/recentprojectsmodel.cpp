@@ -25,6 +25,7 @@
 #include "recentprojectsmodel.h"
 #include "workspace.h"
 #include "settings/workspacesettings.h"
+#include <librepcbcommon/fileio/smarttextfile.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -36,24 +37,29 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) :
-    QAbstractListModel(0), mWorkspace(workspace)
+RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept :
+    QAbstractListModel(nullptr), mWorkspace(workspace)
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-
-    int count = settings.beginReadArray("recent_projects");
-    for (int i = 0; i < count; i++)
-    {
-         settings.setArrayIndex(i);
-         FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), settings.value("filepath").toString());
-         beginInsertRows(QModelIndex(), mRecentProjects.count(), mRecentProjects.count());
-         mRecentProjects.append(filepath);
-         endInsertRows();
+    try {
+        FilePath filepath = mWorkspace.getMetadataPath().getPathTo("recent_projects.txt");
+        if (filepath.isExistingFile()) {
+            mFile.reset(new SmartTextFile(filepath, false, false));
+            QStringList lines = QString(mFile->getContent()).split('\n');
+            beginInsertRows(QModelIndex(), 0, lines.count()-1);
+            foreach (const QString& line, lines) {
+                FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), line);
+                mRecentProjects.append(absPath);
+            }
+            endInsertRows();
+        } else {
+            mFile.reset(SmartTextFile::create(filepath));
+        }
+    } catch (Exception& e) {
+        qWarning() << "Could not read recent projects file:" << e.getUserMsg();
     }
-    settings.endArray();
 }
 
-RecentProjectsModel::~RecentProjectsModel()
+RecentProjectsModel::~RecentProjectsModel() noexcept
 {
 }
 
@@ -61,21 +67,23 @@ RecentProjectsModel::~RecentProjectsModel()
  *  General Methods
  ****************************************************************************************/
 
-void RecentProjectsModel::save()
+void RecentProjectsModel::save() noexcept
 {
-    // save the new list in the workspace
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-
-    settings.beginWriteArray("recent_projects");
-    for (int i = 0; i < mRecentProjects.count(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue("filepath", mRecentProjects.at(i).toRelative(mWorkspace.getPath()));
+    try {
+        // save the new list in the workspace
+        QStringList lines;
+        foreach (const FilePath& filepath, mRecentProjects) {
+            lines.append(filepath.toRelative(mWorkspace.getPath()));
+        }
+        if (mFile.isNull()) throw LogicError(__FILE__, __LINE__);
+        mFile->setContent(lines.join('\n').toUtf8());
+        mFile->save(true); // can throw
+    } catch (Exception& e) {
+        qWarning() << "Could not save recent projects file:" << e.getUserMsg();
     }
-    settings.endArray();
 }
 
-void RecentProjectsModel::setLastRecentProject(const FilePath& filepath)
+void RecentProjectsModel::setLastRecentProject(const FilePath& filepath) noexcept
 {
     // if the filepath is already in the list, we just have to move it to the top of the list
     for (int i = 0; i < mRecentProjects.count(); i++)

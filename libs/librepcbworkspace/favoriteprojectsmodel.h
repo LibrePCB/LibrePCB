@@ -30,6 +30,9 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class SmartTextFile;
+
 namespace workspace {
 
 class Workspace;
@@ -48,22 +51,24 @@ class FavoriteProjectsModel : public QAbstractListModel
     public:
 
         // Constructors / Destructor
-        FavoriteProjectsModel(const Workspace& workspace);
-        ~FavoriteProjectsModel();
+        FavoriteProjectsModel() = delete;
+        FavoriteProjectsModel(const FavoriteProjectsModel& other) = delete;
+        explicit FavoriteProjectsModel(const Workspace& workspace) noexcept;
+        ~FavoriteProjectsModel() noexcept;
 
         // General Methods
-        bool isFavoriteProject(const FilePath& filepath) const;
-        void addFavoriteProject(const FilePath& filepath);
-        void removeFavoriteProject(const FilePath& filepath);
+        bool isFavoriteProject(const FilePath& filepath) const noexcept;
+        void addFavoriteProject(const FilePath& filepath) noexcept;
+        void removeFavoriteProject(const FilePath& filepath) noexcept;
+
+        // Operator Overloadings
+        FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
+
 
     private:
 
-        // make some methods inaccessible...
-        FavoriteProjectsModel(const FavoriteProjectsModel& other);
-        FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs);
-
         // General Methods
-        void save();
+        void save() noexcept;
 
         // Inherited Methods
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -71,6 +76,7 @@ class FavoriteProjectsModel : public QAbstractListModel
 
         // Attributes
         const Workspace& mWorkspace;
+        QScopedPointer<SmartTextFile> mFile;
         QList<FilePath> mFavoriteProjects;
 };
 
