@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarylocaleorder.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,168 +35,179 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(WorkspaceSettings& settings) :
-    WSI_Base(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
-    mBtnDown(0), mBtnAdd(0), mBtnRemove(0)
+WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
+                                               XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement)
 {
-    QStringList list = loadValue("lib_locale_order", QLocale::system().uiLanguages()).toStringList();
-    foreach (const QString& localeStr, list)
-    {
-        QLocale locale(localeStr);
-        mList.append(locale.name());
+    if (xmlElement) {
+        // load setting
+        for (XmlDomElement* child = xmlElement->getFirstChild("locale", false);
+             child; child = child->getNextSibling("locale", false))
+        {
+            QLocale locale(child->getText<QString>(false));
+            if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
+                mList.append(locale.name());
+            }
+        }
+    } else {
+        // load defaults
+        foreach (const QString& localeStr, QLocale::system().uiLanguages()) {
+            QLocale locale(localeStr);
+            if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
+                mList.append(locale.name());
+            }
+        }
     }
+    mList.removeDuplicates();
+    mList.removeAll("");
     mListTmp = mList;
 
     // create the QListWidget
-    mListWidget = new QListWidget();
+    mListWidget.reset(new QListWidget());
     updateListWidgetItems();
 
     // create a QComboBox with all available languages
-    mComboBox = new QComboBox();
-    QStringList allLocales;
-    allLocales << "en_US" << "en_GB" << "de_DE" << "de_CH" << "gsw_CH"; // TODO: add more locales
-    allLocales.sort();
-    foreach (const QString& localeStr, allLocales)
-    {
-        QLocale locale(localeStr);
+    mComboBox.reset(new QComboBox());
+    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,
+                                                         QLocale::AnyScript,
+                                                         QLocale::AnyCountry);
+    qSort(allLocales.begin(), allLocales.end(),
+          [](const QLocale& l1, const QLocale& l2){return l1.name() < l2.name();});
+    foreach (const QLocale& locale, allLocales) {
         QString str = QString("[%1] %2 (%3)").arg(locale.name(), locale.nativeLanguageName(), locale.nativeCountryName());
-        if (mComboBox->findData(locale.name()) < 0)
+        if (mComboBox->findData(locale.name()) < 0) {
             mComboBox->addItem(str, locale.name());
+        }
     }
     mComboBox->setCurrentIndex(mComboBox->findData(QLocale().name()));
 
     // create all buttons
-    mBtnUp = new QToolButton();
-    mBtnDown = new QToolButton();
-    mBtnAdd = new QToolButton();
-    mBtnRemove = new QToolButton();
+    mBtnUp.reset(new QToolButton());
+    mBtnDown.reset(new QToolButton());
+    mBtnAdd.reset(new QToolButton());
+    mBtnRemove.reset(new QToolButton());
     mBtnUp->setArrowType(Qt::UpArrow);
     mBtnDown->setArrowType(Qt::DownArrow);
     mBtnAdd->setIcon(QIcon(":/img/actions/plus_2.png"));
     mBtnRemove->setIcon(QIcon(":/img/actions/minus.png"));
-    connect(mBtnUp, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnUpClicked);
-    connect(mBtnDown, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnDownClicked);
-    connect(mBtnAdd, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnAddClicked);
-    connect(mBtnRemove, &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnRemoveClicked);
+    connect(mBtnUp.data(), &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnUpClicked);
+    connect(mBtnDown.data(), &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnDownClicked);
+    connect(mBtnAdd.data(), &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnAddClicked);
+    connect(mBtnRemove.data(), &QToolButton::clicked, this, &WSI_LibraryLocaleOrder::btnRemoveClicked);
 
     // create the QWidget
-    mWidget = new QWidget();
-    QVBoxLayout* outerLayout = new QVBoxLayout(mWidget);
+    mWidget.reset(new QWidget());
+    QVBoxLayout* outerLayout = new QVBoxLayout(mWidget.data());
     outerLayout->setContentsMargins(0, 0, 0, 0);
-    outerLayout->addWidget(mListWidget);
+    outerLayout->addWidget(mListWidget.data());
     QHBoxLayout* innerLayout = new QHBoxLayout();
     innerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->addLayout(innerLayout);
-    innerLayout->addWidget(mComboBox);
-    innerLayout->addWidget(mBtnAdd);
-    innerLayout->addWidget(mBtnRemove);
-    innerLayout->addWidget(mBtnUp);
-    innerLayout->addWidget(mBtnDown);
+    innerLayout->addWidget(mComboBox.data());
+    innerLayout->addWidget(mBtnAdd.data());
+    innerLayout->addWidget(mBtnRemove.data());
+    innerLayout->addWidget(mBtnUp.data());
+    innerLayout->addWidget(mBtnDown.data());
 }
 
-WSI_LibraryLocaleOrder::~WSI_LibraryLocaleOrder()
+WSI_LibraryLocaleOrder::~WSI_LibraryLocaleOrder() noexcept
 {
-    delete mBtnUp;          mBtnUp = 0;
-    delete mBtnDown;        mBtnDown = 0;
-    delete mBtnAdd;         mBtnAdd = 0;
-    delete mBtnRemove;      mBtnRemove = 0;
-    delete mComboBox;       mComboBox = 0;
-    delete mListWidget;     mListWidget = 0;
-    delete mWidget;         mWidget = 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_LibraryLocaleOrder::restoreDefault()
+void WSI_LibraryLocaleOrder::restoreDefault() noexcept
 {
     mListTmp.clear();
-    foreach (const QString& localeStr, QLocale::system().uiLanguages())
-    {
+    foreach (const QString& localeStr, QLocale::system().uiLanguages()) {
         QLocale locale(localeStr);
-        mListTmp.append(locale.name());
+        if ((!locale.name().isEmpty()) && (!mListTmp.contains(locale.name()))) {
+            mListTmp.append(locale.name());
+        }
     }
     updateListWidgetItems();
 }
 
-void WSI_LibraryLocaleOrder::apply()
+void WSI_LibraryLocaleOrder::apply() noexcept
 {
-    if (mList == mListTmp)
-        return;
-
     mList = mListTmp;
-    saveValue("lib_locale_order", mList);
 }
 
-void WSI_LibraryLocaleOrder::revert()
+void WSI_LibraryLocaleOrder::revert() noexcept
 {
     mListTmp = mList;
     updateListWidgetItems();
 }
 
 /*****************************************************************************************
- *  Public Slots
+ *  Private Methods
  ****************************************************************************************/
 
-void WSI_LibraryLocaleOrder::btnUpClicked()
+void WSI_LibraryLocaleOrder::btnUpClicked() noexcept
 {
     int row = mListWidget->currentRow();
-    if (row > 0)
-    {
+    if (row > 0) {
         mListTmp.move(row, row - 1);
         mListWidget->insertItem(row - 1, mListWidget->takeItem(row));
         mListWidget->setCurrentRow(row - 1);
     }
 }
 
-void WSI_LibraryLocaleOrder::btnDownClicked()
+void WSI_LibraryLocaleOrder::btnDownClicked() noexcept
 {
     int row = mListWidget->currentRow();
-    if ((row >= 0) && (row < mListWidget->count() - 1))
-    {
+    if ((row >= 0) && (row < mListWidget->count() - 1)) {
         mListTmp.move(row, row + 1);
         mListWidget->insertItem(row + 1, mListWidget->takeItem(row));
         mListWidget->setCurrentRow(row + 1);
     }
 }
 
-void WSI_LibraryLocaleOrder::btnAddClicked()
+void WSI_LibraryLocaleOrder::btnAddClicked() noexcept
 {
-    if (mComboBox->currentIndex() >= 0)
-    {
+    if (mComboBox->currentIndex() >= 0) {
         QString locale = mComboBox->currentData().toString();
-        if (!mListTmp.contains(locale))
-        {
+        if (!mListTmp.contains(locale)) {
             mListTmp.append(locale);
             updateListWidgetItems();
         }
     }
 }
 
-void WSI_LibraryLocaleOrder::btnRemoveClicked()
+void WSI_LibraryLocaleOrder::btnRemoveClicked() noexcept
 {
-    if (mListWidget->currentRow() >= 0)
-    {
+    if (mListWidget->currentRow() >= 0) {
         mListTmp.removeAt(mListWidget->currentRow());
         delete mListWidget->item(mListWidget->currentRow());
     }
 }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void WSI_LibraryLocaleOrder::updateListWidgetItems()
+void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
 {
     mListWidget->clear();
-    foreach (const QString& localeStr, mListTmp)
-    {
+    foreach (const QString& localeStr, mListTmp) {
         QLocale locale(localeStr);
-        QString str = QString("[%1] %2 (%3)").arg(locale.name(), locale.nativeLanguageName(), locale.nativeCountryName());
-        QListWidgetItem* item = new QListWidgetItem(str, mListWidget);
+        QString str = QString("[%1] %2 (%3)").arg(localeStr, locale.nativeLanguageName(),
+                                                  locale.nativeCountryName());
+        QListWidgetItem* item = new QListWidgetItem(str, mListWidget.data());
         item->setData(Qt::UserRole, localeStr);
     }
+}
+
+XmlDomElement* WSI_LibraryLocaleOrder::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    foreach (const QString& locale, mList) {
+        root->appendTextChild("locale", locale);
+    }
+    return root.take();
+}
+
+bool WSI_LibraryLocaleOrder::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

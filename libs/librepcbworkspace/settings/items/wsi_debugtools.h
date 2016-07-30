@@ -45,28 +45,36 @@ class WSI_DebugTools final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_DebugTools(WorkspaceSettings& settings);
-        ~WSI_DebugTools();
+        WSI_DebugTools() = delete;
+        WSI_DebugTools(const WSI_DebugTools& other) = delete;
+        WSI_DebugTools(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_DebugTools() noexcept;
 
         // Getters: Widgets
-        QWidget* getWidget() const {return mWidget;}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        WSI_DebugTools& operator=(const WSI_DebugTools& rhs) = delete;
 
 
-    private:
+    private: // Methods
 
-        // make some methods inaccessible...
-        WSI_DebugTools();
-        WSI_DebugTools(const WSI_DebugTools& other);
-        WSI_DebugTools& operator=(const WSI_DebugTools& rhs);
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
+
+    private: // Data
 
         // Widgets
-        QWidget* mWidget;
+        QScopedPointer<QWidget> mWidget;
 };
 
 /*****************************************************************************************

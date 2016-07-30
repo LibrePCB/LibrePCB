@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarynormorder.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,142 +35,143 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_LibraryNormOrder::WSI_LibraryNormOrder(WorkspaceSettings& settings) :
-    WSI_Base(settings), mWidget(0), mListWidget(0), mComboBox(0), mBtnUp(0),
-    mBtnDown(0), mBtnAdd(0), mBtnRemove(0)
+WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
+                                           XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement)
 {
-    mList = loadValue("lib_norm_order").toStringList();
+    if (xmlElement) {
+        // load setting
+        for (XmlDomElement* child = xmlElement->getFirstChild("norm", false);
+             child; child = child->getNextSibling("norm", false))
+        {
+            mList.append(child->getText<QString>(false));
+        }
+    }
     mListTmp = mList;
 
     // create the QListWidget
-    mListWidget = new QListWidget();
+    mListWidget.reset(new QListWidget());
     updateListWidgetItems();
 
     // create a QComboBox with all available norms
-    mComboBox = new QComboBox();
+    mComboBox.reset(new QComboBox());
     mComboBox->setEditable(true);
     mComboBox->addItem("DIN EN 81346"); // TODO: add more norms (dynamically?)
 
     // create all buttons
-    mBtnUp = new QToolButton();
-    mBtnDown = new QToolButton();
-    mBtnAdd = new QToolButton();
-    mBtnRemove = new QToolButton();
+    mBtnUp.reset(new QToolButton());
+    mBtnDown.reset(new QToolButton());
+    mBtnAdd.reset(new QToolButton());
+    mBtnRemove.reset(new QToolButton());
     mBtnUp->setArrowType(Qt::UpArrow);
     mBtnDown->setArrowType(Qt::DownArrow);
     mBtnAdd->setIcon(QIcon(":/img/actions/plus_2.png"));
     mBtnRemove->setIcon(QIcon(":/img/actions/minus.png"));
-    connect(mBtnUp, SIGNAL(clicked()), this, SLOT(btnUpClicked()));
-    connect(mBtnDown, SIGNAL(clicked()), this, SLOT(btnDownClicked()));
-    connect(mBtnAdd, SIGNAL(clicked()), this, SLOT(btnAddClicked()));
-    connect(mBtnRemove, SIGNAL(clicked()), this, SLOT(btnRemoveClicked()));
+    connect(mBtnUp.data(), &QToolButton::clicked, this, &WSI_LibraryNormOrder::btnUpClicked);
+    connect(mBtnDown.data(), &QToolButton::clicked, this, &WSI_LibraryNormOrder::btnDownClicked);
+    connect(mBtnAdd.data(), &QToolButton::clicked, this, &WSI_LibraryNormOrder::btnAddClicked);
+    connect(mBtnRemove.data(), &QToolButton::clicked, this, &WSI_LibraryNormOrder::btnRemoveClicked);
 
     // create the QWidget
-    mWidget = new QWidget();
-    QVBoxLayout* outerLayout = new QVBoxLayout(mWidget);
+    mWidget.reset(new QWidget());
+    QVBoxLayout* outerLayout = new QVBoxLayout(mWidget.data());
     outerLayout->setContentsMargins(0, 0, 0, 0);
-    outerLayout->addWidget(mListWidget);
+    outerLayout->addWidget(mListWidget.data());
     QHBoxLayout* innerLayout = new QHBoxLayout();
     innerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->addLayout(innerLayout);
-    innerLayout->addWidget(mComboBox);
-    innerLayout->addWidget(mBtnAdd);
-    innerLayout->addWidget(mBtnRemove);
-    innerLayout->addWidget(mBtnUp);
-    innerLayout->addWidget(mBtnDown);
+    innerLayout->addWidget(mComboBox.data());
+    innerLayout->addWidget(mBtnAdd.data());
+    innerLayout->addWidget(mBtnRemove.data());
+    innerLayout->addWidget(mBtnUp.data());
+    innerLayout->addWidget(mBtnDown.data());
 }
 
-WSI_LibraryNormOrder::~WSI_LibraryNormOrder()
+WSI_LibraryNormOrder::~WSI_LibraryNormOrder() noexcept
 {
-    delete mBtnUp;          mBtnUp = 0;
-    delete mBtnDown;        mBtnDown = 0;
-    delete mBtnAdd;         mBtnAdd = 0;
-    delete mBtnRemove;      mBtnRemove = 0;
-    delete mComboBox;       mComboBox = 0;
-    delete mListWidget;     mListWidget = 0;
-    delete mWidget;         mWidget = 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_LibraryNormOrder::restoreDefault()
+void WSI_LibraryNormOrder::restoreDefault() noexcept
 {
     mListTmp.clear();
     updateListWidgetItems();
 }
 
-void WSI_LibraryNormOrder::apply()
+void WSI_LibraryNormOrder::apply() noexcept
 {
-    if (mList == mListTmp)
-        return;
-
     mList = mListTmp;
-    saveValue("lib_norm_order", mList);
 }
 
-void WSI_LibraryNormOrder::revert()
+void WSI_LibraryNormOrder::revert() noexcept
 {
     mListTmp = mList;
     updateListWidgetItems();
 }
 
 /*****************************************************************************************
- *  Public Slots
+ *  Private Methods
  ****************************************************************************************/
 
-void WSI_LibraryNormOrder::btnUpClicked()
+void WSI_LibraryNormOrder::btnUpClicked() noexcept
 {
     int row = mListWidget->currentRow();
-    if (row > 0)
-    {
+    if (row > 0) {
         mListTmp.move(row, row - 1);
         mListWidget->insertItem(row - 1, mListWidget->takeItem(row));
         mListWidget->setCurrentRow(row - 1);
     }
 }
 
-void WSI_LibraryNormOrder::btnDownClicked()
+void WSI_LibraryNormOrder::btnDownClicked() noexcept
 {
     int row = mListWidget->currentRow();
-    if ((row >= 0) && (row < mListWidget->count() - 1))
-    {
+    if ((row >= 0) && (row < mListWidget->count() - 1)) {
         mListTmp.move(row, row + 1);
         mListWidget->insertItem(row + 1, mListWidget->takeItem(row));
         mListWidget->setCurrentRow(row + 1);
     }
 }
 
-void WSI_LibraryNormOrder::btnAddClicked()
+void WSI_LibraryNormOrder::btnAddClicked() noexcept
 {
-    if (!mComboBox->currentText().isEmpty())
-    {
-        if (!mListTmp.contains(mComboBox->currentText()))
-        {
+    if (!mComboBox->currentText().isEmpty()) {
+        if (!mListTmp.contains(mComboBox->currentText())) {
             mListTmp.append(mComboBox->currentText());
             updateListWidgetItems();
         }
     }
 }
 
-void WSI_LibraryNormOrder::btnRemoveClicked()
+void WSI_LibraryNormOrder::btnRemoveClicked() noexcept
 {
-    if (mListWidget->currentRow() >= 0)
-    {
+    if (mListWidget->currentRow() >= 0) {
         mListTmp.removeAt(mListWidget->currentRow());
         delete mListWidget->item(mListWidget->currentRow());
     }
 }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void WSI_LibraryNormOrder::updateListWidgetItems()
+void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
 {
     mListWidget->clear();
     mListWidget->addItems(mListTmp);
+}
+
+XmlDomElement* WSI_LibraryNormOrder::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    foreach (const QString& norm, mList) {
+        root->appendTextChild("norm", norm);
+    }
+    return root.take();
+}
+
+bool WSI_LibraryNormOrder::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

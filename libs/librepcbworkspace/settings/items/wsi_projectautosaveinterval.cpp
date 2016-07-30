@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_projectautosaveinterval.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,69 +35,81 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(WorkspaceSettings& settings) :
-    WSI_Base(settings), mWidget(0), mSpinBox(0)
+WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const QString& xmlTagName,
+                                                         XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement),
+    mInterval(600), mIntervalTmp(mInterval)
 {
-    bool ok;
-    mInterval = loadValue("project_autosave_interval", 600).toUInt(&ok);
-    if (!ok) mInterval = 600;
-    if (mInterval % 60 != 0)
+    if (xmlElement) {
+        // load setting
+        mInterval = xmlElement->getText<uint>(true);
+    }
+    if (mInterval % 60 != 0) {
         mInterval += 60 - (mInterval % 60); // round up to the next full minute
+    }
     mIntervalTmp = mInterval;
 
-    mSpinBox = new QSpinBox();
+    // create a spinbox
+    mSpinBox.reset(new QSpinBox());
     mSpinBox->setMinimum(0);
     mSpinBox->setMaximum(60);
     mSpinBox->setValue(mInterval / 60);
     mSpinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(mSpinBox, SIGNAL(valueChanged(int)), this, SLOT(spinBoxValueChanged(int)));
+    connect(mSpinBox.data(), static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &WSI_ProjectAutosaveInterval::spinBoxValueChanged);
 
     // create a QWidget
-    mWidget = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout(mWidget);
+    mWidget.reset(new QWidget());
+    QHBoxLayout* layout = new QHBoxLayout(mWidget.data());
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mSpinBox);
+    layout->addWidget(mSpinBox.data());
     layout->addWidget(new QLabel(tr("Minutes (0 = disable autosave)")));
 }
 
-WSI_ProjectAutosaveInterval::~WSI_ProjectAutosaveInterval()
+WSI_ProjectAutosaveInterval::~WSI_ProjectAutosaveInterval() noexcept
 {
-    delete mSpinBox;            mSpinBox = 0;
-    delete mWidget;             mWidget = 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_ProjectAutosaveInterval::restoreDefault()
+void WSI_ProjectAutosaveInterval::restoreDefault() noexcept
 {
     mIntervalTmp = 600;
     mSpinBox->setValue(mIntervalTmp / 60);
 }
 
-void WSI_ProjectAutosaveInterval::apply()
+void WSI_ProjectAutosaveInterval::apply() noexcept
 {
-    if (mInterval == mIntervalTmp)
-        return;
-
     mInterval = mIntervalTmp;
-    saveValue("project_autosave_interval", mInterval);
 }
 
-void WSI_ProjectAutosaveInterval::revert()
+void WSI_ProjectAutosaveInterval::revert() noexcept
 {
     mIntervalTmp = mInterval;
     mSpinBox->setValue(mIntervalTmp / 60);
 }
 
 /*****************************************************************************************
- *  Public Slots
+ *  Private Methods
  ****************************************************************************************/
 
-void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value)
+void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
 {
     mIntervalTmp = value * 60;
+}
+
+XmlDomElement* WSI_ProjectAutosaveInterval::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    root->setText(mInterval);
+    return root.take();
+}
+
+bool WSI_ProjectAutosaveInterval::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

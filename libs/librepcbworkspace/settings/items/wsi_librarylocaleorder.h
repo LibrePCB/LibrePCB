@@ -49,44 +49,43 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_LibraryLocaleOrder(WorkspaceSettings& settings);
-        ~WSI_LibraryLocaleOrder();
+        WSI_LibraryLocaleOrder() = delete;
+        WSI_LibraryLocaleOrder(const WSI_LibraryLocaleOrder& other) = delete;
+        WSI_LibraryLocaleOrder(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_LibraryLocaleOrder() noexcept;
 
         // Getters
-        const QStringList& getLocaleOrder() const {return mList;}
+        const QStringList& getLocaleOrder() const noexcept {return mList;}
 
         // Getters: Widgets
-        QString getLabelText() const {return tr("Preferred Languages:\n(Highest priority at top)");}
-        QWidget* getWidget() const {return mWidget;}
+        QString getLabelText() const noexcept {return tr("Preferred Languages:\n(Highest priority at top)");}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        WSI_LibraryLocaleOrder& operator=(const WSI_LibraryLocaleOrder& rhs) = delete;
 
 
-    public slots:
+    private: // Methods
 
-        // Public Slots
-        void btnUpClicked();
-        void btnDownClicked();
-        void btnAddClicked();
-        void btnRemoveClicked();
+        void btnUpClicked() noexcept;
+        void btnDownClicked() noexcept;
+        void btnAddClicked() noexcept;
+        void btnRemoveClicked() noexcept;
+        void updateListWidgetItems() noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        WSI_LibraryLocaleOrder();
-        WSI_LibraryLocaleOrder(const WSI_LibraryLocaleOrder& other);
-        WSI_LibraryLocaleOrder& operator=(const WSI_LibraryLocaleOrder& rhs);
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Private Methods
-        void updateListWidgetItems();
-
-
-        // General Attributes
+    private: // Data
 
         /**
          * @brief The list of locales (like "de_CH") in the right order
@@ -100,13 +99,13 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         QStringList mListTmp;
 
         // Widgets
-        QWidget* mWidget;
-        QListWidget* mListWidget;
-        QComboBox* mComboBox;
-        QToolButton* mBtnUp;
-        QToolButton* mBtnDown;
-        QToolButton* mBtnAdd;
-        QToolButton* mBtnRemove;
+        QScopedPointer<QWidget> mWidget;
+        QScopedPointer<QListWidget> mListWidget;
+        QScopedPointer<QComboBox> mComboBox;
+        QScopedPointer<QToolButton> mBtnUp;
+        QScopedPointer<QToolButton> mBtnDown;
+        QScopedPointer<QToolButton> mBtnAdd;
+        QScopedPointer<QToolButton> mBtnRemove;
 };
 
 /*****************************************************************************************

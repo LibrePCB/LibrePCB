@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_appdefaultmeasurementunits.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,84 +35,81 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(WorkspaceSettings& settings) :
-    WSI_Base(settings), mLengthUnit(LengthUnit::millimeters()),
-    mLengthUnitTmp(LengthUnit::millimeters()), mLengthUnitComboBox(0)
+WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(const QString& xmlTagName,
+                                                               XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement),
+    mLengthUnit(LengthUnit::millimeters()), mLengthUnitTmp(mLengthUnit)
 {
-    // load default length unit
-    try
-    {
-        QString lengthUnitStr = loadValue("app_default_length_unit").toString();
-        if (!lengthUnitStr.isEmpty()) mLengthUnit = LengthUnit::fromString(lengthUnitStr);
+    if (xmlElement) {
+        // load default length unit
+        mLengthUnit = xmlElement->getFirstChild("length_unit", true)->getText<LengthUnit>(true);
+        mLengthUnitTmp = mLengthUnit;
     }
-    catch (Exception&)
-    {
-        mLengthUnit = LengthUnit::millimeters();
-    }
-    mLengthUnitTmp = mLengthUnit;
 
     // create a QComboBox with all available length units
-    mLengthUnitComboBox = new QComboBox();
-    foreach (const LengthUnit& unit, LengthUnit::getAllUnits())
+    mLengthUnitComboBox.reset(new QComboBox());
+    foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
         mLengthUnitComboBox->addItem(unit.toStringTr(), unit.getIndex());
+    }
     updateLengthUnitComboBoxIndex();
-    connect(mLengthUnitComboBox, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(lengthUnitComboBoxIndexChanged(int)));
+    connect(mLengthUnitComboBox.data(),
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged);
 }
 
-WSI_AppDefaultMeasurementUnits::~WSI_AppDefaultMeasurementUnits()
+WSI_AppDefaultMeasurementUnits::~WSI_AppDefaultMeasurementUnits() noexcept
 {
-    delete mLengthUnitComboBox;       mLengthUnitComboBox = 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_AppDefaultMeasurementUnits::restoreDefault()
+void WSI_AppDefaultMeasurementUnits::restoreDefault() noexcept
 {
     mLengthUnitTmp = LengthUnit::millimeters();
     updateLengthUnitComboBoxIndex();
 }
 
-void WSI_AppDefaultMeasurementUnits::apply()
+void WSI_AppDefaultMeasurementUnits::apply() noexcept
 {
-    if (mLengthUnit == mLengthUnitTmp)
-        return;
-
     mLengthUnit = mLengthUnitTmp;
-    saveValue("app_default_length_unit", mLengthUnit.toString());
 }
 
-void WSI_AppDefaultMeasurementUnits::revert()
+void WSI_AppDefaultMeasurementUnits::revert() noexcept
 {
     mLengthUnitTmp = mLengthUnit;
     updateLengthUnitComboBoxIndex();
 }
 
 /*****************************************************************************************
- *  Public Slots
- ****************************************************************************************/
-
-void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(int index)
-{
-    try
-    {
-        mLengthUnitTmp = LengthUnit::fromIndex(index);
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(mLengthUnitComboBox, tr("Error"), e.getUserMsg());
-    }
-}
-
-/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex()
+void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(int index) noexcept
+{
+    try {
+        mLengthUnitTmp = LengthUnit::fromIndex(index);
+    } catch (Exception& e) {
+        QMessageBox::critical(mLengthUnitComboBox.data(), tr("Error"), e.getUserMsg());
+    }
+}
+
+void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept
 {
     mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
+}
+
+XmlDomElement* WSI_AppDefaultMeasurementUnits::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    root->appendTextChild("length_unit", mLengthUnit);
+    return root.take();
+}
+
+bool WSI_AppDefaultMeasurementUnits::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

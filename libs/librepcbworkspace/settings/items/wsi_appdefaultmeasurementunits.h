@@ -50,41 +50,40 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_AppDefaultMeasurementUnits(WorkspaceSettings& settings);
-        ~WSI_AppDefaultMeasurementUnits();
+        WSI_AppDefaultMeasurementUnits() = delete;
+        WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other) = delete;
+        WSI_AppDefaultMeasurementUnits(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_AppDefaultMeasurementUnits() noexcept;
 
         // Getters
-        const LengthUnit& getLengthUnit() const {return mLengthUnit;}
+        const LengthUnit& getLengthUnit() const noexcept {return mLengthUnit;}
 
         // Getters: Widgets
-        QString getLengthUnitLabelText() const {return tr("Default Length Unit:");}
-        QComboBox* getLengthUnitComboBox() const {return mLengthUnitComboBox;}
+        QString getLengthUnitLabelText() const noexcept {return tr("Default Length Unit:");}
+        QComboBox* getLengthUnitComboBox() const noexcept {return mLengthUnitComboBox.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        WSI_AppDefaultMeasurementUnits& operator=(const WSI_AppDefaultMeasurementUnits& rhs) = delete;
 
 
-    public slots:
+    private: // Methods
 
-        // Public Slots
-        void lengthUnitComboBoxIndexChanged(int index);
+        void lengthUnitComboBoxIndexChanged(int index) noexcept;
+        void updateLengthUnitComboBoxIndex() noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        WSI_AppDefaultMeasurementUnits();
-        WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other);
-        WSI_AppDefaultMeasurementUnits& operator=(const WSI_AppDefaultMeasurementUnits& rhs);
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Private Methods
-        void updateLengthUnitComboBoxIndex();
-
-
-        // General Attributes
+    private: // Data
 
         /**
          * @brief The application's default length unit
@@ -95,7 +94,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         LengthUnit mLengthUnitTmp;
 
         // Widgets
-        QComboBox* mLengthUnitComboBox;
+        QScopedPointer<QComboBox> mLengthUnitComboBox;
 };
 
 /*****************************************************************************************

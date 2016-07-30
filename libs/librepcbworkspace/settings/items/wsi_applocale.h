@@ -49,41 +49,40 @@ class WSI_AppLocale final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_AppLocale(WorkspaceSettings& settings);
-        ~WSI_AppLocale();
+        WSI_AppLocale() = delete;
+        WSI_AppLocale(const WSI_AppLocale& other) = delete;
+        WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_AppLocale() noexcept;
 
         // Getters
-        const QString& getAppLocaleName() const {return mAppLocale;}
+        const QString& getAppLocaleName() const noexcept {return mAppLocale;}
 
         // Getters: Widgets
-        QString getLabelText() const {return tr("Application Language:");}
-        QWidget* getWidget() const {return mWidget;}
+        QString getLabelText() const noexcept {return tr("Application Language:");}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        WSI_AppLocale& operator=(const WSI_AppLocale& rhs) = delete;
 
 
-    public slots:
+    private: // Methods
 
-        // Public Slots
-        void comboBoxIndexChanged(int index);
+        void comboBoxIndexChanged(int index) noexcept;
+        void updateComboBoxIndex() noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        WSI_AppLocale();
-        WSI_AppLocale(const WSI_AppLocale& other);
-        WSI_AppLocale& operator=(const WSI_AppLocale& rhs);
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Private Methods
-        void updateComboBoxIndex();
-
-
-        // General Attributes
+    private: // Data
 
         /**
          * @brief The locale name
@@ -100,8 +99,8 @@ class WSI_AppLocale final : public WSI_Base
         QList<QTranslator*> mInstalledTranslators; ///< see constructor/destructor code
 
         // Widgets
-        QWidget* mWidget;
-        QComboBox* mComboBox;
+        QScopedPointer<QWidget> mWidget;
+        QScopedPointer<QComboBox> mComboBox;
 };
 
 /*****************************************************************************************

@@ -48,32 +48,43 @@ class WSI_Appearance final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_Appearance(WorkspaceSettings& settings);
-        ~WSI_Appearance();
+        WSI_Appearance() = delete;
+        WSI_Appearance(const WSI_Appearance& other) = delete;
+        WSI_Appearance(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_Appearance() noexcept;
 
         // Getters
         bool getUseOpenGl() const noexcept {return mUseOpenGlCheckBox->isChecked();}
 
         // Getters: Widgets
-        QString getUseOpenGlLabelText() const {return tr("Rendering Method:");}
-        QWidget* getUseOpenGlWidget() const {return mUseOpenGlWidget;}
+        QString getUseOpenGlLabelText() const noexcept {return tr("Rendering Method:");}
+        QWidget* getUseOpenGlWidget() const noexcept {return mUseOpenGlWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
 
-    private:
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-        // make some methods inaccessible...
-        WSI_Appearance();
-        WSI_Appearance(const WSI_Appearance& other);
-        WSI_Appearance& operator=(const WSI_Appearance& rhs);
+        // Operator Overloadings
+        WSI_Appearance& operator=(const WSI_Appearance& rhs) = delete;
 
+
+    private: // Methods
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
+
+    private: // Data
+
+        bool mUseOpenGl;
 
         // Widgets
-        QWidget* mUseOpenGlWidget;
-        QCheckBox* mUseOpenGlCheckBox;
+        QScopedPointer<QWidget> mUseOpenGlWidget;
+        QScopedPointer<QCheckBox> mUseOpenGlCheckBox;
 };
 
 /*****************************************************************************************

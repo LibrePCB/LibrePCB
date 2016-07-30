@@ -49,44 +49,43 @@ class WSI_LibraryNormOrder final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_LibraryNormOrder(WorkspaceSettings& settings);
-        ~WSI_LibraryNormOrder();
+        WSI_LibraryNormOrder() = delete;
+        WSI_LibraryNormOrder(const WSI_LibraryNormOrder& other) = delete;
+        WSI_LibraryNormOrder(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_LibraryNormOrder() noexcept;
 
         // Getters
-        const QStringList& getNormOrder() const {return mList;}
+        const QStringList& getNormOrder() const noexcept {return mList;}
 
         // Getters: Widgets
-        QString getLabelText() const {return tr("Preferred Norms:\n(Highest priority at top)");}
-        QWidget* getWidget() const {return mWidget;}
+        QString getLabelText() const noexcept {return tr("Preferred Norms:\n(Highest priority at top)");}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        WSI_LibraryNormOrder& operator=(const WSI_LibraryNormOrder& rhs) = delete;
 
 
-    public slots:
+    private: // Methods
 
-        // Public Slots
-        void btnUpClicked();
-        void btnDownClicked();
-        void btnAddClicked();
-        void btnRemoveClicked();
+        void btnUpClicked() noexcept;
+        void btnDownClicked() noexcept;
+        void btnAddClicked() noexcept;
+        void btnRemoveClicked() noexcept;
+        void updateListWidgetItems() noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        WSI_LibraryNormOrder();
-        WSI_LibraryNormOrder(const WSI_LibraryNormOrder& other);
-        WSI_LibraryNormOrder& operator=(const WSI_LibraryNormOrder& rhs);
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Private Methods
-        void updateListWidgetItems();
-
-
-        // General Attributes
+    private: // Data
 
         /**
          * @brief The list of norms (like "DIN EN 81346") in the right order
@@ -97,13 +96,13 @@ class WSI_LibraryNormOrder final : public WSI_Base
         QStringList mListTmp;
 
         // Widgets
-        QWidget* mWidget;
-        QListWidget* mListWidget;
-        QComboBox* mComboBox;
-        QToolButton* mBtnUp;
-        QToolButton* mBtnDown;
-        QToolButton* mBtnAdd;
-        QToolButton* mBtnRemove;
+        QScopedPointer<QWidget> mWidget;
+        QScopedPointer<QListWidget> mListWidget;
+        QScopedPointer<QComboBox> mComboBox;
+        QScopedPointer<QToolButton> mBtnUp;
+        QScopedPointer<QToolButton> mBtnDown;
+        QScopedPointer<QToolButton> mBtnAdd;
+        QScopedPointer<QToolButton> mBtnRemove;
 };
 
 /*****************************************************************************************
