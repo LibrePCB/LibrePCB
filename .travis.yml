@@ -1,30 +1,26 @@
 language: cpp
 
+sudo: required
+
 cache: ccache
 
 matrix:
   include:
+    # Ubuntu 14.04 + GCC 4.8 + Qt 5.2 + Doxygen Generation (all packages from official Ubuntu repositories)
     - os: linux
+      dist: trusty
       compiler: gcc
-      env: QT_BASE=52 BUILD_DOXYGEN=true
+      env: BUILD_DOXYGEN=true QT_BASE="trusty"
+    # Ubuntu 14.04 + Clang + Latest Qt from beineri PPA (https://launchpad.net/~beineri)
     - os: linux
-      compiler: gcc
-      env: QT_BASE=53 BUILD_DOXYGEN=false
-    - os: linux
-      compiler: gcc
-      env: QT_BASE=54 BUILD_DOXYGEN=false
-    - os: linux
-      compiler: gcc
-      env: QT_BASE=55 BUILD_DOXYGEN=false
-    - os: linux
+      dist: trusty
       compiler: clang
-      env: QT_BASE=52 BUILD_DOXYGEN=false
-    - os: linux
-      compiler: clang
-      env: QT_BASE=55 BUILD_DOXYGEN=false
+      env: BUILD_DOXYGEN=false QT_BASE="qt57" QT_PPA="ppa:beineri/opt-qt57-trusty"
+    # OS X + GCC
     - os: osx
       compiler: gcc
       env: BUILD_DOXYGEN=false
+    # OS X + Clang
     - os: osx
       compiler: clang
       env: BUILD_DOXYGEN=false
@@ -36,28 +32,19 @@ env:
 
 before_install:
   - | 
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]
+    if [ -n "$QT_PPA" ]
     then
-      if [ "$CXX" = "g++" ];    then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
-      if [ "$QT_BASE" = "52" ]; then sudo add-apt-repository ppa:beineri/opt-qt521 -y; fi
-      if [ "$QT_BASE" = "53" ]; then sudo add-apt-repository ppa:beineri/opt-qt532 -y; fi
-      if [ "$QT_BASE" = "54" ]; then sudo add-apt-repository ppa:beineri/opt-qt542 -y; fi
-      if [ "$QT_BASE" = "55" ]; then sudo add-apt-repository ppa:beineri/opt-qt551 -y; fi
-      if [ "$QT_BASE" = "55" ]; then sudo apt-add-repository -y ppa:libreoffice/libreoffice-4-2; fi # used to install an up-to-date doxygen
-      sudo apt-get update -qq
+      sudo add-apt-repository "${QT_PPA}" -y && sudo apt-get update -qq
     fi
 
 install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
-      if [ "$CXX" = "g++" ];    then sudo apt-get install -qq gcc-4.8 g++-4.8; export CXX="g++-4.8" CC="gcc-4.8"; fi
-      if [ "$QT_BASE" = "52" ]; then sudo apt-get install -qq qt52base qt52tools libxslt-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev; source /opt/qt52/bin/qt52-env.sh; fi
-      if [ "$QT_BASE" = "53" ]; then sudo apt-get install -qq qt53base qt53tools; source /opt/qt53/bin/qt53-env.sh; fi
-      if [ "$QT_BASE" = "54" ]; then sudo apt-get install -qq qt54base qt54tools; source /opt/qt54/bin/qt54-env.sh; fi
-      if [ "$QT_BASE" = "55" ]; then sudo apt-get install -qq qt55base qt55tools; source /opt/qt55/bin/qt55-env.sh; fi
-      if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
       sudo apt-get install -qq libglu1-mesa-dev
+      if [ "$QT_BASE" = "trusty" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools; fi
+      if [ -n "$QT_PPA" ]; then sudo apt-get install -qq "${QT_BASE}base" "${QT_BASE}tools"; source "/opt/${QT_BASE}/bin/${QT_BASE}-env.sh"; fi
+      if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]
     then 
       brew update && brew install qt5 && brew link --force qt5
