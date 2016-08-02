@@ -5,7 +5,7 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/elements.h>
 
 using namespace librepcb;

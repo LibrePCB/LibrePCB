@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARY_H
-#define LIBREPCB_LIBRARY_LIBRARY_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H
+#define LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,22 +36,14 @@ namespace librepcb {
 
 class Version;
 
-namespace library {
-
-class ComponentCategory;
-class PackageCategory;
-class Symbol;
-class SpiceModel;
-class Package;
-class Component;
-class Device;
+namespace workspace {
 
 /*****************************************************************************************
- *  Class Library
+ *  Class WorkspaceLibrary
  ****************************************************************************************/
 
 /**
- * @brief The Library class
+ * @brief The WorkspaceLibrary class
  *
  * @todo This class needs some refactoring:
  *          - rescan() is very slow
@@ -62,15 +54,15 @@ class Device;
  *              --> error if there are multiple XML files in one element directory
  *          - many other issues...
  */
-class Library final : public QObject
+class WorkspaceLibrary final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        Library() = delete;
-        Library(const Library& other) = delete;
+        WorkspaceLibrary() = delete;
+        WorkspaceLibrary(const WorkspaceLibrary& other) = delete;
 
         /**
         * @brief Constructor to open the library of an existing workspace
@@ -81,8 +73,8 @@ class Library final : public QObject
         * @throw Exception If the library could not be opened, this constructor throws
         *                  an exception.
         */
-        explicit Library(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception);
-        ~Library() noexcept;
+        explicit WorkspaceLibrary(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception);
+        ~WorkspaceLibrary() noexcept;
 
 
         // Getters: Library Elements by their UUID
@@ -122,7 +114,7 @@ class Library final : public QObject
         int rescan() throw (Exception);
 
         // Operator Overloadings
-        Library& operator=(const Library& rhs) = delete;
+        WorkspaceLibrary& operator=(const WorkspaceLibrary& rhs) = delete;
 
 
     private:
@@ -159,7 +151,7 @@ class Library final : public QObject
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_LIBRARY_H
+#endif // LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H

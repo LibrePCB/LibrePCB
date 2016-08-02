@@ -25,9 +25,9 @@
 #include "workspace.h"
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
-#include <librepcblibrary/library.h>
 #include <librepcblibraryeditor/libraryeditor.h>
 #include <librepcbproject/project.h>
+#include "library/workspacelibrary.h"
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
@@ -103,7 +103,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mRecentProjectsModel = new RecentProjectsModel(*this);
         mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
         mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibrary = new Library(mLibraryPath, mMetadataPath.getPathTo("library_cache.sqlite"));
+        mLibrary = new WorkspaceLibrary(mLibraryPath, mMetadataPath.getPathTo("library_cache.sqlite"));
     }
     catch (Exception& e)
     {

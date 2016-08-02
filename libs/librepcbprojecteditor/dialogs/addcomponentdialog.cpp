@@ -35,10 +35,10 @@
 #include <librepcblibrary/sym/symbolpreviewgraphicsitem.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbworkspace/settings/workspacesettings.h>
-#include <librepcblibrary/cat/categorytreemodel.h>
+#include <librepcbworkspace/library/cat/categorytreemodel.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/cat/componentcategory.h>
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcbcommon/gridproperties.h>
 
 /*****************************************************************************************
@@ -63,7 +63,7 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->graphicsView->setOriginCrossVisible(false);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    mCategoryTreeModel = new library::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
+    mCategoryTreeModel = new workspace::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddComponentDialog::treeCategories_currentItemChanged);

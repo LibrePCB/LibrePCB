@@ -27,26 +27,28 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
-#include "cat/componentcategory.h"
-#include "cat/packagecategory.h"
-#include "sym/symbol.h"
-#include "pkg/package.h"
-#include "spcmdl/spicemodel.h"
-#include "cmp/component.h"
-#include "dev/device.h"
-#include "library.h"
+#include <librepcblibrary/cat/componentcategory.h>
+#include <librepcblibrary/cat/packagecategory.h>
+#include <librepcblibrary/sym/symbol.h>
+#include <librepcblibrary/pkg/package.h>
+#include <librepcblibrary/spcmdl/spicemodel.h>
+#include <librepcblibrary/cmp/component.h>
+#include <librepcblibrary/dev/device.h>
+#include "workspacelibrary.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace library{
+namespace workspace {
+
+using namespace library;
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Library::Library(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception):
+WorkspaceLibrary::WorkspaceLibrary(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception):
     QObject(0), mLibPath(libDirPath), mLibFilePath(cacheFilePath)
 {
     // select and open library cache sqlite database
@@ -69,7 +71,7 @@ Library::Library(const FilePath& libDirPath, const FilePath& cacheFilePath) thro
     createAllTables(); // can throw
 }
 
-Library::~Library() noexcept
+WorkspaceLibrary::~WorkspaceLibrary() noexcept
 {
     mLibDatabase.close();
 }
@@ -78,37 +80,37 @@ Library::~Library() noexcept
  *  Getters: Library Elements by their UUID
  ****************************************************************************************/
 
-QMultiMap<Version, FilePath> Library::getComponentCategories(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getComponentCategories(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("component_categories", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getPackageCategories(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getPackageCategories(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("package_categories", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getSymbols(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getSymbols(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("symbols", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getSpiceModels(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getSpiceModels(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("spice_models", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getPackages(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getPackages(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("packages", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getComponents(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getComponents(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("components", uuid);
 }
 
-QMultiMap<Version, FilePath> Library::getDevices(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibrary::getDevices(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("devices", uuid);
 }
@@ -117,37 +119,37 @@ QMultiMap<Version, FilePath> Library::getDevices(const Uuid& uuid) const throw (
  *  Getters: Best Match Library Elements by their UUID
  ****************************************************************************************/
 
-FilePath Library::getLatestComponentCategory(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestComponentCategory(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getComponentCategories(uuid));
 }
 
-FilePath Library::getLatestPackageCategory(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestPackageCategory(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getPackageCategories(uuid));
 }
 
-FilePath Library::getLatestSymbol(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestSymbol(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getSymbols(uuid));
 }
 
-FilePath Library::getLatestSpiceModel(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestSpiceModel(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getSpiceModels(uuid));
 }
 
-FilePath Library::getLatestPackage(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestPackage(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getPackages(uuid));
 }
 
-FilePath Library::getLatestComponent(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestComponent(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getComponents(uuid));
 }
 
-FilePath Library::getLatestDevice(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibrary::getLatestDevice(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getDevices(uuid));
 }
@@ -156,7 +158,7 @@ FilePath Library::getLatestDevice(const Uuid& uuid) const throw (Exception)
  *  Getters: Element Metadata
  ****************************************************************************************/
 
-void Library::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid, QString* nameEn) const throw (Exception)
+void WorkspaceLibrary::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid, QString* nameEn) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
         "SELECT package_uuid, devices_tr.name FROM devices "
@@ -176,7 +178,7 @@ void Library::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid, QString* 
     }
 }
 
-void Library::getPackageMetadata(const FilePath& pkgDir, QString* nameEn) const throw (Exception)
+void WorkspaceLibrary::getPackageMetadata(const FilePath& pkgDir, QString* nameEn) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
         "SELECT packages_tr.name FROM packages "
@@ -199,22 +201,22 @@ void Library::getPackageMetadata(const FilePath& pkgDir, QString* nameEn) const 
  *  Getters: Special
  ****************************************************************************************/
 
-QSet<Uuid> Library::getComponentCategoryChilds(const Uuid& parent) const throw (Exception)
+QSet<Uuid> WorkspaceLibrary::getComponentCategoryChilds(const Uuid& parent) const throw (Exception)
 {
     return getCategoryChilds("component_categories", parent);
 }
 
-QSet<Uuid> Library::getPackageCategoryChilds(const Uuid& parent) const throw (Exception)
+QSet<Uuid> WorkspaceLibrary::getPackageCategoryChilds(const Uuid& parent) const throw (Exception)
 {
     return getCategoryChilds("package_categories", parent);
 }
 
-QSet<Uuid> Library::getComponentsByCategory(const Uuid& category) const throw (Exception)
+QSet<Uuid> WorkspaceLibrary::getComponentsByCategory(const Uuid& category) const throw (Exception)
 {
     return getElementsByCategory("components", "component_id", category);
 }
 
-QSet<Uuid> Library::getDevicesOfComponent(const Uuid& component) const throw (Exception)
+QSet<Uuid> WorkspaceLibrary::getDevicesOfComponent(const Uuid& component) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
         "SELECT uuid, filepath FROM devices WHERE component_uuid = :uuid");
@@ -238,7 +240,7 @@ QSet<Uuid> Library::getDevicesOfComponent(const Uuid& component) const throw (Ex
  *  General Methods
  ****************************************************************************************/
 
-int Library::rescan() throw (Exception)
+int WorkspaceLibrary::rescan() throw (Exception)
 {
     clearAllTables();
 
@@ -260,7 +262,7 @@ int Library::rescan() throw (Exception)
  ****************************************************************************************/
 
 template <typename ElementType>
-int Library::addCategoriesToDb(const QList<FilePath>& dirs, const QString& tablename,
+int WorkspaceLibrary::addCategoriesToDb(const QList<FilePath>& dirs, const QString& tablename,
                                const QString& id_rowname) throw (Exception)
 {
     int count = 0;
@@ -297,7 +299,7 @@ int Library::addCategoriesToDb(const QList<FilePath>& dirs, const QString& table
 }
 
 template <typename ElementType>
-int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
+int WorkspaceLibrary::addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
                              const QString& id_rowname) throw (Exception)
 {
     int count = 0;
@@ -345,7 +347,7 @@ int Library::addElementsToDb(const QList<FilePath>& dirs, const QString& tablena
     return count;
 }
 
-int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
+int WorkspaceLibrary::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
                             const QString& id_rowname) throw (Exception)
 {
     int count = 0;
@@ -395,7 +397,7 @@ int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablenam
     return count;
 }
 
-QMultiMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablename,
+QMultiMap<Version, FilePath> WorkspaceLibrary::getElementFilePathsFromDb(const QString& tablename,
                                                                 const Uuid& uuid) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
@@ -424,7 +426,7 @@ QMultiMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& t
     return elements;
 }
 
-FilePath Library::getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept
+FilePath WorkspaceLibrary::getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept
 {
     if (list.isEmpty())
         return FilePath();
@@ -432,7 +434,7 @@ FilePath Library::getLatestVersionFilePath(const QMultiMap<Version, FilePath>& l
         return list.last(); // highest version number
 }
 
-QSet<Uuid> Library::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception)
+QSet<Uuid> WorkspaceLibrary::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
         "SELECT uuid FROM " % tablename % " WHERE parent_uuid " %
@@ -452,7 +454,7 @@ QSet<Uuid> Library::getCategoryChilds(const QString& tablename, const Uuid& cate
     return elements;
 }
 
-QSet<Uuid> Library::getElementsByCategory(const QString& tablename,
+QSet<Uuid> WorkspaceLibrary::getElementsByCategory(const QString& tablename,
     const QString& idrowname, const Uuid& categoryUuid) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
@@ -475,7 +477,7 @@ QSet<Uuid> Library::getElementsByCategory(const QString& tablename,
     return elements;
 }
 
-void Library::createAllTables() throw (Exception)
+void WorkspaceLibrary::createAllTables() throw (Exception)
 {
     QStringList queries;
 
@@ -665,7 +667,7 @@ void Library::createAllTables() throw (Exception)
     }
 }
 
-void Library::clearAllTables() throw (Exception)
+void WorkspaceLibrary::clearAllTables() throw (Exception)
 {
     QStringList queries;
 
@@ -716,7 +718,7 @@ void Library::clearAllTables() throw (Exception)
     }
 }
 
-QMultiMap<QString, FilePath> Library::getAllElementDirectories() throw (Exception)
+QMultiMap<QString, FilePath> WorkspaceLibrary::getAllElementDirectories() throw (Exception)
 {
     QMultiMap<QString, FilePath> map;
     QStringList filter = QStringList() << "*.dev" << "*.cmpcat" << "*.cmp"
@@ -729,7 +731,7 @@ QMultiMap<QString, FilePath> Library::getAllElementDirectories() throw (Exceptio
     return map;
 }
 
-QSqlQuery Library::prepareQuery(const QString& query) const throw (Exception)
+QSqlQuery WorkspaceLibrary::prepareQuery(const QString& query) const throw (Exception)
 {
     QSqlQuery q(mLibDatabase);
     if (!q.prepare(query))
@@ -741,7 +743,7 @@ QSqlQuery Library::prepareQuery(const QString& query) const throw (Exception)
     return q;
 }
 
-int Library::execQuery(QSqlQuery& query, bool checkId) const throw (Exception)
+int WorkspaceLibrary::execQuery(QSqlQuery& query, bool checkId) const throw (Exception)
 {
     if (!query.exec())
     {
@@ -764,5 +766,5 @@ int Library::execQuery(QSqlQuery& query, bool checkId) const throw (Exception)
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb

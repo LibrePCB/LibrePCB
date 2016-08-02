@@ -32,10 +32,6 @@
  ****************************************************************************************/
 namespace librepcb {
 
-namespace library{
-class Library;
-}
-
 namespace project{
 class Project;
 }
@@ -46,6 +42,7 @@ class ProjectTreeModel;
 class RecentProjectsModel;
 class FavoriteProjectsModel;
 class WorkspaceSettings;
+class WorkspaceLibrary;
 
 /*****************************************************************************************
  *  Class Workspace
@@ -118,7 +115,7 @@ class Workspace final : public QObject
         /**
          * @brief Get the workspace library
          */
-        library::Library& getLibrary() const {return *mLibrary;}
+        WorkspaceLibrary& getLibrary() const {return *mLibrary;}
 
 
         // Project Management
@@ -210,7 +207,7 @@ class Workspace final : public QObject
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
-        library::Library* mLibrary; ///< the library of the workspace
+        WorkspaceLibrary* mLibrary; ///< the library of the workspace
         ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects

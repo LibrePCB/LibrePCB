@@ -32,10 +32,13 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-
-class Library;
 class ComponentCategory;
 class PackageCategory;
+}
+
+namespace workspace {
+
+class WorkspaceLibrary;
 
 /*****************************************************************************************
  *  Class CategoryTreeItem
@@ -49,7 +52,7 @@ class CategoryTreeItem final
     public:
 
         // Constructors / Destructor
-        CategoryTreeItem(const Library& library, const QStringList localeOrder,
+        CategoryTreeItem(const WorkspaceLibrary& library, const QStringList localeOrder,
                          CategoryTreeItem* parent, const Uuid& uuid) noexcept;
         ~CategoryTreeItem() noexcept;
 
@@ -74,7 +77,7 @@ class CategoryTreeItem final
         QStringList mLocaleOrder;
         CategoryTreeItem* mParent;
         Uuid mUuid;
-        ComponentCategory* mCategory;
+        library::ComponentCategory* mCategory;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
         QString mExceptionMessage;
         QList<CategoryTreeItem*> mChilds;
@@ -84,7 +87,7 @@ class CategoryTreeItem final
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H

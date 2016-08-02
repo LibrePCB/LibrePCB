@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdadddevicetoboard.h"
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/dev/device.h>
 #include <librepcblibrary/pkg/package.h>

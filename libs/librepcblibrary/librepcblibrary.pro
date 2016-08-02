@@ -30,14 +30,11 @@ HEADERS += \
     sym/symbolpin.h \
     sym/symbolpinpreviewgraphicsitem.h \
     sym/symbolpreviewgraphicsitem.h \
-    library.h \
     librarybaseelement.h \
     libraryelement.h \
     libraryelementattribute.h \
     pkg/footprintpad.h \
     cat/librarycategory.h \
-    cat/categorytreemodel.h \
-    cat/categorytreeitem.h \
     elements.h \
     dev/device.h \
     cmp/component.h \
@@ -61,14 +58,11 @@ SOURCES += \
     sym/symbolpin.cpp \
     sym/symbolpinpreviewgraphicsitem.cpp \
     sym/symbolpreviewgraphicsitem.cpp \
-    library.cpp \
     librarybaseelement.cpp \
     libraryelement.cpp \
     libraryelementattribute.cpp \
     pkg/footprintpad.cpp \
     cat/librarycategory.cpp \
-    cat/categorytreemodel.cpp \
-    cat/categorytreeitem.cpp \
     dev/device.cpp \
     cmp/componentsignal.cpp \
     cmp/componentsymbolvariant.cpp \

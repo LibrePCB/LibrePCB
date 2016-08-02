@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddsymboltoschematic.h"
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbworkspace/workspace.h>

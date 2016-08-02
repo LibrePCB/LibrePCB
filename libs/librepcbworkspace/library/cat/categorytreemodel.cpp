@@ -23,20 +23,20 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "categorytreemodel.h"
-#include "../library.h"
+#include "../workspacelibrary.h"
 #include "categorytreeitem.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace library {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeModel::CategoryTreeModel(const Library& library, const QStringList& localeOrder) noexcept :
+CategoryTreeModel::CategoryTreeModel(const WorkspaceLibrary& library, const QStringList& localeOrder) noexcept :
     QAbstractItemModel(nullptr)
 {
     mRootItem = new CategoryTreeItem(library, localeOrder, nullptr, Uuid());
@@ -129,5 +129,5 @@ CategoryTreeItem* CategoryTreeModel::getItem(const QModelIndex& index) const
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb

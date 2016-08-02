@@ -29,9 +29,9 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace library {
+namespace workspace {
 
-class Library;
+class WorkspaceLibrary;
 class CategoryTreeItem;
 
 /*****************************************************************************************
@@ -48,7 +48,7 @@ class CategoryTreeModel final : public QAbstractItemModel
     public:
 
         // Constructors / Destructor
-        explicit CategoryTreeModel(const Library& library, const QStringList& localeOrder) noexcept;
+        explicit CategoryTreeModel(const WorkspaceLibrary& library, const QStringList& localeOrder) noexcept;
         ~CategoryTreeModel() noexcept;
 
         // Inherited Methods
@@ -79,7 +79,7 @@ class CategoryTreeModel final : public QAbstractItemModel
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb
 
 #endif // LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H

@@ -5,15 +5,16 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcblibrary/library.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/dev/device.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 
 using namespace librepcb;
 using namespace librepcb::library;
+using namespace librepcb::workspace;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
@@ -75,7 +76,7 @@ void MainWindow::on_pushButton_2_clicked()
     try
     {
         FilePath libDir(ui->workspacelibrarypath->text());
-        Library lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
+        WorkspaceLibrary lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
 
         for (int i = 0; i < ui->projectfiles->count(); i++)
         {
@@ -178,7 +179,7 @@ void MainWindow::on_rescanlib_clicked()
     try
     {
         FilePath libDir(ui->workspacelibrarypath->text());
-        Library lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
+        WorkspaceLibrary lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
         lib.rescan();
         QMessageBox::information(this, tr("Library Rescan"), tr("Successfully"));
     }

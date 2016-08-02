@@ -34,7 +34,6 @@
 #include "../../dialogs/addcomponentdialog.h"
 #include <librepcbcommon/gridproperties.h>
 #include <librepcbworkspace/workspace.h>
-#include <librepcblibrary/library.h>
 #include <librepcblibrary/sym/symbol.h>
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"

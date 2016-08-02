@@ -22,21 +22,23 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "categorytreeitem.h"
-#include "../library.h"
-#include "componentcategory.h"
-#include "packagecategory.h"
+#include "../workspacelibrary.h"
+#include <librepcblibrary/cat/componentcategory.h>
+#include <librepcblibrary/cat/packagecategory.h>
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace library {
+namespace workspace {
+
+using namespace library;
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeItem::CategoryTreeItem(const Library& library, const QStringList localeOrder,
+CategoryTreeItem::CategoryTreeItem(const WorkspaceLibrary& library, const QStringList localeOrder,
                                    CategoryTreeItem* parent, const Uuid& uuid) noexcept :
     mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid), mCategory(nullptr),
     mDepth(parent ? parent->getDepth() + 1 : 0), mExceptionMessage()
@@ -131,5 +133,5 @@ QVariant CategoryTreeItem::data(int role) const noexcept
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
+} // namespace workspace
 } // namespace librepcb

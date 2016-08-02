@@ -32,7 +32,7 @@
 #include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbworkspace/workspace.h>
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>

@@ -41,12 +41,12 @@ class Component;
 class ComponentSymbolVariant;
 class Symbol;
 class SymbolPreviewGraphicsItem;
-class CategoryTreeModel;
 class ComponentCategory;
 }
 
 namespace workspace {
 class Workspace;
+class CategoryTreeModel;
 }
 
 namespace project {
@@ -106,7 +106,7 @@ class AddComponentDialog final : public QDialog
         Project& mProject;
         Ui::AddComponentDialog* mUi;
         GraphicsScene* mPreviewScene;
-        library::CategoryTreeModel* mCategoryTreeModel;
+        workspace::CategoryTreeModel* mCategoryTreeModel;
 
 
         // Attributes

@@ -30,7 +30,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbworkspace/projecttreemodel.h>
 #include <librepcbworkspace/projecttreeitem.h>
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbcommon/application.h>
 #include "../markdown/markdownconverter.h"

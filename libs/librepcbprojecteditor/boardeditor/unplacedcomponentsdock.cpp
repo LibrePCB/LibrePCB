@@ -29,7 +29,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>
 #include <librepcbproject/circuit/componentinstance.h>
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>

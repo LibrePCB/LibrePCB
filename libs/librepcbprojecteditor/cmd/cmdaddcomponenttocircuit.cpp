@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddcomponenttocircuit.h"
-#include <librepcblibrary/library.h>
+#include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbproject/project.h>
