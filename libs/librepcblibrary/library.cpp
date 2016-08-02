@@ -55,20 +55,21 @@ Library::Library(const FilePath& libDirPath, const FilePath& cacheFilePath) thro
     mLibDatabase.setConnectOptions("foreign_keys = ON");
 
     // check if database is valid
-    if ( ! mLibDatabase.isValid())
-    {
+    if ( ! mLibDatabase.isValid()) {
         throw RuntimeError(__FILE__, __LINE__, mLibFilePath.toStr(),
             QString(tr("Invalid library file: \"%1\"")).arg(mLibFilePath.toNative()));
     }
 
-    if ( ! mLibDatabase.open())
-    {
+    if ( ! mLibDatabase.open()) {
         throw RuntimeError(__FILE__, __LINE__, mLibFilePath.toStr(),
             QString(tr("Could not open library file: \"%1\"")).arg(mLibFilePath.toNative()));
     }
+
+    // create all tables which do not already exist
+    createAllTables(); // can throw
 }
 
-Library::~Library()
+Library::~Library() noexcept
 {
     mLibDatabase.close();
 }
@@ -239,7 +240,7 @@ QSet<Uuid> Library::getDevicesOfComponent(const Uuid& component) const throw (Ex
 
 int Library::rescan() throw (Exception)
 {
-    clearDatabaseAndCreateTables();
+    clearAllTables();
 
     int count = 0;
     QMultiMap<QString, FilePath> dirs = getAllElementDirectories();
@@ -395,7 +396,7 @@ int Library::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablenam
 }
 
 QMultiMap<Version, FilePath> Library::getElementFilePathsFromDb(const QString& tablename,
-                                                                const Uuid& uuid) const noexcept
+                                                                const Uuid& uuid) const throw (Exception)
 {
     QSqlQuery query = prepareQuery(
         "SELECT version, filepath FROM " % tablename % " "
@@ -474,13 +475,12 @@ QSet<Uuid> Library::getElementsByCategory(const QString& tablename,
     return elements;
 }
 
-void Library::clearDatabaseAndCreateTables() throw (Exception)
+void Library::createAllTables() throw (Exception)
 {
     QStringList queries;
 
     // internal
-    queries << QString( "DROP TABLE IF EXISTS internal");
-    queries << QString( "CREATE TABLE internal ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS internal ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`key` TEXT UNIQUE NOT NULL, "
                         "`value_text` TEXT, "
@@ -490,14 +490,12 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // repositories
-    queries << QString( "DROP TABLE IF EXISTS repositories_tr");
-    queries << QString( "DROP TABLE IF EXISTS repositories");
-    queries << QString( "CREATE TABLE repositories ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS repositories ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL "
                         ")");
-    queries << QString( "CREATE TABLE repositories_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS repositories_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`repo_id` INTEGER REFERENCES repositories(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -508,16 +506,14 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // component categories
-    queries << QString( "DROP TABLE IF EXISTS component_categories_tr");
-    queries << QString( "DROP TABLE IF EXISTS component_categories");
-    queries << QString( "CREATE TABLE component_categories ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS component_categories ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL, "
                         "`parent_uuid` TEXT"
                         ")");
-    queries << QString( "CREATE TABLE component_categories_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS component_categories_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`cat_id` INTEGER REFERENCES component_categories(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -528,16 +524,14 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // package categories
-    queries << QString( "DROP TABLE IF EXISTS package_categories_tr");
-    queries << QString( "DROP TABLE IF EXISTS package_categories");
-    queries << QString( "CREATE TABLE package_categories ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS package_categories ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL, "
                         "`parent_uuid` TEXT"
                         ")");
-    queries << QString( "CREATE TABLE package_categories_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS package_categories_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`cat_id` INTEGER REFERENCES package_categories(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -548,16 +542,13 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // symbols
-    queries << QString( "DROP TABLE IF EXISTS symbols_tr");
-    queries << QString( "DROP TABLE IF EXISTS symbols_cat");
-    queries << QString( "DROP TABLE IF EXISTS symbols");
-    queries << QString( "CREATE TABLE symbols ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS symbols ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL"
                         ")");
-    queries << QString( "CREATE TABLE symbols_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS symbols_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -566,7 +557,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(symbol_id, locale)"
                         ")");
-    queries << QString( "CREATE TABLE symbols_cat ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS symbols_cat ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
@@ -574,16 +565,13 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // spice models
-    queries << QString( "DROP TABLE IF EXISTS spice_models_tr");
-    queries << QString( "DROP TABLE IF EXISTS spice_models_cat");
-    queries << QString( "DROP TABLE IF EXISTS spice_models");
-    queries << QString( "CREATE TABLE spice_models ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL"
                         ")");
-    queries << QString( "CREATE TABLE spice_models_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`model_id` INTEGER REFERENCES spice_models(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -592,7 +580,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(model_id, locale)"
                         ")");
-    queries << QString( "CREATE TABLE spice_models_cat ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models_cat ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`model_id` INTEGER REFERENCES spice_models(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
@@ -600,16 +588,13 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // packages
-    queries << QString( "DROP TABLE IF EXISTS packages_tr");
-    queries << QString( "DROP TABLE IF EXISTS packages_cat");
-    queries << QString( "DROP TABLE IF EXISTS packages");
-    queries << QString( "CREATE TABLE packages ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS packages ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL "
                         ")");
-    queries << QString( "CREATE TABLE packages_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS packages_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -618,7 +603,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(package_id, locale)"
                         ")");
-    queries << QString( "CREATE TABLE packages_cat ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS packages_cat ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
@@ -626,16 +611,13 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // components
-    queries << QString( "DROP TABLE IF EXISTS components_tr");
-    queries << QString( "DROP TABLE IF EXISTS components_cat");
-    queries << QString( "DROP TABLE IF EXISTS components");
-    queries << QString( "CREATE TABLE components ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS components ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL"
                         ")");
-    queries << QString( "CREATE TABLE components_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS components_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -644,7 +626,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(component_id, locale)"
                         ")");
-    queries << QString( "CREATE TABLE components_cat ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS components_cat ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
@@ -652,10 +634,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // devices
-    queries << QString( "DROP TABLE IF EXISTS devices_tr");
-    queries << QString( "DROP TABLE IF EXISTS devices_cat");
-    queries << QString( "DROP TABLE IF EXISTS devices");
-    queries << QString( "CREATE TABLE devices ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS devices ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
@@ -663,7 +642,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`component_uuid` TEXT NOT NULL, "
                         "`package_uuid` TEXT NOT NULL"
                         ")");
-    queries << QString( "CREATE TABLE devices_tr ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS devices_tr ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
@@ -672,7 +651,7 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         "`keywords` TEXT, "
                         "UNIQUE(device_id, locale)"
                         ")");
-    queries << QString( "CREATE TABLE devices_cat ("
+    queries << QString( "CREATE TABLE IF NOT EXISTS devices_cat ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                         "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
@@ -680,8 +659,58 @@ void Library::clearDatabaseAndCreateTables() throw (Exception)
                         ")");
 
     // execute queries
-    foreach (const QString& string, queries)
-    {
+    foreach (const QString& string, queries) {
+        QSqlQuery query = prepareQuery(string);
+        execQuery(query, false);
+    }
+}
+
+void Library::clearAllTables() throw (Exception)
+{
+    QStringList queries;
+
+    // internal
+    queries << QString( "DELETE FROM internal");
+
+    // repositories
+    queries << QString( "DELETE FROM repositories_tr");
+    queries << QString( "DELETE FROM repositories");
+
+    // component categories
+    queries << QString( "DELETE FROM component_categories_tr");
+    queries << QString( "DELETE FROM component_categories");
+
+    // package categories
+    queries << QString( "DELETE FROM package_categories_tr");
+    queries << QString( "DELETE FROM package_categories");
+
+    // symbols
+    queries << QString( "DELETE FROM symbols_tr");
+    queries << QString( "DELETE FROM symbols_cat");
+    queries << QString( "DELETE FROM symbols");
+
+    // spice models
+    queries << QString( "DELETE FROM spice_models_tr");
+    queries << QString( "DELETE FROM spice_models_cat");
+    queries << QString( "DELETE FROM spice_models");
+
+    // packages
+    queries << QString( "DELETE FROM packages_tr");
+    queries << QString( "DELETE FROM packages_cat");
+    queries << QString( "DELETE FROM packages");
+
+    // components
+    queries << QString( "DELETE FROM components_tr");
+    queries << QString( "DELETE FROM components_cat");
+    queries << QString( "DELETE FROM components");
+
+    // devices
+    queries << QString( "DELETE FROM devices_tr");
+    queries << QString( "DELETE FROM devices_cat");
+    queries << QString( "DELETE FROM devices");
+
+    // execute queries
+    foreach (const QString& string, queries) {
         QSqlQuery query = prepareQuery(string);
         execQuery(query, false);
     }

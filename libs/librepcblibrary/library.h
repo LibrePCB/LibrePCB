@@ -69,6 +69,8 @@ class Library final : public QObject
     public:
 
         // Constructors / Destructor
+        Library() = delete;
+        Library(const Library& other) = delete;
 
         /**
         * @brief Constructor to open the library of an existing workspace
@@ -80,7 +82,7 @@ class Library final : public QObject
         *                  an exception.
         */
         explicit Library(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception);
-        ~Library();
+        ~Library() noexcept;
 
 
         // Getters: Library Elements by their UUID
@@ -119,14 +121,11 @@ class Library final : public QObject
          */
         int rescan() throw (Exception);
 
+        // Operator Overloadings
+        Library& operator=(const Library& rhs) = delete;
+
 
     private:
-
-        // make some methods inaccessible...
-        Library();
-        Library(const Library& other);
-        Library& operator=(const Library& rhs);
-
 
         // Private Methods
         template <typename ElementType>
@@ -138,12 +137,13 @@ class Library final : public QObject
         int addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
                            const QString& id_rowname) throw (Exception);
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
-                                                               const Uuid& uuid) const noexcept;
+                                                               const Uuid& uuid) const throw (Exception);
         FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
         QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception);
         QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
                                           const Uuid& categoryUuid) const throw (Exception);
-        void clearDatabaseAndCreateTables() throw (Exception);
+        void createAllTables() throw (Exception);
+        void clearAllTables() throw (Exception);
         QMultiMap<QString, FilePath> getAllElementDirectories() throw (Exception);
         QSqlQuery prepareQuery(const QString& query) const throw (Exception);
         int execQuery(QSqlQuery& query, bool checkId) const throw (Exception);
