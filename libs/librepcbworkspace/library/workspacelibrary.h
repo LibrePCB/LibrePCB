@@ -38,6 +38,8 @@ class Version;
 
 namespace workspace {
 
+class Workspace;
+
 /*****************************************************************************************
  *  Class WorkspaceLibrary
  ****************************************************************************************/
@@ -73,7 +75,7 @@ class WorkspaceLibrary final : public QObject
         * @throw Exception If the library could not be opened, this constructor throws
         *                  an exception.
         */
-        explicit WorkspaceLibrary(const FilePath& libDirPath, const FilePath& cacheFilePath) throw (Exception);
+        explicit WorkspaceLibrary(Workspace& ws) throw (Exception);
         ~WorkspaceLibrary() noexcept;
 
 
@@ -142,8 +144,8 @@ class WorkspaceLibrary final : public QObject
 
 
         // Attributes
-        FilePath mLibPath; ///< a FilePath object which represents the library directory
-        FilePath mLibFilePath; ///< a #FilePath object which represents the library_cache.sqlite file
+        Workspace& mWorkspace;
+        FilePath mLibDbFilePath; ///< a #FilePath object which represents the library_cache.sqlite file
         QSqlDatabase mLibDatabase; ///< the SQLite database of the file #mLibFilePath
 };
 

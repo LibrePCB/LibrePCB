@@ -10,6 +10,7 @@
 #include <librepcblibrary/dev/device.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
+#include <librepcbworkspace/workspace.h>
 #include <librepcbworkspace/library/workspacelibrary.h>
 
 using namespace librepcb;
@@ -24,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QSettings s;
     restoreGeometry(s.value("mainwindow/geometry").toByteArray());
     restoreState(s.value("mainwindow/state").toByteArray());
-    ui->workspacelibrarypath->setText(s.value("mainwindow/library_directory").toString());
+    ui->workspacepath->setText(s.value("mainwindow/workspace_directory").toString());
     ui->projectfiles->addItems(s.value("mainwindow/projects").toStringList());
 }
 
@@ -37,7 +38,7 @@ MainWindow::~MainWindow()
     QSettings s;
     s.setValue("mainwindow/geometry", saveGeometry());
     s.setValue("mainwindow/state", saveState());
-    s.setValue("mainwindow/library_directory", ui->workspacelibrarypath->text());
+    s.setValue("mainwindow/workspace_directory", ui->workspacepath->text());
     s.setValue("mainwindow/projects", QVariant::fromValue(projectList));
 
     delete ui;
@@ -45,10 +46,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_libBtn_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, "Select Workspace Library Folder",
-                                                    ui->workspacelibrarypath->text());
+    QString dir = QFileDialog::getExistingDirectory(this, "Select Workspace Directory",
+                                                    ui->workspacepath->text());
     if (dir.isEmpty()) return;
-    ui->workspacelibrarypath->setText(dir);
+    ui->workspacepath->setText(dir);
 }
 
 void MainWindow::on_addProjectBtn_clicked()
@@ -69,14 +70,14 @@ void MainWindow::on_clrProjectBtn_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    if (ui->workspacelibrarypath->text().isEmpty()) return;
+    if (ui->workspacepath->text().isEmpty()) return;
     if (ui->projectfiles->count() == 0) return;
     ui->log->clear();
 
     try
     {
-        FilePath libDir(ui->workspacelibrarypath->text());
-        WorkspaceLibrary lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
+        FilePath workspacePath(ui->workspacepath->text());
+        Workspace workspace(workspacePath);
 
         for (int i = 0; i < ui->projectfiles->count(); i++)
         {
@@ -91,7 +92,7 @@ void MainWindow::on_pushButton_2_clicked()
                  node; node = node->getNextSibling())
             {
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
-                FilePath filepath = lib.getLatestComponent(compUuid);
+                FilePath filepath = workspace.getLibrary().getLatestComponent(compUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -108,7 +109,7 @@ void MainWindow::on_pushButton_2_clicked()
                 {
                     foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
                     {
-                        FilePath filepath = lib.getLatestSymbol(symbolUuid);
+                        FilePath filepath = workspace.getLibrary().getLatestSymbol(symbolUuid);
                         if (!filepath.isValid())
                         {
                             throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -134,7 +135,7 @@ void MainWindow::on_pushButton_2_clicked()
                      node; node = node->getNextSibling())
                 {
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
-                    FilePath filepath = lib.getLatestDevice(deviceUuid);
+                    FilePath filepath = workspace.getLibrary().getLatestDevice(deviceUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -148,7 +149,7 @@ void MainWindow::on_pushButton_2_clicked()
 
                     // get package
                     Uuid packUuid = latestDevice.getPackageUuid();
-                    filepath = lib.getLatestPackage(packUuid);
+                    filepath = workspace.getLibrary().getLatestPackage(packUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -174,13 +175,13 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_rescanlib_clicked()
 {
-    if (ui->workspacelibrarypath->text().isEmpty()) return;
+    if (ui->workspacepath->text().isEmpty()) return;
 
     try
     {
-        FilePath libDir(ui->workspacelibrarypath->text());
-        WorkspaceLibrary lib(libDir, libDir.getPathTo(QString("../.metadata/v%1/library_cache.sqlite").arg(APP_VERSION_MAJOR)));
-        lib.rescan();
+        FilePath workspacePath(ui->workspacepath->text());
+        Workspace workspace(workspacePath);
+        workspace.getLibrary().rescan();
         QMessageBox::information(this, tr("Library Rescan"), tr("Successfully"));
     }
     catch (Exception& e)

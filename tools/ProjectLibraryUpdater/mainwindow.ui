@@ -25,7 +25,7 @@
     <item row="2" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Workspace Library:</string>
+       <string>Workspace:</string>
       </property>
      </widget>
     </item>
@@ -125,7 +125,7 @@
     <item row="2" column="1" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLineEdit" name="workspacelibrarypath"/>
+       <widget class="QLineEdit" name="workspacepath"/>
       </item>
       <item>
        <widget class="QToolButton" name="libBtn">

@@ -103,7 +103,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mRecentProjectsModel = new RecentProjectsModel(*this);
         mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
         mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibrary = new WorkspaceLibrary(mLibraryPath, mMetadataPath.getPathTo("library_cache.sqlite"));
+        mLibrary = new WorkspaceLibrary(*this);
     }
     catch (Exception& e)
     {

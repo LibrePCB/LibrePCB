@@ -13,7 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml sql
+QT += core widgets network xml sql
 
 LIBS += \
     -L$${DESTDIR} \
