@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_debugtools.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,42 +35,57 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_DebugTools::WSI_DebugTools(WorkspaceSettings& settings) :
-    WSI_Base(settings), mWidget(nullptr)
+WSI_DebugTools::WSI_DebugTools(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement)
 {
+    if (xmlElement) {
+        // load setting
+    }
+
     // create a QWidget
-    mWidget = new QWidget();
-    QGridLayout* layout = new QGridLayout(mWidget);
+    mWidget.reset(new QWidget());
+    QGridLayout* layout = new QGridLayout(mWidget.data());
 #ifndef QT_DEBUG
     layout->addWidget(new QLabel(tr("Warning: Some of these settings may only work in DEBUG mode!")), 0, 0);
 #endif
 
     // stretch the last row
     layout->setRowStretch(layout->rowCount(), 1);
-
-    // load from settings
-    revert();
 }
 
-WSI_DebugTools::~WSI_DebugTools()
+WSI_DebugTools::~WSI_DebugTools() noexcept
 {
-    delete mWidget;         mWidget = nullptr;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_DebugTools::restoreDefault()
+void WSI_DebugTools::restoreDefault() noexcept
 {
 }
 
-void WSI_DebugTools::apply()
+void WSI_DebugTools::apply() noexcept
 {
 }
 
-void WSI_DebugTools::revert()
+void WSI_DebugTools::revert() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+XmlDomElement* WSI_DebugTools::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    return root.take();
+}
+
+bool WSI_DebugTools::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

@@ -22,6 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include<librepcbcommon/fileio/smartxmlfile.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
 #include "workspacesettingsdialog.h"
@@ -36,46 +39,44 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
-    QObject(0), mMetadataPath(workspace.getMetadataPath()), mDialog(0),
-    mAppLocale(0), mProjectAutosaveInterval(0), mLibraryLocaleOrder(0),
-    mLibraryNormOrder(0), mDebugTools(0), mAppearance(0)
+WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exception) :
+    QObject(nullptr), mXmlFilePath(workspace.getMetadataPath().getPathTo("settings.xml"))
 {
-    // check if the metadata directory exists
-    if (!mMetadataPath.isExistingDir())
-    {
-        throw RuntimeError(__FILE__, __LINE__, mMetadataPath.toStr(), QString(
-            tr("Invalid workspace metadata path: \"%1\"")).arg(mMetadataPath.toNative()));
+    qDebug("Load workspace settings...");
+
+    // load settings if the settings file exists
+    QSharedPointer<XmlDomDocument> doc;
+    if (mXmlFilePath.isExistingFile()) {
+        SmartXmlFile file(mXmlFilePath, false, true);
+        doc = file.parseFileAndBuildDomTree(true);
+    } else {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+        qInfo("Workspace settings file not found, default settings will be used.");
+#else
+        qWarning("Workspace settings file not found, default settings will be used.");
+#endif
     }
 
-    // check if the file settings.ini is writable
-    QSettings s(mMetadataPath.getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-    if ((!s.isWritable()) || (s.status() != QSettings::NoError))
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("status = %1").arg(s.status()),
-            QString(tr("Error while opening \"%1\"! Please check write permissions!"))
-            .arg(QDir::toNativeSeparators(s.fileName())));
-    }
-
-    // load all settings items
-    mItems.append(mAppLocale                = new WSI_AppLocale(*this));
-    mItems.append(mAppDefMeasUnits          = new WSI_AppDefaultMeasurementUnits(*this));
-    mItems.append(mProjectAutosaveInterval  = new WSI_ProjectAutosaveInterval(*this));
-    mItems.append(mLibraryLocaleOrder       = new WSI_LibraryLocaleOrder(*this));
-    mItems.append(mLibraryNormOrder         = new WSI_LibraryNormOrder(*this));
-    mItems.append(mDebugTools               = new WSI_DebugTools(*this));
-    mItems.append(mAppearance               = new WSI_Appearance(*this));
+    // load all settings
+    XmlDomElement* root = doc.data() ? &doc->getRoot() : nullptr;
+    loadSettingsItem(mAppLocale,                "app_locale",                   root);
+    loadSettingsItem(mAppDefMeasUnits,          "app_default_meas_units",       root);
+    loadSettingsItem(mProjectAutosaveInterval,  "project_autosave_interval",    root);
+    loadSettingsItem(mAppearance,               "appearance",                   root);
+    loadSettingsItem(mLibraryLocaleOrder,       "lib_locale_order",             root);
+    loadSettingsItem(mLibraryNormOrder,         "lib_norm_order",               root);
+    loadSettingsItem(mDebugTools,               "debug_tools",                  root);
 
     // load the settings dialog
-    mDialog = new WorkspaceSettingsDialog(*this);
+    mDialog.reset(new WorkspaceSettingsDialog(*this));
+
+    qDebug("Workspace settings successfully loaded!");
 }
 
-WorkspaceSettings::~WorkspaceSettings()
+WorkspaceSettings::~WorkspaceSettings() noexcept
 {
-    delete mDialog;         mDialog = 0;
-
-    // delete all settings items
-    qDeleteAll(mItems);     mItems.clear();
+    mDialog.reset(); // the dialog must be deleted *before* any settings object!
+    mItems.clear();
 }
 
 /*****************************************************************************************
@@ -84,29 +85,72 @@ WorkspaceSettings::~WorkspaceSettings()
 
 void WorkspaceSettings::restoreDefaults() noexcept
 {
-    foreach (WSI_Base* item, mItems)
+    foreach (WSI_Base* item, mItems) {
         item->restoreDefault();
+    }
 }
 
-void WorkspaceSettings::applyAll() noexcept
+void WorkspaceSettings::applyAll() throw (Exception)
 {
-    foreach (WSI_Base* item, mItems)
+    foreach (WSI_Base* item, mItems) {
         item->apply();
+    }
+
+    saveToFile(); // can throw
 }
 
 void WorkspaceSettings::revertAll() noexcept
 {
-    foreach (WSI_Base* item, mItems)
+    foreach (WSI_Base* item, mItems) {
         item->revert();
+    }
 }
 
 /*****************************************************************************************
  *  Public Slots
  ****************************************************************************************/
 
-void WorkspaceSettings::showSettingsDialog()
+void WorkspaceSettings::showSettingsDialog() noexcept
 {
     mDialog->exec(); // this is blocking
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+template<typename T>
+void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
+                                         XmlDomElement* xmlRoot) throw (Exception)
+{
+    XmlDomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
+    member.reset(new T(xmlTagName, node));
+    mItems.append(member.data());
+}
+
+void WorkspaceSettings::saveToFile() const throw (Exception)
+{
+    XmlDomDocument doc(*serializeToXmlDomElement());
+    doc.setFileVersion(APP_VERSION_MAJOR);
+
+    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
+    file->save(doc, true); // can throw
+}
+
+XmlDomElement* WorkspaceSettings::serializeToXmlDomElement() const throw (Exception)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("workspace_settings"));
+    foreach (WSI_Base* item, mItems) {
+        root->appendChild(item->serializeToXmlDomElement());
+    }
+    return root.take();
+}
+
+bool WorkspaceSettings::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

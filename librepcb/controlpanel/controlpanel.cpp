@@ -305,7 +305,7 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_actionNew_Project_triggered()
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
+    QSettings settings; // client settings
     FilePath lastNewFile(settings.value("controlpanel/last_new_project").toString());
     if (!lastNewFile.getParentDir().isExistingDir())
         lastNewFile.setPath(mWorkspace.getProjectsPath().toStr());
@@ -325,7 +325,7 @@ void ControlPanel::on_actionNew_Project_triggered()
 
 void ControlPanel::on_actionOpen_Project_triggered()
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
+    QSettings settings; // client settings
     QString lastOpenedFile = settings.value("controlpanel/last_open_project",
                              mWorkspace.getPath().toStr()).toString();
 

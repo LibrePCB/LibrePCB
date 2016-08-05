@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 // All Settings Classes
 #include "items/wsi_applocale.h"
@@ -49,60 +50,51 @@ class WorkspaceSettingsDialog;
  ****************************************************************************************/
 
 /**
- * @brief The WorkspaceSettings class manages all workspace related settings (and more)
+ * @brief The WorkspaceSettings class manages all workspace related settings
  *
- * The ".metadata" directory in a workspace is used to store workspace related settings
- * and other workspace related stuff. This class is an interface to such workspace related
- * stuff. A WorkspaceSettings object is created in the constructor of the Workspace object.
+ * The ".metadata/settings.xml" file in a workspace is used to store workspace related
+ * settings. This class is an interface to these settings. A WorkspaceSettings object is
+ * created in the constructor of the Workspace object.
  *
  * This class also provides a graphical dialog to show and edit all these settings. For
  * this purpose, the WorkspaceSettingsDialog class is used. It can be shown by calling
  * the slot #showSettingsDialog().
- *
- * Most of the settings are stored in the file ".metadata/settings.ini" by using QSettings
- * objects. But this file can also be used without using the WorkspaceSettings class. For
- * example the position of most windows (QMainWindow/QDialog) should be stored in the
- * workspace to restore their positions after the application is closed and restarted.
- * But these values are not really settings (they are not shown in the settings dialog),
- * so it does not make sense to manage them with this class... simply use your own
- * QSettings object and pass the filepath to the "settings.ini" file an use the
- * QSettings::IniFormat parameter. To get the filepath to the "settings.ini", you can use
- * the method WorkspaceSettings#getFilepath() without any arguments.
  *
  * @author ubruhin
  * @date 2014-07-12
  *
  * @todo Maybe use XML files instead of INI to save all workspace settings...
  */
-class WorkspaceSettings final : public QObject
+class WorkspaceSettings final : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        WorkspaceSettings(const Workspace& workspace);
-        ~WorkspaceSettings();
-
-
-        // Getters: General
-        const FilePath& getMetadataPath() const {return mMetadataPath;}
+        WorkspaceSettings() = delete;
+        WorkspaceSettings(const WorkspaceSettings& other) = delete;
+        explicit WorkspaceSettings(const Workspace& workspace) throw (Exception);
+        ~WorkspaceSettings() noexcept;
 
 
         // Getters: Settings Items
-        WSI_AppLocale* getAppLocale() const noexcept {return mAppLocale;}
-        WSI_AppDefaultMeasurementUnits* getAppDefMeasUnits() const noexcept {return mAppDefMeasUnits;}
-        WSI_ProjectAutosaveInterval* getProjectAutosaveInterval() const noexcept {return mProjectAutosaveInterval;}
-        WSI_LibraryLocaleOrder* getLibLocaleOrder() const noexcept {return mLibraryLocaleOrder;}
-        WSI_LibraryNormOrder* getLibNormOrder() const noexcept {return mLibraryNormOrder;}
-        WSI_DebugTools* getDebugTools() const noexcept {return mDebugTools;}
-        WSI_Appearance* getAppearance() const noexcept {return mAppearance;}
+        WSI_AppLocale& getAppLocale() const noexcept {return *mAppLocale;}
+        WSI_AppDefaultMeasurementUnits& getAppDefMeasUnits() const noexcept {return *mAppDefMeasUnits;}
+        WSI_ProjectAutosaveInterval& getProjectAutosaveInterval() const noexcept {return *mProjectAutosaveInterval;}
+        WSI_Appearance& getAppearance() const noexcept {return *mAppearance;}
+        WSI_LibraryLocaleOrder& getLibLocaleOrder() const noexcept {return *mLibraryLocaleOrder;}
+        WSI_LibraryNormOrder& getLibNormOrder() const noexcept {return *mLibraryNormOrder;}
+        WSI_DebugTools& getDebugTools() const noexcept {return *mDebugTools;}
 
 
         // General Methods
         void restoreDefaults() noexcept;
-        void applyAll() noexcept;
+        void applyAll() throw (Exception);
         void revertAll() noexcept;
+
+        // Operator Overloadings
+        WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;
 
 
     public slots:
@@ -113,30 +105,36 @@ class WorkspaceSettings final : public QObject
          * @note The dialog is application modal, so this method is blocking while the
          * dialog is open. This method will not return before the dialog is closed.
          */
-        void showSettingsDialog();
+        void showSettingsDialog() noexcept;
 
 
-    private:
+    private: // Methods
 
-        // make some methods inaccessible...
-        WorkspaceSettings(const WorkspaceSettings& other);
-        WorkspaceSettings& operator=(const WorkspaceSettings& rhs);
+        template<typename T>
+        void loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
+                              XmlDomElement* xmlRoot) throw (Exception);
+        void saveToFile() const throw (Exception);
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
+
+    private: // Data
 
         // General Attributes
-        FilePath mMetadataPath; ///< the ".metadata" directory in the workspace
-        WorkspaceSettingsDialog* mDialog; ///< the settings dialog
-
+        FilePath mXmlFilePath; ///< path to the ".metadata/settings.xml" file
+        QScopedPointer<WorkspaceSettingsDialog> mDialog; ///< the settings dialog
 
         // Settings Items
         QList<WSI_Base*> mItems; ///< contains all settings items
-        WSI_AppLocale* mAppLocale;
-        WSI_AppDefaultMeasurementUnits* mAppDefMeasUnits;
-        WSI_ProjectAutosaveInterval* mProjectAutosaveInterval;
-        WSI_LibraryLocaleOrder* mLibraryLocaleOrder;
-        WSI_LibraryNormOrder* mLibraryNormOrder;
-        WSI_DebugTools* mDebugTools;
-        WSI_Appearance* mAppearance;
+        QScopedPointer<WSI_AppLocale> mAppLocale;
+        QScopedPointer<WSI_AppDefaultMeasurementUnits> mAppDefMeasUnits;
+        QScopedPointer<WSI_ProjectAutosaveInterval> mProjectAutosaveInterval;
+        QScopedPointer<WSI_Appearance> mAppearance;
+        QScopedPointer<WSI_LibraryLocaleOrder> mLibraryLocaleOrder;
+        QScopedPointer<WSI_LibraryNormOrder> mLibraryNormOrder;
+        QScopedPointer<WSI_DebugTools> mDebugTools;
 };
 
 /*****************************************************************************************

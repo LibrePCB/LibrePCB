@@ -45,25 +45,25 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     // Add all settings widgets
 
     // tab: general
-    mUi->generalLayout->addRow(mSettings.getAppLocale()->getLabelText(),
-                               mSettings.getAppLocale()->getWidget());
-    mUi->generalLayout->addRow(mSettings.getAppDefMeasUnits()->getLengthUnitLabelText(),
-                               mSettings.getAppDefMeasUnits()->getLengthUnitComboBox());
-    mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval()->getLabelText(),
-                               mSettings.getProjectAutosaveInterval()->getWidget());
+    mUi->generalLayout->addRow(mSettings.getAppLocale().getLabelText(),
+                               mSettings.getAppLocale().getWidget());
+    mUi->generalLayout->addRow(mSettings.getAppDefMeasUnits().getLengthUnitLabelText(),
+                               mSettings.getAppDefMeasUnits().getLengthUnitComboBox());
+    mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval().getLabelText(),
+                               mSettings.getProjectAutosaveInterval().getWidget());
 
     // tab: appearance
-    mUi->appearanceLayout->addRow(mSettings.getAppearance()->getUseOpenGlLabelText(),
-                                 mSettings.getAppearance()->getUseOpenGlWidget());
+    mUi->appearanceLayout->addRow(mSettings.getAppearance().getUseOpenGlLabelText(),
+                                  mSettings.getAppearance().getUseOpenGlWidget());
 
     // tab: library
-    mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder()->getLabelText(),
-                               mSettings.getLibLocaleOrder()->getWidget());
-    mUi->libraryLayout->addRow(mSettings.getLibNormOrder()->getLabelText(),
-                               mSettings.getLibNormOrder()->getWidget());
+    mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder().getLabelText(),
+                               mSettings.getLibLocaleOrder().getWidget());
+    mUi->libraryLayout->addRow(mSettings.getLibNormOrder().getLabelText(),
+                               mSettings.getLibNormOrder().getWidget());
 
     // tab: debug tools
-    mUi->tabWidget->addTab(mSettings.getDebugTools()->getWidget(), tr("Debug Tools"));
+    mUi->tabWidget->addTab(mSettings.getDebugTools().getWidget(), tr("Debug Tools"));
 
     // load the window geometry
     QSettings clientSettings;
@@ -79,20 +79,20 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     // Remove all settings widgets from the dialog (important for memory management!)
 
     // tab: general
-    mSettings.getAppLocale()->getWidget()->setParent(0);
-    mSettings.getAppDefMeasUnits()->getLengthUnitComboBox()->setParent(0);
-    mSettings.getProjectAutosaveInterval()->getWidget()->setParent(0);
+    mSettings.getAppLocale().getWidget()->setParent(0);
+    mSettings.getAppDefMeasUnits().getLengthUnitComboBox()->setParent(0);
+    mSettings.getProjectAutosaveInterval().getWidget()->setParent(0);
 
     // tab: appearance
-    mSettings.getAppearance()->getUseOpenGlWidget()->setParent(0);
+    mSettings.getAppearance().getUseOpenGlWidget()->setParent(0);
 
     // tab: library
-    mSettings.getLibLocaleOrder()->getWidget()->setParent(0);
-    mSettings.getLibNormOrder()->getWidget()->setParent(0);
+    mSettings.getLibLocaleOrder().getWidget()->setParent(0);
+    mSettings.getLibNormOrder().getWidget()->setParent(0);
 
     // tab: debug tools
-    mUi->tabWidget->removeTab(mUi->tabWidget->indexOf(mSettings.getDebugTools()->getWidget()));
-    mSettings.getDebugTools()->getWidget()->setParent(0);
+    mUi->tabWidget->removeTab(mUi->tabWidget->indexOf(mSettings.getDebugTools().getWidget()));
+    mSettings.getDebugTools().getWidget()->setParent(0);
 
     // delete private member objects
     delete mUi;         mUi = 0;
@@ -104,8 +104,13 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
 
 void WorkspaceSettingsDialog::accept()
 {
-    mSettings.applyAll();
-    QDialog::accept();
+    try {
+        mSettings.applyAll(); // can throw
+        QDialog::accept();
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QDialog::reject();
+    }
 }
 
 void WorkspaceSettingsDialog::reject()
@@ -124,7 +129,11 @@ void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
     {
         case QDialogButtonBox::AcceptRole:
         case QDialogButtonBox::ApplyRole:
-            mSettings.applyAll();
+            try {
+                mSettings.applyAll(); // can throw
+            } catch (const Exception& e) {
+                QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+            }
             break;
 
         case QDialogButtonBox::RejectRole:

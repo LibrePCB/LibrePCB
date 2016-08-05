@@ -52,33 +52,39 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
     public:
 
         // Constructors / Destructor
-        explicit WSI_ProjectAutosaveInterval(WorkspaceSettings& settings);
-        ~WSI_ProjectAutosaveInterval();
+        WSI_ProjectAutosaveInterval() = delete;
+        WSI_ProjectAutosaveInterval(const WSI_ProjectAutosaveInterval& other) = delete;
+        WSI_ProjectAutosaveInterval(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        ~WSI_ProjectAutosaveInterval() noexcept;
 
         // Getters
-        unsigned int getInterval() const {return mInterval;}
+        unsigned int getInterval() const noexcept {return mInterval;}
 
         // Getters: Widgets
-        QString getLabelText() const {return tr("Project Autosave Interval:");}
-        QWidget* getWidget() const {return mWidget;}
+        QString getLabelText() const noexcept {return tr("Project Autosave Interval:");}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
 
         // General Methods
-        void restoreDefault();
-        void apply();
-        void revert();
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
 
-    public slots:
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-        // Public Slots
-        void spinBoxValueChanged(int value);
+        // Operator Overloadings
+        WSI_ProjectAutosaveInterval& operator=(const WSI_ProjectAutosaveInterval& rhs) = delete;
 
-    private:
 
-        // make some methods inaccessible...
-        WSI_ProjectAutosaveInterval();
-        WSI_ProjectAutosaveInterval(const WSI_ProjectAutosaveInterval& other);
-        WSI_ProjectAutosaveInterval& operator=(const WSI_ProjectAutosaveInterval& rhs);
+    private: // Methods
 
+        void spinBoxValueChanged(int value) noexcept;
+
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
+
+
+    private: // Data
 
         // General Attributes
 
@@ -87,12 +93,12 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
          *
          * Default: 600 seconds
          */
-        unsigned int mInterval;
-        unsigned int mIntervalTmp;
+        uint mInterval;
+        uint mIntervalTmp;
 
         // Widgets
-        QWidget* mWidget;
-        QSpinBox* mSpinBox;
+        QScopedPointer<QWidget> mWidget;
+        QScopedPointer<QSpinBox> mSpinBox;
 };
 
 /*****************************************************************************************

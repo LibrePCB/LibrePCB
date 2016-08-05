@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_applocale.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,14 +35,17 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
-    WSI_Base(settings), mWidget(0), mComboBox(0)
+WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement),
+    mAppLocale(), mAppLocaleTmp(mAppLocale)
 {
-    mAppLocale = loadValue("app_locale_name", QString()).toString();
-    mAppLocaleTmp = mAppLocale;
+    if (xmlElement) {
+        // load setting
+        mAppLocale = xmlElement->getText<QString>(false);
+        mAppLocaleTmp = mAppLocale;
+    }
 
-    if (!mAppLocale.isEmpty())
-    {
+    if (!mAppLocale.isEmpty()) {
         QLocale selectedLocale(mAppLocale);
         QLocale::setDefault(selectedLocale); // use the selected locale as the application's default locale
 
@@ -59,15 +63,13 @@ WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
     }
 
     // create a QComboBox with all available languages
-    mComboBox = new QComboBox();
-    mComboBox->addItem(tr("System Language"));
+    mComboBox.reset(new QComboBox());
+    mComboBox->addItem(tr("System Language"), QString(""));
     QDir translations(":/i18n/");
-    foreach (QString filename, translations.entryList(QDir::Files, QDir::Name))
-    {
+    foreach (QString filename, translations.entryList(QDir::Files, QDir::Name)) {
         filename.remove("librepcb_");
         QFileInfo fileInfo(filename);
-        if (fileInfo.suffix() == "qm")
-        {
+        if (fileInfo.suffix() == "qm") {
             QLocale loc(fileInfo.baseName());
             QString str(loc.nativeLanguageName() % " (" % loc.nativeCountryName() % ")");
             if (mComboBox->findData(loc.name()) < 0)
@@ -75,74 +77,77 @@ WSI_AppLocale::WSI_AppLocale(WorkspaceSettings& settings) :
         }
     }
     updateComboBoxIndex();
-    connect(mComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
+    connect(mComboBox.data(),
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &WSI_AppLocale::comboBoxIndexChanged);
 
     // create a QWidget
-    mWidget = new QWidget();
-    QVBoxLayout* layout = new QVBoxLayout(mWidget);
+    mWidget.reset(new QWidget());
+    QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+    layout->addWidget(mComboBox.data());
     layout->addWidget(new QLabel(tr("Changing the language needs to restart the application.")));
 }
 
-WSI_AppLocale::~WSI_AppLocale()
+WSI_AppLocale::~WSI_AppLocale() noexcept
 {
-    foreach (QTranslator* translator, mInstalledTranslators)
-    {
+    foreach (QTranslator* translator, mInstalledTranslators) {
         qApp->removeTranslator(translator);
         delete translator;
     }
     mInstalledTranslators.clear();
-
-    delete mComboBox;       mComboBox = 0;
-    delete mWidget;         mWidget = 0;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_AppLocale::restoreDefault()
+void WSI_AppLocale::restoreDefault() noexcept
 {
-    mAppLocaleTmp = QString();
+    mAppLocaleTmp = QString("");
     updateComboBoxIndex();
 }
 
-void WSI_AppLocale::apply()
+void WSI_AppLocale::apply() noexcept
 {
-    if (mAppLocale == mAppLocaleTmp)
-        return;
-
     mAppLocale = mAppLocaleTmp;
-    saveValue("app_locale_name", mAppLocale);
 }
 
-void WSI_AppLocale::revert()
+void WSI_AppLocale::revert() noexcept
 {
     mAppLocaleTmp = mAppLocale;
     updateComboBoxIndex();
 }
 
 /*****************************************************************************************
- *  Public Slots
+ *  Private Methods
  ****************************************************************************************/
 
-void WSI_AppLocale::comboBoxIndexChanged(int index)
+void WSI_AppLocale::comboBoxIndexChanged(int index) noexcept
 {
     mAppLocaleTmp = mComboBox->itemData(index).toString();
 }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void WSI_AppLocale::updateComboBoxIndex()
+void WSI_AppLocale::updateComboBoxIndex() noexcept
 {
     int index = mComboBox->findData(mAppLocaleTmp);
     mComboBox->setCurrentIndex(index > 0 ? index : 0);
 
-    if ((!mAppLocaleTmp.isEmpty()) && (index < 0))
+    if ((!mAppLocaleTmp.isEmpty()) && (index < 0)) {
         qWarning() << "could not find the language:" << mAppLocaleTmp;
+    }
+}
+
+XmlDomElement* WSI_AppLocale::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    root->setText(mAppLocale);
+    return root.take();
+}
+
+bool WSI_AppLocale::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

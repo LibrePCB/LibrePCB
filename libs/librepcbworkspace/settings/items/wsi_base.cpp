@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_base.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 #include "../workspacesettings.h"
 #include "../../workspace.h"
 
@@ -36,31 +37,24 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Base::WSI_Base(WorkspaceSettings& settings) :
-    QObject(0), mSettings(settings)
+WSI_Base::WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+    QObject(0), mXmlElementTagName(xmlTagName)
 {
+    Q_ASSERT((!xmlElement) || (xmlElement->getName() == xmlTagName));
 }
 
-WSI_Base::~WSI_Base()
+WSI_Base::~WSI_Base() noexcept
 {
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Public Methods
  ****************************************************************************************/
 
-void WSI_Base::saveValue(const QString& key, const QVariant& value)
+XmlDomElement* WSI_Base::serializeToXmlDomElement() const throw (Exception)
 {
-    QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
-                QSettings::IniFormat);
-    s.setValue("settings/" % key, value);
-}
-
-QVariant WSI_Base::loadValue(const QString& key, const QVariant& defaultValue) const
-{
-    QSettings s(mSettings.getMetadataPath().getPathTo("settings.ini").toStr(),
-                QSettings::IniFormat);
-    return s.value("settings/" % key, defaultValue);
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+    return new XmlDomElement(mXmlElementTagName);
 }
 
 /*****************************************************************************************

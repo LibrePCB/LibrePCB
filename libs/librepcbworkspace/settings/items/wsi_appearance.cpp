@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_appearance.h"
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -34,43 +35,62 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Appearance::WSI_Appearance(WorkspaceSettings& settings) :
-    WSI_Base(settings), mUseOpenGlWidget(nullptr), mUseOpenGlCheckBox(nullptr)
+WSI_Appearance::WSI_Appearance(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+    WSI_Base(xmlTagName, xmlElement), mUseOpenGl(false)
 {
-    mUseOpenGlWidget = new QWidget();
-    QGridLayout* openGlLayout = new QGridLayout(mUseOpenGlWidget);
+    if (xmlElement) {
+        // load setting
+        mUseOpenGl = xmlElement->getFirstChild("use_opengl", true)->getText<bool>(true);
+    }
+
+    // create widgets
+    mUseOpenGlWidget.reset(new QWidget());
+    QGridLayout* openGlLayout = new QGridLayout(mUseOpenGlWidget.data());
     openGlLayout->setContentsMargins(0, 0, 0, 0);
-    mUseOpenGlCheckBox = new QCheckBox(tr("Use OpenGL Hardware Acceleration"));
-    openGlLayout->addWidget(mUseOpenGlCheckBox, openGlLayout->rowCount(), 0);
+    mUseOpenGlCheckBox.reset(new QCheckBox(tr("Use OpenGL Hardware Acceleration")));
+    mUseOpenGlCheckBox->setChecked(mUseOpenGl);
+    openGlLayout->addWidget(mUseOpenGlCheckBox.data(), openGlLayout->rowCount(), 0);
     openGlLayout->addWidget(new QLabel(tr("This setting will be applied only to newly "
                             "opened windows.")), openGlLayout->rowCount(), 0);
-
-    // load from settings
-    revert();
 }
 
-WSI_Appearance::~WSI_Appearance()
+WSI_Appearance::~WSI_Appearance() noexcept
 {
-    delete mUseOpenGlWidget;        mUseOpenGlWidget = nullptr;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void WSI_Appearance::restoreDefault()
+void WSI_Appearance::restoreDefault() noexcept
 {
     mUseOpenGlCheckBox->setChecked(false);
 }
 
-void WSI_Appearance::apply()
+void WSI_Appearance::apply() noexcept
 {
-    saveValue("appearance_use_opengl", mUseOpenGlCheckBox->isChecked());
+    mUseOpenGl = mUseOpenGlCheckBox->isChecked();
 }
 
-void WSI_Appearance::revert()
+void WSI_Appearance::revert() noexcept
 {
-    mUseOpenGlCheckBox->setChecked(loadValue("appearance_use_opengl", false).toBool());
+    mUseOpenGlCheckBox->setChecked(mUseOpenGl);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+XmlDomElement* WSI_Appearance::serializeToXmlDomElement() const throw (Exception)
+{
+    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
+    root->appendTextChild("use_opengl", mUseOpenGlCheckBox->isChecked());
+    return root.take();
+}
+
+bool WSI_Appearance::checkAttributesValidity() const noexcept
+{
+    return true;
 }
 
 /*****************************************************************************************

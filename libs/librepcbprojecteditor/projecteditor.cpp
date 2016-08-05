@@ -63,7 +63,7 @@ ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project) 
     }
 
     // setup the timer for automatic backups, if enabled in the settings
-    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval()->getInterval();
+    int intervalSecs =  mWorkspace.getSettings().getProjectAutosaveInterval().getInterval();
     if ((intervalSecs > 0) && (!project.isReadOnly()))
     {
         // autosaving is enabled --> start the timer

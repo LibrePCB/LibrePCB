@@ -25,6 +25,7 @@
 #include "favoriteprojectsmodel.h"
 #include "workspace.h"
 #include "settings/workspacesettings.h"
+#include <librepcbcommon/fileio/smarttextfile.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -36,24 +37,29 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FavoriteProjectsModel::FavoriteProjectsModel(const Workspace& workspace) :
-    QAbstractListModel(0), mWorkspace(workspace)
+FavoriteProjectsModel::FavoriteProjectsModel(const Workspace& workspace) noexcept :
+    QAbstractListModel(nullptr), mWorkspace(workspace)
 {
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-
-    int count = settings.beginReadArray("favorite_projects");
-    for (int i = 0; i < count; i++)
-    {
-        settings.setArrayIndex(i);
-        FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), settings.value("filepath").toString());
-        beginInsertRows(QModelIndex(), mFavoriteProjects.count(), mFavoriteProjects.count());
-        mFavoriteProjects.append(filepath);
-        endInsertRows();
+    try {
+        FilePath filepath = mWorkspace.getMetadataPath().getPathTo("favorite_projects.txt");
+        if (filepath.isExistingFile()) {
+            mFile.reset(new SmartTextFile(filepath, false, false));
+            QStringList lines = QString(mFile->getContent()).split('\n');
+            beginInsertRows(QModelIndex(), 0, lines.count()-1);
+            foreach (const QString& line, lines) {
+                FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), line);
+                mFavoriteProjects.append(absPath);
+            }
+            endInsertRows();
+        } else {
+            mFile.reset(SmartTextFile::create(filepath));
+        }
+    } catch (Exception& e) {
+        qWarning() << "Could not read favorite projects file:" << e.getUserMsg();
     }
-    settings.endArray();
 }
 
-FavoriteProjectsModel::~FavoriteProjectsModel()
+FavoriteProjectsModel::~FavoriteProjectsModel() noexcept
 {
 }
 
@@ -61,26 +67,28 @@ FavoriteProjectsModel::~FavoriteProjectsModel()
  *  General Methods
  ****************************************************************************************/
 
-void FavoriteProjectsModel::save()
+void FavoriteProjectsModel::save() noexcept
 {
-    // save the new list in the workspace
-    QSettings settings(mWorkspace.getMetadataPath().getPathTo("settings.ini").toStr(), QSettings::IniFormat);
-
-    settings.beginWriteArray("favorite_projects");
-    for (int i = 0; i < mFavoriteProjects.count(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue("filepath", mFavoriteProjects.at(i).toRelative(mWorkspace.getPath()));
+    try {
+        // save the new list in the workspace
+        QStringList lines;
+        foreach (const FilePath& filepath, mFavoriteProjects) {
+            lines.append(filepath.toRelative(mWorkspace.getPath()));
+        }
+        if (mFile.isNull()) throw LogicError(__FILE__, __LINE__);
+        mFile->setContent(lines.join('\n').toUtf8());
+        mFile->save(true); // can throw
+    } catch (Exception& e) {
+        qWarning() << "Could not save favorite projects file:" << e.getUserMsg();
     }
-    settings.endArray();
 }
 
-bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const
+bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const noexcept
 {
     return mFavoriteProjects.contains(filepath);
 }
 
-void FavoriteProjectsModel::addFavoriteProject(const FilePath& filepath)
+void FavoriteProjectsModel::addFavoriteProject(const FilePath& filepath) noexcept
 {
     // if the filepath is already in the list, we have nothing to do
     if (mFavoriteProjects.contains(filepath))
@@ -93,7 +101,7 @@ void FavoriteProjectsModel::addFavoriteProject(const FilePath& filepath)
     save();
 }
 
-void FavoriteProjectsModel::removeFavoriteProject(const FilePath& filepath)
+void FavoriteProjectsModel::removeFavoriteProject(const FilePath& filepath) noexcept
 {
     int index = mFavoriteProjects.indexOf(filepath);
 

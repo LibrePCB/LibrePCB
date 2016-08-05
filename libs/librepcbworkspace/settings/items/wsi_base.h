@@ -25,14 +25,16 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcbcommon/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
 
-class WorkspaceSettings;
+class XmlDomElement;
+
+namespace workspace {
 
 /*****************************************************************************************
  *  Class WSI_Base
@@ -45,42 +47,37 @@ class WorkspaceSettings;
  * this class as base class. The name of all Workspace Settings Items begin with the
  * prefix "WSI_" to easily recognize them.
  *
- * @todo Use XML instead of INI files to save the workspace settings.
- *
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_Base : public QObject
+class WSI_Base : public QObject, public IF_XmlSerializableObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit WSI_Base(WorkspaceSettings& settings);
-        virtual ~WSI_Base();
+        WSI_Base() = delete;
+        WSI_Base(const WSI_Base& other) = delete;
+        explicit WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        virtual ~WSI_Base() noexcept;
 
         // General Methods
-        virtual void restoreDefault() = 0;
-        virtual void apply() = 0;
-        virtual void revert() = 0;
+        virtual void restoreDefault() noexcept = 0;
+        virtual void apply() noexcept = 0;
+        virtual void revert() noexcept = 0;
 
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-    protected:
+        // Operator Overloadings
+        WSI_Base& operator=(const WSI_Base& rhs) = delete;
 
-        // Helper Methods for Derived Classes
-        void saveValue(const QString& key, const QVariant& value);
-        QVariant loadValue(const QString& key, const QVariant& defaultValue = QVariant()) const;
-
-        // General Attributes
-        WorkspaceSettings& mSettings;
 
     private:
 
-        // make some methods inaccessible...
-        WSI_Base();
-        WSI_Base(const WSI_Base& other);
-        WSI_Base& operator=(const WSI_Base& rhs);
+        // General Attributes
+        QString mXmlElementTagName;
 };
 
 /*****************************************************************************************

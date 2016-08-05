@@ -117,6 +117,12 @@ void XmlDomElement::setText<bool>(const bool& value) noexcept
 }
 
 template <>
+void XmlDomElement::setText<uint>(const uint& value) noexcept
+{
+    setText(QString::number(value));
+}
+
+template <>
 void XmlDomElement::setText<QDateTime>(const QDateTime& value) noexcept
 {
     setText(value.toUTC().toString(Qt::ISODate));
@@ -173,6 +179,23 @@ bool XmlDomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) c
     {
         throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
                              QString(tr("Invalid boolean value in node \"%1\".")).arg(mName));
+    }
+}
+
+template <>
+uint XmlDomElement::getText<uint>(bool throwIfEmpty, const uint& defaultValue) const throw (Exception)
+{
+    QString text = getText<QString>(throwIfEmpty);
+    bool ok = false;
+    uint value = text.toUInt(&ok);
+    if (ok)
+        return value;
+    else if ((text.isEmpty()) && (!throwIfEmpty))
+        return defaultValue;
+    else
+    {
+        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                             QString(tr("Invalid number in node \"%1\".")).arg(mName));
     }
 }
 
@@ -259,6 +282,27 @@ Length XmlDomElement::getText<Length>(bool throwIfEmpty, const Length& defaultVa
         {
             throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
                                  QString(tr("Invalid length in node \"%1\".")).arg(mName));
+        }
+    }
+}
+
+template <>
+LengthUnit XmlDomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUnit& defaultValue) const throw (Exception)
+{
+    QString text = getText<QString>(throwIfEmpty);
+    try
+    {
+        LengthUnit obj = LengthUnit::fromString(text);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((text.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                                 QString(tr("Invalid length unit in node \"%1\".")).arg(mName));
         }
     }
 }
@@ -627,6 +671,12 @@ template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Length& value) noexcept
 {
     return appendTextChild<QString>(name, value.toMmString());
+}
+
+template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const LengthUnit& value) noexcept
+{
+    return appendTextChild<QString>(name, value.toString());
 }
 
 XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
