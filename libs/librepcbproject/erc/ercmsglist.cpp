@@ -92,7 +92,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
-    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
+    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
     XmlDomElement& root = doc->getRoot();
 
     // reset all ignore attributes
@@ -123,7 +123,6 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         XmlDomDocument doc(*serializeToXmlDomElement());
-        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

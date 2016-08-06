@@ -21,9 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "smartxmlfile.h"
-#include "xmldomdocument.h"
-#include "xmldomelement.h"
+#include "smartversionfile.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -34,12 +32,26 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
+SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
+                                   bool create, const Version& newVersion) throw (Exception) :
+    SmartFile(filepath, restore, readOnly, create), mVersion()
 {
+    if (mIsCreated) {
+        mVersion = newVersion;
+    }
+    else {
+        // read the content of the file
+        QString content = QString(readContentFromFile(mOpenedFilePath));
+        QStringList lines = content.split("\n", QString::KeepEmptyParts);
+        mVersion.setVersion((lines.count() > 0) ? lines.first() : QString());
+        if (!mVersion.isValid()) {
+            throw RuntimeError(__FILE__, __LINE__, content,
+                QString(tr("Invalid version number in file \"%1\".")).arg(filepath.toNative()));
+        }
+    }
 }
 
-SmartXmlFile::~SmartXmlFile() noexcept
+SmartVersionFile::~SmartVersionFile() noexcept
 {
 }
 
@@ -47,26 +59,24 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
+void SmartVersionFile::save(bool toOriginal) throw (Exception)
 {
-    return QSharedPointer<XmlDomDocument>(
-        new XmlDomDocument(readContentFromFile(mOpenedFilePath), mOpenedFilePath));
-}
-
-void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception)
-{
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    saveContentToFile(filepath, domDocument.toByteArray());
-    updateMembersAfterSaving(toOriginal);
+    if (mVersion.isValid()) {
+        const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
+        saveContentToFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
+        updateMembersAfterSaving(toOriginal);
+    } else {
+        throw LogicError(__FILE__, __LINE__, mVersion.toStr(), tr("Invalid version number"));
+    }
 }
 
 /*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
-SmartXmlFile* SmartXmlFile::create(const FilePath &filepath) throw (Exception)
+SmartVersionFile* SmartVersionFile::create(const FilePath& filepath, const Version& version) throw (Exception)
 {
-    return new SmartXmlFile(filepath, false, false, true);
+    return new SmartVersionFile(filepath, false, false, true, version);
 }
 
 /*****************************************************************************************

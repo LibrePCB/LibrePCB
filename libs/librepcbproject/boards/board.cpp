@@ -190,7 +190,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // the board seems to be ready to open, so we will create all needed objects
@@ -805,7 +805,6 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
         if (mIsAddedToProject)
         {
             XmlDomDocument doc(*serializeToXmlDomElement());
-            doc.setFileVersion(APP_VERSION_MAJOR);
             mXmlFile->save(doc, toOriginal);
         }
         else

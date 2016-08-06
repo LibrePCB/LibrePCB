@@ -72,7 +72,8 @@ HEADERS += \
     dialogs/boarddesignrulesdialog.h \
     cam/gerbergenerator.h \
     cam/gerberaperturelist.h \
-    cam/excellongenerator.h
+    cam/excellongenerator.h \
+    fileio/smartversionfile.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -120,7 +121,8 @@ SOURCES += \
     dialogs/boarddesignrulesdialog.cpp \
     cam/gerbergenerator.cpp \
     cam/gerberaperturelist.cpp \
-    cam/excellongenerator.cpp
+    cam/excellongenerator.cpp \
+    fileio/smartversionfile.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \

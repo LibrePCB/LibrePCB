@@ -48,7 +48,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     QSharedPointer<XmlDomDocument> doc;
     if (mXmlFilePath.isExistingFile()) {
         SmartXmlFile file(mXmlFilePath, false, true);
-        doc = file.parseFileAndBuildDomTree(true);
+        doc = file.parseFileAndBuildDomTree();
     } else {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         qInfo("Workspace settings file not found, default settings will be used.");
@@ -131,7 +131,6 @@ void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QStrin
 void WorkspaceSettings::saveToFile() const throw (Exception)
 {
     XmlDomDocument doc(*serializeToXmlDomElement());
-    doc.setFileVersion(APP_VERSION_MAJOR);
 
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
     file->save(doc, true); // can throw

@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarybaseelement.h"
-#include <librepcbcommon/fileio/smarttextfile.h>
+#include <librepcbcommon/fileio/smartversionfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
@@ -124,8 +124,8 @@ void LibraryBaseElement::save() throw (Exception)
     xmlFile->save(doc, true);
 
     // save version number file
-    QScopedPointer<SmartTextFile> versionFile(SmartTextFile::create(mDirectory.getPathTo("version")));
-    versionFile->setContent(QString("%1\n").arg(APP_VERSION_MAJOR).toUtf8());
+    QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
+        mDirectory.getPathTo(".version"), Version(QString::number(APP_VERSION_MAJOR))));
     versionFile->save(true);
 }
 
@@ -207,33 +207,20 @@ void LibraryBaseElement::readFromFile() throw (Exception)
     }
 
     // read version number from version file
-    FilePath versionFilePath = mDirectory.getPathTo("version");
-    bool versionNumberValid = false;
-    int fileVersion = 0;
-    SmartTextFile versionFile(versionFilePath, false, true);
-    QString versionFileContent = QString(versionFile.getContent());
-    QStringList versionFileLines = versionFileContent.split("\n", QString::KeepEmptyParts);
-    if (versionFileLines.count() > 0) {
-        fileVersion = versionFileLines.first().toInt(&versionNumberValid);
-    }
-    if ((!versionNumberValid) || (fileVersion < 0))
-    {
-        throw RuntimeError(__FILE__, __LINE__, versionFileContent,
-            QString(tr("Invalid version number in file %1."))
-            .arg(versionFilePath.toNative()));
-    }
-    if (!(fileVersion <= APP_VERSION_MAJOR))
-    {
+    FilePath versionFilePath = mDirectory.getPathTo(".version");
+    QScopedPointer<SmartVersionFile> versionFile(
+        new SmartVersionFile(versionFilePath, false, true));
+    if (!(versionFile->getVersion() <= Version(qApp->applicationVersion()))) {
         throw RuntimeError(__FILE__, __LINE__, QString::number(APP_VERSION_MAJOR),
             QString(tr("The library element %1 was created with a newer application "
-                       "version. You need at least version %2.0.0 to open this file."))
-            .arg(mDirectory.toNative()).arg(fileVersion));
+                       "version. You need at least version %2 to open this file."))
+            .arg(mDirectory.toNative()).arg(versionFile->getVersion().toStr()));
     }
 
     // open XML file
     FilePath xmlFilePath = mDirectory.getPathTo(mXmlFileNamePrefix % ".xml");
     SmartXmlFile xmlFile(xmlFilePath, false, true);
-    QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree(true);
+    QSharedPointer<XmlDomDocument> doc = xmlFile.parseFileAndBuildDomTree();
     parseDomTree(doc->getRoot());
 
     // check UUID
@@ -272,14 +259,9 @@ void LibraryBaseElement::parseDomTree(const XmlDomElement& root) throw (Exceptio
 
 XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
 {
-    bool valid = checkAttributesValidity();
-    Q_ASSERT(valid == true);
-    if (!valid) throw LogicError(__FILE__, __LINE__);
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
-    root->setAttribute("version", APP_VERSION_MAJOR);
-
-    // meta
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("version", mVersion);

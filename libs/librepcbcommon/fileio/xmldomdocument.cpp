@@ -74,34 +74,6 @@ XmlDomDocument::~XmlDomDocument() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool XmlDomDocument::hasFileVersion() const noexcept
-{
-    Q_ASSERT(mRootElement != nullptr);
-    return mRootElement->hasAttribute("version");
-}
-
-int XmlDomDocument::getFileVersion() const throw (Exception)
-{
-    Q_ASSERT(mRootElement != nullptr);
-    return mRootElement->getAttribute<uint>("version", true); // use "uint" to automatically check for >= 0
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void XmlDomDocument::setFileVersion(int version) noexcept
-{
-    Q_ASSERT(version >= 0);
-    Q_ASSERT(version <= APP_VERSION_MAJOR);
-    Q_ASSERT(mRootElement != nullptr);
-    mRootElement->setAttribute("version", version);
-}
-
-/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 

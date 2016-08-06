@@ -17,48 +17,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SMARTXMLFILE_H
-#define LIBREPCB_SMARTXMLFILE_H
+#ifndef LIBREPCB_SMARTVERSIONFILE_H
+#define LIBREPCB_SMARTVERSIONFILE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include "smartfile.h"
+#include "../version.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomDocument;
-
 /*****************************************************************************************
- *  Class SmartXmlFile
+ *  Class SmartVersionFile
  ****************************************************************************************/
 
 /**
- * @brief The SmartXmlFile class represents a XML file and provides methods to load/save
- *        XML DOM trees (#XmlDomDocument)
- *
- * With #parseFileAndBuildDomTree() the XML file can be parsed and a DOM tree is created.
- * With #save() the DOM tree can be saved back to the XML file.
+ * @brief The SmartVersionFile class
  *
  * @note See class #SmartFile for more information.
  *
  * @author ubruhin
- * @date 2014-08-13
+ * @date 2016-08-06
  */
-class SmartXmlFile final : public SmartFile
+class SmartVersionFile final : public SmartFile
 {
-        Q_DECLARE_TR_FUNCTIONS(SmartXmlFile)
+        Q_DECLARE_TR_FUNCTIONS(SmartVersionFile)
 
     public:
 
         // Constructors / Destructor
+        SmartVersionFile() = delete;
+        SmartVersionFile(const SmartVersionFile& other) = delete;
 
         /**
-         * @brief The constructor to open an existing XML file
+         * @brief The constructor to open an existing version file
          *
          * This constructor tries to open an existing file and throws an exception if an
          * error occurs.
@@ -67,44 +64,60 @@ class SmartXmlFile final : public SmartFile
          * @param restore   See SmartFile#SmartFile()
          * @param readOnly  See SmartFile#SmartFile()
          *
-         * @throw Exception If the specified text file could not be opened successful, an
-         *                  exception will be thrown.
+         * @throw Exception See SmartFile#SmartFile()
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
-            SmartXmlFile(filepath, restore, readOnly, false) {}
+        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+            SmartVersionFile(filepath, restore, readOnly, false, Version()) {}
 
         /**
          * @copydoc SmartFile#~SmartFile()
          */
-        ~SmartXmlFile() noexcept;
+        ~SmartVersionFile() noexcept;
+
+
+        // Getters
+
+        /**
+         * @brief Get the content of the file
+         *
+         * @return The content of the file
+         */
+        const Version& getVersion() const noexcept {return mVersion;}
+
+
+        // Setters
+
+        /**
+         * @brief Set the version of the file
+         *
+         * @note The version won't be written to the file until #save() is called.
+         *
+         * @param version   The new version of the file
+         */
+        void setVersion(const Version& version) noexcept {mVersion = version;}
 
 
         // General Methods
 
         /**
-         * @brief Open and parse the XML file and build the whole DOM tree
+         * @brief Write all changes to the file system
          *
-         * @return  A pointer to the created DOM tree. The caller takes the ownership of
-         *          the DOM document.
-         */
-        QSharedPointer<XmlDomDocument> parseFileAndBuildDomTree() const throw (Exception);
-
-        /**
-         * @brief Write the XML DOM tree to the file system
-         *
-         * @param domDocument   The DOM document to save
          * @param toOriginal    Specifies whether the original or the backup file should
          *                      be overwritten/created.
          *
          * @throw Exception If an error occurs
          */
-        void save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception);
+        void save(bool toOriginal) throw (Exception);
+
+
+        // Operator Overloadings
+        SmartVersionFile& operator=(const SmartVersionFile& rhs) = delete;
 
 
         // Static Methods
 
         /**
-         * @brief Create a new XML file
+         * @brief Create a new version file
          *
          * @note    This method will NOT immediately create the file! The file will be
          *          created after calling #save().
@@ -112,35 +125,38 @@ class SmartXmlFile final : public SmartFile
          * @param filepath  The filepath to the file to create (always to the original file,
          *                  not to the backup file with "~" at the end of the filename!)
          *
-         * @return The #SmartXmlFile object of the created file
+         * @return The #SmartVersionFile object of the created file
          *
          * @throw Exception If an error occurs
          */
-        static SmartXmlFile* create(const FilePath &filepath) throw (Exception);
+        static SmartVersionFile* create(const FilePath& filepath, const Version& version) throw (Exception);
 
 
-    private:
+    protected:
 
-        // make some methods inaccessible...
-        SmartXmlFile();
-        SmartXmlFile(const SmartXmlFile& other);
-        SmartXmlFile& operator=(const SmartXmlFile& rhs);
-
-
-        // Private Methods
+        // Protected Methods
 
         /**
-         * @brief Constructor to create or open a XML file
+         * @brief Constructor to create or open a version file
          *
-         * @param filepath          See SmartFile#SmartFile()
-         * @param restore           See SmartFile#SmartFile()
-         * @param readOnly          See SmartFile#SmartFile()
-         * @param create            See SmartFile#SmartFile()
+         * @param filepath      See SmartFile#SmartFile()
+         * @param restore       See SmartFile#SmartFile()
+         * @param readOnly      See SmartFile#SmartFile()
+         * @param create        See SmartFile#SmartFile()
+         * @param newVersion    If "create == true", this is the new version of the file
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
+        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
+                         bool create, const Version& newVersion) throw (Exception);
 
+
+        // General Attributes
+
+        /**
+         * @brief The version number of the file
+         */
+        Version mVersion;
 };
 
 /*****************************************************************************************
@@ -149,4 +165,4 @@ class SmartXmlFile final : public SmartFile
 
 } // namespace librepcb
 
-#endif // LIBREPCB_SMARTXMLFILE_H
+#endif // LIBREPCB_SMARTVERSIONFILE_H

@@ -57,7 +57,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree(true);
+            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings
@@ -119,7 +119,6 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
     try
     {
         XmlDomDocument doc(*serializeToXmlDomElement());
-        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

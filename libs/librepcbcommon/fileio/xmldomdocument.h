@@ -98,35 +98,6 @@ class XmlDomDocument final
          */
         XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
 
-        /**
-         * @brief Check if the document has a file version number (attribute "version" of
-         *        the root element)
-         *
-         * @return  true/false
-         */
-        bool hasFileVersion() const noexcept;
-
-        /**
-         * @brief Get the file version number of the document (attribute "version" of the
-         *        root element)
-         *
-         * @return  The file version number
-         *
-         * @throw   If the attribute "version" of the root node is invalid or does not exist
-         */
-        int getFileVersion() const throw (Exception);
-
-
-        // Setters
-
-        /**
-         * @brief Set the file version number of the document (attribute "version" of the
-         *        root element)
-         *
-         * @param version   The file version
-         */
-        void setFileVersion(int version) noexcept;
-
 
         // General Methods
 

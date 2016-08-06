@@ -83,11 +83,11 @@ void MainWindow::on_pushButton_2_clicked()
         {
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
             SmartXmlFile projectFile(projectFilepath, false, true);
-            QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree(true);
+            QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
 
             // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
-            QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree(true);
+            QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
             for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("component_instances/*", true, false);
                  node; node = node->getNextSibling())
             {
@@ -130,7 +130,7 @@ void MainWindow::on_pushButton_2_clicked()
             {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
-                QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree(true);
+                QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
                 for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);
                      node; node = node->getNextSibling())
                 {

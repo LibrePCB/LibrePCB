@@ -169,7 +169,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         else
         {
             mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
-            doc = mXmlFile->parseFileAndBuildDomTree(true);
+            doc = mXmlFile->parseFileAndBuildDomTree();
             root = &doc->getRoot();
         }
 
@@ -627,7 +627,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     {
         setLastModified(QDateTime::currentDateTime());
         XmlDomDocument doc(*serializeToXmlDomElement());
-        doc.setFileVersion(APP_VERSION_MAJOR);
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
