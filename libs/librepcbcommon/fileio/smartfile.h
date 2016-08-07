@@ -61,6 +61,8 @@ class SmartFile
     public:
 
         // Constructors / Destructor
+        SmartFile() = delete;
+        SmartFile(const SmartFile& other) = delete;
 
         /**
          * @brief The constructor
@@ -135,13 +137,8 @@ class SmartFile
          */
         void removeFile(bool original) throw (Exception);
 
-
-    private:
-
-        // make some methods inaccessible...
-        SmartFile();
-        SmartFile(const SmartFile& other);
-        SmartFile& operator=(const SmartFile& rhs);
+        // Operator Overloadings
+        SmartFile& operator=(const SmartFile& rhs) = delete;
 
 
     protected:

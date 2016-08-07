@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "smartfile.h"
+#include "fileutils.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -43,32 +44,22 @@ SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool
         Q_ASSERT(mIsReadOnly == false);
 
         // remove the files if they exists already
-        if (mFilePath.isExistingFile())
-        {
-            if (!QFile::remove(mFilePath.toStr()))
-            {
-                throw RuntimeError(__FILE__, __LINE__, mFilePath.toStr(),
-                    QString(tr("Cannot remove file \"%1\"")).arg(mFilePath.toNative()));
-            }
+        if (mFilePath.isExistingFile()) {
+            FileUtils::removeFile(mFilePath);
         }
-        if (mTmpFilePath.isExistingFile())
-        {
-            if (!QFile::remove(mTmpFilePath.toStr()))
-            {
-                throw RuntimeError(__FILE__, __LINE__, mTmpFilePath.toStr(),
-                    QString(tr("Cannot remove file \"%1\"")).arg(mTmpFilePath.toNative()));
-            }
+        if (mTmpFilePath.isExistingFile()) {
+            FileUtils::removeFile(mTmpFilePath);
         }
     }
     else
     {
         // decide if we open the original file (*.*) or the backup (*.*~)
-        if ((mIsRestored) && (mTmpFilePath.isExistingFile()))
+        if ((mIsRestored) && (mTmpFilePath.isExistingFile())) {
             mOpenedFilePath = mTmpFilePath;
+        }
 
         // check if the file exists
-        if (!mOpenedFilePath.isExistingFile())
-        {
+        if (!mOpenedFilePath.isExistingFile()) {
             throw RuntimeError(__FILE__, __LINE__, mOpenedFilePath.toStr(),
                 QString(tr("The file \"%1\" does not exist!")).arg(mOpenedFilePath.toNative()));
         }
@@ -77,10 +68,13 @@ SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool
 
 SmartFile::~SmartFile() noexcept
 {
-    if ((!mIsRestored) && (!mIsReadOnly) && (mTmpFilePath.isExistingFile()))
-    {
-        // remove temporary file
-        QFile::remove(mTmpFilePath.toStr());
+    // remove temporary file, if required
+    if ((!mIsRestored) && (!mIsReadOnly) && (mTmpFilePath.isExistingFile())) {
+        try {
+            FileUtils::removeFile(mTmpFilePath);
+        } catch (const Exception& e) {
+            qWarning() << "Could not remove temporary file:" << e.getUserMsg();
+        }
     }
 }
 
@@ -90,18 +84,13 @@ SmartFile::~SmartFile() noexcept
 
 void SmartFile::removeFile(bool original) throw (Exception)
 {
-    if (mIsReadOnly)
+    if (mIsReadOnly) {
         throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot remove read-only file!"));
+    }
 
     FilePath filepath(original ? mFilePath : mTmpFilePath);
-
-    if (filepath.isExistingFile())
-    {
-        if (!QFile::remove(filepath.toStr()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
-                QString(tr("Cannot remove file \"%1\"")).arg(filepath.toNative()));
-        }
+    if (filepath.isExistingFile()) {
+        FileUtils::removeFile(filepath);
     }
 }
 
@@ -111,13 +100,13 @@ void SmartFile::removeFile(bool original) throw (Exception)
 
 const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception)
 {
-    if (mIsReadOnly)
+    if (mIsReadOnly) {
         throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
+    }
 
     const FilePath& filepath(toOriginal ? mFilePath : mTmpFilePath);
 
-    if (!filepath.getParentDir().isExistingDir())
-    {
+    if (!filepath.getParentDir().isExistingDir()) {
         // try to create parent directories
         if (!filepath.getParentDir().mkPath())
             qWarning() << "could not make path for file" << filepath.toNative();
@@ -138,8 +127,7 @@ void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept
 QByteArray SmartFile::readContentFromFile(const FilePath& filepath) throw (Exception)
 {
     QFile file(filepath.toStr());
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr("Cannot "
             "open file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
     }
@@ -149,8 +137,7 @@ QByteArray SmartFile::readContentFromFile(const FilePath& filepath) throw (Excep
 void SmartFile::saveContentToFile(const FilePath& filepath, const QByteArray& content) throw (Exception)
 {
     QSaveFile file(filepath.toStr());
-    if (!file.open(QIODevice::WriteOnly))
-    {
+    if (!file.open(QIODevice::WriteOnly)) {
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
             .arg(filepath.toStr(), file.errorString()).arg(file.error()),
             QString(tr("Could not open or create file \"%1\": %2"))
@@ -158,8 +145,7 @@ void SmartFile::saveContentToFile(const FilePath& filepath, const QByteArray& co
     }
 
     qint64 written = file.write(content);
-    if (written != content.size())
-    {
+    if (written != content.size()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1: %2 (only %3 of %4 bytes written)")
             .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
@@ -167,8 +153,7 @@ void SmartFile::saveContentToFile(const FilePath& filepath, const QByteArray& co
             .arg(filepath.toNative(), file.errorString()));
     }
 
-    if (!file.commit())
-    {
+    if (!file.commit()) {
         throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not write to "
             "file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
     }
