@@ -56,6 +56,8 @@ class XmlDomDocument final
     public:
 
         // Constructors / Destructor
+        XmlDomDocument() = delete;
+        XmlDomDocument(const XmlDomDocument& other) = delete;
 
         /**
          * @brief Constructor to create a new DOM document with a root element
@@ -98,6 +100,16 @@ class XmlDomDocument final
          */
         XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
 
+        /**
+         * @brief Get the root XML DOM element and check it's tag name
+         *
+         * @param expectedName  The expected name of the root element. If it differs,
+         *                      an exception will be thrown.
+         *
+         * @return The root element of the document
+         */
+        XmlDomElement& getRoot(const QString& expectedName) const throw (Exception);
+
 
         // General Methods
 
@@ -109,17 +121,15 @@ class XmlDomDocument final
         QByteArray toByteArray() const noexcept;
 
 
+        // Operator Overloadings
+        XmlDomDocument& operator=(const XmlDomDocument& rhs) = delete;
+
+
     private:
 
-        // make some methods inaccessible...
-        XmlDomDocument();
-        XmlDomDocument(const XmlDomDocument& other);
-        XmlDomDocument& operator=(const XmlDomDocument& rhs);
-
-
         // General
-        FilePath mFilePath;             ///< the filepath from the constructor
-        XmlDomElement* mRootElement;    ///< the root DOM element
+        FilePath mFilePath;                         ///< the filepath from the constructor
+        QScopedPointer<XmlDomElement> mRootElement; ///< the root DOM element
 };
 
 /*****************************************************************************************

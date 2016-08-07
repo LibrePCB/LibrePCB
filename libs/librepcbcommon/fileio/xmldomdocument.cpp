@@ -48,8 +48,7 @@ XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath&
     QString errMsg;
     int errLine;
     int errColumn;
-    if (!doc.setContent(xmlFileContent, &errMsg, &errLine, &errColumn))
-    {
+    if (!doc.setContent(xmlFileContent, &errMsg, &errLine, &errColumn)) {
         QString line = xmlFileContent.split('\n').at(errLine-1);
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
             .arg(filepath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
@@ -59,18 +58,31 @@ XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath&
 
     // check if the root node exists
     QDomElement root = doc.documentElement();
-    if (root.isNull())
-    {
+    if (root.isNull()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("No XML root node found in \"%1\"!")).arg(/*xmlFilePath.toNative()*/QString()));
+            QString(tr("No XML root node found in \"%1\"!")).arg(mFilePath.toNative()));
     }
 
-    mRootElement = XmlDomElement::fromQDomElement(root, this);
+    mRootElement.reset(XmlDomElement::fromQDomElement(root, this));
 }
 
 XmlDomDocument::~XmlDomDocument() noexcept
 {
-    delete mRootElement;        mRootElement = nullptr;
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+XmlDomElement& XmlDomDocument::getRoot(const QString& expectedName) const throw (Exception)
+{
+    XmlDomElement& root = getRoot();
+    if (root.getName() != expectedName) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("XML root node name mismatch in file \"%1\": %2 != %3"))
+            .arg(mFilePath.toNative(), root.getName(), expectedName));
+    }
+    return root;
 }
 
 /*****************************************************************************************
