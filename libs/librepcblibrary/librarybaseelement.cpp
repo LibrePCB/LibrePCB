@@ -142,11 +142,11 @@ LibraryBaseElement::~LibraryBaseElement() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString LibraryBaseElement::checkDirectoryNameValidity() const noexcept
+QString LibraryBaseElement::checkDirectoryNameValidity(const FilePath& dir) const noexcept
 {
-    if (mDirectoryBasenameMustBeUuid && (mDirectory.getCompleteBasename() != mUuid.toStr())) {
+    if (mDirectoryBasenameMustBeUuid && (dir.getCompleteBasename() != mUuid.toStr())) {
         return QString(tr("The directory basename must be equal to the element's UUID."));
-    } else if (mDirectory.getSuffix() != mShortElementName) {
+    } else if (dir.getSuffix() != mShortElementName) {
         return QString(tr("The directory name suffix must be \".%1\".")).arg(mShortElementName);
     } else {
         return QString();
@@ -241,7 +241,7 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
 {
     if (destination != mDirectory) {
         // check destination directory name validity
-        QString errMsg = checkDirectoryNameValidity();
+        QString errMsg = checkDirectoryNameValidity(destination);
         if (!errMsg.isEmpty()) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                  QString(tr("Invalid library element directory name \"%1\": %2"))

@@ -67,7 +67,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // Getters: General
         const FilePath& getFilePath() const noexcept {return mDirectory;}
-        QString checkDirectoryNameValidity() const noexcept;
+        QString checkDirectoryNameValidity(const FilePath& dir) const noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
