@@ -49,10 +49,12 @@ class Component final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Component(const Uuid& uuid, const Version& version, const QString& author,
-                           const QString& name_en_US, const QString& description_en_US,
-                           const QString& keywords_en_US) throw (Exception);
-        explicit Component(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        Component() = delete;
+        Component(const Component& other) = delete;
+        Component(const Uuid& uuid, const Version& version, const QString& author,
+                  const QString& name_en_US, const QString& description_en_US,
+                  const QString& keywords_en_US) throw (Exception);
+        Component(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Component() noexcept;
 
         // General
@@ -110,17 +112,13 @@ class Component final : public LibraryElement
         ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) noexcept;
         const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) const noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        Component() = delete;
-        Component(const Component& other) = delete;
+        // Operator Overloadings
         Component& operator=(const Component& rhs) = delete;
 
 
+    private:
+
         // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;

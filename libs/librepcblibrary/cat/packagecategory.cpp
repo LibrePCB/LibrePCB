@@ -22,6 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "packagecategory.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -33,23 +35,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-PackageCategory::PackageCategory(const FilePath& elementDirectory, bool readOnly) :
+PackageCategory::PackageCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryCategory(elementDirectory, "pkgcat", "package_category", readOnly)
 {
-    readFromFile();
+    cleanupAfterLoadingElementFromFile();
 }
 
 PackageCategory::~PackageCategory()
 {
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void PackageCategory::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryCategory::parseDomTree(root);
 }
 
 /*****************************************************************************************

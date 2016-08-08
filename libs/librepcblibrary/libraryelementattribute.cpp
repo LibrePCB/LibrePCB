@@ -46,9 +46,9 @@ LibraryElementAttribute::LibraryElementAttribute(const XmlDomElement& domElement
     mDefaultUnit = mType->getUnitFromString(domElement.getAttribute<QString>("unit", false));
 
     // read names, descriptions and default values in all available languages
-    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "default_value", mDefaultValues);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
+    LibraryBaseElement::readLocaleDomNodes(domElement, "default_value", mDefaultValues, false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

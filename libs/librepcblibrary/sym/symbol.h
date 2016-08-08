@@ -50,6 +50,8 @@ class Symbol final : public LibraryElement
     public:
 
         // Constructors / Destructor
+        Symbol() = delete;
+        Symbol(const Symbol& other) = delete;
         explicit Symbol(const Uuid& uuid, const Version& version, const QString& author,
                         const QString& name_en_US, const QString& description_en_US,
                         const QString& keywords_en_US) throw (Exception);
@@ -88,23 +90,16 @@ class Symbol final : public LibraryElement
         void addText(Text& text) noexcept;
         void removeText(Text& text) noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        Symbol() = delete;
-        Symbol(const Symbol& other) = delete;
+        // Operator Overloadings
         Symbol& operator=(const Symbol& rhs) = delete;
 
 
+    private:
+
         // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // Symbol Attributes

@@ -54,8 +54,8 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
         mNorm = domElement.getAttribute<QString>("norm", false);
 
         // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all symbol variant items
         for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);

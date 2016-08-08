@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "component.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
@@ -37,10 +38,10 @@ namespace library {
 Component::Component(const Uuid& uuid, const Version& version, const QString& author,
                      const QString& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("cmp", "component", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
+    LibraryElement("cmp", "component", uuid, version, author, name_en_US,
+                   description_en_US, keywords_en_US),
     mSchematicOnly(false), mDefaultSymbolVariantUuid()
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
@@ -49,7 +50,84 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
 {
     try
     {
-        readFromFile();
+        XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+
+        // Load all properties
+        mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
+
+        // Load all attributes
+        for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
+             node; node = node->getNextSibling("attribute"))
+        {
+            LibraryElementAttribute* attribute = new LibraryElementAttribute(*node); // throws an exception on error
+            if (getAttributeByKey(attribute->getKey())) {
+                throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
+                    QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
+                    .arg(attribute->getKey(), root.getDocFilePath().toNative()));
+            }
+            mAttributes.append(attribute);
+        }
+
+        // Load default values in all available languages
+        readLocaleDomNodes(*root.getFirstChild("properties", true, true),
+                           "default_value", mDefaultValues, false);
+
+        // Load all prefixes
+        for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
+             node; node = node->getNextSibling("prefix"))
+        {
+            if (mPrefixes.contains(node->getAttribute<QString>("norm", false))) {
+                throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
+                    QString(tr("The prefix \"%1\" exists multiple times in \"%2\"."))
+                    .arg(node->getAttribute<QString>("norm", false), root.getDocFilePath().toNative()));
+            }
+            mPrefixes.insert(node->getAttribute<QString>("norm", false), node->getText<QString>(false));
+        }
+        if (!mPrefixes.contains(QString(""))) {
+            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
+                QString(tr("The file \"%1\" has no default prefix defined."))
+                .arg(root.getDocFilePath().toNative()));
+        }
+
+        // Load all signals
+        for (XmlDomElement* node = root.getFirstChild("signals/signal", true, false);
+             node; node = node->getNextSibling("signal"))
+        {
+            ComponentSignal* signal = new ComponentSignal(*node);
+            if (getSignalByUuid(signal->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
+                    QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
+                    .arg(signal->getUuid().toStr(), root.getDocFilePath().toNative()));
+            }
+            mSignals.append(signal);
+        }
+
+        // Load all symbol variants
+        XmlDomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
+        for (XmlDomElement* node = symbolVariantsNode->getFirstChild("variant", false);
+             node; node = node->getNextSibling("variant"))
+        {
+            ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
+            if (getSymbolVariantByUuid(variant->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
+                    QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
+                    .arg(variant->getUuid().toStr(), root.getDocFilePath().toNative()));
+            }
+            mSymbolVariants.append(variant);
+        }
+        if (mSymbolVariants.isEmpty()) {
+            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
+                QString(tr("The file \"%1\" has no symbol variants defined."))
+                .arg(root.getDocFilePath().toNative()));
+        }
+        mDefaultSymbolVariantUuid = symbolVariantsNode->getAttribute<Uuid>("default", true);
+        if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid)) {
+            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
+                QString(tr("The file \"%1\" has no valid default symbol variant defined."))
+                .arg(root.getDocFilePath().toNative()));
+        }
+
+        cleanupAfterLoadingElementFromFile();
     }
     catch (Exception& e)
     {
@@ -172,9 +250,15 @@ const ComponentSignal* Component::getSignalOfPin(const Uuid& symbVar, const Uuid
                                                  const Uuid& pin) const noexcept
 {
     const ComponentSymbolVariantItem* i = getSymbVarItem(symbVar, item);
-    Q_ASSERT(i); if (!i) return nullptr;
+    if (!i) {
+        qWarning() << "Invalid symbol variant/item UUID:" << symbVar.toStr() << item.toStr();
+        return nullptr;
+    }
     const ComponentPinSignalMapItem* map = i->getPinSignalMapItemOfPin(pin);
-    Q_ASSERT(map); if (!map) return nullptr;
+    if (!map) {
+        qWarning() << "Invalid symbol pin UUID:" << pin.toStr();
+        return nullptr;
+    }
     Uuid signalUuid = map->getSignalUuid();
     if (signalUuid.isNull()) return nullptr;
     return getSignalByUuid(signalUuid);
@@ -256,89 +340,6 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
  *  Private Methods
  ****************************************************************************************/
 
-void Component::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
-
-    mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
-
-    // Load all attributes
-    for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
-         node; node = node->getNextSibling("attribute"))
-    {
-        LibraryElementAttribute* attribute = new LibraryElementAttribute(*node); // throws an exception on error
-        if (getAttributeByKey(attribute->getKey()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
-                QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
-                .arg(attribute->getKey(), root.getDocFilePath().toNative()));
-        }
-        mAttributes.append(attribute);
-    }
-
-    // Load default values in all available languages
-    readLocaleDomNodes(*root.getFirstChild("properties", true, true), "default_value", mDefaultValues);
-
-    // Load all prefixes
-    for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
-         node; node = node->getNextSibling("prefix"))
-    {
-        if (mPrefixes.contains(node->getAttribute<QString>("norm", false)))
-        {
-            throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
-                QString(tr("The prefix \"%1\" exists multiple times in \"%2\"."))
-                .arg(node->getAttribute<QString>("norm", false), root.getDocFilePath().toNative()));
-        }
-        mPrefixes.insert(node->getAttribute<QString>("norm", false), node->getText<QString>(false));
-    }
-    if (!mPrefixes.contains(QString("")))
-    {
-        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
-            QString(tr("The file \"%1\" has no default prefix defined."))
-            .arg(root.getDocFilePath().toNative()));
-    }
-
-    // Load all signals
-    for (XmlDomElement* node = root.getFirstChild("signals/signal", true, false);
-         node; node = node->getNextSibling("signal"))
-    {
-        ComponentSignal* signal = new ComponentSignal(*node);
-        if (getSignalByUuid(signal->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
-                QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
-                .arg(signal->getUuid().toStr(), root.getDocFilePath().toNative()));
-        }
-        mSignals.append(signal);
-    }
-
-    // Load all symbol variants
-    XmlDomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
-    for (XmlDomElement* node = symbolVariantsNode->getFirstChild("variant", false);
-         node; node = node->getNextSibling("variant"))
-    {
-        ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
-        if (getSymbolVariantByUuid(variant->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
-                QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
-                .arg(variant->getUuid().toStr(), root.getDocFilePath().toNative()));
-        }
-        mSymbolVariants.append(variant);
-    }
-    if (mSymbolVariants.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
-            QString(tr("The file \"%1\" has no symbol variants defined."))
-            .arg(root.getDocFilePath().toNative()));
-    }
-    mDefaultSymbolVariantUuid = symbolVariantsNode->getAttribute<Uuid>("default", true);
-    if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid)) {
-        throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
-            QString(tr("The file \"%1\" has no valid default symbol variant defined."))
-            .arg(root.getDocFilePath().toNative()));
-    }
-}
-
 XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
@@ -356,14 +357,14 @@ XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
         child->setAttribute("norm", norm);
     }
     XmlDomElement* signalsNode = root->appendChild("signals");
-    foreach (const ComponentSignal* signal, mSignals)
+    foreach (const ComponentSignal* signal, mSignals) {
         signalsNode->appendChild(signal->serializeToXmlDomElement());
+    }
     XmlDomElement* symbol_variants = root->appendChild("symbol_variants");
     symbol_variants->setAttribute("default", mDefaultSymbolVariantUuid);
-    foreach (const ComponentSymbolVariant* variant, mSymbolVariants)
+    foreach (const ComponentSymbolVariant* variant, mSymbolVariants) {
         symbol_variants->appendChild(variant->serializeToXmlDomElement());
-    //XmlDomElement* spice_models = root->appendChild("spice_models");
-    //Q_UNUSED(spice_models);
+    }
     return root.take();
 }
 

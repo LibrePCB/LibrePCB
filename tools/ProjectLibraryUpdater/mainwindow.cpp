@@ -101,7 +101,7 @@ void MainWindow::on_pushButton_2_clicked()
                 // copy component
                 Component latestComp(filepath, true);
                 FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
-                latestComp.saveTo(dest);
+                latestComp.saveIntoParentDirectory(dest);
                 ui->log->addItem(latestComp.getFilePath().toNative());
 
                 // search all required symbols
@@ -117,7 +117,7 @@ void MainWindow::on_pushButton_2_clicked()
                         }
                         Symbol latestSymbol(filepath, true);
                         FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
-                        latestSymbol.saveTo(dest);
+                        latestSymbol.saveIntoParentDirectory(dest);
                         ui->log->addItem(latestSymbol.getFilePath().toNative());
                     }
                 }
@@ -144,7 +144,7 @@ void MainWindow::on_pushButton_2_clicked()
                     // copy device
                     Device latestDevice(filepath, true);
                     FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
-                    latestDevice.saveTo(dest);
+                    latestDevice.saveIntoParentDirectory(dest);
                     ui->log->addItem(latestDevice.getFilePath().toNative());
 
                     // get package
@@ -158,7 +158,7 @@ void MainWindow::on_pushButton_2_clicked()
                     // copy package
                     Package latestPackage(filepath, true);
                     dest = projectFilepath.getParentDir().getPathTo("library/pkg");
-                    latestPackage.saveTo(dest);
+                    latestPackage.saveIntoParentDirectory(dest);
                     ui->log->addItem(latestPackage.getFilePath().toNative());
                 }
             }

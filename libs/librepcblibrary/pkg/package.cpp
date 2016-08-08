@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "package.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
@@ -37,7 +38,8 @@ namespace library {
 Package::Package(const Uuid& uuid, const Version& version, const QString& author,
                  const QString& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("pkg", "package", uuid, version, author, name_en_US, description_en_US, keywords_en_US),
+    LibraryElement("pkg", "package", uuid, version, author, name_en_US,
+                   description_en_US, keywords_en_US),
     mDefaultFootprintUuid()
 {
 }
@@ -48,7 +50,44 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
 {
     try
     {
-        readFromFile();
+        const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+
+        // Load all pads
+        for (XmlDomElement* node = root.getFirstChild("pads/pad", true, false);
+             node; node = node->getNextSibling("pad"))
+        {
+            PackagePad* pad = new PackagePad(*node);
+            if (getPadByUuid(pad->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
+                    QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                    .arg(pad->getUuid().toStr(), root.getDocFilePath().toNative()));
+            }
+            mPads.insert(pad->getUuid(), pad);
+        }
+
+        // Load all footprints
+        XmlDomElement* footprintsNode = root.getFirstChild("footprints", true);
+        for (XmlDomElement* node = footprintsNode->getFirstChild("footprint", true);
+             node; node = node->getNextSibling("footprint"))
+        {
+            Footprint* footprint = new Footprint(*node);
+            if (getFootprintByUuid(footprint->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
+                    QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
+                    .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
+            }
+            mFootprints.insert(footprint->getUuid(), footprint);
+        }
+
+        // load default footprint
+        mDefaultFootprintUuid = footprintsNode->getAttribute<Uuid>("default", true);
+        if (!mFootprints.contains(mDefaultFootprintUuid)) {
+            throw RuntimeError(__FILE__, __LINE__, mDefaultFootprintUuid.toStr(),
+                QString(tr("The package \"%1\" has no valid default footprint set."))
+                .arg(root.getDocFilePath().toNative()));
+        }
+
+        cleanupAfterLoadingElementFromFile();
     }
     catch (Exception& e)
     {
@@ -110,61 +149,18 @@ void Package::removeFootprint(Footprint& footprint) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Package::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
-
-    // Load all pads
-    for (XmlDomElement* node = root.getFirstChild("pads/pad", true, false);
-         node; node = node->getNextSibling("pad"))
-    {
-        PackagePad* pad = new PackagePad(*node);
-        if (getPadByUuid(pad->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
-                QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                .arg(pad->getUuid().toStr(), root.getDocFilePath().toNative()));
-        }
-        mPads.insert(pad->getUuid(), pad);
-    }
-
-    // Load all footprints
-    XmlDomElement* footprintsNode = root.getFirstChild("footprints", true);
-    for (XmlDomElement* node = footprintsNode->getFirstChild("footprint", true);
-         node; node = node->getNextSibling("footprint"))
-    {
-        Footprint* footprint = new Footprint(*node);
-        if (getFootprintByUuid(footprint->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
-                QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
-                .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
-        }
-        mFootprints.insert(footprint->getUuid(), footprint);
-    }
-
-    // load default footprint
-    mDefaultFootprintUuid = footprintsNode->getAttribute<Uuid>("default", true);
-    if (!mFootprints.contains(mDefaultFootprintUuid)) {
-        throw RuntimeError(__FILE__, __LINE__, mDefaultFootprintUuid.toStr(),
-            QString(tr("The package \"%1\" has no valid default footprint set."))
-            .arg(root.getDocFilePath().toNative()));
-    }
-}
-
 XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-
     XmlDomElement* padsNode = root->appendChild("pads");
-    foreach (const PackagePad* pad, mPads)
+    foreach (const PackagePad* pad, mPads) {
         padsNode->appendChild(pad->serializeToXmlDomElement());
+    }
     XmlDomElement* footprintsNode = root->appendChild("footprints");
     footprintsNode->setAttribute("default", mDefaultFootprintUuid);
     foreach (const Footprint* footprint, mFootprints) {
         footprintsNode->appendChild(footprint->serializeToXmlDomElement());
     }
-
     return root.take();
 }
 

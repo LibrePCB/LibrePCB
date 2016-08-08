@@ -45,20 +45,14 @@ class PackageCategory final : public LibraryCategory
 
     public:
 
-        explicit PackageCategory(const FilePath& elementDirectory, bool readOnly);
-        virtual ~PackageCategory();
+        // Constructors / Destructor
+        PackageCategory() = delete;
+        PackageCategory(const PackageCategory& other) = delete;
+        PackageCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        ~PackageCategory() noexcept;
 
-    private:
-
-        // make some methods inaccessible...
-        PackageCategory();
-        PackageCategory(const PackageCategory& other);
-        PackageCategory& operator=(const PackageCategory& rhs);
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-
+        // Operator Overloadings
+        PackageCategory& operator=(const PackageCategory& rhs) = delete;
 };
 
 /*****************************************************************************************

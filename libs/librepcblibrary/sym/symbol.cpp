@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "symbol.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
@@ -37,7 +38,8 @@ namespace library {
 Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("sym", "symbol", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("sym", "symbol", uuid, version, author, name_en_US,
+                   description_en_US, keywords_en_US)
 {
 }
 
@@ -46,7 +48,39 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
 {
     try
     {
-        readFromFile();
+        const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+
+        // Load all pins
+        for (XmlDomElement* node = root.getFirstChild("pins/pin", true, false);
+             node; node = node->getNextSibling("pin"))
+        {
+            SymbolPin* pin = new SymbolPin(*node);
+            if (mPins.contains(pin->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
+                    QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
+                    .arg(pin->getUuid().toStr(), root.getDocFilePath().toNative()));
+            }
+            mPins.insert(pin->getUuid(), pin);
+        }
+
+        // Load all geometry elements
+        for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
+             node; node = node->getNextSibling())
+        {
+            if (node->getName() == "polygon") {
+                mPolygons.append(new Polygon(*node));
+            } else if (node->getName() == "text") {
+                mTexts.append(new Text(*node));
+            } else if (node->getName() == "ellipse") {
+                mEllipses.append(new Ellipse(*node));
+            } else {
+                throw RuntimeError(__FILE__, __LINE__, node->getName(),
+                    QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
+                    .arg(node->getName(), root.getDocFilePath().toNative()));
+            }
+        }
+
+        cleanupAfterLoadingElementFromFile();
     }
     catch (Exception& e)
     {
@@ -60,7 +94,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
 
 Symbol::~Symbol() noexcept
 {
-
+    qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPins);          mPins.clear();
@@ -135,71 +169,24 @@ void Symbol::removeText(Text& text) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Symbol::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
-
-    // Load all pins
-    for (XmlDomElement* node = root.getFirstChild("pins/pin", true, false);
-         node; node = node->getNextSibling("pin"))
-    {
-        SymbolPin* pin = new SymbolPin(*node);
-        if (mPins.contains(pin->getUuid()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
-                QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                .arg(pin->getUuid().toStr(), root.getDocFilePath().toNative()));
-        }
-        mPins.insert(pin->getUuid(), pin);
-    }
-
-    // Load all geometry elements
-    for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
-         node; node = node->getNextSibling())
-    {
-        if (node->getName() == "polygon")
-        {
-            mPolygons.append(new Polygon(*node));
-        }
-        else if (node->getName() == "text")
-        {
-            mTexts.append(new Text(*node));
-        }
-        else if (node->getName() == "ellipse")
-        {
-            mEllipses.append(new Ellipse(*node));
-        }
-        else
-        {
-            throw RuntimeError(__FILE__, __LINE__, node->getName(),
-                QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                .arg(node->getName(), root.getDocFilePath().toNative()));
-        }
-    }
-}
-
 XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
     XmlDomElement* pins = root->appendChild("pins");
-    foreach (const SymbolPin* pin, mPins)
+    foreach (const SymbolPin* pin, mPins) {
         pins->appendChild(pin->serializeToXmlDomElement());
+    }
     XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const Polygon* polygon, mPolygons)
+    foreach (const Polygon* polygon, mPolygons) {
         geometry->appendChild(polygon->serializeToXmlDomElement());
-    foreach (const Text* text, mTexts)
+    }
+    foreach (const Text* text, mTexts) {
         geometry->appendChild(text->serializeToXmlDomElement());
-    foreach (const Ellipse* ellipse, mEllipses)
+    }
+    foreach (const Ellipse* ellipse, mEllipses) {
         geometry->appendChild(ellipse->serializeToXmlDomElement());
+    }
     return root.take();
-}
-
-bool Symbol::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())                 return false;
-    if (mPins.isEmpty() && mTexts.isEmpty() &&
-        mPolygons.isEmpty() && mEllipses.isEmpty())                 return false;
-    return true;
 }
 
 /*****************************************************************************************

@@ -241,8 +241,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         FilePath subdirPath(directory.getPathTo(dirname));
 
         // check if directory is a valid library element
-        if (!LibraryBaseElement::isDirectoryValidElement(subdirPath))
-        {
+        if (!LibraryBaseElement::isDirectoryLibraryElement(subdirPath)) {
             qWarning() << "Found an invalid directory in the library:" << subdirPath.toNative();
             continue;
         }
@@ -250,8 +249,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         // load the library element --> an exception will be thrown on error
         ElementType* element = new ElementType(subdirPath, false);
 
-        if (elementList.contains(element->getUuid()))
-        {
+        if (elementList.contains(element->getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, element->getUuid().toStr(),
                 QString(tr("There are multiple library elements with the same "
                 "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
@@ -277,7 +275,7 @@ void ProjectLibrary::addElement(ElementType& element,
     if (removedElementsList.contains(&element)) {
         removedElementsList.removeOne(&element);
     } else {
-        element.saveTo(FilePath::getRandomTempPath());
+        element.saveIntoParentDirectory(FilePath::getRandomTempPath());
     }
     elementList.insert(element.getUuid(), &element);
     addedElementsList.append(&element);
@@ -308,7 +306,7 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
         foreach (ElementType* element, removedElementsList) {
             try {
                 if (element->getFilePath().getParentDir().getParentDir() == mLibraryPath) {
-                    element->moveTo(FilePath::getRandomTempPath());
+                    element->moveIntoParentDirectory(FilePath::getRandomTempPath());
                 }
             }
             catch (Exception& e) {
@@ -321,7 +319,7 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
     foreach (ElementType* element, elementList) {
         try {
             if (element->getFilePath().getParentDir().getParentDir() != mLibraryPath) {
-                element->moveTo(parentDir);
+                element->moveIntoParentDirectory(parentDir);
             }
             if (toOriginal && addedElementsList.contains(element))
                 addedElementsList.removeOne(element);

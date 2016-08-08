@@ -45,20 +45,14 @@ class ComponentCategory final : public LibraryCategory
 
     public:
 
-        explicit ComponentCategory(const FilePath& elementDirectory, bool readOnly);
-        virtual ~ComponentCategory();
+        // Constructors / Destructor
+        ComponentCategory() = delete;
+        ComponentCategory(const ComponentCategory& other) = delete;
+        ComponentCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        ~ComponentCategory() noexcept;
 
-    private:
-
-        // make some methods inaccessible...
-        ComponentCategory();
-        ComponentCategory(const ComponentCategory& other);
-        ComponentCategory& operator=(const ComponentCategory& rhs);
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-
+        // Operator Overloadings
+        ComponentCategory& operator=(const ComponentCategory& rhs) = delete;
 };
 
 /*****************************************************************************************

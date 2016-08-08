@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QObject>
 #include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/version.h>
 #include <librepcbcommon/uuid.h>
@@ -34,6 +33,10 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class XmlDomDocument;
+class XmlDomElement;
+
 namespace library {
 
 /*****************************************************************************************
@@ -50,19 +53,21 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit LibraryBaseElement(const QString& xmlFileNamePrefix,
-                                    const QString& xmlRootNodeName,
-                                    const Uuid& uuid, const Version& version,
-                                    const QString& author, const QString& name_en_US,
-                                    const QString& description_en_US,
-                                    const QString& keywords_en_US) throw (Exception);
-        explicit LibraryBaseElement(const FilePath& elementDirectory,
-                                    const QString& xmlFileNamePrefix,
-                                    const QString& xmlRootNodeName, bool readOnly) throw (Exception);
+        LibraryBaseElement() = delete;
+        LibraryBaseElement(const LibraryBaseElement& other) = delete;
+        LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
+                           const QString& xmlRootNodeName, const Uuid& uuid,
+                           const Version& version, const QString& author,
+                           const QString& name_en_US, const QString& description_en_US,
+                           const QString& keywords_en_US) throw (Exception);
+        LibraryBaseElement(const FilePath& elementDirectory, bool dirnameMustBeUuid,
+                           const QString& shortElementName, const QString& xmlRootNodeName,
+                           bool readOnly) throw (Exception);
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
         const FilePath& getFilePath() const noexcept {return mDirectory;}
+        QString checkDirectoryNameValidity() const noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
@@ -87,9 +92,14 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
 
         // General Methods
-        void save() throw (Exception);
-        void saveTo(const FilePath& parentDir) throw (Exception);
-        void moveTo(const FilePath& parentDir) throw (Exception);
+        virtual void save() throw (Exception);
+        virtual void saveTo(const FilePath& destination) throw (Exception);
+        virtual void saveIntoParentDirectory(const FilePath& parentDir) throw (Exception);
+        virtual void moveTo(const FilePath& destination) throw (Exception);
+        virtual void moveIntoParentDirectory(const FilePath& parentDir) throw (Exception);
+
+        // Operator Overloadings
+        LibraryBaseElement& operator=(const LibraryBaseElement& rhs) = delete;
 
         // Static Methods
 
@@ -121,17 +131,21 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          *                          inserted. The locales (values of "locale" attributes)
          *                          are the keys of the list, the node texts ("the value"
          *                          in the example) are the values of the list.
+         * @param throwIfValueEmpty If true and at least one value is an empty string,
+         *                          an exception will be thrown.
          *
          * @throw Exception     This method will throw an exception in the following cases:
          *  - The attribute "locale" of a node does not exist or its value is empty
          *  - There are multiple nodes with the same locale
          *  - There is no entry with the locale "en_US"
+         *  - There was an empty entry and "throwIfValueEmpty" is set to "true"
          *
          * @see #localeStringFromList()
          */
         static void readLocaleDomNodes(const XmlDomElement& parentNode,
                                        const QString& childNodesName,
-                                       QMap<QString, QString>& list) throw (Exception);
+                                       QMap<QString, QString>& list,
+                                       bool throwIfValueEmpty) throw (Exception);
 
         /**
          * @brief Get the string of a specific locale from a QMap
@@ -164,41 +178,30 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         /**
          * @brief Check whether a directory contains a valid library element or not
          *
-         * @param dir   The element's root directory ("{UUID}.type")
+         * @param dir   The element's root directory
          *
-         * @return True if there is a valid element, false if not (or the library element's
-         *              file version is newer than the application's major version)
+         * @return True if there is a valid element, false if not.
          */
-        static bool isDirectoryValidElement(const FilePath& dir) noexcept;
+        static bool isDirectoryLibraryElement(const FilePath& dir) noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        LibraryBaseElement(const LibraryBaseElement& other);
-        LibraryBaseElement& operator=(const LibraryBaseElement& rhs);
+        /**
+         * @brief Read the version number in the version file inside a specific directory
+         *
+         * @param dir   The element's root directory
+         *
+         * @return The version number from the version file.
+         */
+        static Version readFileVersionOfElementDirectory(const FilePath& dir) throw (Exception);
 
 
     protected:
 
         // Protected Methods
-        void readFromFile() throw (Exception);
-
-        /**
-         * @brief Parse and load a DOM tree into this library element object
-         *
-         * Each subclass of #LibraryBaseElement has to override this method and must call
-         * that method on all base classes before loading its own properties!
-         *
-         * @param root          DOM tree root element
-         *
-         * @throw Exception     On any error (for example invalid content in XML files)
-         */
-        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
+        virtual void cleanupAfterLoadingElementFromFile() noexcept;
+        virtual void copyTo(const FilePath& parentDir, bool removeSource) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 
@@ -206,10 +209,14 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         // General Attributes
         mutable FilePath mDirectory;
         mutable bool mDirectoryIsTemporary;
-        QString mXmlFileNamePrefix;
-        QString mXmlRootNodeName;
-        bool mDomTreeParsed;
         bool mOpenedReadOnly;
+        bool mDirectoryBasenameMustBeUuid;
+        QString mShortElementName; ///< used for directory name suffix and xml file basename
+        QString mXmlRootNodeName; ///< required for XML serialization
+
+        // Members required for loading elements from file
+        Version mLoadingElementFileVersion;
+        QSharedPointer<XmlDomDocument> mLoadingXmlFileDocument;
 
         // General Library Element Attributes
         Uuid mUuid;

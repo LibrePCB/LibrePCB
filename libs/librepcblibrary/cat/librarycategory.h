@@ -47,15 +47,14 @@ class LibraryCategory : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryCategory(const QString& xmlFileNamePrefix,
-                                 const QString& xmlRootNodeName,
-                                 const Uuid& uuid, const Version& version,
-                                 const QString& author, const QString& name_en_US,
-                                 const QString& description_en_US,
-                                 const QString& keywords_en_US ) throw (Exception);
-        explicit LibraryCategory(const FilePath& elementDirectory,
-                                 const QString& xmlFileNamePrefix,
-                                 const QString& xmlRootNodeName, bool readOnly) throw (Exception);
+        LibraryCategory() = delete;
+        LibraryCategory(const LibraryCategory& other) = delete;
+        LibraryCategory(const QString& shortElementName, const QString& xmlRootNodeName,
+                        const Uuid& uuid, const Version& version, const QString& author,
+                        const QString& name_en_US, const QString& description_en_US,
+                        const QString& keywords_en_US ) throw (Exception);
+        LibraryCategory(const FilePath& elementDirectory, const QString& shortElementName,
+                        const QString& xmlRootNodeName, bool readOnly) throw (Exception);
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes
@@ -64,24 +63,16 @@ class LibraryCategory : public LibraryBaseElement
         // Setters: Attributes
         void setParentUuid(const Uuid& parentUuid) noexcept {mParentUuid = parentUuid;}
 
-
-    private:
-
-        // make some methods inaccessible...
-        LibraryCategory(const LibraryCategory& other);
-        LibraryCategory& operator=(const LibraryCategory& rhs);
+        // Operator Overloadings
+        LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
 
 
     protected:
 
         // Protected Methods
-        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
         Uuid mParentUuid;

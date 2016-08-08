@@ -372,7 +372,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
         // save symbol to file
-        symbol->saveTo(FilePath(QString("%1/sym").arg(ui->output->text())));
+        symbol->saveIntoParentDirectory(FilePath(QString("%1/sym").arg(ui->output->text())));
         delete symbol;
     }
     catch (Exception& e)
@@ -587,7 +587,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
         // save package to file
-        package->saveTo(FilePath(QString("%1/pkg").arg(ui->output->text())));
+        package->saveIntoParentDirectory(FilePath(QString("%1/pkg").arg(ui->output->text())));
 
         // clean up
         delete package;
@@ -715,12 +715,12 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             }
 
             // save device
-            device->saveTo(FilePath(QString("%1/dev").arg(ui->output->text())));
+            device->saveIntoParentDirectory(FilePath(QString("%1/dev").arg(ui->output->text())));
             delete device;
         }
 
         // save component to file
-        component->saveTo(FilePath(QString("%1/cmp").arg(ui->output->text())));
+        component->saveIntoParentDirectory(FilePath(QString("%1/cmp").arg(ui->output->text())));
         delete component;
     }
     catch (Exception& e)

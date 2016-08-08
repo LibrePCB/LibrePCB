@@ -45,20 +45,14 @@ class SpiceModel final : public LibraryElement
 
     public:
 
-        explicit SpiceModel(const FilePath& elementDirectory, bool readOnly);
-        virtual ~SpiceModel();
+        // Constructors / Destructor
+        SpiceModel() = delete;
+        SpiceModel(const SpiceModel& other) = delete;
+        SpiceModel(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        ~SpiceModel() noexcept;
 
-    private:
-
-        // make some methods inaccessible...
-        SpiceModel();
-        SpiceModel(const SpiceModel& other);
-        SpiceModel& operator=(const SpiceModel& rhs);
-
-
-        // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
-
+        // Operator Overloadings
+        SpiceModel& operator=(const SpiceModel& rhs) = delete;
 };
 
 /*****************************************************************************************

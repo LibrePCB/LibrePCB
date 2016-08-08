@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "device.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
@@ -37,15 +38,33 @@ namespace library {
 Device::Device(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("dev", "device", uuid, version, author, name_en_US, description_en_US, keywords_en_US)
+    LibraryElement("dev", "device", uuid, version, author, name_en_US,
+                   description_en_US, keywords_en_US)
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
 Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryElement(elementDirectory, "dev", "device", readOnly)
 {
-    readFromFile();
+    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+
+    // load attributes
+    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
+    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
+    for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
+         node; node = node->getNextSibling("map"))
+    {
+        Uuid pad = node->getAttribute<Uuid>("pad", true);
+        Uuid signal = node->getText<Uuid>(false);
+        if (mPadSignalMap.contains(pad)) {
+            throw RuntimeError(__FILE__, __LINE__, pad.toStr(),
+                QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                .arg(pad.toStr(), root.getDocFilePath().toNative()));
+        }
+        mPadSignalMap.insert(pad, signal);
+    }
+
+    cleanupAfterLoadingElementFromFile();
 }
 
 Device::~Device() noexcept
@@ -71,20 +90,6 @@ void Device::removePadSignalMapping(const Uuid& pad) noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
-
-void Device::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
-
-    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
-    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
-    for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
-         node; node = node->getNextSibling("map"))
-    {
-        mPadSignalMap.insert(node->getAttribute<Uuid>("pad", true),
-                             node->getText<Uuid>(false));
-    }
-}
 
 XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
 {

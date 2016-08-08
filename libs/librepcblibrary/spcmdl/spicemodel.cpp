@@ -22,6 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "spicemodel.h"
+#include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -33,23 +35,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SpiceModel::SpiceModel(const FilePath& elementDirectory, bool readOnly) :
+SpiceModel::SpiceModel(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryElement(elementDirectory, "spcmdl", "spice_model", readOnly)
 {
-    readFromFile();
+    cleanupAfterLoadingElementFromFile();
 }
 
 SpiceModel::~SpiceModel()
 {
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void SpiceModel::parseDomTree(const XmlDomElement& root) throw (Exception)
-{
-    LibraryElement::parseDomTree(root);
 }
 
 /*****************************************************************************************

@@ -46,17 +46,19 @@ class Device final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Device(const Uuid& uuid, const Version& version, const QString& author,
-                        const QString& name_en_US, const QString& description_en_US,
-                        const QString& keywords_en_US) throw (Exception);
-        explicit Device(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        Device() = delete;
+        Device(const Device& other) = delete;
+        Device(const Uuid& uuid, const Version& version, const QString& author,
+               const QString& name_en_US, const QString& description_en_US,
+               const QString& keywords_en_US) throw (Exception);
+        Device(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Device() noexcept;
 
-        // Getters
+        // Getters: Attributes
         const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
         const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
 
-        // Setters
+        // Setters: Attributes
         void setComponentUuid(const Uuid& uuid) noexcept {mComponentUuid = uuid;}
         void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
 
@@ -66,18 +68,13 @@ class Device final : public LibraryElement
         void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
         void removePadSignalMapping(const Uuid& pad) noexcept;
 
+        // Operator Overloadings
+        Device& operator=(const Device& rhs) = delete;
+
 
     private:
 
-        // make some methods inaccessible...
-        Device();
-        Device(const Device& other);
-        Device& operator=(const Device& rhs);
-
-
         // Private Methods
-
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;

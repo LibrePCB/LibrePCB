@@ -47,36 +47,29 @@ class LibraryElement : public LibraryBaseElement
     public:
 
         // Constructors / Destructor
-        explicit LibraryElement(const QString& xmlFileNamePrefix,
-                                const QString& xmlRootNodeName,
-                                const Uuid& uuid, const Version& version,
-                                const QString& author, const QString& name_en_US,
-                                const QString& description_en_US,
-                                const QString& keywords_en_US) throw (Exception);
-        explicit LibraryElement(const FilePath& elementDirectory,
-                                const QString& xmlFileNamePrefix,
-                                const QString& xmlRootNodeName, bool readOnly) throw (Exception);
+        LibraryElement() = delete;
+        LibraryElement(const LibraryElement& other) = delete;
+        LibraryElement(const QString& shortElementName, const QString& xmlRootNodeName,
+                       const Uuid& uuid, const Version& version, const QString& author,
+                       const QString& name_en_US, const QString& description_en_US,
+                       const QString& keywords_en_US) throw (Exception);
+        LibraryElement(const FilePath& elementDirectory, const QString& shortElementName,
+                       const QString& xmlRootNodeName, bool readOnly) throw (Exception);
         virtual ~LibraryElement() noexcept;
 
         // Getters: Attributes
         const QList<Uuid>& getCategories() const noexcept {return mCategories;}
 
-
-    private:
-
-        // make some methods inaccessible...
-        LibraryElement(const LibraryElement& other);
-        LibraryElement& operator=(const LibraryElement& rhs);
+        // Operator Overloadings
+        LibraryElement& operator=(const LibraryElement& rhs) = delete;
 
 
     protected:
 
         // Protected Methods
-        virtual void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 

@@ -48,10 +48,12 @@ class Package final : public LibraryElement
     public:
 
         // Constructors / Destructor
-        explicit Package(const Uuid& uuid, const Version& version, const QString& author,
-                         const QString& name_en_US, const QString& description_en_US,
-                         const QString& keywords_en_US) throw (Exception);
-        explicit Package(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        Package() = delete;
+        Package(const Package& other) = delete;
+        Package(const Uuid& uuid, const Version& version, const QString& author,
+                const QString& name_en_US, const QString& description_en_US,
+                const QString& keywords_en_US) throw (Exception);
+        Package(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Package() noexcept;
 
         // PackagePad Methods
@@ -74,17 +76,13 @@ class Package final : public LibraryElement
         void addFootprint(Footprint& footprint) noexcept;
         void removeFootprint(Footprint& footprint) noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        Package() = delete;
-        Package(const Package& other) = delete;
+        // Operator Overloadings
         Package& operator=(const Package& rhs) = delete;
 
 
+    private:
+
         // Private Methods
-        void parseDomTree(const XmlDomElement& root) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;

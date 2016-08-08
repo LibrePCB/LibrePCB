@@ -52,8 +52,8 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         mUuid = domElement.getAttribute<Uuid>("uuid", true);
 
         // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames);
-        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
+        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all geometry elements
         for (XmlDomElement* node = domElement.getFirstChild("geometry/*", true, false);
