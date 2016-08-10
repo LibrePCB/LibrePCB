@@ -50,7 +50,7 @@ class GridProperties final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         GridProperties() noexcept;
-        explicit GridProperties(const XmlDomElement& domElement) noexcept;
+        explicit GridProperties(const XmlDomElement& domElement) throw (Exception);
         GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept;
         GridProperties(const GridProperties& other) noexcept;
         ~GridProperties() noexcept;

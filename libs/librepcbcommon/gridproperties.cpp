@@ -38,7 +38,7 @@ GridProperties::GridProperties() noexcept :
 {
 }
 
-GridProperties::GridProperties(const XmlDomElement& domElement) noexcept
+GridProperties::GridProperties(const XmlDomElement& domElement) throw (Exception)
 {
     mType = stringToType(domElement.getAttribute<QString>("type", true));
     mInterval = domElement.getAttribute<Length>("interval", true);

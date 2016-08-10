@@ -43,7 +43,7 @@ BoardDesignRules::BoardDesignRules(const BoardDesignRules& other)
     *this = other;
 }
 
-BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) noexcept :
+BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) throw (Exception) :
     BoardDesignRules() // this loads all default values!
 {
     // general attributes

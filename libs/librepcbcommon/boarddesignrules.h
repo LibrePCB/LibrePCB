@@ -52,7 +52,7 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         // Constructors / Destructor
         BoardDesignRules() noexcept;
         BoardDesignRules(const BoardDesignRules& other);
-        explicit BoardDesignRules(const XmlDomElement& domElement) noexcept;
+        explicit BoardDesignRules(const XmlDomElement& domElement) throw (Exception);
         ~BoardDesignRules() noexcept;
 
         // Getters : General Attributes
