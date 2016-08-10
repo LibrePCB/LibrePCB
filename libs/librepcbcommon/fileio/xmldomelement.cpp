@@ -348,6 +348,12 @@ void XmlDomElement::setAttribute(const QString& name, const QColor& value) noexc
 }
 
 template <>
+void XmlDomElement::setAttribute(const QString& name, const QUrl& value) noexcept
+{
+    setAttribute<QString>(name, value.isValid() ? value.toString(QUrl::PrettyDecoded) : "");
+}
+
+template <>
 void XmlDomElement::setAttribute(const QString& name, const Uuid& value) noexcept
 {
     setAttribute<QString>(name, value.isNull() ? "" : value.toStr());
@@ -471,6 +477,22 @@ QColor XmlDomElement::getAttribute<QColor>(const QString& name, bool throwIfEmpt
     {
         throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
             QString(tr("Invalid Color attribute \"%1\" in node \"%2\".")).arg(name, mName));
+    }
+}
+
+template <>
+QUrl XmlDomElement::getAttribute<QUrl>(const QString& name, bool throwIfEmpty, const QUrl& defaultValue) const throw (Exception)
+{
+    QString attr = getAttribute<QString>(name, throwIfEmpty);
+    QUrl obj(attr, QUrl::StrictMode);
+    if (obj.isValid())
+        return obj;
+    else if ((attr.isEmpty()) && (!throwIfEmpty))
+        return defaultValue;
+    else
+    {
+        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
+            QString(tr("Invalid Url attribute \"%1\" in node \"%2\": %3")).arg(name, mName, obj.errorString()));
     }
 }
 
