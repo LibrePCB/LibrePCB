@@ -117,7 +117,22 @@ namespace librepcb {
  */
 class FilePath final
 {
-    public:
+    public: // Types
+
+        enum CleanFileNameOption {
+            // spaces
+            KeepSpaces      = 0<<1,
+            ReplaceSpaces   = 1<<1,
+            // case
+            KeepCase        = 0<<2,
+            ToLowerCase     = 1<<2,
+            // default
+            Default         = KeepSpaces | KeepCase,
+        };
+        Q_DECLARE_FLAGS(CleanFileNameOptions, CleanFileNameOption);
+
+
+    public: // Methods
 
         // Constructors / Destructor
 
@@ -194,6 +209,13 @@ class FilePath final
          * @return True if the filepath is the filesystem root, false otherwise
          */
         bool isRoot() const noexcept;
+
+        /**
+         * @brief Check if the filepath is located inside another directory
+         *
+         * @return True if the filepath points to an item inside "dir", false otherwise
+         */
+        bool isLocatedInDir(const FilePath& dir) const noexcept;
 
         /**
          * @brief Get the absolute and well-formatted filepath as a QString
@@ -364,6 +386,29 @@ class FilePath final
          */
         static FilePath getRandomTempPath() noexcept;
 
+        /**
+         * @brief Clean a given string so that it becomes a valid filename
+         *
+         * Every time a file- or directory name needs to be constructed (e.g. from user
+         * input), you must use this function to replace/remove all characters which are
+         * not allowed for file/dir paths.
+         *
+         * These are the only allowed characters: A–Z a–z 0–9 . _ -
+         *
+         * In addition, the length of the filename will be limited to 120 characters.
+         *
+         * @param userInput An arbitrary string (may be directly from a user input field)
+         * @param options   Some options to define how the filename should be escaped
+         *
+         * @return A string which is either empty or a valid filename (based on userInput)
+         *
+         * @note    This function does exectly the same on all supported platforms, even
+         *          if the set of allowed characters depends on the platform. This way we
+         *          can guarantee that all created files/directories are platform
+         *          independent.
+         */
+        static QString cleanFileName(const QString& userInput, CleanFileNameOptions options) noexcept;
+
 
         // Operator Overloadings
 
@@ -421,5 +466,8 @@ QDebug& operator<<(QDebug& stream, const FilePath& filepath);
  ****************************************************************************************/
 
 } // namespace librepcb
+
+// QFlags
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::FilePath::CleanFileNameOptions)
 
 #endif // LIBREPCB_FILEPATH_H
