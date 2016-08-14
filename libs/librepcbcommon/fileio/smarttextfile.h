@@ -50,6 +50,8 @@ class SmartTextFile final : public SmartFile
     public:
 
         // Constructors / Destructor
+        SmartTextFile() = delete;
+        SmartTextFile(const SmartTextFile& other) = delete;
 
         /**
          * @brief The constructor to open an existing text file
@@ -107,6 +109,10 @@ class SmartTextFile final : public SmartFile
         void save(bool toOriginal) throw (Exception);
 
 
+        // Operator Overloadings
+        SmartTextFile& operator=(const SmartTextFile& rhs) = delete;
+
+
         // Static Methods
 
         /**
@@ -123,14 +129,6 @@ class SmartTextFile final : public SmartFile
          * @throw Exception If an error occurs
          */
         static SmartTextFile* create(const FilePath& filepath) throw (Exception);
-
-
-    private:
-
-        // make some methods inaccessible...
-        SmartTextFile();
-        SmartTextFile(const SmartTextFile& other);
-        SmartTextFile& operator=(const SmartTextFile& rhs);
 
 
     protected:

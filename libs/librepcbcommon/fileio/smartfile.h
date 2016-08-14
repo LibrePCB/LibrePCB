@@ -137,6 +137,7 @@ class SmartFile
          */
         void removeFile(bool original) throw (Exception);
 
+
         // Operator Overloadings
         SmartFile& operator=(const SmartFile& rhs) = delete;
 
@@ -174,30 +175,6 @@ class SmartFile
          * @param toOriginal    Specifies whether the original or the backup file was saved.
          */
         void updateMembersAfterSaving(bool toOriginal) noexcept;
-
-        /**
-         * @brief Helper method to read the content from a file into a QByteArray
-         *
-         * @param filepath  The path to the file
-         *
-         * @return The file content
-         *
-         * @throw Exception     If an error occurs, this method throws an exception.
-         */
-        static QByteArray readContentFromFile(const FilePath& filepath) throw (Exception);
-
-        /**
-         * @brief Helper method to save the content of a QByteArray to a file
-         *
-         * This method can be used in derived classes of #SmartFile to simply write a
-         * QByteArray to a file.
-         *
-         * @param filepath      The path to the file
-         * @param content       The content which will be written to the file
-         *
-         * @throw Exception     If an error occurs, this method throws an exception.
-         */
-        static void saveContentToFile(const FilePath& filepath, const QByteArray& content) throw (Exception);
 
 
         // General Attributes

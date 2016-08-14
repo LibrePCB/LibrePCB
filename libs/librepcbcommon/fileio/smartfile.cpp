@@ -104,15 +104,7 @@ const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) throw (
         throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
     }
 
-    const FilePath& filepath(toOriginal ? mFilePath : mTmpFilePath);
-
-    if (!filepath.getParentDir().isExistingDir()) {
-        // try to create parent directories
-        if (!filepath.getParentDir().mkPath())
-            qWarning() << "could not make path for file" << filepath.toNative();
-    }
-
-    return filepath;
+    return toOriginal ? mFilePath : mTmpFilePath;
 }
 
 void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept
@@ -122,41 +114,6 @@ void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept
 
     if (toOriginal && mIsCreated)
         mIsCreated = false;
-}
-
-QByteArray SmartFile::readContentFromFile(const FilePath& filepath) throw (Exception)
-{
-    QFile file(filepath.toStr());
-    if (!file.open(QIODevice::ReadOnly)) {
-        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(), QString(tr("Cannot "
-            "open file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
-    }
-    return file.readAll();
-}
-
-void SmartFile::saveContentToFile(const FilePath& filepath, const QByteArray& content) throw (Exception)
-{
-    QSaveFile file(filepath.toStr());
-    if (!file.open(QIODevice::WriteOnly)) {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
-            .arg(filepath.toStr(), file.errorString()).arg(file.error()),
-            QString(tr("Could not open or create file \"%1\": %2"))
-            .arg(filepath.toNative(), file.errorString()));
-    }
-
-    qint64 written = file.write(content);
-    if (written != content.size()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString("%1: %2 (only %3 of %4 bytes written)")
-            .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
-            QString(tr("Could not write to file \"%1\": %2"))
-            .arg(filepath.toNative(), file.errorString()));
-    }
-
-    if (!file.commit()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not write to "
-            "file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
-    }
 }
 
 /*****************************************************************************************

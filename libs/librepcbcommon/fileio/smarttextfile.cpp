@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "smarttextfile.h"
+#include "fileutils.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,14 +36,11 @@ namespace librepcb {
 SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
     SmartFile(filepath, restore, readOnly, create)
 {
-    if (mIsCreated)
-    {
+    if (mIsCreated) {
         // nothing to do, leave "mContent" empty
-    }
-    else
-    {
+    } else {
         // read the content of the file
-        mContent = readContentFromFile(mOpenedFilePath);
+        mContent = FileUtils::readFile(mOpenedFilePath);
     }
 }
 
@@ -57,7 +55,7 @@ SmartTextFile::~SmartTextFile() noexcept
 void SmartTextFile::save(bool toOriginal) throw (Exception)
 {
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    saveContentToFile(filepath, mContent);
+    FileUtils::writeFile(filepath, mContent);
     updateMembersAfterSaving(toOriginal);
 }
 
