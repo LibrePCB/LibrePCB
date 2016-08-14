@@ -358,8 +358,16 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
 
 Schematic* Project::createSchematic(const QString& name) throw (Exception)
 {
-    QString basename = name; /// @todo remove special characters to create a valid filename!
+    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (basename.isEmpty()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("Invalid schematic name: \"%1\"")).arg(name));
+    }
     FilePath filepath = mPath.getPathTo("schematics/" % basename % ".xml");
+    if (filepath.isExistingFile()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("The schematic exists already: \"%1\"")).arg(filepath.toNative()));
+    }
     return Schematic::create(*this, filepath, name);
 }
 
@@ -468,15 +476,31 @@ Board* Project::getBoardByName(const QString& name) const noexcept
 
 Board* Project::createBoard(const QString& name) throw (Exception)
 {
-    QString basename = name; /// @todo remove special characters to create a valid filename!
+    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (basename.isEmpty()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("Invalid board name: \"%1\"")).arg(name));
+    }
     FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    if (filepath.isExistingFile()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
+    }
     return Board::create(*this, filepath, name);
 }
 
 Board* Project::createBoard(const Board& other, const QString& name) throw (Exception)
 {
-    QString basename = name; /// @todo remove special characters to create a valid filename!
+    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (basename.isEmpty()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("Invalid board name: \"%1\"")).arg(name));
+    }
     FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    if (filepath.isExistingFile()) {
+        throw RuntimeError(__FILE__ , __LINE__, QString(),
+            QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
+    }
     return new Board(other, filepath, name);
 }
 
