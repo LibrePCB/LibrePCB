@@ -200,13 +200,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         mSchematicLayerProvider = new SchematicLayerProvider(*this);
 
         // Load all schematics
-        if (create)
-        {
-            FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), "main.xml");
-            Schematic* schematic = Schematic::create(*this, fp, "Main Page");
-            addSchematic(*schematic);
-        }
-        else
+        if (!create)
         {
             for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
                  node; node = node->getNextSibling("schematic"))
@@ -219,13 +213,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // Load all boards
-        if (create)
-        {
-            FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), "default.xml");
-            Board* board = Board::create(*this, fp, "Default");
-            addBoard(*board);
-        }
-        else
+        if (!create)
         {
             for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
                  node; node = node->getNextSibling("board"))
