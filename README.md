@@ -100,6 +100,11 @@ To install LibrePCB on a Linux/UNIX system, just execute the following command a
 sudo make install
 ```
 
+## Credits
+
+- First of all, many thanks to all of our [constributors](AUTHORS.md)!
+- Thanks to [cloudscale.ch](https://www.cloudscale.ch/) for sponsoring our API server!
+
 ## License
 
 LibrePCB is published under the [GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) license.
