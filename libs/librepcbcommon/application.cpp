@@ -75,6 +75,31 @@ Version Application::applicationVersion() noexcept
     return version;
 }
 
+bool Application::isRunningFromInstalledExecutable() noexcept
+{
+    // get the installation prefix directory
+    FilePath installationPrefixDir(INSTALLATION_PREFIX);
+    Q_ASSERT(installationPrefixDir.isValid());
+
+    // get the directory of the currently running executable
+    FilePath executableFilePath(qApp->applicationFilePath());
+    Q_ASSERT(executableFilePath.isValid());
+
+    // check if the running executable is located in the installation prefix directory
+    return executableFilePath.isLocatedInDir(installationPrefixDir);
+}
+
+FilePath Application::getResourcesDir() noexcept
+{
+    if (isRunningFromInstalledExecutable()) {
+        // the application is installed on the system -> use installed ressources
+        return FilePath(INSTALLED_RESOURCES_DIR);
+    } else {
+        // the application is not installed on the system -> use local resources
+        return FilePath(LOCAL_RESOURCES_DIR);
+    }
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <QApplication>
 #include "version.h"
+#include "fileio/filepath.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -60,6 +61,8 @@ class Application final : public QApplication
         static void setApplicationVersion(const Version& version) noexcept;
         static Version applicationVersion() noexcept;
         static int majorVersion() noexcept {return applicationVersion().getNumbers().first();}
+        static bool isRunningFromInstalledExecutable() noexcept;
+        static FilePath getResourcesDir() noexcept;
 
 
     private:
