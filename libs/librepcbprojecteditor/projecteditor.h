@@ -67,11 +67,13 @@ class ProjectEditor final : public QObject
     public:
 
         // Constructors / Destructor
+        ProjectEditor() = delete;
+        ProjectEditor(const Project& other) = delete;
 
         /**
          * @brief The constructor
          */
-        explicit ProjectEditor(workspace::Workspace& workspace, Project& project) throw (Exception);
+        ProjectEditor(workspace::Workspace& workspace, Project& project) throw (Exception);
 
         /**
          * @brief The destructor
@@ -113,13 +115,18 @@ class ProjectEditor final : public QObject
         bool windowIsAboutToClose(QMainWindow& window) noexcept;
 
 
+        // Operator Overloadings
+        ProjectEditor& operator=(const Project& rhs) = delete;
+
+
     public slots:
 
         /**
          * @brief Open the schematic and/or the board editor window
          *
          * Which editors this will open depends on whether the project has schematics
-         * and/or boards.
+         * and/or boards. If there aren't any boards or schematics, the schematic editor
+         * will be shown anyway (otherwise the whole project editor would be invisible).
          */
         void showAllRequiredEditors() noexcept;
 
@@ -196,19 +203,15 @@ class ProjectEditor final : public QObject
         void projectEditorClosed();
 
 
-    private:
+    private: // Methods
 
-        // make some methods inaccessible...
-        ProjectEditor() = delete;
-        ProjectEditor(const Project& other) = delete;
-        ProjectEditor& operator=(const Project& rhs) = delete;
+        int getCountOfVisibleEditorWindows() const noexcept;
 
 
-        // Attributes
+    private: // Data
+
         workspace::Workspace& mWorkspace;
         Project& mProject;
-
-        // General
         QTimer mAutoSaveTimer; ///< the timer for the periodically automatic saving functionality (see also @ref doc_project_save)
         UndoStack* mUndoStack; ///< See @ref doc_project_undostack
         SchematicEditor* mSchematicEditor; ///< The schematic editor (GUI)

@@ -102,18 +102,14 @@ ProjectEditor::~ProjectEditor() noexcept
 
 bool ProjectEditor::windowIsAboutToClose(QMainWindow& window) noexcept
 {
-    int countOfOpenWindows = 0;
-    if (mSchematicEditor->isVisible())  {countOfOpenWindows++;}
-    if (mBoardEditor->isVisible())      {countOfOpenWindows++;}
-
-    if (countOfOpenWindows <= 1)
-    {
+    if (getCountOfVisibleEditorWindows() > 1) {
+        // this is not the last open window, so no problem to close it...
+        return true;
+    } else {
         // the last open window (schematic editor, board editor, ...) is about to close.
         // --> close the whole project
         return closeAndDestroy(&window);
     }
-
-    return true; // this is not the last open window, so no problem to close it...
 }
 
 /*****************************************************************************************
@@ -122,10 +118,14 @@ bool ProjectEditor::windowIsAboutToClose(QMainWindow& window) noexcept
 
 void ProjectEditor::showAllRequiredEditors() noexcept
 {
-    if (!mProject.getBoards().isEmpty())
-        showBoardEditor();
-    if (!mProject.getSchematics().isEmpty())
-        showSchematicEditor();
+    // show board editor if there is at least one board
+    if (!mProject.getBoards().isEmpty())        {showBoardEditor();}
+    // show schematic editor if there is at least one schematic
+    if (!mProject.getSchematics().isEmpty())    {showSchematicEditor();}
+    // if there aren't any boards or schematics, show the schematic editor anyway
+    if (getCountOfVisibleEditorWindows() < 1)   {showSchematicEditor();}
+    // verify if at least one editor window is now visible
+    Q_ASSERT(getCountOfVisibleEditorWindows() > 0);
 }
 
 void ProjectEditor::showSchematicEditor() noexcept
@@ -245,6 +245,18 @@ bool ProjectEditor::closeAndDestroy(bool askForSave, QWidget* msgBoxParent) noex
         default: // cancel, don't close the project
             return false;
     }
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+int ProjectEditor::getCountOfVisibleEditorWindows() const noexcept
+{
+    int count = 0;
+    if (mSchematicEditor->isVisible())  {count++;}
+    if (mBoardEditor->isVisible())      {count++;}
+    return count;
 }
 
 /*****************************************************************************************
