@@ -13,8 +13,7 @@ GENERATED_DIR = ../generated
 # Use common project definitions
 include(../common.pri)
 
-QT += core
-QT -= gui widgets
+QT += core widgets
 
 CONFIG += console
 CONFIG -= app_bundle
@@ -42,6 +41,7 @@ PRE_TARGETDEPS += \
 SOURCES += main.cpp \
     common/filepathtest.cpp \
     common/pointtest.cpp \
-    common/scopeguardtest.cpp
+    common/scopeguardtest.cpp \
+    common/applicationtest.cpp
 
 HEADERS +=
