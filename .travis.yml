@@ -42,7 +42,7 @@ install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
-      sudo apt-get install -qq libglu1-mesa-dev
+      sudo apt-get install -qq libglu1-mesa-dev xvfb
       if [ "$QT_BASE" = "trusty" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools; fi
       if [ -n "$QT_PPA" ]; then sudo apt-get install -qq "${QT_BASE}base" "${QT_BASE}tools"; source "/opt/${QT_BASE}/bin/${QT_BASE}-env.sh"; fi
       if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
@@ -53,7 +53,7 @@ install:
 
 script:
   - mkdir build && cd build && qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" && make -j8 && cd ../   # build librepcb
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ./build/generated/unix/tests; fi                                 # run all unit tests (linux)
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then xvfb-run -a ./build/generated/unix/tests; fi                     # run all unit tests (linux, using xvfb)
   - if [ "${TRAVIS_OS_NAME}" = "osx" ];   then ./build/generated/mac/tests; fi                                  # run all unit tests (mac)
 
 # run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
