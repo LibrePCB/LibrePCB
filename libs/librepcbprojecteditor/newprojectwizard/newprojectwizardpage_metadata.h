@@ -17,66 +17,87 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPLICATION_H
-#define LIBREPCB_APPLICATION_H
+#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H
+#define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QApplication>
-#include "version.h"
-#include "fileio/filepath.h"
+#include <QtWidgets>
+#include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
+
 namespace librepcb {
+namespace project {
+
+namespace Ui {
+class NewProjectWizardPage_Metadata;
+}
 
 /*****************************************************************************************
- *  Class Application
+ *  Class NewProjectWizardPage_Metadata
  ****************************************************************************************/
 
 /**
- * @brief The Application class extends the QApplication with the exception-save method
- *        #notify()
+ * @brief The NewProjectWizardPage_Metadata class
  *
  * @author ubruhin
- * @date 2014-10-23
+ * @date 2016-08-13
  */
-class Application final : public QApplication
+class NewProjectWizardPage_Metadata final : public QWizardPage
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        Application(int& argc, char** argv);
-        ~Application();
+        explicit NewProjectWizardPage_Metadata(QWidget* parent = nullptr) noexcept;
+        NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) = delete;
+        ~NewProjectWizardPage_Metadata() noexcept;
 
-        // Reimplemented from QApplication
-        bool notify(QObject* receiver, QEvent* e);
+        // Setters
+        void setDefaultLocation(const FilePath& dir) noexcept;
 
-        // Static Methods
-        static void setApplicationVersion(const Version& version) noexcept;
-        static Version applicationVersion() noexcept;
-        static int majorVersion() noexcept {return applicationVersion().getNumbers().first();}
-        static bool isRunningFromInstalledExecutable() noexcept;
-        static FilePath getResourcesDir() noexcept;
+        // Getters
+        QString getProjectName() const noexcept;
+        QString getProjectAuthor() const noexcept;
+        bool isLicenseSet() const noexcept;
+        FilePath getProjectLicenseFilePath() const noexcept;
+        FilePath getFullFilePath() const noexcept;
+
+        // Operator Overloadings
+        NewProjectWizardPage_Metadata& operator=(const NewProjectWizardPage_Metadata& rhs) = delete;
 
 
-    private:
+    private: // GUI Action Handlers
 
-        // make some methods inaccessible...
-        Application();
-        Application(const Application& other);
-        Application& operator=(const Application& rhs);
+        void nameChanged(const QString& name) noexcept;
+        void locationChanged(const QString& dir) noexcept;
+        void chooseLocationClicked() noexcept;
+
+
+    private: // Methods
+
+        void updateProjectFilePath() noexcept;
+        bool isComplete() const noexcept override;
+        bool validatePage() noexcept override;
+
+
+    private: // Data
+
+        QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
+        FilePath mFullFilePath;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_APPLICATION_H
+#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H

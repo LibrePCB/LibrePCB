@@ -117,13 +117,13 @@ class ControlPanel final : public QMainWindow
         // Project Management
 
         /**
-         * @brief Create a new project and open it with the editor
+         * @brief Open a project with the editor (or bring an already opened editor to front)
          *
-         * @param filepath  The filepath to the *.lpp project file of the project to create
+         * @param project       An already opened project (but without the editor)
          *
          * @return The pointer to the opened project editor (nullptr on error)
          */
-        project::ProjectEditor* createProject(const FilePath& filepath) noexcept;
+        project::ProjectEditor* openProject(project::Project& project) noexcept;
 
         /**
          * @brief Open a project with the editor (or bring an already opened editor to front)

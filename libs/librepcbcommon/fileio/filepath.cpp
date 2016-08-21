@@ -99,6 +99,14 @@ bool FilePath::isRoot() const noexcept
     return mIsValid && dir.isRoot();
 }
 
+bool FilePath::isLocatedInDir(const FilePath& dir) const noexcept
+{
+    if ((!mIsValid) || (!dir.mIsValid))
+        return false;
+
+    return toStr().startsWith(dir.toStr() % "/", Qt::CaseInsensitive);
+}
+
 QString FilePath::toStr() const noexcept
 {
     if (!mIsValid)
@@ -258,6 +266,24 @@ FilePath FilePath::getRandomTempPath() noexcept
 {
     QString random = QString("%1_%2").arg(QDateTime::currentMSecsSinceEpoch()).arg(qrand());
     return getApplicationTempPath().getPathTo(random);
+}
+
+QString FilePath::cleanFileName(const QString& userInput, CleanFileNameOptions options) noexcept
+{
+    // perform compatibility decomposition (NFKD)
+    QString ret = userInput.normalized(QString::NormalizationForm_KD);
+    // remove leading and trailing spaces
+    ret = ret.trimmed();
+    // replace spaces with underscore
+    if (options.testFlag(CleanFileNameOption::ReplaceSpaces)) ret.replace(' ', '_');
+    // remove all invalid characters
+    QString validChars("_\\-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+    ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+    // make all characters lowerspace
+    if (options.testFlag(CleanFileNameOption::ToLowerCase)) ret = ret.toLower();
+    // limit length to 120 characters
+    ret.truncate(120);
+    return ret;
 }
 
 QString FilePath::makeWellFormatted(const QString& filepath) noexcept

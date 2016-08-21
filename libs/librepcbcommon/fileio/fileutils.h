@@ -57,6 +57,29 @@ class FileUtils final
         // Static methods
 
         /**
+         * @brief Read the content of a file into a QByteArray
+         *
+         * @param filepath      The file to read
+         *
+         * @return              The content of the file
+         *
+         * @throws Exception    If an error occurs.
+         */
+        static QByteArray readFile(const FilePath& filepath) throw (Exception);
+
+        /**
+         * @brief Write the content of a QByteArray into a file
+         *
+         * If the file does not exist, it will be created (with all parent directories).
+         *
+         * @param filepath      The file to (over)write
+         * @param content       The content to write
+         *
+         * @throws Exception    If an error occurs.
+         */
+        static void writeFile(const FilePath& filepath, const QByteArray& content) throw (Exception);
+
+        /**
          * @brief Copy a single file
          *
          * @param source        Filepath to an existing file.

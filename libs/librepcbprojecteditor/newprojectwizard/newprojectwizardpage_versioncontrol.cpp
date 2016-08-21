@@ -21,55 +21,56 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "smarttextfile.h"
-#include "fileutils.h"
+#include <QtWidgets>
+#include "newprojectwizardpage_versioncontrol.h"
+#include "ui_newprojectwizardpage_versioncontrol.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
+NewProjectWizardPage_VersionControl::NewProjectWizardPage_VersionControl(QWidget *parent) noexcept :
+    QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_VersionControl)
 {
-    if (mIsCreated) {
-        // nothing to do, leave "mContent" empty
-    } else {
-        // read the content of the file
-        mContent = FileUtils::readFile(mOpenedFilePath);
-    }
+    mUi->setupUi(this);
+    setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
+    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 }
 
-SmartTextFile::~SmartTextFile() noexcept
+NewProjectWizardPage_VersionControl::~NewProjectWizardPage_VersionControl() noexcept
 {
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Getters
  ****************************************************************************************/
 
-void SmartTextFile::save(bool toOriginal) throw (Exception)
+bool NewProjectWizardPage_VersionControl::getInitGitRepository() const noexcept
 {
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, mContent);
-    updateMembersAfterSaving(toOriginal);
+    return mUi->gbxInitGitRepo->isChecked();
 }
 
 /*****************************************************************************************
- *  Static Methods
+ *  GUI Action Handlers
  ****************************************************************************************/
 
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
-{
-    return new SmartTextFile(filepath, false, false, true);
-}
+
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb

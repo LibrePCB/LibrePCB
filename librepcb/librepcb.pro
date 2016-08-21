@@ -30,6 +30,8 @@ macx {
 unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = $${PREFIX}/bin
+    resources.path = $${INSTALLED_RESOURCES_DIR}/../
+    resources.files = $${LOCAL_RESOURCES_DIR}
     icon.path = $${PREFIX}/share/pixmaps
     icon.files = ../packaging/unix/img/librepcb.svg
     desktop.path = $${PREFIX}/share/applications
@@ -38,7 +40,7 @@ unix:!macx {
     mimexml.files = ../packaging/unix/mime/librepcb.xml
     mimedesktop.path = $${PREFIX}/share/mimelnk/application
     mimedesktop.files = ../packaging/unix/mime/x-librepcb-project.desktop
-    INSTALLS += target icon desktop mimexml mimedesktop
+    INSTALLS += target resources icon desktop mimexml mimedesktop
 }
 
 # Note: The order of the libraries is very important for the linker!
@@ -117,3 +119,10 @@ lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_PATH}/${Q
 lrelease.CONFIG += no_link
 QMAKE_EXTRA_COMPILERS += lrelease
 PRE_TARGETDEPS += compiler_lrelease_make_all
+
+# Copy resource files to output directory
+copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../res/.)\"" "\"$$system_path($${LOCAL_RESOURCES_DIR})\""
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata

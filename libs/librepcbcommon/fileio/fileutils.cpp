@@ -33,6 +33,49 @@ namespace librepcb {
  *  Static Methods
  ****************************************************************************************/
 
+QByteArray FileUtils::readFile(const FilePath& filepath) throw (Exception)
+{
+    if (!filepath.isExistingFile()) {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            QString(tr("The file \"%1\" does not exist."))
+            .arg(filepath.toNative()));
+    }
+    QFile file(filepath.toStr());
+    if (!file.open(QIODevice::ReadOnly)) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Cannot "
+            "open file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
+    }
+    return file.readAll();
+}
+
+void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) throw (Exception)
+{
+    FilePath parentDir = filepath.getParentDir();
+    if (!parentDir.mkPath()) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Could not create directory \"%1\".")).arg(parentDir.toNative()));
+    }
+    QSaveFile file(filepath.toStr());
+    if (!file.open(QIODevice::WriteOnly)) {
+        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
+            .arg(filepath.toStr(), file.errorString()).arg(file.error()),
+            QString(tr("Could not open or create file \"%1\": %2"))
+            .arg(filepath.toNative(), file.errorString()));
+    }
+    qint64 written = file.write(content);
+    if (written != content.size()) {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString("%1: %2 (only %3 of %4 bytes written)")
+            .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
+            QString(tr("Could not write to file \"%1\": %2"))
+            .arg(filepath.toNative(), file.errorString()));
+    }
+    if (!file.commit()) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not write to "
+            "file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
+    }
+}
+
 void FileUtils::copyFile(const FilePath& source, const FilePath& dest) throw (Exception)
 {
     if (!source.isExistingFile()) {

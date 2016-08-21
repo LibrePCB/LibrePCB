@@ -71,7 +71,11 @@ SOURCES += \
     boardeditor/fabricationoutputdialog.cpp \
     cmd/cmdremovedevicefromboard.cpp \
     cmd/cmdremoveviafromboard.cpp \
-    cmd/cmddetachboardnetpointfromviaorpad.cpp
+    cmd/cmddetachboardnetpointfromviaorpad.cpp \
+    newprojectwizard/newprojectwizard.cpp \
+    newprojectwizard/newprojectwizardpage_metadata.cpp \
+    newprojectwizard/newprojectwizardpage_initialization.cpp \
+    newprojectwizard/newprojectwizardpage_versioncontrol.cpp
 
 HEADERS += \
     projecteditor.h \
@@ -124,7 +128,11 @@ HEADERS += \
     boardeditor/fabricationoutputdialog.h \
     cmd/cmdremovedevicefromboard.h \
     cmd/cmdremoveviafromboard.h \
-    cmd/cmddetachboardnetpointfromviaorpad.h
+    cmd/cmddetachboardnetpointfromviaorpad.h \
+    newprojectwizard/newprojectwizard.h \
+    newprojectwizard/newprojectwizardpage_metadata.h \
+    newprojectwizard/newprojectwizardpage_initialization.h \
+    newprojectwizard/newprojectwizardpage_versioncontrol.h
 
 FORMS += \
     schematiceditor/schematiceditor.ui \
@@ -139,5 +147,9 @@ FORMS += \
     dialogs/addcomponentdialog.ui \
     boardeditor/boardlayersdock.ui \
     boardeditor/boardviapropertiesdialog.ui \
-    boardeditor/fabricationoutputdialog.ui
+    boardeditor/fabricationoutputdialog.ui \
+    newprojectwizard/newprojectwizard.ui \
+    newprojectwizard/newprojectwizardpage_metadata.ui \
+    newprojectwizard/newprojectwizardpage_initialization.ui \
+    newprojectwizard/newprojectwizardpage_versioncontrol.ui
 

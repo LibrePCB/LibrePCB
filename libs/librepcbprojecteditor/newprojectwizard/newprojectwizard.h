@@ -17,59 +17,84 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARD_H
+#define LIBREPCB_PROJECT_NEWPROJECTWIZARD_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "smarttextfile.h"
-#include "fileutils.h"
+#include <QtWidgets>
+#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/fileio/filepath.h>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+
 namespace librepcb {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
-{
-    if (mIsCreated) {
-        // nothing to do, leave "mContent" empty
-    } else {
-        // read the content of the file
-        mContent = FileUtils::readFile(mOpenedFilePath);
-    }
+namespace workspace {
+class Workspace;
 }
 
-SmartTextFile::~SmartTextFile() noexcept
-{
+namespace project {
+
+class Project;
+class NewProjectWizardPage_Metadata;
+class NewProjectWizardPage_Initialization;
+class NewProjectWizardPage_VersionControl;
+
+namespace Ui {
+class NewProjectWizard;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Class NewProjectWizard
  ****************************************************************************************/
 
-void SmartTextFile::save(bool toOriginal) throw (Exception)
+/**
+ * @brief The NewProjectWizard class
+ *
+ * @author ubruhin
+ * @date 2016-08-13
+ */
+class NewProjectWizard final : public QWizard
 {
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, mContent);
-    updateMembersAfterSaving(toOriginal);
-}
+        Q_OBJECT
 
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
+    public:
 
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
-{
-    return new SmartTextFile(filepath, false, false, true);
-}
+        // Constructors / Destructor
+        NewProjectWizard() = delete;
+        NewProjectWizard(const NewProjectWizard& other) = delete;
+        explicit NewProjectWizard(const workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
+        ~NewProjectWizard() noexcept;
+
+        // Setters
+        void setLocation(const FilePath& dir) noexcept;
+
+        // General Methods
+        Project* createProject() const throw (Exception);
+
+        // Operator Overloadings
+        NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;
+
+
+    private: // Data
+
+        const workspace::Workspace& mWorkspace;
+        QScopedPointer<Ui::NewProjectWizard> mUi;
+        NewProjectWizardPage_Metadata* mPageMetadata;
+        NewProjectWizardPage_Initialization* mPageInitialization;
+        NewProjectWizardPage_VersionControl* mPageVersionControl;
+};
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARD_H

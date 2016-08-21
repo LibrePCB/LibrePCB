@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "smartversionfile.h"
+#include "fileutils.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -41,7 +42,7 @@ SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool 
     }
     else {
         // read the content of the file
-        QString content = QString(readContentFromFile(mOpenedFilePath));
+        QString content = QString(FileUtils::readFile(mOpenedFilePath));
         QStringList lines = content.split("\n", QString::KeepEmptyParts);
         mVersion.setVersion((lines.count() > 0) ? lines.first() : QString());
         if (!mVersion.isValid()) {
@@ -63,7 +64,7 @@ void SmartVersionFile::save(bool toOriginal) throw (Exception)
 {
     if (mVersion.isValid()) {
         const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-        saveContentToFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
+        FileUtils::writeFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
         updateMembersAfterSaving(toOriginal);
     } else {
         throw LogicError(__FILE__, __LINE__, mVersion.toStr(), tr("Invalid version number"));

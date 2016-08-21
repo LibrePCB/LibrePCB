@@ -17,66 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPLICATION_H
-#define LIBREPCB_APPLICATION_H
+#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
+#define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QApplication>
-#include "version.h"
-#include "fileio/filepath.h"
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
+
 namespace librepcb {
+namespace project {
+
+namespace Ui {
+class NewProjectWizardPage_Initialization;
+}
 
 /*****************************************************************************************
- *  Class Application
+ *  Class NewProjectWizardPage_Initialization
  ****************************************************************************************/
 
 /**
- * @brief The Application class extends the QApplication with the exception-save method
- *        #notify()
+ * @brief The NewProjectWizardPage_Initialization class
  *
  * @author ubruhin
- * @date 2014-10-23
+ * @date 2016-08-13
  */
-class Application final : public QApplication
+class NewProjectWizardPage_Initialization final : public QWizardPage
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        Application(int& argc, char** argv);
-        ~Application();
 
-        // Reimplemented from QApplication
-        bool notify(QObject* receiver, QEvent* e);
+        explicit NewProjectWizardPage_Initialization(QWidget* parent = nullptr) noexcept;
+        NewProjectWizardPage_Initialization(const NewProjectWizardPage_Initialization& other) = delete;
+        ~NewProjectWizardPage_Initialization() noexcept;
 
-        // Static Methods
-        static void setApplicationVersion(const Version& version) noexcept;
-        static Version applicationVersion() noexcept;
-        static int majorVersion() noexcept {return applicationVersion().getNumbers().first();}
-        static bool isRunningFromInstalledExecutable() noexcept;
-        static FilePath getResourcesDir() noexcept;
+        // Getters
+        bool getCreateSchematic() const noexcept;
+        QString getSchematicName() const noexcept;
+        QString getSchematicFileName() const noexcept;
+        bool getCreateBoard() const noexcept;
+        QString getBoardName() const noexcept;
+        QString getBoardFileName() const noexcept;
+
+        // Operator Overloadings
+        NewProjectWizardPage_Initialization& operator=(const NewProjectWizardPage_Initialization& rhs) = delete;
 
 
-    private:
+    private: // GUI Action Handlers
 
-        // make some methods inaccessible...
-        Application();
-        Application(const Application& other);
-        Application& operator=(const Application& rhs);
+        void schematicNameChanged(const QString& name) noexcept;
+        void boardNameChanged(const QString& name) noexcept;
+
+
+    private: // Methods
+
+        bool isComplete() const noexcept override;
+
+
+    private: // Data
+
+        QScopedPointer<Ui::NewProjectWizardPage_Initialization> mUi;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_APPLICATION_H
+#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H

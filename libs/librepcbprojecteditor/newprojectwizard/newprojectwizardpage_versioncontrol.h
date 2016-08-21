@@ -17,59 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H
+#define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "smarttextfile.h"
-#include "fileutils.h"
+#include <QtWidgets>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
+
 namespace librepcb {
+namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
-{
-    if (mIsCreated) {
-        // nothing to do, leave "mContent" empty
-    } else {
-        // read the content of the file
-        mContent = FileUtils::readFile(mOpenedFilePath);
-    }
-}
-
-SmartTextFile::~SmartTextFile() noexcept
-{
+namespace Ui {
+class NewProjectWizardPage_VersionControl;
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Class NewProjectWizardPage_VersionControl
  ****************************************************************************************/
 
-void SmartTextFile::save(bool toOriginal) throw (Exception)
+/**
+ * @brief The NewProjectWizardPage_VersionControl class
+ *
+ * @author ubruhin
+ * @date 2016-08-13
+ *
+ * @todo Add more functionality (run "git init" and "git commit").
+ */
+class NewProjectWizardPage_VersionControl final : public QWizardPage
 {
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, mContent);
-    updateMembersAfterSaving(toOriginal);
-}
+        Q_OBJECT
 
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
+    public:
 
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
-{
-    return new SmartTextFile(filepath, false, false, true);
-}
+        // Constructors / Destructor
+
+        explicit NewProjectWizardPage_VersionControl(QWidget* parent = nullptr) noexcept;
+        NewProjectWizardPage_VersionControl(const NewProjectWizardPage_VersionControl& other) = delete;
+        ~NewProjectWizardPage_VersionControl() noexcept;
+
+        // Getters
+        bool getInitGitRepository() const noexcept;
+
+        // Operator Overloadings
+        NewProjectWizardPage_VersionControl& operator=(const NewProjectWizardPage_VersionControl& rhs) = delete;
+
+
+    private: // GUI Action Handlers
+
+
+    private: // Methods
+
+
+    private: // Data
+
+        QScopedPointer<Ui::NewProjectWizardPage_VersionControl> mUi;
+};
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H

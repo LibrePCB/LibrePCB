@@ -80,16 +80,12 @@ void Debug::setDebugLevelLogFile(DebugLevel_t level)
         mLogFilepath.getParentDir().mkPath();
         mLogFile = new QFile(mLogFilepath.toStr());
         bool success = mLogFile->open(QFile::WriteOnly);
-        if (success)
-        {
+        if (success) {
             mDebugLevelLogFile = level; // activate logging to file immediately!
-            qDebug() << "enabled logging to file" << mLogFilepath.toNative();
-            qDebug() << "Qt version:" << qVersion();
-        }
-        else
-        {
-            qWarning() << "cannot enable logging to file" << mLogFilepath.toNative();
-            qWarning() << "error message:" << mLogFile->errorString();
+            qDebug() << "Enabled logging to file:" << mLogFilepath.toNative();
+        } else {
+            qWarning() << "Cannot enable logging to file" << mLogFilepath.toNative();
+            qWarning() << "Error message:" << mLogFile->errorString();
             delete mLogFile;
             mLogFile = 0;
         }

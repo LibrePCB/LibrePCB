@@ -20,56 +20,71 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+
 #include <QtCore>
-#include "smarttextfile.h"
-#include "fileutils.h"
+#include <gtest/gtest.h>
+#include <librepcbcommon/application.h>
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace tests {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Test Class
  ****************************************************************************************/
 
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
-    SmartFile(filepath, restore, readOnly, create)
+class ApplicationTest : public ::testing::Test
 {
-    if (mIsCreated) {
-        // nothing to do, leave "mContent" empty
-    } else {
-        // read the content of the file
-        mContent = FileUtils::readFile(mOpenedFilePath);
-    }
-}
-
-SmartTextFile::~SmartTextFile() noexcept
-{
-}
+};
 
 /*****************************************************************************************
- *  General Methods
+ *  Test Methods
  ****************************************************************************************/
 
-void SmartTextFile::save(bool toOriginal) throw (Exception)
+TEST(ApplicationTest, testApplicationVersion)
 {
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, mContent);
-    updateMembersAfterSaving(toOriginal);
+    // read application version and check validity
+    Version v = Application::applicationVersion();
+    EXPECT_TRUE(v.isValid());
+
+    // compare with QApplication version
+    Version v1(qApp->applicationVersion());
+    EXPECT_TRUE(v1.isValid());
+    EXPECT_EQ(v, v1);
+
+    // compare with defines
+    Version v2(QString("%1.%2.%3").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH));
+    EXPECT_TRUE(v2.isValid());
+    EXPECT_EQ(v, v2);
 }
 
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
+TEST(ApplicationTest, testMajorVersion)
 {
-    return new SmartTextFile(filepath, false, false, true);
+    EXPECT_EQ(APP_VERSION_MAJOR, Application::majorVersion());
+}
+
+TEST(ApplicationTest, testIsRunningFromInstalledExecutable)
+{
+    // as there is no "make install" available for the unit tests, it can't be installed ;)
+    EXPECT_FALSE(Application::isRunningFromInstalledExecutable());
+}
+
+TEST(ApplicationTest, testGetResourcesDir)
+{
+    // as the tests can't be installed, the resources must be located in LOCAL_RESOURCES_DIR
+    EXPECT_EQ(Application::getResourcesDir(), FilePath(LOCAL_RESOURCES_DIR));
+
+    // check if the resources directory is valid, exists and is not empty
+    EXPECT_TRUE(Application::getResourcesDir().isValid());
+    EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
+    EXPECT_FALSE(Application::getResourcesDir().isEmptyDir());
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace tests
 } // namespace librepcb

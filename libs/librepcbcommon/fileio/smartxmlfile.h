@@ -56,6 +56,8 @@ class SmartXmlFile final : public SmartFile
     public:
 
         // Constructors / Destructor
+        SmartXmlFile() = delete;
+        SmartXmlFile(const SmartXmlFile& other) = delete;
 
         /**
          * @brief The constructor to open an existing XML file
@@ -101,6 +103,10 @@ class SmartXmlFile final : public SmartFile
         void save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception);
 
 
+        // Operator Overloadings
+        SmartXmlFile& operator=(const SmartXmlFile& rhs) = delete;
+
+
         // Static Methods
 
         /**
@@ -119,15 +125,7 @@ class SmartXmlFile final : public SmartFile
         static SmartXmlFile* create(const FilePath &filepath) throw (Exception);
 
 
-    private:
-
-        // make some methods inaccessible...
-        SmartXmlFile();
-        SmartXmlFile(const SmartXmlFile& other);
-        SmartXmlFile& operator=(const SmartXmlFile& rhs);
-
-
-        // Private Methods
+    private: // Methods
 
         /**
          * @brief Constructor to create or open a XML file

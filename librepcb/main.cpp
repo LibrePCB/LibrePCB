@@ -41,6 +41,7 @@ using namespace librepcb::workspace;
  ****************************************************************************************/
 
 static void setApplicationMetadata() noexcept;
+static void writeLogHeader() noexcept;
 static void installTranslations() noexcept;
 static void init3rdPartyLibs() noexcept;
 static void cleanup3rdPartyLibs() noexcept;
@@ -65,6 +66,9 @@ int main(int argc, char* argv[])
     // Creates the Debug object which installs the message handler. This must be done as
     // early as possible, but *after* setting application metadata (organization + name).
     Debug::instance();
+
+    // Write some information about the application instance to the log.
+    writeLogHeader();
 
     // Install translation files. This must be done before any widget is shown.
     installTranslations();
@@ -110,6 +114,27 @@ static void setApplicationMetadata() noexcept
 #endif
     Application::setApplicationVersion(Version(QString("%1.%2.%3").arg(APP_VERSION_MAJOR)
                                        .arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH)));
+}
+
+/*****************************************************************************************
+ *  writeLogHeader()
+ ****************************************************************************************/
+
+static void writeLogHeader() noexcept
+{
+    // @TODO: After removing support for Qt versions below 5.5, we could use qInfo() here.
+
+    // write application name and version to log
+    QString msg = QString("LibrePCB %1 (%2)").arg(qApp->applicationVersion(), GIT_VERSION);
+    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+
+    // write Qt version to log
+    msg = QString("Qt version: %1 (compiled against %2)").arg(qVersion(), QT_VERSION_STR);
+    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+
+    // write resources directory path to log
+    msg = QString("Resources directory: %1").arg(Application::getResourcesDir().toNative());
+    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
 }
 
 /*****************************************************************************************

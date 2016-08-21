@@ -32,6 +32,7 @@
 #include <librepcbworkspace/projecttreeitem.h>
 #include <librepcbworkspace/library/workspacelibrary.h>
 #include <librepcbprojecteditor/projecteditor.h>
+#include <librepcbprojecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcbcommon/application.h>
 #include "../markdown/markdownconverter.h"
 
@@ -48,7 +49,7 @@ using namespace workspace;
  ****************************************************************************************/
 
 ControlPanel::ControlPanel(Workspace& workspace) :
-    QMainWindow(0), mWorkspace(workspace), mUi(new Ui::ControlPanel)
+    QMainWindow(0), mWorkspace(workspace), mUi(new librepcb::Ui::ControlPanel)
 {
     mUi->setupUi(this);
 
@@ -191,22 +192,29 @@ void ControlPanel::showProjectReadmeInBrowser(const FilePath& projectFilePath) n
  *  Project Management
  ****************************************************************************************/
 
-ProjectEditor* ControlPanel::createProject(const FilePath& filepath) noexcept
+project::ProjectEditor* ControlPanel::openProject(project::Project& project) noexcept
 {
     try
     {
-        Project* project = Project::create(filepath);
-        ProjectEditor* editor = new ProjectEditor(mWorkspace, *project);
-        connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
-        connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
-        mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-        mWorkspace.setLastRecentlyUsedProject(filepath);
+        ProjectEditor* editor = getOpenProject(project.getFilepath());
+        if (!editor) {
+            editor = new ProjectEditor(mWorkspace, project);
+            connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
+            connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
+            mOpenProjectEditors.insert(project.getFilepath().toUnique().toStr(), editor);
+            mWorkspace.setLastRecentlyUsedProject(project.getFilepath());
+        }
         editor->showAllRequiredEditors();
         return editor;
     }
+    catch (UserCanceled& e)
+    {
+        // do nothing
+        return nullptr;
+    }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Could not create project"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not open project"), e.getUserMsg());
         return nullptr;
     }
 }
@@ -305,22 +313,16 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_actionNew_Project_triggered()
 {
-    QSettings settings; // client settings
-    FilePath lastNewFile(settings.value("controlpanel/last_new_project").toString());
-    if (!lastNewFile.getParentDir().isExistingDir())
-        lastNewFile.setPath(mWorkspace.getProjectsPath().toStr());
-
-    FilePath filepath(QFileDialog::getSaveFileName(this, tr("New Project"), lastNewFile.toStr(),
-                                    tr("LibrePCB project files (%1)").arg("*.lpp")));
-    if (filepath.getSuffix() != "lpp")
-        filepath.setPath(filepath.toStr() % ".lpp");
-
-    if (!filepath.isValid())
-        return;
-
-    settings.setValue("controlpanel/last_new_project", filepath.toNative());
-
-    createProject(filepath);
+    NewProjectWizard wizard(mWorkspace, this);
+    wizard.setLocation(mWorkspace.getProjectsPath());
+    if (wizard.exec() == QWizard::Accepted) {
+        try {
+            QScopedPointer<Project> project(wizard.createProject()); // can throw
+            openProject(*project.take());
+        } catch (Exception& e) {
+            QMessageBox::critical(this, tr("Could not create project"), e.getUserMsg());
+        }
+    }
 }
 
 void ControlPanel::on_actionOpen_Project_triggered()

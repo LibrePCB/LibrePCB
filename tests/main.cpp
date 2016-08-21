@@ -23,6 +23,7 @@
 
 #include <QtCore>
 #include <gmock/gmock.h>
+#include <librepcbcommon/application.h>
 #include <librepcbcommon/debug.h>
 
 /*****************************************************************************************
@@ -36,6 +37,14 @@ using namespace librepcb;
 
 int main(int argc, char *argv[])
 {
+    // many classes rely on a QApplication instance, so we create it here
+    Application app(argc, argv);
+    Application::setOrganizationName("LibrePCB");
+    Application::setOrganizationDomain("librepcb.org");
+    Application::setApplicationName("LibrePCB-UnitTests");
+    Application::setApplicationVersion(Version(QString("%1.%2.%3").arg(APP_VERSION_MAJOR)
+                                       .arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH)));
+
     // disable the whole debug output (we want only the output from gtest)
     Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
     Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);

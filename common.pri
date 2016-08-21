@@ -12,6 +12,10 @@ macx:DESTDIR = $${GENERATED_DIR}/mac
 unix:!macx:DESTDIR = $${GENERATED_DIR}/unix
 win32:DESTDIR = $${GENERATED_DIR}/windows
 
+# set destination path for resources
+LOCAL_RESOURCES_DIR = $$shadowed($$absolute_path($${GENERATED_DIR}/res, $$_PRO_FILE_PWD_))
+INSTALLED_RESOURCES_DIR = $${PREFIX}/share/librepcb/res
+
 # use separate folders for different types of files
 OBJECTS_DIR = obj
 MOC_DIR = moc
@@ -20,7 +24,7 @@ UI_DIR = ui
 UI_HEADERS_DIR = ui
 UI_SOURCES_DIR = ui
 
-#is qt version sufficient
+# is qt version sufficient
 lessThan(QT_MAJOR_VERSION, 5) {
     error("Qt version $$[QT_VERSION] is too old, should be version 5.2 or newer!")
 } else {
@@ -37,7 +41,11 @@ CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
 
+# set preprocessor defines
 DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
+DEFINES += LOCAL_RESOURCES_DIR="\\\"$${LOCAL_RESOURCES_DIR}\\\""
+DEFINES += INSTALLED_RESOURCES_DIR="\\\"$${INSTALLED_RESOURCES_DIR}\\\""
+DEFINES += INSTALLATION_PREFIX="\\\"$${PREFIX}\\\""
 
 # Define the application version
 DEFINES += APP_VERSION_MAJOR=0
