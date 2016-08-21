@@ -55,15 +55,39 @@ Version::~Version() noexcept
  *  Getters
  ****************************************************************************************/
 
+bool Version::isPrefixOf(const Version& other) const noexcept
+{
+    if ((other.mNumbers.count() >= mNumbers.count()) && (mNumbers.count() > 0)) {
+        for (int i = 0; i < mNumbers.count(); i++) {
+            if (mNumbers.at(i) != other.mNumbers.at(i)) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
 QString Version::toStr() const noexcept
 {
-    QString str;
-    for (int i = 0; i < mNumbers.count(); i++)
-    {
-        if (i > 0) str.append(".");
-        str.append(QString::number(mNumbers.at(i)));
+    return toPrettyStr(0);
+}
+
+QString Version::toPrettyStr(int minSegCount, int maxSegCount) const noexcept
+{
+    Q_ASSERT(maxSegCount >= minSegCount);
+
+    if (isValid()) {
+        QString str;
+        for (int i = 0; i < qMin(qMax(mNumbers.count(), minSegCount), maxSegCount); i++) {
+            if (i > 0) str.append(".");
+            str.append(QString::number((i < mNumbers.count()) ? mNumbers.at(i) : 0));
+        }
+        return str;
+    } else {
+        return QString();
     }
-    return str;
 }
 
 QString Version::toComparableStr() const noexcept
@@ -127,38 +151,52 @@ Version& Version::operator=(const Version& rhs) noexcept
 
 bool Version::operator>(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) > 0);
+    if (isValid() && rhs.isValid()) {
+        return (compare(rhs) > 0);
+    } else {
+        return false;
+    }
 }
 
 bool Version::operator<(const Version& rhs) const  noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) < 0);
+    if (isValid() && rhs.isValid()) {
+        return (compare(rhs) < 0);
+    } else {
+        return false;
+    }
 }
 
 bool Version::operator>=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) >= 0);
+    if (isValid() && rhs.isValid()) {
+        return (compare(rhs) >= 0);
+    } else {
+        return false;
+    }
 }
 
 bool Version::operator<=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) <= 0);
+    if (isValid() && rhs.isValid()) {
+        return (compare(rhs) <= 0);
+    } else {
+        return false;
+    }
 }
 
 bool Version::operator==(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) == 0);
+    if (isValid() && rhs.isValid()) {
+        return (compare(rhs) == 0);
+    } else {
+        return false;
+    }
 }
 
 bool Version::operator!=(const Version& rhs) const noexcept
 {
-    if (mNumbers.isEmpty()) return false;
-    return (compare(rhs) != 0);
+    return !(*this == rhs);
 }
 
 /*****************************************************************************************
