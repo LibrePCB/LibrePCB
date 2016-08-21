@@ -39,7 +39,7 @@ namespace librepcb {
  * @brief This class provides some methods to get information from the operating system
  *
  * For example, this class is used to get the name of the user which is logged in and the
- * hostname of the computer to create a lock file (see class FileLock).
+ * hostname of the computer to create a lock file (see class #DirectoryLock).
  *
  * @note Only static methods are available. You cannot create objects of this class.
  *

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/directorylock.h>
 #include <librepcbcommon/exceptions.h>
 
 /*****************************************************************************************
@@ -202,7 +202,7 @@ class Workspace final : public QObject
 
         // Attributes
         FilePath mPath; ///< a FilePath object which represents the workspace directory
-        FileLock mLock; ///< to lock the whole workspace (allow only one app instance)
+        DirectoryLock mLock; ///< to lock the whole workspace (allow only one app instance)
         FilePath mMetadataPath; ///< the directory ".metadata/v#"
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"

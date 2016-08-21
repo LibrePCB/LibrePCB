@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QPrinter>
 #include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/directorylock.h>
 #include <librepcbcommon/fileio/smarttextfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
@@ -89,13 +89,13 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
     // project should be opened, the lock file will be created/updated here.
     switch (mFileLock.getStatus()) // throws an exception on error
     {
-        case FileLock::LockStatus_t::Unlocked:
+        case DirectoryLock::LockStatus_t::Unlocked:
         {
             // nothing to do here (the project will be locked later)
             break;
         }
 
-        case FileLock::LockStatus_t::Locked:
+        case DirectoryLock::LockStatus_t::Locked:
         {
             if (!mIsReadOnly)
             {
@@ -116,7 +116,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             break;
         }
 
-        case FileLock::LockStatus_t::StaleLock:
+        case DirectoryLock::LockStatus_t::StaleLock:
         {
             // the application crashed while this project was open! ask the user what to do
             QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Restore Project?"),

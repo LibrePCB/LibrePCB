@@ -71,17 +71,17 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         // Check if the workspace is locked (already open or application was crashed).
         switch (mLock.getStatus()) // throws an exception on error
         {
-            case FileLock::LockStatus_t::Unlocked:
+            case DirectoryLock::LockStatus_t::Unlocked:
                 break; // nothing to do here (the workspace will be locked later)
 
-            case FileLock::LockStatus_t::Locked:
+            case DirectoryLock::LockStatus_t::Locked:
             {
                 // the workspace is locked by another application instance
                 throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
                                    "opened by another application instance or user!"));
             }
 
-            case FileLock::LockStatus_t::StaleLock:
+            case DirectoryLock::LockStatus_t::StaleLock:
             {
                 // ignore stale lock as there is nothing to restore
                 qWarning() << "There was a stale lock on the workspace:" << mPath;

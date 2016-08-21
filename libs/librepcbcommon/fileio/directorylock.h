@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FILELOCK_H
-#define LIBREPCB_FILELOCK_H
+#ifndef LIBREPCB_DIRECTORYLOCK_H
+#define LIBREPCB_DIRECTORYLOCK_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,7 +33,7 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class FileLock
+ *  Class DirectoryLock
  ****************************************************************************************/
 
 /**
@@ -86,10 +86,10 @@ namespace librepcb {
  * @note    The destructor will automatically unlock the specified file if you created
  *          the lock file with #lock() and didn't removed the lock with #unlock().
  *          This allows a reliable implementation of a file lock, because you can add
- *          a FileLock instance to the attributes of your class which uses a file that
+ *          a DirectoryLock instance to the attributes of your class which uses a file that
  *          should be locked. This will ensure that the lock will be released when your
  *          object gets destroyed (like RAII). See the code example below (you do not
- *          need to use the FileLock class this way - you can use this class also
+ *          need to use the DirectoryLock class this way - you can use this class also
  *          without using RAII [Resource Acquisition Is Initialization]).
  *
  * Code Example:
@@ -128,11 +128,11 @@ namespace librepcb {
  *          }
  *
  *      private:
- *          FileLock myLock; // an instance, not only a pointer (important for RAII)!
+ *          DirectoryLock myLock; // an instance, not only a pointer (important for RAII)!
  *  };
  * @endcode
  *
- * @note    You do not have to create a FileLock object for each file you want to protect.
+ * @note    You do not have to create a DirectoryLock object for each file you want to protect.
  *          For example, to lock a whole project with all its (many!) files, one single
  *          lock file for the main project file (*.lpp) is enough. The class
  *          project::Project then will handle the file lock. If the project file is
@@ -141,9 +141,9 @@ namespace librepcb {
  * @author ubruhin
  * @date 2014-07-29
  */
-class FileLock final
+class DirectoryLock final
 {
-        Q_DECLARE_TR_FUNCTIONS(FileLock)
+        Q_DECLARE_TR_FUNCTIONS(DirectoryLock)
 
     public:
 
@@ -167,7 +167,7 @@ class FileLock final
          * @warning     If you use this constructor, you need to call #setFileToLock()
          *              afterwards (before calling any other method of this class)!
          */
-        explicit FileLock() noexcept;
+        explicit DirectoryLock() noexcept;
 
         /**
          * @brief A constructor which will call #setFileToLock()
@@ -177,14 +177,14 @@ class FileLock final
          *
          * @param filepath  See #setFileToLock()
          */
-        explicit FileLock(const FilePath& filepath) noexcept;
+        explicit DirectoryLock(const FilePath& filepath) noexcept;
 
         /**
          * @brief The destructor (this may also unlock the locked file)
          *
          * @note The destructor will also unlock the file if it was locked with this object!
          */
-        ~FileLock() noexcept;
+        ~DirectoryLock() noexcept;
 
 
         // Setters
@@ -257,8 +257,8 @@ class FileLock final
     private:
 
         // make some methods inaccessible...
-        FileLock(const FileLock& other);            ///< inaccessible
-        FileLock& operator=(const FileLock& rhs);   ///< inaccessible
+        DirectoryLock(const DirectoryLock& other);            ///< inaccessible
+        DirectoryLock& operator=(const DirectoryLock& rhs);   ///< inaccessible
 
 
         // Attributes
@@ -298,4 +298,4 @@ class FileLock final
 
 } // namespace librepcb
 
-#endif // LIBREPCB_FILELOCK_H
+#endif // LIBREPCB_DIRECTORYLOCK_H

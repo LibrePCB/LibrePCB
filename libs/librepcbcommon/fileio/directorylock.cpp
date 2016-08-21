@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "filelock.h"
+#include "directorylock.h"
 #include "../systeminfo.h"
 
 /*****************************************************************************************
@@ -33,19 +33,19 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FileLock::FileLock() noexcept :
+DirectoryLock::DirectoryLock() noexcept :
     mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
 {
     // nothing to do...
 }
 
-FileLock::FileLock(const FilePath& filepath) noexcept :
+DirectoryLock::DirectoryLock(const FilePath& filepath) noexcept :
     mFileToLock(), mLockFilepath(), mLockedByThisObject(false)
 {
     setFileToLock(filepath);
 }
 
-FileLock::~FileLock() noexcept
+DirectoryLock::~DirectoryLock() noexcept
 {
     if (mLockedByThisObject)
         try{unlock();} catch (...) {}
@@ -55,7 +55,7 @@ FileLock::~FileLock() noexcept
  *  Setters
  ****************************************************************************************/
 
-void FileLock::setFileToLock(const FilePath& filepath) noexcept
+void DirectoryLock::setFileToLock(const FilePath& filepath) noexcept
 {
     Q_ASSERT(!mLockedByThisObject);
 
@@ -70,7 +70,7 @@ void FileLock::setFileToLock(const FilePath& filepath) noexcept
  *  Getters
  ****************************************************************************************/
 
-FileLock::LockStatus_t FileLock::getStatus() const throw (Exception)
+DirectoryLock::LockStatus_t DirectoryLock::getStatus() const throw (Exception)
 {
     if (!mLockFilepath.isValid())
     {
@@ -148,7 +148,7 @@ FileLock::LockStatus_t FileLock::getStatus() const throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void FileLock::lock() throw (Exception)
+void DirectoryLock::lock() throw (Exception)
 {
     if (!mLockFilepath.isValid())
     {
@@ -203,7 +203,7 @@ void FileLock::lock() throw (Exception)
     mLockedByThisObject = true;
 }
 
-void FileLock::unlock() throw (Exception)
+void DirectoryLock::unlock() throw (Exception)
 {
     if (!mLockFilepath.isValid())
     {
