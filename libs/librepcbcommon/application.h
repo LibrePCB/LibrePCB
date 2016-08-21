@@ -34,6 +34,14 @@
 namespace librepcb {
 
 /*****************************************************************************************
+ *  Macros
+ ****************************************************************************************/
+#if defined(qApp)
+#undef qApp
+#endif
+#define qApp (static_cast<Application *>(QCoreApplication::instance()))
+
+/*****************************************************************************************
  *  Class Application
  ****************************************************************************************/
 
@@ -51,26 +59,32 @@ class Application final : public QApplication
     public:
 
         // Constructors / Destructor
-        Application(int& argc, char** argv);
-        ~Application();
+        Application() = delete;
+        Application(const Application& other) = delete;
+        Application(int& argc, char** argv) noexcept;
+        ~Application() noexcept;
 
         // Reimplemented from QApplication
         bool notify(QObject* receiver, QEvent* e);
 
+        // Operator Overloadings
+        Application& operator=(const Application& rhs) = delete;
+
         // Static Methods
-        static void setApplicationVersion(const Version& version) noexcept;
-        static Version applicationVersion() noexcept;
-        static int majorVersion() noexcept {return applicationVersion().getNumbers().first();}
-        static bool isRunningFromInstalledExecutable() noexcept;
-        static FilePath getResourcesDir() noexcept;
+        const Version& getAppVersion() const noexcept {return mAppVersion;}
+        const QString& getGitVersion() const noexcept {return mGitVersion;}
+        const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
+        bool isRunningFromInstalledExecutable() const noexcept {return mIsRunningFromInstalledExecutable;}
+        const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
 
 
-    private:
+    private: // Data
 
-        // make some methods inaccessible...
-        Application();
-        Application(const Application& other);
-        Application& operator=(const Application& rhs);
+        Version mAppVersion;
+        QString mGitVersion;
+        Version mFileFormatVersion;
+        bool mIsRunningFromInstalledExecutable;
+        FilePath mResourcesDir;
 };
 
 /*****************************************************************************************

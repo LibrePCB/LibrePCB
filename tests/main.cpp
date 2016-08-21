@@ -42,8 +42,6 @@ int main(int argc, char *argv[])
     Application::setOrganizationName("LibrePCB");
     Application::setOrganizationDomain("librepcb.org");
     Application::setApplicationName("LibrePCB-UnitTests");
-    Application::setApplicationVersion(Version(QString("%1.%2.%3").arg(APP_VERSION_MAJOR)
-                                       .arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH)));
 
     // disable the whole debug output (we want only the output from gtest)
     Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);

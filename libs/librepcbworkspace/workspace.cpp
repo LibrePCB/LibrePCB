@@ -25,6 +25,7 @@
 #include "workspace.h"
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/application.h>
 #include <librepcblibraryeditor/libraryeditor.h>
 #include <librepcbproject/project.h>
 #include "library/workspacelibrary.h"
@@ -51,7 +52,7 @@ namespace workspace {
 Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     QObject(0),
     mPath(wsPath), mLock(wsPath.getPathTo("workspace")),
-    mMetadataPath(wsPath.getPathTo(QString(".metadata/v%1").arg(APP_VERSION_MAJOR))),
+    mMetadataPath(wsPath.getPathTo(QString(".metadata/v%1").arg(qApp->getFileFormatVersion().getNumbers().value(0)))),
     mProjectsPath(wsPath.getPathTo("projects")),
     mLibraryPath(wsPath.getPathTo("library")),
     mWorkspaceSettings(0), mLibrary(0), mProjectTreeModel(0), mRecentProjectsModel(0),
@@ -189,7 +190,7 @@ bool Workspace::createNewWorkspace(const FilePath& path) noexcept
         return true;
 
     // create directory ".metadata/v#/" (and all needed parent directories)
-    return path.getPathTo(QString(".metadata/v%1").arg(APP_VERSION_MAJOR)).mkPath();
+    return path.getPathTo(QString(".metadata/v%1").arg(qApp->getFileFormatVersion().getNumbers().value(0))).mkPath();
 }
 
 FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept

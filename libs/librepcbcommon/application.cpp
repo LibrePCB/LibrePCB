@@ -33,9 +33,47 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Application::Application(int& argc, char** argv) :
+Application::Application(int& argc, char** argv) noexcept :
     QApplication(argc, argv)
 {
+    // set application version
+    mAppVersion = Version(APP_VERSION);
+    QApplication::setApplicationVersion(mAppVersion.toPrettyStr(2));
+    Q_ASSERT(mAppVersion.isValid());
+
+    // set "git describe" version
+    mGitVersion = QString(GIT_VERSION);
+    if (mGitVersion.isEmpty()) {
+        qWarning() << "Could not determine Git version. Check if Git is added to the PATH.";
+    }
+
+    // set and verify file format version
+    mFileFormatVersion = Version(FILE_FORMAT_VERSION);
+    Q_ASSERT(mFileFormatVersion.isValid());
+    Q_ASSERT_X(mFileFormatVersion.isPrefixOf(mAppVersion),
+               "Application::Application()",
+               "The file format version is not a prefix of the application version. "
+               "Please correct this in the file 'librepcbcommon.pro'.");
+
+    // get the installation prefix directory
+    FilePath installationPrefixDir(INSTALLATION_PREFIX);
+    Q_ASSERT(installationPrefixDir.isValid());
+
+    // get the directory of the currently running executable
+    FilePath executableFilePath(QApplication::applicationFilePath());
+    Q_ASSERT(executableFilePath.isValid());
+
+    // check if the running executable is located in the installation prefix directory
+    if (executableFilePath.isLocatedInDir(installationPrefixDir)) {
+        // the application is installed on the system -> use installed ressources
+        mIsRunningFromInstalledExecutable = true;
+        mResourcesDir = FilePath(INSTALLED_RESOURCES_DIR);
+    } else {
+        // the application is not installed on the system -> use local resources
+        mIsRunningFromInstalledExecutable = false;
+        mResourcesDir = FilePath(LOCAL_RESOURCES_DIR);
+    }
+    Q_ASSERT(mResourcesDir.isValid());
 }
 
 Application::~Application()
@@ -57,47 +95,6 @@ bool Application::notify(QObject* receiver, QEvent* e)
         qCritical() << "Exception caught in Application::notify()!";
     }
     return false;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-void Application::setApplicationVersion(const Version& version) noexcept
-{
-    QApplication::setApplicationVersion(version.toStr());
-}
-
-Version Application::applicationVersion() noexcept
-{
-    Version version(QApplication::applicationVersion());
-    Q_ASSERT(version.isValid());
-    return version;
-}
-
-bool Application::isRunningFromInstalledExecutable() noexcept
-{
-    // get the installation prefix directory
-    FilePath installationPrefixDir(INSTALLATION_PREFIX);
-    Q_ASSERT(installationPrefixDir.isValid());
-
-    // get the directory of the currently running executable
-    FilePath executableFilePath(qApp->applicationFilePath());
-    Q_ASSERT(executableFilePath.isValid());
-
-    // check if the running executable is located in the installation prefix directory
-    return executableFilePath.isLocatedInDir(installationPrefixDir);
-}
-
-FilePath Application::getResourcesDir() noexcept
-{
-    if (isRunningFromInstalledExecutable()) {
-        // the application is installed on the system -> use installed ressources
-        return FilePath(INSTALLED_RESOURCES_DIR);
-    } else {
-        // the application is not installed on the system -> use local resources
-        return FilePath(LOCAL_RESOURCES_DIR);
-    }
 }
 
 /*****************************************************************************************

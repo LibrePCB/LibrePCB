@@ -40,14 +40,3 @@ CONFIG += c++11
 CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
-
-# set preprocessor defines
-DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
-DEFINES += LOCAL_RESOURCES_DIR="\\\"$${LOCAL_RESOURCES_DIR}\\\""
-DEFINES += INSTALLED_RESOURCES_DIR="\\\"$${INSTALLED_RESOURCES_DIR}\\\""
-DEFINES += INSTALLATION_PREFIX="\\\"$${PREFIX}\\\""
-
-# Define the application version
-DEFINES += APP_VERSION_MAJOR=0
-DEFINES += APP_VERSION_MINOR=1
-DEFINES += APP_VERSION_PATCH=0
