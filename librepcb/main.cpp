@@ -112,8 +112,6 @@ static void setApplicationMetadata() noexcept
 #else
     Application::setApplicationName("LibrePCB");
 #endif
-    Application::setApplicationVersion(Version(QString("%1.%2.%3").arg(APP_VERSION_MAJOR)
-                                       .arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH)));
 }
 
 /*****************************************************************************************
@@ -125,7 +123,8 @@ static void writeLogHeader() noexcept
     // @TODO: After removing support for Qt versions below 5.5, we could use qInfo() here.
 
     // write application name and version to log
-    QString msg = QString("LibrePCB %1 (%2)").arg(qApp->applicationVersion(), GIT_VERSION);
+    QString msg = QString("LibrePCB %1 (%2)").arg(qApp->getAppVersion().toPrettyStr(3),
+                                                  qApp->getGitVersion());
     Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
 
     // write Qt version to log
@@ -133,7 +132,7 @@ static void writeLogHeader() noexcept
     Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
 
     // write resources directory path to log
-    msg = QString("Resources directory: %1").arg(Application::getResourcesDir().toNative());
+    msg = QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
     Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
 }
 

@@ -27,6 +27,7 @@
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/fileio/fileutils.h>
+#include <librepcbcommon/application.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -94,11 +95,11 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // read version number from version file
     mLoadingElementFileVersion = readFileVersionOfElementDirectory(mDirectory);
-    if (!(mLoadingElementFileVersion <= Version(qApp->applicationVersion()))) {
-        throw RuntimeError(__FILE__, __LINE__, QString::number(APP_VERSION_MAJOR),
+    if (!(mLoadingElementFileVersion <= qApp->getAppVersion())) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The library element %1 was created with a newer application "
                        "version. You need at least LibrePCB version %2 to open it."))
-            .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toStr()));
+            .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toPrettyStr(3)));
     }
 
     // open main XML file
@@ -199,7 +200,7 @@ void LibraryBaseElement::save() throw (Exception)
 
     // save version number file
     QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
-        mDirectory.getPathTo(".version"), Version(QString::number(APP_VERSION_MAJOR))));
+        mDirectory.getPathTo(".version"), qApp->getFileFormatVersion()));
     versionFile->save(true);
 }
 

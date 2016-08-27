@@ -52,8 +52,6 @@ namespace librepcb {
  *
  * @author ubruhin
  * @date 2014-10-30
- *
- * @todo Test all methods of this class! No idea if this class works as expected!
  */
 class Version final
 {
@@ -96,6 +94,18 @@ class Version final
         bool isValid() const noexcept {return (mNumbers.count() > 0);}
 
         /**
+         * @brief Check if this version is the prefix of another version
+         *
+         * Example: "1.2" is a prefix of "1.2", "1.2.0.1", "1.2.1"
+         *
+         * @param other     Another version
+         *
+         * @return  True if both versions are valid and "other" starts with the same
+         *          segments as all segments of this version. False in all other cases.
+         */
+        bool isPrefixOf(const Version& other) const noexcept;
+
+        /**
          * @brief Get the numbers in the version string
          *
          * The first item in the list is the major version number.
@@ -110,6 +120,20 @@ class Version final
          * @return The version as a string (empty string = invalid version)
          */
         QString toStr() const noexcept;
+
+        /**
+         * @brief Get the version as a string with trailing zeros (e.g. "1.2.0")
+         *
+         * @param minSegCount   If the version has less segments than specified by this
+         *                      parameter, trailing zeros will be appended.
+         *                      Example: "0.1" gets "0.1.0.0" with minSegCount = 4
+         * @param maxSegCount   If the version has more segments than specified by this
+         *                      parameter, trailing segments will be omitted.
+         *                      Example: "0.1.2.3.4" gets "0.1" with maxSegCount = 2
+         *
+         * @return The version as a string (empty string = invalid version)
+         */
+        QString toPrettyStr(int minSegCount, int maxSegCount = 10) const noexcept;
 
         /**
          * @brief Get the version as a comparable string (59 characters)
@@ -140,15 +164,18 @@ class Version final
         bool setVersion(const QString& version) noexcept;
 
 
+        // Operator overloadings
+        Version& operator=(const Version& rhs) noexcept;
+
         //@{
         /**
-         * @brief Operator overloadings
+         * @brief Comparison operators
          *
          * @param rhs   The other object to compare
          *
-         * @return If at least one of both objects is invalid, false will be returned!
+         * @return  If at least one of both objects is invalid, false will be returned
+         *          (except #operator!=() which would return true in this case)!
          */
-        Version& operator=(const Version& rhs) noexcept;
         bool operator>(const Version& rhs) const noexcept;
         bool operator<(const Version& rhs) const  noexcept;
         bool operator>=(const Version& rhs) const noexcept;

@@ -43,43 +43,43 @@ class ApplicationTest : public ::testing::Test
  *  Test Methods
  ****************************************************************************************/
 
-TEST(ApplicationTest, testApplicationVersion)
+TEST(ApplicationTest, testAppVersion)
 {
     // read application version and check validity
-    Version v = Application::applicationVersion();
+    Version v = qApp->getAppVersion();
     EXPECT_TRUE(v.isValid());
 
     // compare with QApplication version
     Version v1(qApp->applicationVersion());
     EXPECT_TRUE(v1.isValid());
     EXPECT_EQ(v, v1);
-
-    // compare with defines
-    Version v2(QString("%1.%2.%3").arg(APP_VERSION_MAJOR).arg(APP_VERSION_MINOR).arg(APP_VERSION_PATCH));
-    EXPECT_TRUE(v2.isValid());
-    EXPECT_EQ(v, v2);
 }
 
-TEST(ApplicationTest, testMajorVersion)
+TEST(ApplicationTest, testFileFormatVersion)
 {
-    EXPECT_EQ(APP_VERSION_MAJOR, Application::majorVersion());
+    // check validity
+    EXPECT_TRUE(qApp->getFileFormatVersion().isValid());
+
+    // it can't be greater then the application version
+    EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
 }
 
 TEST(ApplicationTest, testIsRunningFromInstalledExecutable)
 {
     // as there is no "make install" available for the unit tests, it can't be installed ;)
-    EXPECT_FALSE(Application::isRunningFromInstalledExecutable());
+    EXPECT_FALSE(qApp->isRunningFromInstalledExecutable());
 }
 
 TEST(ApplicationTest, testGetResourcesDir)
 {
-    // as the tests can't be installed, the resources must be located in LOCAL_RESOURCES_DIR
-    EXPECT_EQ(Application::getResourcesDir(), FilePath(LOCAL_RESOURCES_DIR));
-
     // check if the resources directory is valid, exists and is not empty
-    EXPECT_TRUE(Application::getResourcesDir().isValid());
-    EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
-    EXPECT_FALSE(Application::getResourcesDir().isEmptyDir());
+    EXPECT_TRUE(qApp->getResourcesDir().isValid());
+    EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
+    EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
+
+    // as the tests can't be installed, the resources must be located in the "generated" dir
+    FilePath generatedDir = qApp->getResourcesDir().getParentDir();
+    EXPECT_TRUE(FilePath(qApp->applicationFilePath()).isLocatedInDir(generatedDir));
 }
 
 /*****************************************************************************************

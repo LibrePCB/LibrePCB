@@ -54,7 +54,7 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     mUi->setupUi(this);
 
     setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
-                   .arg(Application::applicationVersion().toStr()));
+                   .arg(qApp->getAppVersion().toPrettyStr(2)));
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
         .arg(mWorkspace.getPath().toNative())));
 
@@ -302,13 +302,14 @@ void ControlPanel::projectEditorClosed() noexcept
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About LibrePCB"), tr(
+    QMessageBox::about(this, tr("About LibrePCB"), QString(tr(
         "<h1>About LibrePCB</h1>"
         "<p>LibrePCB is a free & open source schematic/layout-editor.</p>"
-        "<p>Version: " GIT_VERSION "</p>"
+        "<p>Version: %1 (%2)</p>"
         "<p>Please see <a href='http://librepcb.org/'>librepcb.org</a> for more information.</p>"
         "You can find the project on GitHub:<br>"
-        "<a href='https://github.com/LibrePCB/LibrePCB'>https://github.com/LibrePCB/LibrePCB</a>"));
+        "<a href='https://github.com/LibrePCB/LibrePCB'>https://github.com/LibrePCB/LibrePCB</a>"))
+        .arg(qApp->getAppVersion().toPrettyStr(3), qApp->getGitVersion()));
 }
 
 void ControlPanel::on_actionNew_Project_triggered()

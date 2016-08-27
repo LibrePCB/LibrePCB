@@ -113,7 +113,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
 
     // copy readme file
     try {
-        FilePath source = Application::getResourcesDir().getPathTo("project/readme_template");
+        FilePath source = qApp->getResourcesDir().getPathTo("project/readme_template");
         FilePath destination = projectFilePath.getParentDir().getPathTo("README.md");
         QByteArray content = FileUtils::readFile(source); // can throw
         content.replace("{PROJECT_NAME}", mPageMetadata->getProjectName().toUtf8());
@@ -131,7 +131,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
     if (mPageVersionControl->getInitGitRepository()) {
         // copy .gitignore
         try {
-            FilePath source = Application::getResourcesDir().getPathTo("project/gitignore_template");
+            FilePath source = qApp->getResourcesDir().getPathTo("project/gitignore_template");
             FilePath destination = projectFilePath.getParentDir().getPathTo(".gitignore");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
@@ -139,7 +139,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
         }
         // copy .gitattributes
         try {
-            FilePath source = Application::getResourcesDir().getPathTo("project/gitattributes_template");
+            FilePath source = qApp->getResourcesDir().getPathTo("project/gitattributes_template");
             FilePath destination = projectFilePath.getParentDir().getPathTo(".gitattributes");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
