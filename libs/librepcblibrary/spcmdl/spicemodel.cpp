@@ -41,7 +41,7 @@ SpiceModel::SpiceModel(const FilePath& elementDirectory, bool readOnly) throw (E
     cleanupAfterLoadingElementFromFile();
 }
 
-SpiceModel::~SpiceModel()
+SpiceModel::~SpiceModel() noexcept
 {
 }
 

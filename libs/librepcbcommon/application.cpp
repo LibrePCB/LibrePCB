@@ -76,7 +76,7 @@ Application::Application(int& argc, char** argv) noexcept :
     Q_ASSERT(mResourcesDir.isValid());
 }
 
-Application::~Application()
+Application::~Application() noexcept
 {
 }
 

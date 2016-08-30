@@ -108,7 +108,7 @@ bool ProjectEditor::windowIsAboutToClose(QMainWindow& window) noexcept
     } else {
         // the last open window (schematic editor, board editor, ...) is about to close.
         // --> close the whole project
-        return closeAndDestroy(&window);
+        return closeAndDestroy(true, &window);
     }
 }
 

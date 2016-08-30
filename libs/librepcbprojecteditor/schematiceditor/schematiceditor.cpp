@@ -258,7 +258,7 @@ void SchematicEditor::closeEvent(QCloseEvent* event)
 
 void SchematicEditor::on_actionClose_Project_triggered()
 {
-    mProjectEditor.closeAndDestroy(this);
+    mProjectEditor.closeAndDestroy(true, this);
 }
 
 void SchematicEditor::on_actionNew_Schematic_Page_triggered()

@@ -315,7 +315,7 @@ void BoardEditor::boardRemoved(int oldIndex)
 
 void BoardEditor::on_actionProjectClose_triggered()
 {
-    mProjectEditor.closeAndDestroy(this);
+    mProjectEditor.closeAndDestroy(true, this);
 }
 
 void BoardEditor::on_actionNewBoard_triggered()

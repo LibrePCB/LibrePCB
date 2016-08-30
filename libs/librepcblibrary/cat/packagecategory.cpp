@@ -41,7 +41,7 @@ PackageCategory::PackageCategory(const FilePath& elementDirectory, bool readOnly
     cleanupAfterLoadingElementFromFile();
 }
 
-PackageCategory::~PackageCategory()
+PackageCategory::~PackageCategory() noexcept
 {
 }
 
