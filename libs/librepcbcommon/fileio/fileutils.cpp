@@ -50,11 +50,7 @@ QByteArray FileUtils::readFile(const FilePath& filepath) throw (Exception)
 
 void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) throw (Exception)
 {
-    FilePath parentDir = filepath.getParentDir();
-    if (!parentDir.mkPath()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("Could not create directory \"%1\".")).arg(parentDir.toNative()));
-    }
+    makePath(filepath.getParentDir()); // can throw
     QSaveFile file(filepath.toStr());
     if (!file.open(QIODevice::WriteOnly)) {
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
@@ -107,11 +103,7 @@ void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest)
             QString(tr("The file or directory \"%1\" exists already."))
             .arg(dest.toNative()));
     }
-    if (!dest.mkPath()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
-            QString(tr("Could not create directory \"%1\"."))
-            .arg(dest.toNative()));
-    }
+    makePath(dest); // can throw
     QDir sourceDir(source.toStr());
     foreach (const QString& file, sourceDir.entryList(QDir::Files | QDir::Hidden)) {
         copyFile(source.getPathTo(file), dest.getPathTo(file));
@@ -135,6 +127,15 @@ void FileUtils::removeDirRecursively(const FilePath& dir) throw (Exception)
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("Could not remove directory \"%1\"."))
             .arg(dir.toNative()));
+    }
+}
+
+void FileUtils::makePath(const FilePath& path) throw (Exception)
+{
+    if (!QDir().mkpath(path.toStr())) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("Could not create directory or path \"%1\"."))
+            .arg(path.toNative()));
     }
 }
 

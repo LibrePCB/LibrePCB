@@ -28,6 +28,7 @@
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/fileio/fileutils.h>
 #include <librepcbcommon/systeminfo.h>
 #include <librepcbcommon/schematiclayer.h>
 #include "project.h"
@@ -72,11 +73,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(), QString(tr(
                 "The file \"%1\" does already exist!")).arg(mFilepath.toNative()));
         }
-        if (!mPath.mkPath())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(), QString(tr(
-                "Could not create the directory \"%1\"!")).arg(mPath.toNative()));
-        }
+        FileUtils::makePath(mPath); // can throw
     }
     else
     {

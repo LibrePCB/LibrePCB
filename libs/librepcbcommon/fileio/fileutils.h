@@ -119,6 +119,13 @@ class FileUtils final
          */
         static void removeDirRecursively(const FilePath& dir) throw (Exception);
 
+        /**
+         * @brief Create a directory with all parent directories
+         *
+         * @param path          Filepath to a directory (may or may not exist).
+         */
+        static void makePath(const FilePath& path) throw (Exception);
+
 
         // Operator Overloadings
         FileUtils& operator=(const FileUtils& rhs) = delete;

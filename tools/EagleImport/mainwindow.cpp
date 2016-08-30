@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
+#include <librepcbcommon/fileio/fileutils.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
@@ -152,7 +153,11 @@ void MainWindow::convertAllFiles(ConvertFileType_t type)
 
     // create output directory
     FilePath outputDir(ui->output->text());
-    outputDir.mkPath();
+    try {
+        FileUtils::makePath(outputDir); // can throw
+    } catch (const Exception& e) {
+        addError("Fatal Error: " % e.getUserMsg());
+    }
 
     QSettings outputSettings(UUID_LIST_FILEPATH, QSettings::IniFormat);
 
