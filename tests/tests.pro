@@ -43,6 +43,7 @@ SOURCES += main.cpp \
     common/pointtest.cpp \
     common/scopeguardtest.cpp \
     common/applicationtest.cpp \
-    common/versiontest.cpp
+    common/versiontest.cpp \
+    common/systeminfotest.cpp
 
 HEADERS +=
