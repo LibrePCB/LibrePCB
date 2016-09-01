@@ -29,7 +29,7 @@
 #include <librepcbcommon/if_schematiclayerprovider.h>
 #include <librepcbcommon/if_boardlayerprovider.h>
 #include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/directorylock.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

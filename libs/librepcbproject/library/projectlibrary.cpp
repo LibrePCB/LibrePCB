@@ -24,6 +24,7 @@
 #include <librepcbcommon/exceptions.h>
 #include "projectlibrary.h"
 #include <librepcbcommon/fileio/filepath.h>
+#include <librepcbcommon/fileio/fileutils.h>
 #include "../project.h"
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/spcmdl/spicemodel.h>
@@ -52,13 +53,8 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
 
     Q_UNUSED(restore)
 
-    if ((!mLibraryPath.isExistingDir()) && (!readOnly))
-    {
-        if (!mLibraryPath.mkPath())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mLibraryPath.toStr(), QString(
-                tr("Could not create the directory \"%1\"!")).arg(mLibraryPath.toNative()));
-        }
+    if ((!mLibraryPath.isExistingDir()) && (!readOnly)) {
+        FileUtils::makePath(mLibraryPath); // can throw
     }
 
     try

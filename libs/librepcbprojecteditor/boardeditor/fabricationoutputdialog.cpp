@@ -67,19 +67,15 @@ void FabricationOutputDialog::on_btnSelectDir_clicked()
 
 void FabricationOutputDialog::on_btnGenerate_clicked()
 {
-    FilePath filepath(mUi->edtOutputDirPath->text());
-    if (filepath.mkPath()) {
-        try
-        {
-            BoardGerberExport grbExport(mBoard, filepath);
-            grbExport.exportAllLayers();
-        }
-        catch (Exception& e)
-        {
-            QMessageBox::warning(this, tr("Error"), e.getUserMsg());
-        }
-    } else {
-        QMessageBox::warning(this, tr("Warning"), tr("Directory does not exist."));
+    try
+    {
+        FilePath filepath(mUi->edtOutputDirPath->text());
+        BoardGerberExport grbExport(mBoard, filepath);
+        grbExport.exportAllLayers();
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
     }
 }
 

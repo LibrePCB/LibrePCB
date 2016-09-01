@@ -36,7 +36,7 @@ HEADERS += \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \
     dialogs/gridsettingsdialog.h \
-    fileio/filelock.h \
+    fileio/directorylock.h \
     fileio/filepath.h \
     fileio/if_xmlserializableobject.h \
     fileio/smartfile.h \
@@ -93,7 +93,7 @@ SOURCES += \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
     dialogs/gridsettingsdialog.cpp \
-    fileio/filelock.cpp \
+    fileio/directorylock.cpp \
     fileio/filepath.cpp \
     fileio/smartfile.cpp \
     fileio/smarttextfile.cpp \

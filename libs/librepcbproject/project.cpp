@@ -23,11 +23,12 @@
 #include <QtCore>
 #include <QPrinter>
 #include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/filelock.h>
+#include <librepcbcommon/fileio/directorylock.h>
 #include <librepcbcommon/fileio/smarttextfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcbcommon/fileio/fileutils.h>
 #include <librepcbcommon/systeminfo.h>
 #include <librepcbcommon/schematiclayer.h>
 #include "project.h"
@@ -52,8 +53,8 @@ namespace project {
 
 Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception) :
     QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(nullptr), mFileLock(filepath), mIsRestored(false),
-    mIsReadOnly(readOnly), mProjectSettings(nullptr),
+    mFilepath(filepath), mXmlFile(nullptr), mLock(filepath.getParentDir()),
+    mIsRestored(false), mIsReadOnly(readOnly), mProjectSettings(nullptr),
     mProjectLibrary(nullptr), mErcMsgList(nullptr), mCircuit(nullptr),
     mSchematicLayerProvider(nullptr)
 {
@@ -72,11 +73,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(), QString(tr(
                 "The file \"%1\" does already exist!")).arg(mFilepath.toNative()));
         }
-        if (!mPath.mkPath())
-        {
-            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(), QString(tr(
-                "Could not create the directory \"%1\"!")).arg(mPath.toNative()));
-        }
+        FileUtils::makePath(mPath); // can throw
     }
     else
     {
@@ -90,18 +87,14 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
     // Check if the project is locked (already open or application was crashed). In case
     // of a crash, the user can decide if the last backup should be restored. If the
     // project should be opened, the lock file will be created/updated here.
-    switch (mFileLock.getStatus()) // throws an exception on error
+    switch (mLock.getStatus()) // can throw
     {
-        case FileLock::LockStatus_t::Unlocked:
-        {
+        case DirectoryLock::LockStatus::Unlocked: {
             // nothing to do here (the project will be locked later)
             break;
         }
-
-        case FileLock::LockStatus_t::Locked:
-        {
-            if (!mIsReadOnly)
-            {
+        case DirectoryLock::LockStatus::Locked: {
+            if (!mIsReadOnly) {
                 // the project is locked by another application instance! open read only?
                 QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
                     tr("The project is already opened by another application instance or user. "
@@ -118,9 +111,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             }
             break;
         }
-
-        case FileLock::LockStatus_t::StaleLock:
-        {
+        case DirectoryLock::LockStatus::StaleLock: {
             // the application crashed while this project was open! ask the user what to do
             QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Restore Project?"),
                 tr("It seems that the application was crashed while this project was open. "
@@ -139,12 +130,13 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             }
             break;
         }
-
         default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
     }
 
     // the project can be opened by this application, so we will lock the whole project
-    if (!mIsReadOnly) mFileLock.lock(); // throws an exception on error
+    if (!mIsReadOnly) {
+        mLock.lock(); // can throw
+    }
 
     // check if the combination of "create", "mIsRestored" and "mIsReadOnly" is valid
     Q_ASSERT(!(create && (mIsRestored || mIsReadOnly)));

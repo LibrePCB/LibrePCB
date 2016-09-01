@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "exceptions.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -38,7 +39,7 @@ namespace librepcb {
  * @brief This class provides some methods to get information from the operating system
  *
  * For example, this class is used to get the name of the user which is logged in and the
- * hostname of the computer to create a lock file (see class FileLock).
+ * hostname of the computer to create a lock file (see class #DirectoryLock).
  *
  * @note Only static methods are available. You cannot create objects of this class.
  *
@@ -47,39 +48,66 @@ namespace librepcb {
  */
 class SystemInfo final
 {
+        Q_DECLARE_TR_FUNCTIONS(SystemInfo)
+
     public:
+
+        // Constructors/Destructor
+        SystemInfo() = delete;
 
         /**
          * @brief Get the name of the user which is logged in (like "homer")
          *
          * @return The username (in case of an error, this string can be empty!)
-         *
-         * @todo test this method on windows and mac!
          */
-        static QString getUsername() noexcept;
+        static const QString& getUsername() noexcept;
 
         /**
          * @brief Get the full name of the user which is logged in (like "Homer Simpson")
          *
-         * @return The full user name (in case of an error, this string can be empty!)
+         * @return The full user name (can be empty)
          *
-         * @todo complete this method for windows systems!
+         * @todo The implementation of this method is very ugly...
          */
-        static QString getFullUsername() noexcept;
+        static const QString& getFullUsername() noexcept;
 
         /**
          * @brief Get the hostname of the computer (like "homer-workstation")
          *
          * @return The hostname (in case of an error, this string can be empty!)
-         *
-         * @todo test this method on windows and mac!
          */
-        static QString getHostname() noexcept;
+        static const QString& getHostname() noexcept;
+
+        /**
+         * @brief Check whether a process with a given PID is running or not
+         *
+         * @param pid   The process ID to query
+         *
+         * @return  True if the process is running, fals if not
+         *
+         * @throw  Exception    In case of an error.
+         */
+        static bool isProcessRunning(qint64 pid) throw (Exception);
+
+        /**
+         * @brief Get the process name of a given PID
+         *
+         * @param pid   The process ID (may be a running process or not)
+         *
+         * @return  The name of the given process ID, or an empty string if no process
+         *          with the given PID exists.
+         *
+         * @throw  Exception    In case of an error.
+         */
+        static QString getProcessNameByPid(qint64 pid) throw (Exception);
 
 
     private:
 
-        SystemInfo(); ///< make the default constructor inaccessible
+        // Cached Data
+        static QString sUsername;
+        static QString sFullUsername;
+        static QString sHostname;
 };
 
 /*****************************************************************************************

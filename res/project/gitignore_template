@@ -5,7 +5,7 @@
 
 # LibrePCB files
 user/
-.~lock.*
+.lock
 *~
 
 # Files created by operating systems or file managers

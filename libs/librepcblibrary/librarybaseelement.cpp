@@ -52,11 +52,7 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
     mUuid(uuid), mVersion(version), mAuthor(author),
     mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
 {
-    if (!mDirectory.mkPath()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Could not create temporary directory \"%1\"."))
-            .arg(mDirectory.toNative()));
-    }
+    FileUtils::makePath(mDirectory); // can throw
 
     mNames.insert("en_US", name_en_US);
     mDescriptions.insert("en_US", description_en_US);

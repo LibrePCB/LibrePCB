@@ -26,23 +26,24 @@
         @see #XmlDomDocument, #SmartXmlFile
         
 
-    @section doc_project_lock Avoid opening a project multiple times (File Lock)
+    @section doc_project_lock Avoid opening a project multiple times (Directory Lock)
 
         Opening a project multiple times simultaneously can be dangerous. Even if
         the application's design does not allow to open a project multiple times, it's
         still possible to save a project in a shared folder and open it from different
         computers at the same time (for example). This could demage the project files.
 
-        To avoid such problems, the project#Project's constructor will try to lock the project
-        file (*.lpp) with a #FileLock object (project#Project#mFileLock). If the project
-        file is already locked by another application instance, the project cannot be
-        opened (the project#Project's constructor throws an exception). If the lock file exists
-        because the application was crashed while the project was open, the user gets a
-        message box to ask whether the last automatic backup should be restored or not
-        (see also @ref doc_project_save). The lock will be released automatically when
-        the project#Project object is destroyed (RAII, see #FileLock documentation).
+        To avoid such problems, the librepcb::project#Project's constructor will try to lock the
+        project's directory with a #DirectoryLock object (librepcb::project::Project::mLock).
+		If the project is already locked by another application instance, the project cannot be
+        opened (the librepcb::project::Project's constructor throws an exception). If the lock
+		file exists because the application was crashed while the project was open, the user
+		gets a message box which asks whether the last automatic backup should be restored or
+		not (see also @ref doc_project_save). The lock will be released automatically when
+        the librepcb::project::Project object is destroyed (RAII, see librepcb::DirectoryLock).
 
-        @see #FileLock, project#Project#Project(), project#Project#mFileLock
+        @see librepcb::DirectoryLock, librepcb::project::Project::Project(), 
+			 librepcb::project::Project::mLock
         
      
     @section doc_project_save Saving Procedere / Automatic Periodically Saving
@@ -55,7 +56,7 @@
         all the changes made in a project after the last saving. If the application
         crashes with unsaved changes, it should be possible to restore (some of) these
         changes while opening that project the next time. To indicate a crash, the
-        #FileLock class is used (see @ref doc_project_lock)
+        librepcb::DirectoryLock class is used (see @ref doc_project_lock)
 
         <b>To try to reach these goals, we use temporary copies of the project files while a
         project is open. This means:</b>
@@ -72,7 +73,7 @@
                if there is an error in the save algorithm.
             -# On closing a project, all temporary files will be removed from the harddisc.
             -# If the application crashes while unsaved changes are made in a project, the
-               temporary files won't be removed (and also the file lock still exist). On opening
+               temporary files won't be removed (and also the lock still exist). On opening
                this project the next time, the user can choose whether to restore the last backup
                or not. If not, the normal, original files will be loaded (as if there was no
                crash). But if the backup should be restored, the backup files will be loaded
