@@ -538,7 +538,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.lpp project file
         SmartXmlFile* mXmlFile; ///< the *.lpp project file
-        DirectoryLock mFileLock; ///< See @ref doc_project_lock
+        DirectoryLock mLock; ///< Lock for the whole project directory (see @ref doc_project_lock)
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 

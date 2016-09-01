@@ -37,78 +37,85 @@ namespace librepcb {
  ****************************************************************************************/
 
 /**
- * @brief This class can be used to implement file-based file locks
+ * @brief This class can be used to implement file-based directory locks
  *
- * Many classes of this project open some files (project files, library files, ...).
- * But it's very dangerous if a file is opened multiple times simultaneously (by the
- * same or another instance of the application, maybe even on different computers if
- * the files are located in a shared folder). To avoid such problems, this class provides
- * a mechanism to create file locks.
+ * Many classes of this project open some directories (workspaces, projects, library
+ * elements, ...). But it's very dangerous if a directory is opened multiple times
+ * simultaneously (by the same or another instance of the application, maybe even on
+ * different computers if the directories are located on a network drive). To avoid such
+ * problems, this class provides a mechanism to create directory locks.
  *
  *
- * <b>How such a file lock works:</b>
+ * <b>How such a directory lock works:</b>
  *
- * Let's say that you want to open the file "/foo/goo.xml". Then a lock file with the
- * filename "/foo/.~lock.goo.xml#" will be created. After closing your file, the lock file
- * will be removed. So, while the file is open, there will be a lock file in the same
- * directory. If the same or another instance of the application now wants to open the same
- * file at the same time, the lock file is detected and opening the file will be denied.
+ * Let's say that you want to open the directory "/foo/bar/". Then a lock file with the
+ * filepath "/foo/bar/.lock" will be created. After closing the directory, the lock file
+ * will be removed. So, while the directory (e.g. a project) is open, there will be a lock
+ * file in the same directory. If the same or another instance of the application now
+ * wants to open the same directory at the same time, the lock file is detected and
+ * opening the directory will be denied.
  *
- * The lock file is a simple UTF-8 coded text file with a comma-seperated list of these
- * values (all in one line, commas in the usernames and hostname are removed):
+ * The lock file is a simple UTF-8 encoded text file with 5 lines with following values:
  *  -# The full name (first name + last name) of the user which holds the lock
  *  -# The username (logon name) of the user which holds the lock
  *  -# The hostname of the user's computer which holds the lock
  *  -# The process id (PID) of the application instance which holds the lock
+ *  -# The process name of the application instance which holds the lock
  *  -# The datetime when the lock file was created/updated (UTC and ISO format!)
  *
- * Example: @code Homer Simpson,homer,homer-workstation,1234,2013-04-13T12:43:52Z @endcode
+ * Example:
+ * @code
+ * Homer Simpson
+ * homer
+ * homer-workstation
+ * 1234
+ * librepcb
+ * 2013-04-13T12:43:52Z
+ * @endcode
  *
  * The lock file (and especially its content) is also used to detect application crashes.
- * If the application crashes while a file was locked, the lock file will still exist
- * after the application was closed accidently. Now, if the user tries to open the locked
- * file again, the content of the lock file will be parsed. If the username and the
- * hostname in the lock file is equal to the current user which tries to get the lock,
- * it's clear that the lock file does NOT exist because the locked file is already open,
- * but that the application was crashed while the file was locked. If there exists a
- * backup of the locked file, this allows to ask the user whether the backup should be
- * restored or not. Or alternatively, the lock file can be simply overwritten.
+ * If the application crashes while a directory was locked, the lock file will still exist
+ * after the application was crashed. Now, if the user tries to open the locked directory
+ * again, the content of the lock file will be parsed. If the username and the hostname in
+ * the lock file is equal to the current user which tries to get the lock, it's clear that
+ * the lock file does NOT exist because the locked directory is already open, but that the
+ * application was crashed while the directory was locked. If there exists a backup of the
+ * locked directory (e.g. project auto-save), this allows to ask the user whether the
+ * backup should be restored or not.
  *
  *
  * <b>How to use this class:</b>
  *
- * First, you need to create an instance of this class for each file you want to protect
- * with a lock. There are two different constructors for this purpose. If you use the
- * default constructor, you need to call #setFileToLock() afterwards. Now you can read
- * the lock status of the specified file with #getStatus(). With #lock() you can create
- * the lock file, and with #unlock() you can remove the lock file.
+ * First, you need to create an instance of this class for the directory you want to
+ * protect with a lock. There are two different constructors for this purpose. If you use
+ * the default constructor, you need to call #setDirToLock() afterwards. Now you can read
+ * the lock status of the specified directory with #getStatus(). With #lock() you can
+ * create the lock file, and with #unlock() you can remove the lock file.
  *
- * @note    The destructor will automatically unlock the specified file if you created
- *          the lock file with #lock() and didn't removed the lock with #unlock().
- *          This allows a reliable implementation of a file lock, because you can add
- *          a DirectoryLock instance to the attributes of your class which uses a file that
- *          should be locked. This will ensure that the lock will be released when your
- *          object gets destroyed (like RAII). See the code example below (you do not
- *          need to use the DirectoryLock class this way - you can use this class also
- *          without using RAII [Resource Acquisition Is Initialization]).
+ * @note    The destructor will automatically call #unlock() if the object holds the lock.
+ *          This allows a reliable implementation of a directory lock, because you can add
+ *          a DirectoryLock instance to the attributes of your class which access a
+ *          directory which should be locked. This will ensure that the lock will be
+ *          released when your object gets destroyed (RAII). See the code example below.
  *
  * Code Example:
  * @code
- *  class MyFileOpeningClass // a class which opens a file and needs a lock for it
+ *  class MyDirectoryOpeningClass // a class which opens a directory and needs to lock it
  *  {
  *      public:
- *          MyFileOpeningClass() // constructor
- *              : myLock(FilePath("C:/myFile.txt")) // variant 1 to set the filepath
+ *          MyDirectoryOpeningClass() // constructor
+ *              : myLock(FilePath("C:/myDirectory")) // variant 1 to set the filepath
  *          {
- *              myLock.setFileToLock(FilePath("C:/myFile.txt")); // variant 2
+ *              myLock.setDirToLock(FilePath("C:/myDirectory")); // variant 2
  *              switch (myLock.getStatus()) // Note: this line can throw an exception!
  *              {
  *                  case Unlocked:
- *                      // No lock exists --> lock the file now
+ *                      // No lock exists --> lock the directory now
  *                      myLock.lock(); // Note: this line can throw an exception!
  *                      break;
  *                  case Locked:
- *                      // The file is locked by another instance. You cannot open the file.
+ *                      // The directory is already locked by another instance!
+ *                      throw Exception("Directory is locked!");
  *                      break;
  *                  case StaleLock:
  *                      // The application was crashed while the lock was active.
@@ -120,7 +127,7 @@ namespace librepcb {
  *              }
  *
  *          }
- *          ~MyFileOpeningClass() // destructor
+ *          ~MyDirectoryOpeningClass() // destructor
  *          {
  *              // You do not have to (but you could) call myLock.unlock(), as it will be
  *              // called automatically in the destructor of myLock (only because you have
@@ -131,12 +138,6 @@ namespace librepcb {
  *          DirectoryLock myLock; // an instance, not only a pointer (important for RAII)!
  *  };
  * @endcode
- *
- * @note    You do not have to create a DirectoryLock object for each file you want to protect.
- *          For example, to lock a whole project with all its (many!) files, one single
- *          lock file for the main project file (*.lpp) is enough. The class
- *          project::Project then will handle the file lock. If the project file is
- *          locked, the whole project will not be opened.
  *
  * @author ubruhin
  * @date 2014-07-29
@@ -152,10 +153,10 @@ class DirectoryLock final
         /**
          * @brief The return type of #getStatus()
          */
-        enum class LockStatus_t {
-            Unlocked,   ///< the file is not locked (lock file does not exist)
-            Locked,     ///< the file is locked by another application instance
-            StaleLock   ///< the file is locked by a crashed application instance
+        enum class LockStatus {
+            Unlocked,   ///< the directory is not locked (lock file does not exist)
+            Locked,     ///< the directory is locked by another application instance
+            StaleLock   ///< the directory is locked by a crashed application instance
         };
 
 
@@ -164,25 +165,30 @@ class DirectoryLock final
         /**
          * @brief The default constructor
          *
-         * @warning     If you use this constructor, you need to call #setFileToLock()
+         * @warning     If you use this constructor, you need to call #setDirToLock()
          *              afterwards (before calling any other method of this class)!
          */
-        explicit DirectoryLock() noexcept;
+        DirectoryLock() noexcept;
 
         /**
-         * @brief A constructor which will call #setFileToLock()
+         * @brief Copy constructor
          *
-         * @note    If you use this constructor instead of the default constructor, you
-         *          do not need to call #setFileToLock() afterwards.
-         *
-         * @param filepath  See #setFileToLock()
+         * @param other     The object to copy
          */
-        explicit DirectoryLock(const FilePath& filepath) noexcept;
+        DirectoryLock(const DirectoryLock& other) = delete;
+
+        /**
+         * @brief A constructor which will call #setDirToLock()
+         *
+         * @param dir       See #setDirToLock()
+         */
+        explicit DirectoryLock(const FilePath& dir) noexcept;
 
         /**
          * @brief The destructor (this may also unlock the locked file)
          *
-         * @note The destructor will also unlock the file if it was locked with this object!
+         * @note    The destructor will also try to unlock the directory if it was locked
+         *          with this object.
          */
         ~DirectoryLock() noexcept;
 
@@ -190,33 +196,35 @@ class DirectoryLock final
         // Setters
 
         /**
-         * @brief Specify the file for which you need the lock (NOT the lock file itself!)
+         * @brief Specify the directory for which you need the lock
          *
-         * @param filepath      The filepath to the file to lock (it do not need to exist)
+         * @param filepath      The filepath to the directory to lock
+         *
+         * @warning This method must not be called when this object already holds a lock!
          */
-        void setFileToLock(const FilePath& filepath) noexcept;
+        void setDirToLock(const FilePath& dir) noexcept;
 
 
         // Getters
 
         /**
-         * @brief Get the filepath of the file to lock (passed by #setFileToLock())
+         * @brief Get the filepath of the directory to lock (passed by #setDirToLock())
          *
-         * @return The filepath to the file to lock (invalid if no valid filepath was set)
+         * @return The filepath to the directory to lock (invalid if no filepath was set)
          */
-        const FilePath& getFileToLock() const noexcept {return mFileToLock;}
+        const FilePath& getDirToLock() const noexcept {return mDirToLock;}
 
         /**
-         * @brief Get the filepath of the lock file (NOT the file passed by setFileToLock()!)
+         * @brief Get the filepath of the lock file (NOT the directory to lock!)
          *
          * @return The filepath to the lock file (invalid if no valid filepath was set)
          */
-        const FilePath& getLockFilepath() const noexcept {return mLockFilepath;}
+        const FilePath& getLockFilepath() const noexcept {return mLockFilePath;}
 
         /**
-         * @brief Get the lock status of the specified file
+         * @brief Get the lock status of the specified directory
          *
-         * @return  The current lock status (see #LockStatus_t)
+         * @return  The current lock status (see #LockStatus)
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          *
@@ -226,13 +234,13 @@ class DirectoryLock final
          *          should't be a problem. Otherwise, the PID in the lock file must
          *          be considered (and check if such a process exists).
          */
-        LockStatus_t getStatus() const throw (Exception);
+        LockStatus getStatus() const throw (Exception);
 
 
         // General Methods
 
         /**
-         * @brief Lock the specified file (create/update the lock file)
+         * @brief Lock the specified directory (create/update the lock file)
          *
          * @warning This method will always overwrite an already existing lock file,
          *          even if that lock file was created by another application instance!
@@ -243,7 +251,7 @@ class DirectoryLock final
         void lock() throw (Exception);
 
         /**
-         * @brief Unlock the specified file (remove the lock file)
+         * @brief Unlock the specified directory (remove the lock file)
          *
          * @warning This method will always remove an existing lock file,
          *          even if that lock file was created by another application instance!
@@ -254,27 +262,24 @@ class DirectoryLock final
         void unlock() throw (Exception);
 
 
-    private:
-
-        // make some methods inaccessible...
-        DirectoryLock(const DirectoryLock& other);            ///< inaccessible
-        DirectoryLock& operator=(const DirectoryLock& rhs);   ///< inaccessible
+        // Operator Overloadings
+        DirectoryLock& operator=(const DirectoryLock& rhs) = delete;
 
 
-        // Attributes
+    private: // Data
 
         /**
-         * @brief The filepath to the file to lock (passed by #setFileToLock())
+         * @brief The filepath to the directory to lock (passed by #setDirToLock())
          */
-        FilePath mFileToLock;
+        FilePath mDirToLock;
 
         /**
          * @brief The filepath to the lock file
          *
-         * Example: If the filepath "C:/foo/goo.xml" was passed to setFileToLock(),
-         *          this attribute will have the value "C:/foo/.~lock.goo.xml#".
+         * Example: If the filepath "/foo/bar" was passed to #setDirToLock(),
+         *          this attribute will have the value "/foo/bar/.lock".
          */
-        FilePath mLockFilepath;
+        FilePath mLockFilePath;
 
         /**
          * @brief This attribute defines if the lock is active by this object
@@ -282,7 +287,7 @@ class DirectoryLock final
          * If #lock() was called successfully, mLockedByThisObject is set to true.
          * If #unlock() was called successfully, mLockedByThisObject is set to false.
          *
-         * In other words: This attribute is true while this object has the "ownership"
+         * In other words: This attribute is true while this object has the ownership
          * over the lock file (between calling #lock() and #unlock()).
          *
          * The only goal of this attrubute is to decide whether the destructor should
