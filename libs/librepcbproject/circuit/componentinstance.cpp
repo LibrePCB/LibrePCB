@@ -390,7 +390,7 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("component_instance"));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement("component"));
     root->setAttribute("uuid", mUuid);
     root->setAttribute("component", mLibComponent->getUuid());
     root->setAttribute("symbol_variant", mCompSymbVar->getUuid());

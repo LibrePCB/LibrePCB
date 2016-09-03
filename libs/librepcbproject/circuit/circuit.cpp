@@ -84,8 +84,8 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             }
 
             // Load all component instances
-            for (XmlDomElement* node = root.getFirstChild("component_instances/component_instance", true, false);
-                 node; node = node->getNextSibling("component_instance"))
+            for (XmlDomElement* node = root.getFirstChild("components/component", true, false);
+                 node; node = node->getNextSibling("component"))
             {
                 ComponentInstance* component = new ComponentInstance(*this, *node);
                 addComponentInstance(*component);
@@ -407,7 +407,7 @@ XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* netsignals = root->appendChild("netsignals");
     foreach (NetSignal* netsignal, mNetSignals)
         netsignals->appendChild(netsignal->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("component_instances");
+    XmlDomElement* components = root->appendChild("components");
     foreach (ComponentInstance* instance, mComponentInstances)
         components->appendChild(instance->serializeToXmlDomElement());
     return root.take();
