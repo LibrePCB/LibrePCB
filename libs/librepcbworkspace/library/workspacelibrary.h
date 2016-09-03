@@ -83,7 +83,6 @@ class WorkspaceLibrary final : public QObject
         QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const throw (Exception);
         QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const throw (Exception);
         QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getSpiceModels(const Uuid& uuid) const throw (Exception);
         QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const throw (Exception);
         QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const throw (Exception);
         QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const throw (Exception);
@@ -92,7 +91,6 @@ class WorkspaceLibrary final : public QObject
         FilePath getLatestComponentCategory(const Uuid& uuid) const throw (Exception);
         FilePath getLatestPackageCategory(const Uuid& uuid) const throw (Exception);
         FilePath getLatestSymbol(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestSpiceModel(const Uuid& uuid) const throw (Exception);
         FilePath getLatestPackage(const Uuid& uuid) const throw (Exception);
         FilePath getLatestComponent(const Uuid& uuid) const throw (Exception);
         FilePath getLatestDevice(const Uuid& uuid) const throw (Exception);

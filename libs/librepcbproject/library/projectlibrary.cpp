@@ -27,7 +27,6 @@
 #include <librepcbcommon/fileio/fileutils.h>
 #include "../project.h"
 #include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/spcmdl/spicemodel.h>
 #include <librepcblibrary/pkg/package.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/dev/device.h>
@@ -61,7 +60,6 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
     {
         // Load all library elements
         loadElements<Symbol>    (mLibraryPath.getPathTo("sym"),    "symbols",      mSymbols);
-        loadElements<SpiceModel>(mLibraryPath.getPathTo("spcmdl"), "spice models", mSpiceModels);
         loadElements<Package>   (mLibraryPath.getPathTo("pkg"),    "packages",     mPackages);
         loadElements<Component> (mLibraryPath.getPathTo("cmp"),    "components",   mComponents);
         loadElements<Device>    (mLibraryPath.getPathTo("dev"),    "devices",      mDevices);
@@ -72,7 +70,6 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) th
         qDeleteAll(mDevices);       mDevices.clear();
         qDeleteAll(mComponents);    mComponents.clear();
         qDeleteAll(mPackages);      mPackages.clear();
-        qDeleteAll(mSpiceModels);   mSpiceModels.clear();
         qDeleteAll(mSymbols);       mSymbols.clear();
         throw; // ...and rethrow the exception
     }
@@ -84,7 +81,6 @@ ProjectLibrary::~ProjectLibrary() noexcept
 {
     // clean up all removed elements
     cleanupElements<Symbol>(mAddedSymbols, mRemovedSymbols);
-    cleanupElements<SpiceModel>(mAddedSpiceModels, mRemovedSpiceModels);
     cleanupElements<Package>(mAddedPackages, mRemovedPackages);
     cleanupElements<Component>(mAddedComponents, mRemovedComponents);
     cleanupElements<Device>(mAddedDevices, mRemovedDevices);
@@ -93,7 +89,6 @@ ProjectLibrary::~ProjectLibrary() noexcept
     qDeleteAll(mDevices);       mDevices.clear();
     qDeleteAll(mComponents);    mComponents.clear();
     qDeleteAll(mPackages);      mPackages.clear();
-    qDeleteAll(mSpiceModels);   mSpiceModels.clear();
     qDeleteAll(mSymbols);       mSymbols.clear();
 }
 
@@ -104,11 +99,6 @@ ProjectLibrary::~ProjectLibrary() noexcept
 Symbol* ProjectLibrary::getSymbol(const Uuid& uuid) const noexcept
 {
     return mSymbols.value(uuid, 0);
-}
-
-SpiceModel* ProjectLibrary::getSpiceModel(const Uuid& uuid) const noexcept
-{
-    return mSpiceModels.value(uuid, 0);
 }
 
 Package* ProjectLibrary::getPackage(const Uuid& uuid) const noexcept
@@ -150,11 +140,6 @@ void ProjectLibrary::addSymbol(library::Symbol& s) throw (Exception)
     addElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
 }
 
-void ProjectLibrary::addSpiceModel(library::SpiceModel& m) throw (Exception)
-{
-    addElement<SpiceModel>(m, mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels);
-}
-
 void ProjectLibrary::addPackage(library::Package& p) throw (Exception)
 {
     addElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
@@ -173,11 +158,6 @@ void ProjectLibrary::addDevice(library::Device& d) throw (Exception)
 void ProjectLibrary::removeSymbol(library::Symbol& s) throw (Exception)
 {
     removeElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
-}
-
-void ProjectLibrary::removeSpiceModel(library::SpiceModel& m) throw (Exception)
-{
-    removeElement<SpiceModel>(m, mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels);
 }
 
 void ProjectLibrary::removePackage(library::Package& p) throw (Exception)
@@ -207,8 +187,6 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
     // Save all elements
     if (!saveElements<Symbol>(toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mAddedSymbols, mRemovedSymbols))
         success = false;
-    if (!saveElements<SpiceModel>(toOriginal, errors, mLibraryPath.getPathTo("spcmdl"), mSpiceModels, mAddedSpiceModels, mRemovedSpiceModels))
-        success = false;
     if (!saveElements<Package>(toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mAddedPackages, mRemovedPackages))
         success = false;
     if (!saveElements<Component>(toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mAddedComponents, mRemovedComponents))
@@ -237,10 +215,10 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         FilePath subdirPath(directory.getPathTo(dirname));
 
         // check if directory is a valid library element
-        if (!LibraryBaseElement::isDirectoryLibraryElement(subdirPath)) {
+        /*if (!LibraryBaseElement::isDirectoryLibraryElement(subdirPath)) {
             qWarning() << "Found an invalid directory in the library:" << subdirPath.toNative();
             continue;
-        }
+        }*/
 
         // load the library element --> an exception will be thrown on error
         ElementType* element = new ElementType(subdirPath, false);

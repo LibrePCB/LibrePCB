@@ -31,7 +31,6 @@
 #include <librepcblibrary/cat/packagecategory.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcblibrary/pkg/package.h>
-#include <librepcblibrary/spcmdl/spicemodel.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/dev/device.h>
 #include "workspacelibrary.h"
@@ -97,11 +96,6 @@ QMultiMap<Version, FilePath> WorkspaceLibrary::getSymbols(const Uuid& uuid) cons
     return getElementFilePathsFromDb("symbols", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibrary::getSpiceModels(const Uuid& uuid) const throw (Exception)
-{
-    return getElementFilePathsFromDb("spice_models", uuid);
-}
-
 QMultiMap<Version, FilePath> WorkspaceLibrary::getPackages(const Uuid& uuid) const throw (Exception)
 {
     return getElementFilePathsFromDb("packages", uuid);
@@ -134,11 +128,6 @@ FilePath WorkspaceLibrary::getLatestPackageCategory(const Uuid& uuid) const thro
 FilePath WorkspaceLibrary::getLatestSymbol(const Uuid& uuid) const throw (Exception)
 {
     return getLatestVersionFilePath(getSymbols(uuid));
-}
-
-FilePath WorkspaceLibrary::getLatestSpiceModel(const Uuid& uuid) const throw (Exception)
-{
-    return getLatestVersionFilePath(getSpiceModels(uuid));
 }
 
 FilePath WorkspaceLibrary::getLatestPackage(const Uuid& uuid) const throw (Exception)
@@ -251,7 +240,6 @@ int WorkspaceLibrary::rescan() throw (Exception)
     count += addCategoriesToDb<ComponentCategory>(  dirs.values("cmpcat"),  "component_categories", "cat_id");
     count += addCategoriesToDb<PackageCategory>(    dirs.values("pkgcat"),  "package_categories",   "cat_id");
     count += addElementsToDb<Symbol>(               dirs.values("sym"),     "symbols",              "symbol_id");
-    count += addElementsToDb<SpiceModel>(           dirs.values("spcmdl"),  "spice_models",         "model_id");
     count += addElementsToDb<Package>(              dirs.values("pkg"),     "packages",             "package_id");
     count += addElementsToDb<Component>(            dirs.values("cmp"),     "components",           "component_id");
     count += addDevicesToDb(                        dirs.values("dev"),     "devices",              "device_id");
@@ -568,29 +556,6 @@ void WorkspaceLibrary::createAllTables() throw (Exception)
                         "UNIQUE(symbol_id, category_uuid)"
                         ")");
 
-    // spice models
-    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                        "`filepath` TEXT UNIQUE NOT NULL, "
-                        "`uuid` TEXT NOT NULL, "
-                        "`version` TEXT NOT NULL"
-                        ")");
-    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                        "`model_id` INTEGER REFERENCES spice_models(id) NOT NULL, "
-                        "`locale` TEXT NOT NULL, "
-                        "`name` TEXT, "
-                        "`description` TEXT, "
-                        "`keywords` TEXT, "
-                        "UNIQUE(model_id, locale)"
-                        ")");
-    queries << QString( "CREATE TABLE IF NOT EXISTS spice_models_cat ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                        "`model_id` INTEGER REFERENCES spice_models(id) NOT NULL, "
-                        "`category_uuid` TEXT NOT NULL, "
-                        "UNIQUE(model_id, category_uuid)"
-                        ")");
-
     // packages
     queries << QString( "CREATE TABLE IF NOT EXISTS packages ("
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
@@ -692,11 +657,6 @@ void WorkspaceLibrary::clearAllTables() throw (Exception)
     queries << QString( "DELETE FROM symbols_tr");
     queries << QString( "DELETE FROM symbols_cat");
     queries << QString( "DELETE FROM symbols");
-
-    // spice models
-    queries << QString( "DELETE FROM spice_models_tr");
-    queries << QString( "DELETE FROM spice_models_cat");
-    queries << QString( "DELETE FROM spice_models");
 
     // packages
     queries << QString( "DELETE FROM packages_tr");

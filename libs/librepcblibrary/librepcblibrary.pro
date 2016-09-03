@@ -25,7 +25,6 @@ HEADERS += \
     cat/packagecategory.h \
     pkg/footprint.h \
     pkg/package.h \
-    spcmdl/spicemodel.h \
     sym/symbol.h \
     sym/symbolpin.h \
     sym/symbolpinpreviewgraphicsitem.h \
@@ -53,7 +52,6 @@ SOURCES += \
     cat/packagecategory.cpp \
     pkg/footprint.cpp \
     pkg/package.cpp \
-    spcmdl/spicemodel.cpp \
     sym/symbol.cpp \
     sym/symbolpin.cpp \
     sym/symbolpinpreviewgraphicsitem.cpp \
