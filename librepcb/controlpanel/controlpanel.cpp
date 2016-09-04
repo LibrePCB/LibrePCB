@@ -58,6 +58,11 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
         .arg(mWorkspace.getPath().toNative())));
 
+    // decive if we have to show the warning about a newer workspace file format version
+    Version actualVersion = qApp->getFileFormatVersion();
+    Version highestVersion = Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
+    mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
+
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, &QAction::triggered,
             this, &ControlPanel::close);
