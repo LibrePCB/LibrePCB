@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreState(s.value("mainwindow/state").toByteArray());
     ui->libDirs->addItems(s.value("mainwindow/lib_dirs").toStringList());
 
+    ui->cbx_lplib->setChecked(s.value("mainwindow/cbx_lplib", true).toBool());
     ui->cbx_cmpcat->setChecked(s.value("mainwindow/cbx_cmpcat", true).toBool());
     ui->cbx_pkgcat->setChecked(s.value("mainwindow/cbx_pkgcat", true).toBool());
     ui->cbx_sym->setChecked(s.value("mainwindow/cbx_sym", true).toBool());
@@ -42,6 +43,7 @@ MainWindow::~MainWindow()
     s.setValue("mainwindow/state", saveState());
     s.setValue("mainwindow/lib_dirs", QVariant::fromValue(libDirList));
 
+    s.setValue("mainwindow/cbx_lplib", ui->cbx_lplib->isChecked());
     s.setValue("mainwindow/cbx_cmpcat", ui->cbx_cmpcat->isChecked());
     s.setValue("mainwindow/cbx_pkgcat", ui->cbx_pkgcat->isChecked());
     s.setValue("mainwindow/cbx_sym", ui->cbx_sym->isChecked());
@@ -54,9 +56,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_addDirectoryBtn_clicked()
 {
-    lastDir = QFileDialog::getExistingDirectory(this, "Select Directory", lastDir);
-    if (lastDir.isEmpty()) return;
-    ui->libDirs->addItem(lastDir);
+    QFileDialog dialog(this, "Select Directories", lastDir);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly |
+                      QFileDialog::HideNameFilterDetails | QFileDialog::DontUseNativeDialog);
+    QListView* l = dialog.findChild<QListView*>("listView");
+    if (l) l->setSelectionMode(QAbstractItemView::MultiSelection);
+    QTreeView* t = dialog.findChild<QTreeView*>();
+    if (t) t->setSelectionMode(QAbstractItemView::MultiSelection);
+    if (dialog.exec()) {
+        ui->libDirs->addItems(dialog.selectedFiles());
+    }
+    lastDir = dialog.directory().absolutePath();
 }
 
 void MainWindow::on_removeDirectoryBtn_clicked()
@@ -74,79 +85,58 @@ void MainWindow::on_updateBtn_clicked()
     if (ui->libDirs->count() == 0) return;
     ui->log->clear();
 
-    int elementCount = 0;
-    int ignoreCount = 0;
-    int errorCount = 0;
+    elementCount = 0;
+    ignoreCount = 0;
+    errorCount = 0;
     for (int i = 0; i < ui->libDirs->count(); i++)
     {
         QString dirStr = ui->libDirs->item(i)->text();
-        QStringList filter;
-        if (ui->cbx_cmpcat->isChecked())    filter.append("*.cmpcat");
-        if (ui->cbx_pkgcat->isChecked())    filter.append("*.pkgcat");
-        if (ui->cbx_sym->isChecked())       filter.append("*.sym");
-        if (ui->cbx_pkg->isChecked())       filter.append("*.pkg");
-        if (ui->cbx_cmp->isChecked())       filter.append("*.cmp");
-        if (ui->cbx_dev->isChecked())       filter.append("*.dev");
 
-        // search library elements
-        QDirIterator it(dirStr, filter, QDir::Dirs, QDirIterator::Subdirectories);
-        while (it.hasNext())
+        try
         {
-            FilePath dirFilePath(it.next());
-            if (dirFilePath.getBasename() == "00000000-0000-4001-8000-000000000000")
-            {
-                // ignore demo files as they contain documentation which would be removed
-                ignoreCount++;
-                continue;
-            }
-            try
-            {
-                if (dirFilePath.getSuffix() == "cmpcat")
-                {
-                    library::ComponentCategory elem(dirFilePath, false);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "pkgcat")
-                {
-                    library::PackageCategory elem(dirFilePath, false);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "sym")
-                {
-                    library::Symbol elem(dirFilePath, false);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "pkg")
-                {
-                    library::Package elem(dirFilePath, false);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "cmp")
-                {
-                    library::Component elem(dirFilePath, false);
-                    elem.save();
-                }
-                else if (dirFilePath.getSuffix() == "dev")
-                {
-                    library::Device elem(dirFilePath, false);
-                    elem.save();
-                }
-                else
-                {
-                    Q_ASSERT(false);
-                }
-                ui->log->addItem(dirFilePath.toNative());
+            library::Library lib(FilePath(dirStr), false);
+
+            if (ui->cbx_cmpcat->isChecked()) updateElements<ComponentCategory>(lib);
+            if (ui->cbx_pkgcat->isChecked()) updateElements<PackageCategory>(lib);
+            if (ui->cbx_sym->isChecked()) updateElements<Symbol>(lib);
+            if (ui->cbx_pkg->isChecked()) updateElements<Package>(lib);
+            if (ui->cbx_cmp->isChecked()) updateElements<Component>(lib);
+            if (ui->cbx_dev->isChecked()) updateElements<Device>(lib);
+
+            if (ui->cbx_lplib->isChecked()) {
+                lib.save();
                 elementCount++;
             }
-            catch (Exception& e)
-            {
-                ui->log->addItem("ERROR: " % e.getUserMsg());
-                errorCount++;
-            }
+        }
+        catch (Exception& e)
+        {
+            ui->log->addItem("ERROR: " % e.getUserMsg());
+            errorCount++;
         }
     }
 
     ui->log->addItem(QString("FINISHED: %1 updated, %2 ignored, %3 errors")
                      .arg(elementCount).arg(ignoreCount).arg(errorCount));
     ui->log->setCurrentRow(ui->log->count()-1);
+}
+
+template <typename ElementType>
+void MainWindow::updateElements(const library::Library& lib) noexcept
+{
+    foreach (const FilePath& fp, lib.searchForElements<ElementType>()) {
+        if (fp.getBasename() == "00000000-0000-4001-8000-000000000000") {
+            // ignore demo files as they contain documentation which would be removed
+            ignoreCount++;
+            continue;
+        }
+        try {
+            ElementType element(fp, false);
+            element.save();
+            ui->log->addItem(fp.toNative());
+            elementCount++;
+        } catch (const Exception& e) {
+            ui->log->addItem("ERROR: " % e.getUserMsg());
+            errorCount++;
+        }
+    }
 }

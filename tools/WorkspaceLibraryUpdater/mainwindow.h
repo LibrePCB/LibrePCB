@@ -9,7 +9,15 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace librepcb {
+
 class XmlDomElement;
+
+namespace library {
+class Library;
+}
+
+}
 
 class MainWindow : public QMainWindow
 {
@@ -29,9 +37,15 @@ class MainWindow : public QMainWindow
 
     private:
 
+        template <typename ElementType>
+        void updateElements(const librepcb::library::Library& lib) noexcept;
+
         // Attributes
         Ui::MainWindow *ui;
         QString lastDir;
+        int elementCount;
+        int ignoreCount;
+        int errorCount;
 };
 
 #endif // MAINWINDOW_H

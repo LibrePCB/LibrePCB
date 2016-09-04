@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <librepcbcommon/fileio/fileutils.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
@@ -81,27 +82,31 @@ void MainWindow::on_pushButton_2_clicked()
 
         for (int i = 0; i < ui->projectfiles->count(); i++)
         {
+            // open the project xml file
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
             SmartXmlFile projectFile(projectFilepath, false, true);
             QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
 
+            // remove the whole library directory
+            FilePath libDir = projectFilepath.getParentDir().getPathTo("library");
+            FileUtils::removeDirRecursively(libDir); // can throw
+
             // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
             QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
-            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("component_instances/*", true, false);
+            for (XmlDomElement* node = circuitDoc->getRoot().getFirstChild("components/*", true, false);
                  node; node = node->getNextSibling())
             {
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
                 FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
-                if (!filepath.isValid())
-                {
-                    throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                        QString("missing component: %1").arg(compUuid.toStr()));
+                if (!filepath.isExistingDir()) {
+                    throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                        QString("Missing component: %1").arg(compUuid.toStr()));
                 }
-                // copy component
+                // open & copy component
                 Component latestComp(filepath, true);
-                FilePath dest = projectFilepath.getParentDir().getPathTo("library/cmp");
-                latestComp.saveIntoParentDirectory(dest);
+                FilePath dest = libDir.getPathTo("cmp").getPathTo(filepath.getFilename());
+                if (!dest.isExistingDir()) FileUtils::copyDirRecursively(filepath, dest);
                 ui->log->addItem(latestComp.getFilePath().toNative());
 
                 // search all required symbols
@@ -110,55 +115,52 @@ void MainWindow::on_pushButton_2_clicked()
                     foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
                     {
                         FilePath filepath = workspace.getLibraryDb().getLatestSymbol(symbolUuid);
-                        if (!filepath.isValid())
-                        {
-                            throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                                QString("missing symbol: %1").arg(symbolUuid.toStr()));
+                        if (!filepath.isExistingDir()) {
+                            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                                QString("Missing symbol: %1").arg(symbolUuid.toStr()));
                         }
+                        // open & copy symbol
                         Symbol latestSymbol(filepath, true);
-                        FilePath dest = projectFilepath.getParentDir().getPathTo("library/sym");
-                        latestSymbol.saveIntoParentDirectory(dest);
+                        FilePath dest = libDir.getPathTo("sym").getPathTo(filepath.getFilename());
+                        if (!dest.isExistingDir()) FileUtils::copyDirRecursively(filepath, dest);
                         ui->log->addItem(latestSymbol.getFilePath().toNative());
                     }
                 }
             }
 
-
-            // devices & footprints
+            // devices & packages
             for (XmlDomElement* node = projectDoc->getRoot().getFirstChild("boards/*", true, false);
                  node; node = node->getNextSibling())
             {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
-                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("device_instances/*", true, false);
+                for (XmlDomElement* node = boardDoc->getRoot().getFirstChild("devices/*", true, false);
                      node; node = node->getNextSibling())
                 {
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
                     FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);
-                    if (!filepath.isValid())
-                    {
-                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing device: %1").arg(deviceUuid.toStr()));
+                    if (!filepath.isExistingDir()) {
+                        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                            QString("Missing device: %1").arg(deviceUuid.toStr()));
                     }
-                    // copy device
+                    // open & copy device
                     Device latestDevice(filepath, true);
-                    FilePath dest = projectFilepath.getParentDir().getPathTo("library/dev");
-                    latestDevice.saveIntoParentDirectory(dest);
+                    FilePath dest = libDir.getPathTo("dev").getPathTo(filepath.getFilename());
+                    if (!dest.isExistingDir()) FileUtils::copyDirRecursively(filepath, dest);
                     ui->log->addItem(latestDevice.getFilePath().toNative());
 
                     // get package
                     Uuid packUuid = latestDevice.getPackageUuid();
                     filepath = workspace.getLibraryDb().getLatestPackage(packUuid);
-                    if (!filepath.isValid())
-                    {
-                        throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
-                            QString("missing package: %1").arg(packUuid.toStr()));
+                    if (!filepath.isExistingDir()) {
+                        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                            QString("Missing package: %1").arg(packUuid.toStr()));
                     }
-                    // copy package
+                    // open & copy package
                     Package latestPackage(filepath, true);
-                    dest = projectFilepath.getParentDir().getPathTo("library/pkg");
-                    latestPackage.saveIntoParentDirectory(dest);
+                    dest = libDir.getPathTo("pkg").getPathTo(filepath.getFilename());
+                    if (!dest.isExistingDir()) FileUtils::copyDirRecursively(filepath, dest);
                     ui->log->addItem(latestPackage.getFilePath().toNative());
                 }
             }
