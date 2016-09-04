@@ -42,7 +42,7 @@ class ProjectTreeModel;
 class RecentProjectsModel;
 class FavoriteProjectsModel;
 class WorkspaceSettings;
-class WorkspaceLibrary;
+class WorkspaceLibraryDb;
 
 /*****************************************************************************************
  *  Class Workspace
@@ -113,9 +113,9 @@ class Workspace final : public QObject
         WorkspaceSettings& getSettings() const {return *mWorkspaceSettings;}
 
         /**
-         * @brief Get the workspace library
+         * @brief Get the workspace library database
          */
-        WorkspaceLibrary& getLibrary() const {return *mLibrary;}
+        WorkspaceLibraryDb& getLibraryDb() const {return *mLibraryDb;}
 
 
         // Project Management
@@ -207,7 +207,7 @@ class Workspace final : public QObject
         FilePath mProjectsPath; ///< the directory "projects"
         FilePath mLibraryPath; ///< the directory "library"
         WorkspaceSettings* mWorkspaceSettings; ///< the WorkspaceSettings object
-        WorkspaceLibrary* mLibrary; ///< the library of the workspace
+        WorkspaceLibraryDb* mLibraryDb; ///< the library database of the workspace
         ProjectTreeModel* mProjectTreeModel; ///< a tree model for the whole projects directory
         RecentProjectsModel* mRecentProjectsModel; ///< a list model of all recent projects
         FavoriteProjectsModel* mFavoriteProjectsModel; ///< a list model of all favorite projects

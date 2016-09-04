@@ -32,7 +32,7 @@
 #include <librepcbproject/boards/items/bi_device.h>
 #include <librepcbproject/circuit/componentinstance.h>
 #include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>
@@ -250,7 +250,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
             // get all available alternative devices and footprints
-            QSet<Uuid> devicesList = mWorkspace.getLibrary().getDevicesOfComponent(cmpInst.getLibComponent().getUuid());
+            QSet<Uuid> devicesList = mWorkspace.getLibraryDb().getDevicesOfComponent(cmpInst.getLibComponent().getUuid());
             QList<Uuid> footprintsList = devInst.getLibPackage().getFootprintUuids();
 
             // build the context menu
@@ -263,10 +263,10 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             foreach (const Uuid& deviceUuid, devicesList) {
                 Uuid pkgUuid;
                 QString devName, pkgName;
-                FilePath devFp = mWorkspace.getLibrary().getLatestDevice(deviceUuid);
-                mWorkspace.getLibrary().getDeviceMetadata(devFp, &pkgUuid, &devName);
-                FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
-                mWorkspace.getLibrary().getPackageMetadata(pkgFp, &pkgName);
+                FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);
+                mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid, &devName);
+                FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+                mWorkspace.getLibraryDb().getPackageMetadata(pkgFp, &pkgName);
                 QAction* a = aChangeDeviceMenu->addAction(QString("%1 [%2]").arg(devName).arg(pkgName));
                 a->setData(deviceUuid.toStr());
                 if (deviceUuid == devInst.getLibDevice().getUuid()) {

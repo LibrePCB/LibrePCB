@@ -30,7 +30,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbworkspace/projecttreemodel.h>
 #include <librepcbworkspace/projecttreeitem.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbprojecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcbcommon/application.h>
@@ -553,7 +553,7 @@ void ControlPanel::on_actionRescanLibrary_triggered()
     try
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        int count = mWorkspace.getLibrary().rescan();
+        int count = mWorkspace.getLibraryDb().rescan();
         QApplication::restoreOverrideCursor();
         QMessageBox::information(this, tr("Rescan Library"),
             QString("Successfully scanned %1 library elements.").arg(count));

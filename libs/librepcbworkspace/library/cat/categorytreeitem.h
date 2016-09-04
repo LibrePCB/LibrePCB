@@ -38,7 +38,7 @@ class PackageCategory;
 
 namespace workspace {
 
-class WorkspaceLibrary;
+class WorkspaceLibraryDb;
 
 /*****************************************************************************************
  *  Class CategoryTreeItem
@@ -52,7 +52,7 @@ class CategoryTreeItem final
     public:
 
         // Constructors / Destructor
-        CategoryTreeItem(const WorkspaceLibrary& library, const QStringList localeOrder,
+        CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
                          CategoryTreeItem* parent, const Uuid& uuid) noexcept;
         ~CategoryTreeItem() noexcept;
 

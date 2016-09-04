@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "categorytreemodel.h"
-#include "../workspacelibrary.h"
+#include "../workspacelibrarydb.h"
 #include "categorytreeitem.h"
 
 /*****************************************************************************************
@@ -36,7 +36,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeModel::CategoryTreeModel(const WorkspaceLibrary& library, const QStringList& localeOrder) noexcept :
+CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept :
     QAbstractItemModel(nullptr)
 {
     mRootItem = new CategoryTreeItem(library, localeOrder, nullptr, Uuid());

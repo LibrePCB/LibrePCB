@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdadddevicetoboard.h"
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/dev/device.h>
 #include <librepcblibrary/pkg/package.h>
@@ -79,7 +79,7 @@ bool CmdAddDeviceToBoard::performExecute() throw (Exception)
     // workspace library to the project's library
     library::Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
     if (!dev) {
-        FilePath devFp = mWorkspace.getLibrary().getLatestDevice(mDeviceUuid);
+        FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(mDeviceUuid);
         if (!devFp.isValid()) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                 QString(tr("The device with the UUID \"%1\" does not exist in the "
@@ -97,7 +97,7 @@ bool CmdAddDeviceToBoard::performExecute() throw (Exception)
     Uuid pkgUuid = dev->getPackageUuid();
     library::Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
     if (!pkg) {
-        FilePath pkgFp = mWorkspace.getLibrary().getLatestPackage(pkgUuid);
+        FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
         if (!pkgFp.isValid()) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                 QString(tr("The package with the UUID \"%1\" does not exist in the "

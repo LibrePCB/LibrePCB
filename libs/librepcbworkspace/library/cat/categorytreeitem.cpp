@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "categorytreeitem.h"
-#include "../workspacelibrary.h"
+#include "../workspacelibrarydb.h"
 #include <librepcblibrary/cat/componentcategory.h>
 #include <librepcblibrary/cat/packagecategory.h>
 
@@ -38,7 +38,7 @@ using namespace library;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeItem::CategoryTreeItem(const WorkspaceLibrary& library, const QStringList localeOrder,
+CategoryTreeItem::CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
                                    CategoryTreeItem* parent, const Uuid& uuid) noexcept :
     mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid), mCategory(nullptr),
     mDepth(parent ? parent->getDepth() + 1 : 0), mExceptionMessage()

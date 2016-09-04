@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H
-#define LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
+#define LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
 
 /*****************************************************************************************
  *  Includes
@@ -41,11 +41,11 @@ namespace workspace {
 class Workspace;
 
 /*****************************************************************************************
- *  Class WorkspaceLibrary
+ *  Class WorkspaceLibraryDb
  ****************************************************************************************/
 
 /**
- * @brief The WorkspaceLibrary class
+ * @brief The WorkspaceLibraryDb class
  *
  * @todo This class needs some refactoring:
  *          - rescan() is very slow
@@ -56,15 +56,15 @@ class Workspace;
  *              --> error if there are multiple XML files in one element directory
  *          - many other issues...
  */
-class WorkspaceLibrary final : public QObject
+class WorkspaceLibraryDb final : public QObject
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        WorkspaceLibrary() = delete;
-        WorkspaceLibrary(const WorkspaceLibrary& other) = delete;
+        WorkspaceLibraryDb() = delete;
+        WorkspaceLibraryDb(const WorkspaceLibraryDb& other) = delete;
 
         /**
         * @brief Constructor to open the library of an existing workspace
@@ -75,8 +75,8 @@ class WorkspaceLibrary final : public QObject
         * @throw Exception If the library could not be opened, this constructor throws
         *                  an exception.
         */
-        explicit WorkspaceLibrary(Workspace& ws) throw (Exception);
-        ~WorkspaceLibrary() noexcept;
+        explicit WorkspaceLibraryDb(Workspace& ws) throw (Exception);
+        ~WorkspaceLibraryDb() noexcept;
 
 
         // Getters: Library Elements by their UUID
@@ -114,7 +114,7 @@ class WorkspaceLibrary final : public QObject
         int rescan() throw (Exception);
 
         // Operator Overloadings
-        WorkspaceLibrary& operator=(const WorkspaceLibrary& rhs) = delete;
+        WorkspaceLibraryDb& operator=(const WorkspaceLibraryDb& rhs) = delete;
 
 
     private:
@@ -154,4 +154,4 @@ class WorkspaceLibrary final : public QObject
 } // namespace workspace
 } // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_WORKSPACELIBRARY_H
+#endif // LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H

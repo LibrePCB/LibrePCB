@@ -11,7 +11,7 @@
 #include <librepcblibrary/pkg/footprint.h>
 #include <librepcblibrary/pkg/package.h>
 #include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 
 using namespace librepcb;
 using namespace librepcb::library;
@@ -92,7 +92,7 @@ void MainWindow::on_pushButton_2_clicked()
                  node; node = node->getNextSibling())
             {
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
-                FilePath filepath = workspace.getLibrary().getLatestComponent(compUuid);
+                FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
                 if (!filepath.isValid())
                 {
                     throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -109,7 +109,7 @@ void MainWindow::on_pushButton_2_clicked()
                 {
                     foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
                     {
-                        FilePath filepath = workspace.getLibrary().getLatestSymbol(symbolUuid);
+                        FilePath filepath = workspace.getLibraryDb().getLatestSymbol(symbolUuid);
                         if (!filepath.isValid())
                         {
                             throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -135,7 +135,7 @@ void MainWindow::on_pushButton_2_clicked()
                      node; node = node->getNextSibling())
                 {
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
-                    FilePath filepath = workspace.getLibrary().getLatestDevice(deviceUuid);
+                    FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -149,7 +149,7 @@ void MainWindow::on_pushButton_2_clicked()
 
                     // get package
                     Uuid packUuid = latestDevice.getPackageUuid();
-                    filepath = workspace.getLibrary().getLatestPackage(packUuid);
+                    filepath = workspace.getLibraryDb().getLatestPackage(packUuid);
                     if (!filepath.isValid())
                     {
                         throw RuntimeError(__FILE__, __LINE__, projectFilepath.toStr(),
@@ -181,7 +181,7 @@ void MainWindow::on_rescanlib_clicked()
     {
         FilePath workspacePath(ui->workspacepath->text());
         Workspace workspace(workspacePath);
-        workspace.getLibrary().rescan();
+        workspace.getLibraryDb().rescan();
         QMessageBox::information(this, tr("Library Rescan"), tr("Successfully"));
     }
     catch (Exception& e)

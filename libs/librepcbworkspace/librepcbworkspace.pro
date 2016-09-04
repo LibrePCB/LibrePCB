@@ -36,7 +36,7 @@ SOURCES += \
     settings/items/wsi_librarynormorder.cpp \
     settings/items/wsi_debugtools.cpp \
     settings/items/wsi_appearance.cpp \
-    library/workspacelibrary.cpp \
+    library/workspacelibrarydb.cpp \
     library/cat/categorytreemodel.cpp \
     library/cat/categorytreeitem.cpp
 
@@ -56,7 +56,7 @@ HEADERS += \
     settings/items/wsi_librarynormorder.h \
     settings/items/wsi_debugtools.h \
     settings/items/wsi_appearance.h \
-    library/workspacelibrary.h \
+    library/workspacelibrarydb.h \
     library/cat/categorytreemodel.h \
     library/cat/categorytreeitem.h
 

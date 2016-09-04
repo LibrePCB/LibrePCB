@@ -38,7 +38,7 @@
 #include <librepcbworkspace/library/cat/categorytreemodel.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcblibrary/cat/componentcategory.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcbcommon/gridproperties.h>
 
 /*****************************************************************************************
@@ -63,7 +63,7 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->graphicsView->setOriginCrossVisible(false);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    mCategoryTreeModel = new workspace::CategoryTreeModel(mWorkspace.getLibrary(), localeOrder);
+    mCategoryTreeModel = new workspace::CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddComponentDialog::treeCategories_currentItemChanged);
@@ -166,10 +166,10 @@ void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
     mSelectedCategoryUuid = categoryUuid;
-    QSet<Uuid> components = mWorkspace.getLibrary().getComponentsByCategory(categoryUuid);
+    QSet<Uuid> components = mWorkspace.getLibraryDb().getComponentsByCategory(categoryUuid);
     foreach (const Uuid& cmpUuid, components)
     {
-        FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(cmpUuid);
+        FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);
         if (!cmpFp.isValid()) continue;
         library::Component component(cmpFp, true); // TODO: use library metadata instead of loading the whole component
 
@@ -239,7 +239,7 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
             const library::ComponentSymbolVariantItem* item = symbVar->getItem(i);
             Q_ASSERT(item); if (!item) continue;
 
-            FilePath symbolFp = mWorkspace.getLibrary().getLatestSymbol(item->getSymbolUuid());
+            FilePath symbolFp = mWorkspace.getLibraryDb().getLatestSymbol(item->getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning
             const library::Symbol* symbol = new library::Symbol(symbolFp, true); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(

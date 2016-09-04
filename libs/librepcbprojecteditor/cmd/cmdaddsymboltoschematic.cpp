@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddsymboltoschematic.h"
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcblibrary/sym/symbol.h>
 #include <librepcbworkspace/workspace.h>
@@ -85,7 +85,7 @@ bool CmdAddSymbolToSchematic::performExecute() throw (Exception)
     // workspace library to the project's library
     Uuid symbolUuid = item->getSymbolUuid();
     if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
-        FilePath symFp = mWorkspace.getLibrary().getLatestSymbol(symbolUuid);
+        FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);
         if (!symFp.isValid()) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                 QString(tr("The symbol with the UUID \"%1\" does not exist in the "

@@ -31,7 +31,7 @@
 namespace librepcb {
 namespace workspace {
 
-class WorkspaceLibrary;
+class WorkspaceLibraryDb;
 class CategoryTreeItem;
 
 /*****************************************************************************************
@@ -48,7 +48,7 @@ class CategoryTreeModel final : public QAbstractItemModel
     public:
 
         // Constructors / Destructor
-        explicit CategoryTreeModel(const WorkspaceLibrary& library, const QStringList& localeOrder) noexcept;
+        explicit CategoryTreeModel(const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept;
         ~CategoryTreeModel() noexcept;
 
         // Inherited Methods

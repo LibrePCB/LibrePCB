@@ -29,7 +29,7 @@
 #include <librepcbcommon/application.h>
 #include <librepcblibraryeditor/libraryeditor.h>
 #include <librepcbproject/project.h>
-#include "library/workspacelibrary.h"
+#include "library/workspacelibrarydb.h"
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
@@ -56,7 +56,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     mMetadataPath(wsPath.getPathTo(QString(".metadata/v%1").arg(qApp->getFileFormatVersion().getNumbers().value(0)))),
     mProjectsPath(wsPath.getPathTo("projects")),
     mLibraryPath(wsPath.getPathTo("library")),
-    mWorkspaceSettings(0), mLibrary(0), mProjectTreeModel(0), mRecentProjectsModel(0),
+    mWorkspaceSettings(0), mLibraryDb(0), mProjectTreeModel(0), mRecentProjectsModel(0),
     mFavoriteProjectsModel(0)
 {
     try
@@ -101,12 +101,12 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         mRecentProjectsModel = new RecentProjectsModel(*this);
         mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
         mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibrary = new WorkspaceLibrary(*this);
+        mLibraryDb = new WorkspaceLibraryDb(*this);
     }
     catch (Exception& e)
     {
         // free allocated memory and rethrow the exception
-        delete mLibrary;                mLibrary = 0;
+        delete mLibraryDb;              mLibraryDb = 0;
         delete mProjectTreeModel;       mProjectTreeModel = 0;
         delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
         delete mRecentProjectsModel;    mRecentProjectsModel = 0;
@@ -117,7 +117,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
 
 Workspace::~Workspace()
 {
-    delete mLibrary;                mLibrary = 0;
+    delete mLibraryDb;              mLibraryDb = 0;
     delete mProjectTreeModel;       mProjectTreeModel = 0;
     delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
     delete mRecentProjectsModel;    mRecentProjectsModel = 0;
