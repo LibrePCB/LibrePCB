@@ -35,6 +35,7 @@
 #include "favoriteprojectsmodel.h"
 #include "settings/workspacesettings.h"
 #include <librepcbcommon/schematiclayer.h>
+#include <librepcblibrary/library.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -51,77 +52,109 @@ namespace workspace {
  ****************************************************************************************/
 
 Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
-    QObject(0),
-    mPath(wsPath), mLock(wsPath),
-    mMetadataPath(wsPath.getPathTo(QString(".metadata/v%1").arg(qApp->getFileFormatVersion().getNumbers().value(0)))),
-    mProjectsPath(wsPath.getPathTo("projects")),
-    mLibraryPath(wsPath.getPathTo("library")),
-    mWorkspaceSettings(0), mLibraryDb(0), mProjectTreeModel(0), mRecentProjectsModel(0),
-    mFavoriteProjectsModel(0)
+    QObject(nullptr),
+    mPath(wsPath),
+    mProjectsPath(mPath.getPathTo("projects")),
+    mVersionPath(mPath.getPathTo("v" % qApp->getFileFormatVersion().toStr())),
+    mMetadataPath(mVersionPath.getPathTo("metadata")),
+    mLibrariesPath(mVersionPath.getPathTo("libraries")),
+    mLock(mVersionPath)
 {
-    try
-    {
-        // check the workspace path
-        if ((!mPath.isExistingDir()) || (!mMetadataPath.isExistingDir()))
-        {
-            throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
-                QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
-        }
-
-        // Check if the workspace is locked (already open or application was crashed).
-        switch (mLock.getStatus()) // can throw
-        {
-            case DirectoryLock::LockStatus::Unlocked: {
-                // nothing to do here (the workspace will be locked later)
-                break;
-            }
-            case DirectoryLock::LockStatus::Locked: {
-                // the workspace is locked by another application instance
-                throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
-                                   "opened by another application instance or user!"));
-            }
-            case DirectoryLock::LockStatus::StaleLock:{
-                // ignore stale lock as there is nothing to restore
-                qWarning() << "There was a stale lock on the workspace:" << mPath;
-                break;
-            }
-            default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
-        }
-
-        // the workspace can be opened by this application, so we will lock it
-        mLock.lock(); // can throw
-
-        // create directories (if not already exist)
-        FileUtils::makePath(mProjectsPath); // can throw
-        FileUtils::makePath(mLibraryPath); // can throw
-
-        // all OK, let's load the workspace stuff!
-
-        mWorkspaceSettings = new WorkspaceSettings(*this);
-        mRecentProjectsModel = new RecentProjectsModel(*this);
-        mFavoriteProjectsModel = new FavoriteProjectsModel(*this);
-        mProjectTreeModel = new ProjectTreeModel(*this);
-        mLibraryDb = new WorkspaceLibraryDb(*this);
+    // check directory paths
+    if (!isValidWorkspacePath(mPath)) {
+        throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
+            QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
     }
-    catch (Exception& e)
+    if ((!mProjectsPath.isValid()) || (!mVersionPath.isValid())  ||
+        (!mMetadataPath.isValid()) || (!mLibrariesPath.isValid()))
     {
-        // free allocated memory and rethrow the exception
-        delete mLibraryDb;              mLibraryDb = 0;
-        delete mProjectTreeModel;       mProjectTreeModel = 0;
-        delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
-        delete mRecentProjectsModel;    mRecentProjectsModel = 0;
-        delete mWorkspaceSettings;      mWorkspaceSettings = 0;
-        throw;
+        throw LogicError(__FILE__, __LINE__, mPath.toStr(), QString());
     }
+
+    // create directories which do not exist already
+    FileUtils::makePath(mProjectsPath); // can throw
+    FileUtils::makePath(mMetadataPath); // can throw
+    FileUtils::makePath(mLibrariesPath); // can throw
+
+    // Check if the workspace is locked (already open or application was crashed).
+    switch (mLock.getStatus()) // can throw
+    {
+        case DirectoryLock::LockStatus::Unlocked: {
+            // nothing to do here (the workspace will be locked later)
+            break;
+        }
+        case DirectoryLock::LockStatus::Locked: {
+            // the workspace is locked by another application instance
+            throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
+                               "opened by another application instance or user!"));
+        }
+        case DirectoryLock::LockStatus::StaleLock:{
+            // ignore stale lock as there is nothing to restore
+            qWarning() << "There was a stale lock on the workspace:" << mPath;
+            break;
+        }
+        default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
+    }
+
+    // the workspace can be opened by this application, so we will lock it
+    mLock.lock(); // can throw
+
+    // all OK, let's load the workspace stuff!
+
+    // load workspace settings
+    mWorkspaceSettings.reset(new WorkspaceSettings(*this));
+
+    // load local libraries
+    FilePath localLibsDirPath = mLibrariesPath.getPathTo("local");
+    QDir localLibsDir(localLibsDirPath.toStr());
+    foreach (const QString& dir, localLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+        FilePath libDirPath = localLibsDirPath.getPathTo(dir);
+        if (Library::isValidElementDirectory<Library>(libDirPath)) {
+            qDebug() << "Load local workspace library:" << dir;
+            try {
+                addLocalLibrary(dir); // can throw
+            } catch (Exception& e) {
+                // @todo do not show a message box here, better use something like a
+                // getLastError() method which is used by the ControlPanel to show errors
+                QMessageBox::critical(nullptr, tr("Error"), QString(tr(
+                    "Could not open local library %1: %2")).arg(dir, e.getUserMsg()));
+            }
+        } else {
+            qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
+        }
+    }
+
+    // load remote libraries
+    FilePath remoteLibsDirPath = mLibrariesPath.getPathTo("remote");
+    QDir remoteLibsDir(remoteLibsDirPath.toStr());
+    foreach (const QString& dir, remoteLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+        FilePath libDirPath = remoteLibsDirPath.getPathTo(dir);
+        if (Library::isValidElementDirectory<Library>(libDirPath)) {
+            qDebug() << "Load remote workspace library:" << dir;
+            try {
+                addRemoteLibrary(dir); // can throw
+            } catch (Exception& e) {
+                // @todo do not show a message box here, better use something like a
+                // getLastError() method which is used by the ControlPanel to show errors
+                QMessageBox::critical(nullptr, tr("Error"), QString(tr(
+                    "Could not open remote library %1: %2")).arg(dir, e.getUserMsg()));
+            }
+        } else {
+            qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
+        }
+    }
+
+    // load library database
+    mLibraryDb.reset(new WorkspaceLibraryDb(*this)); // can throw
+
+    // load project models
+    mRecentProjectsModel.reset(new RecentProjectsModel(*this));
+    mFavoriteProjectsModel.reset(new FavoriteProjectsModel(*this));
+    mProjectTreeModel.reset(new ProjectTreeModel(*this));
 }
 
-Workspace::~Workspace()
+Workspace::~Workspace() noexcept
 {
-    delete mLibraryDb;              mLibraryDb = 0;
-    delete mProjectTreeModel;       mProjectTreeModel = 0;
-    delete mFavoriteProjectsModel;  mFavoriteProjectsModel = 0;
-    delete mRecentProjectsModel;    mRecentProjectsModel = 0;
-    delete mWorkspaceSettings;      mWorkspaceSettings = 0;
 }
 
 /*****************************************************************************************
@@ -141,6 +174,49 @@ QAbstractItemModel& Workspace::getRecentProjectsModel() const noexcept
 QAbstractItemModel& Workspace::getFavoriteProjectsModel() const noexcept
 {
     return *mFavoriteProjectsModel;
+}
+
+/*****************************************************************************************
+ *  Library Management
+ ****************************************************************************************/
+
+void Workspace::addLocalLibrary(const QString& libDirName) throw (Exception)
+{
+    if (!mLocalLibraries.contains(libDirName)) {
+        FilePath libDirPath = mLibrariesPath.getPathTo("local").getPathTo(libDirName);
+        QSharedPointer<Library> library(new Library(libDirPath, false)); // can throw
+        mLocalLibraries.insert(libDirName, library);
+    }
+}
+
+void Workspace::addRemoteLibrary(const QString& libDirName) throw (Exception)
+{
+    if (!mRemoteLibraries.contains(libDirName)) {
+        // remote libraries are always opened read-only!
+        FilePath libDirPath = mLibrariesPath.getPathTo("remote").getPathTo(libDirName);
+        QSharedPointer<Library> library(new Library(libDirPath, true)); // can throw
+        mRemoteLibraries.insert(libDirName, library);
+    }
+}
+
+void Workspace::removeLocalLibrary(const QString& libDirName) throw (Exception)
+{
+    Library* library = mLocalLibraries.value(libDirName).data();
+    if (library) {
+        FilePath libDirPath = library->getFilePath();
+        mLocalLibraries.remove(libDirName);
+        FileUtils::removeDirRecursively(libDirPath); // can throw
+    }
+}
+
+void Workspace::removeRemoteLibrary(const QString& libDirName) throw (Exception)
+{
+    Library* library = mRemoteLibraries.value(libDirName).data();
+    if (library) {
+        FilePath libDirPath = library->getFilePath();
+        mRemoteLibraries.remove(libDirName);
+        FileUtils::removeDirRecursively(libDirPath); // can throw
+    }
 }
 
 /*****************************************************************************************
@@ -173,29 +249,41 @@ void Workspace::removeFavoriteProject(const FilePath& filepath) noexcept
 
 bool Workspace::isValidWorkspacePath(const FilePath& path) noexcept
 {
-    if (!path.isExistingDir())
-        return false;
-    if (!path.getPathTo(".metadata").isExistingDir())
-        return false;
-
-    return true;
+    return path.getPathTo(".librepcb-workspace").isExistingFile();
 }
 
-bool Workspace::createNewWorkspace(const FilePath& path) noexcept
+QList<Version> Workspace::getFileFormatVersionsOfWorkspace(const FilePath& path) noexcept
 {
+    QList<Version> list;
     if (isValidWorkspacePath(path)) {
-        return true;
+        QDir dir(path.toStr());
+        QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+        foreach (const QString& subdir, subdirs) {
+            if (subdir.startsWith('v')) {
+                Version version(subdir.mid(1, -1));
+                if (version.isValid()) {
+                    list.append(version);
+                }
+            }
+        }
+        qSort(list);
     }
+    return list;
+}
 
-    // create directory ".metadata/v#/" (and all needed parent directories)
-    try {
-        FilePath versionDir = path.getPathTo(QString(".metadata/v%1").arg(
-            qApp->getFileFormatVersion().getNumbers().value(0)));
-        FileUtils::makePath(versionDir); // can throw
-        return true;
-    } catch (...) {
-        return false;
+Version Workspace::getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept
+{
+    QList<Version> versions = getFileFormatVersionsOfWorkspace(path);
+    if (versions.count() > 0) {
+        return versions.last();
+    } else {
+        return Version();
     }
+}
+
+void Workspace::createNewWorkspace(const FilePath& path) throw (Exception)
+{
+    FileUtils::writeFile(path.getPathTo(".librepcb-workspace"), QByteArray()); // can throw
 }
 
 FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept
@@ -214,25 +302,22 @@ FilePath Workspace::chooseWorkspacePath() noexcept
 {
     FilePath path(QFileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
 
-    if (!path.isValid())
-        return FilePath();
-
-    if (!isValidWorkspacePath(path))
-    {
+    if ((path.isValid()) && (!isValidWorkspacePath(path))) {
         int answer = QMessageBox::question(0, tr("Create new workspace?"),
                         tr("The specified workspace does not exist. "
                            "Do you want to create a new workspace?"));
 
-        if (answer == QMessageBox::Yes)
-        {
-            if (!createNewWorkspace(path))
-            {
+        if (answer == QMessageBox::Yes) {
+            try {
+                createNewWorkspace(path); // can throw
+            } catch (const Exception& e) {
                 QMessageBox::critical(0, tr("Error"), tr("Could not create the workspace!"));
                 return FilePath();
             }
         }
-        else
+        else {
             return FilePath();
+        }
     }
 
     return path;

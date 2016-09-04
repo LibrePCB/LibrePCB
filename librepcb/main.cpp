@@ -193,10 +193,11 @@ static FilePath determineWorkspacePath() noexcept
         if (wizard.exec() == QDialog::Accepted) {
             wsPath = wizard.getWorkspaceFilePath();
             if (wizard.getCreateNewWorkspace()) {
-                if (!Workspace::createNewWorkspace(wsPath)) {
-                    QMessageBox::critical(0, Application::translate("Workspace",
-                        "Error"), Application::translate("Workspace", "Could not "
-                        "create the workspace directory. Check file permissions."));
+                try {
+                    Workspace::createNewWorkspace(wsPath); // can throw
+                } catch (const Exception& e) {
+                    QMessageBox::critical(0, Application::translate("Workspace", "Error"),
+                                          e.getUserMsg());
                     return FilePath(); // TODO: Show the wizard again instead of closing the application
                 }
             }
