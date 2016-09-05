@@ -65,7 +65,7 @@ You can install [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/)
         brew unlink qt
         brew link --force qt5
 
-5. [Compile everything](Using qmake and make)
+5. [Compile everything](#user-content-using-qmake-and-make)
 6. Run the program
 
         open ./build/generated/mac/librepcb.app

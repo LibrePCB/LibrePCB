@@ -15,3 +15,4 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - [@NiFa18](https://github.com/NiFa18)
 - [@chrisgwerder](https://github.com/chrisgwerder)
 - [@0xB767B](https://github.com/0xB767B)
+- Josua Schmid ([@schmijos](https://github.com/schmijos))
