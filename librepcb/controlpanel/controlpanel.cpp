@@ -550,19 +550,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
 
 void ControlPanel::on_actionRescanLibrary_triggered()
 {
-    try
-    {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        int count = mWorkspace.getLibraryDb().rescan();
-        QApplication::restoreOverrideCursor();
-        QMessageBox::information(this, tr("Rescan Library"),
-            QString("Successfully scanned %1 library elements.").arg(count));
-    }
-    catch (Exception& e)
-    {
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-    }
+    mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 /*****************************************************************************************

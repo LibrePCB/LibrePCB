@@ -264,9 +264,10 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 Uuid pkgUuid;
                 QString devName, pkgName;
                 FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);
-                mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid, &devName);
+                mWorkspace.getLibraryDb().getElementTranslations<library::Device>(devFp, localeOrder, &devName);
+                mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
                 FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
-                mWorkspace.getLibraryDb().getPackageMetadata(pkgFp, &pkgName);
+                mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
                 QAction* a = aChangeDeviceMenu->addAction(QString("%1 [%2]").arg(devName).arg(pkgName));
                 a->setData(deviceUuid.toStr());
                 if (deviceUuid == devInst.getLibDevice().getUuid()) {

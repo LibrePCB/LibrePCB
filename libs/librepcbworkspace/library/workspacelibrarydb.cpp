@@ -22,11 +22,12 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtSql>
-#include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/sqlitedatabase.h>
 #include <librepcbcommon/fileio/filepath.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcblibrary/library.h>
 #include <librepcblibrary/cat/componentcategory.h>
 #include <librepcblibrary/cat/packagecategory.h>
 #include <librepcblibrary/sym/symbol.h>
@@ -35,6 +36,7 @@
 #include <librepcblibrary/dev/device.h>
 #include "workspacelibrarydb.h"
 #include "../workspace.h"
+#include "workspacelibraryscanner.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -49,32 +51,33 @@ using namespace library;
  ****************************************************************************************/
 
 WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws) throw (Exception):
-    QObject(nullptr), mWorkspace(ws),
-    mLibDbFilePath(ws.getMetadataPath().getPathTo("library_cache.sqlite"))
+    QObject(nullptr), mWorkspace(ws)
 {
-    // select and open library cache sqlite database
-    mLibDatabase = QSqlDatabase::addDatabase("QSQLITE", mLibDbFilePath.toNative());
-    mLibDatabase.setDatabaseName(mLibDbFilePath.toNative());
-    mLibDatabase.setConnectOptions("foreign_keys = ON");
+    qDebug("Load workspace library database...");
 
-    // check if database is valid
-    if ( ! mLibDatabase.isValid()) {
-        throw RuntimeError(__FILE__, __LINE__, mLibDbFilePath.toStr(),
-            QString(tr("Invalid library file: \"%1\"")).arg(mLibDbFilePath.toNative()));
-    }
-
-    if ( ! mLibDatabase.open()) {
-        throw RuntimeError(__FILE__, __LINE__, mLibDbFilePath.toStr(),
-            QString(tr("Could not open library file: \"%1\"")).arg(mLibDbFilePath.toNative()));
-    }
+    // open SQLite database
+    FilePath dbFilePath = ws.getMetadataPath().getPathTo("library_cache.sqlite");
+    mDb.reset(new SQLiteDatabase(dbFilePath)); // can throw
 
     // create all tables which do not already exist
     createAllTables(); // can throw
+
+    // create library scanner object
+    mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace));
+    connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::started,
+            this, &WorkspaceLibraryDb::scanStarted, Qt::QueuedConnection);
+    connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::progressUpdate,
+            this, &WorkspaceLibraryDb::scanProgressUpdate, Qt::QueuedConnection);
+    connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::succeeded,
+            this, &WorkspaceLibraryDb::scanSucceeded, Qt::QueuedConnection);
+    connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::failed,
+            this, &WorkspaceLibraryDb::scanFailed, Qt::QueuedConnection);
+
+    qDebug("Workspace library database successfully loaded!");
 }
 
 WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept
 {
-    mLibDatabase.close();
 }
 
 /*****************************************************************************************
@@ -149,43 +152,62 @@ FilePath WorkspaceLibraryDb::getLatestDevice(const Uuid& uuid) const throw (Exce
  *  Getters: Element Metadata
  ****************************************************************************************/
 
-void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid, QString* nameEn) const throw (Exception)
+template <>
+void WorkspaceLibraryDb::getElementTranslations<ComponentCategory>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
 {
-    QSqlQuery query = prepareQuery(
-        "SELECT package_uuid, devices_tr.name FROM devices "
-        "LEFT JOIN devices_tr ON devices.id=devices_tr.device_id "
-        "WHERE filepath = :filepath");
-    query.bindValue(":filepath", devDir.toRelative(mWorkspace.getLibraryPath()));
-    execQuery(query, false);
-
-    if (/*(query.size() == 1) &&*/ (query.first()))
-    {
-        if (pkgUuid) *pkgUuid = Uuid(query.value(0).toString());
-        if (nameEn) *nameEn = query.value(1).toString();
-    }
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString::number(query.size()));
-    }
+    getElementTranslations("component_categories", "cat_id", elemDir, localeOrder, name, desc, keywords);
 }
 
-void WorkspaceLibraryDb::getPackageMetadata(const FilePath& pkgDir, QString* nameEn) const throw (Exception)
+template <>
+void WorkspaceLibraryDb::getElementTranslations<PackageCategory>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
 {
-    QSqlQuery query = prepareQuery(
-        "SELECT packages_tr.name FROM packages "
-        "LEFT JOIN packages_tr ON packages.id=packages_tr.package_id "
-        "WHERE filepath = :filepath");
-    query.bindValue(":filepath", pkgDir.toRelative(mWorkspace.getLibraryPath()));
-    execQuery(query, false);
+    getElementTranslations("package_categories", "cat_id", elemDir, localeOrder, name, desc, keywords);
+}
 
-    if (/*(query.size() == 1) &&*/ (query.first()))
-    {
-        if (nameEn) *nameEn = query.value(0).toString();
+template <>
+void WorkspaceLibraryDb::getElementTranslations<Symbol>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+{
+    getElementTranslations("symbols", "symbol_id", elemDir, localeOrder, name, desc, keywords);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementTranslations<Package>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+{
+    getElementTranslations("packages", "package_id", elemDir, localeOrder, name, desc, keywords);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementTranslations<Component>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+{
+    getElementTranslations("components", "ccomponent_id", elemDir, localeOrder, name, desc, keywords);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementTranslations<Device>(const FilePath& elemDir,
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+{
+    getElementTranslations("devices", "device_id", elemDir, localeOrder, name, desc, keywords);
+}
+
+void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid) const throw (Exception)
+{
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT package_uuid FROM devices WHERE filepath = :filepath");
+    query.bindValue(":filepath", devDir.toRelative(mWorkspace.getLibrariesPath()));
+    mDb->exec(query);
+
+    Uuid uuid = query.first() ? Uuid(query.value(0).toString()) : Uuid();
+    if (uuid.isNull()) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+            "Device not found in workspace library: \"%1\"")).arg(devDir.toNative()));
     }
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString::number(query.size()));
-    }
+
+    if (pkgUuid) *pkgUuid = uuid;
 }
 
 /*****************************************************************************************
@@ -209,20 +231,19 @@ QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const Uuid& category) con
 
 QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) const throw (Exception)
 {
-    QSqlQuery query = prepareQuery(
-        "SELECT uuid, filepath FROM devices WHERE component_uuid = :uuid");
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT uuid FROM devices WHERE component_uuid = :uuid");
     query.bindValue(":uuid", component.toStr());
-    execQuery(query, false);
+    mDb->exec(query);
 
     QSet<Uuid> elements;
-    while (query.next())
-    {
-        QString uuidStr = query.value(0).toString();
-        Uuid uuid(uuidStr);
-        if (!uuid.isNull())
+    while (query.next()) {
+        Uuid uuid(query.value(0).toString());
+        if (!uuid.isNull()) {
             elements.insert(uuid);
-        else
-            qWarning() << "Invalid element in library: devices::" << uuid;
+        } else {
+            throw LogicError(__FILE__, __LINE__);
+        }
     }
     return elements;
 }
@@ -231,186 +252,61 @@ QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) cons
  *  General Methods
  ****************************************************************************************/
 
-int WorkspaceLibraryDb::rescan() throw (Exception)
+void WorkspaceLibraryDb::startLibraryRescan() noexcept
 {
-    clearAllTables();
-
-    int count = 0;
-    QMultiMap<QString, FilePath> dirs = getAllElementDirectories();
-    count += addCategoriesToDb<ComponentCategory>(  dirs.values("cmpcat"),  "component_categories", "cat_id");
-    count += addCategoriesToDb<PackageCategory>(    dirs.values("pkgcat"),  "package_categories",   "cat_id");
-    count += addElementsToDb<Symbol>(               dirs.values("sym"),     "symbols",              "symbol_id");
-    count += addElementsToDb<Package>(              dirs.values("pkg"),     "packages",             "package_id");
-    count += addElementsToDb<Component>(            dirs.values("cmp"),     "components",           "component_id");
-    count += addDevicesToDb(                        dirs.values("dev"),     "devices",              "device_id");
-
-    return count;
+    mLibraryScanner->start();
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-template <typename ElementType>
-int WorkspaceLibraryDb::addCategoriesToDb(const QList<FilePath>& dirs, const QString& tablename,
-                               const QString& id_rowname) throw (Exception)
+void WorkspaceLibraryDb::getElementTranslations(const QString& table,
+    const QString& idRow, const FilePath& elemDir, const QStringList& localeOrder,
+    QString* name, QString* desc, QString* keywords) const throw (Exception)
 {
-    int count = 0;
-    foreach (const FilePath& filepath, dirs)
-    {
-        ElementType element(filepath, true);
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT locale, name, description, keywords FROM " % table % "_tr "
+        "INNER JOIN " % table % " ON " % table % ".id=" % table % "_tr." % idRow % " "
+        "WHERE " % table % ".filepath = :filepath");
+    query.bindValue(":filepath", elemDir.toRelative(mWorkspace.getLibrariesPath()));
+    mDb->exec(query);
 
-        QSqlQuery query = prepareQuery(
-            "INSERT INTO " % tablename % " "
-            "(filepath, uuid, version, parent_uuid) VALUES "
-            "(:filepath, :uuid, :version, :parent_uuid)");
-        query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibraryPath()));
-        query.bindValue(":uuid",        element.getUuid().toStr());
-        query.bindValue(":version",     element.getVersion().toStr());
-        query.bindValue(":parent_uuid", element.getParentUuid().isNull() ? QVariant(QVariant::String) : element.getParentUuid().toStr());
-        int id = execQuery(query, true);
-
-        foreach (const QString& locale, element.getAllAvailableLocales())
-        {
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_tr "
-                "(" % id_rowname % ", locale, name, description, keywords) VALUES "
-                "(:element_id, :locale, :name, :description, :keywords)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getNames().value(locale));
-            query.bindValue(":description", element.getDescriptions().value(locale));
-            query.bindValue(":keywords",    element.getKeywords().value(locale));
-            execQuery(query, false);
-        }
-        count++;
+    QMap<QString, QString> nameList;
+    QMap<QString, QString> descriptionList;
+    QMap<QString, QString> keywordsList;
+    while (query.next()) {
+        QString locale      = query.value(0).toString();
+        QString name        = query.value(1).toString();
+        QString description = query.value(2).toString();;
+        QString keywords    = query.value(3).toString();
+        if (!name.isNull())          nameList.insert(locale, name);
+        if (!description.isNull())   descriptionList.insert(locale, description);
+        if (!keywords.isNull())      keywordsList.insert(locale, keywords);
     }
-    return count;
+
+    if (name) *name = LibraryBaseElement::localeStringFromList(nameList, localeOrder);
+    if (desc) *desc = LibraryBaseElement::localeStringFromList(descriptionList, localeOrder);
+    if (keywords) *keywords = LibraryBaseElement::localeStringFromList(keywordsList, localeOrder);
 }
 
-template <typename ElementType>
-int WorkspaceLibraryDb::addElementsToDb(const QList<FilePath>& dirs, const QString& tablename,
-                             const QString& id_rowname) throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(
+    const QString& tablename, const Uuid& uuid) const throw (Exception)
 {
-    int count = 0;
-    foreach (const FilePath& filepath, dirs)
-    {
-        ElementType element(filepath, true);
-
-        QSqlQuery query = prepareQuery(
-            "INSERT INTO " % tablename % " "
-            "(filepath, uuid, version) VALUES "
-            "(:filepath, :uuid, :version)");
-        query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibraryPath()));
-        query.bindValue(":uuid",        element.getUuid().toStr());
-        query.bindValue(":version",     element.getVersion().toStr());
-        int id = execQuery(query, true);
-
-        foreach (const QString& locale, element.getAllAvailableLocales())
-        {
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_tr "
-                "(" % id_rowname % ", locale, name, description, keywords) VALUES "
-                "(:element_id, :locale, :name, :description, :keywords)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getNames().value(locale));
-            query.bindValue(":description", element.getDescriptions().value(locale));
-            query.bindValue(":keywords",    element.getKeywords().value(locale));
-            execQuery(query, false);
-        }
-
-        foreach (const Uuid& categoryUuid, element.getCategories())
-        {
-            Q_ASSERT(!categoryUuid.isNull());
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_cat "
-                "(" % id_rowname % ", category_uuid) VALUES "
-                "(:element_id, :category_uuid)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":category_uuid", categoryUuid.toStr());
-            execQuery(query, false);
-        }
-
-        count++;
-    }
-    return count;
-}
-
-int WorkspaceLibraryDb::addDevicesToDb(const QList<FilePath>& dirs, const QString& tablename,
-                            const QString& id_rowname) throw (Exception)
-{
-    int count = 0;
-    foreach (const FilePath& filepath, dirs)
-    {
-        Device element(filepath, true);
-
-        QSqlQuery query = prepareQuery(
-            "INSERT INTO " % tablename % " "
-            "(filepath, uuid, version, component_uuid, package_uuid) VALUES "
-            "(:filepath, :uuid, :version, :component_uuid, :package_uuid)");
-        query.bindValue(":filepath",        filepath.toRelative(mWorkspace.getLibraryPath()));
-        query.bindValue(":uuid",            element.getUuid().toStr());
-        query.bindValue(":version",         element.getVersion().toStr());
-        query.bindValue(":component_uuid",  element.getComponentUuid().toStr());
-        query.bindValue(":package_uuid",    element.getPackageUuid().toStr());
-        int id = execQuery(query, true);
-
-        foreach (const QString& locale, element.getAllAvailableLocales())
-        {
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_tr "
-                "(" % id_rowname % ", locale, name, description, keywords) VALUES "
-                "(:element_id, :locale, :name, :description, :keywords)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":locale",      locale);
-            query.bindValue(":name",        element.getNames().value(locale));
-            query.bindValue(":description", element.getDescriptions().value(locale));
-            query.bindValue(":keywords",    element.getKeywords().value(locale));
-            execQuery(query, false);
-        }
-
-        foreach (const Uuid& categoryUuid, element.getCategories())
-        {
-            Q_ASSERT(!categoryUuid.isNull());
-            QSqlQuery query = prepareQuery(
-                "INSERT INTO " % tablename % "_cat "
-                "(" % id_rowname % ", category_uuid) VALUES "
-                "(:element_id, :category_uuid)");
-            query.bindValue(":element_id",  id);
-            query.bindValue(":category_uuid", categoryUuid.toStr());
-            execQuery(query, false);
-        }
-
-        count++;
-    }
-    return count;
-}
-
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(const QString& tablename,
-                                                                const Uuid& uuid) const throw (Exception)
-{
-    QSqlQuery query = prepareQuery(
-        "SELECT version, filepath FROM " % tablename % " "
-        "WHERE uuid = :uuid");
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT version, filepath FROM " % tablename % " WHERE uuid = :uuid");
     query.bindValue(":uuid", uuid.toStr());
-    execQuery(query, false);
+    mDb->exec(query);
 
     QMultiMap<Version, FilePath> elements;
-    while (query.next())
-    {
-        QString versionStr = query.value(0).toString();
-        QString filepathStr = query.value(1).toString();
-        Version version(versionStr);
-        FilePath filepath(FilePath::fromRelative(mWorkspace.getLibraryPath(), filepathStr));
-        if (version.isValid() && filepath.isValid())
-        {
+    while (query.next()) {
+        Version version(query.value(0).toString());
+        FilePath filepath(FilePath::fromRelative(mWorkspace.getLibrariesPath(),
+                                                 query.value(1).toString()));
+        if (version.isValid() && filepath.isValid()) {
             elements.insert(version, filepath);
-        }
-        else
-        {
-            qWarning() << "Invalid element in library:" << tablename << "::"
-                       << filepathStr << "::" << versionStr;
+        } else {
+            throw LogicError(__FILE__, __LINE__);
         }
     }
     return elements;
@@ -426,20 +322,19 @@ FilePath WorkspaceLibraryDb::getLatestVersionFilePath(const QMultiMap<Version, F
 
 QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception)
 {
-    QSqlQuery query = prepareQuery(
+    QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " WHERE parent_uuid " %
         (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toStr() % "'"));
-    execQuery(query, false);
+    mDb->exec(query);
 
     QSet<Uuid> elements;
-    while (query.next())
-    {
-        QString uuidStr = query.value(0).toString();
-        Uuid uuid(uuidStr);
-        if ((!uuid.isNull()))
+    while (query.next()) {
+        Uuid uuid(query.value(0).toString());
+        if (!uuid.isNull()) {
             elements.insert(uuid);
-        else
-            qWarning() << "Invalid category in library:" << tablename << "::" << uuidStr;
+        } else {
+            throw LogicError(__FILE__, __LINE__);
+        }
     }
     return elements;
 }
@@ -447,22 +342,21 @@ QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(const QString& tablename,
     const QString& idrowname, const Uuid& categoryUuid) const throw (Exception)
 {
-    QSqlQuery query = prepareQuery(
+    QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " LEFT JOIN " % tablename % "_cat "
         "ON " % tablename % ".id=" % tablename % "_cat." % idrowname % " "
         "WHERE category_uuid " %
         (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toStr() % "'"));
-    execQuery(query, false);
+    mDb->exec(query);
 
     QSet<Uuid> elements;
-    while (query.next())
-    {
-        QString uuidStr = query.value(0).toString();
-        Uuid uuid(uuidStr);
-        if (!uuid.isNull())
+    while (query.next()) {
+        Uuid uuid(query.value(0).toString());
+        if (!uuid.isNull()) {
             elements.insert(uuid);
-        else
-            qWarning() << "Invalid element in library:" << tablename << "::" << uuidStr;
+        } else {
+            throw LogicError(__FILE__, __LINE__);
+        }
     }
     return elements;
 }
@@ -473,7 +367,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // internal
     queries << QString( "CREATE TABLE IF NOT EXISTS internal ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`key` TEXT UNIQUE NOT NULL, "
                         "`value_text` TEXT, "
                         "`value_int` INTEGER, "
@@ -481,32 +375,16 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "`value_blob` BLOB "
                         ")");
 
-    // repositories
-    queries << QString( "CREATE TABLE IF NOT EXISTS repositories ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                        "`filepath` TEXT UNIQUE NOT NULL, "
-                        "`uuid` TEXT NOT NULL "
-                        ")");
-    queries << QString( "CREATE TABLE IF NOT EXISTS repositories_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                        "`repo_id` INTEGER REFERENCES repositories(id) NOT NULL, "
-                        "`locale` TEXT NOT NULL, "
-                        "`name` TEXT, "
-                        "`description` TEXT, "
-                        "`keywords` TEXT, "
-                        "UNIQUE(repo_id, locale)"
-                        ")");
-
     // component categories
     queries << QString( "CREATE TABLE IF NOT EXISTS component_categories ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL, "
                         "`parent_uuid` TEXT"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS component_categories_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`cat_id` INTEGER REFERENCES component_categories(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -517,14 +395,14 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // package categories
     queries << QString( "CREATE TABLE IF NOT EXISTS package_categories ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL, "
                         "`parent_uuid` TEXT"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS package_categories_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`cat_id` INTEGER REFERENCES package_categories(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -535,13 +413,13 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // symbols
     queries << QString( "CREATE TABLE IF NOT EXISTS symbols ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS symbols_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -550,7 +428,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "UNIQUE(symbol_id, locale)"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS symbols_cat ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
                         "UNIQUE(symbol_id, category_uuid)"
@@ -558,13 +436,13 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // packages
     queries << QString( "CREATE TABLE IF NOT EXISTS packages ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL "
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS packages_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -573,7 +451,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "UNIQUE(package_id, locale)"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS packages_cat ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
                         "UNIQUE(package_id, category_uuid)"
@@ -581,13 +459,13 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // components
     queries << QString( "CREATE TABLE IF NOT EXISTS components ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS components_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -596,7 +474,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "UNIQUE(component_id, locale)"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS components_cat ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
                         "UNIQUE(component_id, category_uuid)"
@@ -604,7 +482,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // devices
     queries << QString( "CREATE TABLE IF NOT EXISTS devices ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`filepath` TEXT UNIQUE NOT NULL, "
                         "`uuid` TEXT NOT NULL, "
                         "`version` TEXT NOT NULL, "
@@ -612,7 +490,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "`package_uuid` TEXT NOT NULL"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS devices_tr ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
                         "`locale` TEXT NOT NULL, "
                         "`name` TEXT, "
@@ -621,7 +499,7 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
                         "UNIQUE(device_id, locale)"
                         ")");
     queries << QString( "CREATE TABLE IF NOT EXISTS devices_cat ("
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                        "`id` INTEGER PRIMARY KEY NOT NULL, "
                         "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
                         "`category_uuid` TEXT NOT NULL, "
                         "UNIQUE(device_id, category_uuid)"
@@ -629,100 +507,9 @@ void WorkspaceLibraryDb::createAllTables() throw (Exception)
 
     // execute queries
     foreach (const QString& string, queries) {
-        QSqlQuery query = prepareQuery(string);
-        execQuery(query, false);
+        QSqlQuery query = mDb->prepareQuery(string); // can throw
+        mDb->exec(query); // can throw
     }
-}
-
-void WorkspaceLibraryDb::clearAllTables() throw (Exception)
-{
-    QStringList queries;
-
-    // internal
-    queries << QString( "DELETE FROM internal");
-
-    // repositories
-    queries << QString( "DELETE FROM repositories_tr");
-    queries << QString( "DELETE FROM repositories");
-
-    // component categories
-    queries << QString( "DELETE FROM component_categories_tr");
-    queries << QString( "DELETE FROM component_categories");
-
-    // package categories
-    queries << QString( "DELETE FROM package_categories_tr");
-    queries << QString( "DELETE FROM package_categories");
-
-    // symbols
-    queries << QString( "DELETE FROM symbols_tr");
-    queries << QString( "DELETE FROM symbols_cat");
-    queries << QString( "DELETE FROM symbols");
-
-    // packages
-    queries << QString( "DELETE FROM packages_tr");
-    queries << QString( "DELETE FROM packages_cat");
-    queries << QString( "DELETE FROM packages");
-
-    // components
-    queries << QString( "DELETE FROM components_tr");
-    queries << QString( "DELETE FROM components_cat");
-    queries << QString( "DELETE FROM components");
-
-    // devices
-    queries << QString( "DELETE FROM devices_tr");
-    queries << QString( "DELETE FROM devices_cat");
-    queries << QString( "DELETE FROM devices");
-
-    // execute queries
-    foreach (const QString& string, queries) {
-        QSqlQuery query = prepareQuery(string);
-        execQuery(query, false);
-    }
-}
-
-QMultiMap<QString, FilePath> WorkspaceLibraryDb::getAllElementDirectories() throw (Exception)
-{
-    QMultiMap<QString, FilePath> map;
-    QStringList filter = QStringList() << "*.dev" << "*.cmpcat" << "*.cmp"
-                                       << "*.pkg" << "*.pkgcat" << "*.sym";
-    QDirIterator it(mWorkspace.getLibraryPath().toStr(), filter, QDir::Dirs,
-                    QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        FilePath dirFilePath(it.next());
-        map.insertMulti(dirFilePath.getSuffix(), dirFilePath);
-    }
-    return map;
-}
-
-QSqlQuery WorkspaceLibraryDb::prepareQuery(const QString& query) const throw (Exception)
-{
-    QSqlQuery q(mLibDatabase);
-    if (!q.prepare(query))
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2, %3").arg(query,
-            q.lastError().databaseText(), q.lastError().driverText()),
-            QString(tr("Error while preparing SQL query: %1")).arg(query));
-    }
-    return q;
-}
-
-int WorkspaceLibraryDb::execQuery(QSqlQuery& query, bool checkId) const throw (Exception)
-{
-    if (!query.exec())
-    {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2, %3").arg(query.lastQuery(),
-            query.lastError().databaseText(), query.lastError().driverText()),
-            QString(tr("Error while executing SQL query: %1")).arg(query.lastQuery()));
-    }
-
-    bool ok = false;
-    int id = query.lastInsertId().toInt(&ok);
-    if ((!ok) && (checkId))
-    {
-        throw RuntimeError(__FILE__, __LINE__, query.lastQuery(),
-            QString(tr("Error while executing SQL query: %1")).arg(query.lastQuery()));
-    }
-    return id;
 }
 
 /*****************************************************************************************

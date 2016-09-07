@@ -181,8 +181,7 @@ void MainWindow::on_rescanlib_clicked()
     {
         FilePath workspacePath(ui->workspacepath->text());
         Workspace workspace(workspacePath);
-        workspace.getLibraryDb().rescan();
-        QMessageBox::information(this, tr("Library Rescan"), tr("Successfully"));
+        workspace.getLibraryDb().startLibraryRescan();
     }
     catch (Exception& e)
     {
