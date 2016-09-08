@@ -185,11 +185,13 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         if (create) {
             mName = mFilepath.getCompleteBasename();
             mAuthor = SystemInfo::getFullUsername();
+            mVersion = "v1";
             mCreated = QDateTime::currentDateTime();
             mLastModified = QDateTime::currentDateTime();
         } else {
             mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
             mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
+            mVersion = root->getFirstChild("meta/version", true, true)->getText<QString>(false);
             mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
             mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
         }
@@ -287,10 +289,10 @@ void Project::setAuthor(const QString& newAuthor) noexcept
     }
 }
 
-void Project::setCreated(const QDateTime& newCreated) noexcept
+void Project::setVersion(const QString& newVersion) noexcept
 {
-    if (newCreated != mCreated) {
-        mCreated = newCreated;
+    if (newVersion != mVersion) {
+        mVersion = newVersion;
         emit attributesChanged();
     }
 }
@@ -612,6 +614,7 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("name", mName);
     meta->appendTextChild("author", mAuthor);
+    meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
     meta->appendTextChild("last_modified", mLastModified);
 

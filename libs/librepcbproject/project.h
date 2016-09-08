@@ -182,6 +182,13 @@ class Project final : public QObject, public IF_AttributeProvider,
         const QString& getAuthor() const noexcept {return mAuthor;}
 
         /**
+         * @brief Get the version of the project
+         *
+         * @return The version of the project (arbitrary string)
+         */
+        const QString& getVersion() const noexcept {return mVersion;}
+
+        /**
          * @brief Get the date and time when the project was created
          *
          * @return The local date and time of creation
@@ -217,13 +224,13 @@ class Project final : public QObject, public IF_AttributeProvider,
         void setAuthor(const QString& newAuthor) noexcept;
 
         /**
-         * @brief Set the date and time when the project was created
+         * @brief Set the version of the project
          *
-         * @param newCreated        The new created datetime
+         * @param newVersion        The new version (can be an arbitrary string)
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setCreated(const QDateTime& newCreated) noexcept;
+        void setVersion(const QString& newVersion) noexcept;
 
         /**
          * @brief Set the date and time when the project was last modified
@@ -551,6 +558,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Attributes
         QString mName;              ///< the name of the project
         QString mAuthor;            ///< the author of the project
+        QString mVersion;           ///< the version of the project (arbitrary string)
         QDateTime mCreated;         ///< the datetime of the project creation
         QDateTime mLastModified;    ///< the datetime of the last project modification
 

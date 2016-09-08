@@ -39,7 +39,7 @@ CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project) noexcept :
     mProject(project),
     mOldName(mProject.getName()),               mNewName(mProject.getName()),
     mOldAuthor(mProject.getAuthor()),           mNewAuthor(mProject.getAuthor()),
-    mOldCreated(mProject.getCreated()),         mNewCreated(mProject.getCreated())
+    mOldVersion(mProject.getVersion()),         mNewVersion(mProject.getVersion())
 {
 }
 
@@ -63,10 +63,10 @@ void CmdProjectSetMetadata::setAuthor(const QString& newAuthor) noexcept
     mNewAuthor = newAuthor;
 }
 
-void CmdProjectSetMetadata::setCreated(const QDateTime& newCreated) noexcept
+void CmdProjectSetMetadata::setVersion(const QString& newVersion) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
-    mNewCreated = newCreated;
+    mNewVersion = newVersion;
 }
 
 /*****************************************************************************************
@@ -84,14 +84,14 @@ void CmdProjectSetMetadata::performUndo() throw (Exception)
 {
     mProject.setName(mOldName);
     mProject.setAuthor(mOldAuthor);
-    mProject.setCreated(mOldCreated);
+    mProject.setVersion(mOldVersion);
 }
 
 void CmdProjectSetMetadata::performRedo() throw (Exception)
 {
     mProject.setName(mNewName);
     mProject.setAuthor(mNewAuthor);
-    mProject.setCreated(mNewCreated);
+    mProject.setVersion(mNewVersion);
 }
 
 /*****************************************************************************************
