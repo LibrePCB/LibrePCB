@@ -114,10 +114,13 @@ class GerberGenerator final
         void printFooter() noexcept;
         QString calcOutputMd5Checksum() const noexcept;
 
+        // Static Methods
+        static QString escapeString(const QString& str) noexcept;
+
 
         // Metadata
         QString mProjectId;
-        QString mProjectGuid;
+        Uuid mProjectUuid;
         QString mProjectRevision;
 
         // Gerber Data

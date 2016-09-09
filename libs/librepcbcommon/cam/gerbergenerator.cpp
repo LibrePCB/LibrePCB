@@ -26,6 +26,7 @@
 #include "../geometry/ellipse.h"
 #include "../geometry/polygon.h"
 #include "../fileio/smarttextfile.h"
+#include "../application.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -38,9 +39,8 @@ namespace librepcb {
 
 GerberGenerator::GerberGenerator(const QString& projName, const Uuid& projUuid,
                                  const QString& projRevision) noexcept :
-    mProjectId(QString(projName).remove(QChar(','))),
-    mProjectGuid(projUuid.toStr().remove(QChar('-'))),
-    mProjectRevision(projRevision), mOutput(), mContent(),
+    mProjectId(escapeString(projName)), mProjectUuid(projUuid),
+    mProjectRevision(escapeString(projRevision)), mOutput(), mContent(),
     mApertureList(new GerberApertureList()), mCurrentApertureNumber(-1),
     mMultiQuadrantArcModeOn(false)
 {
@@ -301,9 +301,14 @@ void GerberGenerator::printHeader() noexcept
     mOutput.append("G04 --- HEADER BEGIN --- *\n");
 
     // add some X2 attributes
-    mOutput.append(QString("%TF.GenerationSoftware,LibrePCB,LibrePCB,%1*%\n").arg(qApp->applicationVersion()));
-    mOutput.append(QString("%TF.CreationDate,%1*%\n").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
-    mOutput.append(QString("%TF.ProjectId,%1,%2,%3*%\n").arg(mProjectId, mProjectGuid, mProjectRevision));
+    QString appVersion = qApp->getAppVersion().toPrettyStr(3);
+    QString creationDate = QDateTime::currentDateTime().toString(Qt::ISODate);
+    QString projId = mProjectId.remove(',');
+    QString projUuid = mProjectUuid.toStr();
+    QString projRevision = mProjectRevision.remove(',');
+    mOutput.append(QString("%TF.GenerationSoftware,LibrePCB,LibrePCB,%1*%\n").arg(appVersion));
+    mOutput.append(QString("%TF.CreationDate,%1*%\n").arg(creationDate));
+    mOutput.append(QString("%TF.ProjectId,%1,%2,%3*%\n").arg(projId, projUuid, projRevision));
     mOutput.append("%TF.Part,Single*%\n"); // "Single" means "this is a PCB"
     //mOutput.append("%TF.FilePolarity,Positive*%\n");
 
@@ -351,6 +356,24 @@ QString GerberGenerator::calcOutputMd5Checksum() const noexcept
     // according to the RS-274C standard, linebreaks are not included in the checksum
     QString data = QString(mOutput).remove(QChar('\n'));
     return QString(QCryptographicHash::hash(data.toUtf8(), QCryptographicHash::Md5).toHex());
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+QString GerberGenerator::escapeString(const QString& str) noexcept
+{
+    // perform compatibility decomposition (NFKD)
+    QString ret = str.normalized(QString::NormalizationForm_KD);
+    // remove all invalid characters
+    // Note: Even if backslashes are allowed, we will remove them because we haven't
+    // implemented proper escaping. Escaping of unicode characters is also missing here.
+    QString validChars("[a-zA-Z0-9_+-/!?<>”’(){}.|&@# ,;$:=]");
+    ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+    // limit length to 65535 characters
+    ret.truncate(65535);
+    return ret;
 }
 
 /*****************************************************************************************

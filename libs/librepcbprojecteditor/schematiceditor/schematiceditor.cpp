@@ -323,8 +323,16 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 {
     try
     {
+        QString projectName = FilePath::cleanFileName(mProject.getName(),
+                              FilePath::ReplaceSpaces | FilePath::KeepCase);
+        QString projectVersion = FilePath::cleanFileName(mProject.getVersion(),
+                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
+        QString relativePath = QString("output/%1/%2_Schematics.pdf")
+                               .arg(projectVersion, projectName);
+        FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+        QDir().mkpath(defaultFilePath.getParentDir().toStr());
         QString filename = QFileDialog::getSaveFileName(this, tr("PDF Export"),
-                                                        QDir::homePath(), "*.pdf");
+                                                        defaultFilePath.toNative(), "*.pdf");
         if (filename.isEmpty()) return;
         if (!filename.endsWith(".pdf")) filename.append(".pdf");
         FilePath filepath(filename);
