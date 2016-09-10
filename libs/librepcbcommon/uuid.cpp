@@ -34,12 +34,14 @@ namespace librepcb {
 
 bool Uuid::setUuid(const QString& uuid) noexcept
 {
-    QUuid quuid(uuid);
-    if (uuid.length() != 36)                return false; // do NOT accept '{' and '}'
+    mUuid = QString(); // make UUID invalid
+    QString lowercaseUuid = uuid.toLower();
+    if (lowercaseUuid.length() != 36)       return false; // do NOT accept '{' and '}'
+    QUuid quuid(lowercaseUuid);
     if (quuid.isNull())                     return false;
     if (quuid.variant() != QUuid::DCE)      return false;
     if (quuid.version() != QUuid::Random)   return false;
-    mUuid = uuid;
+    mUuid = lowercaseUuid;
     return true;
 }
 
@@ -61,8 +63,7 @@ bool Uuid::operator==(const Uuid& rhs) const noexcept
 
 bool Uuid::operator!=(const Uuid& rhs) const noexcept
 {
-    if (mUuid.isEmpty() || rhs.mUuid.isEmpty()) return false;
-    return (mUuid != rhs.mUuid);
+    return !(*this == rhs);
 }
 
 bool Uuid::operator<(const Uuid& rhs) const noexcept
@@ -95,9 +96,10 @@ bool Uuid::operator>=(const Uuid& rhs) const noexcept
 
 Uuid Uuid::createRandom() noexcept
 {
-    QString str = QUuid::createUuid().toString().remove("{").remove("}");
-    Uuid uuid(str);
-    Q_ASSERT(uuid.isNull() == false); // TODO: check if this works on windows
+    Uuid uuid(QUuid::createUuid().toString().remove("{").remove("}"));
+    if (uuid.isNull()) {
+        qCritical() << "Could not generate a valid random UUID!";
+    }
     return uuid;
 }
 
