@@ -26,6 +26,7 @@
 #include <librepcbcommon/fileio/directorylock.h>
 #include <librepcbcommon/fileio/smarttextfile.h>
 #include <librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcbcommon/fileio/smartversionfile.h>
 #include <librepcbcommon/fileio/xmldomdocument.h>
 #include <librepcbcommon/fileio/xmldomelement.h>
 #include <librepcbcommon/fileio/fileutils.h>
@@ -53,34 +54,42 @@ namespace project {
 
 Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception) :
     QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
-    mFilepath(filepath), mXmlFile(nullptr), mLock(filepath.getParentDir()),
-    mIsRestored(false), mIsReadOnly(readOnly), mProjectSettings(nullptr),
-    mProjectLibrary(nullptr), mErcMsgList(nullptr), mCircuit(nullptr),
-    mSchematicLayerProvider(nullptr)
+    mFilepath(filepath), mLock(filepath.getParentDir()), mIsRestored(false),
+    mIsReadOnly(readOnly)
 {
     qDebug() << (create ? "create project:" : "open project:") << filepath.toNative();
 
-    // Check if the filepath is valid
-    if (mFilepath.getSuffix() != "lpp")
-    {
+    // Check if the file extension is correct
+    if (mFilepath.getSuffix() != "lpp") {
         throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
             tr("The suffix of the project file must be \"lpp\"!"));
     }
-    if (create)
-    {
-        if (mFilepath.isExistingDir() || mFilepath.isExistingFile())
-        {
+
+    // Check if the filepath is valid
+    if (create) {
+        if (mPath.isExistingDir() && (!mPath.isEmptyDir())) {
             throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(), QString(tr(
-                "The file \"%1\" does already exist!")).arg(mFilepath.toNative()));
+                "The directory \"%1\" is not empty!")).arg(mFilepath.toNative()));
         }
         FileUtils::makePath(mPath); // can throw
-    }
-    else
-    {
-        if (((!mFilepath.isExistingFile())) || (!mPath.isExistingDir()))
-        {
+    } else {
+        // check if the project does exist
+        if (!isValidProjectDirectory(mPath)) {
             throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
-                QString(tr("Invalid project file: \"%1\"")).arg(mFilepath.toNative()));
+                QString(tr("The directory \"%1\" does not contain a LibrePCB project."))
+                .arg(mPath.toNative()));
+        }
+        if (!mFilepath.isExistingFile()) {
+            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+                QString(tr("The file \"%1\" does not exist.")).arg(mFilepath.toNative()));
+        }
+        // check the project's file format version
+        Version version = getProjectFileFormatVersion(mPath);
+        if ((!version.isValid()) || (version != qApp->getFileFormatVersion())) {
+            throw RuntimeError(__FILE__, __LINE__, QString(),
+                QString(tr("This project was created with a newer application version.\n"
+                           "You need at least LibrePCB %1 to open it.\n\n%2"))
+                .arg(version.toPrettyStr(3)).arg(mFilepath.toNative()));
         }
     }
 
@@ -151,31 +160,34 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
     try
     {
+        // try to create/open the version file
+        FilePath versionFilePath = mPath.getPathTo(".librepcb-project");
+        if (create) {
+            mVersionFile.reset(SmartVersionFile::create(versionFilePath,  qApp->getFileFormatVersion()));
+        } else {
+            mVersionFile.reset(new SmartVersionFile(versionFilePath, mIsRestored, mIsReadOnly));
+            // the version check was already done above, so we can use an assert here
+            Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
+        }
+
         // try to create/open the XML project file
         QSharedPointer<XmlDomDocument> doc;
         XmlDomElement* root = nullptr;
-        if (create)
-        {
-            mXmlFile = SmartXmlFile::create(mFilepath);
-        }
-        else
-        {
-            mXmlFile = new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly);
+        if (create) {
+            mXmlFile.reset(SmartXmlFile::create(mFilepath));
+        } else {
+            mXmlFile.reset(new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly));
             doc = mXmlFile->parseFileAndBuildDomTree();
             root = &doc->getRoot();
         }
 
-
         // load project attributes
-        if (create)
-        {
+        if (create) {
             mName = mFilepath.getCompleteBasename();
             mAuthor = SystemInfo::getFullUsername();
             mCreated = QDateTime::currentDateTime();
             mLastModified = QDateTime::currentDateTime();
-        }
-        else
-        {
+        } else {
             mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
             mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
             mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
@@ -183,17 +195,16 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // Create all needed objects
-        mProjectSettings = new ProjectSettings(*this, mIsRestored, mIsReadOnly, create);
-        mProjectLibrary = new ProjectLibrary(*this, mIsRestored, mIsReadOnly);
-        mErcMsgList = new ErcMsgList(*this, mIsRestored, mIsReadOnly, create);
-        mCircuit = new Circuit(*this, mIsRestored, mIsReadOnly, create);
+        mProjectSettings.reset(new ProjectSettings(*this, mIsRestored, mIsReadOnly, create));
+        mProjectLibrary.reset(new ProjectLibrary(*this, mIsRestored, mIsReadOnly));
+        mErcMsgList.reset(new ErcMsgList(*this, mIsRestored, mIsReadOnly, create));
+        mCircuit.reset(new Circuit(*this, mIsRestored, mIsReadOnly, create));
 
         // Load all schematic layers
-        mSchematicLayerProvider = new SchematicLayerProvider(*this);
+        mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
-        // Load all schematics
-        if (!create)
-        {
+        if (!create) {
+            // Load all schematics
             for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
                  node; node = node->getNextSibling("schematic"))
             {
@@ -202,11 +213,8 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
                 addSchematic(*schematic);
             }
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
-        }
 
-        // Load all boards
-        if (!create)
-        {
+            // Load all boards
             for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
                  node; node = node->getNextSibling("board"))
             {
@@ -229,16 +237,12 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
     catch (...)
     {
         // free the allocated memory in the reverse order of their allocation...
-        foreach (Board* board, mBoards)
+        foreach (Board* board, mBoards) {
             try { removeBoard(*board, true); } catch (...) {}
-        foreach (Schematic* schematic, mSchematics)
+        }
+        foreach (Schematic* schematic, mSchematics) {
             try { removeSchematic(*schematic, true); } catch (...) {}
-        delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
-        delete mCircuit;                mCircuit = nullptr;
-        delete mErcMsgList;             mErcMsgList = nullptr;
-        delete mProjectLibrary;         mProjectLibrary = nullptr;
-        delete mProjectSettings;        mProjectSettings = nullptr;
-        delete mXmlFile;                mXmlFile = nullptr;
+        }
         throw; // ...and rethrow the exception
     }
 
@@ -251,19 +255,14 @@ Project::~Project() noexcept
     // free the allocated memory in the reverse order of their allocation
 
     // delete all boards and schematics (and catch all throwed exceptions)
-    foreach (Board* board, mBoards)
+    foreach (Board* board, mBoards) {
         try { removeBoard(*board, true); } catch (...) {}
+    }
     qDeleteAll(mRemovedBoards); mRemovedBoards.clear();
-    foreach (Schematic* schematic, mSchematics)
+    foreach (Schematic* schematic, mSchematics) {
         try { removeSchematic(*schematic, true); } catch (...) {}
+    }
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
-
-    delete mSchematicLayerProvider; mSchematicLayerProvider = nullptr;
-    delete mCircuit;                mCircuit = nullptr;
-    delete mErcMsgList;             mErcMsgList = nullptr;
-    delete mProjectLibrary;         mProjectLibrary = nullptr;
-    delete mProjectSettings;        mProjectSettings = nullptr;
-    delete mXmlFile;                mXmlFile = nullptr;
 
     qDebug() << "closed project:" << mFilepath.toNative();
 }
@@ -576,6 +575,21 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
     }
 
     return false;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+bool Project::isValidProjectDirectory(const FilePath& dir) noexcept
+{
+    return dir.getPathTo(".librepcb-project").isExistingFile();
+}
+
+Version Project::getProjectFileFormatVersion(const FilePath& dir) throw (Exception)
+{
+    SmartVersionFile versionFile(dir.getPathTo(".librepcb-project"), false, true);
+    return versionFile.getVersion();
 }
 
 /*****************************************************************************************
