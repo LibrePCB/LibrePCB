@@ -37,11 +37,17 @@ namespace librepcb {
 /**
  * @brief The Uuid class is a replacement for QUuid to get UUID strings without {} braces
  *
+ * This class implements an RFC4122 compliant UUID of type "DCE" in Version 4 (random
+ * UUID). Other types and/or versions of UUIDs are considered as invalid. The characters
+ * in a UUID are always lowercase.
+ *
+ * A valid UUID looks like this: "d79d354b-62bd-4866-996a-78941c575e78"
+ *
+ * @see https://de.wikipedia.org/wiki/Universally_Unique_Identifier
+ * @see https://tools.ietf.org/html/rfc4122
+ *
  * @author ubruhin
  * @date 2015-09-29
- *
- * @todo Check if this class works properly on all operating systems
- * @todo Add unit tests
  */
 class Uuid final
 {
@@ -69,7 +75,7 @@ class Uuid final
         Uuid(const Uuid& other) noexcept : mUuid(other.mUuid) {}
 
         /**
-         * Destructor
+         * @brief Destructor
          */
         ~Uuid() noexcept = default;
 
@@ -99,6 +105,8 @@ class Uuid final
          * @param uuid  The uuid as a string (without braces)
          *
          * @return true if uuid was valid, false if not (=> NULL UUID)
+         *
+         * @note If this method returns false, the UUID becames invalid (#isNull() = true)
          */
         bool setUuid(const QString& uuid) noexcept;
 
@@ -109,7 +117,8 @@ class Uuid final
          *
          * @param rhs   The other object to compare
          *
-         * @return If at least one of both objects is invalid, false will be returned!
+         * @return  If at least one of both objects is invalid, false will be returned
+         *          (except #operator!=() which would return true in this case)!
          */
         Uuid& operator=(const Uuid& rhs) noexcept;
         bool operator==(const Uuid& rhs) const noexcept;
