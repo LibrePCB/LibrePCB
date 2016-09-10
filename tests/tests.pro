@@ -45,6 +45,7 @@ SOURCES += main.cpp \
     common/applicationtest.cpp \
     common/versiontest.cpp \
     common/systeminfotest.cpp \
-    common/directorylocktest.cpp
+    common/directorylocktest.cpp \
+    common/uuidtest.cpp
 
 HEADERS +=
