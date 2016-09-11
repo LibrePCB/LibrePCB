@@ -36,7 +36,7 @@ namespace library {
  ****************************************************************************************/
 
 ComponentCategory::ComponentCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryCategory(elementDirectory, "cmpcat", "component_category", readOnly)
+    LibraryCategory(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     cleanupAfterLoadingElementFromFile();
 }

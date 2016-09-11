@@ -49,12 +49,12 @@ class LibraryCategory : public LibraryBaseElement
         // Constructors / Destructor
         LibraryCategory() = delete;
         LibraryCategory(const LibraryCategory& other) = delete;
-        LibraryCategory(const QString& shortElementName, const QString& xmlRootNodeName,
+        LibraryCategory(const QString& shortElementName, const QString& longElementName,
                         const Uuid& uuid, const Version& version, const QString& author,
                         const QString& name_en_US, const QString& description_en_US,
                         const QString& keywords_en_US ) throw (Exception);
         LibraryCategory(const FilePath& elementDirectory, const QString& shortElementName,
-                        const QString& xmlRootNodeName, bool readOnly) throw (Exception);
+                        const QString& longElementName, bool readOnly) throw (Exception);
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes

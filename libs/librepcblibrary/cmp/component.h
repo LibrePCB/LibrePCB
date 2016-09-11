@@ -115,6 +115,10 @@ class Component final : public LibraryElement
         // Operator Overloadings
         Component& operator=(const Component& rhs) = delete;
 
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("cmp");}
+        static QString getLongElementName() noexcept {return QStringLiteral("component");}
+
 
     private:
 

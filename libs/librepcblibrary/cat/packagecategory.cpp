@@ -36,7 +36,7 @@ namespace library {
  ****************************************************************************************/
 
 PackageCategory::PackageCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryCategory(elementDirectory, "pkgcat", "package_category", readOnly)
+    LibraryCategory(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     cleanupAfterLoadingElementFromFile();
 }

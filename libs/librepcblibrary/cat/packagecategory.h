@@ -53,6 +53,10 @@ class PackageCategory final : public LibraryCategory
 
         // Operator Overloadings
         PackageCategory& operator=(const PackageCategory& rhs) = delete;
+
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("pkgcat");}
+        static QString getLongElementName() noexcept {return QStringLiteral("package_category");}
 };
 
 /*****************************************************************************************

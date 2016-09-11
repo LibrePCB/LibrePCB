@@ -36,18 +36,18 @@ namespace library {
  ****************************************************************************************/
 
 LibraryElement::LibraryElement(const QString& shortElementName,
-                               const QString& xmlRootNodeName, const Uuid& uuid,
+                               const QString& longElementName, const Uuid& uuid,
                                const Version& version, const QString& author,
                                const QString& name_en_US, const QString& description_en_US,
                                const QString& keywords_en_US) throw (Exception) :
-    LibraryBaseElement(true, shortElementName, xmlRootNodeName, uuid, version, author,
+    LibraryBaseElement(true, shortElementName, longElementName, uuid, version, author,
                        name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& shortElementName,
-                               const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
-    LibraryBaseElement(elementDirectory, true, shortElementName, xmlRootNodeName, readOnly)
+                               const QString& longElementName, bool readOnly) throw (Exception) :
+    LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read category UUIDs
     XmlDomElement& root = mLoadingXmlFileDocument->getRoot();

@@ -79,6 +79,10 @@ class Package final : public LibraryElement
         // Operator Overloadings
         Package& operator=(const Package& rhs) = delete;
 
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("pkg");}
+        static QString getLongElementName() noexcept {return QStringLiteral("package");}
+
 
     private:
 

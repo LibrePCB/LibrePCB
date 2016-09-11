@@ -38,14 +38,14 @@ namespace library {
 Component::Component(const Uuid& uuid, const Version& version, const QString& author,
                      const QString& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("cmp", "component", uuid, version, author, name_en_US,
-                   description_en_US, keywords_en_US),
+    LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
+                   name_en_US, description_en_US, keywords_en_US),
     mSchematicOnly(false), mDefaultSymbolVariantUuid()
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryElement(elementDirectory, "cmp", "component", readOnly),
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
     mSchematicOnly(false), mDefaultSymbolVariantUuid()
 {
     try

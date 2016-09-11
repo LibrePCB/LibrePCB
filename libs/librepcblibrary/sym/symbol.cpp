@@ -38,13 +38,13 @@ namespace library {
 Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("sym", "symbol", uuid, version, author, name_en_US,
-                   description_en_US, keywords_en_US)
+    LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
+                   name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryElement(elementDirectory, "sym", "symbol", readOnly)
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     try
     {

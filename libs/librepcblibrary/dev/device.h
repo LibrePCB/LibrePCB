@@ -71,6 +71,10 @@ class Device final : public LibraryElement
         // Operator Overloadings
         Device& operator=(const Device& rhs) = delete;
 
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("dev");}
+        static QString getLongElementName() noexcept {return QStringLiteral("device");}
+
 
     private:
 

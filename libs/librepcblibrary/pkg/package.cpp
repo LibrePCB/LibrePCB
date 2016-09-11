@@ -38,14 +38,14 @@ namespace library {
 Package::Package(const Uuid& uuid, const Version& version, const QString& author,
                  const QString& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) throw (Exception) :
-    LibraryElement("pkg", "package", uuid, version, author, name_en_US,
-                   description_en_US, keywords_en_US),
+    LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
+                   name_en_US, description_en_US, keywords_en_US),
     mDefaultFootprintUuid()
 {
 }
 
 Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryElement(elementDirectory, "pkg", "package", readOnly),
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
     mDefaultFootprintUuid()
 {
     try
