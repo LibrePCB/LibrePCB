@@ -1,3 +1,4 @@
+#include "library.h"
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "sym/symbol.h"
