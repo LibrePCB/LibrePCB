@@ -170,6 +170,7 @@ class Debug final
         QTextStream* mStderrStream;     ///< the stream to stderr
         FilePath mLogFilepath;          ///< the filepath for the log file
         QFile* mLogFile;                ///< NULL if file logging is disabled
+        QMutex mMutex;                  ///< for thread safety
 
 };
 

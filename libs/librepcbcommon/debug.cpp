@@ -119,6 +119,8 @@ const FilePath& Debug::getLogFilepath() const
 
 void Debug::print(DebugLevel_t level, const QString& msg, const char* file, int line)
 {
+    QMutexLocker locker(&mMutex);
+
     if ((mDebugLevelStderr < level) && ((mDebugLevelLogFile < level) || (!mLogFile)))
         return; // if there is nothing to print, we will return immediately from this function
 
