@@ -135,7 +135,6 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid)
                       << "[" << process.error() << "]" << std::endl;
             GTEST_FAIL();
         }
-        QThread::usleep(1); // GetModuleFileNameEx() fails without this tiny delay o_o
         ASSERT_EQ("librepcb", SystemInfo::getProcessNameByPid(process.processId()));
         process.kill();
         if (!success) {

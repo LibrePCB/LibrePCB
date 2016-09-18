@@ -39,6 +39,14 @@
 #include <unistd.h>
 #include <pwd.h>
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64) // Windows
+#ifdef WINVER
+#undef WINVER
+#endif
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+#define WINVER 0x0600
+#define _WIN32_WINNT 0x0600
 #include <Windows.h>
 #else
 #error "Unknown operating system!"
@@ -209,37 +217,23 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) throw (Exception)
     // end of the symlink, so we need to remove that to get the naked process name.
     if (processName.endsWith(" (deleted)")) processName.chop(strlen(" (deleted)"));
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64) // Windows
-    // From: http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_win.cpp
-    typedef DWORD (WINAPI *GetModuleFileNameExFunc)(HANDLE, HMODULE, LPTSTR, DWORD);
-    HMODULE hPsapi = LoadLibraryA("psapi");
-    if (!hPsapi) {
-        throw RuntimeError(__FILE__, __LINE__, QString::number(GetLastError()),
-            tr("Could not load library 'psapi'."));
-    }
-    GetModuleFileNameExFunc qGetModuleFileNameEx
-            = (GetModuleFileNameExFunc)GetProcAddress(hPsapi, "GetModuleFileNameExW");
-    if (!qGetModuleFileNameEx) {
-        FreeLibrary(hPsapi);
-        throw RuntimeError(__FILE__, __LINE__, QString::number(GetLastError()),
-            tr("Function 'GetModuleFileNameExW' not found."));
-    }
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, DWORD(pid));
-    if (!hProcess) {
-        FreeLibrary(hPsapi);
-        if (GetLastError() == ERROR_INVALID_PARAMETER) {
-            return QString(); // process not running
-        } else {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
-                QString(tr("OpenProcess() failed with error %1.")).arg(GetLastError()));
-        }
+    // Originally from: http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_win.cpp
+    // But then saw this article: https://blogs.msdn.microsoft.com/oldnewthing/20150716-00/?p=45131/
+    // And therefore switched from GetModuleFileNameExW() to QueryFullProcessImageNameW()
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, DWORD(pid));
+    if ((!hProcess) && (GetLastError() == ERROR_INVALID_PARAMETER)) {
+        return QString(); // process not running
+    } else if (!hProcess) {
+        throw RuntimeError(__FILE__, __LINE__, QString(),
+            QString(tr("OpenProcess() failed with error %1.")).arg(GetLastError()));
     }
     wchar_t buf[MAX_PATH];
-    const DWORD length = qGetModuleFileNameEx(hProcess, NULL, buf, sizeof(buf) / sizeof(wchar_t));
+    DWORD length = MAX_PATH;
+    BOOL success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
     CloseHandle(hProcess);
-    FreeLibrary(hPsapi);
-    if (!length) {
+    if ((!success) || (!length)) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("qGetModuleFileNameEx() failed with error %1.")).arg(GetLastError()));
+            QString(tr("QueryFullProcessImageNameW() failed with error %1.")).arg(GetLastError()));
     }
     processName = QString::fromWCharArray(buf, length);
     int i = processName.lastIndexOf(QLatin1Char('\\'));
