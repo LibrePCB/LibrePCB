@@ -23,6 +23,7 @@ build_script:
   - cd build
   - qmake ..\librepcb.pro -r
   - mingw32-make -j 4
-  - .\generated\windows\tests.exe # run all unit tests
+  - .\generated\windows\qztest.exe # run quazip unit tests
+  - .\generated\windows\tests.exe # run librepcb unit tests
   - cd ..\
 
