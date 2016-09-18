@@ -17,6 +17,9 @@ QT += core widgets xml opengl network sql
 
 CONFIG += staticlib
 
+INCLUDEPATH += \
+    ../../3rdparty/quazip
+
 # set preprocessor defines
 DEFINES += APP_VERSION="\\\"0.1.0\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""

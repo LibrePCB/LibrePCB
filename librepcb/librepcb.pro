@@ -53,10 +53,12 @@ LIBS += \
     -llibrepcbworkspace \
     -llibrepcbproject \
     -llibrepcblibrary \
-    -llibrepcbcommon
+    -llibrepcbcommon \
+    -lquazip -lz
 
 INCLUDEPATH += \
     ../3rdparty \
+    ../3rdparty/quazip \
     ../libs
 
 DEPENDPATH += \
@@ -66,7 +68,8 @@ DEPENDPATH += \
     ../libs/librepcbworkspace \
     ../libs/librepcbproject \
     ../libs/librepcblibrary \
-    ../libs/librepcbcommon
+    ../libs/librepcbcommon \
+    ../3rdparty/quazip
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
@@ -75,7 +78,8 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbworkspace.a \
     $${DESTDIR}/liblibrepcbproject.a \
     $${DESTDIR}/liblibrepcblibrary.a \
-    $${DESTDIR}/liblibrepcbcommon.a
+    $${DESTDIR}/liblibrepcbcommon.a \
+    $${DESTDIR}/libquazip.a
 
 TRANSLATIONS = \
     ../i18n/librepcb_de.ts \
