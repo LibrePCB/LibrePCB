@@ -36,6 +36,9 @@ namespace librepcb {
 Application::Application(int& argc, char** argv) noexcept :
     QApplication(argc, argv)
 {
+    // register meta types
+    qRegisterMetaType<FilePath>();
+
     // set application version
     mAppVersion = Version(APP_VERSION);
     QApplication::setApplicationVersion(mAppVersion.toPrettyStr(2));

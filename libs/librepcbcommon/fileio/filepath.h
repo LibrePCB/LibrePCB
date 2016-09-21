@@ -453,7 +453,7 @@ QDebug& operator<<(QDebug& stream, const FilePath& filepath);
 
 } // namespace librepcb
 
-// QFlags
+Q_DECLARE_METATYPE(librepcb::FilePath)
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::FilePath::CleanFileNameOptions)
 
 #endif // LIBREPCB_FILEPATH_H
