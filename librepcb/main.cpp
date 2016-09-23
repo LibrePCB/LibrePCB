@@ -26,6 +26,7 @@
 #include <librepcbcommon/application.h>
 #include <librepcbcommon/debug.h>
 #include <librepcbcommon/exceptions.h>
+#include <librepcbcommon/network/networkaccessmanager.h>
 #include <librepcbworkspace/workspace.h>
 #include "firstrunwizard/firstrunwizard.h"
 #include "controlpanel/controlpanel.h"
@@ -80,6 +81,9 @@ int main(int argc, char* argv[])
     // Initialize all 3rd party libraries
     init3rdPartyLibs();
 
+    // Start network access manager thread
+    QScopedPointer<NetworkAccessManager> networkAccessManager(new NetworkAccessManager());
+
     // --------------------------------- OPEN WORKSPACE ----------------------------------
 
     // Get the path of the workspace to open (may show the first run wizard)
@@ -93,9 +97,13 @@ int main(int argc, char* argv[])
 
     // -------------------------------- EXIT APPLICATION ---------------------------------
 
+    // Stop network access manager thread
+    networkAccessManager.reset();
+
     // Cleanup all 3rd party libraries
     cleanup3rdPartyLibs();
 
+    qDebug() << "Exit application with code" << retval;
     return retval;
 }
 

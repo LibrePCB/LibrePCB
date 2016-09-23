@@ -85,7 +85,11 @@ HEADERS += \
     cam/excellongenerator.h \
     fileio/smartversionfile.h \
     fileio/fileutils.h \
-    sqlitedatabase.h
+    sqlitedatabase.h \
+    network/filedownload.h \
+    network/networkrequest.h \
+    network/networkrequestbase.h \
+    network/networkaccessmanager.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -136,7 +140,11 @@ SOURCES += \
     cam/excellongenerator.cpp \
     fileio/smartversionfile.cpp \
     fileio/fileutils.cpp \
-    sqlitedatabase.cpp
+    sqlitedatabase.cpp \
+    network/filedownload.cpp \
+    network/networkrequest.cpp \
+    network/networkrequestbase.cpp \
+    network/networkaccessmanager.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
