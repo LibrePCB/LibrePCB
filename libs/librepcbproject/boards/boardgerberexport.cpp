@@ -105,75 +105,74 @@ void BoardGerberExport::exportDrillsPTH() const throw (Exception)
     }
 
     gen.generate();
-    QString filename = QString("%1_DRILLS-PTH.drl").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("DRILLS-PTH.drl"));
 }
 
 void BoardGerberExport::exportLayerBoardOutlines() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::BoardOutlines);
     gen.generate();
-    QString filename = QString("%1_OUTLINES.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("OUTLINES.gbr"));
 }
 
 void BoardGerberExport::exportLayerTopCopper() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::TopCopper);
     gen.generate();
-    QString filename = QString("%1_COPPER-TOP.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("COPPER-TOP.gbr"));
 }
 
 void BoardGerberExport::exportLayerTopSolderMask() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::TopStopMask);
     gen.generate();
-    QString filename = QString("%1_SOLDERMASK-TOP.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("SOLDERMASK-TOP.gbr"));
 }
 
 void BoardGerberExport::exportLayerTopOverlay() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::TopOverlay);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
     drawLayer(gen, BoardLayer::TopStopMask);
     gen.generate();
-    QString filename = QString("%1_SILKSCREEN-TOP.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("SILKSCREEN-TOP.gbr"));
 }
 
 void BoardGerberExport::exportLayerBottomCopper() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::BottomCopper);
     gen.generate();
-    QString filename = QString("%1_COPPER-BOTTOM.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("COPPER-BOTTOM.gbr"));
 }
 
 void BoardGerberExport::exportLayerBottomSolderMask() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::BottomStopMask);
     gen.generate();
-    QString filename = QString("%1_SOLDERMASK-BOTTOM.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("SOLDERMASK-BOTTOM.gbr"));
 }
 
 void BoardGerberExport::exportLayerBottomOverlay() const throw (Exception)
 {
-    GerberGenerator gen(mProject.getName(), mBoard.getUuid(), mBoard.getName());
+    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getVersion());
     drawLayer(gen, BoardLayer::BottomOverlay);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
     drawLayer(gen, BoardLayer::BottomStopMask);
     gen.generate();
-    QString filename = QString("%1_SILKSCREEN-BOTTOM.gbr").arg(mProject.getName());
-    gen.saveToFile(mOutputDirectory.getPathTo(filename));
+    gen.saveToFile(getOutputFilePath("SILKSCREEN-BOTTOM.gbr"));
 }
 
 void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const throw (Exception)
@@ -351,6 +350,13 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
             throw LogicError(__FILE__, __LINE__);
         }
     }
+}
+
+FilePath BoardGerberExport::getOutputFilePath(const QString& suffix) const noexcept
+{
+    QString projectName = FilePath::cleanFileName(mProject.getName(),
+                          FilePath::ReplaceSpaces | FilePath::KeepCase);
+    return mOutputDirectory.getPathTo(projectName % "_" % suffix);
 }
 
 /*****************************************************************************************

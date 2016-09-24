@@ -48,7 +48,9 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
 
     mUi->edtName->setText(mProject.getName());
     mUi->edtAuthor->setText(mProject.getAuthor());
-    mUi->edtCreated->setDateTime(mProject.getCreated());
+    mUi->edtVersion->setText(mProject.getVersion());
+    mUi->lblCreatedDateTime->setText(mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
+    mUi->lblLastModifiedDateTime->setText(mProject.getLastModified().toString(Qt::DefaultLocaleLongDate));
 }
 
 ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept
@@ -92,9 +94,9 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 
         // Metadata
         CmdProjectSetMetadata* cmd = new CmdProjectSetMetadata(mProject);
-        cmd->setName(mUi->edtName->text());
-        cmd->setAuthor(mUi->edtAuthor->text());
-        cmd->setCreated(mUi->edtCreated->dateTime());
+        cmd->setName(mUi->edtName->text().trimmed());
+        cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+        cmd->setVersion(mUi->edtVersion->text().trimmed());
         mUndoStack.appendToCmdGroup(cmd);
 
         mUndoStack.commitCmdGroup();

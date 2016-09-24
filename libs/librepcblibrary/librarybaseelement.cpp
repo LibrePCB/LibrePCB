@@ -40,17 +40,18 @@ namespace library {
  ****************************************************************************************/
 
 LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
-                                       const QString& xmlRootNodeName, const Uuid& uuid,
+                                       const QString& longElementName, const Uuid& uuid,
                                        const Version& version, const QString& author,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) throw (Exception) :
     QObject(nullptr), mDirectory(FilePath::getRandomTempPath()),
     mDirectoryIsTemporary(true), mOpenedReadOnly(false),
-    mDirectoryBasenameMustBeUuid(dirnameMustBeUuid),
-    mShortElementName(shortElementName), mXmlRootNodeName(xmlRootNodeName),
+    mDirectoryNameMustBeUuid(dirnameMustBeUuid),
+    mShortElementName(shortElementName), mLongElementName(longElementName),
     mUuid(uuid), mVersion(version), mAuthor(author),
-    mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime())
+    mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime()),
+    mIsDeprecated(false)
 {
     FileUtils::makePath(mDirectory); // can throw
 
@@ -62,36 +63,33 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        bool dirnameMustBeUuid,
                                        const QString& shortElementName,
-                                       const QString& xmlRootNodeName, bool readOnly) throw (Exception) :
+                                       const QString& longElementName, bool readOnly) throw (Exception) :
     QObject(nullptr), mDirectory(elementDirectory),mDirectoryIsTemporary(false),
-    mOpenedReadOnly(readOnly), mDirectoryBasenameMustBeUuid(dirnameMustBeUuid),
-    mShortElementName(shortElementName), mXmlRootNodeName(xmlRootNodeName)
+    mOpenedReadOnly(readOnly), mDirectoryNameMustBeUuid(dirnameMustBeUuid),
+    mShortElementName(shortElementName), mLongElementName(longElementName)
 {
+    // determine the filepath to the version file
+    FilePath versionFilePath = mDirectory.getPathTo(".librepcb-" % mShortElementName);
+
     // check if the directory is a library element
-    if (!isDirectoryLibraryElement(mDirectory)) {
+    if (!versionFilePath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("Directory is not a LibrePCB library element: \"%1\""))
-            .arg(mDirectory.toNative()));
+            QString(tr("Directory is not a library element of type %1: \"%2\""))
+            .arg(mLongElementName, mDirectory.toNative()));
     }
 
-    // check directory suffix
-    if (mDirectory.getSuffix() != mShortElementName) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("Directory name does not end with \".%1\" : \"%2\""))
-            .arg(mShortElementName, mDirectory.toNative()));
-    }
-
-    // check directory basename
-    Uuid dirUuid(mDirectory.getBasename());
-    if (mDirectoryBasenameMustBeUuid && dirUuid.isNull()) {
+    // check directory name
+    Uuid dirUuid(mDirectory.getFilename());
+    if (mDirectoryNameMustBeUuid && dirUuid.isNull()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("Directory name is not a valid UUID: \"%1\""))
             .arg(mDirectory.toNative()));
     }
 
     // read version number from version file
-    mLoadingElementFileVersion = readFileVersionOfElementDirectory(mDirectory);
-    if (!(mLoadingElementFileVersion <= qApp->getAppVersion())) {
+    SmartVersionFile versionFile(versionFilePath, false, true);
+    mLoadingElementFileVersion = versionFile.getVersion();
+    if (mLoadingElementFileVersion != qApp->getAppVersion()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("The library element %1 was created with a newer application "
                        "version. You need at least LibrePCB version %2 to open it."))
@@ -99,10 +97,10 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     }
 
     // open main XML file
-    FilePath xmlFilePath = mDirectory.getPathTo(mShortElementName % ".xml");
+    FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
     SmartXmlFile xmlFile(xmlFilePath, false, true);
     mLoadingXmlFileDocument = xmlFile.parseFileAndBuildDomTree();
-    const XmlDomElement& root = mLoadingXmlFileDocument->getRoot(mXmlRootNodeName); // checks the name
+    const XmlDomElement& root = mLoadingXmlFileDocument->getRoot(mLongElementName);
     const XmlDomElement& metaElement = *root.getFirstChild("meta", true);
 
     // read attributes
@@ -111,6 +109,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mAuthor = metaElement.getFirstChild("author", true)->getText<QString>(true);
     mCreated = metaElement.getFirstChild("created", true)->getText<QDateTime>(true);
     mLastModified = metaElement.getFirstChild("last_modified", true)->getText<QDateTime>(true);
+    mIsDeprecated = metaElement.getFirstChild("deprecated", true)->getText<bool>(true);
 
     // read names, descriptions and keywords in all available languages
     readLocaleDomNodes(metaElement, "name", mNames, true);
@@ -118,7 +117,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     readLocaleDomNodes(metaElement, "keywords", mKeywords, false);
 
     // check if the UUID equals to the directory basename
-    if (mDirectoryBasenameMustBeUuid && (mUuid != dirUuid)) {
+    if (mDirectoryNameMustBeUuid && (mUuid != dirUuid)) {
         throw RuntimeError(__FILE__, __LINE__,
             QString("%1/%2").arg(mUuid.toStr(), dirUuid.toStr()),
             QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
@@ -138,17 +137,6 @@ LibraryBaseElement::~LibraryBaseElement() noexcept
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-
-QString LibraryBaseElement::checkDirectoryNameValidity(const FilePath& dir) const noexcept
-{
-    if (mDirectoryBasenameMustBeUuid && (dir.getCompleteBasename() != mUuid.toStr())) {
-        return QString(tr("The directory basename must be equal to the element's UUID."));
-    } else if (dir.getSuffix() != mShortElementName) {
-        return QString(tr("The directory name suffix must be \".%1\".")).arg(mShortElementName);
-    } else {
-        return QString();
-    }
-}
 
 QString LibraryBaseElement::getName(const QStringList& localeOrder) const noexcept
 {
@@ -189,14 +177,15 @@ void LibraryBaseElement::save() throw (Exception)
     }
 
     // save xml file
-    FilePath xmlFilePath = mDirectory.getPathTo(mShortElementName % ".xml");
+    FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
     QScopedPointer<XmlDomDocument> doc(new XmlDomDocument(*serializeToXmlDomElement()));
     QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(xmlFilePath));
     xmlFile->save(*doc, true);
 
     // save version number file
     QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
-        mDirectory.getPathTo(".version"), qApp->getFileFormatVersion()));
+        mDirectory.getPathTo(".librepcb-" % mShortElementName),
+        qApp->getFileFormatVersion()));
     versionFile->save(true);
 }
 
@@ -208,7 +197,7 @@ void LibraryBaseElement::saveTo(const FilePath& destination) throw (Exception)
 
 void LibraryBaseElement::saveIntoParentDirectory(const FilePath& parentDir) throw (Exception)
 {
-    FilePath elemDir = parentDir.getPathTo(mUuid.toStr() % "." % mShortElementName);
+    FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
     saveTo(elemDir);
 }
 
@@ -220,7 +209,7 @@ void LibraryBaseElement::moveTo(const FilePath& destination) throw (Exception)
 
 void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir) throw (Exception)
 {
-    FilePath elemDir = parentDir.getPathTo(mUuid.toStr() % "." % mShortElementName);
+    FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
     moveTo(elemDir);
 }
 
@@ -230,7 +219,6 @@ void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir) thro
 
 void LibraryBaseElement::cleanupAfterLoadingElementFromFile() noexcept
 {
-    mLoadingElementFileVersion = Version();
     mLoadingXmlFileDocument.reset(); // destroy the whole XML DOM tree
 }
 
@@ -238,11 +226,10 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
 {
     if (destination != mDirectory) {
         // check destination directory name validity
-        QString errMsg = checkDirectoryNameValidity(destination);
-        if (!errMsg.isEmpty()) {
+        if (mDirectoryNameMustBeUuid && (destination.getFilename() != mUuid.toStr())) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
-                 QString(tr("Invalid library element directory name \"%1\": %2"))
-                .arg(destination.getFilename(), errMsg));
+                 QString(tr("Library element directory name is not a valid UUID: \"%1\""))
+                .arg(destination.getFilename()));
         }
 
         // check if destination directory exists already
@@ -281,19 +268,23 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Excep
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement(mXmlRootNodeName));
+    QScopedPointer<XmlDomElement> root(new XmlDomElement(mLongElementName));
     XmlDomElement* meta = root->appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("created", mCreated);
     meta->appendTextChild("last_modified", mLastModified);
-    foreach (const QString& locale, mNames.keys())
+    meta->appendTextChild("deprecated", mIsDeprecated);
+    foreach (const QString& locale, mNames.keys()) {
         meta->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
+    }
+    foreach (const QString& locale, mDescriptions.keys()) {
         meta->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mKeywords.keys())
+    }
+    foreach (const QString& locale, mKeywords.keys()) {
         meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
+    }
     return root.take();
 }
 
@@ -355,21 +346,6 @@ QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& l
     }
 
     throw RuntimeError(__FILE__, __LINE__, QString(), tr("No translation found."));
-}
-
-bool LibraryBaseElement::isDirectoryLibraryElement(const FilePath& dir) noexcept
-{
-    // The presence of a ".version" file in the element's directory is enought
-    // to say that the directory represents a LibrePCB library element ;)
-    FilePath versionFilePath = dir.getPathTo(".version");
-    return versionFilePath.isExistingFile();
-}
-
-Version LibraryBaseElement::readFileVersionOfElementDirectory(const FilePath& dir) throw (Exception)
-{
-    FilePath versionFilePath = dir.getPathTo(".version");
-    SmartVersionFile versionFile(versionFilePath, false, true);
-    return versionFile.getVersion();
 }
 
 /*****************************************************************************************

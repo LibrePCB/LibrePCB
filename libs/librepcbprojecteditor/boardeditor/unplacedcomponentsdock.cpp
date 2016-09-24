@@ -29,7 +29,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbproject/settings/projectsettings.h>
 #include <librepcbproject/circuit/componentinstance.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcblibrary/elements.h>
 #include <librepcbproject/library/projectlibrary.h>
 #include <librepcbcommon/graphics/graphicsview.h>
@@ -135,10 +135,10 @@ void UnplacedComponentsDock::on_lstUnplacedComponents_currentItemChanged(QListWi
 void UnplacedComponentsDock::on_cbxSelectedDevice_currentIndexChanged(int index)
 {
     Uuid deviceUuid(mUi->cbxSelectedDevice->itemData(index, Qt::UserRole).toString());
-    FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
+    FilePath devFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(deviceUuid);
     if (devFp.isValid()) {
         const library::Device* device = new library::Device(devFp, true);
-        FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(device->getPackageUuid());
+        FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(device->getPackageUuid());
         if (pkgFp.isValid()) {
             const library::Package* package = new library::Package(pkgFp, true);
             setSelectedDeviceAndPackage(device, package);
@@ -198,7 +198,7 @@ void UnplacedComponentsDock::on_btnAddAll_clicked()
         ComponentInstance* component = mProject.getCircuit().getComponentInstanceByUuid(componentUuid);
         if (component)
         {
-            QList<Uuid> devices = mProjectEditor.getWorkspace().getLibrary().
+            QList<Uuid> devices = mProjectEditor.getWorkspace().getLibraryDb().
                 getDevicesOfComponent(component->getLibComponent().getUuid()).toList();
             if (devices.count() > 0)
                 addNextDeviceToCmdGroup(*component, devices.first(), Uuid());
@@ -231,7 +231,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             if (component->getLibComponent().isSchematicOnly()) continue;
 
             // add component to list
-            int deviceCount = mProjectEditor.getWorkspace().getLibrary().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
+            int deviceCount = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
             QString name = component->getName();
             QString value = component->getValue(true).replace("\n", "|");
             QString compName = component->getLibComponent().getName(mProject.getSettings().getLocaleOrder());
@@ -258,17 +258,17 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
     if (mBoard && mSelectedComponent)
     {
         QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-        QSet<Uuid> devices = mProjectEditor.getWorkspace().getLibrary().getDevicesOfComponent(mSelectedComponent->getLibComponent().getUuid());
+        QSet<Uuid> devices = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(mSelectedComponent->getLibComponent().getUuid());
         foreach (const Uuid& deviceUuid, devices)
         {
             // TODO: use library metadata instead of loading the XML files
-            FilePath devFp = mProjectEditor.getWorkspace().getLibrary().getLatestDevice(deviceUuid);
+            FilePath devFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(deviceUuid);
             if (!devFp.isValid()) continue;
             const library::Device device(devFp, true);
 
             Uuid pkgUuid;
-            mProjectEditor.getWorkspace().getLibrary().getDeviceMetadata(devFp, &pkgUuid);
-            FilePath pkgFp = mProjectEditor.getWorkspace().getLibrary().getLatestPackage(pkgUuid);
+            mProjectEditor.getWorkspace().getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
+            FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(pkgUuid);
             const library::Package package(pkgFp, true);
 
             QString devName = device.getName(localeOrder);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
-    <height>384</height>
+    <width>475</width>
+    <height>226</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,31 +43,43 @@
       <item row="1" column="1">
        <widget class="QLineEdit" name="edtAuthor"/>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Created:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QDateTimeEdit" name="edtCreated">
-        <property name="calendarPopup">
-         <bool>true</bool>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Version:</string>
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Attributes</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QTableWidget" name="tblAttributes"/>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="edtVersion"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="lblCreatedDateTime">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Last Modified:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="lblLastModifiedDateTime">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

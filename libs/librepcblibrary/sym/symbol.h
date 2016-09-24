@@ -93,6 +93,10 @@ class Symbol final : public LibraryElement
         // Operator Overloadings
         Symbol& operator=(const Symbol& rhs) = delete;
 
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("sym");}
+        static QString getLongElementName() noexcept {return QStringLiteral("symbol");}
+
 
     private:
 

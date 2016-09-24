@@ -35,7 +35,6 @@ namespace librepcb {
 
 namespace library {
 class Symbol;
-class SpiceModel;
 class Package;
 class Component;
 class Device;
@@ -67,12 +66,10 @@ class ProjectLibrary final : public QObject
 
         // Getters: Library Elements
         const QHash<Uuid, library::Symbol*>&     getSymbols()        const noexcept {return mSymbols;}
-        const QHash<Uuid, library::SpiceModel*>& getSpiceModels()    const noexcept {return mSpiceModels;}
         const QHash<Uuid, library::Package*>&    getPackages()       const noexcept {return mPackages;}
         const QHash<Uuid, library::Component*>&  getComponents()     const noexcept {return mComponents;}
         const QHash<Uuid, library::Device*>&     getDevices()        const noexcept {return mDevices;}
         library::Symbol*      getSymbol(     const Uuid& uuid) const noexcept;
-        library::SpiceModel*  getSpiceModel( const Uuid& uuid) const noexcept;
         library::Package*     getPackage(    const Uuid& uuid) const noexcept;
         library::Component*   getComponent(  const Uuid& uuid) const noexcept;
         library::Device*      getDevice(     const Uuid& uuid) const noexcept;
@@ -83,12 +80,10 @@ class ProjectLibrary final : public QObject
 
         // Add/Remove Methods
         void addSymbol(library::Symbol& s) throw (Exception);
-        void addSpiceModel(library::SpiceModel& m) throw (Exception);
         void addPackage(library::Package& p) throw (Exception);
         void addComponent(library::Component& c) throw (Exception);
         void addDevice(library::Device& d) throw (Exception);
         void removeSymbol(library::Symbol& s) throw (Exception);
-        void removeSpiceModel(library::SpiceModel& m) throw (Exception);
         void removePackage(library::Package& p) throw (Exception);
         void removeComponent(library::Component& c) throw (Exception);
         void removeDevice(library::Device& d) throw (Exception);
@@ -134,21 +129,18 @@ class ProjectLibrary final : public QObject
 
         // The Library Elements
         QHash<Uuid, library::Symbol*> mSymbols;
-        QHash<Uuid, library::SpiceModel*> mSpiceModels;
         QHash<Uuid, library::Package*> mPackages;
         QHash<Uuid, library::Component*> mComponents;
         QHash<Uuid, library::Device*> mDevices;
 
         // Added Library Elements
         QList<library::Symbol*> mAddedSymbols;
-        QList<library::SpiceModel*> mAddedSpiceModels;
         QList<library::Package*> mAddedPackages;
         QList<library::Component*> mAddedComponents;
         QList<library::Device*> mAddedDevices;
 
         // Removed Library Elements
         QList<library::Symbol*> mRemovedSymbols;
-        QList<library::SpiceModel*> mRemovedSpiceModels;
         QList<library::Package*> mRemovedPackages;
         QList<library::Component*> mRemovedComponents;
         QList<library::Device*> mRemovedDevices;

@@ -43,7 +43,10 @@ FabricationOutputDialog::FabricationOutputDialog(Board& board, QWidget *parent) 
 {
     mUi->setupUi(this);
 
-    FilePath gerberDir = mProject.getPath().getPathTo("generated/gerber");
+    QString version = FilePath::cleanFileName(mProject.getVersion(),
+                      FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString outputDir = QString("output/%1/gerber").arg(version);
+    FilePath gerberDir = mProject.getPath().getPathTo(outputDir);
     mUi->edtOutputDirPath->setText(gerberDir.toNative());
 }
 

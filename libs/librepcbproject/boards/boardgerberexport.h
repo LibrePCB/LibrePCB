@@ -91,6 +91,8 @@ class BoardGerberExport final : public QObject
         void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const throw (Exception);
         void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const throw (Exception);
 
+        FilePath getOutputFilePath(const QString& suffix) const noexcept;
+
         // Static Methods
         static Length calcWidthOfLayer(const Length& width, int layerId) noexcept;
 

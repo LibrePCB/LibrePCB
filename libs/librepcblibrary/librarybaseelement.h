@@ -56,18 +56,18 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         LibraryBaseElement() = delete;
         LibraryBaseElement(const LibraryBaseElement& other) = delete;
         LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
-                           const QString& xmlRootNodeName, const Uuid& uuid,
+                           const QString& longElementName, const Uuid& uuid,
                            const Version& version, const QString& author,
                            const QString& name_en_US, const QString& description_en_US,
                            const QString& keywords_en_US) throw (Exception);
         LibraryBaseElement(const FilePath& elementDirectory, bool dirnameMustBeUuid,
-                           const QString& shortElementName, const QString& xmlRootNodeName,
+                           const QString& shortElementName, const QString& longElementName,
                            bool readOnly) throw (Exception);
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
         const FilePath& getFilePath() const noexcept {return mDirectory;}
-        QString checkDirectoryNameValidity(const FilePath& dir) const noexcept;
+        bool isOpenedReadOnly() const noexcept {return mOpenedReadOnly;}
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
@@ -75,6 +75,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
+        bool isDeprecated() const noexcept {return mIsDeprecated;}
         QString getName(const QStringList& localeOrder) const noexcept;
         QString getDescription(const QStringList& localeOrder) const noexcept;
         QString getKeywords(const QStringList& localeOrder) const noexcept;
@@ -84,12 +85,13 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QStringList getAllAvailableLocales() const noexcept;
 
         // Setters
-        void setUuid(const Uuid& uuid) noexcept {mUuid = uuid;}
+        void setVersion(const Version& version) noexcept {mVersion = version;}
+        void setAuthor(const QString& author) noexcept {mAuthor = author;}
+        void setLastModified(const QDateTime& modified) noexcept {mLastModified = modified.toUTC();}
+        void setDeprecated(bool deprecated) noexcept {mIsDeprecated = deprecated;}
         void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
         void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords[locale] = keywords;}
-        void setVersion(const Version& version) noexcept {mVersion = version;}
-        void setAuthor(const QString& author) noexcept {mAuthor = author;}
 
         // General Methods
         virtual void save() throw (Exception);
@@ -175,30 +177,16 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
                                             const QStringList& localeOrder,
                                             QString* usedLocale = nullptr) throw (Exception);
 
-        /**
-         * @brief Check whether a directory contains a valid library element or not
-         *
-         * @param dir   The element's root directory
-         *
-         * @return True if there is a valid element, false if not.
-         */
-        static bool isDirectoryLibraryElement(const FilePath& dir) noexcept;
-
-        /**
-         * @brief Read the version number in the version file inside a specific directory
-         *
-         * @param dir   The element's root directory
-         *
-         * @return The version number from the version file.
-         */
-        static Version readFileVersionOfElementDirectory(const FilePath& dir) throw (Exception);
+        template <typename ElementType>
+        static bool isValidElementDirectory(const FilePath& dir) noexcept
+        {return dir.getPathTo(".librepcb-" % ElementType::getShortElementName()).isExistingFile();}
 
 
     protected:
 
         // Protected Methods
         virtual void cleanupAfterLoadingElementFromFile() noexcept;
-        virtual void copyTo(const FilePath& parentDir, bool removeSource) throw (Exception);
+        virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception);
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -210,9 +198,9 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         mutable FilePath mDirectory;
         mutable bool mDirectoryIsTemporary;
         bool mOpenedReadOnly;
-        bool mDirectoryBasenameMustBeUuid;
-        QString mShortElementName; ///< used for directory name suffix and xml file basename
-        QString mXmlRootNodeName; ///< required for XML serialization
+        bool mDirectoryNameMustBeUuid;
+        QString mShortElementName; ///< e.g. "lib", "cmpcat", "sym"
+        QString mLongElementName; ///< e.g. "library", "component_category", "symbol"
 
         // Members required for loading elements from file
         Version mLoadingElementFileVersion;
@@ -224,6 +212,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         QString mAuthor;
         QDateTime mCreated;
         QDateTime mLastModified;
+        bool mIsDeprecated;
         QMap<QString, QString> mNames;        ///< key: locale (like "en_US"), value: name
         QMap<QString, QString> mDescriptions; ///< key: locale (like "en_US"), value: description
         QMap<QString, QString> mKeywords;     ///< key: locale (like "en_US"), value: keywords

@@ -13,7 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml opengl network
+QT += core widgets xml opengl network sql
 
 CONFIG += staticlib
 
@@ -81,7 +81,8 @@ HEADERS += \
     cam/gerberaperturelist.h \
     cam/excellongenerator.h \
     fileio/smartversionfile.h \
-    fileio/fileutils.h
+    fileio/fileutils.h \
+    sqlitedatabase.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -131,7 +132,8 @@ SOURCES += \
     cam/gerberaperturelist.cpp \
     cam/excellongenerator.cpp \
     fileio/smartversionfile.cpp \
-    fileio/fileutils.cpp
+    fileio/fileutils.cpp \
+    sqlitedatabase.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \

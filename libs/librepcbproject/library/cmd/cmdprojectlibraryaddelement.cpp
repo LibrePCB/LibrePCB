@@ -83,12 +83,6 @@ void CmdProjectLibraryAddElement<library::Symbol>::addElement()
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::SpiceModel>::addElement()
-{
-    mLibrary.addSpiceModel(mElement);
-}
-
-template <>
 void CmdProjectLibraryAddElement<library::Package>::addElement()
 {
     mLibrary.addPackage(mElement);
@@ -110,12 +104,6 @@ template <>
 void CmdProjectLibraryAddElement<library::Symbol>::removeElement()
 {
     mLibrary.removeSymbol(mElement);
-}
-
-template <>
-void CmdProjectLibraryAddElement<library::SpiceModel>::removeElement()
-{
-    mLibrary.removeSpiceModel(mElement);
 }
 
 template <>
@@ -141,7 +129,6 @@ void CmdProjectLibraryAddElement<library::Device>::removeElement()
  ****************************************************************************************/
 
 template class CmdProjectLibraryAddElement<library::Symbol>;
-template class CmdProjectLibraryAddElement<library::SpiceModel>;
 template class CmdProjectLibraryAddElement<library::Package>;
 template class CmdProjectLibraryAddElement<library::Component>;
 template class CmdProjectLibraryAddElement<library::Device>;

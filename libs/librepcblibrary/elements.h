@@ -1,7 +1,7 @@
+#include "library.h"
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "sym/symbol.h"
-#include "spcmdl/spicemodel.h"
 #include "pkg/package.h"
 #include "cmp/component.h"
 #include "dev/device.h"

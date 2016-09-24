@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_DEVICE_H
-#define LIBREPCB_LIBRARY_DEVICE_H
+#ifndef LIBREPCB_LIBRARY_LIBRARY_H
+#define LIBREPCB_LIBRARY_LIBRARY_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../libraryelement.h"
+#include <QtWidgets>
+#include <librepcbcommon/uuid.h>
+#include "librarybaseelement.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -33,64 +35,67 @@ namespace librepcb {
 namespace library {
 
 /*****************************************************************************************
- *  Class Device
+ *  Class Library
  ****************************************************************************************/
 
 /**
- * @brief The Device class
+ * @brief   The Library class represents a library directory
+ *
+ * @author  ubruhin
+ * @date    2016-08-03
  */
-class Device final : public LibraryElement
+class Library final : public LibraryBaseElement
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        Device() = delete;
-        Device(const Device& other) = delete;
-        Device(const Uuid& uuid, const Version& version, const QString& author,
-               const QString& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US) throw (Exception);
-        Device(const FilePath& elementDirectory, bool readOnly) throw (Exception);
-        ~Device() noexcept;
+        Library() = delete;
+        Library(const Library& other) = delete;
+        Library(const Uuid& uuid, const Version& version, const QString& author,
+                const QString& name_en_US, const QString& description_en_US,
+                const QString& keywords_en_US) throw (Exception);
+        Library(const FilePath& libDir, bool readOnly) throw (Exception);
+        ~Library() noexcept;
 
-        // Getters: Attributes
-        const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
-        const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        // Getters
+        const QUrl& getUrl() const noexcept {return mUrl;}
+        const QList<Uuid>& getDependencies() const noexcept {return mDependencies;}
+        const QPixmap& getIcon() const noexcept {return mIcon;}
 
-        // Setters: Attributes
-        void setComponentUuid(const Uuid& uuid) noexcept {mComponentUuid = uuid;}
-        void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
+        // Setters
+        void setUrl(const QUrl& url) noexcept {mUrl = url;}
 
-        // Pad-Signal-Map Methods
-        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
-        void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
-        void removePadSignalMapping(const Uuid& pad) noexcept;
+        // General Methods
+        void addDependency(const Uuid& uuid) noexcept;
+        void removeDependency(const Uuid& uuid) noexcept;
+        template <typename ElementType>
+        QList<FilePath> searchForElements() const noexcept;
 
         // Operator Overloadings
-        Device& operator=(const Device& rhs) = delete;
+        Library& operator=(const Library& rhs) = delete;
 
         // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("dev");}
-        static QString getLongElementName() noexcept {return QStringLiteral("device");}
+        static QString getShortElementName() noexcept {return QStringLiteral("lib");}
+        static QString getLongElementName() noexcept {return QStringLiteral("library");}
 
 
-    private:
+    private: // Methods
 
         // Private Methods
-
+        virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception) override;
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
+        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        virtual bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
-        Uuid mComponentUuid;
-        Uuid mPackageUuid;
-        QHash<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
+    private: // Data
+
+        QUrl mUrl;
+        QList<Uuid> mDependencies;
+        QPixmap mIcon;
 };
 
 /*****************************************************************************************
@@ -100,4 +105,4 @@ class Device final : public LibraryElement
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_DEVICE_H
+#endif // LIBREPCB_LIBRARY_LIBRARY_H

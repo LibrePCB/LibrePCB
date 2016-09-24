@@ -25,7 +25,6 @@ HEADERS += \
     cat/packagecategory.h \
     pkg/footprint.h \
     pkg/package.h \
-    spcmdl/spicemodel.h \
     sym/symbol.h \
     sym/symbolpin.h \
     sym/symbolpinpreviewgraphicsitem.h \
@@ -46,14 +45,14 @@ HEADERS += \
     pkg/footprintpadsmt.h \
     cmp/componentpinsignalmapitem.h \
     pkg/footprintpadpreviewgraphicsitem.h \
-    pkg/footprintpreviewgraphicsitem.h
+    pkg/footprintpreviewgraphicsitem.h \
+    library.h
 
 SOURCES += \
     cat/componentcategory.cpp \
     cat/packagecategory.cpp \
     pkg/footprint.cpp \
     pkg/package.cpp \
-    spcmdl/spicemodel.cpp \
     sym/symbol.cpp \
     sym/symbolpin.cpp \
     sym/symbolpinpreviewgraphicsitem.cpp \
@@ -73,5 +72,6 @@ SOURCES += \
     pkg/footprintpadsmt.cpp \
     cmp/componentpinsignalmapitem.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \
-    pkg/footprintpreviewgraphicsitem.cpp
+    pkg/footprintpreviewgraphicsitem.cpp \
+    library.cpp
 

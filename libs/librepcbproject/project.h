@@ -30,6 +30,7 @@
 #include <librepcbcommon/if_boardlayerprovider.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/uuid.h>
+#include <librepcbcommon/version.h>
 #include <librepcbcommon/fileio/directorylock.h>
 
 /*****************************************************************************************
@@ -41,6 +42,7 @@ namespace librepcb {
 
 class SmartTextFile;
 class SmartXmlFile;
+class SmartVersionFile;
 
 namespace project {
 
@@ -83,6 +85,8 @@ class Project final : public QObject, public IF_AttributeProvider,
     public:
 
         // Constructors / Destructor
+        Project() = delete;
+        Project(const Project& other) = delete;
 
         /**
          * @brief The constructor to open an existing project with all its content
@@ -92,7 +96,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception     If the project could not be opened successfully
          */
-        explicit Project(const FilePath& filepath, bool readOnly) throw (Exception) :
+        Project(const FilePath& filepath, bool readOnly) throw (Exception) :
             Project(filepath, false, readOnly) {}
 
         /**
@@ -178,6 +182,13 @@ class Project final : public QObject, public IF_AttributeProvider,
         const QString& getAuthor() const noexcept {return mAuthor;}
 
         /**
+         * @brief Get the version of the project
+         *
+         * @return The version of the project (arbitrary string)
+         */
+        const QString& getVersion() const noexcept {return mVersion;}
+
+        /**
          * @brief Get the date and time when the project was created
          *
          * @return The local date and time of creation
@@ -213,13 +224,13 @@ class Project final : public QObject, public IF_AttributeProvider,
         void setAuthor(const QString& newAuthor) noexcept;
 
         /**
-         * @brief Set the date and time when the project was created
+         * @brief Set the version of the project
          *
-         * @param newCreated        The new created datetime
+         * @param newVersion        The new version (can be an arbitrary string)
          *
          * @undocmd{project#CmdProjectSetMetadata}
          */
-        void setCreated(const QDateTime& newCreated) noexcept;
+        void setVersion(const QString& newVersion) noexcept;
 
         /**
          * @brief Set the date and time when the project was last modified
@@ -443,10 +454,17 @@ class Project final : public QObject, public IF_AttributeProvider,
                                bool passToParents, QString& value) const noexcept;
 
 
+        // Operator Overloadings
+        Project& operator=(const Project& rhs) = delete;
+
+
         // Static Methods
 
         static Project* create(const FilePath& filepath) throw (Exception)
         {return new Project(filepath, true, false);}
+
+        static bool isValidProjectDirectory(const FilePath& dir) noexcept;
+        static Version getProjectFileFormatVersion(const FilePath& dir) throw (Exception);
 
 
     signals:
@@ -484,12 +502,6 @@ class Project final : public QObject, public IF_AttributeProvider,
 
 
     private:
-
-        // make some methods inaccessible...
-        Project();
-        Project(const Project& other);
-        Project& operator=(const Project& rhs);
-
 
         // Private Methods
 
@@ -537,7 +549,8 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Project File (*.lpp)
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.lpp project file
-        SmartXmlFile* mXmlFile; ///< the *.lpp project file
+        QScopedPointer<SmartVersionFile> mVersionFile; ///< the ".librepcb-project" file
+        QScopedPointer<SmartXmlFile> mXmlFile; ///< the *.lpp project file
         DirectoryLock mLock; ///< Lock for the whole project directory (see @ref doc_project_lock)
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
@@ -545,17 +558,18 @@ class Project final : public QObject, public IF_AttributeProvider,
         // Attributes
         QString mName;              ///< the name of the project
         QString mAuthor;            ///< the author of the project
+        QString mVersion;           ///< the version of the project (arbitrary string)
         QDateTime mCreated;         ///< the datetime of the project creation
         QDateTime mLastModified;    ///< the datetime of the last project modification
 
         // General
-        ProjectSettings* mProjectSettings; ///< all project specific settings
-        ProjectLibrary* mProjectLibrary; ///< the library which contains all elements needed in this project
-        ErcMsgList* mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
-        Circuit* mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, component instances, ...)
+        QScopedPointer<ProjectSettings> mProjectSettings; ///< all project specific settings
+        QScopedPointer<ProjectLibrary> mProjectLibrary; ///< the library which contains all elements needed in this project
+        QScopedPointer<ErcMsgList> mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages
+        QScopedPointer<Circuit> mCircuit; ///< The whole circuit of this project (contains all netclasses, netsignals, component instances, ...)
         QList<Schematic*> mSchematics; ///< All schematics of this project
         QList<Schematic*> mRemovedSchematics; ///< All removed schematics of this project
-        SchematicLayerProvider* mSchematicLayerProvider; ///< All schematic layers of this project
+        QScopedPointer<SchematicLayerProvider> mSchematicLayerProvider; ///< All schematic layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
 };

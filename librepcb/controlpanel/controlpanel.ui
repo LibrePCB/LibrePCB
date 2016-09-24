@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>873</width>
-    <height>621</height>
+    <width>978</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,9 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -26,13 +29,42 @@
      <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>6</number>
+     <number>0</number>
     </property>
     <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
+     <widget class="QLabel" name="lblWarnForNewerAppVersions">
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+	background-color: rgb(255, 255, 127);
+	
+	color: rgb(170, 0, 0);
+};</string>
+      </property>
+      <property name="text">
+       <string>This workspace was already used with a newer version of LibrePCB. All changes in libraries and workspace settings will not be available in newer versions of LibrePCB.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>5</number>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QSplitter" name="splitter_h">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -361,8 +393,8 @@ QListView::item
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>873</width>
-     <height>25</height>
+     <width>978</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

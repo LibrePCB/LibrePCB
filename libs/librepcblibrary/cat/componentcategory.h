@@ -53,6 +53,10 @@ class ComponentCategory final : public LibraryCategory
 
         // Operator Overloadings
         ComponentCategory& operator=(const ComponentCategory& rhs) = delete;
+
+        // Static Methods
+        static QString getShortElementName() noexcept {return QStringLiteral("cmpcat");}
+        static QString getLongElementName() noexcept {return QStringLiteral("component_category");}
 };
 
 /*****************************************************************************************

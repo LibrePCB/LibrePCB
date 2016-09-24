@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QApplication>
+#include <librepcbcommon/application.h>
 #include "mainwindow.h"
 
 /*****************************************************************************************
@@ -32,7 +32,7 @@
 
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
+    librepcb::Application app(argc, argv);
 
     QCoreApplication::setOrganizationName("LibrePCB");
     QCoreApplication::setApplicationName("ProjectLibraryUpdater");

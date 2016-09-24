@@ -30,7 +30,7 @@
 #include <librepcbproject/project.h>
 #include <librepcbworkspace/projecttreemodel.h>
 #include <librepcbworkspace/projecttreeitem.h>
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbprojecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcbcommon/application.h>
@@ -55,8 +55,33 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 
     setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
                    .arg(qApp->getAppVersion().toPrettyStr(2)));
-    mUi->statusBar->addWidget(new QLabel(QString(tr("Workspace: %1"))
-        .arg(mWorkspace.getPath().toNative())));
+
+    // show workspace path in status bar
+    QString wsPath = mWorkspace.getPath().toNative();
+    QLabel* statusBarLabel = new QLabel(QString(tr("Workspace: %1")).arg(wsPath));
+    mUi->statusBar->addWidget(statusBarLabel, 1);
+
+    // add library scanner progress bar to status bar
+    QProgressBar* statusBarProgress = new QProgressBar(this);
+    statusBarProgress->setVisible(false);
+    statusBarProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    statusBarProgress->setMinimumWidth(statusBarProgress->sizeHint().width() * 2);
+    statusBarProgress->setMaximumHeight(statusBarLabel->sizeHint().height());
+    statusBarProgress->setMinimum(0);
+    statusBarProgress->setMaximum(100);
+    statusBarProgress->setFormat("Scanning libraries (%p%)");
+    connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
+            statusBarProgress, &QProgressBar::show, Qt::QueuedConnection);
+    connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanSucceeded,
+            statusBarProgress, &QProgressBar::hide, Qt::QueuedConnection);
+    connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
+            statusBarProgress, &QProgressBar::setValue, Qt::QueuedConnection);
+    mUi->statusBar->addPermanentWidget(statusBarProgress);
+
+    // decive if we have to show the warning about a newer workspace file format version
+    Version actualVersion = qApp->getFileFormatVersion();
+    Version highestVersion = Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
+    mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
 
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, &QAction::triggered,
@@ -550,19 +575,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
 
 void ControlPanel::on_actionRescanLibrary_triggered()
 {
-    try
-    {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        int count = mWorkspace.getLibrary().rescan();
-        QApplication::restoreOverrideCursor();
-        QMessageBox::information(this, tr("Rescan Library"),
-            QString("Successfully scanned %1 library elements.").arg(count));
-    }
-    catch (Exception& e)
-    {
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-    }
+    mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 /*****************************************************************************************

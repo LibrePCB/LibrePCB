@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddcomponenttocircuit.h"
-#include <librepcbworkspace/library/workspacelibrary.h>
+#include <librepcbworkspace/library/workspacelibrarydb.h>
 #include <librepcblibrary/cmp/component.h>
 #include <librepcbworkspace/workspace.h>
 #include <librepcbproject/project.h>
@@ -72,7 +72,7 @@ bool CmdAddComponentToCircuit::performExecute() throw (Exception)
     // if there is no such component in the project's library, copy it from the
     // workspace library to the project's library
     if (!mProject.getLibrary().getComponent(mComponentUuid)) {
-        FilePath cmpFp = mWorkspace.getLibrary().getLatestComponent(mComponentUuid);
+        FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(mComponentUuid);
         if (!cmpFp.isValid()) {
             throw RuntimeError(__FILE__, __LINE__, QString(),
                 QString(tr("The component with the UUID \"%1\" does not exist in the "
