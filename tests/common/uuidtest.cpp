@@ -210,10 +210,10 @@ TEST(UuidTest, testCreateRandom)
 {
     for (int i = 0; i < 1000; i++) {
         Uuid uuid = Uuid::createRandom();
-        ASSERT_FALSE(uuid.isNull());
-        ASSERT_FALSE(uuid.toStr().isEmpty());
-        ASSERT_EQ(QUuid::DCE, QUuid(uuid.toStr()).variant());
-        ASSERT_EQ(QUuid::Random, QUuid(uuid.toStr()).version());
+        EXPECT_FALSE(uuid.isNull());
+        EXPECT_FALSE(uuid.toStr().isEmpty());
+        EXPECT_EQ(QUuid::DCE, QUuid(uuid.toStr()).variant());
+        EXPECT_EQ(QUuid::Random, QUuid(uuid.toStr()).version());
     }
 }
 

@@ -40,18 +40,23 @@ class SystemInfoTest : public ::testing::Test
 {
     protected:
 
-        FilePath getFilepathToLibrepcbExecutable() const noexcept
+        FilePath getTestProcessExePath() const noexcept
         {
             FilePath generatedDir(qApp->applicationDirPath());
 #if defined(Q_OS_OSX) // Mac OS X
-            return generatedDir.getPathTo("librepcb.app/Contents/MacOS/librepcb");
+            return generatedDir.getPathTo("uuid-generator.app/Contents/MacOS/uuid-generator");
 #elif defined(Q_OS_UNIX) // UNIX/Linux
-            return generatedDir.getPathTo("librepcb");
+            return generatedDir.getPathTo("uuid-generator");
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64) // Windows
-            return generatedDir.getPathTo("librepcb.exe");
+            return generatedDir.getPathTo("uuid-generator.exe");
 #else
 #error "Unknown operating system!"
 #endif
+        }
+
+        QString getTestProcessExeName() const noexcept
+        {
+            return QString("uuid-generator");
         }
 };
 
@@ -63,7 +68,7 @@ TEST_F(SystemInfoTest, testGetUsername)
 {
     // the username must not be empty on any system
     QString username = SystemInfo::getUsername();
-    ASSERT_FALSE(username.isEmpty());
+    EXPECT_FALSE(username.isEmpty());
     std::cout << "Username: " << qPrintable(username) << std::endl;
 }
 
@@ -78,7 +83,7 @@ TEST_F(SystemInfoTest, testGetHostname)
 {
     // the hostname must not be empty on any system
     QString hostname = SystemInfo::getHostname();
-    ASSERT_FALSE(hostname.isEmpty());
+    EXPECT_FALSE(hostname.isEmpty());
     std::cout << "Hostname: " << qPrintable(hostname) << std::endl;
 }
 
@@ -86,34 +91,28 @@ TEST_F(SystemInfoTest, testIsProcessRunning)
 {
     // check this process
     {
-        ASSERT_TRUE(SystemInfo::isProcessRunning(qApp->applicationPid()));
+        EXPECT_TRUE(SystemInfo::isProcessRunning(qApp->applicationPid()));
     }
 
     // check another running process
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)) // QProcess::processId() requires Qt>=5.3
     {
         QProcess process;
-        process.start(getFilepathToLibrepcbExecutable().toStr());
+        process.start(getTestProcessExePath().toStr());
         bool success = process.waitForStarted();
-        if (!success) {
-            std::cout << "Failed to start process: " << qPrintable(process.errorString())
-                      << "[" << process.error() << "]" << std::endl;
-            GTEST_FAIL();
-        }
-        ASSERT_TRUE(SystemInfo::isProcessRunning(process.processId()));
+        ASSERT_TRUE(success) << qPrintable(process.errorString());
+        qint64 pid = process.processId();
+        EXPECT_TRUE(SystemInfo::isProcessRunning(pid));
         process.kill();
         success = process.waitForFinished();
-        if (!success) {
-            std::cout << "Failed to stop process: " << qPrintable(process.errorString())
-                      << "[" << process.error() << "]" << std::endl;
-            GTEST_FAIL();
-        }
+        ASSERT_TRUE(success) << qPrintable(process.errorString());
+        EXPECT_FALSE(SystemInfo::isProcessRunning(pid));
     }
 #endif
 
     // check an invalid process
     {
-        ASSERT_FALSE(SystemInfo::isProcessRunning(999999));
+        EXPECT_FALSE(SystemInfo::isProcessRunning(999999));
     }
 }
 
@@ -121,34 +120,37 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid)
 {
     // check this process
     {
-        ASSERT_EQ("tests", SystemInfo::getProcessNameByPid(qApp->applicationPid()));
+        QString processName = SystemInfo::getProcessNameByPid(qApp->applicationPid());
+        EXPECT_EQ("tests", processName) << qPrintable(processName);
     }
 
     // check another running process
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)) // QProcess::processId() requires Qt>=5.3
     {
         QProcess process;
-        process.start(getFilepathToLibrepcbExecutable().toStr());
+        process.start(getTestProcessExePath().toStr());
         bool success = process.waitForStarted();
-        if (!success) {
-            std::cout << "Failed to start process: " << qPrintable(process.errorString())
-                      << "[" << process.error() << "]" << std::endl;
-            GTEST_FAIL();
-        }
-        ASSERT_NE(process.processId(), qApp->applicationPid());
-        ASSERT_EQ("librepcb", SystemInfo::getProcessNameByPid(process.processId()));
+        ASSERT_TRUE(success) << qPrintable(process.errorString());
+        qint64 pid = process.processId();
+        ASSERT_NE(pid, qApp->applicationPid());
+        // the next line is an ugly workaround for infrequent test failures on Mac OS X
+        QThread::msleep(200); QThread::yieldCurrentThread();
+        QString processName = SystemInfo::getProcessNameByPid(pid);
+        EXPECT_EQ(getTestProcessExeName(), processName) << qPrintable(processName);
         process.kill();
-        if (!success) {
-            std::cout << "Failed to stop process: " << qPrintable(process.errorString())
-                      << "[" << process.error() << "]" << std::endl;
-            GTEST_FAIL();
-        }
+        success = process.waitForFinished();
+        ASSERT_TRUE(success) << qPrintable(process.errorString());
+        // the next line is an ugly workaround for infrequent test failures on Mac OS X
+        QThread::msleep(200); QThread::yieldCurrentThread();
+        processName = SystemInfo::getProcessNameByPid(pid);
+        EXPECT_EQ(QString(), processName) << qPrintable(processName);
     }
 #endif
 
     // check an invalid process
     {
-        ASSERT_EQ(QString(), SystemInfo::getProcessNameByPid(999999));
+        QString processName = SystemInfo::getProcessNameByPid(999999);
+        EXPECT_EQ(QString(), processName) << qPrintable(processName);
     }
 }
 

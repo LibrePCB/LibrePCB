@@ -58,15 +58,15 @@ class DirectoryLockTest : public ::testing::Test
             FileUtils::removeDirRecursively(mTempDir); // can throw
         }
 
-        FilePath getFilepathToLibrepcbExecutable() const noexcept
+        FilePath getTestProcessExePath() const noexcept
         {
             FilePath generatedDir(qApp->applicationDirPath());
 #if defined(Q_OS_OSX) // Mac OS X
-            return generatedDir.getPathTo("librepcb.app/Contents/MacOS/librepcb");
+            return generatedDir.getPathTo("uuid-generator.app/Contents/MacOS/uuid-generator");
 #elif defined(Q_OS_UNIX) // UNIX/Linux
-            return generatedDir.getPathTo("librepcb");
+            return generatedDir.getPathTo("uuid-generator");
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64) // Windows
-            return generatedDir.getPathTo("librepcb.exe");
+            return generatedDir.getPathTo("uuid-generator.exe");
 #else
 #error "Unknown operating system!"
 #endif
@@ -229,21 +229,13 @@ TEST_F(DirectoryLockTest, testMultipleStatusLockUnlock)
 TEST_F(DirectoryLockTest, testStaleLock)
 {
     QProcess process;
-    process.start(getFilepathToLibrepcbExecutable().toStr());
+    process.start(getTestProcessExePath().toStr());
     bool success = process.waitForStarted();
-    if (!success) {
-        std::cout << "Failed to start process: " << qPrintable(process.errorString())
-                  << "[" << process.error() << "]" << std::endl;
-        GTEST_FAIL();
-    }
+    ASSERT_TRUE(success) << qPrintable(process.errorString());
     qint64 pid = process.processId();
     process.kill();
     success = process.waitForFinished();
-    if (!success) {
-        std::cout << "Failed to stop process: " << qPrintable(process.errorString())
-                  << "[" << process.error() << "]" << std::endl;
-        GTEST_FAIL();
-    }
+    ASSERT_TRUE(success) << qPrintable(process.errorString());
 
     // get the lock
     DirectoryLock lock(mTempDir);
