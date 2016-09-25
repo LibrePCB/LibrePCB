@@ -5,3 +5,6 @@
 [submodule "3rdparty/hoedown"]
 	path = 3rdparty/hoedown
 	url = https://github.com/LibrePCB/hoedown.git
+[submodule "3rdparty/quazip"]
+	path = 3rdparty/quazip
+	url = https://github.com/LibrePCB/quazip.git

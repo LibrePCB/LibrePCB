@@ -40,3 +40,6 @@ CONFIG += c++11
 CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
+
+# QuaZIP: use as static library
+DEFINES += QUAZIP_STATIC

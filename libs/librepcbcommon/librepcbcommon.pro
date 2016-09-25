@@ -17,6 +17,9 @@ QT += core widgets xml opengl network sql
 
 CONFIG += staticlib
 
+INCLUDEPATH += \
+    ../../3rdparty/quazip
+
 # set preprocessor defines
 DEFINES += APP_VERSION="\\\"0.1.0\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
@@ -82,7 +85,11 @@ HEADERS += \
     cam/excellongenerator.h \
     fileio/smartversionfile.h \
     fileio/fileutils.h \
-    sqlitedatabase.h
+    sqlitedatabase.h \
+    network/filedownload.h \
+    network/networkrequest.h \
+    network/networkrequestbase.h \
+    network/networkaccessmanager.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -133,7 +140,11 @@ SOURCES += \
     cam/excellongenerator.cpp \
     fileio/smartversionfile.cpp \
     fileio/fileutils.cpp \
-    sqlitedatabase.cpp
+    sqlitedatabase.cpp \
+    network/filedownload.cpp \
+    network/networkrequest.cpp \
+    network/networkrequestbase.cpp \
+    network/networkaccessmanager.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \

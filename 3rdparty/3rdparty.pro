@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     hoedown \
-    gmock
+    gmock \
+    quazip
