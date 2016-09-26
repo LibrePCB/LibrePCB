@@ -643,6 +643,17 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         return false;
     }
 
+    // Save version file
+    try
+    {
+        mVersionFile->save(toOriginal);
+    }
+    catch (Exception& e)
+    {
+        success = false;
+        errors.append(e.getUserMsg());
+    }
+
     // Save *.lpp project file
     try
     {
