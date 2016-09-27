@@ -35,6 +35,7 @@
 #include "items/wsi_librarynormorder.h"
 #include "items/wsi_debugtools.h"
 #include "items/wsi_appearance.h"
+#include "items/wsi_repositories.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -85,6 +86,7 @@ class WorkspaceSettings final : public QObject, public IF_XmlSerializableObject
         WSI_Appearance& getAppearance() const noexcept {return *mAppearance;}
         WSI_LibraryLocaleOrder& getLibLocaleOrder() const noexcept {return *mLibraryLocaleOrder;}
         WSI_LibraryNormOrder& getLibNormOrder() const noexcept {return *mLibraryNormOrder;}
+        WSI_Repositories& getRepositories() const noexcept {return *mRepositories;}
         WSI_DebugTools& getDebugTools() const noexcept {return *mDebugTools;}
 
 
@@ -134,6 +136,7 @@ class WorkspaceSettings final : public QObject, public IF_XmlSerializableObject
         QScopedPointer<WSI_Appearance> mAppearance;
         QScopedPointer<WSI_LibraryLocaleOrder> mLibraryLocaleOrder;
         QScopedPointer<WSI_LibraryNormOrder> mLibraryNormOrder;
+        QScopedPointer<WSI_Repositories> mRepositories;
         QScopedPointer<WSI_DebugTools> mDebugTools;
 };
 

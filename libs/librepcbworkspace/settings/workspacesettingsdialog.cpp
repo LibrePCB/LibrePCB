@@ -62,12 +62,18 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     mUi->libraryLayout->addRow(mSettings.getLibNormOrder().getLabelText(),
                                mSettings.getLibNormOrder().getWidget());
 
+    // tab: repositories
+    mUi->repositoriesLayout->addWidget(mSettings.getRepositories().getWidget());
+
     // tab: debug tools
     mUi->tabWidget->addTab(mSettings.getDebugTools().getWidget(), tr("Debug Tools"));
 
     // load the window geometry
     QSettings clientSettings;
     restoreGeometry(clientSettings.value("workspace_settings_dialog/window_geometry").toByteArray());
+
+    // just in case that the wrong tab is selected in the UI designer:
+    mUi->tabWidget->setCurrentIndex(0);
 }
 
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
@@ -89,6 +95,9 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     // tab: library
     mSettings.getLibLocaleOrder().getWidget()->setParent(0);
     mSettings.getLibNormOrder().getWidget()->setParent(0);
+
+    // tab: repositories
+    mSettings.getRepositories().getWidget()->setParent(0);
 
     // tab: debug tools
     mUi->tabWidget->removeTab(mUi->tabWidget->indexOf(mSettings.getDebugTools().getWidget()));
