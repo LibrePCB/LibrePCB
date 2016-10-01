@@ -197,7 +197,7 @@ INSTANTIATE_TEST_CASE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
                           QString(),
                           QByteArray::fromHex("f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f88"), // wrong
                           false}),
-    FileDownloadTestData({QUrl("https://api.librepcb.org/api/v1/libraries/"),
+    FileDownloadTestData({QUrl("https://api.librepcb.org/api/v1/libraries"),
                           QString("libraries.json"),
                           QString(),
                           QByteArray(),
