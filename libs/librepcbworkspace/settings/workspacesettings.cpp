@@ -65,6 +65,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     loadSettingsItem(mAppearance,               "appearance",                   root);
     loadSettingsItem(mLibraryLocaleOrder,       "lib_locale_order",             root);
     loadSettingsItem(mLibraryNormOrder,         "lib_norm_order",               root);
+    loadSettingsItem(mRepositories,             "repositories",                 root);
     loadSettingsItem(mDebugTools,               "debug_tools",                  root);
 
     // load the settings dialog
