@@ -113,6 +113,24 @@ void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest)
     }
 }
 
+void FileUtils::move(const FilePath& source, const FilePath& dest) throw (Exception)
+{
+    if ((!source.isExistingFile()) && (!source.isExistingDir())) {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            QString(tr("The file or directory \"%1\" does not exist."))
+            .arg(source.toNative()));
+    }
+    if (dest.isExistingFile() || dest.isExistingDir()) {
+        throw LogicError(__FILE__, __LINE__, QString(),
+            QString(tr("The file or directory \"%1\" exists already."))
+            .arg(dest.toNative()));
+    }
+    if (!QDir().rename(source.toStr(), dest.toStr())) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+            "Could not move \"%1\" to \"%2\".")).arg(source.toNative(), dest.toNative()));
+    }
+}
+
 void FileUtils::removeFile(const FilePath& file) throw (Exception)
 {
     if (!QFile::remove(file.toStr())) {
