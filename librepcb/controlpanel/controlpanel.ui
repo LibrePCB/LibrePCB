@@ -58,6 +58,29 @@
      </widget>
     </item>
     <item>
+     <widget class="QLabel" name="lblWarnForNoLibraries">
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+	background-color: rgb(255, 255, 127);
+	
+	color: rgb(170, 0, 0);
+};</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This workspace does not contain any libraries, which are essential to create and modify projects. You should open the library manager to add some libraries.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>5</number>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QSplitter" name="splitter_h">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -161,9 +184,9 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="openLibraryEditorButton">
+            <widget class="QPushButton" name="openLibraryManagerButton">
              <property name="text">
-              <string>Library Editor</string>
+              <string>Library Manager</string>
              </property>
              <property name="icon">
               <iconset resource="../../img/images.qrc">
@@ -421,7 +444,7 @@ QListView::item
      <string>Extras</string>
     </property>
     <addaction name="actionRescanLibrary"/>
-    <addaction name="actionOpen_Library_Editor"/>
+    <addaction name="actionOpen_Library_Manager"/>
     <addaction name="separator"/>
     <addaction name="actionWorkspace_Settings"/>
    </widget>
@@ -500,13 +523,16 @@ QListView::item
     <enum>QAction::PreferencesRole</enum>
    </property>
   </action>
-  <action name="actionOpen_Library_Editor">
+  <action name="actionOpen_Library_Manager">
    <property name="icon">
     <iconset resource="../../img/images.qrc">
      <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
    </property>
    <property name="text">
-    <string>Open Library Editor</string>
+    <string>Open Library Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Library Manager</string>
    </property>
   </action>
   <action name="actionClose_all_open_projects">
@@ -562,9 +588,9 @@ QListView::item
    </hints>
   </connection>
   <connection>
-   <sender>openLibraryEditorButton</sender>
+   <sender>openLibraryManagerButton</sender>
    <signal>clicked()</signal>
-   <receiver>actionOpen_Library_Editor</receiver>
+   <receiver>actionOpen_Library_Manager</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

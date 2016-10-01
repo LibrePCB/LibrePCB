@@ -41,6 +41,7 @@ class ProjectEditor;
 
 namespace workspace {
 class Workspace;
+class LibraryManager;
 }
 
 namespace Ui {
@@ -88,6 +89,7 @@ class ControlPanel final : public QMainWindow
         void on_actionAbout_triggered();
         void on_actionNew_Project_triggered();
         void on_actionOpen_Project_triggered();
+        void on_actionOpen_Library_Manager_triggered();
         void on_actionClose_all_open_projects_triggered();
         void on_actionSwitch_Workspace_triggered();
         void on_projectTreeView_clicked(const QModelIndex& index);
@@ -100,6 +102,7 @@ class ControlPanel final : public QMainWindow
         void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
         void on_actionRescanLibrary_triggered();
+
 
     private:
 
@@ -178,7 +181,8 @@ class ControlPanel final : public QMainWindow
 
         // Attributes
         workspace::Workspace& mWorkspace;
-        Ui::ControlPanel* mUi;
+        QScopedPointer<Ui::ControlPanel> mUi;
+        QScopedPointer<workspace::LibraryManager> mLibraryManager;
         QHash<QString, project::ProjectEditor*> mOpenProjectEditors;
 };
 
