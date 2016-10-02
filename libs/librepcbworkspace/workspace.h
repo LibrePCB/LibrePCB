@@ -27,6 +27,7 @@
 #include <librepcbcommon/fileio/directorylock.h>
 #include <librepcbcommon/exceptions.h>
 #include <librepcbcommon/version.h>
+#include <librepcbcommon/uuid.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -128,6 +129,17 @@ class Workspace final : public QObject
         // Library Management
 
         /**
+         * @brief Get the (highest) version of a specific library
+         *
+         * @param uuid      The uuid of the library
+         * @param local     If true, local libraries are searched
+         * @param remote    If true, remote libraries are searched
+         *
+         * @return The highest version of the library (invalid if library not installed)
+         */
+        Version getVersionOfLibrary(const Uuid& uuid, bool local = true, bool remote = true) const noexcept;
+
+        /**
          * @brief Get all local libraries (located in "workspace/v#/libraries/local")
          *
          * @return A list of all local libraries
@@ -165,19 +177,21 @@ class Workspace final : public QObject
          * @brief Remove a local library
          *
          * @param libDirName    The name of the (existing) local library directory
+         * @param rmDir         It true, the library's directory will be removed
          *
          * @throws Exception on error
          */
-        void removeLocalLibrary(const QString& libDirName) throw (Exception);
+        void removeLocalLibrary(const QString& libDirName, bool rmDir = true) throw (Exception);
 
         /**
          * @brief Remove a remote library
          *
          * @param libDirName    The name of the (existing) remote library directory
+         * @param rmDir         It true, the library's directory will be removed
          *
          * @throws Exception on error
          */
-        void removeRemoteLibrary(const QString& libDirName) throw (Exception);
+        void removeRemoteLibrary(const QString& libDirName, bool rmDir = true) throw (Exception);
 
 
         /**
@@ -276,6 +290,12 @@ class Workspace final : public QObject
          * @return The choosen filepath (is invalid on error or user cancel)
          */
         static FilePath chooseWorkspacePath() noexcept;
+
+
+    signals:
+
+        void libraryAdded(const FilePath& libDir);
+        void libraryRemoved(const FilePath& libDir);
 
 
     private: // Data

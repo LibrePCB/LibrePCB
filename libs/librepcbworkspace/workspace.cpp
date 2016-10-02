@@ -180,12 +180,33 @@ QAbstractItemModel& Workspace::getFavoriteProjectsModel() const noexcept
  *  Library Management
  ****************************************************************************************/
 
+Version Workspace::getVersionOfLibrary(const Uuid& uuid, bool local, bool remote) const noexcept
+{
+    Version version;
+    if (local) {
+        foreach (const auto& lib, mLocalLibraries) { Q_ASSERT(lib);
+            if ((lib->getUuid() == uuid) && ((!version.isValid()) || (version < lib->getVersion()))) {
+                version = lib->getVersion();
+            }
+        }
+    }
+    if (remote) {
+        foreach (const auto& lib, mRemoteLibraries) { Q_ASSERT(lib);
+            if ((lib->getUuid() == uuid) && ((!version.isValid()) || (version < lib->getVersion()))) {
+                version = lib->getVersion();
+            }
+        }
+    }
+    return version;
+}
+
 void Workspace::addLocalLibrary(const QString& libDirName) throw (Exception)
 {
     if (!mLocalLibraries.contains(libDirName)) {
         FilePath libDirPath = mLibrariesPath.getPathTo("local").getPathTo(libDirName);
         QSharedPointer<Library> library(new Library(libDirPath, false)); // can throw
         mLocalLibraries.insert(libDirName, library);
+        emit libraryAdded(libDirPath);
     }
 }
 
@@ -196,26 +217,29 @@ void Workspace::addRemoteLibrary(const QString& libDirName) throw (Exception)
         FilePath libDirPath = mLibrariesPath.getPathTo("remote").getPathTo(libDirName);
         QSharedPointer<Library> library(new Library(libDirPath, true)); // can throw
         mRemoteLibraries.insert(libDirName, library);
+        emit libraryAdded(libDirPath);
     }
 }
 
-void Workspace::removeLocalLibrary(const QString& libDirName) throw (Exception)
+void Workspace::removeLocalLibrary(const QString& libDirName, bool rmDir) throw (Exception)
 {
     Library* library = mLocalLibraries.value(libDirName).data();
     if (library) {
         FilePath libDirPath = library->getFilePath();
         mLocalLibraries.remove(libDirName);
-        FileUtils::removeDirRecursively(libDirPath); // can throw
+        emit libraryRemoved(libDirPath);
+        if (rmDir)  FileUtils::removeDirRecursively(libDirPath); // can throw
     }
 }
 
-void Workspace::removeRemoteLibrary(const QString& libDirName) throw (Exception)
+void Workspace::removeRemoteLibrary(const QString& libDirName, bool rmDir) throw (Exception)
 {
     Library* library = mRemoteLibraries.value(libDirName).data();
     if (library) {
         FilePath libDirPath = library->getFilePath();
         mRemoteLibraries.remove(libDirName);
-        FileUtils::removeDirRecursively(libDirPath); // can throw
+        emit libraryRemoved(libDirPath);
+        if (rmDir) FileUtils::removeDirRecursively(libDirPath); // can throw
     }
 }
 
