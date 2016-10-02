@@ -89,7 +89,8 @@ HEADERS += \
     network/filedownload.h \
     network/networkrequest.h \
     network/networkrequestbase.h \
-    network/networkaccessmanager.h
+    network/networkaccessmanager.h \
+    network/repository.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -144,7 +145,8 @@ SOURCES += \
     network/filedownload.cpp \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
-    network/networkaccessmanager.cpp
+    network/networkaccessmanager.cpp \
+    network/repository.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
