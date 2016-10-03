@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/img">
+        <file>actions/add.png</file>
         <file>actions/add_via.png</file>
         <file>actions/apply.png</file>
         <file>actions/bookmark.png</file>
