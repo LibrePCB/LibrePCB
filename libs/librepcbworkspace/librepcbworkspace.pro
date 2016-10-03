@@ -13,7 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml sql printsupport
+QT += core widgets xml sql printsupport network
 
 CONFIG += staticlib
 
@@ -40,7 +40,8 @@ SOURCES += \
     library/cat/categorytreemodel.cpp \
     library/cat/categorytreeitem.cpp \
     library/workspacelibraryscanner.cpp \
-    settings/items/wsi_repositories.cpp
+    settings/items/wsi_repositories.cpp \
+    library/manager/librarydownload.cpp
 
 HEADERS += \
     workspace.h \
@@ -62,7 +63,8 @@ HEADERS += \
     library/cat/categorytreemodel.h \
     library/cat/categorytreeitem.h \
     library/workspacelibraryscanner.h \
-    settings/items/wsi_repositories.h
+    settings/items/wsi_repositories.h \
+    library/manager/librarydownload.h
 
 FORMS += \
     workspacechooserdialog.ui \
