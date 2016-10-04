@@ -31,6 +31,7 @@
 #include <librepcbworkspace/projecttreemodel.h>
 #include <librepcbworkspace/projecttreeitem.h>
 #include <librepcbworkspace/library/workspacelibrarydb.h>
+#include <librepcbworkspace/library/manager/librarymanager.h>
 #include <librepcbprojecteditor/projecteditor.h>
 #include <librepcbprojecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcbcommon/application.h>
@@ -49,7 +50,8 @@ using namespace workspace;
  ****************************************************************************************/
 
 ControlPanel::ControlPanel(Workspace& workspace) :
-    QMainWindow(0), mWorkspace(workspace), mUi(new librepcb::Ui::ControlPanel)
+    QMainWindow(nullptr), mWorkspace(workspace), mUi(new librepcb::Ui::ControlPanel),
+    mLibraryManager(new LibraryManager(mWorkspace, this))
 {
     mUi->setupUi(this);
 
@@ -83,6 +85,15 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     Version highestVersion = Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
     mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
 
+    // decide if we have to show the warning about missing workspace libraries
+    if (mWorkspace.getLocalLibraries().isEmpty() && mWorkspace.getRemoteLibraries().isEmpty()) {
+        mUi->lblWarnForNoLibraries->setVisible(true);
+        connect(&mWorkspace, &Workspace::libraryAdded,
+                mUi->lblWarnForNoLibraries, &QLabel::hide);
+    } else {
+        mUi->lblWarnForNoLibraries->setVisible(false);
+    }
+
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionQuit, &QAction::triggered,
             this, &ControlPanel::close);
@@ -111,7 +122,8 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 ControlPanel::~ControlPanel()
 {
     closeAllProjects(false);
-    delete mUi;              mUi = 0;
+    mLibraryManager.reset();
+    mUi.reset();
 }
 
 void ControlPanel::closeEvent(QCloseEvent *event)
@@ -366,6 +378,13 @@ void ControlPanel::on_actionOpen_Project_triggered()
     settings.setValue("controlpanel/last_open_project", filepath.toNative());
 
     openProject(filepath);
+}
+
+void ControlPanel::on_actionOpen_Library_Manager_triggered()
+{
+    mLibraryManager->show();
+    mLibraryManager->raise();
+    mLibraryManager->activateWindow();
 }
 
 void ControlPanel::on_actionClose_all_open_projects_triggered()

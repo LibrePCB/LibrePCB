@@ -102,6 +102,17 @@ class FileUtils final
         static void copyDirRecursively(const FilePath& source, const FilePath& dest) throw (Exception);
 
         /**
+         * @brief Move/rename a file or directory
+         *
+         * @param source        Filepath to an existing file or directory.
+         * @param dest          Filepath to a non-existing file/directory (if it exists
+         *                      already, an exception will be thrown).
+         *
+         * @throws Exception    If an error occurs.
+         */
+        static void move(const FilePath& source, const FilePath& dest) throw (Exception);
+
+        /**
          * @brief Remove a single file
          *
          * @param file          Filepath to a file (may or may not exist).

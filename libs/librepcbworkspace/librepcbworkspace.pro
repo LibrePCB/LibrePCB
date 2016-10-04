@@ -13,7 +13,7 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml sql printsupport
+QT += core widgets xml sql printsupport network
 
 CONFIG += staticlib
 
@@ -39,7 +39,14 @@ SOURCES += \
     library/workspacelibrarydb.cpp \
     library/cat/categorytreemodel.cpp \
     library/cat/categorytreeitem.cpp \
-    library/workspacelibraryscanner.cpp
+    library/workspacelibraryscanner.cpp \
+    settings/items/wsi_repositories.cpp \
+    library/manager/librarydownload.cpp \
+    library/manager/librarylistwidgetitem.cpp \
+    library/manager/libraryinfowidget.cpp \
+    library/manager/addlibrarywidget.cpp \
+    library/manager/librarymanager.cpp \
+    library/manager/repositorylibrarylistwidgetitem.cpp
 
 HEADERS += \
     workspace.h \
@@ -60,8 +67,20 @@ HEADERS += \
     library/workspacelibrarydb.h \
     library/cat/categorytreemodel.h \
     library/cat/categorytreeitem.h \
-    library/workspacelibraryscanner.h
+    library/workspacelibraryscanner.h \
+    settings/items/wsi_repositories.h \
+    library/manager/librarydownload.h \
+    library/manager/librarylistwidgetitem.h \
+    library/manager/libraryinfowidget.h \
+    library/manager/addlibrarywidget.h \
+    library/manager/librarymanager.h \
+    library/manager/repositorylibrarylistwidgetitem.h
 
 FORMS += \
     workspacechooserdialog.ui \
-    settings/workspacesettingsdialog.ui
+    settings/workspacesettingsdialog.ui \
+    library/manager/librarylistwidgetitem.ui \
+    library/manager/libraryinfowidget.ui \
+    library/manager/addlibrarywidget.ui \
+    library/manager/librarymanager.ui \
+    library/manager/repositorylibrarylistwidgetitem.ui
