@@ -22,11 +22,13 @@ INCLUDEPATH += \
 
 SOURCES += \
     common/categorychooserdialog.cpp \
+    common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
     libraryeditor.cpp \
 
 HEADERS += \
     common/categorychooserdialog.h \
+    common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
     libraryeditor.h \
 
