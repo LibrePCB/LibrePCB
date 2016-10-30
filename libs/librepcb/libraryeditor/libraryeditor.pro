@@ -27,6 +27,30 @@ SOURCES += \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
     libraryeditor.cpp \
+    pkg/dialogs/footprintpadpropertiesdialog.cpp \
+    pkg/footprintlisteditorwidget.cpp \
+    pkg/fsm/cmd/cmdmoveselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmdremoveselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmdrotateselectedfootprintitems.cpp \
+    pkg/fsm/packageeditorfsm.cpp \
+    pkg/fsm/packageeditorstate.cpp \
+    pkg/fsm/packageeditorstate_addholes.cpp \
+    pkg/fsm/packageeditorstate_addnames.cpp \
+    pkg/fsm/packageeditorstate_addpads.cpp \
+    pkg/fsm/packageeditorstate_addvalues.cpp \
+    pkg/fsm/packageeditorstate_drawellipse.cpp \
+    pkg/fsm/packageeditorstate_drawline.cpp \
+    pkg/fsm/packageeditorstate_drawpolygon.cpp \
+    pkg/fsm/packageeditorstate_drawpolygonbase.cpp \
+    pkg/fsm/packageeditorstate_drawrect.cpp \
+    pkg/fsm/packageeditorstate_drawtext.cpp \
+    pkg/fsm/packageeditorstate_drawtextbase.cpp \
+    pkg/fsm/packageeditorstate_select.cpp \
+    pkg/packageeditorwidget.cpp \
+    pkg/packagepadlisteditorwidget.cpp \
+    pkg/widgets/boardsideselectorwidget.cpp \
+    pkg/widgets/footprintpadshapeselectorwidget.cpp \
+    pkg/widgets/packagepadcombobox.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/dialogs/symbolpinpropertiesdialog.cpp \
     sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp \
@@ -54,6 +78,30 @@ HEADERS += \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
     libraryeditor.h \
+    pkg/dialogs/footprintpadpropertiesdialog.h \
+    pkg/footprintlisteditorwidget.h \
+    pkg/fsm/cmd/cmdmoveselectedfootprintitems.h \
+    pkg/fsm/cmd/cmdremoveselectedfootprintitems.h \
+    pkg/fsm/cmd/cmdrotateselectedfootprintitems.h \
+    pkg/fsm/packageeditorfsm.h \
+    pkg/fsm/packageeditorstate.h \
+    pkg/fsm/packageeditorstate_addholes.h \
+    pkg/fsm/packageeditorstate_addnames.h \
+    pkg/fsm/packageeditorstate_addpads.h \
+    pkg/fsm/packageeditorstate_addvalues.h \
+    pkg/fsm/packageeditorstate_drawellipse.h \
+    pkg/fsm/packageeditorstate_drawline.h \
+    pkg/fsm/packageeditorstate_drawpolygon.h \
+    pkg/fsm/packageeditorstate_drawpolygonbase.h \
+    pkg/fsm/packageeditorstate_drawrect.h \
+    pkg/fsm/packageeditorstate_drawtext.h \
+    pkg/fsm/packageeditorstate_drawtextbase.h \
+    pkg/fsm/packageeditorstate_select.h \
+    pkg/packageeditorwidget.h \
+    pkg/packagepadlisteditorwidget.h \
+    pkg/widgets/boardsideselectorwidget.h \
+    pkg/widgets/footprintpadshapeselectorwidget.h \
+    pkg/widgets/packagepadcombobox.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/dialogs/symbolpinpropertiesdialog.h \
     sym/fsm/cmd/cmdmoveselectedsymbolitems.h \
@@ -79,6 +127,8 @@ FORMS += \
     common/categorychooserdialog.ui \
     common/categorylisteditorwidget.ui \
     libraryeditor.ui \
+    pkg/dialogs/footprintpadpropertiesdialog.ui \
+    pkg/packageeditorwidget.ui \
     pkgcat/packagecategoryeditorwidget.ui \
     sym/dialogs/symbolpinpropertiesdialog.ui \
     sym/symboleditorwidget.ui \
