@@ -88,6 +88,7 @@ class FootprintPadPreviewGraphicsItem final : public QGraphicsItem
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
+        QFont mFont;
 };
 
 /*****************************************************************************************

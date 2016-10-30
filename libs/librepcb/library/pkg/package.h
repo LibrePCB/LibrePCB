@@ -39,7 +39,18 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Package class
+ * @brief The Package class represents a package of a component (including footprint and
+ *        3D model)
+ *
+ * Following information is considered as the "interface" of a package and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Package pads (neither adding nor removing pads is allowed)
+ *    - UUID
+ *  - Footprints (adding new footprints is allowed, but removing not)
+ *    - UUID
+ *    - Footprint pads (neither adding nor removing pads is allowed)
+ *      - UUID
  */
 class Package final : public LibraryElement
 {
@@ -56,21 +67,11 @@ class Package final : public LibraryElement
         Package(const FilePath& elementDirectory, bool readOnly);
         ~Package() noexcept;
 
-        // PackagePad Methods
-        const QMap<Uuid, PackagePad*>& getPads() noexcept {return mPads;}
-        QList<Uuid> getPadUuids() const noexcept {return mPads.keys();}
-        PackagePad* getPadByUuid(const Uuid& uuid) noexcept {return mPads.value(uuid);}
-        const PackagePad* getPadByUuid(const Uuid& uuid) const noexcept {return mPads.value(uuid);}
-        void addPad(PackagePad& pad) noexcept;
-        void removePad(PackagePad& pad) noexcept;
-
-        // Footprint Methods
-        const QMap<Uuid, Footprint*>& getFootprints() noexcept {return mFootprints;}
-        QList<Uuid> getFootprintUuids() const noexcept {return mFootprints.keys();}
-        const Footprint* getFootprintByUuid(const Uuid& uuid) const noexcept {return mFootprints.value(uuid);}
-        Footprint* getFootprintByUuid(const Uuid& uuid) noexcept {return mFootprints.value(uuid);}
-        void addFootprint(Footprint& footprint) noexcept;
-        void removeFootprint(Footprint& footprint) noexcept;
+        // Getters
+        PackagePadList& getPads() noexcept {return mPads;}
+        const PackagePadList& getPads() const noexcept {return mPads;}
+        FootprintList& getFootprints() noexcept {return mFootprints;}
+        const FootprintList& getFootprints() const noexcept {return mFootprints;}
 
         // Operator Overloadings
         Package& operator=(const Package& rhs) = delete;
@@ -80,18 +81,16 @@ class Package final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("package");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
-        QMap<Uuid, PackagePad*> mPads; ///< empty if the package has no pads
-        QMap<Uuid, Footprint*> mFootprints; ///< minimum one footprint
+    private: // Data
+        PackagePadList mPads; ///< empty list if the package has no pads
+        FootprintList mFootprints; ///< minimum one footprint
 };
 
 /*****************************************************************************************

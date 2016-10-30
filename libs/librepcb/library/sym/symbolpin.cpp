@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "symbolpin.h"
+#include "symbolpingraphicsitem.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,9 +34,16 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+SymbolPin::SymbolPin(const SymbolPin& other) noexcept :
+    mRegisteredGraphicsItem(nullptr)
+{
+    *this = other; // use assignment operator
+}
+
 SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
                      const Length& length, const Angle& rotation) noexcept :
-    mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation)
+    mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation),
+    mRegisteredGraphicsItem(nullptr)
 {
     Q_ASSERT(!mUuid.isNull());
     Q_ASSERT(!mName.isEmpty());
@@ -43,7 +51,7 @@ SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& positio
 }
 
 SymbolPin::SymbolPin(const DomElement& domElement) :
-    mUuid(), mPosition(), mLength(), mRotation()
+    mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -58,6 +66,7 @@ SymbolPin::SymbolPin(const DomElement& domElement) :
 
 SymbolPin::~SymbolPin() noexcept
 {
+    Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*****************************************************************************************
@@ -68,27 +77,43 @@ void SymbolPin::setName(const QString& name) noexcept
 {
     Q_ASSERT(!name.isEmpty());
     mName = name;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setName(mName);
 }
 
 void SymbolPin::setPosition(const Point& pos) noexcept
 {
     mPosition = pos;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
 }
 
 void SymbolPin::setLength(const Length& length) noexcept
 {
     Q_ASSERT(length >= 0);
     mLength = length;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLength(mLength);
 }
 
 void SymbolPin::setRotation(const Angle& rotation) noexcept
 {
     mRotation = rotation;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void SymbolPin::registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept
+{
+    Q_ASSERT(!mRegisteredGraphicsItem);
+    mRegisteredGraphicsItem = &item;
+}
+
+void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept
+{
+    Q_ASSERT(mRegisteredGraphicsItem == &item);
+    mRegisteredGraphicsItem = nullptr;
+}
 
 void SymbolPin::serialize(DomElement& root) const
 {
@@ -100,6 +125,30 @@ void SymbolPin::serialize(DomElement& root) const
     root.setAttribute("length", mLength);
     root.setAttribute("rotation", mRotation);
     root.setText(mName);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool SymbolPin::operator==(const SymbolPin& rhs) const noexcept
+{
+    if (mUuid != rhs.mUuid)         return false;
+    if (mName != rhs.mName)         return false;
+    if (mPosition != rhs.mPosition) return false;
+    if (mLength != rhs.mLength)     return false;
+    if (mRotation != rhs.mRotation) return false;
+    return true;
+}
+
+SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept
+{
+    mUuid = rhs.mUuid;
+    mName = rhs.mName;
+    mPosition = rhs.mPosition;
+    mLength = rhs.mLength;
+    mRotation = rhs.mRotation;
+    return *this;
 }
 
 /*****************************************************************************************

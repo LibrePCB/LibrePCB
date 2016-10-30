@@ -42,6 +42,11 @@ FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_Graphi
         const PackagePad* pkgPad) noexcept :
     QGraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
 {
+    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    mFont.setStyleHint(QFont::SansSerif);
+    mFont.setFamily("Helvetica");
+    mFont.setPixelSize(2);
+
     if (mPackagePad)
         setToolTip(mPackagePad->getName());
 
@@ -75,12 +80,23 @@ void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptio
 {
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);
+    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
+    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw shape
     QBrush brush(mLayer->getColor(selected), Qt::SolidPattern);
     painter->setPen(Qt::NoPen);
     painter->setBrush(brush);
     painter->drawPath(mShape);
+
+    // draw text
+    if ((!deviceIsPrinter) && (lod > 3)) {
+        QColor color = mLayer->getColor(selected).lighter(150);
+        color.setAlpha(255);
+        painter->setPen(color);
+        painter->setFont(mFont);
+        painter->drawText(mBoundingRect, Qt::AlignCenter, mPackagePad->getName());
+    }
 
 #ifdef QT_DEBUG
     if (mDrawBoundingRect)

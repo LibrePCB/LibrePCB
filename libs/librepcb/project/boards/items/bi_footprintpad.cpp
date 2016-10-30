@@ -55,17 +55,9 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
     BI_Base(footprint.getBoard()), mFootprint(footprint), mFootprintPad(nullptr),
     mPackagePad(nullptr), mComponentSignalInstance(nullptr)
 {
-    mFootprintPad = mFootprint.getLibFootprint().getPadByUuid(padUuid);
-    if (!mFootprintPad) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
-    }
-    mPackagePad = mFootprint.getDeviceInstance().getLibPackage().getPadByUuid(padUuid);
-    if (!mPackagePad) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid package pad UUID: \"%1\"")).arg(padUuid.toStr()));
-    }
-    Uuid cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getSignalOfPad(padUuid);
+    mFootprintPad = mFootprint.getLibFootprint().getPads().get(padUuid).get(); // can throw
+    mPackagePad = mFootprint.getDeviceInstance().getLibPackage().getPads().get(padUuid).get(); // can throw
+    Uuid cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getPadSignalMap().get(padUuid)->getSignalUuid(); // can throw
     mComponentSignalInstance = mFootprint.getDeviceInstance().getComponentInstance().getSignalInstance(cmpSignalUuid);
 
     mGraphicsItem.reset(new BGI_FootprintPad(*this));
@@ -88,7 +80,7 @@ BI_FootprintPad::~BI_FootprintPad()
 
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept
 {
-    return mFootprintPad->getUuid();
+    return mFootprintPad->getPackagePadUuid();
 }
 
 QString BI_FootprintPad::getDisplayText() const noexcept
@@ -167,8 +159,7 @@ void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
         || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
         || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal())
         || (!netpoint.getLayer().isCopperLayer())
-        || ((mFootprintPad->getTechnology() == library::FootprintPad::Technology_t::SMT)
-            && (netpoint.getLayer().getName() != getLayerName())))
+        || (!isOnLayer(netpoint.getLayer().getName())))
     {
         throw LogicError(__FILE__, __LINE__);
     }

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "symbol.h"
+#include "symbolgraphicsitem.h"
 #include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
@@ -38,139 +39,141 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US)
+                   name_en_US, description_en_US, keywords_en_US),
+    mPins(this), mPolygons(this), mEllipses(this), mTexts(this),
+    mRegisteredGraphicsItem(nullptr)
 {
 }
 
 Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
+    mPins(this), mPolygons(this), mEllipses(this), mTexts(this),
+    mRegisteredGraphicsItem(nullptr)
 {
-    try
-    {
-        const DomElement& root = mLoadingXmlFileDocument->getRoot();
+    const DomElement& root = mLoadingXmlFileDocument->getRoot();
+    mPins.loadFromDomElement(root); // can throw
+    mPolygons.loadFromDomElement(root); // can throw
+    mEllipses.loadFromDomElement(root); // can throw
+    mTexts.loadFromDomElement(root); // can throw
 
-        // Load all pins
-        foreach (const DomElement* node, root.getChilds("pin")) {
-            SymbolPin* pin = new SymbolPin(*node);
-            if (mPins.contains(pin->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
-                    .arg(pin->getUuid().toStr(), root.getDocFilePath().toNative()));
-            }
-            mPins.insert(pin->getUuid(), pin);
-        }
-
-        // Load all polygons
-        foreach (const DomElement* node, root.getChilds("polygon")) {
-            mPolygons.append(new Polygon(*node));
-        }
-
-        // Load all ellipses
-        foreach (const DomElement* node, root.getChilds("ellipse")) {
-            mEllipses.append(new Ellipse(*node));
-        }
-
-        // Load all texts
-        foreach (const DomElement* node, root.getChilds("text")) {
-            mTexts.append(new Text(*node));
-        }
-
-        cleanupAfterLoadingElementFromFile();
-    }
-    catch (Exception& e)
-    {
-        qDeleteAll(mTexts);         mTexts.clear();
-        qDeleteAll(mEllipses);      mEllipses.clear();
-        qDeleteAll(mPolygons);      mPolygons.clear();
-        qDeleteAll(mPins);          mPins.clear();
-        throw;
-    }
+    cleanupAfterLoadingElementFromFile();
 }
 
 Symbol::~Symbol() noexcept
 {
-    qDeleteAll(mTexts);         mTexts.clear();
-    qDeleteAll(mEllipses);      mEllipses.clear();
-    qDeleteAll(mPolygons);      mPolygons.clear();
-    qDeleteAll(mPins);          mPins.clear();
+    Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*****************************************************************************************
- *  FootprintPad Methods
+ *  General Methods
  ****************************************************************************************/
 
-void Symbol::addPin(SymbolPin& pin) noexcept
+void Symbol::registerGraphicsItem(SymbolGraphicsItem& item) noexcept
 {
-    Q_ASSERT(!mPins.contains(pin.getUuid()));
-    mPins.insert(pin.getUuid(), &pin);
+    Q_ASSERT(!mRegisteredGraphicsItem);
+    mRegisteredGraphicsItem = &item;
 }
 
-void Symbol::removePin(SymbolPin& pin) noexcept
+void Symbol::unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept
 {
-    Q_ASSERT(mPins.contains(pin.getUuid()));
-    Q_ASSERT(mPins.value(pin.getUuid()) == &pin);
-    mPins.remove(pin.getUuid());
-}
-
-/*****************************************************************************************
- *  Polygon Methods
- ****************************************************************************************/
-
-void Symbol::addPolygon(Polygon& polygon) noexcept
-{
-    Q_ASSERT(!mPolygons.contains(&polygon));
-    mPolygons.append(&polygon);
-}
-
-void Symbol::removePolygon(Polygon& polygon) noexcept
-{
-    Q_ASSERT(mPolygons.contains(&polygon));
-    mPolygons.removeAll(&polygon);
-}
-
-/*****************************************************************************************
- *  Ellipse Methods
- ****************************************************************************************/
-
-void Symbol::addEllipse(Ellipse& ellipse) noexcept
-{
-    Q_ASSERT(!mEllipses.contains(&ellipse));
-    mEllipses.append(&ellipse);
-}
-
-void Symbol::removeEllipse(Ellipse& ellipse) noexcept
-{
-    Q_ASSERT(mEllipses.contains(&ellipse));
-    mEllipses.removeAll(&ellipse);
-}
-
-/*****************************************************************************************
- *  Text Methods
- ****************************************************************************************/
-
-void Symbol::addText(Text& text) noexcept
-{
-    Q_ASSERT(!mTexts.contains(&text));
-    mTexts.append(&text);
-}
-
-void Symbol::removeText(Text& text) noexcept
-{
-    Q_ASSERT(mTexts.contains(&text));
-    mTexts.removeAll(&text);
+    Q_ASSERT(mRegisteredGraphicsItem == &item);
+    mRegisteredGraphicsItem = nullptr;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
+void Symbol::listObjectAdded(const SymbolPinList& list, int newIndex,
+                             const std::shared_ptr<SymbolPin>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mPins);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPin(*ptr);
+}
+
+void Symbol::listObjectAdded(const PolygonList& list, int newIndex,
+                             const std::shared_ptr<Polygon>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mPolygons);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPolygon(*ptr);
+}
+
+void Symbol::listObjectAdded(const EllipseList& list, int newIndex,
+                             const std::shared_ptr<Ellipse>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mEllipses);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addEllipse(*ptr);
+}
+
+void Symbol::listObjectAdded(const TextList& list, int newIndex,
+                             const std::shared_ptr<Text>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mTexts);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addText(*ptr);
+}
+
+void Symbol::listObjectRemoved(const SymbolPinList& list, int oldIndex,
+                               const std::shared_ptr<SymbolPin>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mPins);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePin(*ptr);
+}
+
+void Symbol::listObjectRemoved(const PolygonList& list, int oldIndex,
+                               const std::shared_ptr<Polygon>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mPolygons);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePolygon(*ptr);
+}
+
+void Symbol::listObjectRemoved(const EllipseList& list, int oldIndex,
+                               const std::shared_ptr<Ellipse>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mEllipses);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeEllipse(*ptr);
+}
+
+void Symbol::listObjectRemoved(const TextList& list, int oldIndex,
+                               const std::shared_ptr<Text>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mTexts);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeText(*ptr);
+}
+
 void Symbol::serialize(DomElement& root) const
 {
     LibraryElement::serialize(root);
-    serializePointerContainer(root, mPins,     "pin");
-    serializePointerContainer(root, mPolygons, "polygon");
-    serializePointerContainer(root, mEllipses, "ellipse");
-    serializePointerContainer(root, mTexts,    "text");
+    mPins.serialize(root);
+    mPolygons.serialize(root);
+    mEllipses.serialize(root);
+    mTexts.serialize(root);
+}
+
+bool Symbol::checkAttributesValidity() const noexcept
+{
+    // symbol pin uuids and names must be unique
+    QList<Uuid> uuids;
+    QList<QString> names;
+    for (const SymbolPin& pin : mPins) {
+        Uuid uuid = pin.getUuid();
+        QString name = pin.getName();
+        if (uuid.isNull() || uuids.contains(uuid) || names.contains(name)) {
+            return false;
+        } else {
+            uuids.append(uuid);
+            names.append(name);
+        }
+    }
+
+    return true;
 }
 
 /*****************************************************************************************

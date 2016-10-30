@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "../cmp/componentsymbolvariantitem.h"
+#include "../cmp/cmpsigpindisplaytype.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -54,12 +54,10 @@ class SymbolPinPreviewGraphicsItem final : public QGraphicsItem
 {
     public:
 
-        // Types
-        using PinDisplayType_t = ComponentPinSignalMapItem::PinDisplayType_t;
-
         // Constructors / Destructor
         explicit SymbolPinPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
-            const SymbolPin& pin, const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept;
+            const SymbolPin& pin, const ComponentSignal* compSignal,
+            const CmpSigPinDisplayType& displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -85,7 +83,7 @@ class SymbolPinPreviewGraphicsItem final : public QGraphicsItem
         // General Attributes
         const SymbolPin& mPin;
         const ComponentSignal* mComponentSignal;
-        PinDisplayType_t mDisplayType;
+        CmpSigPinDisplayType mDisplayType;
         GraphicsLayer* mCircleLayer;
         GraphicsLayer* mLineLayer;
         GraphicsLayer* mTextLayer;

@@ -24,6 +24,7 @@
 #include <librepcb/common/fileio/domelement.h>
 #include "footprint.h"
 #include "package.h"
+#include "footprintgraphicsitem.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,184 +36,185 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+Footprint::Footprint(const Footprint& other) noexcept :
+    mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
+    mRegisteredGraphicsItem(nullptr)
+{
+    *this = other;
+}
+
 Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
                      const QString& description_en_US) :
-    mUuid(uuid)
+    mUuid(uuid), mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
+    mRegisteredGraphicsItem(nullptr)
 {
     Q_ASSERT(mUuid.isNull() == false);
     mNames.setDefaultValue(name_en_US);
     mDescriptions.setDefaultValue(description_en_US);
 }
 
-Footprint::Footprint(const DomElement& domElement)
+Footprint::Footprint(const DomElement& domElement) :
+    mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
+    mRegisteredGraphicsItem(nullptr)
 {
-    try
-    {
-        // read attributes
-        mUuid = domElement.getAttribute<Uuid>("uuid", true);
-        mNames.loadFromDomElement(domElement);
-        mDescriptions.loadFromDomElement(domElement);
+    // read attributes
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mNames.loadFromDomElement(domElement);
+    mDescriptions.loadFromDomElement(domElement);
 
-        // Load all pads
-        foreach (const DomElement* node, domElement.getChilds("pad")) {
-            FootprintPad* pad = FootprintPad::fromDomElement(*node);
-            if (mPads.contains(pad->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                    .arg(pad->getUuid().toStr(), domElement.getDocFilePath().toNative()));
-            }
-            mPads.insert(pad->getUuid(), pad);
-        }
-
-        // Load all polygons
-        foreach (const DomElement* node, domElement.getChilds("polygon")) {
-            mPolygons.append(new Polygon(*node));
-        }
-
-        // Load all ellipses
-        foreach (const DomElement* node, domElement.getChilds("ellipse")) {
-            mEllipses.append(new Ellipse(*node));
-        }
-
-        // Load all texts
-        foreach (const DomElement* node, domElement.getChilds("text")) {
-            mTexts.append(new Text(*node));
-        }
-
-        // Load all holes
-        foreach (const DomElement* node, domElement.getChilds("hole")) {
-            mHoles.append(new Hole(*node));
-        }
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    }
-    catch (Exception& e) {
-        qDeleteAll(mHoles);         mHoles.clear();
-        qDeleteAll(mTexts);         mTexts.clear();
-        qDeleteAll(mEllipses);      mEllipses.clear();
-        qDeleteAll(mPolygons);      mPolygons.clear();
-        qDeleteAll(mPads);          mPads.clear();
-        throw;
-    }
+    // load all elements
+    mPads.loadFromDomElement(domElement);
+    mPolygons.loadFromDomElement(domElement);
+    mEllipses.loadFromDomElement(domElement);
+    mTexts.loadFromDomElement(domElement);
+    mHoles.loadFromDomElement(domElement);
 }
 
 Footprint::~Footprint() noexcept
 {
-    qDeleteAll(mHoles);         mHoles.clear();
-    qDeleteAll(mTexts);         mTexts.clear();
-    qDeleteAll(mEllipses);      mEllipses.clear();
-    qDeleteAll(mPolygons);      mPolygons.clear();
-    qDeleteAll(mPads);          mPads.clear();
+    Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*****************************************************************************************
- *  FootprintPad Methods
+ *  General Methods
  ****************************************************************************************/
 
-void Footprint::addPad(FootprintPad& pad) noexcept
+void Footprint::registerGraphicsItem(FootprintGraphicsItem& item) noexcept
 {
-    Q_ASSERT(!mPads.contains(pad.getUuid()));
-    mPads.insert(pad.getUuid(), &pad);
+    Q_ASSERT(!mRegisteredGraphicsItem);
+    mRegisteredGraphicsItem = &item;
 }
 
-void Footprint::removePad(FootprintPad& pad) noexcept
+void Footprint::unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept
 {
-    Q_ASSERT(mPads.contains(pad.getUuid()));
-    Q_ASSERT(mPads.value(pad.getUuid()) == &pad);
-    mPads.remove(pad.getUuid());
+    Q_ASSERT(mRegisteredGraphicsItem == &item);
+    mRegisteredGraphicsItem = nullptr;
 }
-
-/*****************************************************************************************
- *  Polygon Methods
- ****************************************************************************************/
-
-void Footprint::addPolygon(Polygon& polygon) noexcept
-{
-    Q_ASSERT(!mPolygons.contains(&polygon));
-    mPolygons.append(&polygon);
-}
-
-void Footprint::removePolygon(Polygon& polygon) noexcept
-{
-    Q_ASSERT(mPolygons.contains(&polygon));
-    mPolygons.removeAll(&polygon);
-}
-
-/*****************************************************************************************
- *  Ellipse Methods
- ****************************************************************************************/
-
-void Footprint::addEllipse(Ellipse& ellipse) noexcept
-{
-    Q_ASSERT(!mEllipses.contains(&ellipse));
-    mEllipses.append(&ellipse);
-}
-
-void Footprint::removeEllipse(Ellipse& ellipse) noexcept
-{
-    Q_ASSERT(mEllipses.contains(&ellipse));
-    mEllipses.removeAll(&ellipse);
-}
-
-/*****************************************************************************************
- *  Text Methods
- ****************************************************************************************/
-
-void Footprint::addText(Text& text) noexcept
-{
-    Q_ASSERT(!mTexts.contains(&text));
-    mTexts.append(&text);
-}
-
-void Footprint::removeText(Text& text) noexcept
-{
-    Q_ASSERT(mTexts.contains(&text));
-    mTexts.removeAll(&text);
-}
-
-/*****************************************************************************************
- *  Hole Methods
- ****************************************************************************************/
-
-void Footprint::addHole(Hole& hole) noexcept
-{
-    Q_ASSERT(!mHoles.contains(&hole));
-    mHoles.append(&hole);
-}
-
-void Footprint::removeHole(Hole& hole) noexcept
-{
-    Q_ASSERT(mHoles.contains(&hole));
-    mHoles.removeAll(&hole);
-}
-
-/*****************************************************************************************
- *  Public Methods
- ****************************************************************************************/
 
 void Footprint::serialize(DomElement& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.setAttribute("uuid", mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
-    serializePointerContainer(root, mPads,     "pad");
-    serializePointerContainer(root, mPolygons, "polygon");
-    serializePointerContainer(root, mEllipses, "ellipse");
-    serializePointerContainer(root, mTexts,    "text");
-    serializePointerContainer(root, mHoles,    "hole");
+    mPads.serialize(root);
+    mPolygons.serialize(root);
+    mEllipses.serialize(root);
+    mTexts.serialize(root);
+    mHoles.serialize(root);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool Footprint::operator==(const Footprint& rhs) const noexcept
+{
+    if (mUuid != rhs.mUuid)                     return false;
+    if (mNames != rhs.mNames)                   return false;
+    if (mDescriptions != rhs.mDescriptions)     return false;
+    if (mPads != rhs.mPads)                     return false;
+    if (mPolygons != rhs.mPolygons)             return false;
+    if (mEllipses != rhs.mEllipses)             return false;
+    if (mTexts != rhs.mTexts)                   return false;
+    if (mHoles != rhs.mHoles)                   return false;
+    return true;
+}
+
+Footprint& Footprint::operator=(const Footprint& rhs) noexcept
+{
+    mUuid = rhs.mUuid;
+    mNames = rhs.mNames;
+    mDescriptions = rhs.mDescriptions;
+    mPads = rhs.mPads;
+    mPolygons = rhs.mPolygons;
+    mEllipses = rhs.mEllipses;
+    mTexts = rhs.mTexts;
+    mHoles = rhs.mHoles;
+    return *this;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool Footprint::checkAttributesValidity() const noexcept
+void Footprint::listObjectAdded(const FootprintPadList& list, int newIndex,
+                                const std::shared_ptr<FootprintPad>& ptr) noexcept
 {
-    if (mPads.isEmpty() && mTexts.isEmpty() &&
-        mPolygons.isEmpty() && mEllipses.isEmpty())                 return false;
-    return true;
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mPads);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPad(*ptr);
+}
+
+void Footprint::listObjectAdded(const PolygonList& list, int newIndex,
+                                const std::shared_ptr<Polygon>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mPolygons);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPolygon(*ptr);
+}
+
+void Footprint::listObjectAdded(const EllipseList& list, int newIndex,
+                                const std::shared_ptr<Ellipse>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mEllipses);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addEllipse(*ptr);
+}
+
+void Footprint::listObjectAdded(const TextList& list, int newIndex,
+                                const std::shared_ptr<Text>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mTexts);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addText(*ptr);
+}
+
+void Footprint::listObjectAdded(const HoleList& list, int newIndex,
+                                const std::shared_ptr<Hole>& ptr) noexcept
+{
+    Q_UNUSED(newIndex);
+    Q_ASSERT(&list == &mHoles);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addHole(*ptr);
+}
+
+void Footprint::listObjectRemoved(const FootprintPadList& list, int oldIndex,
+                                  const std::shared_ptr<FootprintPad>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mPads);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePad(*ptr);
+}
+
+void Footprint::listObjectRemoved(const PolygonList& list, int oldIndex,
+                                  const std::shared_ptr<Polygon>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mPolygons);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePolygon(*ptr);
+}
+
+void Footprint::listObjectRemoved(const EllipseList& list, int oldIndex,
+                                  const std::shared_ptr<Ellipse>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mEllipses);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeEllipse(*ptr);
+}
+
+void Footprint::listObjectRemoved(const TextList& list, int oldIndex,
+                                  const std::shared_ptr<Text>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mTexts);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeText(*ptr);
+}
+
+void Footprint::listObjectRemoved(const HoleList& list, int oldIndex,
+                                  const std::shared_ptr<Hole>& ptr) noexcept
+{
+    Q_UNUSED(oldIndex);
+    Q_ASSERT(&list == &mHoles);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeHole(*ptr);
 }
 
 /*****************************************************************************************

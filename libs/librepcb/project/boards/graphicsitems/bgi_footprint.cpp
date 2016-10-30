@@ -95,17 +95,15 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
     }
 
     // polygons
-    for (int i = 0; i < mLibFootprint.getPolygonCount(); i++) {
-        const Polygon* polygon = mLibFootprint.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-        layer = getLayer(polygon->getLayerName());
+    for (const Polygon& polygon : mLibFootprint.getPolygons()) {
+        layer = getLayer(polygon.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
-        QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getLineWidth().toPx() / 2;
+        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-        if (!polygon->isGrabArea()) continue;
+        if (!polygon.isGrabArea()) continue;
         layer = getLayer(GraphicsLayer::sTopGrabAreas);
         if (!layer) continue;
         if (!layer->isVisible()) continue;
@@ -114,10 +112,8 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
 
     // texts
     mCachedTextProperties.clear();
-    for (int i = 0; i < mLibFootprint.getTextCount(); i++) {
-        const Text* text = mLibFootprint.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-        layer = getLayer(text->getLayerName());
+    for (const Text& text : mLibFootprint.getTexts()) {
+        layer = getLayer(text.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -125,32 +121,32 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text->getText();
+        props.text = text.getText();
         mFootprint.replaceVariablesWithAttributes(props.text, true);
 
         // calculate font metrics
-        props.fontPixelSize = qCeil(text->getHeight().toPx());
+        props.fontPixelSize = qCeil(text.getHeight().toPx());
         mFont.setPixelSize(props.fontPixelSize);
         QFontMetricsF metrics(mFont);
-        props.scaleFactor = text->getHeight().toPx() / metrics.height();
-        props.textRect = metrics.boundingRect(QRectF(), text->getAlign().toQtAlign() |
+        props.scaleFactor = text.getHeight().toPx() / metrics.height();
+        props.textRect = metrics.boundingRect(QRectF(), text.getAlign().toQtAlign() |
                                               Qt::TextDontClip, props.text);
         QRectF scaledTextRect = QRectF(props.textRect.topLeft() * props.scaleFactor,
                                        props.textRect.bottomRight() * props.scaleFactor);
 
         // check rotation
-        Angle absAngle = text->getRotation() + mFootprint.getRotation();
+        Angle absAngle = text.getRotation() + mFootprint.getRotation();
         absAngle.mapTo180deg();
         props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
-        scaledTextRect.translate(text->getPosition().toPxQPointF());
+        scaledTextRect.translate(text.getPosition().toPxQPointF());
 
         // text alignment
         if (props.rotate180)
-            props.flags = text->getAlign().mirrored().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().mirrored().toQtAlign() | Qt::TextWordWrap;
         else
-            props.flags = text->getAlign().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().toQtAlign() | Qt::TextWordWrap;
 
         // calculate text bounding rect
         mBoundingRect = mBoundingRect.united(scaledTextRect);
@@ -163,7 +159,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         }
 
         // save properties
-        mCachedTextProperties.insert(text, props);
+        mCachedTextProperties.insert(&text, props);
     }
 
     if (!mShape.isEmpty())
@@ -188,24 +184,21 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw all polygons
-    for (int i = 0; i < mLibFootprint.getPolygonCount(); i++) {
-        const Polygon* polygon = mLibFootprint.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
+    for (const Polygon& polygon : mLibFootprint.getPolygons()) {
         // get layer
-        layer = getLayer(polygon->getLayerName());
+        layer = getLayer(polygon.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
         // set pen
-        if (polygon->getLineWidth() > 0)
-            painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        if (polygon.getLineWidth() > 0)
+            painter->setPen(QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
 
         // set brush
-        if (!polygon->isFilled()) {
-            if (polygon->isGrabArea())
+        if (!polygon.isFilled()) {
+            if (polygon.isGrabArea())
                 layer = getLayer(GraphicsLayer::sTopGrabAreas);
             else
                 layer = nullptr;
@@ -220,28 +213,25 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
 
         // draw polygon
-        painter->drawPath(polygon->toQPainterPathPx());
+        painter->drawPath(polygon.toQPainterPathPx());
     }
 
     // draw all ellipses
-    for (int i = 0; i < mLibFootprint.getEllipseCount(); i++) {
-        const Ellipse* ellipse = mLibFootprint.getEllipse(i);
-        Q_ASSERT(ellipse); if (!ellipse) continue;
-
+    for (const Ellipse& ellipse : mLibFootprint.getEllipses()) {
         // get layer
-        layer = getLayer(ellipse->getLayerName());
+        layer = getLayer(ellipse.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
         // set pen
-        if (ellipse->getLineWidth() > 0)
-            painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        if (ellipse.getLineWidth() > 0)
+            painter->setPen(QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
 
         // set brush
-        if (!ellipse->isFilled()) {
-            if (ellipse->isGrabArea())
+        if (!ellipse.isFilled()) {
+            if (ellipse.isGrabArea())
                 layer = getLayer(GraphicsLayer::sTopGrabAreas);
             else
                 layer = nullptr;
@@ -256,33 +246,30 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
 
         // draw ellipse
-        painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
-                             ellipse->getRadiusY().toPx());
+        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
+                             ellipse.getRadiusY().toPx());
         // TODO: rotation
     }
 
     // draw all texts
-    for (int i = 0; i < mLibFootprint.getTextCount(); i++) {
-        const Text* text = mLibFootprint.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mLibFootprint.getTexts()) {
         // get layer
-        layer = getLayer(text->getLayerName());
+        layer = getLayer(text.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
         // get cached text properties
-        const CachedTextProperties_t& props = mCachedTextProperties.value(text);
+        const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
         mFont.setPixelSize(props.fontPixelSize);
 
         // draw text or rect
         painter->save();
-        painter->translate(text->getPosition().toPxQPointF());
-        painter->rotate(-text->getRotation().toDeg());
-        painter->translate(-text->getPosition().toPxQPointF());
+        painter->translate(text.getPosition().toPxQPointF());
+        painter->rotate(-text.getRotation().toDeg());
+        painter->translate(-text.getPosition().toPxQPointF());
         painter->scale(props.scaleFactor, props.scaleFactor);
         if (props.rotate180) painter->rotate(180);
-        if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 8))
+        if ((deviceIsPrinter) || (lod * text.getHeight().toPx() > 8))
         {
             // draw text
             painter->setPen(QPen(layer->getColor(selected), 0));
@@ -309,10 +296,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw all holes
-    for (int i = 0; i < mLibFootprint.getHoleCount(); i++) {
-        const Hole* hole = mLibFootprint.getHole(i);
-        Q_ASSERT(hole); if (!hole) continue;
-
+    for (const Hole& hole : mLibFootprint.getHoles()) {
         // get layer
         layer = getLayer(GraphicsLayer::sBoardDrillsNpth);
         if (!layer) continue;
@@ -323,8 +307,8 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
 
         // draw hole
-        qreal radius = (hole->getDiameter() / 2).toPx();
-        painter->drawEllipse(hole->getPosition().toPxQPointF(), radius, radius);
+        qreal radius = (hole.getDiameter() / 2).toPx();
+        painter->drawEllipse(hole.getPosition().toPxQPointF(), radius, radius);
     }
 
     // draw origin cross

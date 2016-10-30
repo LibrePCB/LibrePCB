@@ -83,36 +83,28 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     prepareGeometryChange();
 
     // set Z value
-    if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
-        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad); Q_ASSERT(smt);
-        if ((smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) != mPad.getIsMirrored()) {
-            setZValue(Board::ZValue_FootprintPadsBottom);
-        } else {
-            setZValue(Board::ZValue_FootprintPadsTop);
-        }
+    if ((mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) != mPad.getIsMirrored()) {
+        setZValue(Board::ZValue_FootprintPadsBottom);
     } else {
         setZValue(Board::ZValue_FootprintPadsTop);
     }
 
     // set layers
     mPadLayer = getLayer(mLibPad.getLayerName());
-    if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
-        const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad); Q_ASSERT(smt);
-        if (smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) {
-            mTopStopMaskLayer = nullptr;
-            mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
-            mTopCreamMaskLayer = nullptr;
-            mBottomCreamMaskLayer = getLayer(GraphicsLayer::sBotSolderPaste);
-        } else {
-            mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
-            mBottomStopMaskLayer = nullptr;
-            mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
-            mBottomCreamMaskLayer = nullptr;
-        }
-    } else {
+    if (mLibPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
         mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
         mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
         mTopCreamMaskLayer = nullptr;
+        mBottomCreamMaskLayer = nullptr;
+    } else if (mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) {
+        mTopStopMaskLayer = nullptr;
+        mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
+        mTopCreamMaskLayer = nullptr;
+        mBottomCreamMaskLayer = getLayer(GraphicsLayer::sBotSolderPaste);
+    } else {
+        mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
+        mBottomStopMaskLayer = nullptr;
+        mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
         mBottomCreamMaskLayer = nullptr;
     }
 

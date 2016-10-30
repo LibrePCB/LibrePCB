@@ -112,8 +112,8 @@ bool CmdAddDeviceToBoard::performExecute()
     Q_ASSERT(pkg);
 
     // TODO: remove this!
-    if (mFootprintUuid.isNull() && (!pkg->getFootprintUuids().isEmpty())) {
-        mFootprintUuid = pkg->getFootprintUuids().first();
+    if (mFootprintUuid.isNull() && pkg->getFootprints().count() > 0) {
+        mFootprintUuid = pkg->getFootprints().first()->getUuid();
     }
 
     // create child command to add a new device instance to the board

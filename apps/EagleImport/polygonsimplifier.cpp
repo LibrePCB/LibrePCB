@@ -78,11 +78,11 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         rect->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
         rect->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
         rect->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
-        mLibraryElement.addPolygon(*rect);
+        mLibraryElement.getPolygons().append(std::shared_ptr<Polygon>(rect));
 
         // remove all lines
         foreach (Polygon* line, lines)
-            mLibraryElement.removePolygon(*line);
+            mLibraryElement.getPolygons().remove(line);
     }
 }
 
@@ -95,9 +95,9 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
 {
     // find lines
     QList<Polygon*> linePolygons;
-    foreach (Polygon* polygon, mLibraryElement.getPolygons()) {
-        if (polygon->getSegments().count() == 1)
-            linePolygons.append(polygon);
+    for (Polygon& polygon : mLibraryElement.getPolygons()) {
+        if (polygon.getSegments().count() == 1)
+            linePolygons.append(&polygon);
     }
 
     // find rectangle

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
+#ifndef LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H
+#define LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include "footprintpad.h"
-#include <librepcb/common/geometry/polygon.h>
+#include <QtCore>
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,58 +32,54 @@
 namespace librepcb {
 namespace library {
 
+class PackagePad;
+
 /*****************************************************************************************
- *  Class FootprintPadSmt
+ *  Class CmdPackagePadEdit
  ****************************************************************************************/
 
 /**
- * @brief The FootprintPadSmt class
+ * @brief The CmdPackagePadEdit class
  */
-class FootprintPadSmt final : public FootprintPad
+class CmdPackagePadEdit final : public UndoCommand
 {
-        Q_DECLARE_TR_FUNCTIONS(FootprintPadSmt)
-
     public:
 
-        // Types
-        enum class BoardSide_t { TOP, BOTTOM };
-
         // Constructors / Destructor
-        explicit FootprintPadSmt(const Uuid& padUuid, const Point& pos, const Angle& rot,
-                                 const Length& width, const Length& height, BoardSide_t side) noexcept;
-        explicit FootprintPadSmt(const DomElement& domElement);
-        ~FootprintPadSmt() noexcept;
-
-        // Getters
-        BoardSide_t getBoardSide() const noexcept {return mBoardSide;}
-        QString getLayerName() const noexcept override;
-        bool isOnLayer(const QString& layerName) const noexcept override;
-        const QPainterPath& toQPainterPathPx() const noexcept override;
-        QPainterPath toMaskQPainterPathPx(const Length& clearance) const noexcept override;
+        CmdPackagePadEdit() = delete;
+        CmdPackagePadEdit(const CmdPackagePadEdit& other) = delete;
+        explicit CmdPackagePadEdit(PackagePad& pad) noexcept;
+        ~CmdPackagePadEdit() noexcept;
 
         // Setters
-        void setBoardSide(BoardSide_t side) noexcept;
+        void setName(const QString& name) noexcept;
 
-        // General Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
-
-        // Static Methods
-        static BoardSide_t stringToBoardSide(const QString& side);
-        static QString boardSideToString(BoardSide_t side) noexcept;
+        // Operator Overloadings
+        CmdPackagePadEdit& operator=(const CmdPackagePadEdit& rhs) = delete;
 
 
     private:
 
-        // make some methods inaccessible...
-        FootprintPadSmt() = delete;
-        FootprintPadSmt(const FootprintPadSmt& other) = delete;
-        FootprintPadSmt& operator=(const FootprintPadSmt& rhs) = delete;
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
 
 
-        // Pin Attributes
-        BoardSide_t mBoardSide;
+        // Private Member Variables
+
+        // Attributes from the constructor
+        PackagePad& mPad;
+
+        // General Attributes
+        QString mOldName;
+        QString mNewName;
 };
 
 /*****************************************************************************************
@@ -93,4 +89,4 @@ class FootprintPadSmt final : public FootprintPad
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_FOOTPRINTPADSMT_H
+#endif // LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H

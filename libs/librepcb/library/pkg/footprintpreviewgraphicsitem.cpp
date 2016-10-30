@@ -54,15 +54,12 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(const IF_GraphicsLaye
 
     updateCacheAndRepaint();
 
-    foreach (const Uuid& padUuid, footprint.getPadUuids())
-    {
-        const FootprintPad* fptPad = footprint.getPadByUuid(padUuid);
-        Q_ASSERT(fptPad); if (!fptPad) continue;
+    for (const FootprintPad& fptPad : footprint.getPads()) {
         const PackagePad* pkgPad = nullptr;
-        if (mPackage) pkgPad = mPackage->getPadByUuid(padUuid);
-        FootprintPadPreviewGraphicsItem* item = new FootprintPadPreviewGraphicsItem(layerProvider, *fptPad, pkgPad);
-        item->setPos(fptPad->getPosition().toPxQPointF());
-        item->setRotation(-fptPad->getRotation().toDeg());
+        if (mPackage) pkgPad = mPackage->getPads().find(fptPad.getPackagePadUuid()).get();
+        FootprintPadPreviewGraphicsItem* item = new FootprintPadPreviewGraphicsItem(layerProvider, fptPad, pkgPad);
+        item->setPos(fptPad.getPosition().toPxQPointF());
+        item->setRotation(-fptPad.getRotation().toDeg());
         item->setZValue(-1);
         item->setParentItem(this);
     }
@@ -104,73 +101,65 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    for (int i = 0; i < mFootprint.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mFootprint.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
-        QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getLineWidth().toPx() / 2;
+    for (const Polygon& polygon : mFootprint.getPolygons()) {
+        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-        if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
+        if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
     }
 
     // texts
     mCachedTextProperties.clear();
-    for (int i = 0; i < mFootprint.getTextCount(); i++)
-    {
-        const Text* text = mFootprint.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mFootprint.getTexts()) {
         // create static text properties
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text->getText();
+        props.text = text.getText();
         replaceVariablesWithAttributes(props.text, false);
 
         // calculate font metrics
-        mFont.setPointSizeF(text->getHeight().toPx());
+        mFont.setPointSizeF(text.getHeight().toPx());
         QFontMetricsF metrics(mFont);
-        props.fontSize = text->getHeight().toPx()*0.8*text->getHeight().toPx()/metrics.height();
+        props.fontSize = text.getHeight().toPx()*0.8*text.getHeight().toPx()/metrics.height();
         mFont.setPointSizeF(props.fontSize);
         metrics = QFontMetricsF(mFont);
-        props.textRect = metrics.boundingRect(QRectF(), text->getAlign().toQtAlign() |
+        props.textRect = metrics.boundingRect(QRectF(), text.getAlign().toQtAlign() |
                                               Qt::TextDontClip, props.text);
 
         // check rotation
-        Angle absAngle = text->getRotation() + Angle::fromDeg(rotation());
+        Angle absAngle = text.getRotation() + Angle::fromDeg(rotation());
         absAngle.mapTo180deg();
         props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
         qreal dx, dy;
-        if (text->getAlign().getV() == VAlign::top())
-            dy = text->getPosition().toPxQPointF().y()-props.textRect.top();
-        else if (text->getAlign().getV() == VAlign::bottom())
-            dy = text->getPosition().toPxQPointF().y()-props.textRect.bottom();
+        if (text.getAlign().getV() == VAlign::top())
+            dy = text.getPosition().toPxQPointF().y()-props.textRect.top();
+        else if (text.getAlign().getV() == VAlign::bottom())
+            dy = text.getPosition().toPxQPointF().y()-props.textRect.bottom();
         else
-            dy = text->getPosition().toPxQPointF().y()-(props.textRect.top()+props.textRect.bottom())/2;
-        if (text->getAlign().getH() == HAlign::left())
-            dx = text->getPosition().toPxQPointF().x()-props.textRect.left();
-        else if (text->getAlign().getH() == HAlign::right())
-            dx = text->getPosition().toPxQPointF().x()-props.textRect.right();
+            dy = text.getPosition().toPxQPointF().y()-(props.textRect.top()+props.textRect.bottom())/2;
+        if (text.getAlign().getH() == HAlign::left())
+            dx = text.getPosition().toPxQPointF().x()-props.textRect.left();
+        else if (text.getAlign().getH() == HAlign::right())
+            dx = text.getPosition().toPxQPointF().x()-props.textRect.right();
         else
-            dx = text->getPosition().toPxQPointF().x()-(props.textRect.left()+props.textRect.right())/2;
+            dx = text.getPosition().toPxQPointF().x()-(props.textRect.left()+props.textRect.right())/2;
 
         // text alignment
         if (props.rotate180)
         {
             props.align = 0;
-            if (text->getAlign().getV() == VAlign::top()) props.align |= Qt::AlignBottom;
-            if (text->getAlign().getV() == VAlign::center()) props.align |= Qt::AlignVCenter;
-            if (text->getAlign().getV() == VAlign::bottom()) props.align |= Qt::AlignTop;
-            if (text->getAlign().getH() == HAlign::left()) props.align |= Qt::AlignRight;
-            if (text->getAlign().getH() == HAlign::center()) props.align |= Qt::AlignHCenter;
-            if (text->getAlign().getH() == HAlign::right()) props.align |= Qt::AlignLeft;
+            if (text.getAlign().getV() == VAlign::top()) props.align |= Qt::AlignBottom;
+            if (text.getAlign().getV() == VAlign::center()) props.align |= Qt::AlignVCenter;
+            if (text.getAlign().getV() == VAlign::bottom()) props.align |= Qt::AlignTop;
+            if (text.getAlign().getH() == HAlign::left()) props.align |= Qt::AlignRight;
+            if (text.getAlign().getH() == HAlign::center()) props.align |= Qt::AlignHCenter;
+            if (text.getAlign().getH() == HAlign::right()) props.align |= Qt::AlignLeft;
         }
         else
-            props.align = text->getAlign().toQtAlign();
+            props.align = text.getAlign().toQtAlign();
 
         // calculate text bounding rect
         props.textRect = props.textRect.translated(dx, dy).normalized();
@@ -182,7 +171,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         }
 
         // save properties
-        mCachedTextProperties.insert(text, props);
+        mCachedTextProperties.insert(&text, props);
     }
 
     update();
@@ -202,79 +191,67 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    for (int i = 0; i < mFootprint.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mFootprint.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
+    for (const Polygon& polygon : mFootprint.getPolygons()) {
         // set colors
-        layer = mLayerProvider.getLayer(polygon->getLayerName());
+        layer = mLayerProvider.getLayer(polygon.getLayerName());
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
-        if (polygon->isFilled())
-            layer = mLayerProvider.getLayer(polygon->getLayerName());
-        else if (polygon->isGrabArea())
+        if (polygon.isFilled())
+            layer = mLayerProvider.getLayer(polygon.getLayerName());
+        else if (polygon.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sTopGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
-        painter->drawPath(polygon->toQPainterPathPx());
+        painter->drawPath(polygon.toQPainterPathPx());
     }
 
     // draw all ellipses
-    for (int i = 0; i < mFootprint.getEllipseCount(); i++)
-    {
-        const Ellipse* ellipse = mFootprint.getEllipse(i);
-        Q_ASSERT(ellipse); if (!ellipse) continue;
-
+    for (const Ellipse& ellipse : mFootprint.getEllipses()) {
         // set colors
-        layer = mLayerProvider.getLayer(ellipse->getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(ellipse.getLayerName()); if (!layer) continue;
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
-        if (ellipse->isFilled())
-            layer = mLayerProvider.getLayer(ellipse->getLayerName());
-        else if (ellipse->isGrabArea())
+        if (ellipse.isFilled())
+            layer = mLayerProvider.getLayer(ellipse.getLayerName());
+        else if (ellipse.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sTopGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
-        painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
-                             ellipse->getRadiusY().toPx());
+        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
+                             ellipse.getRadiusY().toPx());
         // TODO: rotation
     }
 
     // draw all texts
-    for (int i = 0; i < mFootprint.getTextCount(); i++)
-    {
-        const Text* text = mFootprint.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mFootprint.getTexts()) {
         // get layer
-        layer = mLayerProvider.getLayer(text->getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(text.getLayerName()); if (!layer) continue;
 
         // get cached text properties
-        const CachedTextProperties_t& props = mCachedTextProperties.value(text);
+        const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
         mFont.setPointSizeF(props.fontSize);
 
         // draw text
         painter->save();
-        painter->translate(text->getPosition().toPxQPointF());
-        painter->rotate(-text->getRotation().toDeg());
-        painter->translate(-text->getPosition().toPxQPointF());
+        painter->translate(text.getPosition().toPxQPointF());
+        painter->rotate(-text.getRotation().toDeg());
+        painter->translate(-text.getPosition().toPxQPointF());
         if (props.rotate180) painter->rotate(180);
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setFont(mFont);

@@ -59,12 +59,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
             "project's library!")).arg(cmpUuid.toStr()));
     }
     Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant", true);
-    mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVarUuid);
-    if (!mCompSymbVar) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("No symbol variant with the UUID \"%1\" found."))
-            .arg(symbVarUuid.toStr()));
-    }
+    mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
 
     // load all component attributes
     mAttributes.reset(new AttributeList(domElement)); // can throw
@@ -79,8 +74,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
         }
         mSignals.insert(signal->getCompSignal().getUuid(), signal);
     }
-    if (mSignals.count() != mLibComponent->getSignalCount()) {
-        qDebug() << mSignals.count() << "!=" << mLibComponent->getSignalCount();
+    if (mSignals.count() != mLibComponent->getSignals().count()) {
+        qDebug() << mSignals.count() << "!=" << mLibComponent->getSignals().count();
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The signal count of the component instance \"%1\" does "
             "not match with the signal count of the component \"%2\"."))
@@ -101,22 +96,15 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
             tr("The name of the component must not be empty."));
     }
     mValue = cmp.getDefaultValue();
-    mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVar);
-    if (!mCompSymbVar) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("No symbol variant with the UUID \"%1\" found."))
-            .arg(symbVar.toStr()));
-    }
+    mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVar).get(); // can throw
 
     // add attributes
     mAttributes.reset(new AttributeList(cmp.getAttributes()));
 
     // add signal map
-    for (int i = 0; i < cmp.getSignalCount(); i++) {
-        const library::ComponentSignal* signal = cmp.getSignal(i);
-        Q_ASSERT(signal); if (!signal) continue;
+    for (const library::ComponentSignal& signal : cmp.getSignals()) {
         ComponentSignalInstance* signalInstance = new ComponentSignalInstance(
-            mCircuit, *this, *signal, nullptr);
+            mCircuit, *this, signal, nullptr);
         mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
     }
 
@@ -161,16 +149,14 @@ QString ComponentInstance::getValue(bool replaceAttributes) const noexcept
 
 int ComponentInstance::getUnplacedSymbolsCount() const noexcept
 {
-    return (mCompSymbVar->getItemCount() - mRegisteredSymbols.count());
+    return (mCompSymbVar->getSymbolItems().count() - mRegisteredSymbols.count());
 }
 
 int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
 {
     int count = 0;
-    for (int i = 0; i < mCompSymbVar->getItemCount(); i++) {
-        const library::ComponentSymbolVariantItem* item = mCompSymbVar->getItem(i);
-        Q_ASSERT(item); if (!item) continue;
-        if ((item->isRequired()) && (!mRegisteredSymbols.contains(item->getUuid()))) {
+    for (const library::ComponentSymbolVariantItem& item : mCompSymbVar->getSymbolItems()) {
+        if ((item.isRequired()) && (!mRegisteredSymbols.contains(item.getUuid()))) {
             count++;
         }
     }
@@ -180,10 +166,8 @@ int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept
 int ComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept
 {
     int count = 0;
-    for (int i = 0; i < mCompSymbVar->getItemCount(); i++) {
-        const library::ComponentSymbolVariantItem* item = mCompSymbVar->getItem(i);
-        Q_ASSERT(item); if (!item) continue;
-        if ((!item->isRequired()) && (!mRegisteredSymbols.contains(item->getUuid()))) {
+    for (const library::ComponentSymbolVariantItem& item : mCompSymbVar->getSymbolItems()) {
+        if ((!item.isRequired()) && (!mRegisteredSymbols.contains(item.getUuid()))) {
             count++;
         }
     }
@@ -289,7 +273,7 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol)
         throw LogicError(__FILE__, __LINE__);
     }
     Uuid itemUuid = symbol.getCompSymbVarItem().getUuid();
-    if (!mCompSymbVar->getItemByUuid(itemUuid)) {
+    if (!mCompSymbVar->getSymbolItems().find(itemUuid)) {
         throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Invalid symbol item in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }

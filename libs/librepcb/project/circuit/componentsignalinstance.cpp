@@ -51,11 +51,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
 {
     // read attributes
     Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal", true);
-    mComponentSignal = mComponentInstance.getLibComponent().getSignalByUuid(compSignalUuid);
-    if(!mComponentSignal) {
-        throw RuntimeError(__FILE__, __LINE__, QString(
-            tr("Invalid component signal UUID: \"%1\"")).arg(compSignalUuid.toStr()));
-    }
+    mComponentSignal = mComponentInstance.getLibComponent().getSignals().get(compSignalUuid).get(); // can throw
     Uuid netsignalUuid = domElement.getAttribute<Uuid>("netsignal", false, Uuid());
     if (!netsignalUuid.isNull()) {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);

@@ -26,7 +26,10 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/signalrole.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,22 +42,24 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSignal class
+ * @brief The ComponentSignal class represents one signal of a component
  */
-class ComponentSignal final : public SerializableObject
+class ComponentSignal final : public QObject, public SerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(ComponentSignal)
+        Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
+        ComponentSignal() = delete;
+        ComponentSignal(const ComponentSignal& other) noexcept;
+        ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
         explicit ComponentSignal(const DomElement& domElement);
         ~ComponentSignal() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        QString getName() const noexcept {return mName;}
+        const QString& getName() const noexcept {return mName;}
         const SignalRole& getRole() const noexcept {return mRole;}
         const QString& getForcedNetName() const noexcept {return mForcedNetName;}
         bool isRequired() const noexcept {return mIsRequired;}
@@ -63,31 +68,39 @@ class ComponentSignal final : public SerializableObject
         bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
 
         // Setters
-        void setName(const QString& name) noexcept {mName = name;}
-        void setRole(const SignalRole& role) noexcept {mRole = role;}
-        void setForcedNetName(const QString& name) noexcept {mForcedNetName = name;}
-        void setIsRequired(bool required) noexcept {mIsRequired = required;}
-        void setIsNegated(bool negated) noexcept {mIsNegated = negated;}
-        void setIsClock(bool clock) noexcept {mIsClock = clock;}
+        void setName(const QString& name) noexcept;
+        void setRole(const SignalRole& role) noexcept;
+        void setForcedNetName(const QString& name) noexcept;
+        void setIsRequired(bool required) noexcept;
+        void setIsNegated(bool negated) noexcept;
+        void setIsClock(bool clock) noexcept;
 
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const ComponentSignal& rhs) const noexcept;
+        bool operator!=(const ComponentSignal& rhs) const noexcept {return !(*this == rhs);}
+        ComponentSignal& operator=(const ComponentSignal& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        ComponentSignal() = delete;
-        ComponentSignal(const ComponentSignal& other) = delete;
-        ComponentSignal& operator=(const ComponentSignal& rhs) = delete;
+    signals:
+        void edited();
+        void nameChanged(const QString& name);
+        void roleChanged(const SignalRole& role);
+        void forcedNetNameChanged(const QString& name);
+        void isRequiredChanged(bool required);
+        void isNegatedChanged(bool negated);
+        void isClockChanged(bool clock);
 
-        // Private Methods
+
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Signal Attributes
+    private: // Data
         Uuid mUuid;
         QString mName;
         SignalRole mRole;
@@ -96,6 +109,16 @@ class ComponentSignal final : public SerializableObject
         bool mIsNegated;
         bool mIsClock;
 };
+
+/*****************************************************************************************
+ *  Class ComponentSignalList
+ ****************************************************************************************/
+
+struct ComponentSignalListNameProvider {static constexpr const char* tagname = "signal";};
+using ComponentSignalList = SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalInsert = CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalRemove = CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalsSwap = CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

@@ -214,7 +214,9 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
 
                         // check if there is a next symbol to add
                         mCurrentSymbVarItemIndex++;
-                        auto* currentSymbVarItem = mCurrentComponent->getSymbolVariant().getItem(mCurrentSymbVarItemIndex);
+                        const library::ComponentSymbolVariantItem* currentSymbVarItem =
+                                mCurrentComponent->getSymbolVariant().getSymbolItems()
+                                .value(mCurrentSymbVarItemIndex).get();
 
                         if (currentSymbVarItem)
                         {
@@ -336,9 +338,9 @@ void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar
 
         // create the first symbol instance and add it to the schematic
         mCurrentSymbVarItemIndex = 0;
-        auto* currentSymbVarItem = mCurrentComponent->getSymbolVariant().getItem(mCurrentSymbVarItemIndex);
-        if (!currentSymbVarItem)
-        {
+        const library::ComponentSymbolVariantItem* currentSymbVarItem =
+            mCurrentComponent->getSymbolVariant().getSymbolItems().value(mCurrentSymbVarItemIndex).get();
+        if (!currentSymbVarItem) {
             qDebug() << symbVar;
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The component with the UUID \"%1\" does not have any symbol."))

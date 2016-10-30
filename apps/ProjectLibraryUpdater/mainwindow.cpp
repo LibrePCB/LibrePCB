@@ -109,10 +109,8 @@ void MainWindow::on_pushButton_2_clicked()
                 ui->log->addItem(latestComp.getFilePath().toNative());
 
                 // search all required symbols
-                foreach (const ComponentSymbolVariant* symbvar, latestComp.getSymbolVariants())
-                {
-                    foreach (const Uuid& symbolUuid, symbvar->getAllItemSymbolUuids())
-                    {
+                for (const ComponentSymbolVariant& symbvar : latestComp.getSymbolVariants()) {
+                    foreach (const Uuid& symbolUuid, symbvar.getAllSymbolUuids()) {
                         FilePath filepath = workspace.getLibraryDb().getLatestSymbol(symbolUuid);
                         if (!filepath.isExistingDir()) {
                             qDebug() << filepath.toStr();

@@ -58,7 +58,10 @@ class LibraryElement : public LibraryBaseElement
         virtual ~LibraryElement() noexcept;
 
         // Getters: Attributes
-        const QList<Uuid>& getCategories() const noexcept {return mCategories;}
+        const QSet<Uuid>& getCategories() const noexcept {return mCategories;}
+
+        // Setters: Attributes
+        void setCategories(const QSet<Uuid>& uuids) noexcept {mCategories = uuids;}
 
         // Operator Overloadings
         LibraryElement& operator=(const LibraryElement& rhs) = delete;
@@ -73,7 +76,7 @@ class LibraryElement : public LibraryBaseElement
         virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes
-        QList<Uuid> mCategories;
+        QSet<Uuid> mCategories;
 };
 
 /*****************************************************************************************

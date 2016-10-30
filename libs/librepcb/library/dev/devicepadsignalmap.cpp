@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "componentpinsignalmapitem.h"
+#include "devicepadsignalmap.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,72 +33,80 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
-                                                     PinDisplayType_t displayType) noexcept :
-    mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType)
+DevicePadSignalMapItem::DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept :
+    QObject(nullptr)
+{
+    *this = other; // use assignment operator
+}
+
+DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const Uuid& signal) noexcept :
+    QObject(nullptr), mPadUuid(pad), mSignalUuid(signal)
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const DomElement& domElement)
+DevicePadSignalMapItem::DevicePadSignalMapItem(const DomElement& domElement) :
+    QObject(nullptr)
 {
     // read attributes
-    mPinUuid = domElement.getAttribute<Uuid>("pin", true);
-    mDisplayType = stringToDisplayType(domElement.getAttribute<QString>("display", true));
+    mPadUuid = domElement.getAttribute<Uuid>("pad", true);
     mSignalUuid = domElement.getText<Uuid>(false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
+DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void DevicePadSignalMapItem::setSignalUuid(const Uuid& uuid) noexcept
+{
+    if (uuid == mSignalUuid) return;
+    mSignalUuid = uuid;
+    emit signalUuidChanged(mSignalUuid);
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void ComponentPinSignalMapItem::serialize(DomElement& root) const
+void DevicePadSignalMapItem::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("pin", mPinUuid);
-    root.setAttribute<QString>("display", displayTypeToString(mDisplayType));
+    root.setAttribute("pad", mPadUuid);
     root.setText(mSignalUuid);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool DevicePadSignalMapItem::operator==(const DevicePadSignalMapItem& rhs) const noexcept
+{
+    if (mPadUuid != rhs.mPadUuid)           return false;
+    if (mSignalUuid != rhs.mSignalUuid)     return false;
+    return true;
+}
+
+DevicePadSignalMapItem& DevicePadSignalMapItem::operator=(const DevicePadSignalMapItem& rhs) noexcept
+{
+    mPadUuid = rhs.mPadUuid;
+    setSignalUuid(rhs.mSignalUuid);
+    return *this;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool ComponentPinSignalMapItem::checkAttributesValidity() const noexcept
+bool DevicePadSignalMapItem::checkAttributesValidity() const noexcept
 {
-    if (mPinUuid.isNull())  return false;
+    if (mPadUuid.isNull())  return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-ComponentPinSignalMapItem::PinDisplayType_t ComponentPinSignalMapItem::stringToDisplayType(const QString& type)
-{
-    if      (type == QLatin1String("none"))             return PinDisplayType_t::NONE;
-    else if (type == QLatin1String("pin_name"))         return PinDisplayType_t::PIN_NAME;
-    else if (type == QLatin1String("component_signal")) return PinDisplayType_t::COMPONENT_SIGNAL;
-    else if (type == QLatin1String("net_signal"))       return PinDisplayType_t::NET_SIGNAL;
-    else throw RuntimeError(__FILE__, __LINE__, type);
-}
-
-QString ComponentPinSignalMapItem::displayTypeToString(PinDisplayType_t type) noexcept
-{
-    switch (type)
-    {
-        case PinDisplayType_t::NONE:                return QString("none");
-        case PinDisplayType_t::PIN_NAME:            return QString("pin_name");
-        case PinDisplayType_t::COMPONENT_SIGNAL:    return QString("component_signal");
-        case PinDisplayType_t::NET_SIGNAL:          return QString("net_signal");
-        default: Q_ASSERT(false);                   return QString();
-    }
 }
 
 /*****************************************************************************************

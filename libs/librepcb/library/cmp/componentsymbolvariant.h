@@ -24,8 +24,11 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include "componentsymbolvariantitem.h"
 
 /*****************************************************************************************
@@ -39,18 +42,28 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariant class
+ * @brief The ComponentSymbolVariant class represents a symbol variant of a component
+ *
+ * Following information is considered as the "interface" of a symbol variant and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Symbol items (neither adding nor removing items is allowed)
+ *    - UUID
+ *    - Symbol UUID
+ *    - Pin-signal-mapping
  */
-class ComponentSymbolVariant final : public SerializableObject
+class ComponentSymbolVariant final : public QObject, public SerializableObject,
+                                     private ComponentSymbolVariantItemList::IF_Observer
 {
-        Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariant)
+        Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
-                                        const QString& name_en_US,
-                                        const QString& desc_en_US) noexcept;
+        ComponentSymbolVariant() = delete;
+        ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept;
+        ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
+                               const QString& name_en_US, const QString& desc_en_US) noexcept;
         explicit ComponentSymbolVariant(const DomElement& domElement);
         ~ComponentSymbolVariant() noexcept;
 
@@ -64,42 +77,54 @@ class ComponentSymbolVariant final : public SerializableObject
         void setNorm(const QString& norm) noexcept;
         void setName(const QString& locale, const QString& name) noexcept;
         void setDescription(const QString& locale, const QString& desc) noexcept;
+        void setNames(const LocalizedNameMap& names) noexcept;
+        void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
 
         // Symbol Item Methods
-        const QList<ComponentSymbolVariantItem*>& getItems() noexcept {return mSymbolItems;}
-        int getItemCount() const noexcept {return mSymbolItems.count();}
-        ComponentSymbolVariantItem* getItem(int index) noexcept {return mSymbolItems.value(index);}
-        const ComponentSymbolVariantItem* getItem(int index) const noexcept {return mSymbolItems.value(index);}
-        ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) noexcept;
-        const ComponentSymbolVariantItem* getItemByUuid(const Uuid& uuid) const noexcept;
-        QSet<Uuid> getAllItemSymbolUuids() const noexcept;
-        void addItem(ComponentSymbolVariantItem& item) noexcept;
-        void removeItem(ComponentSymbolVariantItem& item) noexcept;
+        ComponentSymbolVariantItemList& getSymbolItems() noexcept {return mSymbolItems;}
+        const ComponentSymbolVariantItemList& getSymbolItems() const noexcept {return mSymbolItems;}
+        QSet<Uuid> getAllSymbolUuids() const noexcept {return ComponentSymbolVariantItemListHelpers::getAllSymbolUuids(mSymbolItems);}
 
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const ComponentSymbolVariant& rhs) const noexcept;
+        bool operator!=(const ComponentSymbolVariant& rhs) const noexcept {return !(*this == rhs);}
+        ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        ComponentSymbolVariant() = delete;
-        ComponentSymbolVariant(const ComponentSymbolVariant& other) = delete;
-        ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) = delete;
+    signals:
+        void edited();
 
-        // Private Methods
+
+    private: // Methods
+        void listObjectAdded(const ComponentSymbolVariantItemList& list, int newIndex,
+                             const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
+        void listObjectRemoved(const ComponentSymbolVariantItemList& list, int oldIndex,
+                               const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
         bool checkAttributesValidity() const noexcept;
 
 
-        // Symbol Variant Attributes
+    private: // Data
         Uuid mUuid;
         QString mNorm;
         LocalizedNameMap mNames;
         LocalizedDescriptionMap mDescriptions;
-        QList<ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
+        ComponentSymbolVariantItemList mSymbolItems;
 };
+
+/*****************************************************************************************
+ *  Class ComponentSymbolVariantList
+ ****************************************************************************************/
+
+struct ComponentSymbolVariantListNameProvider {static constexpr const char* tagname = "symbol_variant";};
+using ComponentSymbolVariantList = SerializableObjectList<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
+using CmdComponentSymbolVariantInsert = CmdListElementInsert<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
+using CmdComponentSymbolVariantRemove = CmdListElementRemove<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
+using CmdComponentSymbolVariantsSwap = CmdListElementsSwap<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

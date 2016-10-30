@@ -73,6 +73,7 @@ class LibraryCategory : public LibraryBaseElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         virtual void serialize(DomElement& root) const override;
+        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
         Uuid mParentUuid;

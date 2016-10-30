@@ -33,16 +33,18 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+PackagePad::PackagePad(const PackagePad& other) noexcept :
+    mUuid(other.mUuid), mName(other.mName)
+{
+}
+
 PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
     mUuid(uuid), mName(name)
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
-PackagePad::PackagePad(const DomElement& domElement) :
-    mUuid()
+PackagePad::PackagePad(const DomElement& domElement)
 {
-    // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
     mName = domElement.getText<QString>(true);
 
@@ -72,6 +74,24 @@ void PackagePad::serialize(DomElement& root) const
 
     root.setAttribute("uuid", mUuid);
     root.setText(mName);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool PackagePad::operator==(const PackagePad& rhs) const noexcept
+{
+    if (mUuid != rhs.mUuid) return false;
+    if (mName != rhs.mName) return false;
+    return true;
+}
+
+PackagePad& PackagePad::operator=(const PackagePad& rhs) noexcept
+{
+    mUuid = rhs.mUuid;
+    mName = rhs.mName;
+    return *this;
 }
 
 /*****************************************************************************************

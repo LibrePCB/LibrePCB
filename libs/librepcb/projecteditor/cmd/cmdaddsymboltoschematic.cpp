@@ -75,16 +75,11 @@ SI_Symbol* CmdAddSymbolToSchematic::getSymbolInstance() const noexcept
 bool CmdAddSymbolToSchematic::performExecute()
 {
     // get the symbol UUID
-    const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);
-    if (!item) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The component instance \"%1\" has no symbol variant item with "
-            "the uuid \"%2\"!")).arg(mComponentInstance.getUuid().toStr(), mSymbolItemUuid.toStr()));
-    }
+    const library::ComponentSymbolVariantItem& item = *mComponentInstance.getSymbolVariant().getSymbolItems().get(mSymbolItemUuid); // can throw
+    Uuid symbolUuid = item.getSymbolUuid();
 
     // if there is no such symbol in the project's library, copy it from the
     // workspace library to the project's library
-    Uuid symbolUuid = item->getSymbolUuid();
     if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
         FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);
         if (!symFp.isValid()) {

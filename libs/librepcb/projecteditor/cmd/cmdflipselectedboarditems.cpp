@@ -192,10 +192,10 @@ void CmdFlipSelectedBoardItems::flipDevice(BI_Device& device, const Point& cente
 
     // reconnect all netpoints/netlines and change netline layers if required
     foreach (BI_FootprintPad* pad, device.getFootprint().getPads()) {
-        if (pad->getLibPad().getTechnology() == library::FootprintPad::Technology_t::SMT) {
-            // netline/netpoint must be flipped too (place via and change layer)
-
-        }
+        //if (pad->getLibPad().getTechnology() == library::FootprintPad::Technology_t::SMT) {
+        //    // netline/netpoint must be flipped too (place via and change layer)
+        //
+        //}
         foreach (BI_NetPoint* netpoint, pad->getNetPoints()) {
             CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
             cmd->setPadToAttach(pad);

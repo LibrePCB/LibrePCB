@@ -25,8 +25,12 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include "componentpinsignalmapitem.h"
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
+#include "componentpinsignalmap.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,7 +43,14 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariantItem class
+ * @brief The ComponentSymbolVariantItem class represents one symbol of a component symbol
+ *        variant
+ *
+ * Following information is considered as the "interface" of a symbol variant item and
+ * must therefore never be changed:
+ *  - UUID
+ *  - Symbol UUID
+ *  - Pin-signal-mapping
  */
 class ComponentSymbolVariantItem final : public SerializableObject
 {
@@ -48,46 +59,81 @@ class ComponentSymbolVariantItem final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
-                                            bool isRequired, const QString& suffix) noexcept;
+        ComponentSymbolVariantItem() = delete;
+        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept;
+        ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
+                                   bool isRequired, const QString& suffix) noexcept;
         explicit ComponentSymbolVariantItem(const DomElement& domElement);
         ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Uuid& getSymbolUuid() const noexcept {return mSymbolUuid;}
+        const Point& getSymbolPosition() const noexcept {return mSymbolPos;}
+        const Angle& getSymbolRotation() const noexcept {return mSymbolRot;}
         bool isRequired() const noexcept {return mIsRequired;}
         const QString& getSuffix() const noexcept {return mSuffix;}
 
+        // Setters: Attributes
+        void setSymbolUuid(const Uuid& uuid) noexcept {mSymbolUuid = uuid;}
+        void setSymbolPosition(const Point& pos) noexcept {mSymbolPos = pos;}
+        void setSymbolRotation(const Angle& rot) noexcept {mSymbolRot = rot;}
+        void setIsRequired(bool required) noexcept {mIsRequired = required;}
+        void setSuffix(const QString& suffix) noexcept {mSuffix = suffix;}
+
         // Pin-Signal-Map Methods
-        const QMap<Uuid, ComponentPinSignalMapItem*>& getPinSignalMappings() noexcept {return mPinSignalMap;}
-        QList<Uuid> getPinUuids() const noexcept {return mPinSignalMap.keys();}
-        ComponentPinSignalMapItem* getPinSignalMapItemOfPin(const Uuid& pinUuid) noexcept {return mPinSignalMap.value(pinUuid);}
-        const ComponentPinSignalMapItem* getPinSignalMapItemOfPin(const Uuid& pinUuid) const noexcept {return mPinSignalMap.value(pinUuid);}
-        void addPinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
-        void removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
+        ComponentPinSignalMap& getPinSignalMap() noexcept {return mPinSignalMap;}
+        const ComponentPinSignalMap& getPinSignalMap()const  noexcept {return mPinSignalMap;}
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const ComponentSymbolVariantItem& rhs) const noexcept;
+        bool operator!=(const ComponentSymbolVariantItem& rhs) const noexcept {return !(*this == rhs);}
+        ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        ComponentSymbolVariantItem() = delete;
-        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) = delete;
-        ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Symbol Variant Item Attributes
+    private: // Data
         Uuid mUuid;
         Uuid mSymbolUuid;
+        Point mSymbolPos;
+        Angle mSymbolRot;
         bool mIsRequired;
         QString mSuffix;
-        QMap<Uuid, ComponentPinSignalMapItem*> mPinSignalMap; ///< Key: Pin UUID (all pins required!)
+        ComponentPinSignalMap mPinSignalMap;
+};
+
+/*****************************************************************************************
+ *  Class ComponentSymbolVariantItemList
+ ****************************************************************************************/
+
+struct ComponentSymbolVariantItemListNameProvider {static constexpr const char* tagname = "symbol_item";};
+using ComponentSymbolVariantItemList = SerializableObjectList<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
+using CmdComponentSymbolVariantItemInsert = CmdListElementInsert<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
+using CmdComponentSymbolVariantItemRemove = CmdListElementRemove<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
+using CmdComponentSymbolVariantItemsSwap = CmdListElementsSwap<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
+
+/*****************************************************************************************
+ *  Class ComponentSymbolVariantItemListHelpers
+ ****************************************************************************************/
+
+class ComponentSymbolVariantItemListHelpers
+{
+    public:
+        ComponentSymbolVariantItemListHelpers() = delete; // disable instantiation
+
+        static QSet<Uuid> getAllSymbolUuids(const ComponentSymbolVariantItemList& list) noexcept {
+            QSet<Uuid> set;
+            for (const auto& item : list) {
+                set.insert(item.getSymbolUuid());
+            }
+            return set;
+        }
 };
 
 /*****************************************************************************************

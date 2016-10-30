@@ -71,12 +71,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
 
 void SI_Symbol::init(const Uuid& symbVarItemUuid)
 {
-    mSymbVarItem = mComponentInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
-    if (!mSymbVarItem) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The symbol variant item UUID \"%1\" is invalid."))
-            .arg(symbVarItemUuid.toStr()));
-    }
+    mSymbVarItem = mComponentInstance->getSymbolVariant().getSymbolItems().get(symbVarItemUuid).get(); // can throw
     mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
     if (!mSymbol) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -88,18 +83,16 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid)
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
 
-    foreach (const Uuid& libPinUuid, mSymbol->getPinUuids()) {
-        const library::SymbolPin* libPin = mSymbol->getPinByUuid(libPinUuid);
-        Q_ASSERT(libPin); if (!libPin) continue;
-        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
-        if (mPins.contains(libPin->getUuid())) {
+    for (const library::SymbolPin& libPin : mSymbol->getPins()) {
+        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid()); // can throw
+        if (mPins.contains(libPin.getUuid())) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
-                .arg(libPin->getUuid().toStr()));
+                .arg(libPin.getUuid().toStr()));
         }
-        mPins.insert(libPin->getUuid(), pin);
+        mPins.insert(libPin.getUuid(), pin);
     }
-    if (mPins.count() != mSymbVarItem->getPinUuids().count()) {
+    if (mPins.count() != mSymbVarItem->getPinSignalMap().count()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
             "the pin-signal-map of its component.")).arg(mUuid.toStr()));

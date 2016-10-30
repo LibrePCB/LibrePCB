@@ -28,6 +28,7 @@
 #include <librepcb/common/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 

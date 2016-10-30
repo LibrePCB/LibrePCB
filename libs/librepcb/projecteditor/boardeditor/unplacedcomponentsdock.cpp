@@ -298,10 +298,8 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(const library::Device* 
             mSelectedDevice = device;
             mSelectedPackage = package;
             QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-            foreach (const Uuid& uuid, mSelectedPackage->getFootprintUuids()) {
-                const library::Footprint* fpt = mSelectedPackage->getFootprintByUuid(uuid);
-                Q_ASSERT(fpt); if (!fpt) continue;
-                mUi->cbxSelectedFootprint->addItem(fpt->getNames().value(localeOrder), uuid.toStr());
+            for (const library::Footprint& fpt : mSelectedPackage->getFootprints()) {
+                mUi->cbxSelectedFootprint->addItem(fpt.getNames().value(localeOrder), fpt.getUuid().toStr());
             }
             if (mUi->cbxSelectedFootprint->count() > 0) {
                 Uuid footprintUuid = mLastFootprintOfDevice.value(mSelectedDevice->getUuid());
@@ -321,9 +319,8 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(const Uuid& uuid) noexcept
     }
     mSelectedFootprintUuid = uuid;
 
-    if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage && (!mSelectedFootprintUuid.isNull()))
-    {
-        const library::Footprint* fpt = mSelectedPackage->getFootprintByUuid(mSelectedFootprintUuid);
+    if (mBoard && mSelectedComponent && mSelectedDevice && mSelectedPackage && (!mSelectedFootprintUuid.isNull())) {
+        const library::Footprint* fpt = mSelectedPackage->getFootprints().find(mSelectedFootprintUuid).get();
         if (fpt) {
             mFootprintPreviewGraphicsItem = new library::FootprintPreviewGraphicsItem(
                 mBoard->getLayerStack(), mProject.getSettings().getLocaleOrder(), *fpt,
