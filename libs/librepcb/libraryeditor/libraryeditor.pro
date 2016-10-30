@@ -32,8 +32,12 @@ SOURCES += \
     common/categorychooserdialog.cpp \
     common/categorylisteditorwidget.cpp \
     common/categorytreelabeltextbuilder.cpp \
+    common/componentchooserdialog.cpp \
     common/editorwidgetbase.cpp \
+    common/packagechooserdialog.cpp \
     common/symbolchooserdialog.cpp \
+    dev/deviceeditorwidget.cpp \
+    dev/padsignalmapeditorwidget.cpp \
     libraryeditor.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintlisteditorwidget.cpp \
@@ -92,8 +96,12 @@ HEADERS += \
     common/categorychooserdialog.h \
     common/categorylisteditorwidget.h \
     common/categorytreelabeltextbuilder.h \
+    common/componentchooserdialog.h \
     common/editorwidgetbase.h \
+    common/packagechooserdialog.h \
     common/symbolchooserdialog.h \
+    dev/deviceeditorwidget.h \
+    dev/padsignalmapeditorwidget.h \
     libraryeditor.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintlisteditorwidget.h \
@@ -145,7 +153,10 @@ FORMS += \
     cmpcat/componentcategoryeditorwidget.ui \
     common/categorychooserdialog.ui \
     common/categorylisteditorwidget.ui \
+    common/componentchooserdialog.ui \
+    common/packagechooserdialog.ui \
     common/symbolchooserdialog.ui \
+    dev/deviceeditorwidget.ui \
     libraryeditor.ui \
     pkg/dialogs/footprintpadpropertiesdialog.ui \
     pkg/packageeditorwidget.ui \
