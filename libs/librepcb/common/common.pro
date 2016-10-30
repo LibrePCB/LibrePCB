@@ -88,6 +88,7 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/repository.cpp \
+    signalrole.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
     toolbox.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     network/repository.h \
     scopeguard.h \
     scopeguardlist.h \
+    signalrole.h \
     sqlitedatabase.h \
     systeminfo.h \
     toolbox.h \

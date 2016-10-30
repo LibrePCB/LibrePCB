@@ -21,75 +21,77 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "componentsignal.h"
-#include "component.h"
+#include "signalrole.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept :
-    mUuid(uuid), mName(name), mRole(SignalRole::passive()), mForcedNetName(),
-    mIsRequired(false), mIsNegated(false), mIsClock(false)
+SignalRole::SignalRole() noexcept :
+    SignalRole(passive())
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSignal::ComponentSignal(const DomElement& domElement)
+SignalRole::SignalRole(const QString& role, const QString& name) noexcept :
+    mRole(role), mName(name)
 {
-    // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getText<QString>(true);
-    mRole = domElement.getAttribute<SignalRole>("role", true);
-    mForcedNetName = domElement.getAttribute<QString>("forced_net_name", false);
-    mIsRequired = domElement.getAttribute<bool>("required", true);
-    mIsNegated = domElement.getAttribute<bool>("negated", true);
-    mIsClock = domElement.getAttribute<bool>("clock", true);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-ComponentSignal::~ComponentSignal() noexcept
+SignalRole::SignalRole(const SignalRole& other) noexcept :
+    mRole(other.mRole), mName(other.mName)
+{
+}
+
+SignalRole::~SignalRole() noexcept
 {
 }
 
 /*****************************************************************************************
- *  General Methods
+ *  Operator Overloadings
  ****************************************************************************************/
 
-void ComponentSignal::serialize(DomElement& root) const
+SignalRole& SignalRole::operator=(const SignalRole& rhs) noexcept
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("role", mRole);
-    root.setAttribute("forced_net_name", mForcedNetName);
-    root.setAttribute("required", mIsRequired);
-    root.setAttribute("negated", mIsNegated);
-    root.setAttribute("clock", mIsClock);
-    root.setText(mName);
+    mRole = rhs.mRole;
+    mName = rhs.mName;
+    return *this;
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Static Methods
  ****************************************************************************************/
 
-bool ComponentSignal::checkAttributesValidity() const noexcept
+const SignalRole& SignalRole::deserializeFromString(const QString& str)
 {
-    if (mUuid.isNull())     return false;
-    if (mName.isEmpty())    return false;
-    return true;
+    foreach (const SignalRole& role, getAllRoles()) {
+        if (role.serializeToString() == str) {
+            return role;
+        }
+    }
+    throw RuntimeError(__FILE__, __LINE__,
+        QString(tr("Invalid signal role: \"%1\"")).arg(str));
+}
+
+const QList<SignalRole>& SignalRole::getAllRoles() noexcept
+{
+    static QList<SignalRole> list{
+        passive(),
+        power(),
+        input(),
+        output(),
+        inout(),
+        opendrain(),
+    };
+    return list;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
 } // namespace librepcb
