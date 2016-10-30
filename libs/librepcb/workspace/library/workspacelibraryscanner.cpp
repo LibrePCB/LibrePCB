@@ -84,23 +84,30 @@ void WorkspaceLibraryScanner::run() noexcept
         int count = 0;
         qreal percent = 0;
         foreach (const QSharedPointer<Library>& lib, libraries) {
+            int libId = addLibraryToDb(db, lib);
             if (mAbort) break;
-            count += addCategoriesToDb<ComponentCategory>(  db, lib->searchForElements<ComponentCategory>(),    "component_categories", "cat_id");
+            count += addCategoriesToDb<ComponentCategory>(db, lib->searchForElements<ComponentCategory>(),
+                                                          "component_categories", "cat_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
             if (mAbort) break;
-            count += addCategoriesToDb<PackageCategory>(    db, lib->searchForElements<PackageCategory>(),      "package_categories",   "cat_id");
+            count += addCategoriesToDb<PackageCategory>(db, lib->searchForElements<PackageCategory>(),
+                                                        "package_categories", "cat_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
             if (mAbort) break;
-            count += addElementsToDb<Symbol>(               db, lib->searchForElements<Symbol>(),               "symbols",              "symbol_id");
+            count += addElementsToDb<Symbol>(db, lib->searchForElements<Symbol>(),
+                                             "symbols", "symbol_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
             if (mAbort) break;
-            count += addElementsToDb<Package>(              db, lib->searchForElements<Package>(),              "packages",             "package_id");
+            count += addElementsToDb<Package>(db, lib->searchForElements<Package>(),
+                                              "packages", "package_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
             if (mAbort) break;
-            count += addElementsToDb<Component>(            db, lib->searchForElements<Component>(),            "components",           "component_id");
+            count += addElementsToDb<Component>(db, lib->searchForElements<Component>(),
+                                                "components", "component_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
             if (mAbort) break;
-            count += addDevicesToDb(                        db, lib->searchForElements<Device>(),               "devices",              "device_id");
+            count += addDevicesToDb(db, lib->searchForElements<Device>(),
+                                    "devices", "device_id", libId);
             emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
         }
 
@@ -116,8 +123,9 @@ void WorkspaceLibraryScanner::run() noexcept
 
 void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db)
 {
-    // internal
-    db.clearTable("internal");
+    // libraries
+    db.clearTable("libraries_tr");
+    db.clearTable("libraries");
 
     // component categories
     db.clearTable("component_categories_tr");
@@ -148,9 +156,35 @@ void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db)
     db.clearTable("devices");
 }
 
+int WorkspaceLibraryScanner::addLibraryToDb(SQLiteDatabase& db,
+                                            const QSharedPointer<library::Library>& lib)
+{
+    QSqlQuery query = db.prepareQuery(
+        "INSERT INTO libraries "
+        "(filepath, uuid, version) VALUES "
+        "(:filepath, :uuid, :version)");
+    query.bindValue(":filepath",    lib->getFilePath().toRelative(mWorkspace.getLibrariesPath()));
+    query.bindValue(":uuid",        lib->getUuid().toStr());
+    query.bindValue(":version",     lib->getVersion().toStr());
+    int id = db.insert(query);
+    foreach (const QString& locale, lib->getAllAvailableLocales()) {
+        QSqlQuery query = db.prepareQuery(
+            "INSERT INTO libraries_tr "
+            "(lib_id, locale, name, description, keywords) VALUES "
+            "(:element_id, :locale, :name, :description, :keywords)");
+        query.bindValue(":element_id",  id);
+        query.bindValue(":locale",      locale);
+        query.bindValue(":name",        lib->getNames().value(locale));
+        query.bindValue(":description", lib->getDescriptions().value(locale));
+        query.bindValue(":keywords",    lib->getKeywords().value(locale));
+        db.insert(query);
+    }
+    return id;
+}
+
 template <typename ElementType>
 int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn)
+    const QString& table, const QString& idColumn, int libId)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {
@@ -159,8 +193,9 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
             ElementType element(filepath, true); // can throw
             QSqlQuery query = db.prepareQuery(
                 "INSERT INTO " % table % " "
-                "(filepath, uuid, version, parent_uuid) VALUES "
-                "(:filepath, :uuid, :version, :parent_uuid)");
+                "(lib_id, filepath, uuid, version, parent_uuid) VALUES "
+                "(:lib_id, :filepath, :uuid, :version, :parent_uuid)");
+            query.bindValue(":lib_id",      libId);
             query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibrariesPath()));
             query.bindValue(":uuid",        element.getUuid().toStr());
             query.bindValue(":version",     element.getVersion().toStr());
@@ -188,7 +223,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
 
 template <typename ElementType>
 int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn)
+    const QString& table, const QString& idColumn, int libId)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {
@@ -197,8 +232,9 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<Fil
             ElementType element(filepath, true); // can throw
             QSqlQuery query = db.prepareQuery(
                 "INSERT INTO " % table % " "
-                "(filepath, uuid, version) VALUES "
-                "(:filepath, :uuid, :version)");
+                "(lib_id, filepath, uuid, version) VALUES "
+                "(:lib_id, :filepath, :uuid, :version)");
+            query.bindValue(":lib_id",      libId);
             query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibrariesPath()));
             query.bindValue(":uuid",        element.getUuid().toStr());
             query.bindValue(":version",     element.getVersion().toStr());
@@ -234,7 +270,7 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<Fil
 }
 
 int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn)
+    const QString& table, const QString& idColumn, int libId)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {
@@ -243,8 +279,9 @@ int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase& db, const QList<File
             Device element(filepath, true); // can throw
             QSqlQuery query = db.prepareQuery(
                 "INSERT INTO " % table % " "
-                "(filepath, uuid, version, component_uuid, package_uuid) VALUES "
-                "(:filepath, :uuid, :version, :component_uuid, :package_uuid)");
+                "(lib_id, filepath, uuid, version, component_uuid, package_uuid) VALUES "
+                "(:lib_id, :filepath, :uuid, :version, :component_uuid, :package_uuid)");
+            query.bindValue(":lib_id",      libId);
             query.bindValue(":filepath",        filepath.toRelative(mWorkspace.getLibrariesPath()));
             query.bindValue(":uuid",            element.getUuid().toStr());
             query.bindValue(":version",         element.getVersion().toStr());
