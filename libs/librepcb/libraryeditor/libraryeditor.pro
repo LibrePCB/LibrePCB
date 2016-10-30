@@ -21,18 +21,21 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
+    cmpcat/componentcategoryeditorwidget.cpp \
     common/categorychooserdialog.cpp \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
     libraryeditor.cpp \
 
 HEADERS += \
+    cmpcat/componentcategoryeditorwidget.h \
     common/categorychooserdialog.h \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
     libraryeditor.h \
 
 FORMS += \
+    cmpcat/componentcategoryeditorwidget.ui \
     common/categorychooserdialog.ui \
     libraryeditor.ui \
 
