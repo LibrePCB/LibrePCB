@@ -38,62 +38,67 @@ using namespace library;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeItem::CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
-                                   CategoryTreeItem* parent, const Uuid& uuid) noexcept :
-    mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid), mCategory(nullptr),
+template <typename ElementType>
+CategoryTreeItem<ElementType>::CategoryTreeItem(const WorkspaceLibraryDb& library,
+        const QStringList localeOrder, CategoryTreeItem* parent, const Uuid& uuid) noexcept :
+    mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid),
     mDepth(parent ? parent->getDepth() + 1 : 0), mExceptionMessage()
 {
-    try
-    {
-        if (!mUuid.isNull())
-        {
-            FilePath fp = library.getLatestComponentCategory(mUuid);
-            if (fp.isValid()) mCategory = new ComponentCategory(fp, true);
+    try {
+        if (!mUuid.isNull()) {
+            FilePath fp = getLatestCategory(library);
+            if (fp.isValid()) mCategory.reset(new ElementType(fp, true));
         }
 
-        if ((!mUuid.isNull()) || (!mParent))
-        {
-            QSet<Uuid> childs = library.getComponentCategoryChilds(mUuid);
-            foreach (const Uuid& childUuid, childs)
-                mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
+        if ((!mUuid.isNull()) || (!mParent)) {
+            QSet<Uuid> childs = getCategoryChilds(library);
+            foreach (const Uuid& childUuid, childs) {
+                ChildType child(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
+                mChilds.append(child);
+            }
 
             // sort childs
             qSort(mChilds.begin(), mChilds.end(),
-                  [](const CategoryTreeItem* a, const CategoryTreeItem* b)
+                  [](const ChildType& a, const ChildType& b)
                   {return a->data(Qt::DisplayRole) < b->data(Qt::DisplayRole);});
         }
 
-        if (!mParent)
-        {
+        if (!mParent) {
             // add category for elements without category
-            mChilds.append(new CategoryTreeItem(library, mLocaleOrder, this, Uuid()));
+            ChildType child(new CategoryTreeItem(library, mLocaleOrder, this, Uuid()));
+            mChilds.append(child);
         }
-    }
-    catch (Exception& e)
-    {
+    } catch (const Exception& e) {
         mExceptionMessage = e.getMsg();
     }
 }
 
-CategoryTreeItem::~CategoryTreeItem() noexcept
+template <typename ElementType>
+CategoryTreeItem<ElementType>::~CategoryTreeItem() noexcept
 {
-    qDeleteAll(mChilds);        mChilds.clear();
-    delete mCategory;           mCategory = nullptr;
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
-int CategoryTreeItem::getChildNumber() const noexcept
+template <typename ElementType>
+int CategoryTreeItem<ElementType>::getChildNumber() const noexcept
 {
-    if (mParent)
-        return mParent->mChilds.indexOf(const_cast<CategoryTreeItem*>(this));
-    else
+    if (mParent) {
+        for (int i = 0; i < mParent->mChilds.count(); ++i) {
+            if (mParent->mChilds.value(i).data() == this) {
+                return i;
+            }
+        }
+        return -1;
+    } else {
         return 0;
+    }
 }
 
-QVariant CategoryTreeItem::data(int role) const noexcept
+template <typename ElementType>
+QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
 {
     switch (role)
     {
@@ -128,6 +133,40 @@ QVariant CategoryTreeItem::data(int role) const noexcept
     }
     return QVariant();
 }
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+template <>
+FilePath CategoryTreeItem<ComponentCategory>::getLatestCategory(const WorkspaceLibraryDb& lib) const
+{
+    return lib.getLatestComponentCategory(mUuid);
+}
+
+template <>
+FilePath CategoryTreeItem<PackageCategory>::getLatestCategory(const WorkspaceLibraryDb& lib) const
+{
+    return lib.getLatestPackageCategory(mUuid);
+}
+
+template <>
+QSet<Uuid> CategoryTreeItem<ComponentCategory>::getCategoryChilds(const WorkspaceLibraryDb& lib) const
+{
+    return lib.getComponentCategoryChilds(mUuid);
+}
+
+template <>
+QSet<Uuid> CategoryTreeItem<PackageCategory>::getCategoryChilds(const WorkspaceLibraryDb& lib) const
+{
+    return lib.getPackageCategoryChilds(mUuid);
+}
+
+/*****************************************************************************************
+ *  Explicit template instantiations
+ ****************************************************************************************/
+template class CategoryTreeItem<library::ComponentCategory>;
+template class CategoryTreeItem<library::PackageCategory>;
 
 /*****************************************************************************************
  *  End of File

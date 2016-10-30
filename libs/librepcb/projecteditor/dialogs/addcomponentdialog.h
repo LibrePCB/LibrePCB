@@ -28,6 +28,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/workspace/library/cat/categorytreemodel.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -46,7 +47,6 @@ class ComponentCategory;
 
 namespace workspace {
 class Workspace;
-class CategoryTreeModel;
 }
 
 namespace project {
@@ -108,7 +108,7 @@ class AddComponentDialog final : public QDialog
         Project& mProject;
         Ui::AddComponentDialog* mUi;
         GraphicsScene* mPreviewScene;
-        workspace::CategoryTreeModel* mCategoryTreeModel;
+        workspace::ComponentCategoryTreeModel* mCategoryTreeModel;
 
 
         // Attributes
