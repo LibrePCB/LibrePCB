@@ -2,11 +2,11 @@
 	path = dev/demo-workspace
 	url = https://github.com/LibrePCB/demo-workspace.git
 [submodule "3rdparty/hoedown"]
-	path = 3rdparty/hoedown
+	path = libs/hoedown
 	url = https://github.com/LibrePCB/hoedown.git
 [submodule "3rdparty/quazip"]
-	path = 3rdparty/quazip
+	path = libs/quazip
 	url = https://github.com/LibrePCB/quazip.git
 [submodule "3rdparty/googletest"]
-	path = 3rdparty/googletest
+	path = libs/googletest
 	url = https://github.com/LibrePCB/googletest.git
