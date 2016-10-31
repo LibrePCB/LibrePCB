@@ -4,213 +4,213 @@
   <g>
     <rect style="fill: #ffffff" x="0" y="360" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="360" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="376">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="395">ComponentInstance</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="376">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="395">ComponentInstance</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="240" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="240" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="648.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="275">SI_Symbol</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="648.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="275">SI_Symbol</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1600" y="240" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1600" y="240" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1728.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1728.2" y="275">DeviceInstance</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1728.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1728.2" y="275">DeviceInstance</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="540" y="40" width="464.3" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540" y="40" width="464.3" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="772.15" y="56">&lt;&lt;QObject, IF_AttributeProvider, IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.15" y="75">Project</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="772.15" y="56">&lt;&lt;QObject, IF_AttributeProvider, IF_XmlSerializableObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.15" y="75">Project</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="700" y="320" width="171.7" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="700" y="320" width="171.7" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="785.85" y="336">&lt;&lt;IF_ErcMsgProvider&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="785.85" y="355">SI_SymbolPin</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="785.85" y="336">&lt;&lt;IF_ErcMsgProvider&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="785.85" y="355">SI_SymbolPin</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1780" y="320" width="181.05" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1780" y="320" width="181.05" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1870.53" y="339">DevicePadInstance</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1870.53" y="339">DevicePadInstance</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="300" y="160" width="333.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="300" y="160" width="333.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="466.7" y="176">&lt;&lt;CADScene, IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="466.7" y="195">Schematic</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="466.7" y="176">&lt;&lt;CADScene, IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="466.7" y="195">Schematic</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1380" y="160" width="333.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1380" y="160" width="333.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1546.7" y="176">&lt;&lt;CADScene, IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1546.7" y="195">Board</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1546.7" y="176">&lt;&lt;CADScene, IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1546.7" y="195">Board</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="1200" y="160" width="157.8" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1200" y="160" width="157.8" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1278.9" y="176">&lt;&lt;QMainWindow&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1278.9" y="195">SchematicEditor</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1278.9" y="176">&lt;&lt;QMainWindow&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1278.9" y="195">SchematicEditor</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="2240" y="160" width="125.5" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2240" y="160" width="125.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2302.75" y="176">&lt;&lt;QMainWindow&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2302.75" y="195">BoardEditor</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2302.75" y="176">&lt;&lt;QMainWindow&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2302.75" y="195">BoardEditor</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="380" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="380" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="648.2" y="396">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="415">SchematicNetPoint</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="648.2" y="396">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="648.2" y="415">SchematicNetPoint</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="440" width="225.6" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="440" width="225.6" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="632.8" y="456">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="632.8" y="475">SchematicNetLine</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="632.8" y="456">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="632.8" y="475">SchematicNetLine</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="0" y="300" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="300" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="316">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="335">NetSignal</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="316">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="335">NetSignal</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="0" y="240" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="240" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="275">NetClass</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="128.2" y="256">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="128.2" y="275">NetClass</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="-200" y="160" width="294.9" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-200" y="160" width="294.9" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-52.55" y="176">&lt;&lt;QObject, IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-52.55" y="195">Circuit</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-52.55" y="176">&lt;&lt;QObject, IF_XmlSerializableObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-52.55" y="195">Circuit</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,229.172 -52.55,262 3.60822e-15,262 "/>
     <polygon style="fill: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="258"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="258">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="259"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="259">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,229.172 -52.55,322 3.60822e-15,322 "/>
     <polygon style="fill: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="318"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="318">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="319"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="319">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 1278.9,129 1278.9,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1025.53" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1282.9" y="156">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1025.53" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1282.9" y="156">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 2302.75,129 2302.75,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1537.45" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2306.75" y="156">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1537.45" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2306.75" y="156">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,229.172 -52.55,382 3.60822e-15,382 "/>
     <polygon style="fill: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-52.55,204 -47.75,218 -52.55,232 -57.35,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="378"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="378">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-26.275" y="379"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-41.55" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="-4" y="379">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,229.172 466.7,262 520,262 "/>
     <polygon style="fill: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="258"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="258">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="259"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="259">0..*</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="180" y="440" width="256.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="440" width="256.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="308.2" y="456">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="308.2" y="475">ComponentSignalInstance</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="308.2" y="456">&lt;&lt;IF_XmlSerializableObject,...&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="308.2" y="475">ComponentSignalInstance</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="128.2,429.172 128.2,462 180,462 "/>
     <polygon style="fill: #000000" points="128.2,404 133,418 128.2,432 123.4,418 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="128.2,404 133,418 128.2,432 123.4,418 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="154.1" y="458"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="139.2" y="416">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="458">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="154.1" y="459"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="139.2" y="416">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="459">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1546.7,229.172 1546.7,262 1600,262 "/>
     <polygon style="fill: #000000" points="1546.7,204 1551.5,218 1546.7,232 1541.9,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1546.7,204 1551.5,218 1546.7,232 1541.9,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1573.35" y="258"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1557.7" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1596" y="258">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1573.35" y="259"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1557.7" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1596" y="259">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="801.572,262 791.4,262 859,262 860,262 "/>
     <polygon style="fill: #000000" points="776.4,262 790.4,257.2 804.4,262 790.4,266.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="776.4,262 790.4,257.2 804.4,262 790.4,266.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="825.2" y="258"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="808.4" y="258">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="258">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="825.2" y="259"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="808.4" y="259">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="259">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1881.57,262 1871.4,262 1939,262 1940,262 "/>
     <polygon style="fill: #000000" points="1856.4,262 1870.4,257.2 1884.4,262 1870.4,266.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1856.4,262 1870.4,257.2 1884.4,262 1870.4,266.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1905.2" y="258"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1888.4" y="258">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1936" y="258">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1905.2" y="259"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1888.4" y="259">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1936" y="259">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 466.7,129 466.7,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="619.425" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="470.7" y="156">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="619.425" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="470.7" y="156">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 1546.7,129 1546.7,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1159.42" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1550.7" y="156">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1159.42" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1550.7" y="156">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,229.172 466.7,402 520,402 "/>
     <polygon style="fill: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="398"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="398">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="399"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="399">0..*</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="-360" y="160" width="138.35" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-360" y="160" width="138.35" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-290.825" y="176">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-290.825" y="195">ProjectLibrary</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-290.825" y="176">&lt;&lt;QObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-290.825" y="195">ProjectLibrary</text>
   </g>
   <g>
     <polygon style="fill: #ffffff" points="-380,300 -212.3,300 -200.3,312 -200.3,398 -380,398 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-380,300 -212.3,300 -200.3,312 -200.3,398 -380,398 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="-212.3,300 -212.3,312 -200.3,312 "/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-373" y="324.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-373" y="324.9">
       <tspan x="-373" y="324.9">- library::Symbol</tspan>
       <tspan x="-373" y="340.9">- library::SpiceModel</tspan>
       <tspan x="-373" y="356.9">- library::Package</tspan>
@@ -222,259 +222,259 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-290.825,230.177 -290.825,259 -290.15,259 -290.15,298.994 "/>
     <polygon style="fill: #000000" points="-290.825,205.006 -286.025,219.006 -290.825,233.006 -295.625,219.006 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="-290.825,205.006 -286.025,219.006 -290.825,233.006 -295.625,219.006 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-290.487" y="255"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-279.825" y="217.006">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.15" y="294.994">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-290.487" y="256"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-279.825" y="217.006">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.15" y="294.994">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,229.172 466.7,462 520,462 "/>
     <polygon style="fill: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="458"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="458">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="459"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="459">0..*</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="860" y="240" width="269.15" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="240" width="269.15" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="994.575" y="256">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="994.575" y="275">library::SymbolGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="994.575" y="256">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="994.575" y="275">library::SymbolGraphicsItem</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="1940" y="240" width="286.45" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1940" y="240" width="286.45" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2083.22" y="256">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2083.22" y="275">library::FootprintGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2083.22" y="256">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2083.22" y="275">library::FootprintGraphicsItem</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="648.2,309.172 648.2,342 700,342 "/>
     <polygon style="fill: #000000" points="648.2,284 653,298 648.2,312 643.4,298 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="648.2,284 653,298 648.2,312 643.4,298 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="674.1" y="338"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="659.2" y="296">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="696" y="338">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="674.1" y="339"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="659.2" y="296">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="696" y="339">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1728.2,309.172 1728.2,334 1780,334 "/>
     <polygon style="fill: #000000" points="1728.2,284 1733,298 1728.2,312 1723.4,298 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1728.2,284 1733,298 1728.2,312 1723.4,298 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1754.1" y="330"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1739.2" y="296">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1776" y="330">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1754.1" y="331"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1739.2" y="296">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1776" y="331">0..*</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="1320" y="240" width="104.4" height="114"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1320" y="240" width="104.4" height="114"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1372.2" y="256">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1372.2" y="275">SES_FSM</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="290.5">The whole</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="304.5">schematic editor</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="318.5">state machine</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="332.5">with lot of</text>
-    <text font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="346.5">objects</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1372.2" y="256">&lt;&lt;QObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1372.2" y="275">SES_FSM</text>
+    <text xml:space="preserve" font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="290.5">The whole</text>
+    <text xml:space="preserve" font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="304.5">schematic editor</text>
+    <text xml:space="preserve" font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="318.5">state machine</text>
+    <text xml:space="preserve" font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="332.5">with lot of</text>
+    <text xml:space="preserve" font-size="11.2" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1372.2" y="346.5">objects</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1278.9,229.172 1278.9,297 1320,297 "/>
     <polygon style="fill: #000000" points="1278.9,204 1283.7,218 1278.9,232 1274.1,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1278.9,204 1283.7,218 1278.9,232 1274.1,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1299.45" y="293"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1289.9" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1316" y="293">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1299.45" y="294"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1289.9" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1316" y="294">1</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="2420" y="160" width="108.05" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2420" y="160" width="108.05" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2474.03" y="176">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2474.03" y="195">ErcMsgList</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2474.03" y="176">&lt;&lt;QObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2474.03" y="195">ErcMsgList</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 2474.03,129 2474.03,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1623.09" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2478.03" y="156">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1623.09" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2478.03" y="156">1</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="2540" y="240" width="75.2" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2540" y="240" width="75.2" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2577.6" y="259">ErcMsg</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2577.6" y="259">ErcMsg</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2474.03,229.172 2474.03,254 2540,254 "/>
     <polygon style="fill: #ffffff" points="2474.03,204 2478.82,218 2474.03,232 2469.23,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2474.03,204 2478.82,218 2474.03,232 2469.23,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2507.01" y="250"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2485.03" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="2536" y="250">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2507.01" y="251"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2485.03" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="2536" y="251">0..*</text>
   </g>
-  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="0">
+  <text xml:space="preserve" font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="0">
     <tspan x="680" y="0">Namespace: project</tspan>
   </text>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 -52.55,129 -52.55,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="359.8" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-48.55" y="156">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="359.8" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-48.55" y="156">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,109.172 772.15,129 -290.825,129 -290.825,160 "/>
     <polygon style="fill: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="772.15,84 776.95,98 772.15,112 767.35,98 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="240.663" y="125"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.825" y="156">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="240.663" y="126"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.15" y="96">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-286.825" y="156">1</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="180" y="500" width="272.65" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="500" width="272.65" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="316.325" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="316.325" y="535">ComponentAttributeInstance</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="316.325" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="316.325" y="535">ComponentAttributeInstance</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="0" y="620" width="260" height="120"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="620" width="260" height="120"/>
     <rect style="fill: #ffffff" x="0" y="600" width="181.1" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="0" y="600" width="181.1" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2" y="614">Circuit related classes</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2" y="615">Circuit related classes</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="20" y="640" width="202.4" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="20" y="640" width="202.4" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="121.2" y="656">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="121.2" y="675">EditNetClassesDialog</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="121.2" y="656">&lt;&lt;QDialog&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="121.2" y="675">EditNetClassesDialog</text>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="20" y="720">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="20" y="720">
     <tspan x="20" y="720">+ some undo commands</tspan>
   </text>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="128.2,429.172 128.2,522 180,522 "/>
     <polygon style="fill: #000000" points="128.2,404 133,418 128.2,432 123.4,418 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="128.2,404 133,418 128.2,432 123.4,418 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="154.1" y="518"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="139.2" y="416">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="518">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="154.1" y="519"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="139.2" y="416">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="176" y="519">0..*</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="-400" y="620" width="320" height="180"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-400" y="620" width="320" height="180"/>
     <rect style="fill: #ffffff" x="-400" y="600" width="181.1" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-400" y="600" width="181.1" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-398" y="614">Project related classes</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-398" y="615">Project related classes</text>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-380" y="780">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-380" y="780">
     <tspan x="-380" y="780">+ some undo commands</tspan>
   </text>
   <g>
     <rect style="fill: #92ff92" x="-380" y="640" width="206" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-380" y="640" width="206" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-277" y="656">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-277" y="675">AddComponentDialog</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-277" y="656">&lt;&lt;QDialog&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-277" y="675">AddComponentDialog</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="-380" y="700" width="280.5" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-380" y="700" width="280.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-239.75" y="716">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-239.75" y="735">ProjectPropertiesEditorDialog</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="-239.75" y="716">&lt;&lt;QDialog&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-239.75" y="735">ProjectPropertiesEditorDialog</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="500" width="225.6" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="500" width="225.6" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="632.8" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="632.8" y="535">SchematicNetLabel</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="632.8" y="516">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="632.8" y="535">SchematicNetLabel</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="860" y="380" width="302.85" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="380" width="302.85" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1011.42" y="396">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1011.42" y="415">SchematicNetPointGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1011.42" y="396">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1011.42" y="415">SchematicNetPointGraphicsItem</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="860" y="500" width="304.35" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="500" width="304.35" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1012.17" y="516">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1012.17" y="535">SchematicNetLabelGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1012.17" y="516">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1012.17" y="535">SchematicNetLabelGraphicsItem</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="860" y="440" width="293.5" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="440" width="293.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1006.75" y="456">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1006.75" y="475">SchematicNetLineGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1006.75" y="456">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1006.75" y="475">SchematicNetLineGraphicsItem</text>
   </g>
   <g>
     <rect style="fill: #bfd4ff" x="940" y="320" width="297.8" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="940" y="320" width="297.8" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1088.9" y="336">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1088.9" y="355">library::SymbolPinGraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1088.9" y="336">&lt;&lt;&lt;QGraphicsItem&gt;&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1088.9" y="355">library::SymbolPinGraphicsItem</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="896.872,342 886.7,342 939,342 940,342 "/>
     <polygon style="fill: #000000" points="871.7,342 885.7,337.2 899.7,342 885.7,346.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="871.7,342 885.7,337.2 899.7,342 885.7,346.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="912.85" y="338"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="903.7" y="338">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="936" y="338">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="912.85" y="339"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="903.7" y="339">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="936" y="339">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,229.172 466.7,522 520,522 "/>
     <polygon style="fill: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="466.7,204 471.5,218 466.7,232 461.9,218 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="518"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="518">0..*</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="493.35" y="519"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="477.7" y="216">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="519">0..*</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="801.572,402 791.4,402 859,402 860,402 "/>
     <polygon style="fill: #000000" points="776.4,402 790.4,397.2 804.4,402 790.4,406.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="776.4,402 790.4,397.2 804.4,402 790.4,406.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="825.2" y="398"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="808.4" y="398">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="398">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="825.2" y="399"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="808.4" y="399">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="399">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="770.772,462 760.6,462 859,462 860,462 "/>
     <polygon style="fill: #000000" points="745.6,462 759.6,457.2 773.6,462 759.6,466.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="745.6,462 759.6,457.2 773.6,462 759.6,466.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="809.8" y="458"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="777.6" y="458">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="458">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="809.8" y="459"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="777.6" y="459">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="459">1</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="770.772,522 760.6,522 859,522 860,522 "/>
     <polygon style="fill: #000000" points="745.6,522 759.6,517.2 773.6,522 759.6,526.8 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="745.6,522 759.6,517.2 773.6,522 759.6,526.8 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="809.8" y="518"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="777.6" y="518">1</text>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="518">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="809.8" y="519"/>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="777.6" y="519">1</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="856" y="519">1</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="520" y="620" width="340" height="240"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="620" width="340" height="240"/>
     <rect style="fill: #ffffff" x="520" y="600" width="196.5" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="600" width="196.5" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="522" y="614">Schematic related classes</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="522" y="615">Schematic related classes</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="540" y="640" width="201.7" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540" y="640" width="201.7" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="640.85" y="656">&lt;&lt;QDockWidget&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="640.85" y="675">SchematicPagesDock</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="640.85" y="656">&lt;&lt;QDockWidget&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="640.85" y="675">SchematicPagesDock</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="540" y="700" width="305.5" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540" y="700" width="305.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="692.75" y="716">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="692.75" y="735">SymbolInstancePropertiesDialog</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="692.75" y="716">&lt;&lt;QDialog&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="692.75" y="735">SymbolInstancePropertiesDialog</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="540" y="760" width="190.15" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540" y="760" width="190.15" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="635.075" y="776">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="635.075" y="795">SchematicClipboard</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="635.075" y="776">&lt;&lt;QObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="635.075" y="795">SchematicClipboard</text>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="540" y="840">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="540" y="840">
     <tspan x="540" y="840">+ some undo commands</tspan>
   </text>
   <g>
@@ -482,17 +482,17 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2400" y="640" width="220" height="120"/>
     <rect style="fill: #ffffff" x="2400" y="620" width="150.3" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2400" y="620" width="150.3" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2402" y="634">ERC related classes</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2402" y="635">ERC related classes</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="2420" y="660" width="176.95" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2420" y="660" width="176.95" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="2508.47" y="679">IF_ErcMsgProvider</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="2508.47" y="679">IF_ErcMsgProvider</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="2420" y="700" width="125.5" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2420" y="700" width="125.5" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2482.75" y="716">&lt;&lt;QDockWidget&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2482.75" y="735">ErcMsgDock</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2482.75" y="716">&lt;&lt;QDockWidget&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2482.75" y="735">ErcMsgDock</text>
   </g>
 </svg>

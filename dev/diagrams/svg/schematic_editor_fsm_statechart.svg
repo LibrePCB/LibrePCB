@@ -6,63 +6,63 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="420" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="400" width="50.2" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="400" width="50.2" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="414">select</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="415">select</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="540" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="540" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="520" width="40" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="520" width="40" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="534">move</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="535">move</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="660" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="660" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="640" width="73.3" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="640" width="73.3" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="654">draw_text</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="655">draw_text</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="780" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="780" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="760" width="111.8" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="760" width="111.8" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="774">draw_rectangle</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="775">draw_rectangle</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="900" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="900" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="880" width="96.4" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="880" width="96.4" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="894">draw_polygon</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="895">draw_polygon</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="1020" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1020" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="1000" width="88.7" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1000" width="88.7" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1014">draw_circle</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1015">draw_circle</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="1140" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1140" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="1120" width="96.4" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1120" width="96.4" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1134">draw_ellipse</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1135">draw_ellipse</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="1260" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1260" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="1240" width="73.3" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1240" width="73.3" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1254">draw_wire</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1255">draw_wire</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="1380" width="200" height="80"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1380" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="1360" width="104.1" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1360" width="104.1" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1374">add_component</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1375">add_component</text>
   </g>
   <ellipse style="fill: #000000" cx="690" cy="370" rx="10" ry="10"/>
   <g>

@@ -7,10 +7,10 @@
     <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1965" cy="1265" rx="15" ry="15"/>
     <ellipse style="fill: #000000" cx="1965" cy="1265" rx="10" ry="10"/>
   </g>
-  <text font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="900" y="320">
+  <text xml:space="preserve" font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="900" y="320">
     <tspan x="900" y="320">Schematic Editor Activity: Add Component</tspan>
   </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1600" y="360">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1600" y="360">
     <tspan x="1600" y="360">Enter Tool </tspan>
     <tspan x="1600" y="376">"Add Component"</tspan>
   </text>
@@ -18,7 +18,7 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1680,371.005 1680,381.005 1680,430 1680,435.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1675,427.764 1680,437.764 1685,427.764 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1880" y="1262">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1880" y="1262">
     <tspan x="1880" y="1262">Leave Tool</tspan>
     <tspan x="1880" y="1278">"Add Component"</tspan>
   </text>
@@ -26,19 +26,19 @@
     <polygon style="fill: #ffce8e" points="1660,460 1680,440 1700,460 1680,480 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1660,460 1680,440 1700,460 1680,480 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1780" y="420">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1780" y="420">
     <tspan x="1780" y="420">Is the component to place</tspan>
     <tspan x="1780" y="436">delivered with the event?</tspan>
   </text>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1700,460 2039.3,460 2039.3,515.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2034.3,507.764 2039.3,517.764 2044.3,507.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1720" y="476">[no]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1720" y="476">[no]</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1940" y="520" width="198.6" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1940" y="520" width="198.6" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2039.3" y="541.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2039.3" y="541.9">
       <tspan x="2039.3" y="541.9">Show AddComponentDialog</tspan>
       <tspan x="2039.3" y="557.9">to choose a component</tspan>
     </text>
@@ -46,7 +46,7 @@
   <g>
     <rect style="fill: #ffff94" x="1192" y="700" width="217.65" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1192" y="700" width="217.65" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1300.83" y="721.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1300.83" y="721.9">
       <tspan x="1300.83" y="721.9">Add chosen component to</tspan>
       <tspan x="1300.83" y="737.9">circuit =&gt; ComponentInstance</tspan>
     </text>
@@ -59,29 +59,29 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2039.3,572 2039.3,606 2040,606 2040,635.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2035,627.764 2040,637.764 2045,627.764 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="2092" y="632">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="2092" y="632">
     <tspan x="2092" y="632">Component </tspan>
     <tspan x="2092" y="648">chosen?</tspan>
   </text>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2040,680 2040,1200 1965,1200 1965,1245.53 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1960,1237.76 1965,1247.76 1970,1237.76 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2060" y="692">[no]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2060" y="692">[no]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2020,660 1300.83,660 1300.83,695.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1295.83,687.764 1300.83,697.764 1305.83,687.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2000" y="652">[yes]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="2000" y="652">[yes]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1660,460 1300.83,460 1300.83,695.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1295.83,687.764 1300.83,697.764 1305.83,687.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1635.89" y="476">[yes]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1635.89" y="476">[yes]</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1176" y="800" width="248.4" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1176" y="800" width="248.4" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1300.2" y="821.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1300.2" y="821.9">
       <tspan x="1300.2" y="821.9">Add next symbol of component</tspan>
       <tspan x="1300.2" y="837.9">to current schematic =&gt; SI_Symbol</tspan>
     </text>
@@ -94,7 +94,7 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300.2,852 1300.2,886 1300,886 1300,915.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1295,907.764 1300,917.764 1305,907.764 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1684" y="820">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1684" y="820">
     <tspan x="1684" y="820">All symbols of current</tspan>
     <tspan x="1684" y="836">component placed?</tspan>
   </text>
@@ -105,7 +105,7 @@
   <g>
     <rect style="fill: #ffff94" x="940" y="980" width="158.95" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="940" y="980" width="158.95" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1019.48" y="1001.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1019.48" y="1001.9">
       <tspan x="1019.48" y="1001.9">Move current symbol </tspan>
       <tspan x="1019.48" y="1017.9">to cursor position</tspan>
     </text>
@@ -113,7 +113,7 @@
   <g>
     <rect style="fill: #ffff94" x="1500" y="980" width="182" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="980" width="182" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1591" y="1001.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1591" y="1001.9">
       <tspan x="1591" y="1001.9">Place current symbol </tspan>
       <tspan x="1591" y="1017.9">at current cursor position</tspan>
     </text>
@@ -121,7 +121,7 @@
   <g>
     <rect style="fill: #ffff94" x="960" y="1080" width="127.6" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="1080" width="127.6" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023.8" y="1101.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023.8" y="1101.9">
       <tspan x="1023.8" y="1101.9">Rotate current </tspan>
       <tspan x="1023.8" y="1117.9">symbol 90° CCW</tspan>
     </text>
@@ -129,17 +129,17 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300,960 1300,1006 1103.42,1006 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1111.19,1001 1101.19,1006 1111.19,1011 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1200" y="1000">[MouseMoved]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1200" y="1000">[MouseMoved]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300,960 1300,1106 1092.07,1106 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1099.84,1101 1089.84,1106 1099.84,1111 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1200" y="1100">[RightMouseButtonClicked]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1200" y="1100">[RightMouseButtonClicked]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300,960 1300,1006 1495.53,1006 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1487.76,1011 1497.76,1006 1487.76,1001 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1396" y="1000">[LeftMouseButtonClicked]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1396" y="1000">[LeftMouseButtonClicked]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="940,1006 900,1006 900,940 1275.53,940 "/>
@@ -152,7 +152,7 @@
   <g>
     <rect style="fill: #ffff94" x="1500" y="1080" width="172.55" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="1080" width="172.55" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1586.28" y="1101.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1586.28" y="1101.9">
       <tspan x="1586.28" y="1101.9">Remove current symbol</tspan>
       <tspan x="1586.28" y="1117.9">from schematic</tspan>
     </text>
@@ -160,13 +160,13 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1300,960 1300,1106 1495.53,1106 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1487.76,1111 1497.76,1106 1487.76,1101 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1400" y="1100">[EscapePressed]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1400" y="1100">[EscapePressed]</text>
   </g>
   <g>
     <polygon style="fill: #ffce8e" points="1870,1106 1890,1086 1910,1106 1890,1126 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1870,1106 1890,1086 1910,1106 1890,1126 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1772" y="1084">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="1772" y="1084">
     <tspan x="1772" y="1084">Was the component to place</tspan>
     <tspan x="1772" y="1100">delivered with the event?</tspan>
   </text>
@@ -185,21 +185,21 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1590,806 1590,726 1414.12,726 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1421.89,721 1411.89,726 1421.89,731 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1568" y="800">[yes]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1568" y="800">[yes]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1570,826 1560,826 1434.4,826 1428.87,826 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1436.64,821 1426.64,826 1436.64,831 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1552" y="840">[no]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1552" y="840">[no]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1890,1126 1890,1200 1965,1200 1965,1245.53 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1960,1237.76 1965,1247.76 1970,1237.76 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1912" y="1140">[yes]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1912" y="1140">[yes]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1890,1086 1890,546 1935.53,546 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1927.76,551 1937.76,546 1927.76,541 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1908" y="1080">[no]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1908" y="1080">[no]</text>
   </g>
 </svg>

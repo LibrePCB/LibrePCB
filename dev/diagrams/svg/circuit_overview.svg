@@ -4,41 +4,41 @@
   <g>
     <rect style="fill: #ffffff" x="660" y="220" width="225.6" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="660" y="220" width="225.6" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.8" y="239">Circuit</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="772.8" y="239">Circuit</text>
     <rect style="fill: #ffffff" x="660" y="248" width="225.6" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="660" y="248" width="225.6" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="262">-Netlist (Classes + Signals)</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="278">-Components</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="294">-Assembly Variants</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="262">-Netlist (Classes + Signals)</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="278">-Components</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="663" y="294">-Assembly Variants</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="980" y="100" width="160" height="320"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="100" width="160" height="320"/>
     <rect style="fill: #ffffff" x="980" y="80" width="127.2" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="980" y="80" width="127.2" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="982" y="94">Schematic Editor</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="982" y="95">Schematic Editor</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="200" y="100" width="350" height="380"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="200" y="100" width="350" height="380"/>
     <rect style="fill: #ffffff" x="200" y="80" width="96.4" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="200" y="80" width="96.4" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="202" y="94">Board Editor</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="202" y="95">Board Editor</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1000" y="120" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="120" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="139">Schematic</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="139">Schematic</text>
     <rect style="fill: #ffffff" x="1000" y="148" width="125.5" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="148" width="125.5" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="162">-Symbols</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="178">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="194">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="162">-Symbols</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="178">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="194">-Netlist Lines</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="210" y="290" width="132.25" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210" y="290" width="132.25" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="276.125" y="309">Model Viewer</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="276.125" y="309">Model Viewer</text>
     <rect style="fill: #ffffff" x="210" y="318" width="132.25" height="8"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210" y="318" width="132.25" height="8"/>
     <rect style="fill: #ffffff" x="210" y="326" width="132.25" height="8"/>
@@ -106,17 +106,17 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="580" y="440" width="380" height="120"/>
     <rect style="fill: #ffffff" x="580" y="420" width="134.9" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="580" y="420" width="134.9" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="582" y="434">Simulation Editor</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="582" y="435">Simulation Editor</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="720" y="460" width="110.1" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="460" width="110.1" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="775.05" y="479">Simulation</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="775.05" y="479">Simulation</text>
     <rect style="fill: #ffffff" x="720" y="488" width="110.1" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="720" y="488" width="110.1" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="502">-Netlist</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="518">-Components</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="534">-SPICE Models</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="502">-Netlist</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="518">-Components</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="723" y="534">-SPICE Models</text>
   </g>
   <g>
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="660.821" y1="452.159" x2="772.8" y2="300"/>
@@ -138,12 +138,12 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-140" y="100" width="320" height="380"/>
     <rect style="fill: #ffffff" x="-140" y="80" width="134.9" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-140" y="80" width="134.9" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-138" y="94">FrontPanel Editor</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-138" y="95">FrontPanel Editor</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="-130" y="290" width="132.25" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-130" y="290" width="132.25" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-63.875" y="309">Model Viewer</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-63.875" y="309">Model Viewer</text>
     <rect style="fill: #ffffff" x="-130" y="318" width="132.25" height="8"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-130" y="318" width="132.25" height="8"/>
     <rect style="fill: #ffffff" x="-130" y="326" width="132.25" height="8"/>
@@ -152,12 +152,12 @@
   <g>
     <rect style="fill: #ffffff" x="40" y="240" width="113.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="240" width="113.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="259">Front Panel</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="259">Front Panel</text>
     <rect style="fill: #ffffff" x="40" y="268" width="113.3" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="268" width="113.3" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="282">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="298">-Drills</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="314">-Shapes</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="282">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="298">-Drills</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="314">-Shapes</text>
   </g>
   <g>
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="390" y1="134" x2="163.033" y2="134"/>
@@ -192,94 +192,94 @@
   <g>
     <rect style="fill: #ffffff" x="1000" y="220" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="220" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="239">Schematic</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="239">Schematic</text>
     <rect style="fill: #ffffff" x="1000" y="248" width="125.5" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="248" width="125.5" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="262">-Symbols</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="278">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="294">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="262">-Symbols</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="278">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="294">-Netlist Lines</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1000" y="320" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="320" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="339">Schematic</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.75" y="339">Schematic</text>
     <rect style="fill: #ffffff" x="1000" y="348" width="125.5" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1000" y="348" width="125.5" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="362">-Symbols</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="378">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="394">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="362">-Symbols</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="378">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1003" y="394">-Netlist Lines</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="600" y="460" width="110.1" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="460" width="110.1" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="655.05" y="479">Simulation</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="655.05" y="479">Simulation</text>
     <rect style="fill: #ffffff" x="600" y="488" width="110.1" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="488" width="110.1" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="502">-Netlist</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="518">-Components</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="534">-SPICE Models</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="502">-Netlist</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="518">-Components</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="603" y="534">-SPICE Models</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="840" y="460" width="110.1" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="840" y="460" width="110.1" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="895.05" y="479">Simulation</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="895.05" y="479">Simulation</text>
     <rect style="fill: #ffffff" x="840" y="488" width="110.1" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="840" y="488" width="110.1" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="502">-Netlist</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="518">-Components</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="534">-SPICE Models</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="502">-Netlist</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="518">-Components</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843" y="534">-SPICE Models</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="390" y="120" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="120" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="139">Board</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="139">Board</text>
     <rect style="fill: #ffffff" x="390" y="148" width="125.5" height="68"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="148" width="125.5" height="68"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="162">-Devices</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="178">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="194">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="210">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="162">-Devices</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="178">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="194">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="210">-Netlist Lines</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="40" y="120" width="113.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="120" width="113.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="139">Front Panel</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="139">Front Panel</text>
     <rect style="fill: #ffffff" x="40" y="148" width="113.3" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="148" width="113.3" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="162">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="178">-Drills</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="194">-Shapes</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="162">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="178">-Drills</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="194">-Shapes</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="40" y="360" width="113.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="360" width="113.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="379">Front Panel</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="96.65" y="379">Front Panel</text>
     <rect style="fill: #ffffff" x="40" y="388" width="113.3" height="52"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="40" y="388" width="113.3" height="52"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="402">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="418">-Drills</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="434">-Shapes</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="402">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="418">-Drills</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="43" y="434">-Shapes</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="390" y="240" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="240" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="259">Board</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="259">Board</text>
     <rect style="fill: #ffffff" x="390" y="268" width="125.5" height="68"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="268" width="125.5" height="68"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="282">-Devices</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="298">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="314">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="330">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="282">-Devices</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="298">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="314">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="330">-Netlist Lines</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="390" y="360" width="125.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="360" width="125.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="379">Board</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="452.75" y="379">Board</text>
     <rect style="fill: #ffffff" x="390" y="388" width="125.5" height="68"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="390" y="388" width="125.5" height="68"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="402">-Devices</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="418">-Packages</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="434">-Netlist Points</text>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="450">-Netlist Lines</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="402">-Devices</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="418">-Packages</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="434">-Netlist Points</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="393" y="450">-Netlist Lines</text>
   </g>
 </svg>

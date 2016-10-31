@@ -7,10 +7,10 @@
     <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="865" cy="1505" rx="15" ry="15"/>
     <ellipse style="fill: #000000" cx="865" cy="1505" rx="10" ry="10"/>
   </g>
-  <text font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="460" y="260">
+  <text xml:space="preserve" font-size="16.9333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="460" y="260">
     <tspan x="460" y="260">Schematic Editor Activity: Draw Wire</tspan>
   </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="792" y="310">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="792" y="310">
     <tspan x="792" y="310">Enter Tool </tspan>
     <tspan x="792" y="326">"Draw Wire"</tspan>
   </text>
@@ -18,11 +18,11 @@
     <polygon style="fill: #ffce8e" points="840,580 860,560 880,580 860,600 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="840,580 860,560 880,580 860,600 "/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="928" y="1506">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="928" y="1506">
     <tspan x="928" y="1506">Leave Tool</tspan>
     <tspan x="928" y="1522">"Draw Wire"</tspan>
   </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="770" y="570">
+  <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:normal" x="770" y="570">
     <tspan x="770" y="570">Starting netpoint found?</tspan>
   </text>
   <g>
@@ -32,12 +32,12 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,410 860,435 861.15,435 861.15,455.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="856.15,447.764 861.15,457.764 866.15,447.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="772" y="432">[LeftMouseButtonClicked]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="772" y="432">[LeftMouseButtonClicked]</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="770" y="750" width="182" height="68" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="770" y="750" width="182" height="68" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="771.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="771.9">
       <tspan x="861" y="771.9">Create a new netpoint</tspan>
       <tspan x="861" y="787.9">at current cursor position</tspan>
       <tspan x="861" y="803.9">--&gt; middlepoint of wire!</tspan>
@@ -46,7 +46,7 @@
   <g>
     <rect style="fill: #ffff94" x="770" y="990" width="182" height="68" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="770" y="990" width="182" height="68" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="1011.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="1011.9">
       <tspan x="861" y="1011.9">Create a new netpoint</tspan>
       <tspan x="861" y="1027.9">at current cursor position</tspan>
       <tspan x="861" y="1043.9">--&gt; endpoint of wire!</tspan>
@@ -59,7 +59,7 @@
   <g>
     <rect style="fill: #ffff94" x="754" y="870" width="212.55" height="68" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="754" y="870" width="212.55" height="68" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860.275" y="891.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860.275" y="891.9">
       <tspan x="860.275" y="891.9">Create a new netline between</tspan>
       <tspan x="860.275" y="907.9">startpoint and middlepoint</tspan>
       <tspan x="860.275" y="923.9">--&gt; segment1 of wire!</tspan>
@@ -68,7 +68,7 @@
   <g>
     <rect style="fill: #ffff94" x="754" y="1110" width="212.55" height="68" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="754" y="1110" width="212.55" height="68" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860.275" y="1131.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="860.275" y="1131.9">
       <tspan x="860.275" y="1131.9">Create a new netline between</tspan>
       <tspan x="860.275" y="1147.9">middlepoint and endpoint</tspan>
       <tspan x="860.275" y="1163.9">--&gt; segment2 of wire!</tspan>
@@ -85,7 +85,7 @@
   <g>
     <rect style="fill: #ffff94" x="780" y="460" width="162.3" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="460" width="162.3" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861.15" y="481.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861.15" y="481.9">
       <tspan x="861.15" y="481.9">Determine netpoint to</tspan>
       <tspan x="861.15" y="497.9">be used as startpoint</tspan>
     </text>
@@ -105,7 +105,7 @@
   <g>
     <rect style="fill: #ffff94" x="880" y="620" width="182" height="68" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="880" y="620" width="182" height="68" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="971" y="641.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="971" y="641.9">
       <tspan x="971" y="641.9">Create new netpoint</tspan>
       <tspan x="971" y="657.9">at current cursor position</tspan>
       <tspan x="971" y="673.9">--&gt; startpoint of wire!</tspan>
@@ -114,12 +114,12 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="880,580 971,580 971,615.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="966,607.764 971,617.764 976,607.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="896" y="572">[no]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="896" y="572">[no]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="860,600 860,675 861,675 861,745.528 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="856,737.764 861,747.764 866,737.764 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="840" y="616">[yes]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="840" y="616">[yes]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="971,688 971,719 861,719 861,745.528 "/>
@@ -129,15 +129,15 @@
     <polygon style="fill: #ffffff" points="980,430 1310.8,430 1322.8,442 1322.8,543.956 980,543.956 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #ff0000" points="980,430 1310.8,430 1322.8,442 1322.8,543.956 980,543.956 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 0.5; stroke: #ff0000" points="1310.8,430 1310.8,442 1322.8,442 "/>
-    <text font-size="9.59556" style="fill: #ff0000;text-anchor:start;font-family:monospace;font-style:italic;font-weight:normal" x="986.5" y="451.45">
-      <tspan x="986.5" y="451.45">These actions actually contain complex algorithms to do </tspan>
-      <tspan x="986.5" y="463.444">many things like:</tspan>
-      <tspan x="986.5" y="475.439">- determine the resulting netsignal/netsegment/netpoint</tspan>
-      <tspan x="986.5" y="487.433">- create new netsignal/netsegment/netpoint</tspan>
-      <tspan x="986.5" y="499.428">- split up netlines and add new netpoint in between</tspan>
-      <tspan x="986.5" y="511.422">- connect symbol pins / component signals to netsignals</tspan>
-      <tspan x="986.5" y="523.417">- connect netsegments/netsignals together</tspan>
-      <tspan x="986.5" y="535.411">- and many more...</tspan>
+    <text xml:space="preserve" font-size="9.59556" style="fill: #ff0000;text-anchor:start;font-family:monospace;font-style:italic;font-weight:normal" x="986.5" y="451.4">
+      <tspan x="986.5" y="451.4">These actions actually contain complex algorithms to do </tspan>
+      <tspan x="986.5" y="463.394">many things like:</tspan>
+      <tspan x="986.5" y="475.389">- determine the resulting netsignal/netsegment/netpoint</tspan>
+      <tspan x="986.5" y="487.383">- create new netsignal/netsegment/netpoint</tspan>
+      <tspan x="986.5" y="499.378">- split up netlines and add new netpoint in between</tspan>
+      <tspan x="986.5" y="511.372">- connect symbol pins / component signals to netsignals</tspan>
+      <tspan x="986.5" y="523.367">- connect netsegments/netsignals together</tspan>
+      <tspan x="986.5" y="535.361">- and many more...</tspan>
     </text>
   </g>
   <g>
@@ -159,7 +159,7 @@
   <g>
     <rect style="fill: #ffff94" x="480" y="1290" width="201.8" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="480" y="1290" width="201.8" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="580.9" y="1311.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="580.9" y="1311.9">
       <tspan x="580.9" y="1311.9">Calculate/update position </tspan>
       <tspan x="580.9" y="1327.9">of middlepoint and endpoint</tspan>
     </text>
@@ -167,7 +167,7 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="862,1270 862,1316 686.272,1316 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="694.036,1311 684.036,1316 694.036,1321 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="778" y="1310">[MouseMoved]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="778" y="1310">[MouseMoved]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="580.9,1290 580.9,1250 837.528,1250 "/>
@@ -176,7 +176,7 @@
   <g>
     <rect style="fill: #ffff94" x="1060" y="1390" width="262.95" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1060" y="1390" width="262.95" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1191.47" y="1411.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1191.47" y="1411.9">
       <tspan x="1191.47" y="1411.9">Undo creating (startpoint), segment1,</tspan>
       <tspan x="1191.47" y="1427.9">middlepoint, segment2 and endpoint</tspan>
     </text>
@@ -184,7 +184,7 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="862,1270 862,1416 1055.53,1416 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1047.76,1421 1057.76,1416 1047.76,1411 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="954" y="1410">[EscapePressed]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="954" y="1410">[EscapePressed]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1322.95,1416 1360,1416 1360,390 884.472,390 "/>
@@ -193,7 +193,7 @@
   <g>
     <rect style="fill: #ffff94" x="1060" y="1290" width="258.9" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1060" y="1290" width="258.9" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1189.45" y="1311.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1189.45" y="1311.9">
       <tspan x="1189.45" y="1311.9">Simplify the drawn wire segment</tspan>
       <tspan x="1189.45" y="1327.9">(remove needless netpoints/netlines)</tspan>
     </text>
@@ -201,17 +201,17 @@
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="862,1270 862,1316 1055.53,1316 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1047.76,1321 1057.76,1316 1047.76,1311 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="954" y="1310">[LeftMouseButtonPressed]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="954" y="1310">[LeftMouseButtonPressed]</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="862,1270 862,1416 659.822,1416 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="667.586,1411 657.586,1416 667.586,1421 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="766" y="1410">[RightMouseButtonPressed]</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="766" y="1410">[RightMouseButtonPressed]</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="510" y="1390" width="145.35" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="510" y="1390" width="145.35" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="582.675" y="1411.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="582.675" y="1411.9">
       <tspan x="582.675" y="1411.9">Switch to the next</tspan>
       <tspan x="582.675" y="1427.9">wire buckling mode</tspan>
     </text>
@@ -223,7 +223,7 @@
   <g>
     <rect style="fill: #ffff94" x="1100" y="1090" width="180" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1100" y="1090" width="180" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1190" y="1111.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1190" y="1111.9">
       <tspan x="1190" y="1111.9">Use the current endpoint</tspan>
       <tspan x="1190" y="1127.9">as the new startpoint</tspan>
     </text>
@@ -239,7 +239,7 @@
   <g>
     <rect style="fill: #ffff94" x="1110" y="1190" width="162.35" height="52" rx="20" ry="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1110" y="1190" width="162.35" height="52" rx="20" ry="20"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1191.18" y="1211.9">
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1191.18" y="1211.9">
       <tspan x="1191.18" y="1211.9">Fix all netpoints of the</tspan>
       <tspan x="1191.18" y="1227.9">drawn wire segment</tspan>
     </text>
