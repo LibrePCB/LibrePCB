@@ -37,6 +37,7 @@ class Workspace;
 }
 
 namespace library {
+namespace editor {
 
 namespace Ui {
 class LibraryEditor;
@@ -77,6 +78,7 @@ class LibraryEditor final : public QMainWindow
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace library
 } // namespace librepcb
 

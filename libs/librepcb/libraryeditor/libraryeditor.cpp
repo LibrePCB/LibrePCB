@@ -31,6 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -51,5 +52,6 @@ LibraryEditor::~LibraryEditor() noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace library
 } // namespace librepcb
