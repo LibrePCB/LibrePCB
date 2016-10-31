@@ -7,3 +7,6 @@
 [submodule "3rdparty/quazip"]
 	path = 3rdparty/quazip
 	url = https://github.com/LibrePCB/quazip.git
+[submodule "3rdparty/googletest"]
+	path = 3rdparty/googletest
+	url = https://github.com/LibrePCB/googletest.git
