@@ -70,3 +70,8 @@ after_success:
       git config user.name "LibrePCB-Builder" && git config user.email "builder@librepcb.org"
       git add -A > /dev/null && git commit --amend -q -m "Update documentation of branch '$BRANCH_NAME'" && git push --force -q origin master
     fi
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
