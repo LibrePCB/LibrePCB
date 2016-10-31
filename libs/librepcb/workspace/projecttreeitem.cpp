@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "projecttreeitem.h"
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace

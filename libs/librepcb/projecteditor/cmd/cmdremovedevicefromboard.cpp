@@ -22,12 +22,12 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremovedevicefromboard.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_footprint.h>
-#include <librepcbproject/boards/items/bi_footprintpad.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
+#include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
 #include "cmddetachboardnetpointfromviaorpad.h"
 
 /*****************************************************************************************

@@ -21,16 +21,16 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
 #include "netsignal.h"
 #include "componentinstance.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "../settings/projectsettings.h"
 
 /*****************************************************************************************

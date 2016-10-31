@@ -8,17 +8,17 @@ TEMPLATE = lib
 TARGET = librepcbcommon
 
 # Set the path for the generated binary
-GENERATED_DIR = ../../generated
+GENERATED_DIR = ../../../generated
 
 # Use common project definitions
-include(../../common.pri)
+include(../../../common.pri)
 
 QT += core widgets xml opengl network sql
 
 CONFIG += staticlib
 
 INCLUDEPATH += \
-    ../../3rdparty/quazip
+    ../../quazip
 
 # set preprocessor defines
 DEFINES += APP_VERSION="\\\"0.1.0\\\""

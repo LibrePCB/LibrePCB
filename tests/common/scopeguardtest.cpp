@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <gtest/gtest.h>
 #include <chrono>
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace

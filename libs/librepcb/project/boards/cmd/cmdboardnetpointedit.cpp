@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdboardnetpointedit.h"
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "../items/bi_netpoint.h"
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_via.h"

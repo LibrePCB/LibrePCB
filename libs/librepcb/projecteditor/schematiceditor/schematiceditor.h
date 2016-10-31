@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/graphics/if_graphicsvieweventhandler.h>
+#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

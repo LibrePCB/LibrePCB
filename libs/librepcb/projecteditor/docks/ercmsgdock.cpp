@@ -24,10 +24,10 @@
 #include <QtWidgets>
 #include "ercmsgdock.h"
 #include "ui_ercmsgdock.h"
-#include <librepcbproject/project.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/erc/ercmsg.h>
-#include <librepcbproject/erc/ercmsglist.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/erc/ercmsg.h>
+#include <librepcb/project/erc/ercmsglist.h>
 
 /*****************************************************************************************
  *  Namespace

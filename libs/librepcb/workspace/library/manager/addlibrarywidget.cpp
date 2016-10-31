@@ -24,11 +24,11 @@
 #include <QtWidgets>
 #include "addlibrarywidget.h"
 #include "ui_addlibrarywidget.h"
-#include <librepcbcommon/application.h>
-#include <librepcbcommon/systeminfo.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/network/repository.h>
-#include <librepcblibrary/library.h>
+#include <librepcb/common/application.h>
+#include <librepcb/common/systeminfo.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/network/repository.h>
+#include <librepcb/library/library.h>
 #include "../../workspace.h"
 #include "../../settings/workspacesettings.h"
 #include "repositorylibrarylistwidgetitem.h"

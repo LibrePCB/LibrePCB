@@ -29,10 +29,10 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace

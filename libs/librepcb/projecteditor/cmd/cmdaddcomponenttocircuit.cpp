@@ -22,13 +22,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddcomponenttocircuit.h"
-#include <librepcbworkspace/library/workspacelibrarydb.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/library/projectlibrary.h>
-#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcbproject/circuit/cmd/cmdcomponentinstanceadd.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/library/projectlibrary.h>
+#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
+#include <librepcb/project/circuit/cmd/cmdcomponentinstanceadd.h>
 
 /*****************************************************************************************
  *  Namespace

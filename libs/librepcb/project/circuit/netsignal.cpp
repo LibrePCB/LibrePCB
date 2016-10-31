@@ -23,11 +23,11 @@
 #include <QtCore>
 #include "netsignal.h"
 #include "netclass.h"
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 #include "circuit.h"
 #include "../erc/ercmsg.h"
 #include "componentsignalinstance.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "../schematics/items/si_netlabel.h"
 #include "../schematics/items/si_netpoint.h"
 #include "../boards/items/bi_netpoint.h"

@@ -23,20 +23,20 @@
 #include <QtCore>
 #include "si_symbolpin.h"
 #include "si_symbol.h"
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/sym/symbolpin.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/sym/symbolpin.h>
 #include "../../circuit/componentinstance.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "si_netpoint.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
-#include <librepcblibrary/cmp/componentsymbolvariantitem.h>
+#include <librepcb/library/cmp/componentsymbolvariantitem.h>
 #include "../../circuit/netsignal.h"
 #include "../../settings/projectsettings.h"
-#include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/graphicsscene.h>
 
 /*****************************************************************************************
  *  Namespace

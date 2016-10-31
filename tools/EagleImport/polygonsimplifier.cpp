@@ -22,8 +22,8 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/pkg/footprint.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/pkg/footprint.h>
 #include "polygonsimplifier.h"
 
 /*****************************************************************************************

@@ -24,10 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QObject>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/version.h>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/version.h>
+#include <librepcb/common/uuid.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

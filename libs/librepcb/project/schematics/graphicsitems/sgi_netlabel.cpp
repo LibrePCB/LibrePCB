@@ -28,7 +28,7 @@
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcbcommon/schematiclayer.h>
+#include <librepcb/common/schematiclayer.h>
 
 /*****************************************************************************************
  *  Namespace

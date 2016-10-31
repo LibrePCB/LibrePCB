@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

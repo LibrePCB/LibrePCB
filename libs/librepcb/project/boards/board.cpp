@@ -23,16 +23,16 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "board.h"
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/scopeguardlist.h>
-#include <librepcbcommon/boarddesignrules.h>
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/scopeguardlist.h>
+#include <librepcb/common/boarddesignrules.h>
+#include <librepcb/common/boardlayer.h>
 #include "../project.h"
-#include <librepcbcommon/graphics/graphicsview.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/gridproperties.h>
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/gridproperties.h>
 #include "../circuit/circuit.h"
 #include "../erc/ercmsg.h"
 #include "../circuit/componentinstance.h"
@@ -42,7 +42,7 @@
 #include "items/bi_via.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "items/bi_polygon.h"
 #include "boardlayerstack.h"
 

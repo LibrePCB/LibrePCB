@@ -22,13 +22,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcombineschematicnetpoints.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/circuit/netsignal.h>
-#include <librepcbproject/schematics/items/si_netpoint.h>
-#include <librepcbproject/schematics/items/si_netline.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetlineremove.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetlineadd.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetpointremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/schematics/items/si_netpoint.h>
+#include <librepcb/project/schematics/items/si_netline.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetpointremove.h>
 
 /*****************************************************************************************
  *  Namespace

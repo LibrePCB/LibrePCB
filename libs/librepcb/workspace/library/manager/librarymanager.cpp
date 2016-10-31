@@ -24,7 +24,7 @@
 #include <QtWidgets>
 #include "librarymanager.h"
 #include "ui_librarymanager.h"
-#include <librepcblibrary/library.h>
+#include <librepcb/library/library.h>
 #include "../../workspace.h"
 #include "../../settings/workspacesettings.h"
 #include "../workspacelibrarydb.h"

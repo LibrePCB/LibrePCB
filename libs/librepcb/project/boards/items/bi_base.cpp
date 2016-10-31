@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/graphicsscene.h>
 #include "../graphicsitems/bgi_base.h"
 #include "../board.h"
 #include "../../project.h"

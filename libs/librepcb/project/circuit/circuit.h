@@ -24,10 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

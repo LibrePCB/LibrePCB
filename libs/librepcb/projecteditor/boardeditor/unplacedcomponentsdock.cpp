@@ -24,22 +24,22 @@
 #include <QtWidgets>
 #include "unplacedcomponentsdock.h"
 #include "ui_unplacedcomponentsdock.h"
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/settings/projectsettings.h>
-#include <librepcbproject/circuit/componentinstance.h>
-#include <librepcbworkspace/library/workspacelibrarydb.h>
-#include <librepcblibrary/elements.h>
-#include <librepcbproject/library/projectlibrary.h>
-#include <librepcbcommon/graphics/graphicsview.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbworkspace/workspace.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/project/circuit/componentinstance.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/library/elements.h>
+#include <librepcb/project/library/projectlibrary.h>
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/workspace/workspace.h>
 #include "../projecteditor.h"
-#include <librepcblibrary/pkg/footprintpreviewgraphicsitem.h>
-#include <librepcbproject/boards/boardlayerstack.h>
+#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include "../cmd/cmdadddevicetoboard.h"
 
 /*****************************************************************************************

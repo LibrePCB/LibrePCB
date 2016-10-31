@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "workspacelibraryscanner.h"
-#include <librepcbcommon/sqlitedatabase.h>
-#include <librepcblibrary/elements.h>
+#include <librepcb/common/sqlitedatabase.h>
+#include <librepcb/library/elements.h>
 #include "../workspace.h"
 
 /*****************************************************************************************

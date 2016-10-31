@@ -22,10 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremoveviafromboard.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/cmd/cmdboardviaremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/cmd/cmdboardviaremove.h>
 #include "cmddetachboardnetpointfromviaorpad.h"
 
 /*****************************************************************************************

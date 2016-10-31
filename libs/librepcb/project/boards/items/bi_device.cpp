@@ -25,13 +25,13 @@
 #include "../board.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
-#include <librepcblibrary/elements.h>
+#include <librepcb/library/elements.h>
 #include "../../erc/ercmsg.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "bi_footprint.h"
-#include <librepcbcommon/scopeguard.h>
+#include <librepcb/common/scopeguard.h>
 
 /*****************************************************************************************
  *  Namespace

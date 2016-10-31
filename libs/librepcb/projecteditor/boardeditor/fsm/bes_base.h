@@ -27,8 +27,8 @@
 #include "boardeditorevent.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/graphics/graphicsview.h>
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/graphics/graphicsview.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

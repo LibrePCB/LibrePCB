@@ -28,12 +28,12 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/boarddesignrules.h>
-#include <librepcblibrary/pkg/footprint.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/boarddesignrules.h>
+#include <librepcb/library/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
 #include "../items/bi_device.h"
-#include <librepcblibrary/pkg/package.h>
+#include <librepcb/library/pkg/package.h>
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
 

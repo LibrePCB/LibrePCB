@@ -28,9 +28,9 @@
 #include "../schematic.h"
 #include "../../project.h"
 #include "../../circuit/componentinstance.h"
-#include <librepcbcommon/schematiclayer.h>
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/common/schematiclayer.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/cmp/component.h>
 
 /*****************************************************************************************
  *  Namespace

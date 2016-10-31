@@ -3,9 +3,9 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 
 namespace Ui {
 class MainWindow;

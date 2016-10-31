@@ -24,10 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/directorylock.h>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/version.h>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/fileio/directorylock.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/version.h>
+#include <librepcb/common/uuid.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

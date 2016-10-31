@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/uuid.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

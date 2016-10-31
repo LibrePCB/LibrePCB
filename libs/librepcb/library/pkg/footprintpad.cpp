@@ -21,8 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/boardlayer.h>
 #include "footprintpad.h"
 #include "footprintpadsmt.h"
 #include "footprintpadtht.h"

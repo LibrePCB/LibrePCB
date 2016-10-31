@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

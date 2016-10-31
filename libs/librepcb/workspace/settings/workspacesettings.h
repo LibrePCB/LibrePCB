@@ -24,8 +24,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
 
 // All Settings Classes
 #include "items/wsi_applocale.h"

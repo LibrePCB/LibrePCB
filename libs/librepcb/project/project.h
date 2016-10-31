@@ -24,14 +24,14 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/if_attributeprovider.h>
-#include <librepcbcommon/if_schematiclayerprovider.h>
-#include <librepcbcommon/if_boardlayerprovider.h>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/version.h>
-#include <librepcbcommon/fileio/directorylock.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/if_schematiclayerprovider.h>
+#include <librepcb/common/if_boardlayerprovider.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/version.h>
+#include <librepcb/common/fileio/directorylock.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

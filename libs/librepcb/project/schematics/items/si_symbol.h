@@ -25,8 +25,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/if_attributeprovider.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/if_attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************

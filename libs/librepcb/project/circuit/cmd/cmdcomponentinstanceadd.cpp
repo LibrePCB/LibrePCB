@@ -26,7 +26,7 @@
 #include "../componentinstance.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "../../settings/projectsettings.h"
 
 /*****************************************************************************************

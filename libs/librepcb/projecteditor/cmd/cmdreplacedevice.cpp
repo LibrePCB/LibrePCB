@@ -22,18 +22,18 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdreplacedevice.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/items/bi_footprint.h>
-#include <librepcbproject/boards/items/bi_footprintpad.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/items/bi_netline.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
+#include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
 #include "cmdadddevicetoboard.h"
 
 /*****************************************************************************************

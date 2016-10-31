@@ -57,19 +57,18 @@ LIBS += \
     -lquazip -lz
 
 INCLUDEPATH += \
-    ../3rdparty \
-    ../3rdparty/quazip \
+    ../libs/quazip \
     ../libs
 
 DEPENDPATH += \
-    ../3rdparty/hoedown \
-    ../libs/librepcbprojecteditor \
-    ../libs/librepcblibraryeditor \
-    ../libs/librepcbworkspace \
-    ../libs/librepcbproject \
-    ../libs/librepcblibrary \
-    ../libs/librepcbcommon \
-    ../3rdparty/quazip
+    ../libs/hoedown \
+    ../libs/librepcb/projecteditor \
+    ../libs/librepcb/libraryeditor \
+    ../libs/librepcb/workspace \
+    ../libs/librepcb/project \
+    ../libs/librepcb/library \
+    ../libs/librepcb/common \
+    ../libs/quazip
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \

@@ -22,13 +22,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcombineboardnetpoints.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/circuit/netsignal.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/items/bi_netline.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
 
 /*****************************************************************************************
  *  Namespace

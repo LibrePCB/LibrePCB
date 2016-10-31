@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/graphics/graphicsitem.h>
+#include <librepcb/common/graphics/graphicsitem.h>
 #include "../board.h"
 
 /*****************************************************************************************

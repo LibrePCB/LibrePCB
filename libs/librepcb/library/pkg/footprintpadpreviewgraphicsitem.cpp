@@ -26,8 +26,8 @@
 #include "footprintpadpreviewgraphicsitem.h"
 #include "packagepad.h"
 #include "footprintpad.h"
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/if_boardlayerprovider.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/if_boardlayerprovider.h>
 
 /*****************************************************************************************
  *  Namespace

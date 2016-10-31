@@ -28,11 +28,11 @@
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
 #include "../../circuit/componentinstance.h"
-#include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace

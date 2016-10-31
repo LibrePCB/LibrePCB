@@ -25,9 +25,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

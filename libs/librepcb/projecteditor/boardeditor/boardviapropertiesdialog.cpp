@@ -24,12 +24,12 @@
 #include <QtWidgets>
 #include "boardviapropertiesdialog.h"
 #include "ui_boardviapropertiesdialog.h"
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/circuit/netsignal.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 
 /*****************************************************************************************
  *  Namespace

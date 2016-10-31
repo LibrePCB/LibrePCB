@@ -27,8 +27,8 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/common/boardlayer.h>
 #include "../items/bi_device.h"
 #include "../boardlayerstack.h"
 

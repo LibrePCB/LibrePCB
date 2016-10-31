@@ -3,7 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcb/common/fileio/filepath.h>
 
 namespace Ui {
 class MainWindow;

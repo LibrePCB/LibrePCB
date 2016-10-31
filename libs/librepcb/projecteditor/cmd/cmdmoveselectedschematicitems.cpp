@@ -22,17 +22,17 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdmoveselectedschematicitems.h"
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/schematics/schematic.h>
-#include <librepcbproject/schematics/items/si_symbol.h>
-#include <librepcbproject/schematics/items/si_symbolpin.h>
-#include <librepcbproject/schematics/items/si_netpoint.h>
-#include <librepcbproject/schematics/items/si_netline.h>
-#include <librepcbproject/schematics/items/si_netlabel.h>
-#include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetpointedit.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/project/schematics/items/si_symbol.h>
+#include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/items/si_netpoint.h>
+#include <librepcb/project/schematics/items/si_netline.h>
+#include <librepcb/project/schematics/items/si_netlabel.h>
+#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
 
 /*****************************************************************************************
  *  Namespace

@@ -22,21 +22,21 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdplaceboardnetpoint.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/circuit/netsignal.h>
-#include <librepcbproject/circuit/componentsignalinstance.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/items/bi_netline.h>
-#include <librepcbproject/boards/items/bi_footprintpad.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointadd.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/circuit/componentsignalinstance.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
 #include "cmdcombineallitemsunderboardnetpoint.h"
 
 /*****************************************************************************************

@@ -24,9 +24,9 @@
 #include "bi_polygon.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/geometry/polygon.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/geometry/polygon.h>
 #include "../graphicsitems/bgi_polygon.h"
 
 /*****************************************************************************************

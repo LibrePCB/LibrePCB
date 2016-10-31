@@ -24,8 +24,8 @@
 #include <QtWidgets>
 #include "newprojectwizardpage_metadata.h"
 #include "ui_newprojectwizardpage_metadata.h"
-#include <librepcbcommon/application.h>
-#include <librepcbcommon/systeminfo.h>
+#include <librepcb/common/application.h>
+#include <librepcb/common/systeminfo.h>
 
 /*****************************************************************************************
  *  Namespace

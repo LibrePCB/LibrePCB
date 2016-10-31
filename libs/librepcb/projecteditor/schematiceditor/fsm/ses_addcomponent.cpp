@@ -24,17 +24,17 @@
 #include "ses_addcomponent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include <librepcbproject/project.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/circuit/componentinstance.h>
-#include <librepcbproject/schematics/cmd/cmdsymbolinstanceedit.h>
-#include <librepcbproject/schematics/items/si_symbol.h>
-#include <librepcbproject/schematics/schematic.h>
+#include <librepcb/project/project.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/circuit/componentinstance.h>
+#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcb/project/schematics/items/si_symbol.h>
+#include <librepcb/project/schematics/schematic.h>
 #include "../../dialogs/addcomponentdialog.h"
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcblibrary/sym/symbol.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/library/sym/symbol.h>
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"
 

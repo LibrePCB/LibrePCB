@@ -2,16 +2,16 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcblibrary/pkg/package.h>
-#include <librepcblibrary/dev/device.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/schematiclayer.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/schematiclayer.h>
 #include "polygonsimplifier.h"
 
 namespace librepcb {

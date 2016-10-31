@@ -25,16 +25,16 @@
 #include <QFileDialog>
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
-#include <librepcbproject/project.h>
-#include <librepcbworkspace/projecttreemodel.h>
-#include <librepcbworkspace/projecttreeitem.h>
-#include <librepcbworkspace/library/workspacelibrarydb.h>
-#include <librepcbworkspace/library/manager/librarymanager.h>
-#include <librepcbprojecteditor/projecteditor.h>
-#include <librepcbprojecteditor/newprojectwizard/newprojectwizard.h>
-#include <librepcbcommon/application.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/project/project.h>
+#include <librepcb/workspace/projecttreemodel.h>
+#include <librepcb/workspace/projecttreeitem.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/workspace/library/manager/librarymanager.h>
+#include <librepcb/projecteditor/projecteditor.h>
+#include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
+#include <librepcb/common/application.h>
 #include "../markdown/markdownconverter.h"
 
 /*****************************************************************************************

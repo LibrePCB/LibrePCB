@@ -23,8 +23,8 @@
 #include <QtCore>
 #include "categorytreeitem.h"
 #include "../workspacelibrarydb.h"
-#include <librepcblibrary/cat/componentcategory.h>
-#include <librepcblibrary/cat/packagecategory.h>
+#include <librepcb/library/cat/componentcategory.h>
+#include <librepcb/library/cat/packagecategory.h>
 
 /*****************************************************************************************
  *  Namespace

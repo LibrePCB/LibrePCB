@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/uuid.h>
 #include "librarybaseelement.h"
 
 /*****************************************************************************************

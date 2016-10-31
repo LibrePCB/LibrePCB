@@ -24,12 +24,12 @@
 #include <QtWidgets>
 #include "schematicpagesdock.h"
 #include "ui_schematicpagesdock.h"
-#include <librepcbproject/project.h>
-#include <librepcbproject/schematics/schematic.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/schematics/schematic.h>
 #include "schematiceditor.h"
-#include <librepcbproject/schematics/cmd/cmdschematicadd.h>
-#include <librepcbproject/schematics/cmd/cmdschematicremove.h>
-#include <librepcbcommon/undostack.h>
+#include <librepcb/project/schematics/cmd/cmdschematicadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicremove.h>
+#include <librepcb/common/undostack.h>
 #include "../projecteditor.h"
 
 /*****************************************************************************************

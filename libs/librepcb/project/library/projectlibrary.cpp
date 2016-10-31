@@ -21,16 +21,16 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 #include "projectlibrary.h"
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/fileio/fileutils.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include "../project.h"
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/pkg/package.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/dev/device.h>
-#include <librepcbcommon/application.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/common/application.h>
 
 /*****************************************************************************************
  *  Namespace

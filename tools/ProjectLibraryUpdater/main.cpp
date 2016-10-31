@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/application.h>
+#include <librepcb/common/application.h>
 #include "mainwindow.h"
 
 /*****************************************************************************************

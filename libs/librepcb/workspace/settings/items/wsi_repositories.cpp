@@ -23,8 +23,8 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_repositories.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/network/repository.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/network/repository.h>
 
 /*****************************************************************************************
  *  Namespace

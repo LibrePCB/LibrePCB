@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

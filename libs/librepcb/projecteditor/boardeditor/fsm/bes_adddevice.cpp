@@ -24,11 +24,11 @@
 #include "bes_adddevice.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include "../../cmd/cmdadddevicetoboard.h"
 
 /*****************************************************************************************

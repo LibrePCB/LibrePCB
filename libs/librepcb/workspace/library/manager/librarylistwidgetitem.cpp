@@ -24,7 +24,7 @@
 #include <QtWidgets>
 #include "librarylistwidgetitem.h"
 #include "ui_librarylistwidgetitem.h"
-#include <librepcblibrary/library.h>
+#include <librepcb/library/library.h>
 #include "../../workspace.h"
 #include "../../settings/workspacesettings.h"
 

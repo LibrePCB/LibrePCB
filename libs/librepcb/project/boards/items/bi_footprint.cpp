@@ -27,12 +27,12 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../library/projectlibrary.h"
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcblibrary/pkg/package.h>
-#include <librepcblibrary/dev/device.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "bi_device.h"
 
 /*****************************************************************************************

@@ -251,7 +251,7 @@
   <customwidget>
    <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcbcommon/graphics/graphicsview.h</header>
+   <header location="global">librepcb/common/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

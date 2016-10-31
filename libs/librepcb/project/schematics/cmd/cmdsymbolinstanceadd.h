@@ -24,9 +24,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/units/all_length_units.h>
-#include <librepcbcommon/undocommand.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

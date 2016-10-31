@@ -24,7 +24,7 @@
 #include <QtWidgets>
 #include "repositorylibrarylistwidgetitem.h"
 #include "ui_repositorylibrarylistwidgetitem.h"
-#include <librepcbcommon/network/networkrequest.h>
+#include <librepcb/common/network/networkrequest.h>
 #include "../../workspace.h"
 #include "librarydownload.h"
 

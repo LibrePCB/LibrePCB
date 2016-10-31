@@ -23,9 +23,9 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "library.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "sym/symbol.h"

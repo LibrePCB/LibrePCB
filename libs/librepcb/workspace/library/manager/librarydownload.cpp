@@ -22,9 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarydownload.h"
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/network/filedownload.h>
-#include <librepcblibrary/library.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/network/filedownload.h>
+#include <librepcb/library/library.h>
 
 /*****************************************************************************************
  *  Namespace

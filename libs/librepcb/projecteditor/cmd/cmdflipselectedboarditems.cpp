@@ -22,24 +22,24 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdflipselectedboarditems.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcblibrary/pkg/footprintpad.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/boardlayerstack.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/items/bi_footprint.h>
-#include <librepcbproject/boards/items/bi_footprintpad.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/items/bi_netline.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
-#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/library/pkg/footprintpad.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
+#include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
 
 /*****************************************************************************************
  *  Namespace

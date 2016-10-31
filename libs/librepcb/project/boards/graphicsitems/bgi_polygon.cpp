@@ -27,8 +27,8 @@
 #include "../items/bi_polygon.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/geometry/polygon.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/geometry/polygon.h>
 #include "../boardlayerstack.h"
 
 /*****************************************************************************************

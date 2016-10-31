@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bes_base.h"
-#include <librepcbproject/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_via.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

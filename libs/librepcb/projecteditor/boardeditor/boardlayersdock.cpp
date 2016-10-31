@@ -24,10 +24,10 @@
 #include <QtWidgets>
 #include "boardlayersdock.h"
 #include "ui_boardlayersdock.h"
-#include <librepcbproject/boards/board.h>
+#include <librepcb/project/boards/board.h>
 #include "boardeditor.h"
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbproject/boards/boardlayerstack.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 
 /*****************************************************************************************
  *  Namespace

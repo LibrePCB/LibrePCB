@@ -22,21 +22,21 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "schematic.h"
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "../project.h"
-#include <librepcblibrary/sym/symbolpin.h>
+#include <librepcb/library/sym/symbolpin.h>
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
 #include "items/si_netpoint.h"
 #include "items/si_netline.h"
 #include "items/si_netlabel.h"
-#include <librepcbcommon/graphics/graphicsview.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbcommon/application.h>
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/application.h>
 
 /*****************************************************************************************
  *  Namespace

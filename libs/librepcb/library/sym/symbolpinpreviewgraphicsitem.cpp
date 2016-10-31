@@ -26,8 +26,8 @@
 #include "symbolpinpreviewgraphicsitem.h"
 #include "symbolpin.h"
 #include "../cmp/component.h"
-#include <librepcbcommon/schematiclayer.h>
-#include <librepcbcommon/if_schematiclayerprovider.h>
+#include <librepcb/common/schematiclayer.h>
+#include <librepcb/common/if_schematiclayerprovider.h>
 
 /*****************************************************************************************
  *  Namespace

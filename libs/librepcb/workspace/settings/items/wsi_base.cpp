@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_base.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "../workspacesettings.h"
 #include "../../workspace.h"
 

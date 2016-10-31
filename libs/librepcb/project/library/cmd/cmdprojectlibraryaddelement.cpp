@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "cmdprojectlibraryaddelement.h"
 #include "../projectlibrary.h"
-#include <librepcblibrary/elements.h>
+#include <librepcb/library/elements.h>
 
 /*****************************************************************************************
  *  Namespace

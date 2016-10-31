@@ -30,7 +30,7 @@
 #include "../boardlayerstack.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/boardlayer.h>
 
 /*****************************************************************************************
  *  Namespace

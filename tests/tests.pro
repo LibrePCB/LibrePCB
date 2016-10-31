@@ -27,16 +27,16 @@ LIBS += \
     -lquazip -lz
 
 INCLUDEPATH += \
-    ../3rdparty/googletest/googletest/include \
-    ../3rdparty/googletest/googlemock/include \
-    ../3rdparty/quazip \
+    ../libs/googletest/googletest/include \
+    ../libs/googletest/googlemock/include \
+    ../libs/quazip \
     ../libs
 
 DEPENDPATH += \
     ../libs/librepcbproject \
     ../libs/librepcblibrary \
     ../libs/librepcbcommon \
-    ../3rdparty/quazip \
+    ../libs/quazip \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \

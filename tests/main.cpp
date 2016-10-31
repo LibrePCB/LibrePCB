@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <gmock/gmock.h>
-#include <librepcbcommon/application.h>
-#include <librepcbcommon/debug.h>
+#include <librepcb/common/application.h>
+#include <librepcb/common/debug.h>
 
 /*****************************************************************************************
  *  Namespace

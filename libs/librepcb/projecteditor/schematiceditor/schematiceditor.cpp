@@ -24,21 +24,21 @@
 #include <QtWidgets>
 #include "schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include <librepcbproject/project.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/schematics/schematic.h>
+#include <librepcb/project/project.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/schematics/schematic.h>
 #include "schematicpagesdock.h"
 #include "../docks/ercmsgdock.h"
 #include "fsm/ses_fsm.h"
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbcommon/dialogs/gridsettingsdialog.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
-#include <librepcbproject/settings/projectsettings.h>
-#include <librepcbcommon/graphics/graphicsview.h>
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbproject/schematics/cmd/cmdschematicadd.h>
+#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/project/schematics/cmd/cmdschematicadd.h>
 #include "../projecteditor.h"
 
 /*****************************************************************************************

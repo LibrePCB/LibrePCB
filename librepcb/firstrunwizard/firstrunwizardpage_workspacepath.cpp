@@ -23,8 +23,8 @@
 #include <QFileDialog>
 #include "firstrunwizardpage_workspacepath.h"
 #include "ui_firstrunwizardpage_workspacepath.h"
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbworkspace/workspace.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/workspace/workspace.h>
 
 /*****************************************************************************************
  *  Namespace

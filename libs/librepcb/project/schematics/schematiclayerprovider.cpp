@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/schematiclayer.h>
+#include <librepcb/common/schematiclayer.h>
 #include "schematiclayerprovider.h"
 
 /*****************************************************************************************

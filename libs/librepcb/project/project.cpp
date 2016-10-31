@@ -22,16 +22,16 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QPrinter>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/directorylock.h>
-#include <librepcbcommon/fileio/smarttextfile.h>
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/smartversionfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/systeminfo.h>
-#include <librepcbcommon/schematiclayer.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/directorylock.h>
+#include <librepcb/common/fileio/smarttextfile.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/systeminfo.h>
+#include <librepcb/common/schematiclayer.h>
 #include "project.h"
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
@@ -39,7 +39,7 @@
 #include "erc/ercmsglist.h"
 #include "settings/projectsettings.h"
 #include "boards/board.h"
-#include <librepcbcommon/application.h>
+#include <librepcb/common/application.h>
 #include "schematics/schematiclayerprovider.h"
 
 /*****************************************************************************************

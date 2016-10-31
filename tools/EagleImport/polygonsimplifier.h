@@ -25,7 +25,7 @@
  ****************************************************************************************/
 
 #include <QtCore>
-#include <librepcbcommon/geometry/polygon.h>
+#include <librepcb/common/geometry/polygon.h>
 
 /*****************************************************************************************
  *  Namespace

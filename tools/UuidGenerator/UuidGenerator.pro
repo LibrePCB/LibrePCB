@@ -23,7 +23,7 @@ INCLUDEPATH += \
     ../../libs
 
 DEPENDPATH += \
-    ../../libs/librepcbcommon
+    ../../libs/librepcb/common
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a

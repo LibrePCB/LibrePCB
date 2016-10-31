@@ -21,10 +21,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include<librepcbcommon/fileio/smartxmlfile.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
 #include "workspacesettingsdialog.h"

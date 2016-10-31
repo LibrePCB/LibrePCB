@@ -22,14 +22,14 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "boardgerberexport.h"
-#include <librepcbcommon/cam/gerbergenerator.h>
-#include <librepcbcommon/cam/excellongenerator.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/boarddesignrules.h>
-#include <librepcbcommon/geometry/hole.h>
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcblibrary/pkg/footprintpadsmt.h>
-#include <librepcblibrary/pkg/footprintpadtht.h>
+#include <librepcb/common/cam/gerbergenerator.h>
+#include <librepcb/common/cam/excellongenerator.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/boarddesignrules.h>
+#include <librepcb/common/geometry/hole.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/library/pkg/footprintpadsmt.h>
+#include <librepcb/library/pkg/footprintpadtht.h>
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"

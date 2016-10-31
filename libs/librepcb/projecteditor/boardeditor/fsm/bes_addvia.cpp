@@ -24,15 +24,15 @@
 #include "bes_addvia.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/boards/cmd/cmdboardviaadd.h>
-#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/circuit/netsignal.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/boards/cmd/cmdboardviaadd.h>
+#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/netsignal.h>
 
 /*****************************************************************************************
  *  Namespace

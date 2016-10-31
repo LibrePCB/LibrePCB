@@ -31,9 +31,9 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
-#include <librepcbcommon/schematiclayer.h>
-#include <librepcblibrary/sym/symbolpin.h>
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/common/schematiclayer.h>
+#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/library/cmp/component.h>
 #include "../../settings/projectsettings.h"
 
 /*****************************************************************************************

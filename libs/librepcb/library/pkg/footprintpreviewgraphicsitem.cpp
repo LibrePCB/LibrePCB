@@ -25,11 +25,11 @@
 #include <QPrinter>
 #include "footprintpreviewgraphicsitem.h"
 #include "footprint.h"
-#include <librepcbcommon/boardlayer.h>
-#include <librepcbcommon/if_boardlayerprovider.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/if_boardlayerprovider.h>
 #include "footprintpadpreviewgraphicsitem.h"
 #include "package.h"
-#include <librepcbcommon/geometry/text.h>
+#include <librepcb/common/geometry/text.h>
 #include "../cmp/component.h"
 
 /*****************************************************************************************

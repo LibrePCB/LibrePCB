@@ -26,10 +26,10 @@ INCLUDEPATH += \
     ../../libs
 
 DEPENDPATH += \
-    ../../libs/librepcbworkspace \
-    ../../libs/librepcbproject \
-    ../../libs/librepcblibrary \
-    ../../libs/librepcbcommon
+    ../../libs/librepcb/workspace \
+    ../../libs/librepcb/project \
+    ../../libs/librepcb/library \
+    ../../libs/librepcb/common
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbworkspace.a \

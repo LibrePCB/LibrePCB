@@ -28,9 +28,9 @@
 #include "../../circuit/netsignal.h"
 #include "si_symbol.h"
 #include "si_symbolpin.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/scopeguard.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/scopeguard.h>
 
 /*****************************************************************************************
  *  Namespace

@@ -24,14 +24,14 @@
 #include "ses_addnetlabel.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/schematics/items/si_netlabel.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetlabeladd.h>
-#include <librepcbproject/schematics/cmd/cmdschematicnetlabeledit.h>
-#include <librepcbproject/schematics/schematic.h>
-#include <librepcbproject/schematics/items/si_netline.h>
-#include <librepcbcommon/gridproperties.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/schematics/items/si_netlabel.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
+#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/project/schematics/items/si_netline.h>
+#include <librepcb/common/gridproperties.h>
 
 /*****************************************************************************************
  *  Namespace

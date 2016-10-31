@@ -25,11 +25,11 @@
 #include <QPrinter>
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
-#include <librepcbcommon/schematiclayer.h>
-#include <librepcbcommon/if_schematiclayerprovider.h>
+#include <librepcb/common/schematiclayer.h>
+#include <librepcb/common/if_schematiclayerprovider.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../cmp/component.h"
-#include <librepcbcommon/geometry/text.h>
+#include <librepcb/common/geometry/text.h>
 
 /*****************************************************************************************
  *  Namespace

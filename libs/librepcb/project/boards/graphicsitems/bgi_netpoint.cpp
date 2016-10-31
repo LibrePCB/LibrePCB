@@ -29,7 +29,7 @@
 #include "../../project.h"
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/boardlayer.h>
 
 /*****************************************************************************************
  *  Namespace

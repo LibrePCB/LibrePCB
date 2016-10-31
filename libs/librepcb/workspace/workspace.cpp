@@ -23,19 +23,19 @@
 #include <QtCore>
 #include <QFileDialog>
 #include "workspace.h"
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/application.h>
-#include <librepcblibraryeditor/libraryeditor.h>
-#include <librepcbproject/project.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/application.h>
+#include <librepcb/libraryeditor/libraryeditor.h>
+#include <librepcb/project/project.h>
 #include "library/workspacelibrarydb.h"
 #include "projecttreemodel.h"
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
 #include "settings/workspacesettings.h"
-#include <librepcbcommon/schematiclayer.h>
-#include <librepcblibrary/library.h>
+#include <librepcb/common/schematiclayer.h>
+#include <librepcb/library/library.h>
 
 /*****************************************************************************************
  *  Namespace

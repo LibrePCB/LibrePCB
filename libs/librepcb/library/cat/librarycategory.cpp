@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarycategory.h"
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace

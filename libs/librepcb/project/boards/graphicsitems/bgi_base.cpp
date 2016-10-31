@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bgi_base.h"
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/boardlayer.h>
 #include "../board.h"
 
 /*****************************************************************************************

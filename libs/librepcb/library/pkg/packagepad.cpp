@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "packagepad.h"
 
 /*****************************************************************************************

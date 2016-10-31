@@ -25,9 +25,9 @@
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
 #include "../project.h"
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace

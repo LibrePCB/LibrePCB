@@ -23,9 +23,9 @@
 #include <QtCore>
 #include "fabricationoutputdialog.h"
 #include "ui_fabricationoutputdialog.h"
-#include <librepcbproject/project.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/boardgerberexport.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardgerberexport.h>
 
 /*****************************************************************************************
  *  Namespace

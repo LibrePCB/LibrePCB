@@ -25,7 +25,7 @@
 #include "recentprojectsmodel.h"
 #include "workspace.h"
 #include "settings/workspacesettings.h"
-#include <librepcbcommon/fileio/smarttextfile.h>
+#include <librepcb/common/fileio/smarttextfile.h>
 
 /*****************************************************************************************
  *  Namespace

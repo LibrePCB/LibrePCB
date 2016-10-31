@@ -34,11 +34,11 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/boardlayer.h>
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/boardlayer.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace

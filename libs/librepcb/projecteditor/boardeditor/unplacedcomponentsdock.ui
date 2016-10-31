@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
+    <width>319</width>
     <height>416</height>
    </rect>
   </property>
@@ -89,7 +89,7 @@
   <customwidget>
    <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcbcommon/graphics/graphicsview.h</header>
+   <header location="global">librepcb/common/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

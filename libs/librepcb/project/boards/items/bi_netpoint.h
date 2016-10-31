@@ -25,8 +25,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/uuid.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_netpoint.h"
 

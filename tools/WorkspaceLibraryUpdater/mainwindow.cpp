@@ -2,11 +2,11 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbworkspace/library/workspacelibrarydb.h>
-#include <librepcblibrary/elements.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/library/elements.h>
 
 using namespace librepcb;
 using namespace librepcb::library;

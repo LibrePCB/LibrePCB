@@ -24,8 +24,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommandgroup.h>
-#include <librepcbcommon/units/angle.h>
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

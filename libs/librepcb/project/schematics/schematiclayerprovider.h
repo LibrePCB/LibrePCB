@@ -24,8 +24,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/if_schematiclayerprovider.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/if_schematiclayerprovider.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

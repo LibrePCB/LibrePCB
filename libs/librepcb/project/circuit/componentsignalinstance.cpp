@@ -21,15 +21,15 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "componentsignalinstance.h"
 #include "componentinstance.h"
 #include "circuit.h"
 #include "netsignal.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "../project.h"
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbolpin.h"

@@ -26,9 +26,9 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/circuit.h"
 #include "../../project.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/graphics/graphicsscene.h>
-#include <librepcbcommon/scopeguard.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/scopeguard.h>
 
 /*****************************************************************************************
  *  Namespace

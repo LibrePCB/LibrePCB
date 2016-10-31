@@ -24,7 +24,7 @@
 #include "schematiceditorevent.h"
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
-#include <librepcbproject/schematics/schematic.h>
+#include <librepcb/project/schematics/schematic.h>
 
 /*****************************************************************************************
  *  Namespace

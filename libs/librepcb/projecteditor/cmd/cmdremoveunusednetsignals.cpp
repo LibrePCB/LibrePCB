@@ -22,9 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremoveunusednetsignals.h"
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/circuit/netsignal.h>
-#include <librepcbproject/circuit/cmd/cmdnetsignalremove.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
 
 /*****************************************************************************************
  *  Namespace

@@ -25,10 +25,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/version.h>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/version.h>
+#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_projectautosaveinterval.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace

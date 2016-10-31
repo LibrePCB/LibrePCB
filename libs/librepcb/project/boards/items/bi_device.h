@@ -25,10 +25,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/if_attributeprovider.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/if_attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
 #include "../graphicsitems/bgi_footprint.h"
 
 /*****************************************************************************************

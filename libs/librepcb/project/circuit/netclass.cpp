@@ -22,11 +22,11 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "netclass.h"
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/exceptions.h>
 #include "netsignal.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace

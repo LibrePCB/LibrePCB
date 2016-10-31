@@ -23,11 +23,11 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QTranslator>
-#include <librepcbcommon/application.h>
-#include <librepcbcommon/debug.h>
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/network/networkaccessmanager.h>
-#include <librepcbworkspace/workspace.h>
+#include <librepcb/common/application.h>
+#include <librepcb/common/debug.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/network/networkaccessmanager.h>
+#include <librepcb/workspace/workspace.h>
 #include "firstrunwizard/firstrunwizard.h"
 #include "controlpanel/controlpanel.h"
 

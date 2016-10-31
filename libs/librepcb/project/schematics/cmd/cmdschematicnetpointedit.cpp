@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdschematicnetpointedit.h"
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "../items/si_netpoint.h"
 
 /*****************************************************************************************

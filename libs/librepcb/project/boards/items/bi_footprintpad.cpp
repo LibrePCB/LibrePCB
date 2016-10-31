@@ -23,23 +23,23 @@
 #include <QtCore>
 #include "bi_footprintpad.h"
 #include "bi_footprint.h"
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcblibrary/pkg/footprintpad.h>
-#include <librepcblibrary/pkg/packagepad.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/library/pkg/footprintpad.h>
+#include <librepcb/library/pkg/packagepad.h>
 #include "../board.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../settings/projectsettings.h"
-#include <librepcbcommon/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/graphicsscene.h>
 #include "bi_device.h"
-#include <librepcblibrary/dev/device.h>
+#include <librepcb/library/dev/device.h>
 #include "../../circuit/componentinstance.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "bi_netpoint.h"
 #include "../../circuit/componentsignalinstance.h"
-#include <librepcbcommon/boardlayer.h>
+#include <librepcb/common/boardlayer.h>
 #include "../../circuit/netsignal.h"
-#include <librepcblibrary/pkg/package.h>
+#include <librepcb/library/pkg/package.h>
 
 /*****************************************************************************************
  *  Namespace

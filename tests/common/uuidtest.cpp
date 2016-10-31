@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/uuid.h>
+#include <librepcb/common/uuid.h>
 
 /*****************************************************************************************
  *  Namespace

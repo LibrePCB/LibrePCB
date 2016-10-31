@@ -2,17 +2,17 @@
 #include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/sym/symbol.h>
-#include <librepcblibrary/dev/device.h>
-#include <librepcblibrary/pkg/footprint.h>
-#include <librepcblibrary/pkg/package.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/library/workspacelibrarydb.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 
 using namespace librepcb;
 using namespace librepcb::library;

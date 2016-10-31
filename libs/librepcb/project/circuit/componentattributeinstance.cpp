@@ -23,9 +23,9 @@
 #include <QtCore>
 #include "componentattributeinstance.h"
 #include "componentinstance.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/attributes/attributetype.h>
-#include <librepcbcommon/attributes/attributeunit.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/attributes/attributetype.h>
+#include <librepcb/common/attributes/attributeunit.h>
 #include "componentinstance.h"
 
 /*****************************************************************************************

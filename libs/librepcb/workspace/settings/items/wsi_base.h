@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

@@ -24,11 +24,11 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/geometry/polygon.h>
-#include <librepcbcommon/geometry/ellipse.h>
-#include <librepcbcommon/geometry/text.h>
-#include <librepcbcommon/geometry/hole.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/geometry/polygon.h>
+#include <librepcb/common/geometry/ellipse.h>
+#include <librepcb/common/geometry/text.h>
+#include <librepcb/common/geometry/hole.h>
 #include "footprintpadsmt.h"
 #include "footprintpadtht.h"
 

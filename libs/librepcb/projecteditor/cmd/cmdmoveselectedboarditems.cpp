@@ -22,16 +22,16 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdmoveselectedboarditems.h"
-#include <librepcbcommon/gridproperties.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/items/bi_footprint.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceedit.h>
-#include <librepcbproject/boards/cmd/cmdboardviaedit.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
 
 /*****************************************************************************************
  *  Namespace

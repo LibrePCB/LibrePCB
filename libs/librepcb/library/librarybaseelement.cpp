@@ -22,12 +22,12 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarybaseelement.h"
-#include <librepcbcommon/fileio/smartversionfile.h>
-#include <librepcbcommon/fileio/smartxmlfile.h>
-#include <librepcbcommon/fileio/xmldomdocument.h>
-#include <librepcbcommon/fileio/xmldomelement.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/application.h>
+#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/application.h>
 
 /*****************************************************************************************
  *  Namespace

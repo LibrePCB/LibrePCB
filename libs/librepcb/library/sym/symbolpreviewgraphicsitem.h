@@ -25,9 +25,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/graphics/graphicsitem.h>
-#include <librepcbcommon/if_attributeprovider.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/graphics/graphicsitem.h>
+#include <librepcb/common/if_attributeprovider.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

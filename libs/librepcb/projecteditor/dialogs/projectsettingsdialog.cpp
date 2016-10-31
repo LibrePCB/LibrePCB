@@ -24,10 +24,10 @@
 #include <QtWidgets>
 #include "projectsettingsdialog.h"
 #include "ui_projectsettingsdialog.h"
-#include <librepcbproject/settings/cmd/cmdprojectsettingschange.h>
-#include <librepcbproject/settings/projectsettings.h>
-#include <librepcbproject/project.h>
-#include <librepcbcommon/undostack.h>
+#include <librepcb/project/settings/cmd/cmdprojectsettingschange.h>
+#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/project/project.h>
+#include <librepcb/common/undostack.h>
 
 /*****************************************************************************************
  *  Namespace

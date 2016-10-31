@@ -24,9 +24,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/if_boardlayerprovider.h>
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/if_boardlayerprovider.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

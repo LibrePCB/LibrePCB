@@ -24,9 +24,9 @@
 #include <QtWidgets>
 #include "projectpropertieseditordialog.h"
 #include "ui_projectpropertieseditordialog.h"
-#include <librepcbproject/project.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/cmd/cmdprojectsetmetadata.h>
+#include <librepcb/project/project.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/cmd/cmdprojectsetmetadata.h>
 
 /*****************************************************************************************
  *  Namespace

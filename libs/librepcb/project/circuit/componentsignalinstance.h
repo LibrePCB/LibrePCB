@@ -25,8 +25,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcbcommon/fileio/if_xmlserializableobject.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

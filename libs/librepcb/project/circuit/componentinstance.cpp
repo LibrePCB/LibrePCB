@@ -22,16 +22,16 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "componentinstance.h"
-#include <librepcbcommon/exceptions.h>
-#include <librepcbcommon/scopeguardlist.h>
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/scopeguardlist.h>
 #include "circuit.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
 #include "componentsignalinstance.h"
-#include <librepcblibrary/cmp/component.h>
+#include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
 #include "componentattributeinstance.h"
-#include <librepcbcommon/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/xmldomelement.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"

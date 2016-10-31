@@ -22,10 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "projecteditor.h"
-#include <librepcbcommon/undostack.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbworkspace/settings/workspacesettings.h>
-#include <librepcbproject/project.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/project/project.h>
 #include "schematiceditor/schematiceditor.h"
 #include "boardeditor/boardeditor.h"
 #include "dialogs/projectsettingsdialog.h"

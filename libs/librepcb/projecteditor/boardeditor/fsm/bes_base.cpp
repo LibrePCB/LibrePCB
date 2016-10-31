@@ -23,8 +23,8 @@
 #include <QtCore>
 #include "bes_base.h"
 #include "../boardeditor.h"
-#include <librepcbproject/project.h>
-#include <librepcbprojecteditor/projecteditor.h>
+#include <librepcb/project/project.h>
+#include <librepcb/projecteditor/projecteditor.h>
 
 /*****************************************************************************************
  *  Namespace

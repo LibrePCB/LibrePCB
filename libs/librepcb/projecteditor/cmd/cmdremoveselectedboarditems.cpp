@@ -22,16 +22,16 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdremoveselectedboarditems.h"
-#include <librepcbcommon/scopeguard.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/boards/items/bi_device.h>
-#include <librepcbproject/boards/items/bi_footprint.h>
-#include <librepcbproject/boards/items/bi_via.h>
-#include <librepcbproject/boards/items/bi_netline.h>
-#include <librepcbproject/boards/items/bi_netpoint.h>
-#include <librepcbproject/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcbproject/boards/cmd/cmdboardnetpointremove.h>
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
+#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
 #include "cmdremoveviafromboard.h"
 #include "cmdremovedevicefromboard.h"
 

@@ -22,17 +22,17 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdadddevicetoboard.h"
-#include <librepcbworkspace/library/workspacelibrarydb.h>
-#include <librepcblibrary/cmp/component.h>
-#include <librepcblibrary/dev/device.h>
-#include <librepcblibrary/pkg/package.h>
-#include <librepcbworkspace/workspace.h>
-#include <librepcbproject/project.h>
-#include <librepcbproject/library/projectlibrary.h>
-#include <librepcbproject/boards/board.h>
-#include <librepcbproject/circuit/componentinstance.h>
-#include <librepcbproject/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcbproject/boards/cmd/cmddeviceinstanceadd.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/library/projectlibrary.h>
+#include <librepcb/project/boards/board.h>
+#include <librepcb/project/circuit/componentinstance.h>
+#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceadd.h>
 
 /*****************************************************************************************
  *  Namespace

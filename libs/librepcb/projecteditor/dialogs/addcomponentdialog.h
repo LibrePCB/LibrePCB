@@ -25,9 +25,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcbcommon/uuid.h>
-#include <librepcbcommon/fileio/filepath.h>
-#include <librepcbcommon/exceptions.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include "wsi_base.h"
-#include <librepcbcommon/units/lengthunit.h>
+#include <librepcb/common/units/lengthunit.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

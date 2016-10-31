@@ -24,13 +24,13 @@
 #include <QtWidgets>
 #include "editnetclassesdialog.h"
 #include "ui_editnetclassesdialog.h"
-#include <librepcbproject/circuit/circuit.h>
-#include <librepcbproject/project.h>
-#include <librepcbcommon/undostack.h>
-#include <librepcbproject/circuit/netclass.h>
-#include <librepcbproject/circuit/cmd/cmdnetclassedit.h>
-#include <librepcbproject/circuit/cmd/cmdnetclassadd.h>
-#include <librepcbproject/circuit/cmd/cmdnetclassremove.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/project.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/circuit/netclass.h>
+#include <librepcb/project/circuit/cmd/cmdnetclassedit.h>
+#include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
+#include <librepcb/project/circuit/cmd/cmdnetclassremove.h>
 
 /*****************************************************************************************
  *  Namespace

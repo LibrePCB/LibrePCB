@@ -24,9 +24,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/geometry/polygon.h>
-#include <librepcbcommon/geometry/ellipse.h>
-#include <librepcbcommon/geometry/text.h>
+#include <librepcb/common/geometry/polygon.h>
+#include <librepcb/common/geometry/ellipse.h>
+#include <librepcb/common/geometry/text.h>
 #include "../libraryelement.h"
 #include "symbolpin.h"
 

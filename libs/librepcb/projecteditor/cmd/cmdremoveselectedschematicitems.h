@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcbcommon/undocommandgroup.h>
+#include <librepcb/common/undocommandgroup.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
