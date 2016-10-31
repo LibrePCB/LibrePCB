@@ -181,7 +181,7 @@ class Board final : public QObject, public IF_AttributeProvider,
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept override;
 
         // Operator Overloadings
         Board& operator=(const Board& rhs) = delete;
@@ -196,7 +196,7 @@ class Board final : public QObject, public IF_AttributeProvider,
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void attributesChanged() override;
 
         void deviceAdded(BI_Device& comp);
         void deviceRemoved(BI_Device& comp);

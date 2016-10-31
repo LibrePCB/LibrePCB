@@ -89,7 +89,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept override;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Footprint;}
@@ -113,7 +113,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void attributesChanged() override;
 
 
     private:

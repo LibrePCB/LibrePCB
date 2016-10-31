@@ -170,7 +170,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept override;
 
         // Operator Overloadings
         Schematic& operator=(const Schematic& rhs) = delete;
@@ -185,7 +185,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void attributesChanged() override;
 
 
     private:

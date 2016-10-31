@@ -247,7 +247,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
          */
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        SchematicLayer* getSchematicLayer(int id) const noexcept override;
 
         /**
          * @brief Get the page index of a specific schematic
@@ -451,7 +451,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @copydoc IF_AttributeProvider#getAttributeValue()
          */
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept override;
 
 
         // Operator Overloadings
@@ -470,7 +470,7 @@ class Project final : public QObject, public IF_AttributeProvider,
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void attributesChanged() override;
 
         /**
          * @brief This signal is emitted after a schematic was added to the project
@@ -523,7 +523,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
          */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception);
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

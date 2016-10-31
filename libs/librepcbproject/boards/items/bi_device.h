@@ -99,7 +99,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+                               bool passToParents, QString& value) const noexcept override;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}
@@ -115,7 +115,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
     signals:
 
         /// @copydoc IF_AttributeProvider#attributesChanged()
-        void attributesChanged();
+        void attributesChanged() override;
 
         void moved(const Point& newPos);
         void rotated(const Angle& newRotation);

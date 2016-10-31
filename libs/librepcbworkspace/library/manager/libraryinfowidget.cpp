@@ -90,7 +90,7 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, QSharedPointer<library::Libr
     mUi->lblDirectory->setToolTip(lib->getFilePath().toNative());
 }
 
-LibraryInfoWidget::~LibraryInfoWidget()
+LibraryInfoWidget::~LibraryInfoWidget() noexcept
 {
 }
 

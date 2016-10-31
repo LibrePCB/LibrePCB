@@ -62,10 +62,10 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         Board& getBoard() const noexcept {return mBoard;}
 
         /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
-        QList<int> getAllBoardLayerIds() const noexcept {return mLayers.keys();}
+        QList<int> getAllBoardLayerIds() const noexcept override {return mLayers.keys();}
 
         /// @copydoc IF_BoardLayerProvider#getBoardLayer()
-        BoardLayer* getBoardLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
+        BoardLayer* getBoardLayer(int id) const noexcept override {return mLayers.value(id, nullptr);}
 
         // General Methods
 
