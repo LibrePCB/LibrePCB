@@ -36,13 +36,14 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryManager::LibraryManager(Workspace& ws, QWidget* parent) noexcept :
+LibraryManager::LibraryManager(workspace::Workspace& ws, QWidget* parent) noexcept :
     QMainWindow(parent), mWorkspace(ws), mUi(new Ui::LibraryManager),
     mCurrentWidget(nullptr)
 {
@@ -109,7 +110,6 @@ void LibraryManager::loadLibraryList() noexcept
     foreach (LibraryListWidgetItem* widget, widgets) { Q_ASSERT(widget);
         QListWidgetItem* item = new QListWidgetItem(mUi->lstLibraries);
         item->setSizeHint(widget->sizeHint());
-        //item->setData(Qt::UserRole, QVariant::fromValue(lib));
         mUi->lstLibraries->setItemWidget(item, widget);
     }
 
@@ -198,5 +198,6 @@ bool LibraryManager::widgetsLessThan(const LibraryListWidgetItem* a,
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb

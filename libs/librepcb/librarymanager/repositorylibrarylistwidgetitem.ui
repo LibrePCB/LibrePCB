@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::workspace::RepositoryLibraryListWidgetItem</class>
- <widget class="QWidget" name="librepcb::workspace::RepositoryLibraryListWidgetItem">
+ <class>librepcb::library::manager::RepositoryLibraryListWidgetItem</class>
+ <widget class="QWidget" name="librepcb::library::manager::RepositoryLibraryListWidgetItem">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>448</width>
-    <height>68</height>
+    <height>69</height>
    </rect>
   </property>
   <property name="windowTitle">

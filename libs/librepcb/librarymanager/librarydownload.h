@@ -33,7 +33,8 @@ namespace librepcb {
 
 class FileDownload;
 
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Class LibraryDownload
@@ -117,7 +118,8 @@ class LibraryDownload final : public QObject
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H

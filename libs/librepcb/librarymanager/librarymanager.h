@@ -32,13 +32,16 @@
  ****************************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Library;
+namespace workspace {
+class Workspace;
 }
 
-namespace workspace {
+namespace library {
 
-class Workspace;
+class Library;
+
+namespace manager {
+
 class AddLibraryWidget;
 class LibraryListWidgetItem;
 
@@ -65,7 +68,7 @@ class LibraryManager final : public QMainWindow
         // Constructors / Destructor
         LibraryManager() = delete;
         LibraryManager(const LibraryManager& other) = delete;
-        LibraryManager(Workspace& ws, QWidget* parent = nullptr) noexcept;
+        LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
         ~LibraryManager() noexcept;
 
         // Operator Overloadings
@@ -87,11 +90,9 @@ class LibraryManager final : public QMainWindow
 
     private: // Data
 
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::LibraryManager> mUi;
         QScopedPointer<AddLibraryWidget> mAddLibraryWidget;
-        //QMap<QString, library::Library*> mLibraries;
-        //QHash<library::Library*, LibraryListWidgetItem*> mLibraryListWidgets;
         QWidget* mCurrentWidget;
 };
 
@@ -99,7 +100,8 @@ class LibraryManager final : public QMainWindow
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_LIBRARYMANAGER_H

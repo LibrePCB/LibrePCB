@@ -32,9 +32,14 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
 
+namespace workspace {
 class Workspace;
+}
+
+namespace library {
+namespace manager {
+
 class LibraryDownload;
 
 namespace Ui {
@@ -60,7 +65,7 @@ class AddLibraryWidget final : public QWidget
         // Constructors / Destructor
         AddLibraryWidget() noexcept;
         AddLibraryWidget(const AddLibraryWidget& other) = delete;
-        explicit AddLibraryWidget(Workspace& ws) noexcept;
+        explicit AddLibraryWidget(workspace::Workspace& ws) noexcept;
         ~AddLibraryWidget() noexcept;
 
         // General Methods
@@ -94,7 +99,7 @@ class AddLibraryWidget final : public QWidget
 
     private: // Data
 
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::AddLibraryWidget> mUi;
         QScopedPointer<LibraryDownload> mManualLibraryDownload;
 };
@@ -104,7 +109,8 @@ class AddLibraryWidget final : public QWidget
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H

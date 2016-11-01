@@ -32,13 +32,15 @@
  ****************************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Library;
+namespace workspace {
+class Workspace;
 }
 
-namespace workspace {
+namespace library {
 
-class Workspace;
+class Library;
+
+namespace manager {
 
 namespace Ui {
 class LibraryInfoWidget;
@@ -63,7 +65,7 @@ class LibraryInfoWidget final : public QWidget
         // Constructors / Destructor
         LibraryInfoWidget() noexcept;
         LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
-        LibraryInfoWidget(Workspace& ws, QSharedPointer<library::Library> lib) noexcept;
+        LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
         ~LibraryInfoWidget() noexcept;
 
         // Getters
@@ -87,15 +89,16 @@ class LibraryInfoWidget final : public QWidget
     private: // Data
 
         QScopedPointer<Ui::LibraryInfoWidget> mUi;
-        Workspace& mWorkspace;
-        QSharedPointer<library::Library> mLib;
+        workspace::Workspace& mWorkspace;
+        QSharedPointer<Library> mLib;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_LIBRARYINFOWIDGET_H

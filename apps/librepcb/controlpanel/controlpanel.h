@@ -34,6 +34,12 @@ namespace librepcb {
 
 class FilePath;
 
+namespace library {
+namespace manager {
+class LibraryManager;
+}
+}
+
 namespace project {
 class Project;
 
@@ -44,7 +50,6 @@ class ProjectEditor;
 
 namespace workspace {
 class Workspace;
-class LibraryManager;
 }
 
 namespace Ui {
@@ -185,7 +190,7 @@ class ControlPanel final : public QMainWindow
         // Attributes
         workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::ControlPanel> mUi;
-        QScopedPointer<workspace::LibraryManager> mLibraryManager;
+        QScopedPointer<library::manager::LibraryManager> mLibraryManager;
         QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
 };
 

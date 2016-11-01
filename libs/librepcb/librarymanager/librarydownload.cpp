@@ -30,7 +30,8 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -191,5 +192,6 @@ FilePath LibraryDownload::getPathToLibDir() noexcept
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb

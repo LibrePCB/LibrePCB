@@ -32,14 +32,15 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryListWidgetItem::LibraryListWidgetItem(const Workspace& ws,
-                                             QSharedPointer<library::Library> lib) noexcept :
+LibraryListWidgetItem::LibraryListWidgetItem(const workspace::Workspace& ws,
+                                             QSharedPointer<Library> lib) noexcept :
     QWidget(nullptr), mUi(new Ui::LibraryListWidgetItem), mLib(lib)
 {
     mUi->setupUi(this);
@@ -96,5 +97,6 @@ bool LibraryListWidgetItem::isRemoteLibrary() const noexcept
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb

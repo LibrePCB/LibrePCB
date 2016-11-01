@@ -34,9 +34,14 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
 
+namespace workspace {
 class Workspace;
+}
+
+namespace library {
+namespace manager {
+
 class LibraryDownload;
 
 namespace Ui {
@@ -62,7 +67,7 @@ class RepositoryLibraryListWidgetItem final : public QWidget
         // Constructors / Destructor
         RepositoryLibraryListWidgetItem() = delete;
         RepositoryLibraryListWidgetItem(const RepositoryLibraryListWidgetItem& other) = delete;
-        RepositoryLibraryListWidgetItem(Workspace& ws, const QJsonObject& obj) noexcept;
+        RepositoryLibraryListWidgetItem(workspace::Workspace& ws, const QJsonObject& obj) noexcept;
         ~RepositoryLibraryListWidgetItem() noexcept;
 
         // Getters
@@ -95,7 +100,7 @@ class RepositoryLibraryListWidgetItem final : public QWidget
 
     private: // Data
 
-        Workspace& mWorkspace;
+        workspace::Workspace& mWorkspace;
         QJsonObject mJsonObject;
         Uuid mUuid;
         Version mVersion;
@@ -109,7 +114,8 @@ class RepositoryLibraryListWidgetItem final : public QWidget
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_REPOSITORYLIBRARYLISTWIDGETITEM_H

@@ -44,6 +44,7 @@ namespace librepcb {
 
 using namespace project;
 using namespace project::editor;
+using namespace library::manager;
 using namespace workspace;
 
 /*****************************************************************************************

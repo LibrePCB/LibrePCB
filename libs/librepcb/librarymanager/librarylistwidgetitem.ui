@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::workspace::LibraryListWidgetItem</class>
- <widget class="QWidget" name="librepcb::workspace::LibraryListWidgetItem">
+ <class>librepcb::library::manager::LibraryListWidgetItem</class>
+ <widget class="QWidget" name="librepcb::library::manager::LibraryListWidgetItem">
   <property name="geometry">
    <rect>
     <x>0</x>

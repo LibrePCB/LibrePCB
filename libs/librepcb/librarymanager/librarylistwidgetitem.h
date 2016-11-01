@@ -32,13 +32,15 @@
  ****************************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Library;
+namespace workspace {
+class Workspace;
 }
 
-namespace workspace {
+namespace library {
 
-class Workspace;
+class Library;
+
+namespace manager {
 
 namespace Ui {
 class LibraryListWidgetItem;
@@ -63,11 +65,11 @@ class LibraryListWidgetItem final : public QWidget
         // Constructors / Destructor
         LibraryListWidgetItem() noexcept;
         LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-        LibraryListWidgetItem(const Workspace& ws, QSharedPointer<library::Library> lib) noexcept;
+        LibraryListWidgetItem(const workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
         ~LibraryListWidgetItem() noexcept;
 
         // Getters
-        QSharedPointer<library::Library> getLibrary() const noexcept {return mLib;}
+        QSharedPointer<Library> getLibrary() const noexcept {return mLib;}
         QString getName() const noexcept;
         bool isRemoteLibrary() const noexcept;
 
@@ -78,14 +80,15 @@ class LibraryListWidgetItem final : public QWidget
     private: // Data
 
         QScopedPointer<Ui::LibraryListWidgetItem> mUi;
-        QSharedPointer<library::Library> mLib;
+        QSharedPointer<Library> mLib;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
 
 #endif // LIBREPCB_WORKSPACE_LIBRARYLISTWIDGETITEM_H

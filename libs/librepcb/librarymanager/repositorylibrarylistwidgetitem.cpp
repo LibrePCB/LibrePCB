@@ -32,13 +32,14 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(Workspace& ws,
+RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Workspace& ws,
                                                                  const QJsonObject& obj) noexcept :
     QWidget(nullptr), mWorkspace(ws), mJsonObject(obj),
     mUi(new Ui::RepositoryLibraryListWidgetItem)
@@ -213,5 +214,6 @@ void RepositoryLibraryListWidgetItem::iconReceived(const QByteArray& data) noexc
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb

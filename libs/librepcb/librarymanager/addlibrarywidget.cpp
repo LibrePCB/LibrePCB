@@ -38,13 +38,14 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace library {
+namespace manager {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept :
+AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept :
     QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget)
 {
     mUi->setupUi(this);
@@ -181,8 +182,8 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
 
     try {
         // create the new library
-        QScopedPointer<library::Library> lib(new library::Library(
-            Uuid::createRandom(), version, author, name, desc, QString("")));
+        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), version, author,
+                                                name, desc, QString("")));
         lib->setUrl(url);
         lib->saveTo(directory); // can throw
 
@@ -447,5 +448,6 @@ QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(QLineEdit* edit, boo
  *  End of File
  ****************************************************************************************/
 
-} // namespace workspace
+} // namespace manager
+} // namespace library
 } // namespace librepcb
