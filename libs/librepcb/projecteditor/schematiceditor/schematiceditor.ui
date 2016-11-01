@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::project::editor::SchematicEditor</class>
+ <widget class="QMainWindow" name="librepcb::project::editor::SchematicEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>920</width>
+    <height>636</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Schematic Editor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../../../img/images.qrc">
+    <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>920</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionPDF_Export"/>
+    </widget>
+    <addaction name="actionNew_Schematic_Page"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="actionPrint"/>
+    <addaction name="menuExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose_Project"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionHelp"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionRotate_CCW"/>
+    <addaction name="actionRotate_CW"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionRemove"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditNetclasses"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionGrid"/>
+    <addaction name="actionLayers"/>
+    <addaction name="separator"/>
+    <addaction name="actionZoom_In"/>
+    <addaction name="actionZoom_Out"/>
+    <addaction name="actionZoom_All"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionToolSelect"/>
+    <addaction name="actionToolDrawWire"/>
+    <addaction name="actionToolAddNetLabel"/>
+    <addaction name="actionToolAddComponent"/>
+   </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>Project</string>
+    </property>
+    <addaction name="actionProjectProperties"/>
+    <addaction name="actionProjectSettings"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuProject"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="fileToolbar">
+   <property name="windowTitle">
+    <string>File</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionClose_Project"/>
+   <addaction name="separator"/>
+   <addaction name="actionNew_Schematic_Page"/>
+   <addaction name="actionSave_Project"/>
+   <addaction name="actionPrint"/>
+   <addaction name="actionPDF_Export"/>
+   <addaction name="separator"/>
+   <addaction name="actionShow_Control_Panel"/>
+   <addaction name="actionShow_Board_Editor"/>
+   <addaction name="separator"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+  </widget>
+  <widget class="QToolBar" name="zoomToolbar">
+   <property name="windowTitle">
+    <string>View</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionZoom_In"/>
+   <addaction name="actionZoom_Out"/>
+   <addaction name="actionZoom_All"/>
+  </widget>
+  <widget class="QToolBar" name="editToolbar">
+   <property name="windowTitle">
+    <string>Edit</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRotate_CCW"/>
+   <addaction name="actionRotate_CW"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionRemove"/>
+  </widget>
+  <widget class="QToolBar" name="viewToolbar">
+   <property name="windowTitle">
+    <string>View Tools</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLayers"/>
+   <addaction name="actionGrid"/>
+  </widget>
+  <widget class="QToolBar" name="toolsToolbar">
+   <property name="windowTitle">
+    <string>Tools</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionToolSelect"/>
+   <addaction name="actionToolDrawWire"/>
+   <addaction name="actionToolAddNetLabel"/>
+   <addaction name="actionToolAddComponent"/>
+  </widget>
+  <widget class="QToolBar" name="commandToolbar">
+   <property name="windowTitle">
+    <string>Command</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionCommandAbort"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionAddComp_Resistor"/>
+   <addaction name="actionAddComp_Inductor"/>
+   <addaction name="actionAddComp_BipolarCapacitor"/>
+   <addaction name="actionAddComp_UnipolarCapacitor"/>
+   <addaction name="actionAddComp_gnd"/>
+   <addaction name="actionAddComp_vcc"/>
+  </widget>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
+   </property>
+   <property name="text">
+    <string>Print</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionPDF_Export">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
+   </property>
+   <property name="text">
+    <string>PDF Export</string>
+   </property>
+  </action>
+  <action name="actionShow_Control_Panel">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/home.png</normaloff>:/img/actions/home.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Control Panel</string>
+   </property>
+  </action>
+  <action name="actionShow_Board_Editor">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Board Editor</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionZoom_In">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionZoom_All">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom All</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionRotate_CCW">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Counterclockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionRotate_CW">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Clockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+R</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionToolSelect">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="actionToolAddComponent">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Component</string>
+   </property>
+  </action>
+  <action name="actionToolDrawWire">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/drawWire.png</normaloff>:/img/actions/drawWire.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Wire</string>
+   </property>
+  </action>
+  <action name="actionCommandAbort">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Abort Command</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionLayers">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/layers.png</normaloff>:/img/actions/layers.png</iconset>
+   </property>
+   <property name="text">
+    <string>Layers</string>
+   </property>
+  </action>
+  <action name="actionGrid">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid</string>
+   </property>
+  </action>
+  <action name="actionEditNetclasses">
+   <property name="text">
+    <string>Net Classes</string>
+   </property>
+  </action>
+  <action name="actionAddComp_Resistor">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/resistor_eu.png</normaloff>:/img/library/resistor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Resistor</string>
+   </property>
+  </action>
+  <action name="actionAddComp_BipolarCapacitor">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/bipolar_capacitor_eu.png</normaloff>:/img/library/bipolar_capacitor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Bipolar Capacitor</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Bipolar Capacitor</string>
+   </property>
+  </action>
+  <action name="actionAddComp_Inductor">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/inductor_eu.png</normaloff>:/img/library/inductor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Inductor</string>
+   </property>
+  </action>
+  <action name="actionAddComp_gnd">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/gnd.png</normaloff>:/img/library/gnd.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add GND</string>
+   </property>
+  </action>
+  <action name="actionAddComp_vcc">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/vcc.png</normaloff>:/img/library/vcc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add VCC</string>
+   </property>
+  </action>
+  <action name="actionProjectProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="actionProjectSettings">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionToolAddNetLabel">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_netlabel.png</normaloff>:/img/actions/draw_netlabel.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Netlabel</string>
+   </property>
+  </action>
+  <action name="actionAddComp_UnipolarCapacitor">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/library/unipolar_capacitor_eu.png</normaloff>:/img/library/unipolar_capacitor_eu.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Unipolar Capacitor</string>
+   </property>
+  </action>
+  <action name="actionNew_Schematic_Page">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Schematic Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
+ <connections/>
+</ui>

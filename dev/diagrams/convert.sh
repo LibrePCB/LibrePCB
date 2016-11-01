@@ -3,8 +3,17 @@
 rm -r svg
 mkdir svg
 
+# convert all *.dia files to *.svg files
 find . -type f -name "*.dia" | while read f
 do
   mkdir -p "svg/"`dirname "$f"`
-  dia -e "svg/${f%.dia}.svg" "$f"
+  outfile="svg/${f%.dia}.svg"
+  dia -e "$outfile" "$f"
+  
+  # ugly workaround for missing spaces in SVG texts:
+  # http://stackoverflow.com/questions/27499032/svg-text-element-with-whitespace-not-preserved-in-ie#27499096
+  sed -i -e 's/<text font-size=/<text xml:space="preserve" font-size=/g' "$outfile"
 done
+
+# update architecture overview diagram in doxygen documentation
+inkscape -z -f svg/architecture_overview.svg -w 1000 -e ../doxygen/images/architecture_overview.png

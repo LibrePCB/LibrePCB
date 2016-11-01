@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/systeminfo.h>
-#include <librepcbproject/project.h>
+#include <librepcb/common/systeminfo.h>
+#include <librepcb/project/project.h>
 
 /*****************************************************************************************
  *  Namespace

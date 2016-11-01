@@ -6,34 +6,34 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="140" y="120" width="260" height="300"/>
     <rect style="fill: #ffffff" x="140" y="100" width="81" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="140" y="100" width="81" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="142" y="114">exceptions</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="142" y="115">exceptions</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="420" y="120" width="160" height="180"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="120" width="160" height="180"/>
     <rect style="fill: #ffffff" x="420" y="100" width="42.5" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="100" width="42.5" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="422" y="114">units</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="422" y="115">units</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1500" y="100" width="68.45" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="100" width="68.45" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1534.23" y="119">Debug</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1534.23" y="119">Debug</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="180" width="72.95" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="180" width="72.95" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="476.475" y="199">Length</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="476.475" y="199">Length</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="220" width="61.6" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="220" width="61.6" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="470.8" y="239">Angle</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="470.8" y="239">Angle</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="260" width="57.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="260" width="57.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="468.65" y="279">Point</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="468.65" y="279">Point</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="218.9,202.236 218.9,234 240,234 "/>
@@ -53,44 +53,44 @@
   <g>
     <rect style="fill: #ffffff" x="160" y="140" width="117.8" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="160" y="140" width="117.8" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="218.9" y="156">&lt;&lt;QException&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="218.9" y="175">Exception</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="218.9" y="156">&lt;&lt;QException&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="218.9" y="175">Exception</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="220" width="103.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="240" y="220" width="103.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="291.65" y="239">LogicError</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="291.65" y="239">LogicError</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="260" width="131.4" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="240" y="260" width="131.4" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="305.7" y="279">RuntimeError</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="305.7" y="279">RuntimeError</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="300" width="112.45" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="240" y="300" width="112.45" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="296.225" y="319">RangeError</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="296.225" y="319">RangeError</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1500" y="140" width="111.9" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="140" width="111.9" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1555.95" y="159">SystemInfo</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1555.95" y="159">SystemInfo</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="1500" y="280" width="106.95" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="280" width="106.95" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1553.47" y="296">&lt;&lt;QObject&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1553.47" y="315">UndoStack</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1553.47" y="296">&lt;&lt;QObject&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1553.47" y="315">UndoStack</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1500" y="240" width="146.55" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="240" width="146.55" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1573.27" y="259">UndoCommand</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1573.27" y="259">UndoCommand</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="380" width="133.35" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="240" y="380" width="133.35" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="306.675" y="399">UserCanceled</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="306.675" y="399">UserCanceled</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="218.9,202.236 218.9,394 240,394 "/>
@@ -100,25 +100,25 @@
   <g>
     <rect style="fill: #ffffff" x="1500" y="420" width="153.05" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="420" width="153.05" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1576.53" y="439">SchematicLayer</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1576.53" y="439">SchematicLayer</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="440" y="140" width="110.5" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="140" width="110.5" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="495.25" y="159">LengthUnit</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="495.25" y="159">LengthUnit</text>
   </g>
   <g>
     <rect style="fill: #ffbdbd" x="1500" y="180" width="133.2" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="180" width="133.2" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1566.6" y="196">&lt;&lt;QApplication&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1566.6" y="215">Application</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1566.6" y="196">&lt;&lt;QApplication&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1566.6" y="215">Application</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1500" y="380" width="77.7" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="380" width="77.7" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1538.85" y="399">Version</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1538.85" y="399">Version</text>
   </g>
-  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="800" y="40">
+  <text xml:space="preserve" font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="800" y="40">
     <tspan x="800" y="40">Common classes</tspan>
   </text>
   <g>
@@ -126,18 +126,18 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1040" y="120" width="216.348" height="76.3883"/>
     <rect style="fill: #ffffff" x="1040" y="100" width="57.9" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1040" y="100" width="57.9" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1042" y="114">dialogs</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1042" y="115">dialogs</text>
   </g>
   <g>
     <rect style="fill: #92ff92" x="1056.35" y="136.388" width="181.05" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1056.35" y="136.388" width="181.05" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1146.87" y="152.388">&lt;&lt;QDialog&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1146.87" y="171.388">GridSettingsDialog</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1146.87" y="152.388">&lt;&lt;QDialog&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1146.87" y="171.388">GridSettingsDialog</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="240" y="340" width="138.8" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="240" y="340" width="138.8" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="309.4" y="359">FileParseError</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="309.4" y="359">FileParseError</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="218.9,202.236 218.9,354 240,354 "/>
@@ -149,54 +149,54 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="120" width="260" height="400"/>
     <rect style="fill: #ffffff" x="760" y="100" width="57.9" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="100" width="57.9" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="762" y="114">file_io</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="762" y="115">file_io</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="220" width="233.6" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="220" width="233.6" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="896.8" y="239">IF_XmlSerializableObject</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="896.8" y="239">IF_XmlSerializableObject</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="260" width="177.2" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="260" width="177.2" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="868.6" y="279">XmlDomDocument</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="868.6" y="279">XmlDomDocument</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="300" width="159.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="300" width="159.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="859.65" y="319">XmlDomElement</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="859.65" y="319">XmlDomElement</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="600" y="120" width="140" height="140"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="120" width="140" height="140"/>
     <rect style="fill: #ffffff" x="600" y="100" width="73.3" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="600" y="100" width="73.3" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602" y="114">alignment</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602" y="115">alignment</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="620" y="140" width="69.65" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="140" width="69.65" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="654.825" y="159">HAlign</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="654.825" y="159">HAlign</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="620" y="180" width="67.55" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="180" width="67.55" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="653.775" y="199">VAlign</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="653.775" y="199">VAlign</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="620" y="220" width="102.8" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="220" width="102.8" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="671.4" y="239">Alignment</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="671.4" y="239">Alignment</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="140" width="83.95" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="140" width="83.95" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="821.975" y="159">FilePath</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="821.975" y="159">FilePath</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="180" width="84.15" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="180" width="84.15" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="822.075" y="199">FileLock</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="822.075" y="199">FileLock</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="828.65,386.236 828.65,414 860,414 "/>
@@ -211,22 +211,22 @@
   <g>
     <rect style="fill: #ffffff" x="860" y="440" width="131.8" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="440" width="131.8" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="925.9" y="459">SmartXmlFile</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="925.9" y="459">SmartXmlFile</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="860" y="480" width="120.15" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="480" width="120.15" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="920.075" y="499">SmartIniFile</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="920.075" y="499">SmartIniFile</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="780" y="340" width="97.3" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="780" y="340" width="97.3" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="828.65" y="359">SmartFile</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="828.65" y="359">SmartFile</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="860" y="400" width="134.9" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="400" width="134.9" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="927.45" y="419">SmartTextFile</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="927.45" y="419">SmartTextFile</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="828.65,386.236 828.65,494 860,494 "/>
@@ -236,36 +236,36 @@
   <g>
     <rect style="fill: #ffffff" x="1500" y="460" width="193.35" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="460" width="193.35" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1596.67" y="479">IF_AttributeProvider</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:italic;font-weight:700" x="1596.67" y="479">IF_AttributeProvider</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1280" y="120" width="180" height="200"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="120" width="180" height="200"/>
     <rect style="fill: #ffffff" x="1280" y="100" width="65.6" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="100" width="65.6" height="20"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1282" y="114">graphics</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1282" y="115">graphics</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1300" y="140" width="140.9" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="140" width="140.9" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="156">&lt;&lt;QGraphicsView&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="175">GraphicsView</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="156">&lt;&lt;QGraphicsView&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="175">GraphicsView</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1300" y="200" width="148.6" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="200" width="148.6" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1374.3" y="216">&lt;&lt;QGraphicsScene&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1374.3" y="235">GraphicsScene</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1374.3" y="216">&lt;&lt;QGraphicsScene&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1374.3" y="235">GraphicsScene</text>
   </g>
   <g>
     <rect style="fill: #ffff94" x="1300" y="260" width="140.9" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1300" y="260" width="140.9" height="44"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="276">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="295">GraphicsItem</text>
+    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1370.45" y="276">&lt;&lt;QGraphicsItem&gt;&gt;</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1370.45" y="295">GraphicsItem</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="1500" y="340" width="51.35" height="28"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1500" y="340" width="51.35" height="28"/>
-    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1525.67" y="359">Uuid</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1525.67" y="359">Uuid</text>
   </g>
 </svg>

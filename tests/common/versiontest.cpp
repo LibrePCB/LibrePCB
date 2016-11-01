@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/version.h>
+#include <librepcb/common/version.h>
 
 /*****************************************************************************************
  *  Namespace

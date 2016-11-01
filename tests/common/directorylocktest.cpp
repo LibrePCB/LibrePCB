@@ -23,9 +23,9 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/fileio/directorylock.h>
-#include <librepcbcommon/fileio/fileutils.h>
-#include <librepcbcommon/systeminfo.h>
+#include <librepcb/common/fileio/directorylock.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/systeminfo.h>
 
 /*****************************************************************************************
  *  Namespace

@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/systeminfo.h>
-#include <librepcbcommon/fileio/filepath.h>
+#include <librepcb/common/systeminfo.h>
+#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace

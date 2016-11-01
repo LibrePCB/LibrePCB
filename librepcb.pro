@@ -1,12 +1,9 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
-    3rdparty \
+    apps \
     libs \
-    librepcb \
-    tools \
     tests
 
-librepcb.depends = libs
-tools.depends = libs
-tests.depends = 3rdparty libs
+apps.depends = libs
+tests.depends = libs

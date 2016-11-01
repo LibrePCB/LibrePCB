@@ -22,9 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/network/networkaccessmanager.h>
-#include <librepcbcommon/network/filedownload.h>
-#include <librepcbcommon/fileio/fileutils.h>
+#include <librepcb/common/network/networkaccessmanager.h>
+#include <librepcb/common/network/filedownload.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include "networkrequestbasesignalreceiver.h"
 
 /*****************************************************************************************

@@ -23,8 +23,8 @@
 
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcbcommon/units/point.h>
-#include <librepcbcommon/units/angle.h>
+#include <librepcb/common/units/point.h>
+#include <librepcb/common/units/angle.h>
 
 /*****************************************************************************************
  *  Namespace
