@@ -27,6 +27,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -47,4 +48,5 @@ FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb

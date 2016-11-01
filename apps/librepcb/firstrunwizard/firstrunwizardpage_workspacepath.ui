@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::FirstRunWizardPage_WorkspacePath</class>
- <widget class="QWizardPage" name="librepcb::FirstRunWizardPage_WorkspacePath">
+ <class>librepcb::application::FirstRunWizardPage_WorkspacePath</class>
+ <widget class="QWizardPage" name="librepcb::application::FirstRunWizardPage_WorkspacePath">
   <property name="geometry">
    <rect>
     <x>0</x>

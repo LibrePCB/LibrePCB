@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 /*****************************************************************************************
  *  Class MarkdownConverter
@@ -57,6 +58,7 @@ class MarkdownConverter final
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb
 
 #endif // LIBREPCB_MARKDOWNCONVERTER_H

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::FirstRunWizard</class>
- <widget class="QWizard" name="librepcb::FirstRunWizard">
+ <class>librepcb::application::FirstRunWizard</class>
+ <widget class="QWizard" name="librepcb::application::FirstRunWizard">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -17,7 +17,7 @@
    <string>Choose LibrePCB Workspace</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../img/images.qrc">
+   <iconset resource="../../../img/images.qrc">
     <normaloff>:/img/app.png</normaloff>:/img/app.png</iconset>
   </property>
   <property name="wizardStyle">
@@ -25,7 +25,7 @@
   </property>
  </widget>
  <resources>
-  <include location="../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
  </resources>
  <connections/>
 </ui>

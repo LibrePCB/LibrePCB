@@ -41,6 +41,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 using namespace project;
 using namespace project::editor;
@@ -52,7 +53,7 @@ using namespace workspace;
  ****************************************************************************************/
 
 ControlPanel::ControlPanel(Workspace& workspace) :
-    QMainWindow(nullptr), mWorkspace(workspace), mUi(new librepcb::Ui::ControlPanel),
+    QMainWindow(nullptr), mWorkspace(workspace), mUi(new Ui::ControlPanel),
     mLibraryManager(new LibraryManager(mWorkspace, this))
 {
     mUi->setupUi(this);
@@ -603,4 +604,5 @@ void ControlPanel::on_actionRescanLibrary_triggered()
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb

@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 namespace Ui {
 class FirstRunWizardPage_WorkspacePath;
@@ -81,6 +82,7 @@ class FirstRunWizardPage_WorkspacePath final : public QWizardPage
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb
 
 #endif // LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H

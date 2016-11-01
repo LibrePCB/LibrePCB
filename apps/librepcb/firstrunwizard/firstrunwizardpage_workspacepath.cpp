@@ -30,6 +30,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -128,4 +129,5 @@ void FirstRunWizardPage_WorkspacePath::on_btnOpenWsBrowse_clicked()
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb

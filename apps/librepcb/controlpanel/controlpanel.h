@@ -52,6 +52,8 @@ namespace workspace {
 class Workspace;
 }
 
+namespace application {
+
 namespace Ui {
 class ControlPanel;
 }
@@ -198,6 +200,7 @@ class ControlPanel final : public QMainWindow
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb
 
 #endif // LIBREPCB_CONTROLPANEL_H

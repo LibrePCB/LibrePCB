@@ -36,6 +36,7 @@
  ****************************************************************************************/
 using namespace librepcb;
 using namespace librepcb::workspace;
+using namespace librepcb::application;
 
 /*****************************************************************************************
  *  Function Prototypes

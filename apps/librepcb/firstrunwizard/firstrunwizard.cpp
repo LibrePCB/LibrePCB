@@ -29,6 +29,7 @@
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace application {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -72,4 +73,5 @@ FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace application
 } // namespace librepcb
