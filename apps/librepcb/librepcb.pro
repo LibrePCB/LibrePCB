@@ -48,6 +48,7 @@ unix:!macx {
 LIBS += \
     -L$${DESTDIR} \
     -lhoedown \
+    -llibrepcblibrarymanager \
     -llibrepcbprojecteditor \
     -llibrepcblibraryeditor \
     -llibrepcbworkspace \
@@ -62,6 +63,7 @@ INCLUDEPATH += \
 
 DEPENDPATH += \
     ../../libs/hoedown \
+    ../../libs/librepcb/librarymanager \
     ../../libs/librepcb/projecteditor \
     ../../libs/librepcb/libraryeditor \
     ../../libs/librepcb/workspace \
@@ -72,6 +74,7 @@ DEPENDPATH += \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
+    $${DESTDIR}/liblibrepcblibrarymanager.a \
     $${DESTDIR}/liblibrepcbprojecteditor.a \
     $${DESTDIR}/liblibrepcblibraryeditor.a \
     $${DESTDIR}/liblibrepcbworkspace.a \

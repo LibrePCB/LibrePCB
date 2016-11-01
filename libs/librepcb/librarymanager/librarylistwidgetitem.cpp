@@ -25,8 +25,8 @@
 #include "librarylistwidgetitem.h"
 #include "ui_librarylistwidgetitem.h"
 #include <librepcb/library/library.h>
-#include "../../workspace.h"
-#include "../../settings/workspacesettings.h"
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
 
 /*****************************************************************************************
  *  Namespace

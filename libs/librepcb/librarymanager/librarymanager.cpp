@@ -25,9 +25,9 @@
 #include "librarymanager.h"
 #include "ui_librarymanager.h"
 #include <librepcb/library/library.h>
-#include "../../workspace.h"
-#include "../../settings/workspacesettings.h"
-#include "../workspacelibrarydb.h"
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 #include "librarylistwidgetitem.h"
 #include "libraryinfowidget.h"
 #include "addlibrarywidget.h"

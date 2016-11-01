@@ -31,7 +31,7 @@
 #include <librepcb/workspace/projecttreemodel.h>
 #include <librepcb/workspace/projecttreeitem.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/library/manager/librarymanager.h>
+#include <librepcb/librarymanager/librarymanager.h>
 #include <librepcb/projecteditor/projecteditor.h>
 #include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcb/common/application.h>

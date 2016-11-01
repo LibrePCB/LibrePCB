@@ -25,7 +25,7 @@
 #include "repositorylibrarylistwidgetitem.h"
 #include "ui_repositorylibrarylistwidgetitem.h"
 #include <librepcb/common/network/networkrequest.h>
-#include "../../workspace.h"
+#include <librepcb/workspace/workspace.h>
 #include "librarydownload.h"
 
 /*****************************************************************************************
