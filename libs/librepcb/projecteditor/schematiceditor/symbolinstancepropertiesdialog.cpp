@@ -46,6 +46,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -426,5 +427,6 @@ void SymbolInstancePropertiesDialog::abortCmd()
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

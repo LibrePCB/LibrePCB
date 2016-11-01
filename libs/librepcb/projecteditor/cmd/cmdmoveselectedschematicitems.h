@@ -38,6 +38,8 @@ class CmdSymbolInstanceEdit;
 class CmdSchematicNetPointEdit;
 class CmdSchematicNetLabelEdit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdMoveSelectedSchematicItems
  ****************************************************************************************/
@@ -80,6 +82,7 @@ class CmdMoveSelectedSchematicItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

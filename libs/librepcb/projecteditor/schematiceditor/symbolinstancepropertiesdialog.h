@@ -42,6 +42,8 @@ class Project;
 class ComponentInstance;
 class SI_Symbol;
 
+namespace editor {
+
 namespace Ui {
 class SymbolInstancePropertiesDialog;
 }
@@ -121,6 +123,7 @@ class SymbolInstancePropertiesDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

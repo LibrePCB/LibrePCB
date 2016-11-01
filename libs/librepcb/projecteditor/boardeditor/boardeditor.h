@@ -38,14 +38,17 @@ class GridProperties;
 
 namespace project {
 
-class ProjectEditor;
 class Project;
 class Board;
+class ComponentInstance;
+
+namespace editor {
+
+class ProjectEditor;
 class ErcMsgDock;
 class UnplacedComponentsDock;
 class BoardLayersDock;
 class BES_FSM;
-class ComponentInstance;
 
 namespace Ui {
 class BoardEditor;
@@ -148,6 +151,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

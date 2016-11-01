@@ -32,6 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -211,5 +212,6 @@ bool NewProjectWizardPage_Metadata::validatePage() noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

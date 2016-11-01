@@ -35,6 +35,8 @@ namespace project {
 
 class Board;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRotateSelectedBoardItems
  ****************************************************************************************/
@@ -70,6 +72,7 @@ class CmdRotateSelectedBoardItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

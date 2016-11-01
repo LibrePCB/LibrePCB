@@ -44,6 +44,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -140,5 +141,6 @@ BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPointAtPad() throw (Exception)
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

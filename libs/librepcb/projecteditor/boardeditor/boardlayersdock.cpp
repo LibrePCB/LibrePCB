@@ -34,12 +34,13 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayersDock::BoardLayersDock(project::BoardEditor& editor) noexcept:
+BoardLayersDock::BoardLayersDock(BoardEditor& editor) noexcept:
     QDockWidget(nullptr), mUi(new Ui::BoardLayersDock), mBoardEditor(editor),
     mActiveBoard(nullptr)
 {
@@ -216,5 +217,6 @@ QList<int> BoardLayersDock::getBottomLayers() const noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

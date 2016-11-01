@@ -35,6 +35,8 @@ namespace project {
 
 class Schematic;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRotateSelectedSchematicItems
  ****************************************************************************************/
@@ -70,6 +72,7 @@ class CmdRotateSelectedSchematicItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

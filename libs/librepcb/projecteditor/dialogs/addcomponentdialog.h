@@ -53,6 +53,8 @@ namespace project {
 
 class Project;
 
+namespace editor {
+
 namespace Ui {
 class AddComponentDialog;
 }
@@ -120,6 +122,7 @@ class AddComponentDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

@@ -37,6 +37,8 @@ namespace project {
 
 class Schematic;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class SchematicClipboard
  ****************************************************************************************/
@@ -81,6 +83,7 @@ class SchematicClipboard final : public QObject
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

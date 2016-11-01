@@ -31,6 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Class SEE_Base
@@ -67,5 +68,6 @@ SEE_StartAddComponent::~SEE_StartAddComponent()
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

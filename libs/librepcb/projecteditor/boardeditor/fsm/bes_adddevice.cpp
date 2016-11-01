@@ -36,6 +36,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -318,5 +319,6 @@ void BES_AddDevice::mirrorDevice(Qt::Orientation orientation) noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

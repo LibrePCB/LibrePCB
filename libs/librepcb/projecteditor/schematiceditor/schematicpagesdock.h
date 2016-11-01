@@ -33,6 +33,9 @@ namespace librepcb {
 namespace project {
 
 class Project;
+
+namespace editor {
+
 class SchematicEditor;
 
 namespace Ui {
@@ -89,6 +92,7 @@ class SchematicPagesDock final : public QDockWidget
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

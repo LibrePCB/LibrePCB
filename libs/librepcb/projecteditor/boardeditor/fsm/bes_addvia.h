@@ -37,6 +37,8 @@ class Board;
 class BI_Via;
 class CmdBoardViaEdit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class BES_AddVia
  ****************************************************************************************/
@@ -95,6 +97,7 @@ class BES_AddVia final : public BES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

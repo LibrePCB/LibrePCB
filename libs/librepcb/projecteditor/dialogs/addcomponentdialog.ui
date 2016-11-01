@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::AddComponentDialog</class>
- <widget class="QDialog" name="librepcb::project::AddComponentDialog">
+ <class>librepcb::project::editor::AddComponentDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::AddComponentDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -259,7 +259,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::AddComponentDialog</receiver>
+   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -275,7 +275,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::AddComponentDialog</receiver>
+   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -54,6 +54,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -552,5 +553,6 @@ Point BES_DrawTrace::calcMiddlePointPos(const Point& p1, const Point p2, WireMod
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

@@ -35,6 +35,8 @@ namespace project {
 class Project;
 class Board;
 
+namespace editor {
+
 namespace Ui {
 class FabricationOutputDialog;
 }
@@ -80,6 +82,7 @@ class FabricationOutputDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

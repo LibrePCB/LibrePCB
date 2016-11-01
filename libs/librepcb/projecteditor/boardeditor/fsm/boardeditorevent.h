@@ -34,6 +34,10 @@ namespace project {
 
 class Project;
 class Board;
+class ComponentInstance;
+
+namespace editor {
+
 class BoardEditor;
 
 namespace Ui {
@@ -147,8 +151,6 @@ class BEE_RedirectedQEvent final : public BEE_Base
  *  Class BEE_StartAddDevice
  ****************************************************************************************/
 
-class ComponentInstance;
-
 /**
  * @brief The BEE_StartAddDevice class
  *
@@ -180,6 +182,7 @@ class BEE_StartAddDevice final : public BEE_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

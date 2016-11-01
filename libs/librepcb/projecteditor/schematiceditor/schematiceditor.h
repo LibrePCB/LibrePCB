@@ -37,9 +37,12 @@ class GridProperties;
 
 namespace project {
 
-class ProjectEditor;
 class Project;
 class Schematic;
+
+namespace editor {
+
+class ProjectEditor;
 class SchematicPagesDock;
 class ErcMsgDock;
 class SES_FSM;
@@ -137,6 +140,7 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

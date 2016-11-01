@@ -47,6 +47,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -241,5 +242,6 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exce
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

@@ -34,6 +34,9 @@ namespace project {
 
 class Project;
 class Schematic;
+
+namespace editor {
+
 class SchematicEditor;
 
 namespace Ui {
@@ -200,6 +203,7 @@ class SEE_SwitchToSchematicPage final : public SEE_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

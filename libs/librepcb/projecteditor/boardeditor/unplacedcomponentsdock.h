@@ -48,6 +48,9 @@ namespace project {
 class Project;
 class Board;
 class ComponentInstance;
+
+namespace editor {
+
 class ProjectEditor;
 
 namespace Ui {
@@ -70,7 +73,7 @@ class UnplacedComponentsDock final : public QDockWidget
     public:
 
         // Constructors / Destructor
-        explicit UnplacedComponentsDock(project::ProjectEditor& editor);
+        explicit UnplacedComponentsDock(ProjectEditor& editor);
         ~UnplacedComponentsDock();
 
         // Setters
@@ -137,6 +140,7 @@ class UnplacedComponentsDock final : public QDockWidget
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

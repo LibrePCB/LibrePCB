@@ -36,6 +36,8 @@ namespace project {
 class Board;
 class BI_Device;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdFlipSelectedBoardItems
  ****************************************************************************************/
@@ -72,6 +74,7 @@ class CmdFlipSelectedBoardItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

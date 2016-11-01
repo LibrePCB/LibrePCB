@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::EditNetClassesDialog</class>
- <widget class="QDialog" name="librepcb::project::EditNetClassesDialog">
+ <class>librepcb::project::editor::EditNetClassesDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::EditNetClassesDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -73,7 +73,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::EditNetClassesDialog</receiver>
+   <receiver>librepcb::project::editor::EditNetClassesDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -89,7 +89,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::EditNetClassesDialog</receiver>
+   <receiver>librepcb::project::editor::EditNetClassesDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

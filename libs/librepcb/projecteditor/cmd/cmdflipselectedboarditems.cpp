@@ -46,6 +46,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -208,5 +209,6 @@ void CmdFlipSelectedBoardItems::flipDevice(BI_Device& device, const Point& cente
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

@@ -39,6 +39,8 @@ namespace project {
 class Project;
 class BI_Via;
 
+namespace editor {
+
 namespace Ui {
 class BoardViaPropertiesDialog;
 }
@@ -81,6 +83,7 @@ class BoardViaPropertiesDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

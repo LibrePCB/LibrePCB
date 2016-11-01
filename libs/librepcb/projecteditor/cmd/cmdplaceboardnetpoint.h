@@ -40,6 +40,8 @@ class Circuit;
 class Board;
 class BI_NetPoint;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdPlaceBoardNetPoint
  ****************************************************************************************/
@@ -83,6 +85,7 @@ class CmdPlaceBoardNetPoint final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

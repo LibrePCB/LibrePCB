@@ -38,6 +38,8 @@ class Schematic;
 class SI_NetPoint;
 class NetSignal;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdPlaceSchematicNetPoint
  ****************************************************************************************/
@@ -86,6 +88,7 @@ class CmdPlaceSchematicNetPoint final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

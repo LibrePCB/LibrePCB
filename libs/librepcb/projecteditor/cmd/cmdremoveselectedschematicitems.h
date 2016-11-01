@@ -36,6 +36,8 @@ class Schematic;
 class SI_NetPoint;
 class ComponentSignalInstance;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRemoveSelectedSchematicItems
  ****************************************************************************************/
@@ -71,6 +73,7 @@ class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

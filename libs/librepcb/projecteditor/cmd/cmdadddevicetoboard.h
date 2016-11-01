@@ -48,6 +48,8 @@ class ComponentInstance;
 class BI_Device;
 class CmdDeviceInstanceAdd;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdAddDeviceToBoard
  ****************************************************************************************/
@@ -98,6 +100,7 @@ class CmdAddDeviceToBoard final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

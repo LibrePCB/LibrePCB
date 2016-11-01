@@ -37,6 +37,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -176,5 +177,6 @@ SES_FSM::State SES_FSM::processEventFromChild(SEE_Base* event) noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

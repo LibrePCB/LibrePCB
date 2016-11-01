@@ -41,6 +41,8 @@ namespace project {
 class Board;
 class BI_Device;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdReplaceDevice
  ****************************************************************************************/
@@ -80,6 +82,7 @@ class CmdReplaceDevice final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

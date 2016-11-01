@@ -31,6 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Class SES_FSM
@@ -81,6 +82,7 @@ class SES_FSM final : public SES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

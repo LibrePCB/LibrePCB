@@ -35,6 +35,8 @@ namespace project {
 class BI_NetPoint;
 class BI_NetLine;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdDetachBoardNetPointFromViaOrPad
  ****************************************************************************************/
@@ -80,6 +82,7 @@ class CmdDetachBoardNetPointFromViaOrPad final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

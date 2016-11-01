@@ -34,6 +34,8 @@ namespace project {
 
 class BI_Via;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRemoveViaFromBoard
  ****************************************************************************************/
@@ -73,6 +75,7 @@ class CmdRemoveViaFromBoard final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

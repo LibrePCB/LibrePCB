@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::NewProjectWizardPage_Metadata</class>
- <widget class="QWizardPage" name="librepcb::project::NewProjectWizardPage_Metadata">
+ <class>librepcb::project::editor::NewProjectWizardPage_Metadata</class>
+ <widget class="QWizardPage" name="librepcb::project::editor::NewProjectWizardPage_Metadata">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>586</width>
-    <height>214</height>
+    <height>224</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -147,7 +147,7 @@
       </size>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../img/images.qrc">:/img/status/info.png</pixmap>
+      <pixmap resource="../../../../img/images.qrc">:/img/status/info.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -212,7 +212,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
  </resources>
  <connections/>
 </ui>

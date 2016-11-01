@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::ProjectSettingsDialog</class>
- <widget class="QDialog" name="librepcb::project::ProjectSettingsDialog">
+ <class>librepcb::project::editor::ProjectSettingsDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::ProjectSettingsDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -67,7 +67,7 @@
            <item>
             <widget class="QToolButton" name="btnLocaleAdd">
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../../../img/images.qrc">
                <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
              </property>
             </widget>
@@ -75,7 +75,7 @@
            <item>
             <widget class="QToolButton" name="btnLocaleRemove">
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../../../img/images.qrc">
                <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
              </property>
             </widget>
@@ -128,7 +128,7 @@
            <item>
             <widget class="QToolButton" name="btnNormAdd">
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../../../img/images.qrc">
                <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
              </property>
             </widget>
@@ -136,7 +136,7 @@
            <item>
             <widget class="QToolButton" name="btnNormRemove">
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset resource="../../../../img/images.qrc">
                <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
              </property>
             </widget>
@@ -176,13 +176,13 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
  </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::ProjectSettingsDialog</receiver>
+   <receiver>librepcb::project::editor::ProjectSettingsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -198,7 +198,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::ProjectSettingsDialog</receiver>
+   <receiver>librepcb::project::editor::ProjectSettingsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

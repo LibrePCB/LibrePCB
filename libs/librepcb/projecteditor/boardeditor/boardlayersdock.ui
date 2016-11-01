@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::BoardLayersDock</class>
- <widget class="QDockWidget" name="librepcb::project::BoardLayersDock">
+ <class>librepcb::project::editor::BoardLayersDock</class>
+ <widget class="QDockWidget" name="librepcb::project::editor::BoardLayersDock">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>216</width>
+    <width>242</width>
     <height>246</height>
    </rect>
   </property>

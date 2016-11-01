@@ -36,6 +36,8 @@ class Schematic;
 class SI_NetLabel;
 class CmdSchematicNetLabelEdit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class SES_AddNetLabel
  ****************************************************************************************/
@@ -79,6 +81,7 @@ class SES_AddNetLabel final : public SES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

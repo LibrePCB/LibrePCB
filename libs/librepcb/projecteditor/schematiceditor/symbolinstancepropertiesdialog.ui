@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::SymbolInstancePropertiesDialog</class>
- <widget class="QDialog" name="librepcb::project::SymbolInstancePropertiesDialog">
+ <class>librepcb::project::editor::SymbolInstancePropertiesDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::SymbolInstancePropertiesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -507,7 +507,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../../img/images.qrc">
+             <iconset resource="../../../../img/images.qrc">
               <normaloff>:/img/actions/apply.png</normaloff>:/img/actions/apply.png</iconset>
             </property>
            </widget>
@@ -535,7 +535,7 @@
           <item row="0" column="7">
            <widget class="QToolButton" name="btnAttrRemove">
             <property name="icon">
-             <iconset resource="../../../img/images.qrc">
+             <iconset resource="../../../../img/images.qrc">
               <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
             </property>
            </widget>
@@ -549,7 +549,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../../img/images.qrc">
+             <iconset resource="../../../../img/images.qrc">
               <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
             </property>
            </widget>
@@ -574,13 +574,13 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
  </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::SymbolInstancePropertiesDialog</receiver>
+   <receiver>librepcb::project::editor::SymbolInstancePropertiesDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -596,7 +596,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::SymbolInstancePropertiesDialog</receiver>
+   <receiver>librepcb::project::editor::SymbolInstancePropertiesDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -41,6 +41,9 @@ class Workspace;
 namespace project {
 
 class Project;
+
+namespace editor {
+
 class NewProjectWizardPage_Metadata;
 class NewProjectWizardPage_Initialization;
 class NewProjectWizardPage_VersionControl;
@@ -94,6 +97,7 @@ class NewProjectWizard final : public QWizard
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

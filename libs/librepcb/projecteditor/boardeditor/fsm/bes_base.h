@@ -46,6 +46,8 @@ namespace project {
 class Project;
 class Circuit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class BES_Base
  ****************************************************************************************/
@@ -92,6 +94,7 @@ class BES_Base : public QObject
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

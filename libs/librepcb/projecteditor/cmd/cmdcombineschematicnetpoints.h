@@ -34,6 +34,8 @@ namespace project {
 
 class SI_NetPoint;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdCombineSchematicNetPoints
  ****************************************************************************************/
@@ -67,6 +69,7 @@ class CmdCombineSchematicNetPoints final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

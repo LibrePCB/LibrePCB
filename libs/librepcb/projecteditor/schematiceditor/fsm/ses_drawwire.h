@@ -36,6 +36,8 @@ namespace project {
 class SI_NetPoint;
 class SI_NetLine;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class SES_DrawWire
  ****************************************************************************************/
@@ -128,6 +130,7 @@ class SES_DrawWire final : public SES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

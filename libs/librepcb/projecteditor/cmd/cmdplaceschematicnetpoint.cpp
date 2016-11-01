@@ -48,6 +48,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -135,5 +136,6 @@ SI_NetPoint* CmdPlaceSchematicNetPoint::createNewNetPoint(NetSignal& netsignal) 
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

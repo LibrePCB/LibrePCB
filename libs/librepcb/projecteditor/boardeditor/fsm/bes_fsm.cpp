@@ -37,6 +37,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -173,5 +174,6 @@ BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

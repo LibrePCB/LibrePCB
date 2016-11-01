@@ -32,6 +32,7 @@
 
 namespace librepcb {
 namespace project {
+namespace editor {
 
 namespace Ui {
 class NewProjectWizardPage_VersionControl;
@@ -83,6 +84,7 @@ class NewProjectWizardPage_VersionControl final : public QWizardPage
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

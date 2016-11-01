@@ -38,6 +38,8 @@ namespace project {
 
 class Circuit;
 
+namespace editor {
+
 namespace Ui {
 class EditNetClassesDialog;
 }
@@ -88,6 +90,7 @@ class EditNetClassesDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

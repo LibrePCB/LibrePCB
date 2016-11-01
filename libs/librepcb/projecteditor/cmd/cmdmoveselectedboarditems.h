@@ -38,6 +38,8 @@ class CmdDeviceInstanceEdit;
 class CmdBoardViaEdit;
 class CmdBoardNetPointEdit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdMoveSelectedBoardItems
  ****************************************************************************************/
@@ -80,6 +82,7 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

@@ -38,6 +38,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -129,5 +130,6 @@ void CmdDetachBoardNetPointFromViaOrPad::removeNetpointIfUnused(BI_NetPoint& p) 
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

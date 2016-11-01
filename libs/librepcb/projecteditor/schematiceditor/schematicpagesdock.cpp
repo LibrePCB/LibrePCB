@@ -37,6 +37,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -156,5 +157,6 @@ void SchematicPagesDock::on_listWidget_currentRowChanged(int currentRow)
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

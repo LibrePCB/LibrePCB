@@ -46,6 +46,8 @@ class Project;
 class ComponentInstance;
 class CmdComponentInstanceAdd;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdAddComponentToCircuit
  ****************************************************************************************/
@@ -89,6 +91,7 @@ class CmdAddComponentToCircuit final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

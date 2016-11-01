@@ -36,6 +36,8 @@ class Project;
 class ErcMsg;
 class ErcMsgList;
 
+namespace editor {
+
 namespace Ui {
 class ErcMsgDock;
 }
@@ -94,6 +96,7 @@ class ErcMsgDock final : public QDockWidget
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

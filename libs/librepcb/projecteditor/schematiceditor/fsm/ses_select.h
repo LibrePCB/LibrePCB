@@ -34,6 +34,7 @@ namespace librepcb {
 class UndoCommandGroup;
 
 namespace project {
+namespace editor {
 
 class CmdMoveSelectedSchematicItems;
 
@@ -99,6 +100,7 @@ class SES_Select final : public SES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

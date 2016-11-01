@@ -47,6 +47,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -390,5 +391,6 @@ void UnplacedComponentsDock::addDeviceManually(ComponentInstance& cmp, const Uui
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

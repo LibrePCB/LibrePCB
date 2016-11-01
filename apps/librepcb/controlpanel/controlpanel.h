@@ -36,7 +36,10 @@ class FilePath;
 
 namespace project {
 class Project;
+
+namespace editor {
 class ProjectEditor;
+}
 }
 
 namespace workspace {
@@ -126,7 +129,7 @@ class ControlPanel final : public QMainWindow
          *
          * @return The pointer to the opened project editor (nullptr on error)
          */
-        project::ProjectEditor* openProject(project::Project& project) noexcept;
+        project::editor::ProjectEditor* openProject(project::Project& project) noexcept;
 
         /**
          * @brief Open a project with the editor (or bring an already opened editor to front)
@@ -135,7 +138,7 @@ class ControlPanel final : public QMainWindow
          *
          * @return The pointer to the opened project editor (nullptr on error)
          */
-        project::ProjectEditor* openProject(const FilePath& filepath) noexcept;
+        project::editor::ProjectEditor* openProject(const FilePath& filepath) noexcept;
 
         /**
          * @brief Close an opened project editor
@@ -145,7 +148,7 @@ class ControlPanel final : public QMainWindow
          *
          * @retval  true if the project was successfully closed, false otherwise
          */
-        bool closeProject(project::ProjectEditor& editor, bool askForSave) noexcept;
+        bool closeProject(project::editor::ProjectEditor& editor, bool askForSave) noexcept;
 
         /**
          * @brief Close an opened project editor
@@ -176,14 +179,14 @@ class ControlPanel final : public QMainWindow
          *
          * @return The pointer to the open project editor, or nullptr if the project is not open
          */
-        project::ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
+        project::editor::ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
 
 
         // Attributes
         workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::ControlPanel> mUi;
         QScopedPointer<workspace::LibraryManager> mLibraryManager;
-        QHash<QString, project::ProjectEditor*> mOpenProjectEditors;
+        QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
 };
 
 /*****************************************************************************************

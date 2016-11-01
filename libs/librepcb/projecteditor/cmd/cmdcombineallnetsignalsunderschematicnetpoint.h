@@ -37,6 +37,8 @@ class Circuit;
 class Schematic;
 class SI_NetPoint;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdCombineAllNetSignalsUnderSchematicNetPoint
  ****************************************************************************************/
@@ -77,6 +79,7 @@ class CmdCombineAllNetSignalsUnderSchematicNetPoint final : public UndoCommandGr
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

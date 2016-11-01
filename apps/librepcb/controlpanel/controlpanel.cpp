@@ -43,6 +43,7 @@
 namespace librepcb {
 
 using namespace project;
+using namespace project::editor;
 using namespace workspace;
 
 /*****************************************************************************************
@@ -229,7 +230,7 @@ void ControlPanel::showProjectReadmeInBrowser(const FilePath& projectFilePath) n
  *  Project Management
  ****************************************************************************************/
 
-project::ProjectEditor* ControlPanel::openProject(project::Project& project) noexcept
+ProjectEditor* ControlPanel::openProject(Project& project) noexcept
 {
     try
     {

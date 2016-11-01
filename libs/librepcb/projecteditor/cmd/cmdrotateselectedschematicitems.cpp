@@ -39,6 +39,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -117,5 +118,6 @@ bool CmdRotateSelectedSchematicItems::performExecute() throw (Exception)
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

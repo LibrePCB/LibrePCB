@@ -37,6 +37,8 @@ class ComponentInstance;
 class BI_Device;
 class CmdDeviceInstanceEdit;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class BES_AddDevice
  ****************************************************************************************/
@@ -83,6 +85,7 @@ class BES_AddDevice final : public BES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

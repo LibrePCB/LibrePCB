@@ -58,6 +58,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -562,5 +563,6 @@ Point SES_DrawWire::calcMiddlePointPos(const Point& p1, const Point p2, WireMode
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

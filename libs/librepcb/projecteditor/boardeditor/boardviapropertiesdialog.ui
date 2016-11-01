@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::BoardViaPropertiesDialog</class>
- <widget class="QDialog" name="librepcb::project::BoardViaPropertiesDialog">
+ <class>librepcb::project::editor::BoardViaPropertiesDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::BoardViaPropertiesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -198,7 +198,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::BoardViaPropertiesDialog</receiver>
+   <receiver>librepcb::project::editor::BoardViaPropertiesDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -214,7 +214,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::BoardViaPropertiesDialog</receiver>
+   <receiver>librepcb::project::editor::BoardViaPropertiesDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -30,6 +30,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Class BEE_Base
@@ -63,5 +64,6 @@ BEE_StartAddDevice::~BEE_StartAddDevice()
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

@@ -42,6 +42,9 @@ namespace project {
 class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceEdit;
+
+namespace editor {
+
 class AddComponentDialog;
 
 /*****************************************************************************************
@@ -92,6 +95,7 @@ class SES_AddComponent final : public SES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

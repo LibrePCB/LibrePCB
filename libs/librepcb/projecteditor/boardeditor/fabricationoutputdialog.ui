@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::FabricationOutputDialog</class>
- <widget class="QDialog" name="librepcb::project::FabricationOutputDialog">
+ <class>librepcb::project::editor::FabricationOutputDialog</class>
+ <widget class="QDialog" name="librepcb::project::editor::FabricationOutputDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -99,7 +99,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::FabricationOutputDialog</receiver>
+   <receiver>librepcb::project::editor::FabricationOutputDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -115,7 +115,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::FabricationOutputDialog</receiver>
+   <receiver>librepcb::project::editor::FabricationOutputDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

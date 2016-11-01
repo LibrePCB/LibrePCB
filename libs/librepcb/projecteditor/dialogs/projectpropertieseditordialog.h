@@ -37,6 +37,8 @@ namespace project {
 
 class Project;
 
+namespace editor {
+
 namespace Ui {
 class ProjectPropertiesEditorDialog;
 }
@@ -84,6 +86,7 @@ class ProjectPropertiesEditorDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

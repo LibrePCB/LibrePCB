@@ -36,6 +36,8 @@ namespace project {
 class BI_NetPoint;
 class BI_NetLine;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class BES_DrawTrace
  ****************************************************************************************/
@@ -126,6 +128,7 @@ class BES_DrawTrace final : public BES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

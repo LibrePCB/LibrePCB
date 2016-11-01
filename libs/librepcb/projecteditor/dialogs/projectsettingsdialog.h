@@ -39,6 +39,8 @@ namespace project {
 class ProjectSettings;
 class CmdProjectSettingsChange;
 
+namespace editor {
+
 namespace Ui {
 class ProjectSettingsDialog;
 }
@@ -100,6 +102,7 @@ class ProjectSettingsDialog final : public QDialog
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

@@ -35,6 +35,8 @@ namespace project {
 class Circuit;
 class NetSignal;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdCombineNetSignals
  ****************************************************************************************/
@@ -69,6 +71,7 @@ class CmdCombineNetSignals final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

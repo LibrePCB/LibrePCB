@@ -1,4 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
-    librepcb
+    librepcb \
+    EagleImport \
+    ProjectLibraryUpdater \
+    UuidGenerator \
+    WorkspaceLibraryUpdater

@@ -34,6 +34,8 @@ namespace project {
 
 class Board;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRemoveSelectedBoardItems
  ****************************************************************************************/
@@ -66,6 +68,7 @@ class CmdRemoveSelectedBoardItems final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

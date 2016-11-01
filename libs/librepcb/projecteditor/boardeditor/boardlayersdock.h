@@ -36,6 +36,9 @@ namespace project {
 class Project;
 class Board;
 class ComponentInstance;
+
+namespace editor {
+
 class BoardEditor;
 
 namespace Ui {
@@ -56,7 +59,7 @@ class BoardLayersDock final : public QDockWidget
     public:
 
         // Constructors / Destructor
-        explicit BoardLayersDock(project::BoardEditor& editor) noexcept;
+        explicit BoardLayersDock(BoardEditor& editor) noexcept;
         ~BoardLayersDock() noexcept;
 
         // Setters
@@ -99,6 +102,7 @@ class BoardLayersDock final : public QDockWidget
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

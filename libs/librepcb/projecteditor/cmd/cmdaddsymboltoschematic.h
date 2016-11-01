@@ -48,6 +48,8 @@ class ComponentInstance;
 class SI_Symbol;
 class CmdSymbolInstanceAdd;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdAddSymbolToSchematic
  ****************************************************************************************/
@@ -95,6 +97,7 @@ class CmdAddSymbolToSchematic final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

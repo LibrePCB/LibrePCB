@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::UnplacedComponentsDock</class>
- <widget class="QDockWidget" name="librepcb::project::UnplacedComponentsDock">
+ <class>librepcb::project::editor::UnplacedComponentsDock</class>
+ <widget class="QDockWidget" name="librepcb::project::editor::UnplacedComponentsDock">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -28,6 +28,7 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
@@ -92,5 +93,6 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

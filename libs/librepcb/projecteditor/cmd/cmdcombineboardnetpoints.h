@@ -34,6 +34,8 @@ namespace project {
 
 class BI_NetPoint;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdCombineBoardNetPoints
  ****************************************************************************************/
@@ -67,6 +69,7 @@ class CmdCombineBoardNetPoints final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

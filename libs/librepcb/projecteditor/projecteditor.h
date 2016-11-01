@@ -47,6 +47,9 @@ class Workspace;
 namespace project {
 
 class Project;
+
+namespace editor {
+
 class SchematicEditor;
 class BoardEditor;
 
@@ -222,6 +225,7 @@ class ProjectEditor final : public QObject
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

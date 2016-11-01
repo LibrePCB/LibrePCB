@@ -34,6 +34,8 @@ namespace project {
 
 class BI_Device;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRemoveDeviceFromBoard
  ****************************************************************************************/
@@ -73,6 +75,7 @@ class CmdRemoveDeviceFromBoard final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

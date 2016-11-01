@@ -35,6 +35,8 @@ namespace project {
 class Circuit;
 class NetSignal;
 
+namespace editor {
+
 /*****************************************************************************************
  *  Class CmdRemoveUnusedNetSignals
  ****************************************************************************************/
@@ -71,6 +73,7 @@ class CmdRemoveUnusedNetSignals final : public UndoCommandGroup
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 

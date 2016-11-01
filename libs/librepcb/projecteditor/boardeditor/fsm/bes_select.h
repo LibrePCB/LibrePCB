@@ -34,6 +34,7 @@ namespace librepcb {
 class UndoCommandGroup;
 
 namespace project {
+namespace editor {
 
 class CmdMoveSelectedBoardItems;
 
@@ -97,6 +98,7 @@ class BES_Select final : public BES_Base
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 
