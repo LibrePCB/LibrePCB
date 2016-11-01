@@ -8,23 +8,23 @@ TEMPLATE = app
 TARGET = librepcb
 
 # Set the path for the generated binary
-GENERATED_DIR = ../generated
+GENERATED_DIR = ../../generated
 
 # Use common project definitions
-include(../common.pri)
+include(../../common.pri)
 
 QT += core widgets opengl network xml printsupport sql
 
-exists(../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
+exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {
     # Windows-specific configurations
-    RC_ICONS = ../packaging/windows/img/librepcb.ico
+    RC_ICONS = ../../packaging/windows/img/librepcb.ico
 }
 
 macx {
     # Mac-specific configurations
-    ICON = ../packaging/mac/img/librepcb.icns
+    ICON = ../../packaging/mac/img/librepcb.icns
 }
 
 unix:!macx {
@@ -33,13 +33,13 @@ unix:!macx {
     resources.path = $${INSTALLED_RESOURCES_DIR}/../
     resources.files = $${LOCAL_RESOURCES_DIR}
     icon.path = $${PREFIX}/share/pixmaps
-    icon.files = ../packaging/unix/img/librepcb.svg
+    icon.files = ../../packaging/unix/img/librepcb.svg
     desktop.path = $${PREFIX}/share/applications
-    desktop.files = ../packaging/unix/librepcb.desktop
+    desktop.files = ../../packaging/unix/librepcb.desktop
     mimexml.path = $${PREFIX}/share/mime/packages
-    mimexml.files = ../packaging/unix/mime/librepcb.xml
+    mimexml.files = ../../packaging/unix/mime/librepcb.xml
     mimedesktop.path = $${PREFIX}/share/mimelnk/application
-    mimedesktop.files = ../packaging/unix/mime/x-librepcb-project.desktop
+    mimedesktop.files = ../../packaging/unix/mime/x-librepcb-project.desktop
     INSTALLS += target resources icon desktop mimexml mimedesktop
 }
 
@@ -57,18 +57,18 @@ LIBS += \
     -lquazip -lz
 
 INCLUDEPATH += \
-    ../libs/quazip \
-    ../libs
+    ../../libs/quazip \
+    ../../libs
 
 DEPENDPATH += \
-    ../libs/hoedown \
-    ../libs/librepcb/projecteditor \
-    ../libs/librepcb/libraryeditor \
-    ../libs/librepcb/workspace \
-    ../libs/librepcb/project \
-    ../libs/librepcb/library \
-    ../libs/librepcb/common \
-    ../libs/quazip
+    ../../libs/hoedown \
+    ../../libs/librepcb/projecteditor \
+    ../../libs/librepcb/libraryeditor \
+    ../../libs/librepcb/workspace \
+    ../../libs/librepcb/project \
+    ../../libs/librepcb/library \
+    ../../libs/librepcb/common \
+    ../../libs/quazip
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
@@ -81,13 +81,13 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libquazip.a
 
 TRANSLATIONS = \
-    ../i18n/librepcb_de.ts \
-    ../i18n/librepcb_de_CH.ts \
-    ../i18n/librepcb_gsw_CH.ts
+    ../../i18n/librepcb_de.ts \
+    ../../i18n/librepcb_de_CH.ts \
+    ../../i18n/librepcb_gsw_CH.ts
 
 RESOURCES += \
-    ../img/images.qrc \
-    ../i18n/translations.qrc
+    ../../img/images.qrc \
+    ../../i18n/translations.qrc
 
 SOURCES += \
     main.cpp \
@@ -124,7 +124,7 @@ QMAKE_EXTRA_COMPILERS += lrelease
 PRE_TARGETDEPS += compiler_lrelease_make_all
 
 # Copy resource files to output directory
-copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../res/.)\"" "\"$$system_path($${LOCAL_RESOURCES_DIR})\""
+copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../res/.)\"" "\"$$system_path($${LOCAL_RESOURCES_DIR})\""
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
