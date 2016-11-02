@@ -40,7 +40,7 @@ namespace library {
 
 FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
         const PackagePad* pkgPad) noexcept :
-    GraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
+    QGraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
 {
     if (mPackagePad)
         setToolTip(mPackagePad->getName());

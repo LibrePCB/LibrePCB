@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/graphics/graphicsitem.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -50,7 +49,7 @@ class FootprintPad;
  * @author ubruhin
  * @date 2016-01-09
  */
-class FootprintPadPreviewGraphicsItem final : public GraphicsItem
+class FootprintPadPreviewGraphicsItem final : public QGraphicsItem
 {
     public:
 

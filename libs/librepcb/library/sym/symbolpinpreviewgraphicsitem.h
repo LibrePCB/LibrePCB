@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/graphics/graphicsitem.h>
 #include "../cmp/componentsymbolvariantitem.h"
 
 /*****************************************************************************************
@@ -51,7 +50,7 @@ class ComponentSignal;
  * @author ubruhin
  * @date 2015-04-21
  */
-class SymbolPinPreviewGraphicsItem final : public GraphicsItem
+class SymbolPinPreviewGraphicsItem final : public QGraphicsItem
 {
     public:
 

@@ -26,7 +26,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/graphics/graphicsitem.h>
 #include <librepcb/common/if_attributeprovider.h>
 
 /*****************************************************************************************
@@ -55,7 +54,7 @@ class Footprint;
  * @author ubruhin
  * @date 2015-04-21
  */
-class FootprintPreviewGraphicsItem final : public GraphicsItem, public IF_AttributeProvider
+class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_AttributeProvider
 {
     public:
 

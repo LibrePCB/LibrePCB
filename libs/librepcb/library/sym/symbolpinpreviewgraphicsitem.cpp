@@ -40,7 +40,7 @@ namespace library {
 
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
         const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept :
-    GraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
+    QGraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
     mDrawBoundingRect(false)
 {
     setToolTip(mPin.getName());

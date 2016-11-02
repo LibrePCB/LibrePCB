@@ -69,7 +69,6 @@ SOURCES += \
     geometry/hole.cpp \
     geometry/polygon.cpp \
     geometry/text.cpp \
-    graphics/graphicsitem.cpp \
     graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
@@ -152,7 +151,6 @@ HEADERS += \
     geometry/hole.h \
     geometry/polygon.h \
     geometry/text.h \
-    graphics/graphicsitem.h \
     graphics/graphicslayer.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \

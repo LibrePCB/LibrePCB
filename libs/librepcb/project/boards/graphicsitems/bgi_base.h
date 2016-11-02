@@ -25,7 +25,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/graphics/graphicsitem.h>
 #include "../board.h"
 
 /*****************************************************************************************
@@ -41,7 +40,7 @@ namespace project {
 /**
  * @brief The Board Graphics Item Base (BGI_Base) class
  */
-class BGI_Base : public GraphicsItem
+class BGI_Base : public QGraphicsItem
 {
     public:
 
