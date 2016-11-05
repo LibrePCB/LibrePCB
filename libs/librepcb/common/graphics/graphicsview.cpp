@@ -111,6 +111,11 @@ void GraphicsView::setOriginCrossVisible(bool visible) noexcept
     setForegroundBrush(foregroundBrush()); // this will repaint the foreground
 }
 
+void GraphicsView::setEventHandlerObject(IF_GraphicsViewEventHandler* eventHandler) noexcept
+{
+    mEventHandlerObject = eventHandler;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/

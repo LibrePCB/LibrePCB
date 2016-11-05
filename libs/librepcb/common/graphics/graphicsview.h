@@ -66,6 +66,7 @@ class GraphicsView final : public QGraphicsView
         void setScene(GraphicsScene* scene) noexcept;
         void setVisibleSceneRect(const QRectF& rect) noexcept;
         void setOriginCrossVisible(bool visible) noexcept;
+        void setEventHandlerObject(IF_GraphicsViewEventHandler* eventHandler) noexcept;
 
         // General Methods
         Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
