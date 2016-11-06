@@ -72,6 +72,7 @@ SOURCES += \
     network/repository.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
+    toolbox.cpp \
     undocommand.cpp \
     undocommandgroup.cpp \
     undostack.cpp \
@@ -145,6 +146,7 @@ HEADERS += \
     scopeguardlist.h \
     sqlitedatabase.h \
     systeminfo.h \
+    toolbox.h \
     undocommand.h \
     undocommandgroup.h \
     undostack.h \
