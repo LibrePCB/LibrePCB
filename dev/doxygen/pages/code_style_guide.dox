@@ -19,6 +19,7 @@
             void foo() noexcept;            // this method never throws exceptions
             void bar() throw (Exception);   // this method can throw exceptions of type "Exception" (or any subclass of it)
             @endcode
+        - Use Qt's smart pointers @c QScopedPointer and @c QSharedPointer for object ownership (instead of raw pointers)
     
     
     @section doc_code_style_guide_header_files Header Files

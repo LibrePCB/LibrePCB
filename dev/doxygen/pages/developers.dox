@@ -9,8 +9,10 @@
 
     @section doc_developers_git Git
     
-        - The "master" branch must always be compilable and executable. Bugs and non-finished features are allowed in this early development phase.
-        - Do not pack lot of changes in one commit. Make one commit per bugfix resp. one commit per new feature.
+        - The @c master branch must always be stable (CI successful).
+        - Use separate branches to fix bugs or implement new features.
+        - Do not pack lot of changes in one commit. Make small, incremental commits instead.
+        - Write commit messages according this guideline: http://chris.beams.io/posts/git-commit/
         
     
     @section doc_developers_internationalization Internationalization (i18n)
