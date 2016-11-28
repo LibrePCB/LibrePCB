@@ -51,6 +51,27 @@ sudo apt-get install g++ qt5-default qttools5-dev-tools qt5-doc qtcreator libglu
 
 You can install [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
 
+#### Installation on Mac OS X 10.11
+
+1. Install Xcode through the app store and start it at least once 
+   (for the license)
+2. Install [homebrew](https://github.com/Homebrew/brew) (**the** package 
+   manager)
+3. Install *qt5*
+
+        brew update && brew install qt5
+
+4. Make the toolchain available (you can undo it by linking against *qt*
+   again)
+
+        brew unlink qt
+        brew link --force qt5
+
+5. [Compile everything](#user-content-using-qmake-and-make)
+6. Run the program
+
+        open ./build/generated/mac/librepcb.app
+
 #### Installation in a docker container
 
 To build and run LibrePCB in a [docker](https://www.docker.com/) container (which is pretty cool!), check out [these instructions](https://github.com/LibrePCB/LibrePCB/tree/master/dev/docker).
