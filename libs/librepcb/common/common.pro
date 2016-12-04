@@ -86,6 +86,7 @@ HEADERS += \
     units/length.h \
     units/lengthunit.h \
     units/point.h \
+    utils/undostackactiongroup.h \
     uuid.h \
     version.h \
 
@@ -142,6 +143,7 @@ SOURCES += \
     units/length.cpp \
     units/lengthunit.cpp \
     units/point.cpp \
+    utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
 
