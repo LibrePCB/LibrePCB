@@ -113,15 +113,15 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
 
     // Add wire mode actions to the "command" toolbar
     mWireModeActions.insert(WireMode_HV, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wireHV.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
     mWireModeActions.insert(WireMode_VH, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wireVH.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
     mWireModeActions.insert(WireMode_9045, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wire9045.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
     mWireModeActions.insert(WireMode_4590, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wire4590.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
     mWireModeActions.insert(WireMode_Straight, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wireStraight.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_straight.png"), ""));
     mActionSeparators.append(mEditorUi.commandToolbar->addSeparator());
     updateWireModeActionsCheckedState();
 

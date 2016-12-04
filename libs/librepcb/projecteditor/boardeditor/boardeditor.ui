@@ -551,7 +551,7 @@
   <action name="actionToolDrawTrace">
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
-     <normaloff>:/img/actions/drawWire.png</normaloff>:/img/actions/drawWire.png</iconset>
+     <normaloff>:/img/actions/draw_wire.png</normaloff>:/img/actions/draw_wire.png</iconset>
    </property>
    <property name="text">
     <string>Draw Trace</string>

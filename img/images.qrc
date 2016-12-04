@@ -39,18 +39,18 @@
         <file>actions/move.png</file>
         <file>actions/refresh.png</file>
         <file>actions/text.png</file>
-        <file>actions/drawWire.png</file>
+        <file>actions/draw_wire.png</file>
         <file>actions/export_gerber.png</file>
         <file>actions/schematic.png</file>
         <file>actions/recent.png</file>
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>
         <file>command_toolbars/via_octagon.png</file>
-        <file>command_toolbars/wire4590.png</file>
-        <file>command_toolbars/wire9045.png</file>
-        <file>command_toolbars/wireHV.png</file>
-        <file>command_toolbars/wireStraight.png</file>
-        <file>command_toolbars/wireVH.png</file>
+        <file>command_toolbars/wire_45_90.png</file>
+        <file>command_toolbars/wire_90_45.png</file>
+        <file>command_toolbars/wire_h_v.png</file>
+        <file>command_toolbars/wire_straight.png</file>
+        <file>command_toolbars/wire_v_h.png</file>
         <file>command_toolbars/cancel.png</file>
         <file>library/3d_model.png</file>
         <file>library/device.png</file>
@@ -90,8 +90,8 @@
         <file>library/unipolar_capacitor_eu.png</file>
         <file>library/gnd.png</file>
         <file>library/vcc.png</file>
-        <file>status/dialog-error.png</file>
-        <file>status/dialog-warning.png</file>
+        <file>status/dialog_error.png</file>
+        <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
         <file>status/success.png</file>
         <file>logo/32x32.png</file>

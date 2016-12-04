@@ -67,17 +67,17 @@ ErcMsgDock::ErcMsgDock(Project& project) :
 
     // set icons
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitError)]->
-            setIcon(0, QIcon(":/img/status/dialog-error.png"));
+            setIcon(0, QIcon(":/img/status/dialog_error.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitWarning)]->
-            setIcon(0, QIcon(":/img/status/dialog-warning.png"));
+            setIcon(0, QIcon(":/img/status/dialog_warning.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicError)]->
-            setIcon(0, QIcon(":/img/status/dialog-error.png"));
+            setIcon(0, QIcon(":/img/status/dialog_error.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)]->
-            setIcon(0, QIcon(":/img/status/dialog-warning.png"));
+            setIcon(0, QIcon(":/img/status/dialog_warning.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)]->
-            setIcon(0, QIcon(":/img/status/dialog-error.png"));
+            setIcon(0, QIcon(":/img/status/dialog_error.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)]->
-            setIcon(0, QIcon(":/img/status/dialog-warning.png"));
+            setIcon(0, QIcon(":/img/status/dialog_warning.png"));
     mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)]->
             setIcon(0, QIcon(":/img/actions/apply.png"));
 
