@@ -1,7 +1,14 @@
 <RCC>
     <qresource prefix="/img">
         <file>actions/add.png</file>
+        <file>actions/add_hole.png</file>
+        <file>actions/add_name.png</file>
+        <file>actions/add_value.png</file>
+        <file>actions/add_text.png</file>
+        <file>actions/add_symbol_pin.png</file>
         <file>actions/add_via.png</file>
+        <file>actions/add_smt_pad.png</file>
+        <file>actions/add_tht_pad.png</file>
         <file>actions/apply.png</file>
         <file>actions/bookmark.png</file>
         <file>actions/bookmark_gray.png</file>
@@ -11,6 +18,7 @@
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
         <file>actions/download.png</file>
+        <file>actions/edit.png</file>
         <file>actions/help.png</file>
         <file>actions/home.png</file>
         <file>actions/info.png</file>
@@ -38,8 +46,8 @@
         <file>actions/working.png</file>
         <file>actions/move.png</file>
         <file>actions/refresh.png</file>
-        <file>actions/text.png</file>
         <file>actions/draw_wire.png</file>
+        <file>actions/draw_line.png</file>
         <file>actions/export_gerber.png</file>
         <file>actions/schematic.png</file>
         <file>actions/recent.png</file>
@@ -48,12 +56,18 @@
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>
         <file>command_toolbars/via_octagon.png</file>
+        <file>command_toolbars/shape_round.png</file>
+        <file>command_toolbars/shape_rect.png</file>
+        <file>command_toolbars/shape_octagon.png</file>
         <file>command_toolbars/wire_45_90.png</file>
         <file>command_toolbars/wire_90_45.png</file>
         <file>command_toolbars/wire_h_v.png</file>
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
         <file>command_toolbars/cancel.png</file>
+        <file>command_toolbars/pad_top.png</file>
+        <file>command_toolbars/pad_bottom.png</file>
+        <file>command_toolbars/pad_tht.png</file>
         <file>library/3d_model.png</file>
         <file>library/device.png</file>
         <file>library/footprint.png</file>
@@ -78,7 +92,6 @@
         <file>actions/new_folder.png</file>
         <file>places/file.png</file>
         <file>empty.png</file>
-        <file>actions/draw_text.png</file>
         <file>actions/draw_circle.png</file>
         <file>actions/draw_ellipse.png</file>
         <file>actions/draw_polygon.png</file>
