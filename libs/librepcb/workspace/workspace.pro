@@ -21,49 +21,50 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
-    workspace.cpp \
-    projecttreemodel.cpp \
-    projecttreeitem.cpp \
-    recentprojectsmodel.cpp \
     favoriteprojectsmodel.cpp \
+    library/cat/categorytreeitem.cpp \
+    library/cat/categorytreemodel.cpp \
+    library/workspacelibrarydb.cpp \
+    library/workspacelibraryscanner.cpp \
+    projecttreeitem.cpp \
+    projecttreemodel.cpp \
+    recentprojectsmodel.cpp \
+    settings/items/wsi_appdefaultmeasurementunits.cpp \
+    settings/items/wsi_appearance.cpp \
+    settings/items/wsi_applocale.cpp \
+    settings/items/wsi_base.cpp \
+    settings/items/wsi_debugtools.cpp \
+    settings/items/wsi_librarylocaleorder.cpp \
+    settings/items/wsi_librarynormorder.cpp \
+    settings/items/wsi_projectautosaveinterval.cpp \
+    settings/items/wsi_repositories.cpp \
     settings/workspacesettings.cpp \
     settings/workspacesettingsdialog.cpp \
-    settings/items/wsi_base.cpp \
-    settings/items/wsi_applocale.cpp \
-    settings/items/wsi_projectautosaveinterval.cpp \
-    settings/items/wsi_librarylocaleorder.cpp \
-    settings/items/wsi_appdefaultmeasurementunits.cpp \
-    settings/items/wsi_librarynormorder.cpp \
-    settings/items/wsi_debugtools.cpp \
-    settings/items/wsi_appearance.cpp \
-    library/workspacelibrarydb.cpp \
-    library/cat/categorytreemodel.cpp \
-    library/cat/categorytreeitem.cpp \
-    library/workspacelibraryscanner.cpp \
-    settings/items/wsi_repositories.cpp
+    workspace.cpp \
 
 HEADERS += \
-    workspace.h \
-    projecttreemodel.h \
-    projecttreeitem.h \
-    recentprojectsmodel.h \
     favoriteprojectsmodel.h \
+    library/cat/categorytreeitem.h \
+    library/cat/categorytreemodel.h \
+    library/workspacelibrarydb.h \
+    library/workspacelibraryscanner.h \
+    projecttreeitem.h \
+    projecttreemodel.h \
+    recentprojectsmodel.h \
+    settings/items/wsi_appdefaultmeasurementunits.h \
+    settings/items/wsi_appearance.h \
+    settings/items/wsi_applocale.h \
+    settings/items/wsi_base.h \
+    settings/items/wsi_debugtools.h \
+    settings/items/wsi_librarylocaleorder.h \
+    settings/items/wsi_librarynormorder.h \
+    settings/items/wsi_projectautosaveinterval.h \
+    settings/items/wsi_repositories.h \
     settings/workspacesettings.h \
     settings/workspacesettingsdialog.h \
-    settings/items/wsi_base.h \
-    settings/items/wsi_applocale.h \
-    settings/items/wsi_projectautosaveinterval.h \
-    settings/items/wsi_librarylocaleorder.h \
-    settings/items/wsi_appdefaultmeasurementunits.h \
-    settings/items/wsi_librarynormorder.h \
-    settings/items/wsi_debugtools.h \
-    settings/items/wsi_appearance.h \
-    library/workspacelibrarydb.h \
-    library/cat/categorytreemodel.h \
-    library/cat/categorytreeitem.h \
-    library/workspacelibraryscanner.h \
-    settings/items/wsi_repositories.h
+    workspace.h \
 
 FORMS += \
+    settings/workspacesettingsdialog.ui \
     workspacechooserdialog.ui \
-    settings/workspacesettingsdialog.ui
+

@@ -22,56 +22,56 @@ INCLUDEPATH += \
 
 HEADERS += \
     cat/componentcategory.h \
+    cat/librarycategory.h \
     cat/packagecategory.h \
+    cmp/component.h \
+    cmp/componentpinsignalmapitem.h \
+    cmp/componentsignal.h \
+    cmp/componentsymbolvariant.h \
+    cmp/componentsymbolvariantitem.h \
+    dev/device.h \
+    elements.h \
+    library.h \
+    librarybaseelement.h \
+    libraryelement.h \
+    libraryelementattribute.h \
     pkg/footprint.h \
+    pkg/footprintpad.h \
+    pkg/footprintpadpreviewgraphicsitem.h \
+    pkg/footprintpadsmt.h \
+    pkg/footprintpadtht.h \
+    pkg/footprintpreviewgraphicsitem.h \
     pkg/package.h \
+    pkg/packagepad.h \
     sym/symbol.h \
     sym/symbolpin.h \
     sym/symbolpinpreviewgraphicsitem.h \
     sym/symbolpreviewgraphicsitem.h \
-    librarybaseelement.h \
-    libraryelement.h \
-    libraryelementattribute.h \
-    pkg/footprintpad.h \
-    cat/librarycategory.h \
-    elements.h \
-    dev/device.h \
-    cmp/component.h \
-    cmp/componentsignal.h \
-    cmp/componentsymbolvariant.h \
-    cmp/componentsymbolvariantitem.h \
-    pkg/packagepad.h \
-    pkg/footprintpadtht.h \
-    pkg/footprintpadsmt.h \
-    cmp/componentpinsignalmapitem.h \
-    pkg/footprintpadpreviewgraphicsitem.h \
-    pkg/footprintpreviewgraphicsitem.h \
-    library.h
 
 SOURCES += \
     cat/componentcategory.cpp \
+    cat/librarycategory.cpp \
     cat/packagecategory.cpp \
+    cmp/component.cpp \
+    cmp/componentpinsignalmapitem.cpp \
+    cmp/componentsignal.cpp \
+    cmp/componentsymbolvariant.cpp \
+    cmp/componentsymbolvariantitem.cpp \
+    dev/device.cpp \
+    library.cpp \
+    librarybaseelement.cpp \
+    libraryelement.cpp \
+    libraryelementattribute.cpp \
     pkg/footprint.cpp \
+    pkg/footprintpad.cpp \
+    pkg/footprintpadpreviewgraphicsitem.cpp \
+    pkg/footprintpadsmt.cpp \
+    pkg/footprintpadtht.cpp \
+    pkg/footprintpreviewgraphicsitem.cpp \
     pkg/package.cpp \
+    pkg/packagepad.cpp \
     sym/symbol.cpp \
     sym/symbolpin.cpp \
     sym/symbolpinpreviewgraphicsitem.cpp \
     sym/symbolpreviewgraphicsitem.cpp \
-    librarybaseelement.cpp \
-    libraryelement.cpp \
-    libraryelementattribute.cpp \
-    pkg/footprintpad.cpp \
-    cat/librarycategory.cpp \
-    dev/device.cpp \
-    cmp/componentsignal.cpp \
-    cmp/componentsymbolvariant.cpp \
-    cmp/componentsymbolvariantitem.cpp \
-    cmp/component.cpp \
-    pkg/packagepad.cpp \
-    pkg/footprintpadtht.cpp \
-    pkg/footprintpadsmt.cpp \
-    cmp/componentpinsignalmapitem.cpp \
-    pkg/footprintpadpreviewgraphicsitem.cpp \
-    pkg/footprintpreviewgraphicsitem.cpp \
-    library.cpp
 
