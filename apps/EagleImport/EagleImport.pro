@@ -38,10 +38,12 @@ PRE_TARGETDEPS += \
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    polygonsimplifier.cpp
+    polygonsimplifier.cpp \
 
 HEADERS += \
     mainwindow.h \
-    polygonsimplifier.h
+    polygonsimplifier.h \
 
-FORMS += mainwindow.ui
+FORMS += \
+    mainwindow.ui \
+

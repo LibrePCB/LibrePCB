@@ -21,11 +21,11 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
-    libraryeditor.cpp
+    libraryeditor.cpp \
 
 HEADERS += \
-    libraryeditor.h
+    libraryeditor.h \
 
 FORMS += \
-    libraryeditor.ui
+    libraryeditor.ui \
 

@@ -30,6 +30,8 @@ DEFINES += INSTALLATION_PREFIX="\\\"$${PREFIX}\\\""
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units/length.h
 
 HEADERS += \
+    alignment.h \
+    application.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
@@ -38,61 +40,61 @@ HEADERS += \
     attributes/attrtyperesistance.h \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \
+    boarddesignrules.h \
+    boardlayer.h \
+    cam/excellongenerator.h \
+    cam/gerberaperturelist.h \
+    cam/gerbergenerator.h \
+    debug.h \
+    dialogs/boarddesignrulesdialog.h \
     dialogs/gridsettingsdialog.h \
+    exceptions.h \
     fileio/directorylock.h \
     fileio/filepath.h \
+    fileio/fileutils.h \
     fileio/if_xmlserializableobject.h \
     fileio/smartfile.h \
     fileio/smarttextfile.h \
+    fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
     fileio/xmldomdocument.h \
     fileio/xmldomelement.h \
+    geometry/ellipse.h \
+    geometry/hole.h \
+    geometry/polygon.h \
+    geometry/text.h \
     graphics/graphicsitem.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
     graphics/if_graphicsvieweventhandler.h \
+    gridproperties.h \
+    if_attributeprovider.h \
+    if_boardlayerprovider.h \
+    if_schematiclayerprovider.h \
+    network/filedownload.h \
+    network/networkaccessmanager.h \
+    network/networkrequest.h \
+    network/networkrequestbase.h \
+    network/repository.h \
+    schematiclayer.h \
+    scopeguard.h \
+    scopeguardlist.h \
+    sqlitedatabase.h \
+    systeminfo.h \
+    undocommand.h \
+    undocommandgroup.h \
+    undostack.h \
     units/all_length_units.h \
     units/angle.h \
     units/length.h \
     units/lengthunit.h \
     units/point.h \
-    alignment.h \
-    application.h \
-    debug.h \
-    exceptions.h \
-    gridproperties.h \
-    if_attributeprovider.h \
-    schematiclayer.h \
-    systeminfo.h \
-    undocommand.h \
-    undostack.h \
-    version.h \
-    if_schematiclayerprovider.h \
-    boardlayer.h \
-    if_boardlayerprovider.h \
     uuid.h \
-    geometry/polygon.h \
-    geometry/ellipse.h \
-    geometry/text.h \
-    geometry/hole.h \
-    undocommandgroup.h \
-    scopeguard.h \
-    scopeguardlist.h \
-    boarddesignrules.h \
-    dialogs/boarddesignrulesdialog.h \
-    cam/gerbergenerator.h \
-    cam/gerberaperturelist.h \
-    cam/excellongenerator.h \
-    fileio/smartversionfile.h \
-    fileio/fileutils.h \
-    sqlitedatabase.h \
-    network/filedownload.h \
-    network/networkrequest.h \
-    network/networkrequestbase.h \
-    network/networkaccessmanager.h \
-    network/repository.h
+    version.h \
 
 SOURCES += \
+    alignment.cpp \
+    application.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -101,53 +103,52 @@ SOURCES += \
     attributes/attrtyperesistance.cpp \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
+    boarddesignrules.cpp \
+    boardlayer.cpp \
+    cam/excellongenerator.cpp \
+    cam/gerberaperturelist.cpp \
+    cam/gerbergenerator.cpp \
+    debug.cpp \
+    dialogs/boarddesignrulesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
+    exceptions.cpp \
     fileio/directorylock.cpp \
     fileio/filepath.cpp \
+    fileio/fileutils.cpp \
     fileio/smartfile.cpp \
     fileio/smarttextfile.cpp \
+    fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
     fileio/xmldomdocument.cpp \
     fileio/xmldomelement.cpp \
+    geometry/ellipse.cpp \
+    geometry/hole.cpp \
+    geometry/polygon.cpp \
+    geometry/text.cpp \
     graphics/graphicsitem.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
+    gridproperties.cpp \
+    if_attributeprovider.cpp \
+    network/filedownload.cpp \
+    network/networkaccessmanager.cpp \
+    network/networkrequest.cpp \
+    network/networkrequestbase.cpp \
+    network/repository.cpp \
+    schematiclayer.cpp \
+    sqlitedatabase.cpp \
+    systeminfo.cpp \
+    undocommand.cpp \
+    undocommandgroup.cpp \
+    undostack.cpp \
     units/angle.cpp \
     units/length.cpp \
     units/lengthunit.cpp \
     units/point.cpp \
-    alignment.cpp \
-    application.cpp \
-    debug.cpp \
-    exceptions.cpp \
-    gridproperties.cpp \
-    if_attributeprovider.cpp \
-    schematiclayer.cpp \
-    systeminfo.cpp \
-    undocommand.cpp \
-    undostack.cpp \
-    version.cpp \
-    boardlayer.cpp \
     uuid.cpp \
-    geometry/polygon.cpp \
-    geometry/ellipse.cpp \
-    geometry/text.cpp \
-    geometry/hole.cpp \
-    undocommandgroup.cpp \
-    boarddesignrules.cpp \
-    dialogs/boarddesignrulesdialog.cpp \
-    cam/gerbergenerator.cpp \
-    cam/gerberaperturelist.cpp \
-    cam/excellongenerator.cpp \
-    fileio/smartversionfile.cpp \
-    fileio/fileutils.cpp \
-    sqlitedatabase.cpp \
-    network/filedownload.cpp \
-    network/networkrequest.cpp \
-    network/networkrequestbase.cpp \
-    network/networkaccessmanager.cpp \
-    network/repository.cpp
+    version.cpp \
 
 FORMS += \
+    dialogs/boarddesignrulesdialog.ui \
     dialogs/gridsettingsdialog.ui \
-    dialogs/boarddesignrulesdialog.ui
+

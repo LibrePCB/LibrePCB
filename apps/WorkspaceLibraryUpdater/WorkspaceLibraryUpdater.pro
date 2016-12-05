@@ -39,9 +39,11 @@ PRE_TARGETDEPS += \
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
 
-FORMS += mainwindow.ui
+FORMS += \
+    mainwindow.ui \
+

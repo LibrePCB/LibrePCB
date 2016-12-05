@@ -21,24 +21,25 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
-    librarydownload.cpp \
-    librarylistwidgetitem.cpp \
-    libraryinfowidget.cpp \
     addlibrarywidget.cpp \
+    librarydownload.cpp \
+    libraryinfowidget.cpp \
+    librarylistwidgetitem.cpp \
     librarymanager.cpp \
-    repositorylibrarylistwidgetitem.cpp
+    repositorylibrarylistwidgetitem.cpp \
 
 HEADERS += \
-    librarydownload.h \
-    librarylistwidgetitem.h \
-    libraryinfowidget.h \
     addlibrarywidget.h \
+    librarydownload.h \
+    libraryinfowidget.h \
+    librarylistwidgetitem.h \
     librarymanager.h \
-    repositorylibrarylistwidgetitem.h
+    repositorylibrarylistwidgetitem.h \
 
 FORMS += \
-    librarylistwidgetitem.ui \
-    libraryinfowidget.ui \
     addlibrarywidget.ui \
+    libraryinfowidget.ui \
+    librarylistwidgetitem.ui \
     librarymanager.ui \
-    repositorylibrarylistwidgetitem.ui
+    repositorylibrarylistwidgetitem.ui \
+
