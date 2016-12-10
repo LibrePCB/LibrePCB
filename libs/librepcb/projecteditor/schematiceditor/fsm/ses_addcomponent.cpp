@@ -154,10 +154,6 @@ bool SES_AddComponent::entry(SEE_Base* event) noexcept
         delete mAddComponentDialog; mAddComponentDialog = nullptr;
         return false;
     }
-
-    // update the command toolbar action
-    mEditorUi.actionToolAddComponent->setCheckable(true);
-    mEditorUi.actionToolAddComponent->setChecked(true);
     return true;
 }
 
@@ -167,8 +163,6 @@ bool SES_AddComponent::exit(SEE_Base* event) noexcept
     if (!abortCommand(true)) return false;
     Q_ASSERT(mIsUndoCmdActive == false);
     delete mAddComponentDialog;   mAddComponentDialog = nullptr;
-    mEditorUi.actionToolAddComponent->setCheckable(false);
-    mEditorUi.actionToolAddComponent->setChecked(false);
     return true;
 }
 

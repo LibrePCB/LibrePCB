@@ -46,17 +46,6 @@ class BES_FSM final : public BES_Base
 
     public:
 
-        // Constructors / Destructor
-        explicit BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
-        ~BES_FSM() noexcept;
-
-        // General Methods
-        bool processEvent(BEE_Base* event, bool deleteEvent = false) noexcept;
-
-
-    private:
-
         /// FSM States
         enum State {
             State_NoState,      ///< no state active
@@ -66,6 +55,24 @@ class BES_FSM final : public BES_Base
             State_AddDevice,    ///< @see librepcb#project#BES_AddDevice
         };
 
+
+        // Constructors / Destructor
+        explicit BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
+        ~BES_FSM() noexcept;
+
+        // Getters
+        State getCurrentState() const noexcept {return mCurrentState;}
+
+        // General Methods
+        bool processEvent(BEE_Base* event, bool deleteEvent = false) noexcept;
+
+
+    signals:
+        void stateChanged(State newState);
+
+
+    private:
 
         // General Methods
         ProcRetVal process(BEE_Base* event) noexcept;

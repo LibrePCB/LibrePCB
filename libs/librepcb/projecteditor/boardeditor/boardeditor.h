@@ -36,6 +36,7 @@ namespace librepcb {
 class GraphicsView;
 class GridProperties;
 class UndoStackActionGroup;
+class ExclusiveActionGroup;
 
 namespace project {
 
@@ -126,6 +127,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
 
         // Private Methods
         bool graphicsViewEventHandler(QEvent* event);
+        void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
 
         // General Attributes
         ProjectEditor& mProjectEditor;
@@ -133,6 +135,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         Ui::BoardEditor* mUi;
         GraphicsView* mGraphicsView;
         QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
+        QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
         // Misc
         int mActiveBoardIndex;

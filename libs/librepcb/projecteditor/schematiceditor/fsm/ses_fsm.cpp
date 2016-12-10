@@ -55,15 +55,20 @@ SES_FSM::SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
     mSubStates.insert(State_AddComponent, new SES_AddComponent(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
-    if (mSubStates[State_Select]->entry(nullptr))
+    if (mSubStates[State_Select]->entry(nullptr)) {
         mCurrentState = State_Select;
+        emit stateChanged(mCurrentState);
+    }
 }
 
 SES_FSM::~SES_FSM() noexcept
 {
     // exit the current substate
-    if (mCurrentState != State_NoState)
+    if (mCurrentState != State_NoState) {
         mSubStates[mCurrentState]->exit(nullptr);
+        mCurrentState = State_NoState;
+        emit stateChanged(mCurrentState);
+    }
     // delete all substates
     qDeleteAll(mSubStates);     mSubStates.clear();
 }
@@ -118,15 +123,18 @@ SES_Base::ProcRetVal SES_FSM::process(SEE_Base* event) noexcept
             {
                 mPreviousState = mCurrentState;
                 mCurrentState = State_NoState;
+                emit stateChanged(mCurrentState);
             }
         }
         if ((mCurrentState == State_NoState) && (nextState != State_NoState))
         {
             // entry the next state
-            if (mSubStates[nextState]->entry(event))
+            if (mSubStates[nextState]->entry(event)) {
                 mCurrentState = nextState;
-            else // use the select state as fallback
+                emit stateChanged(mCurrentState);
+            } else { // use the select state as fallback
                 processEvent(new SEE_Base(SEE_Base::StartSelect), true);
+            }
         }
     }
 

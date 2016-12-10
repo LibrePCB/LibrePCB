@@ -29,6 +29,7 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
+#include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/project/schematics/schematic.h>
 #include "schematicpagesdock.h"
 #include "../docks/ercmsgdock.h"
@@ -105,17 +106,17 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     // build the whole schematic editor finite state machine with all its substate objects
     mFsm = new SES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
 
-    // connect the "tools" toolbar with the state machine (the second line of the lambda
-    // functions is a workaround to set the checked attribute of the QActions properly)
-    connect(mUi->actionToolSelect, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartSelect), true);
-                     mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
-    connect(mUi->actionToolDrawWire, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
-                     mUi->actionToolDrawWire->setChecked(mUi->actionToolDrawWire->isCheckable());});
-    connect(mUi->actionToolAddNetLabel, &QAction::triggered,
-            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::StartAddNetLabel), true);
-                     mUi->actionToolAddNetLabel->setChecked(mUi->actionToolAddNetLabel->isCheckable());});
+    // connect the "tools" toolbar with the state machine
+    mToolsActionGroup.reset(new ExclusiveActionGroup());
+    mToolsActionGroup->addAction(SES_FSM::State::State_Select, mUi->actionToolSelect);
+    mToolsActionGroup->addAction(SES_FSM::State::State_DrawWire, mUi->actionToolDrawWire);
+    mToolsActionGroup->addAction(SES_FSM::State::State_AddNetLabel, mUi->actionToolAddNetLabel);
+    mToolsActionGroup->addAction(SES_FSM::State::State_AddComponent, mUi->actionToolAddComponent);
+    mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
+    connect(mFsm, &SES_FSM::stateChanged,
+            mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
+    connect(mToolsActionGroup.data(), &ExclusiveActionGroup::changeRequestTriggered,
+            this, &SchematicEditor::toolActionGroupChangeTriggered);
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
@@ -312,20 +313,12 @@ void SchematicEditor::on_actionPDF_Export_triggered()
     }
 }
 
-void SchematicEditor::on_actionToolAddComponent_triggered()
-{
-    SEE_StartAddComponent* addEvent = new SEE_StartAddComponent();
-    mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
-}
-
 void SchematicEditor::on_actionAddComp_Resistor_triggered()
 {
     Uuid componentUuid = Uuid("ef80cd5e-2689-47ee-8888-31d04fc99174");
     Uuid symbVarUuid = Uuid("a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered()
@@ -334,7 +327,6 @@ void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered()
     Uuid symbVarUuid = Uuid("8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered()
@@ -343,7 +335,6 @@ void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered()
     Uuid symbVarUuid = Uuid("5412add2-af9c-44b8-876d-a0fb7c201897");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddComp_Inductor_triggered()
@@ -352,7 +343,6 @@ void SchematicEditor::on_actionAddComp_Inductor_triggered()
     Uuid symbVarUuid = Uuid("62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddComp_gnd_triggered()
@@ -361,7 +351,6 @@ void SchematicEditor::on_actionAddComp_gnd_triggered()
     Uuid symbVarUuid = Uuid("f09ad258-595b-4ee9-a1fc-910804a203ae");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionAddComp_vcc_triggered()
@@ -370,7 +359,6 @@ void SchematicEditor::on_actionAddComp_vcc_triggered()
     Uuid symbVarUuid = Uuid("afb86b45-68ec-47b6-8d96-153d73567228");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
-    mUi->actionToolAddComponent->setChecked(mUi->actionToolAddComponent->isCheckable());
 }
 
 void SchematicEditor::on_actionProjectProperties_triggered()
@@ -387,6 +375,25 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event)
 {
     SEE_RedirectedQEvent* e = new SEE_RedirectedQEvent(SEE_Base::GraphicsViewEvent, event);
     return mFsm->processEvent(e, true);
+}
+
+void SchematicEditor::toolActionGroupChangeTriggered(const QVariant& newTool) noexcept
+{
+    switch (newTool.toInt()) {
+        case SES_FSM::State::State_Select:
+            mFsm->processEvent(new SEE_Base(SEE_Base::StartSelect), true);
+            break;
+        case SES_FSM::State::State_DrawWire:
+            mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
+            break;
+        case SES_FSM::State::State_AddNetLabel:
+            mFsm->processEvent(new SEE_Base(SEE_Base::StartAddNetLabel), true);
+            break;
+        case SES_FSM::State::State_AddComponent:
+            mFsm->processEvent(new SEE_StartAddComponent(), true);
+            break;
+        default: Q_ASSERT(false); qCritical() << "Unknown tool triggered!"; break;
+    }
 }
 
 /*****************************************************************************************

@@ -91,10 +91,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     // add a new via
     if (!addVia(*board)) return false;
 
-    // Check this state in the "tools" toolbar
-    mEditorUi.actionToolAddVia->setCheckable(true);
-    mEditorUi.actionToolAddVia->setChecked(true);
-
     // Add shape actions to the "command" toolbar
     mShapeActions.insert(static_cast<int>(BI_Via::Shape::Round),
                          mEditorUi.commandToolbar->addAction(
@@ -207,10 +203,6 @@ bool BES_AddVia::exit(BEE_Base* event) noexcept
     delete mSizeLabel;              mSizeLabel = nullptr;
     qDeleteAll(mShapeActions);      mShapeActions.clear();
     qDeleteAll(mActionSeparators);  mActionSeparators.clear();
-
-    // Uncheck this state in the "tools" toolbar
-    mEditorUi.actionToolAddVia->setCheckable(false);
-    mEditorUi.actionToolAddVia->setChecked(false);
     return true;
 }
 

@@ -46,17 +46,6 @@ class SES_FSM final : public SES_Base
 
     public:
 
-        // Constructors / Destructor
-        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
-        ~SES_FSM() noexcept;
-
-        // General Methods
-        bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
-
-
-    private:
-
         /// FSM States
         enum State {
             State_NoState,      ///< no state active
@@ -66,6 +55,23 @@ class SES_FSM final : public SES_Base
             State_AddComponent  ///< @see #project#SES_AddComponent
         };
 
+        // Constructors / Destructor
+        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
+        ~SES_FSM() noexcept;
+
+        // Getters
+        State getCurrentState() const noexcept {return mCurrentState;}
+
+        // General Methods
+        bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
+
+
+    signals:
+        void stateChanged(State newState);
+
+
+    private:
 
         // General Methods
         ProcRetVal process(SEE_Base* event) noexcept;
