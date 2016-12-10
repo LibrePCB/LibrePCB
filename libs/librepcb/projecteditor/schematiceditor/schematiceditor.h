@@ -34,6 +34,7 @@ namespace librepcb {
 
 class GraphicsView;
 class GridProperties;
+class UndoStackActionGroup;
 
 namespace project {
 
@@ -90,8 +91,6 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         // Actions
         void on_actionClose_Project_triggered();
         void on_actionNew_Schematic_Page_triggered();
-        void on_actionUndo_triggered();
-        void on_actionRedo_triggered();
         void on_actionGrid_triggered();
         void on_actionPDF_Export_triggered();
         void on_actionToolAddComponent_triggered();
@@ -125,6 +124,7 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         Ui::SchematicEditor* mUi;
         GraphicsView* mGraphicsView;
         GridProperties* mGridProperties;
+        QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
 
         int mActiveSchematicIndex;
 
