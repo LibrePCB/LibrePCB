@@ -201,8 +201,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
         {
             if (!underMouse()) break;
             QGraphicsSceneMouseEvent* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
-            if (e->buttons().testFlag(Qt::RightButton) && (!mPanningActive)) {
-                QPoint diff = mapFromScene(e->scenePos()) - mapFromScene(e->buttonDownScenePos(Qt::RightButton));
+            if (e->buttons().testFlag(Qt::MiddleButton) && (!mPanningActive)) {
+                QPoint diff = mapFromScene(e->scenePos()) - mapFromScene(e->buttonDownScenePos(Qt::MiddleButton));
                 mPanningActive = true; // avoid recursive calls (=> stack overflow)
                 horizontalScrollBar()->setValue(horizontalScrollBar()->value() - diff.x());
                 verticalScrollBar()->setValue(verticalScrollBar()->value() - diff.y());
