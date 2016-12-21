@@ -197,9 +197,26 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
 {
     switch (event->type())
     {
-        case QEvent::GraphicsSceneMouseMove:
-        {
-            if (!underMouse()) break;
+        case QEvent::GraphicsSceneMousePress: {
+            QGraphicsSceneMouseEvent* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            if (e->button() == Qt::MiddleButton) {
+                mCursorBeforePanning = cursor();
+                setCursor(Qt::ClosedHandCursor);
+            } else if (mEventHandlerObject) {
+                mEventHandlerObject->graphicsViewEventHandler(event);
+            }
+            return true;
+        }
+        case QEvent::GraphicsSceneMouseRelease: {
+            QGraphicsSceneMouseEvent* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            if (e->button() == Qt::MiddleButton) {
+                setCursor(mCursorBeforePanning);
+            } else if (mEventHandlerObject) {
+                mEventHandlerObject->graphicsViewEventHandler(event);
+            }
+            return true;
+        }
+        case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
             if (e->buttons().testFlag(Qt::MiddleButton) && (!mPanningActive)) {
                 QPoint diff = mapFromScene(e->scenePos()) - mapFromScene(e->buttonDownScenePos(Qt::MiddleButton));
@@ -207,32 +224,23 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
                 horizontalScrollBar()->setValue(horizontalScrollBar()->value() - diff.x());
                 verticalScrollBar()->setValue(verticalScrollBar()->value() - diff.y());
                 mPanningActive = false;
-                return true;
-            } else if (mPanningActive) {
-                return true;
             }
             // no break here!
         }
         case QEvent::GraphicsSceneMouseDoubleClick:
-        case QEvent::GraphicsSceneMousePress:
-        case QEvent::GraphicsSceneMouseRelease:
-        case QEvent::GraphicsSceneContextMenu:
-        {
-            if (!underMouse()) break;
-            if (mEventHandlerObject)
+        case QEvent::GraphicsSceneContextMenu: {
+            if (mEventHandlerObject) {
                 mEventHandlerObject->graphicsViewEventHandler(event);
+            }
             return true;
         }
-        case QEvent::GraphicsSceneWheel:
-        {
+        case QEvent::GraphicsSceneWheel: {
             if (!underMouse()) break;
-            if (mEventHandlerObject)
-            {
-                if (!mEventHandlerObject->graphicsViewEventHandler(event))
+            if (mEventHandlerObject) {
+                if (!mEventHandlerObject->graphicsViewEventHandler(event)) {
                     handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
-            }
-            else
-            {
+                }
+            } else {
                 handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
             }
             return true;
