@@ -230,9 +230,6 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
 BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept
 {
-    if (mouseEvent->screenPos() != mouseEvent->buttonDownScreenPos(Qt::RightButton))
-        return PassToParentState; // mouse moved -> don't show context menu!
-
     // handle item selection
     QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;
