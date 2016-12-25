@@ -220,9 +220,6 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(QGraphicsSceneMouseE
 SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent* mouseEvent, Schematic* schematic) noexcept
 {
-    if (mouseEvent->screenPos() != mouseEvent->buttonDownScreenPos(Qt::RightButton))
-        return PassToParentState; // mouse moved -> don't show context menu!
-
     // handle item selection
     QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;
