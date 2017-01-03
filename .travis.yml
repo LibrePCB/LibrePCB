@@ -28,11 +28,6 @@ matrix:
       compiler: clang
       env: BUILD_DOXYGEN=false
 
-env:
-  global:
-    # variable $DOXYGEN_ACCESS_TOKEN (used to push the doxygen output to https://github.com/LibrePCB/LibrePCB-Doxygen)
-    - secure: "iuBMC/IEaPXY+gQY3BpUrgmLZsD5ldqXnEK01QgqraPRYDmKSN3W9Aw9MR3M3BrxRwnpofy9EFBEV7Z0l5LLelIzUxCZHVfWly6d2BEWSdgrsVOfbu3yPOfd4oen9VOv5sRvbpVEfsLsFxrEvVwSOjX3NZvd8bhhuJSFV7yR3Yr9p2clYrl2e8oI57ocVwA4f452hnpZWuxL137/OFIfZUU/FIwvR+jipvBTB+GyoQpfU0gtue+w4GElw0aVdzZ3HHEPNu4oH6CBIHoKYFP57Ftr7Oh5PtJ6QnCeRb+j7tEeD28naHGjc3KUxdMvbAku9Ltb6B0fypHqFnlqsQFETgJgO1VYlJocLcUHJkOSx2o/Nx5z7juVmGaFJWWMgLNDunO4ZG9oBpTW9B62k7zQ0qHZYT3Ci35/OMkrRxsoTDSj5k6MBMxiImJ7Kv6VrYSl0jnecWK+RM+DA53W4IKrMNnymGPTLK0z6NtZnPOXDGIl6zRpUQqlbZFEBrNT5/domqf04OWlSnP2bjW9XfoEnI7Ww42GTgFMAt5lYAajbdcgZxj6Zm1s/wFGEtHHUcZFgJe+kjA4XCg7pt3Mvtov/GTzjqZdsuiWuGCg1cQIABeugj8M/QYkqWmDCV0o8gNthHyR6IEdhSRDO5zC5nonClojJpWv6NYYTppZjUjBY3E="
-
 install:
   - source ./dev/travis/install.sh # source required because it modifies the environment
 
