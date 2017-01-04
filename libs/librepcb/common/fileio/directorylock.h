@@ -227,12 +227,6 @@ class DirectoryLock final
          * @return  The current lock status (see #LockStatus)
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
-         *
-         * @todo    This method cannot detect if a lock file was created by another
-         *          application instance on the same computer with the same user.
-         *          If multiple instances of the application are not allowed, this
-         *          should't be a problem. Otherwise, the PID in the lock file must
-         *          be considered (and check if such a process exists).
          */
         LockStatus getStatus() const throw (Exception);
 
