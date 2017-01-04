@@ -1,10 +1,13 @@
 language: cpp
-
 sudo: required
-
 cache: ccache
+notifications:
+  email:
+    on_success: change
+    on_failure: change
 
 matrix:
+  fast_finish: true
   include:
     # Ubuntu 14.04 + GCC 4.8 + Qt 5.2 + Doxygen Generation (all packages from official Ubuntu repositories)
     - os: linux
@@ -24,54 +27,17 @@ matrix:
     - os: osx
       compiler: clang
       env: BUILD_DOXYGEN=false
-  fast_finish: true
 
 env:
   global:
     # variable $DOXYGEN_ACCESS_TOKEN (used to push the doxygen output to https://github.com/LibrePCB/LibrePCB-Doxygen)
     - secure: "iuBMC/IEaPXY+gQY3BpUrgmLZsD5ldqXnEK01QgqraPRYDmKSN3W9Aw9MR3M3BrxRwnpofy9EFBEV7Z0l5LLelIzUxCZHVfWly6d2BEWSdgrsVOfbu3yPOfd4oen9VOv5sRvbpVEfsLsFxrEvVwSOjX3NZvd8bhhuJSFV7yR3Yr9p2clYrl2e8oI57ocVwA4f452hnpZWuxL137/OFIfZUU/FIwvR+jipvBTB+GyoQpfU0gtue+w4GElw0aVdzZ3HHEPNu4oH6CBIHoKYFP57Ftr7Oh5PtJ6QnCeRb+j7tEeD28naHGjc3KUxdMvbAku9Ltb6B0fypHqFnlqsQFETgJgO1VYlJocLcUHJkOSx2o/Nx5z7juVmGaFJWWMgLNDunO4ZG9oBpTW9B62k7zQ0qHZYT3Ci35/OMkrRxsoTDSj5k6MBMxiImJ7Kv6VrYSl0jnecWK+RM+DA53W4IKrMNnymGPTLK0z6NtZnPOXDGIl6zRpUQqlbZFEBrNT5/domqf04OWlSnP2bjW9XfoEnI7Ww42GTgFMAt5lYAajbdcgZxj6Zm1s/wFGEtHHUcZFgJe+kjA4XCg7pt3Mvtov/GTzjqZdsuiWuGCg1cQIABeugj8M/QYkqWmDCV0o8gNthHyR6IEdhSRDO5zC5nonClojJpWv6NYYTppZjUjBY3E="
 
-before_install:
-  - | 
-    if [ -n "$QT_PPA" ]
-    then
-      sudo add-apt-repository "${QT_PPA}" -y && sudo apt-get update -qq
-    fi
-
 install:
-  - |
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]
-    then
-      sudo apt-get install -qq libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb
-      if [ "$QT_BASE" = "trusty" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools; fi
-      if [ -n "$QT_PPA" ]; then sudo apt-get install -qq "${QT_BASE}base" "${QT_BASE}tools"; source "/opt/${QT_BASE}/bin/${QT_BASE}-env.sh"; fi
-      if [ "$BUILD_DOXYGEN" = "true" ]; then sudo apt-get install -qq doxygen graphviz; fi
-    elif [ "${TRAVIS_OS_NAME}" = "osx" ]
-    then 
-      brew update && brew install qt5 && brew link --force qt5
-    fi
+  - source ./dev/travis/install.sh # source required because it modifies the environment
 
 script:
-  - mkdir build && cd build && qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" && make -j8 && cd ../   # build librepcb
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then xvfb-run -a ./build/generated/unix/qztest; fi                    # run quazip unit tests (linux)
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ];   then ./build/generated/mac/qztest; fi                                 # run quazip unit tests (mac)
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then xvfb-run -a ./build/generated/unix/tests; fi                     # run librepcb unit tests (linux, using xvfb)
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ];   then ./build/generated/mac/tests; fi                                  # run librepcb unit tests (mac)
+  - ./dev/travis/build.sh
+  - ./dev/travis/run_tests.sh
+  - ./dev/travis/update_doxygen.sh
 
-# run doxygen and upload the html output to github (gh-pages of LibrePCB-Doxygen)
-after_success:
-  - |
-    if [ "${BUILD_DOXYGEN}" = "true" -a "${TRAVIS_PULL_REQUEST}" = "false" -a -n "${DOXYGEN_ACCESS_TOKEN}" ]
-    then 
-      BRANCH_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/[^A-Za-z0-9._-]/_/g')
-      cd ./dev/doxygen && doxygen Doxyfile
-      git clone -b master "https://LibrePCB-Builder:${DOXYGEN_ACCESS_TOKEN}@github.com/LibrePCB/LibrePCB-Doxygen.git" && cd LibrePCB-Doxygen
-      mkdir -p $BRANCH_NAME && rm -rf $BRANCH_NAME/* && cp -rf ../output/html/* ./$BRANCH_NAME
-      git config user.name "LibrePCB-Builder" && git config user.email "builder@librepcb.org"
-      git add -A > /dev/null && git commit --amend -q -m "Update documentation of branch '$BRANCH_NAME'" && git push --force -q origin master
-    fi
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change
