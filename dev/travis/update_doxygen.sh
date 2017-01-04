@@ -9,7 +9,7 @@ then
   BRANCH_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/[^A-Za-z0-9._-]/_/g')
   cd ./dev/doxygen
   doxygen Doxyfile
-  git clone -b master "https://LibrePCB-Builder:${DOXYGEN_ACCESS_TOKEN}@github.com/LibrePCB/LibrePCB-Doxygen.git"
+  git clone -b master "https://LibrePCB-Builder:${DOXYGEN_ACCESS_TOKEN}@github.com/LibrePCB/LibrePCB-Doxygen.git" 2> /dev/null
   cd LibrePCB-Doxygen
   rm -rf $BRANCH_NAME
   cp -rf ../output/html ./$BRANCH_NAME
@@ -17,6 +17,6 @@ then
   git config user.email "builder@librepcb.org"
   git add -A > /dev/null
   git commit --amend -q -m "Update documentation of branch '$BRANCH_NAME'"
-  git push --force -q origin master
+  git push --force -q origin master 2> /dev/null
 fi
 
