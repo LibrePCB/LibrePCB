@@ -38,6 +38,8 @@ SOURCES += \
     common/symbolchooserdialog.cpp \
     dev/deviceeditorwidget.cpp \
     dev/padsignalmapeditorwidget.cpp \
+    lib/librarylisteditorwidget.cpp \
+    lib/libraryoverviewwidget.cpp \
     libraryeditor.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintlisteditorwidget.cpp \
@@ -102,6 +104,8 @@ HEADERS += \
     common/symbolchooserdialog.h \
     dev/deviceeditorwidget.h \
     dev/padsignalmapeditorwidget.h \
+    lib/librarylisteditorwidget.h \
+    lib/libraryoverviewwidget.h \
     libraryeditor.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintlisteditorwidget.h \
@@ -157,6 +161,8 @@ FORMS += \
     common/packagechooserdialog.ui \
     common/symbolchooserdialog.ui \
     dev/deviceeditorwidget.ui \
+    lib/librarylisteditorwidget.ui \
+    lib/libraryoverviewwidget.ui \
     libraryeditor.ui \
     pkg/dialogs/footprintpadpropertiesdialog.ui \
     pkg/packageeditorwidget.ui \
