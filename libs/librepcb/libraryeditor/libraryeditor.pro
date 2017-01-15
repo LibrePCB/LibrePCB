@@ -21,9 +21,11 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
+    common/editorwidgetbase.cpp \
     libraryeditor.cpp \
 
 HEADERS += \
+    common/editorwidgetbase.h \
     libraryeditor.h \
 
 FORMS += \
