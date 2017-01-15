@@ -23,6 +23,7 @@ INCLUDEPATH += \
 SOURCES += \
     cmpcat/componentcategoryeditorwidget.cpp \
     common/categorychooserdialog.cpp \
+    common/categorylisteditorwidget.cpp \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
     libraryeditor.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
 HEADERS += \
     cmpcat/componentcategoryeditorwidget.h \
     common/categorychooserdialog.h \
+    common/categorylisteditorwidget.h \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
     libraryeditor.h \
@@ -39,6 +41,7 @@ HEADERS += \
 FORMS += \
     cmpcat/componentcategoryeditorwidget.ui \
     common/categorychooserdialog.ui \
+    common/categorylisteditorwidget.ui \
     libraryeditor.ui \
     pkgcat/packagecategoryeditorwidget.ui \
 
