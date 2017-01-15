@@ -90,9 +90,11 @@ namespace librepcb {
  * protect with a lock. There are two different constructors for this purpose. If you use
  * the default constructor, you need to call #setDirToLock() afterwards. Now you can read
  * the lock status of the specified directory with #getStatus(). With #lock() you can
- * create the lock file, and with #unlock() you can remove the lock file.
+ * create the lock file, and with #unlock() you can remove the lock file. There are also
+ * the two convenience methods #tryLock() and #unlockIfLocked(), just read their
+ * documentation for more information.
  *
- * @note    The destructor will automatically call #unlock() if the object holds the lock.
+ * @note    The destructor will automatically call #unlockIfLocked().
  *          This allows a reliable implementation of a directory lock, because you can add
  *          a DirectoryLock instance to the attributes of your class which access a
  *          directory which should be locked. This will ensure that the lock will be
@@ -125,13 +127,15 @@ namespace librepcb {
  *                      // Should not happen...
  *                      break;
  *              }
+ *              // if you don't care about stale locks, you could just do this instead:
+ *              // myLock.tryLock(); // Note: this line can throw an exception!
  *
  *          }
  *          ~MyDirectoryOpeningClass() // destructor
  *          {
- *              // You do not have to (but you could) call myLock.unlock(), as it will be
- *              // called automatically in the destructor of myLock (only because you have
- *              // called myLock.lock() in the constructor and the lock is still active)!
+ *              // You do not have to (but you could) call myLock.unlockIfLocked(),
+ *              // as it will be called automatically in the destructor of myLock.
+ *              // try { myLock.unlockIfLocked(); } catch (...) { }
  *          }
  *
  *      private:
@@ -234,11 +238,40 @@ class DirectoryLock final
         // General Methods
 
         /**
+         * @brief Lock the specified directory if not already locked
+         *
+         * This is a save method to get a lock without the need for first reading the lock
+         * status with #getStatus(). Depending on the lock status, this method does
+         * following:
+         * - Unlocked:  Set "wasStale = false" and get the lock (calling #lock())
+         * - StaleLock: Set "wasStale = true" and get the lock (calling #lock())
+         * - Locked:    Throw exception (something like "Directory already locked")
+         *
+         * @param wasStale  This variable will be set to true if there was a stale lock,
+         *                  and to false if not (if a valid pointer was passed).
+         *
+         * @throw   Exception on error (e.g. already locked, no access rights, ...)
+         */
+        void tryLock(bool* wasStale = nullptr);
+
+        /**
+         * @brief Unlock the specified directory if it was locked by this object
+         *
+         * If the specified directory is locked by this object, this method calls
+         * #unlock(). Otherwise this method does nothing.
+         *
+         * @return  True if the lock has been released by this object, false otherwise.
+         *
+         * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
+         */
+        bool unlockIfLocked();
+
+        /**
          * @brief Lock the specified directory (create/update the lock file)
          *
-         * @warning This method will always overwrite an already existing lock file,
-         *          even if that lock file was created by another application instance!
-         *          So: Always check first the lock status with #getStatus()!
+         * @warning This method will always overwrite an already existing lock file, even
+         *          if it was created by another application instance! So: Always check
+         *          the lock status first with #getStatus(), or use #tryLock() instead!
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
@@ -247,9 +280,9 @@ class DirectoryLock final
         /**
          * @brief Unlock the specified directory (remove the lock file)
          *
-         * @warning This method will always remove an existing lock file,
-         *          even if that lock file was created by another application instance!
-         *          So: Always check first the lock status with #getStatus()!
+         * @warning This method will always remove an existing lock file, even if it was
+         *          created by another application instance! So: Always check the lock
+         *          status first with #getStatus(), or use #unlockIfLocked() instead!
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
