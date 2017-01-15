@@ -54,7 +54,7 @@ LibraryManager::LibraryManager(workspace::Workspace& ws, QWidget* parent) noexce
             this, &LibraryManager::currentListItemChanged);
 
     mAddLibraryWidget.reset(new AddLibraryWidget(mWorkspace));
-    mUi->horizontalLayout->addWidget(mAddLibraryWidget.data());
+    mUi->verticalLayout->insertWidget(0, mAddLibraryWidget.data());
     connect(mAddLibraryWidget.data(), &AddLibraryWidget::libraryAdded,
             this, &LibraryManager::libraryAddedSlot);
 
@@ -138,12 +138,12 @@ void LibraryManager::currentListItemChanged(QListWidgetItem* current, QListWidge
                     this, &LibraryManager::openLibraryEditorTriggered);
             connect(widget, &LibraryInfoWidget::libraryRemoved,
                     this, &LibraryManager::libraryRemovedSlot);
-            mUi->horizontalLayout->addWidget(widget);
+            mUi->verticalLayout->insertWidget(0, widget);
             mCurrentWidget = widget;
         }
     } else {
         mCurrentWidget = new QWidget();
-        mUi->horizontalLayout->addWidget(mCurrentWidget);
+        mUi->verticalLayout->insertWidget(0, mCurrentWidget);
     }
 
     mAddLibraryWidget->setVisible(mCurrentWidget ? false : true);
