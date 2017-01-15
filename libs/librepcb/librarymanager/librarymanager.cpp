@@ -100,7 +100,10 @@ void LibraryManager::loadLibraryList() noexcept
     libraries.append(mWorkspace.getLocalLibraries().values());
     libraries.append(mWorkspace.getRemoteLibraries().values());
     foreach (const QSharedPointer<library::Library>& lib, libraries) {
-        widgets.append(new LibraryListWidgetItem(mWorkspace, lib));
+        LibraryListWidgetItem* widget = new LibraryListWidgetItem(mWorkspace, lib);
+        connect(widget, &LibraryListWidgetItem::openLibraryEditorTriggered,
+                this, &LibraryManager::openLibraryEditorTriggered);
+        widgets.append(widget);
     }
 
     // sort all list widget items
@@ -131,6 +134,8 @@ void LibraryManager::currentListItemChanged(QListWidgetItem* current, QListWidge
         if (item && (!item->getLibrary().isNull())) {
             QSharedPointer<library::Library> lib = item->getLibrary();
             LibraryInfoWidget* widget = new LibraryInfoWidget(mWorkspace, lib);
+            connect(widget, &LibraryInfoWidget::openLibraryEditorTriggered,
+                    this, &LibraryManager::openLibraryEditorTriggered);
             connect(widget, &LibraryInfoWidget::libraryRemoved,
                     this, &LibraryManager::libraryRemovedSlot);
             mUi->horizontalLayout->addWidget(widget);

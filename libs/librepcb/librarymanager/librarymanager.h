@@ -88,6 +88,10 @@ class LibraryManager final : public QMainWindow
                                     const LibraryListWidgetItem* b) noexcept;
 
 
+    signals:
+        void openLibraryEditorTriggered(QSharedPointer<Library> lib);
+
+
     private: // Data
 
         workspace::Workspace& mWorkspace;
