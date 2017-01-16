@@ -52,7 +52,7 @@ class NetworkRequestTest : public ::testing::TestWithParam<NetworkRequestTestDat
     public:
 
         static void SetUpTestCase() {
-            sDownloadManager = std::make_unique<NetworkAccessManager>();
+            sDownloadManager = std::unique_ptr<NetworkAccessManager>(new NetworkAccessManager());
         }
 
         static void TearDownTestCase() {
