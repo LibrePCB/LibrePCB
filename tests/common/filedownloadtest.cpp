@@ -20,6 +20,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QtCore>
 #include <gtest/gtest.h>
 #include <librepcb/common/network/networkaccessmanager.h>
