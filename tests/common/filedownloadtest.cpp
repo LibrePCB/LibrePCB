@@ -54,11 +54,10 @@ class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData>
     public:
 
         static void SetUpTestCase() {
-            sDownloadManager = new NetworkAccessManager();
+            sDownloadManager = std::make_unique<NetworkAccessManager>();
         }
 
         static void TearDownTestCase() {
-            delete sDownloadManager;
         }
 
         static FilePath getDestination(const FileDownloadTestData& data) {
@@ -76,10 +75,10 @@ class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData>
     protected:
 
         NetworkRequestBaseSignalReceiver mSignalReceiver;
-        static NetworkAccessManager* sDownloadManager;
+        static std::unique_ptr<NetworkAccessManager> sDownloadManager;
 };
 
-NetworkAccessManager* FileDownloadTest::sDownloadManager = nullptr;
+std::unique_ptr<NetworkAccessManager> FileDownloadTest::sDownloadManager = nullptr;
 
 /*****************************************************************************************
  *  Test Methods
