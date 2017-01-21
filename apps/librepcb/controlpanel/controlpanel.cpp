@@ -120,6 +120,9 @@ ControlPanel::ControlPanel(Workspace& workspace) :
         if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp"))
             openProject(filepath);
     }
+
+    // start scanning the workspace library (asynchronously)
+    mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 ControlPanel::~ControlPanel()
