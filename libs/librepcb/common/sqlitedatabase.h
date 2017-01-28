@@ -90,6 +90,29 @@ class SQLiteDatabase final : public QObject
         SQLiteDatabase& operator=(const SQLiteDatabase& rhs) = delete;
 
 
+    private: // Methods
+
+        /**
+         * @brief Enable the "Write-Ahead Logging" (WAL) featur of SQLite
+         *
+         * @note LibrePCB requires to enable WAL to avoid blocking readers by writers. If
+         *       not enabled, the library scanner would also block all read-only accesses
+         *       to the library database.
+         *
+         * @see http://www.sqlite.org/wal.html
+         */
+        void enableSqliteWriteAheadLogging() throw (Exception);
+
+        /**
+         * @brief Get compile options of the SQLite driver library
+         *
+         * @return A hashmap of all compile options (without the "SQLITE_" prefix)
+         *
+         * @see https://sqlite.org/pragma.html#pragma_compile_options
+         */
+        QHash<QString, QString> getSqliteCompileOptions() throw (Exception);
+
+
     private: // Data
 
         QSqlDatabase mDb;
