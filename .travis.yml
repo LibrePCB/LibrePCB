@@ -18,7 +18,7 @@ matrix:
     - os: linux
       dist: trusty
       compiler: clang
-      env: BUILD_DOXYGEN=false QT_BASE="qt57" QT_PPA="ppa:beineri/opt-qt57-trusty"
+      env: BUILD_DOXYGEN=false QT_BASE="qt57" QT_PPA="ppa:beineri/opt-qt571-trusty"
     # OS X + GCC
     - os: osx
       compiler: gcc
