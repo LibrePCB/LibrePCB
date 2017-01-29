@@ -69,9 +69,18 @@ SOURCES += \
     geometry/hole.cpp \
     geometry/polygon.cpp \
     geometry/text.cpp \
+    graphics/ellipsegraphicsitem.cpp \
     graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
+    graphics/holegraphicsitem.cpp \
+    graphics/linegraphicsitem.cpp \
+    graphics/origincrossgraphicsitem.cpp \
+    graphics/polygongraphicsitem.cpp \
+    graphics/primitiveellipsegraphicsitem.cpp \
+    graphics/primitivepathgraphicsitem.cpp \
+    graphics/primitivetextgraphicsitem.cpp \
+    graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
     if_attributeprovider.cpp \
     network/filedownload.cpp \
@@ -151,10 +160,19 @@ HEADERS += \
     geometry/hole.h \
     geometry/polygon.h \
     geometry/text.h \
+    graphics/ellipsegraphicsitem.h \
     graphics/graphicslayer.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
+    graphics/holegraphicsitem.h \
     graphics/if_graphicsvieweventhandler.h \
+    graphics/linegraphicsitem.h \
+    graphics/origincrossgraphicsitem.h \
+    graphics/polygongraphicsitem.h \
+    graphics/primitiveellipsegraphicsitem.h \
+    graphics/primitivepathgraphicsitem.h \
+    graphics/primitivetextgraphicsitem.h \
+    graphics/textgraphicsitem.h \
     gridproperties.h \
     if_attributeprovider.h \
     network/filedownload.h \
