@@ -81,11 +81,13 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath) throw (Exception) :
 
     // set SQLite options
     exec("PRAGMA foreign_keys = ON"); // can throw
+    enableSqliteWriteAheadLogging(); // can throw
 
     // check if all required features are available
     Q_ASSERT(mDb.driver() && mDb.driver()->hasFeature(QSqlDriver::Transactions));
     Q_ASSERT(mDb.driver() && mDb.driver()->hasFeature(QSqlDriver::PreparedQueries));
     Q_ASSERT(mDb.driver() && mDb.driver()->hasFeature(QSqlDriver::LastInsertId));
+    Q_ASSERT(getSqliteCompileOptions()["THREADSAFE"] == "1"); // can throw
 }
 
 SQLiteDatabase::~SQLiteDatabase() noexcept
@@ -184,8 +186,38 @@ void SQLiteDatabase::exec(QSqlQuery& query) throw (Exception)
 
 void SQLiteDatabase::exec(const QString& query) throw (Exception)
 {
-    QSqlQuery q(query, mDb);
+    QSqlQuery q = prepareQuery(query);
     exec(q);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void SQLiteDatabase::enableSqliteWriteAheadLogging() throw (Exception)
+{
+    QSqlQuery query("PRAGMA journal_mode=WAL", mDb);
+    exec(query); // can throw
+    bool success = query.first();
+    QString result = query.value(0).toString();
+    if ((!success) || (result != "wal")) {
+        throw LogicError(__FILE__, __LINE__, QString(), QString(tr(
+            "Could not enable SQLite Write-Ahead Logging: \"%1\"")).arg(result));
+    }
+}
+
+QHash<QString, QString> SQLiteDatabase::getSqliteCompileOptions() throw (Exception)
+{
+    QHash<QString, QString> options;
+    QSqlQuery query("PRAGMA compile_options", mDb);
+    exec(query); // can throw
+    while (query.next()) {
+        QString option = query.value(0).toString();
+        QString key = option.section('=', 0, 0);
+        QString value = option.section('=', 1, -1);
+        options.insert(key, value);
+    }
+    return options;
 }
 
 /*****************************************************************************************
