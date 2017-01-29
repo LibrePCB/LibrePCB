@@ -13,7 +13,7 @@ GENERATED_DIR = ../generated
 # Use common project definitions
 include(../common.pri)
 
-QT += core widgets network printsupport xml opengl
+QT += core widgets network printsupport xml opengl sql concurrent
 
 CONFIG += console
 CONFIG -= app_bundle
@@ -53,6 +53,7 @@ SOURCES += \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/scopeguardtest.cpp \
+    common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
