@@ -86,6 +86,7 @@ SOURCES += \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
+    widgets/alignmentselector.cpp \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
@@ -162,6 +163,7 @@ HEADERS += \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
+    widgets/alignmentselector.h \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
@@ -171,4 +173,5 @@ HEADERS += \
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
     dialogs/gridsettingsdialog.ui \
+    widgets/alignmentselector.ui \
 
