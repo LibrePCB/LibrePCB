@@ -45,18 +45,20 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a \
     $${DESTDIR}/libquazip.a
 
-SOURCES += main.cpp \
+SOURCES += \
+    common/applicationtest.cpp \
+    common/directorylocktest.cpp \
+    common/filedownloadtest.cpp \
     common/filepathtest.cpp \
+    common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/scopeguardtest.cpp \
-    common/applicationtest.cpp \
-    common/versiontest.cpp \
     common/systeminfotest.cpp \
-    common/directorylocktest.cpp \
     common/uuidtest.cpp \
-    common/filedownloadtest.cpp \
-    common/networkrequesttest.cpp \
-    project/projecttest.cpp
+    common/versiontest.cpp \
+    main.cpp \
+    project/projecttest.cpp \
 
 HEADERS += \
-    common/networkrequestbasesignalreceiver.h
+    common/networkrequestbasesignalreceiver.h \
+
