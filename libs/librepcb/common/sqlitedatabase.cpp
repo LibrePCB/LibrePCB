@@ -184,7 +184,7 @@ void SQLiteDatabase::exec(QSqlQuery& query) throw (Exception)
 
 void SQLiteDatabase::exec(const QString& query) throw (Exception)
 {
-    QSqlQuery q(query, mDb);
+    QSqlQuery q = prepareQuery(query);
     exec(q);
 }
 
