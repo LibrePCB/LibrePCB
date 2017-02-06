@@ -114,7 +114,7 @@ QVariant ProjectTreeItem::data(int role) const
                     return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/places/folder.png"));
 
                 case ProjectFile:
-                    return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/app.png"));
+                    return QIcon::fromTheme(mMimeType.iconName(), QIcon(":/img/app/librepcb.png"));
             }
         }
 

@@ -64,7 +64,7 @@
         <file>actions/rotate_right.png</file>
         <file>actions/flip_horizontal.png</file>
         <file>actions/flip_vertical.png</file>
-        <file>app.png</file>
+        <file>app/librepcb.png</file>
         <file>places/folder_gray.png</file>
         <file>places/folder_open_gray.png</file>
         <file>places/folder_open.png</file>

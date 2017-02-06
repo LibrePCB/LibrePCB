@@ -19,12 +19,12 @@ exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {
     # Windows-specific configurations
-    RC_ICONS = ../../packaging/windows/img/librepcb.ico
+    RC_ICONS = ../../img/app/librepcb.ico
 }
 
 macx {
     # Mac-specific configurations
-    ICON = ../../packaging/mac/img/librepcb.icns
+    ICON = ../../img/app/librepcb.icns
 }
 
 unix:!macx {
