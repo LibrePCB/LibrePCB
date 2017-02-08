@@ -30,17 +30,9 @@ macx {
 unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = $${PREFIX}/bin
-    resources.path = $${INSTALLED_RESOURCES_DIR}/../
-    resources.files = $${LOCAL_RESOURCES_DIR}
-    icon.path = $${PREFIX}/share/pixmaps
-    icon.files = ../../packaging/unix/img/librepcb.svg
-    desktop.path = $${PREFIX}/share/applications
-    desktop.files = ../../packaging/unix/librepcb.desktop
-    mimexml.path = $${PREFIX}/share/mime/packages
-    mimexml.files = ../../packaging/unix/mime/librepcb.xml
-    mimedesktop.path = $${PREFIX}/share/mimelnk/application
-    mimedesktop.files = ../../packaging/unix/mime/x-librepcb-project.desktop
-    INSTALLS += target resources icon desktop mimexml mimedesktop
+    share.path = $${PREFIX}
+    share.files = $${SHARE_DIR}
+    INSTALLS += target share
 }
 
 # Note: The order of the libraries is very important for the linker!
@@ -127,7 +119,7 @@ QMAKE_EXTRA_COMPILERS += lrelease
 PRE_TARGETDEPS += compiler_lrelease_make_all
 
 # Copy resource files to output directory
-copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../res/.)\"" "\"$$system_path($${LOCAL_RESOURCES_DIR})\""
+copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../share/.)\"" "\"$$system_path($${SHARE_DIR})\""
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)

@@ -64,12 +64,6 @@ TEST(ApplicationTest, testFileFormatVersion)
     EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
 }
 
-TEST(ApplicationTest, testIsRunningFromInstalledExecutable)
-{
-    // as there is no "make install" available for the unit tests, it can't be installed ;)
-    EXPECT_FALSE(qApp->isRunningFromInstalledExecutable());
-}
-
 TEST(ApplicationTest, testGetResourcesDir)
 {
     // check if the resources directory is valid, exists and is not empty
@@ -78,8 +72,23 @@ TEST(ApplicationTest, testGetResourcesDir)
     EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
 
     // as the tests can't be installed, the resources must be located in the "generated" dir
-    FilePath generatedDir = qApp->getResourcesDir().getParentDir();
+    FilePath generatedDir = qApp->getResourcesDir().getParentDir().getParentDir();
     EXPECT_TRUE(FilePath(qApp->applicationFilePath()).isLocatedInDir(generatedDir));
+}
+
+TEST(ApplicationTest, testGetResourcesFilePath)
+{
+    FilePath dir = qApp->getResourcesDir();
+    EXPECT_EQ(dir, qApp->getResourcesFilePath(""));
+    EXPECT_EQ(dir, qApp->getResourcesFilePath(QString()));
+    EXPECT_EQ(dir.getPathTo("foo"), qApp->getResourcesFilePath("foo"));
+    EXPECT_EQ(dir.getPathTo("foo/bar.ext"), qApp->getResourcesFilePath("foo/bar.ext"));
+}
+
+TEST(ApplicationTest, testExistenceOfResourceFiles)
+{
+    EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
+    EXPECT_TRUE(qApp->getResourcesFilePath(".librepcb-resources").isExistingFile());
 }
 
 /*****************************************************************************************
