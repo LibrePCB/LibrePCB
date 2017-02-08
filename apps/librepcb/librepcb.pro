@@ -81,8 +81,7 @@ TRANSLATIONS = \
     ../../i18n/librepcb_gsw_CH.ts
 
 RESOURCES += \
-    ../../img/images.qrc \
-    ../../i18n/translations.qrc
+    ../../img/images.qrc
 
 SOURCES += \
     controlpanel/controlpanel.cpp \
@@ -112,11 +111,10 @@ isEmpty(QMAKE_LRELEASE) {
     else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 lrelease.input = TRANSLATIONS
-lrelease.output = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
-lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
-lrelease.CONFIG += no_link
+lrelease.output = $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += lrelease
-PRE_TARGETDEPS += compiler_lrelease_make_all
 
 # Copy resource files to output directory
 copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../share/.)\"" "\"$$system_path($${SHARE_DIR})\""
