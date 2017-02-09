@@ -12,9 +12,8 @@ macx:DESTDIR = $${GENERATED_DIR}/mac
 unix:!macx:DESTDIR = $${GENERATED_DIR}/unix
 win32:DESTDIR = $${GENERATED_DIR}/windows
 
-# set destination path for resources
-LOCAL_RESOURCES_DIR = $$shadowed($$absolute_path($${GENERATED_DIR}/res, $$_PRO_FILE_PWD_))
-INSTALLED_RESOURCES_DIR = $${PREFIX}/share/librepcb/res
+# set destination path to share directory
+SHARE_DIR = $$shadowed($$absolute_path($${GENERATED_DIR}/share, $$_PRO_FILE_PWD_))
 
 # use separate folders for different types of files
 OBJECTS_DIR = obj

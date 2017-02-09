@@ -143,6 +143,11 @@ static void writeLogHeader() noexcept
     // write resources directory path to log
     msg = QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
     Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+
+    // warn if runtime resource files are not found
+    if (!qApp->getResourcesFilePath(".librepcb-resources").isExistingFile()) {
+        qCritical() << "Could not find resource files! Maybe packaging went wrong?!";
+    }
 }
 
 /*****************************************************************************************
@@ -157,18 +162,19 @@ static void installTranslations() noexcept
     qApp->installTranslator(qtTranslator);
 
     // Install system language translations (all system languages defined in the system settings, in the defined order)
+    const QString dir = qApp->getResourcesFilePath("i18n").toStr();
     QTranslator* systemTranslator = new QTranslator(qApp);
-    systemTranslator->load(QLocale::system(), "librepcb", "_", ":/i18n/");
+    systemTranslator->load(QLocale::system(), "librepcb", "_", dir);
     qApp->installTranslator(systemTranslator);
 
     // Install language translations (like "de" for German)
     QTranslator* appTranslator1 = new QTranslator(qApp);
-    appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0), ":/i18n");
+    appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0), dir);
     qApp->installTranslator(appTranslator1);
 
     // Install language/country translations (like "de_ch" for German/Switzerland)
     QTranslator* appTranslator2 = new QTranslator(qApp);
-    appTranslator2->load("librepcb_" % QLocale::system().name(), ":/i18n");
+    appTranslator2->load("librepcb_" % QLocale::system().name(), dir);
     qApp->installTranslator(appTranslator2);
 }
 

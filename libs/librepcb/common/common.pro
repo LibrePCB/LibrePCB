@@ -24,9 +24,6 @@ INCLUDEPATH += \
 DEFINES += APP_VERSION="\\\"0.1.0\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
 DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
-DEFINES += LOCAL_RESOURCES_DIR="\\\"$${LOCAL_RESOURCES_DIR}\\\""
-DEFINES += INSTALLED_RESOURCES_DIR="\\\"$${INSTALLED_RESOURCES_DIR}\\\""
-DEFINES += INSTALLATION_PREFIX="\\\"$${PREFIX}\\\""
 #DEFINES += USE_32BIT_LENGTH_UNITS          # see units/length.h
 
 HEADERS += \

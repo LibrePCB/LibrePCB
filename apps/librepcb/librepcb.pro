@@ -19,28 +19,20 @@ exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
 win32 {
     # Windows-specific configurations
-    RC_ICONS = ../../packaging/windows/img/librepcb.ico
+    RC_ICONS = ../../img/app/librepcb.ico
 }
 
 macx {
     # Mac-specific configurations
-    ICON = ../../packaging/mac/img/librepcb.icns
+    ICON = ../../img/app/librepcb.icns
 }
 
 unix:!macx {
     # Linux/UNIX-specific configurations
     target.path = $${PREFIX}/bin
-    resources.path = $${INSTALLED_RESOURCES_DIR}/../
-    resources.files = $${LOCAL_RESOURCES_DIR}
-    icon.path = $${PREFIX}/share/pixmaps
-    icon.files = ../../packaging/unix/img/librepcb.svg
-    desktop.path = $${PREFIX}/share/applications
-    desktop.files = ../../packaging/unix/librepcb.desktop
-    mimexml.path = $${PREFIX}/share/mime/packages
-    mimexml.files = ../../packaging/unix/mime/librepcb.xml
-    mimedesktop.path = $${PREFIX}/share/mimelnk/application
-    mimedesktop.files = ../../packaging/unix/mime/x-librepcb-project.desktop
-    INSTALLS += target resources icon desktop mimexml mimedesktop
+    share.path = $${PREFIX}
+    share.files = $${SHARE_DIR}
+    INSTALLS += target share
 }
 
 # Note: The order of the libraries is very important for the linker!
@@ -89,8 +81,7 @@ TRANSLATIONS = \
     ../../i18n/librepcb_gsw_CH.ts
 
 RESOURCES += \
-    ../../img/images.qrc \
-    ../../i18n/translations.qrc
+    ../../img/images.qrc
 
 SOURCES += \
     controlpanel/controlpanel.cpp \
@@ -120,14 +111,13 @@ isEmpty(QMAKE_LRELEASE) {
     else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 lrelease.input = TRANSLATIONS
-lrelease.output = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
-lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
-lrelease.CONFIG += no_link
+lrelease.output = $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += lrelease
-PRE_TARGETDEPS += compiler_lrelease_make_all
 
 # Copy resource files to output directory
-copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../res/.)\"" "\"$$system_path($${LOCAL_RESOURCES_DIR})\""
+copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../share/.)\"" "\"$$system_path($${SHARE_DIR})\""
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)

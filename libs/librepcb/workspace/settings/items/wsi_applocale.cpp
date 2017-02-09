@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_applocale.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
@@ -45,19 +46,21 @@ WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElemen
         mAppLocaleTmp = mAppLocale;
     }
 
+    const QString i18nDir = qApp->getResourcesFilePath("i18n").toStr();
+
     if (!mAppLocale.isEmpty()) {
         QLocale selectedLocale(mAppLocale);
         QLocale::setDefault(selectedLocale); // use the selected locale as the application's default locale
 
         // Install language translations (like "de" for German)
         QTranslator* newTranslator = new QTranslator();
-        newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0), ":/i18n");
+        newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0), i18nDir);
         qApp->installTranslator(newTranslator);
         mInstalledTranslators.append(newTranslator);
 
         // Install language/country translations (like "de_ch" for German/Switzerland)
         newTranslator = new QTranslator();
-        newTranslator->load("librepcb_" % selectedLocale.name(), ":/i18n");
+        newTranslator->load("librepcb_" % selectedLocale.name(), i18nDir);
         qApp->installTranslator(newTranslator);
         mInstalledTranslators.append(newTranslator);
     }
@@ -65,7 +68,7 @@ WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElemen
     // create a QComboBox with all available languages
     mComboBox.reset(new QComboBox());
     mComboBox->addItem(tr("System Language"), QString(""));
-    QDir translations(":/i18n/");
+    QDir translations(i18nDir);
     foreach (QString filename, translations.entryList(QDir::Files, QDir::Name)) {
         filename.remove("librepcb_");
         QFileInfo fileInfo(filename);

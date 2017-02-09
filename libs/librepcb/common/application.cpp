@@ -58,29 +58,26 @@ Application::Application(int& argc, char** argv) noexcept :
                "The file format version is not a prefix of the application version. "
                "Please correct this in the file 'librepcbcommon.pro'.");
 
-    // get the installation prefix directory
-    FilePath installationPrefixDir(INSTALLATION_PREFIX);
-    Q_ASSERT(installationPrefixDir.isValid());
-
     // get the directory of the currently running executable
-    FilePath executableFilePath(QApplication::applicationFilePath());
-    Q_ASSERT(executableFilePath.isValid());
+    FilePath executableDirPath(QApplication::applicationDirPath());
+    Q_ASSERT(executableDirPath.isValid());
 
-    // check if the running executable is located in the installation prefix directory
-    if (executableFilePath.isLocatedInDir(installationPrefixDir)) {
-        // the application is installed on the system -> use installed ressources
-        mIsRunningFromInstalledExecutable = true;
-        mResourcesDir = FilePath(INSTALLED_RESOURCES_DIR);
-    } else {
-        // the application is not installed on the system -> use local resources
-        mIsRunningFromInstalledExecutable = false;
-        mResourcesDir = FilePath(LOCAL_RESOURCES_DIR);
-    }
+    // determine the path to the resources directory (e.g. /usr/share/librepcb)
+    mResourcesDir = executableDirPath.getPathTo("../share/librepcb");
     Q_ASSERT(mResourcesDir.isValid());
 }
 
 Application::~Application() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+FilePath Application::getResourcesFilePath(const QString& filepath) const noexcept
+{
+    return mResourcesDir.getPathTo(filepath);
 }
 
 /*****************************************************************************************

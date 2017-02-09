@@ -64,26 +64,24 @@ class Application final : public QApplication
         Application(int& argc, char** argv) noexcept;
         ~Application() noexcept;
 
+        // Getters
+        const Version& getAppVersion() const noexcept {return mAppVersion;}
+        const QString& getGitVersion() const noexcept {return mGitVersion;}
+        const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
+        const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
+        FilePath getResourcesFilePath(const QString& filepath) const noexcept;
+
         // Reimplemented from QApplication
         bool notify(QObject* receiver, QEvent* e);
 
         // Operator Overloadings
         Application& operator=(const Application& rhs) = delete;
 
-        // Static Methods
-        const Version& getAppVersion() const noexcept {return mAppVersion;}
-        const QString& getGitVersion() const noexcept {return mGitVersion;}
-        const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
-        bool isRunningFromInstalledExecutable() const noexcept {return mIsRunningFromInstalledExecutable;}
-        const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
-
 
     private: // Data
-
         Version mAppVersion;
         QString mGitVersion;
         Version mFileFormatVersion;
-        bool mIsRunningFromInstalledExecutable;
         FilePath mResourcesDir;
 };
 
