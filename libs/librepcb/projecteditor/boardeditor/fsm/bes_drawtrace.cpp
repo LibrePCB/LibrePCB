@@ -110,7 +110,7 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept
 
     // Add wire mode actions to the "command" toolbar
     mWireModeActions.insert(WireMode_HV, mEditorUi.commandToolbar->addAction(
-                            QIcon(":/img/command_toolbars/wireh_v.png"), ""));
+                            QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
     mWireModeActions.insert(WireMode_VH, mEditorUi.commandToolbar->addAction(
                             QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
     mWireModeActions.insert(WireMode_9045, mEditorUi.commandToolbar->addAction(
