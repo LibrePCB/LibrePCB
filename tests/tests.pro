@@ -21,6 +21,7 @@ CONFIG -= app_bundle
 LIBS += \
     -L$${DESTDIR} \
     -lgoogletest \
+    -llibrepcbworkspace \
     -llibrepcbproject \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
@@ -33,13 +34,15 @@ INCLUDEPATH += \
     ../libs
 
 DEPENDPATH += \
-    ../libs/librepcbproject \
-    ../libs/librepcblibrary \
-    ../libs/librepcbcommon \
+    ../libs/librepcb/workspace \
+    ../libs/librepcb/project \
+    ../libs/librepcb/library \
+    ../libs/librepcb/common \
     ../libs/quazip \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
+    $${DESTDIR}/liblibrepcbworkspace.a \
     $${DESTDIR}/liblibrepcbproject.a \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a \
@@ -59,6 +62,7 @@ SOURCES += \
     common/versiontest.cpp \
     main.cpp \
     project/projecttest.cpp \
+    workspace/workspacetest.cpp \
 
 HEADERS += \
     common/networkrequestbasesignalreceiver.h \
