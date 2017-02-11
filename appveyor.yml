@@ -24,3 +24,16 @@ build_script:
   - mingw32-make -j 4
   - .\generated\windows\qztest.exe # run quazip unit tests
   - .\generated\windows\tests.exe  # run librepcb unit tests
+
+after_build:
+  - xcopy .\generated\share .\output\share /i /e          # resources
+  - xcopy .\generated\windows\librepcb.exe .\output\bin\  # executable
+  - xcopy C:\MinGW\bin\zlib1.dll .\output\bin\            # zlib DLL
+  - xcopy C:\OpenSSL-Win32\bin\*eay*.dll .\output\bin\    # OpenSSL DLLs
+  - xcopy %QTDIR%\bin\lib*.dll .\output\bin\              # MinGW DLLs
+  - windeployqt --compiler-runtime --force .\output\bin\librepcb.exe # Qt DLLs
+
+artifacts:
+  - path: build\output
+    name: librepcb-nightly
+    type: zip
