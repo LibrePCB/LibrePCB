@@ -292,6 +292,16 @@ class Workspace final : public QObject
         static FilePath chooseWorkspacePath() noexcept;
 
 
+        /**
+         * @brief Current workspace file format version (constant)
+         *
+         * @warning Don't change this value unless you know exactly what you're doing!
+         *
+         * @return File format version
+         */
+        static Version FILE_FORMAT_VERSION() noexcept {return Version("0.1");}
+
+
     signals:
 
         void libraryAdded(const FilePath& libDir);

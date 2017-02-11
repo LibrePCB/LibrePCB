@@ -26,6 +26,7 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/application.h>
 #include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/project/project.h>
@@ -60,15 +61,16 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
     mLibrariesPath(mVersionPath.getPathTo("libraries")),
     mLock(mVersionPath)
 {
-    // check directory paths
+    // check if the workspace is valid
     if (!isValidWorkspacePath(mPath)) {
         throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
             QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
     }
-    if ((!mProjectsPath.isValid()) || (!mVersionPath.isValid())  ||
-        (!mMetadataPath.isValid()) || (!mLibrariesPath.isValid()))
-    {
-        throw LogicError(__FILE__, __LINE__, mPath.toStr(), QString());
+    SmartVersionFile wsVersionFile(mPath.getPathTo(".librepcb-workspace"), false, true); // can throw
+    if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+            "The workspace version %1 is not compatible with this application version."))
+            .arg(wsVersionFile.getVersion().toStr()));
     }
 
     // create directories which do not exist already
@@ -307,7 +309,10 @@ Version Workspace::getHighestFileFormatVersionOfWorkspace(const FilePath& path) 
 
 void Workspace::createNewWorkspace(const FilePath& path) throw (Exception)
 {
-    FileUtils::writeFile(path.getPathTo(".librepcb-workspace"), QByteArray()); // can throw
+    FilePath versionFilePath(path.getPathTo(".librepcb-workspace"));
+    QScopedPointer<SmartVersionFile> versionFile(
+        SmartVersionFile::create(versionFilePath, FILE_FORMAT_VERSION())); // can throw
+    versionFile->save(true); // can throw
 }
 
 FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept
