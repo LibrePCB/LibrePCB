@@ -1,4 +1,4 @@
-version: 0.1.{build}-{branch}
+version: '{build}'
 os: Windows Server 2012
 configuration: Debug
 build: off
@@ -7,12 +7,11 @@ deploy: off
 
 environment:
   global:
-    MINGW: C:\Qt\Tools\mingw492_32
+    MINGW: C:\Qt\Tools\mingw530_32
   matrix:
-    - QTDIR: C:\Qt\5.5\mingw492_32
+    - QTDIR: C:\Qt\5.7\mingw53_32
 
 init:
-  - git config --global core.autocrlf input
   - set PATH=%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin;%PATH%
 
 install:
@@ -21,9 +20,20 @@ install:
 build_script:
   - mkdir build
   - cd build
-  - qmake ..\librepcb.pro -r
+  - qmake -r ..\librepcb.pro
   - mingw32-make -j 4
   - .\generated\windows\qztest.exe # run quazip unit tests
-  - .\generated\windows\tests.exe # run librepcb unit tests
-  - cd ..\
+  - .\generated\windows\tests.exe  # run librepcb unit tests
 
+after_build:
+  - xcopy .\generated\share .\output\share /i /e          # resources
+  - xcopy .\generated\windows\librepcb.exe .\output\bin\  # executable
+  - xcopy C:\MinGW\bin\zlib1.dll .\output\bin\            # zlib DLL
+  - xcopy C:\OpenSSL-Win32\bin\*eay*.dll .\output\bin\    # OpenSSL DLLs
+  - xcopy %QTDIR%\bin\lib*.dll .\output\bin\              # MinGW DLLs
+  - windeployqt --compiler-runtime --force .\output\bin\librepcb.exe # Qt DLLs
+
+artifacts:
+  - path: build\output
+    name: librepcb-nightly
+    type: zip
