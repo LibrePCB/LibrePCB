@@ -8,8 +8,8 @@ deploy: off
 environment:
   global:
     MINGW: C:\Qt\Tools\mingw530_32
-  matrix:
-    - QTDIR: C:\Qt\5.7\mingw53_32
+    QTDIR: C:\Qt\5.7\mingw53_32
+    VCRT_DIR: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Redist\x86\Microsoft.VC120.CRT'
 
 init:
   - set PATH=%QTDIR%\bin;%MINGW%\bin;C:\Qt\Tools\QtCreator\bin;%PATH%
@@ -28,8 +28,10 @@ build_script:
 after_build:
   - xcopy .\generated\share .\output\share /i /e          # resources
   - xcopy .\generated\windows\librepcb.exe .\output\bin\  # executable
+  - xcopy "%VCRT_DIR%\*.dll" .\output\bin\                # MS Visual C++ DLLs
   - xcopy C:\MinGW\bin\zlib1.dll .\output\bin\            # zlib DLL
   - xcopy C:\OpenSSL-Win32\bin\*eay*.dll .\output\bin\    # OpenSSL DLLs
+  - xcopy %QTDIR%\bin\icu*.dll .\output\bin\              # ICU DLLs
   - xcopy %QTDIR%\bin\lib*.dll .\output\bin\              # MinGW DLLs
   - windeployqt --compiler-runtime --force .\output\bin\librepcb.exe # Qt DLLs
 
