@@ -73,7 +73,7 @@ Library::Library(const FilePath& libDir, bool readOnly) throw (Exception) :
     }
 
     // load image if available
-    FilePath iconFilePath = libDir.getPathTo("icon.png");
+    FilePath iconFilePath = libDir.getPathTo("library.png");
     if (iconFilePath.isExistingFile()) {
         mIcon = QPixmap(iconFilePath.toStr());
     }
