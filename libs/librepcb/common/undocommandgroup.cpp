@@ -60,10 +60,14 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
     }
 
     if (wasEverExecuted()) {
-        cmd->execute(); // can throw
+        if (cmdScopeGuard->execute()) { // can throw
+            mChilds.append(cmdScopeGuard.take());
+        } else {
+            cmdScopeGuard->undo(); // just to be sure the command has executed nothing...
+        }
+    } else {
+        mChilds.append(cmdScopeGuard.take());
     }
-
-    mChilds.append(cmdScopeGuard.take());
 }
 
 /*****************************************************************************************
@@ -116,8 +120,11 @@ void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
 
-    cmdScopeGuard->execute(); // can throw
-    mChilds.append(cmdScopeGuard.take());
+    if (cmdScopeGuard->execute()) { // can throw
+        mChilds.append(cmdScopeGuard.take());
+    } else {
+        cmdScopeGuard->undo(); // just to be sure the command has executed nothing...
+    }
 }
 
 /*****************************************************************************************
