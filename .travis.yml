@@ -37,3 +37,13 @@ script:
   - ./dev/travis/update_doxygen.sh
   - ./dev/travis/build_appimage.sh
 
+deploy:
+  provider: bintray
+  file: ./dev/travis/bintray.json
+  user: "${BINTRAY_USER}"
+  key: "${BINTRAY_API_KEY}"
+  skip_cleanup: true
+  on:
+    branch: master
+    condition: ${DEPLOY_APPIMAGE} = true
+
