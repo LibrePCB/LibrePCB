@@ -14,6 +14,11 @@ then
     sudo apt-get install -qq qt5-default qttools5-dev-tools
   fi
   sudo apt-get install -qq libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
+  if [ "${DEPLOY_APPIMAGE}" = "true" ]
+  then
+    sudo wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/3/linuxdeployqt-3-x86_64.AppImage" -O /usr/local/bin/linuxdeployqt
+    sudo chmod a+x /usr/local/bin/linuxdeployqt
+  fi
   sudo ln -s ../../bin/ccache /usr/lib/ccache/clang
   sudo ln -s ../../bin/ccache /usr/lib/ccache/clang++
 elif [ "${TRAVIS_OS_NAME}" = "osx" ]
