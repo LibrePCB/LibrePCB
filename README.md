@@ -33,6 +33,8 @@ LibrePCB by yourself. Nevertheless there are easier ways to get LibrePCB running
 
 - For Windows there are nightly builds available to download: 
   [librepcb-nightly.zip](https://ci.appveyor.com/api/projects/librepcb/librepcb/artifacts/build/librepcb-nightly.zip?branch=master)
+- For Linux there are nightly [AppImages](http://appimage.org/) available on [Bintray](https://bintray.com/librepcb):
+  [LibrePCB-Nightly-Linux-x86_64.AppImage](https://bintray.com/librepcb/LibrePCB-Nightly/download_file?file_path=LibrePCB-Nightly-Linux-x86_64.AppImage)
 - On Arch Linux you can install the package 
   [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
 - Using a [Docker](https://www.docker.com/) container you can build and run LibrePCB
