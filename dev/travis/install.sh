@@ -14,10 +14,13 @@ then
     sudo apt-get install -qq qt5-default qttools5-dev-tools
   fi
   sudo apt-get install -qq libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
+  sudo ln -s ../../bin/ccache /usr/lib/ccache/clang
+  sudo ln -s ../../bin/ccache /usr/lib/ccache/clang++
 elif [ "${TRAVIS_OS_NAME}" = "osx" ]
 then
   brew update
-  brew install qt5
+  brew install qt5 ccache
   brew link --force qt5
+  export PATH="/usr/local/opt/ccache/libexec:$PATH"
 fi
 
