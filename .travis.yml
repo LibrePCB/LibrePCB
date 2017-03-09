@@ -13,12 +13,12 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
-      env: BUILD_DOXYGEN=true QT_BASE="trusty"
-    # Ubuntu 14.04 + Clang + Latest Qt from beineri PPA (https://launchpad.net/~beineri)
+      env: BUILD_DOXYGEN=true DEPLOY_APPIMAGE=false QT_BASE="trusty"
+    # Ubuntu 14.04 + Clang + Qt from PPA (https://launchpad.net/~beineri) + AppImage deployment
     - os: linux
       dist: trusty
       compiler: clang
-      env: BUILD_DOXYGEN=false QT_BASE="qt58" QT_PPA="ppa:beineri/opt-qt58-trusty"
+      env: BUILD_DOXYGEN=false DEPLOY_APPIMAGE=true QT_BASE="qt58" QT_PPA="ppa:beineri/opt-qt58-trusty"
     # OS X + GCC
     - os: osx
       compiler: gcc
@@ -35,4 +35,15 @@ script:
   - ./dev/travis/build.sh
   - ./dev/travis/run_tests.sh
   - ./dev/travis/update_doxygen.sh
+  - ./dev/travis/build_appimage.sh
+
+deploy:
+  provider: bintray
+  file: ./dev/travis/bintray.json
+  user: "${BINTRAY_USER}"
+  key: "${BINTRAY_API_KEY}"
+  skip_cleanup: true
+  on:
+    branch: master
+    condition: ${DEPLOY_APPIMAGE} = true
 
