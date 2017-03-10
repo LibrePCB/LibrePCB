@@ -355,7 +355,7 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& ne
         throw LogicError(__FILE__, __LINE__);
     }
     // check if there is no component with the same name in the list
-    if (getComponentInstanceByName(newName) != &cmp) {
+    if ((newName != cmp.getName()) && getComponentInstanceByName(newName)) {
         throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
             QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
     }
