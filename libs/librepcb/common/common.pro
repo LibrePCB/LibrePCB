@@ -92,6 +92,7 @@ HEADERS += \
     uuid.h \
     version.h \
     widgets/attributetypecombobox.h \
+    widgets/attributeunitcombobox.h \
 
 SOURCES += \
     alignment.cpp \
@@ -152,6 +153,7 @@ SOURCES += \
     uuid.cpp \
     version.cpp \
     widgets/attributetypecombobox.cpp \
+    widgets/attributeunitcombobox.cpp \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
