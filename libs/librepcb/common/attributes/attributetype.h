@@ -75,6 +75,7 @@ class AttributeType
         const QList<const AttributeUnit*>& getAvailableUnits() const noexcept {return mAvailableUnits;}
         const AttributeUnit* getUnitFromString(const QString& unit) const throw (Exception);
         const AttributeUnit* getDefaultUnit() const noexcept {return mDefaultUnit;}
+        bool isUnitAvailable(const AttributeUnit* unit) const noexcept;
         void throwIfValueInvalid(const QString& value) const throw (Exception);
         virtual bool isValueValid(const QString& value) const noexcept = 0;
         virtual QString valueFromTr(const QString& value) const noexcept = 0;
