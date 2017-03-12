@@ -29,6 +29,7 @@ DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abb
 HEADERS += \
     alignment.h \
     application.h \
+    attributes/attribute.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
@@ -93,6 +94,7 @@ HEADERS += \
 SOURCES += \
     alignment.cpp \
     application.cpp \
+    attributes/attribute.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
