@@ -32,6 +32,45 @@
 namespace librepcb {
 
 /*****************************************************************************************
+ *  Class UndoStackTransaction
+ ****************************************************************************************/
+
+UndoStackTransaction::UndoStackTransaction(UndoStack& stack, const QString& text) throw (Exception) :
+    mStack(stack), mCmdActive(true)
+{
+    mStack.beginCmdGroup(text); // can throw
+}
+
+UndoStackTransaction::~UndoStackTransaction() noexcept
+{
+    try {
+        if (mCmdActive) mStack.abortCmdGroup(); // can throw, but should really not!
+    } catch (...) {
+        qFatal("UndoStack::abortCmdGroup() has thrown an exception!");
+    }
+}
+
+void UndoStackTransaction::append(UndoCommand* cmd) throw (Exception)
+{
+    if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
+    mStack.appendToCmdGroup(cmd); // can throw
+}
+
+void UndoStackTransaction::abort() throw (Exception)
+{
+    if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
+    mStack.abortCmdGroup(); // can throw
+    mCmdActive = false;
+}
+
+void UndoStackTransaction::commit() throw (Exception)
+{
+    if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
+    mStack.commitCmdGroup(); // can throw
+    mCmdActive = false;
+}
+
+/*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 

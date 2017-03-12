@@ -31,8 +31,50 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class UndoStack;
 class UndoCommand;
 class UndoCommandGroup;
+
+/*****************************************************************************************
+ *  Class UndoStackTransaction
+ ****************************************************************************************/
+
+/**
+ * @brief The UndoStackTransaction class helps to execute transactions on an UndoStack
+ *
+ * This class allows to use RAII on a librepcb::UndoStack object to make its exception
+ * safety easier. The functionality is as follows:
+ * @li The ctor starts a new command group with librepcb::UndoStack::beginCmdGroup().
+ * @li If neccessary, the dtor aborts it with librepcb::UndoStack::abortCmdGroup().
+ * @li #append() redirects to librepcb::UndoStack::appendToCmdGroup().
+ * @li #commit() redirects to librepcb::UndoStack::commitCmdGroup().
+ * @li #abort() redirects to librepcb::UndoStack::abortCmdGroup().
+ *
+ * @author ubruhin
+ * @date 2017-02-25
+ */
+class UndoStackTransaction final
+{
+    public:
+
+        // Constructors / Destructor
+        UndoStackTransaction() = delete;
+        UndoStackTransaction(const UndoStackTransaction& other) = delete;
+        UndoStackTransaction(UndoStack& stack, const QString& text) throw (Exception);
+        ~UndoStackTransaction() noexcept;
+
+        // General Methods
+        void append(UndoCommand* cmd) throw (Exception);
+        void abort() throw (Exception);
+        void commit() throw (Exception);
+
+        // Operator Overloadings
+        UndoStackTransaction& operator=(const UndoStackTransaction& rhs) = delete;
+
+    private:
+        UndoStack& mStack;
+        bool mCmdActive;
+};
 
 /*****************************************************************************************
  *  Class UndoStack

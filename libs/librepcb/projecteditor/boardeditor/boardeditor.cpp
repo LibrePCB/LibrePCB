@@ -28,6 +28,7 @@
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
@@ -115,18 +116,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
             [this](){mProjectEditor.execProjectSettingsDialog(this);});
 
     // connect the undo/redo actions with the UndoStack of the project
-    connect(&mProjectEditor.getUndoStack(), &UndoStack::undoTextChanged,
-            [this](const QString& text){mUi->actionUndo->setText(text);});
-    mUi->actionUndo->setText(mProjectEditor.getUndoStack().getUndoText());
-    connect(&mProjectEditor.getUndoStack(), &UndoStack::canUndoChanged,
-            mUi->actionUndo, &QAction::setEnabled);
-    mUi->actionUndo->setEnabled(mProjectEditor.getUndoStack().canUndo());
-    connect(&mProjectEditor.getUndoStack(), &UndoStack::redoTextChanged,
-            [this](const QString& text){mUi->actionRedo->setText(text);});
-    mUi->actionRedo->setText(mProjectEditor.getUndoStack().getRedoText());
-    connect(&mProjectEditor.getUndoStack(), &UndoStack::canRedoChanged,
-            mUi->actionRedo, &QAction::setEnabled);
-    mUi->actionRedo->setEnabled(mProjectEditor.getUndoStack().canRedo());
+    mUndoStackActionGroup.reset(new UndoStackActionGroup(
+        *mUi->actionUndo, *mUi->actionRedo, nullptr, &mProjectEditor.getUndoStack(), this));
 
     // build the whole board editor finite state machine with all its substate objects
     mFsm = new BES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
@@ -358,30 +349,6 @@ void BoardEditor::on_actionCopyBoard_triggered()
     catch (Exception& e)
     {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-    }
-}
-
-void BoardEditor::on_actionUndo_triggered()
-{
-    try
-    {
-        mProjectEditor.getUndoStack().undo();
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(this, tr("Undo failed"), e.getUserMsg());
-    }
-}
-
-void BoardEditor::on_actionRedo_triggered()
-{
-    try
-    {
-        mProjectEditor.getUndoStack().redo();
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(this, tr("Redo failed"), e.getUserMsg());
     }
 }
 

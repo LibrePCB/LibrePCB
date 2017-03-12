@@ -35,6 +35,7 @@ namespace librepcb {
 
 class GraphicsView;
 class GridProperties;
+class UndoStackActionGroup;
 
 namespace project {
 
@@ -101,8 +102,6 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         void on_actionProjectClose_triggered();
         void on_actionNewBoard_triggered();
         void on_actionCopyBoard_triggered();
-        void on_actionUndo_triggered();
-        void on_actionRedo_triggered();
         void on_actionGrid_triggered();
         void on_actionExportAsPdf_triggered();
         void on_actionGenerateFabricationData_triggered();
@@ -132,6 +131,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         Project& mProject;
         Ui::BoardEditor* mUi;
         GraphicsView* mGraphicsView;
+        QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
 
         // Misc
         int mActiveBoardIndex;
