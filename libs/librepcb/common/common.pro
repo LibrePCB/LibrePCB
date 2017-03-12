@@ -91,6 +91,7 @@ HEADERS += \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
+    widgets/attributetypecombobox.h \
 
 SOURCES += \
     alignment.cpp \
@@ -150,6 +151,7 @@ SOURCES += \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
+    widgets/attributetypecombobox.cpp \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
