@@ -35,11 +35,12 @@ namespace project {
  ****************************************************************************************/
 
 CmdProjectSetMetadata::CmdProjectSetMetadata(Project& project) noexcept :
-    UndoCommand(tr("Change Project Metadata")),
+    UndoCommand(tr("Edit Project Metadata")),
     mProject(project),
     mOldName(mProject.getName()),               mNewName(mProject.getName()),
     mOldAuthor(mProject.getAuthor()),           mNewAuthor(mProject.getAuthor()),
-    mOldVersion(mProject.getVersion()),         mNewVersion(mProject.getVersion())
+    mOldVersion(mProject.getVersion()),         mNewVersion(mProject.getVersion()),
+    mOldAttributes(mProject.getAttributes()),   mNewAttributes(mOldAttributes)
 {
 }
 
@@ -69,6 +70,12 @@ void CmdProjectSetMetadata::setVersion(const QString& newVersion) noexcept
     mNewVersion = newVersion;
 }
 
+void CmdProjectSetMetadata::setAttributes(const AttributeList& attributes) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewAttributes = attributes;
+}
+
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
@@ -77,7 +84,11 @@ bool CmdProjectSetMetadata::performExecute() throw (Exception)
 {
     performRedo(); // can throw
 
-    return true; // TODO: determine if the metadata was really modified
+    if (mNewName != mOldName)               return true;
+    if (mNewAuthor != mOldAuthor)           return true;
+    if (mNewVersion != mOldVersion)         return true;
+    if (mNewAttributes != mOldAttributes)   return true;
+    return false;
 }
 
 void CmdProjectSetMetadata::performUndo() throw (Exception)
@@ -85,6 +96,7 @@ void CmdProjectSetMetadata::performUndo() throw (Exception)
     mProject.setName(mOldName);
     mProject.setAuthor(mOldAuthor);
     mProject.setVersion(mOldVersion);
+    mProject.setAttributes(mOldAttributes);
 }
 
 void CmdProjectSetMetadata::performRedo() throw (Exception)
@@ -92,6 +104,7 @@ void CmdProjectSetMetadata::performRedo() throw (Exception)
     mProject.setName(mNewName);
     mProject.setAuthor(mNewAuthor);
     mProject.setVersion(mNewVersion);
+    mProject.setAttributes(mNewAttributes);
 }
 
 /*****************************************************************************************

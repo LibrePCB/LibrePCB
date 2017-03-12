@@ -32,6 +32,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/fileio/directorylock.h>
+#include <librepcb/common/attributes/attributelist.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -202,6 +203,13 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
 
+        /**
+         * @brief Get the list of attributes
+         *
+         * @return All attributes in a specific order
+         */
+        const AttributeList& getAttributes() const noexcept {return *mAttributes;}
+
 
         // Setters: Attributes
 
@@ -240,6 +248,15 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @note This method is automatically called before saving the project.
          */
         void setLastModified(const QDateTime& newLastModified) noexcept;
+
+        /**
+         * @brief Set all project attributes
+         *
+         * @param newAttributes     The new list of attributes
+         *
+         * @undocmd{librepcb::project::CmdProjectSetMetadata}
+         */
+        void setAttributes(const AttributeList& newAttributes) noexcept;
 
 
         // Schematic Methods
@@ -572,6 +589,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         QScopedPointer<SchematicLayerProvider> mSchematicLayerProvider; ///< All schematic layers of this project
         QList<Board*> mBoards; ///< All boards of this project
         QList<Board*> mRemovedBoards; ///< All removed boards of this project
+        QScopedPointer<AttributeList> mAttributes; ///< all attributes in a specific order
 };
 
 /*****************************************************************************************

@@ -40,10 +40,9 @@ namespace editor {
  ****************************************************************************************/
 
 ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
-                                                             UndoStack& undoStack,
-                                                             QWidget* parent) :
-    QDialog(parent), mProject(project), mUi(new Ui::ProjectPropertiesEditorDialog),
-    mUndoStack(undoStack), mCommandActive(false)
+        UndoStack& undoStack, QWidget* parent) noexcept :
+    QDialog(parent), mProject(project), mUndoStack(undoStack),
+    mUi(new Ui::ProjectPropertiesEditorDialog)
 {
     mUi->setupUi(this);
 
@@ -52,11 +51,11 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
     mUi->edtVersion->setText(mProject.getVersion());
     mUi->lblCreatedDateTime->setText(mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
     mUi->lblLastModifiedDateTime->setText(mProject.getLastModified().toString(Qt::DefaultLocaleLongDate));
+    mUi->attributeListEditorWidget->setAttributeList(mProject.getAttributes());
 }
 
 ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept
 {
-    delete mUi;     mUi = nullptr;
 }
 
 /*****************************************************************************************
@@ -81,33 +80,23 @@ void ProjectPropertiesEditorDialog::keyPressEvent(QKeyEvent* e)
 
 void ProjectPropertiesEditorDialog::accept()
 {
-    // apply all changes
-    if (applyChanges())
+    if (applyChanges()) {
         QDialog::accept();
+    }
 }
 
 bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 {
-    try
-    {
-        mUndoStack.beginCmdGroup(tr("Change project properties"));
-        mCommandActive = true;
-
-        // Metadata
+    try {
         CmdProjectSetMetadata* cmd = new CmdProjectSetMetadata(mProject);
         cmd->setName(mUi->edtName->text().trimmed());
         cmd->setAuthor(mUi->edtAuthor->text().trimmed());
         cmd->setVersion(mUi->edtVersion->text().trimmed());
-        mUndoStack.appendToCmdGroup(cmd);
-
-        mUndoStack.commitCmdGroup();
-        mCommandActive = false;
+        cmd->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
+        mUndoStack.execCmd(cmd);
         return true;
-    }
-    catch (Exception& e)
-    {
+    } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-        try {if (mCommandActive) mUndoStack.abortCmdGroup();} catch (...) {}
         return false;
     }
 }
