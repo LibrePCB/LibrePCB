@@ -30,7 +30,7 @@
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include "componentattributeinstance.h"
+#include <librepcb/common/attributes/attributelist.h>
 #include <librepcb/common/fileio/xmldomelement.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
@@ -48,7 +48,7 @@ namespace project {
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
-    mLibComponent(nullptr), mCompSymbVar(nullptr)
+    mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
     // read general attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -70,17 +70,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     }
 
     // load all component attributes
-    for (XmlDomElement* node = domElement.getFirstChild("attributes/attribute", true, false);
-         node; node = node->getNextSibling("attribute"))
-    {
-        ComponentAttributeInstance* attribute = new ComponentAttributeInstance(*this, *node);
-        if (getAttributeByKey(attribute->getKey())) {
-            throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
-                QString(tr("The component attribute \"%1\" is defined multiple times."))
-                .arg(attribute->getKey()));
-        }
-        mAttributes.append(attribute);
-    }
+    mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
 
     // load all signal instances
     for (XmlDomElement* node = domElement.getFirstChild("signal_mapping/map", true, false);
@@ -108,7 +98,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
                                      const Uuid& symbVar, const QString& name) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
-    mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr)
+    mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr),
+    mAttributes()
 {
     const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
 
@@ -125,14 +116,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     }
 
     // add attributes
-    for (int i = 0; i < cmp.getAttributeCount(); i++) {
-        const library::LibraryElementAttribute* attr = cmp.getAttribute(i);
-        Q_ASSERT(attr); if (!attr) continue;
-        ComponentAttributeInstance* attributeInstance = new ComponentAttributeInstance(
-            *this, attr->getKey(), attr->getType(), attr->getDefaultValue(localeOrder),
-            attr->getDefaultUnit());
-        mAttributes.append(attributeInstance);
-    }
+    mAttributes.reset(new AttributeList(cmp.getAttributes()));
 
     // add signal map
     for (int i = 0; i < cmp.getSignalCount(); i++) {
@@ -167,7 +151,6 @@ ComponentInstance::~ComponentInstance() noexcept
     Q_ASSERT(!isUsed());
 
     qDeleteAll(mSignals);       mSignals.clear();
-    qDeleteAll(mAttributes);    mAttributes.clear();
 }
 
 /*****************************************************************************************
@@ -260,41 +243,12 @@ void ComponentInstance::setValue(const QString& value) noexcept
     }
 }
 
-/*****************************************************************************************
- *  Attribute Handling Methods
- ****************************************************************************************/
-
-ComponentAttributeInstance* ComponentInstance::getAttributeByKey(const QString& key) const noexcept
+void ComponentInstance::setAttributes(const AttributeList& attributes) noexcept
 {
-    foreach (ComponentAttributeInstance* attr, mAttributes) {
-        if (attr->getKey() == key) {
-            return attr;
-        }
+    if (attributes != *mAttributes) {
+        *mAttributes = attributes;
+        emit attributesChanged();
     }
-    return nullptr;
-}
-
-void ComponentInstance::addAttribute(ComponentAttributeInstance& attr) throw (Exception)
-{
-    if ((&attr.getComponentInstance() != this) || (mAttributes.contains(&attr))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (getAttributeByKey(attr.getKey())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("The component \"%1\" has already an attribute with the "
-            "key \"%2\".")).arg(mName, attr.getKey()));
-    }
-    mAttributes.append(&attr);
-    emit attributesChanged();
-}
-
-void ComponentInstance::removeAttribute(ComponentAttributeInstance& attr) throw (Exception)
-{
-    if (!mAttributes.contains(&attr)) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mAttributes.removeOne(&attr);
-    emit attributesChanged();
 }
 
 /*****************************************************************************************
@@ -396,9 +350,7 @@ XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Except
     root->setAttribute("symbol_variant", mCompSymbVar->getUuid());
     root->appendTextChild("name", mName);
     root->appendTextChild("value", mValue);
-    XmlDomElement* attributes = root->appendChild("attributes");
-    foreach (ComponentAttributeInstance* attributeInstance, mAttributes)
-        attributes->appendChild(attributeInstance->serializeToXmlDomElement());
+    root->appendChild(mAttributes->serializeToXmlDomElement());
     XmlDomElement* signalMapping = root->appendChild("signal_mapping");
     foreach (ComponentSignalInstance* signalInstance, mSignals)
         signalMapping->appendChild(signalInstance->serializeToXmlDomElement());
@@ -417,8 +369,8 @@ bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& 
             return value = mName, true;
         else if (attrKey == QLatin1String("VALUE"))
             return value = mValue, true;
-        else if (getAttributeByKey(attrKey))
-            return value = getAttributeByKey(attrKey)->getValueTr(true), true;
+        else if (mAttributes->contains(attrKey))
+            return value = mAttributes->value(attrKey)->getValueTr(true), true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))

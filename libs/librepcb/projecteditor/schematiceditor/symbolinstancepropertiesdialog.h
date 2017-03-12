@@ -33,8 +33,6 @@ namespace librepcb {
 
 class UndoStack;
 class UndoCommand;
-class AttributeType;
-class AttributeUnit;
 
 namespace project {
 
@@ -62,61 +60,30 @@ class SymbolInstancePropertiesDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
-                                                SI_Symbol& symbol, UndoStack& undoStack,
-                                                QWidget* parent) noexcept;
+        SymbolInstancePropertiesDialog() = delete;
+        SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other) = delete;
+        SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
+                                       SI_Symbol& symbol, UndoStack& undoStack,
+                                       QWidget* parent) noexcept;
         ~SymbolInstancePropertiesDialog() noexcept;
 
 
-    private slots:
-
-        // GUI Events
-        void on_tblCompInstAttributes_currentCellChanged(int currentRow, int currentColumn,
-                                                         int previousRow, int previousColumn);
-        void on_cbxAttrType_currentIndexChanged(int index);
-        void on_cbxAttrUnit_currentIndexChanged(int index);
-        void on_btnAttrApply_clicked();
-        void on_btnAttrAdd_clicked();
-        void on_btnAttrRemove_clicked();
+        // Operator Overloadings
+        SymbolInstancePropertiesDialog& operator=(const SymbolInstancePropertiesDialog& rhs) = delete;
 
 
-    private:
-
-        // Types
-        struct AttrItem_t {
-            QString key;
-            const AttributeType* type;
-            QString value;
-            const AttributeUnit* unit;
-        };
-
-        // make some methods inaccessible...
-        SymbolInstancePropertiesDialog();
-        SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other);
-        SymbolInstancePropertiesDialog& operator=(const SymbolInstancePropertiesDialog& rhs);
-
-        // Private Methods
-        void updateAttrTable() noexcept;
+    private: // Methods
         void keyPressEvent(QKeyEvent* e);
         void accept();
         bool applyChanges() noexcept;
-        void execCmd(UndoCommand* cmd);
-        void endCmd();
-        void abortCmd();
 
 
-        // General
+    private: // Data
         Project& mProject;
         ComponentInstance& mComponentInstance;
         SI_Symbol& mSymbol;
-        Ui::SymbolInstancePropertiesDialog* mUi;
         UndoStack& mUndoStack;
-        bool mCommandActive;
-        bool mAttributesEdited;
-        QList<AttrItem_t*> mAttrItems;
-        AttrItem_t* mSelectedAttrItem;
-        const AttributeType* mSelectedAttrType;
-        const AttributeUnit* mSelectedAttrUnit;
+        QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
 };
 
 /*****************************************************************************************

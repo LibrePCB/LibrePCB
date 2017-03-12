@@ -34,7 +34,6 @@ HEADERS += \
     library.h \
     librarybaseelement.h \
     libraryelement.h \
-    libraryelementattribute.h \
     pkg/footprint.h \
     pkg/footprintpad.h \
     pkg/footprintpadpreviewgraphicsitem.h \
@@ -61,7 +60,6 @@ SOURCES += \
     library.cpp \
     librarybaseelement.cpp \
     libraryelement.cpp \
-    libraryelementattribute.cpp \
     pkg/footprint.cpp \
     pkg/footprintpad.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \

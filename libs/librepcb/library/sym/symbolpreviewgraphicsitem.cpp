@@ -339,8 +339,7 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
             return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
-        const LibraryElementAttribute* attr = mComponent->getAttributeByKey(attrKey);
-        if (attr) {
+        if (mComponent->getAttributes().contains(attrKey)) {
             value = attrKey;
             return true;
         }

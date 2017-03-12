@@ -35,6 +35,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class AttributeList;
 class XmlDomElement;
 
 namespace library {
@@ -45,7 +46,6 @@ class ComponentSymbolVariant;
 namespace project {
 
 class Circuit;
-class ComponentAttributeInstance;
 class ComponentSignalInstance;
 class BI_Device;
 class SI_Symbol;
@@ -81,6 +81,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
         const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
         ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
+        const AttributeList& getAttributes() const noexcept {return *mAttributes;}
 
         // Getters: General
         Circuit& getCircuit() const noexcept {return mCircuit;}
@@ -117,12 +118,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
          */
         void setValue(const QString& value) noexcept;
 
-
-        // Attribute Handling Methods
-        const QList<ComponentAttributeInstance*>& getAttributes() const noexcept {return mAttributes;}
-        ComponentAttributeInstance* getAttributeByKey(const QString& key) const noexcept;
-        void addAttribute(ComponentAttributeInstance& attr) throw (Exception);
-        void removeAttribute(ComponentAttributeInstance& attr) throw (Exception);
+        void setAttributes(const AttributeList& attributes) noexcept;
 
 
         // General Methods
@@ -184,7 +180,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         const library::ComponentSymbolVariant* mCompSymbVar;
 
         /// @brief All attributes of this component
-        QList<ComponentAttributeInstance*> mAttributes;
+        QScopedPointer<AttributeList> mAttributes;
 
         /// @brief All signal instances (Key: component signal UUID)
         QHash<Uuid, ComponentSignalInstance*> mSignals;

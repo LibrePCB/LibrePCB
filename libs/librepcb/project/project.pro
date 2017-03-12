@@ -53,9 +53,6 @@ SOURCES += \
     boards/items/bi_polygon.cpp \
     boards/items/bi_via.cpp \
     circuit/circuit.cpp \
-    circuit/cmd/cmdcompattrinstadd.cpp \
-    circuit/cmd/cmdcompattrinstedit.cpp \
-    circuit/cmd/cmdcompattrinstremove.cpp \
     circuit/cmd/cmdcomponentinstanceadd.cpp \
     circuit/cmd/cmdcomponentinstanceedit.cpp \
     circuit/cmd/cmdcomponentinstanceremove.cpp \
@@ -66,7 +63,6 @@ SOURCES += \
     circuit/cmd/cmdnetsignaladd.cpp \
     circuit/cmd/cmdnetsignaledit.cpp \
     circuit/cmd/cmdnetsignalremove.cpp \
-    circuit/componentattributeinstance.cpp \
     circuit/componentinstance.cpp \
     circuit/componentsignalinstance.cpp \
     circuit/netclass.cpp \
@@ -140,9 +136,6 @@ HEADERS += \
     boards/items/bi_polygon.h \
     boards/items/bi_via.h \
     circuit/circuit.h \
-    circuit/cmd/cmdcompattrinstadd.h \
-    circuit/cmd/cmdcompattrinstedit.h \
-    circuit/cmd/cmdcompattrinstremove.h \
     circuit/cmd/cmdcomponentinstanceadd.h \
     circuit/cmd/cmdcomponentinstanceedit.h \
     circuit/cmd/cmdcomponentinstanceremove.h \
@@ -153,7 +146,6 @@ HEADERS += \
     circuit/cmd/cmdnetsignaladd.h \
     circuit/cmd/cmdnetsignaledit.h \
     circuit/cmd/cmdnetsignalremove.h \
-    circuit/componentattributeinstance.h \
     circuit/componentinstance.h \
     circuit/componentsignalinstance.h \
     circuit/netclass.h \
