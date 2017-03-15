@@ -147,6 +147,24 @@ TEST_P(FilePathTest, testOperatorAssign)
     EXPECT_EQ(p1.toStr(), p2.toStr());
 }
 
+TEST(FilePathTest, testCleanFileName)
+{
+    QString input(" ∑ ;.'[a]*(/∮E⋅→∞∏g¼∀x∈ ℝ:T@st⌈x⌉α∧¬β=∨)⊆\nℕ ₀H₂Ω⌀,"
+                  "-=[];\\^με½τρ1ÖÄ23ά ειวชΚμ\tεチハ\r\n\r_+{}|\"?>< ~  ");
+    QString kskc = FilePath::cleanFileName(input, FilePath::KeepSpaces | FilePath::KeepCase);
+    EXPECT_EQ(".aEg14x RTstxN 0H2-121OA23 _", kskc) << qPrintable(kskc);
+    QString kslc = FilePath::cleanFileName(input, FilePath::KeepSpaces | FilePath::ToLowerCase);
+    EXPECT_EQ(".aeg14x rtstxn 0h2-121oa23 _", kslc) << qPrintable(kslc);
+    QString ksuc = FilePath::cleanFileName(input, FilePath::KeepSpaces | FilePath::ToUpperCase);
+    EXPECT_EQ(".AEG14X RTSTXN 0H2-121OA23 _", ksuc) << qPrintable(ksuc);
+    QString rskc = FilePath::cleanFileName(input, FilePath::ReplaceSpaces | FilePath::KeepCase);
+    EXPECT_EQ(".aEg14x_RTstxN_0H2-121OA23__", rskc) << qPrintable(rskc);
+    QString rslc = FilePath::cleanFileName(input, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    EXPECT_EQ(".aeg14x_rtstxn_0h2-121oa23__", rslc) << qPrintable(rslc);
+    QString rsuc = FilePath::cleanFileName(input, FilePath::ReplaceSpaces | FilePath::ToUpperCase);
+    EXPECT_EQ(".AEG14X_RTSTXN_0H2-121OA23__", rsuc) << qPrintable(rsuc);
+}
+
 /*****************************************************************************************
  *  Test Data
  ****************************************************************************************/

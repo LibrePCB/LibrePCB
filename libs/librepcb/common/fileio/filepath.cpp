@@ -260,16 +260,16 @@ QString FilePath::cleanFileName(const QString& userInput, CleanFileNameOptions o
 {
     // perform compatibility decomposition (NFKD)
     QString ret = userInput.normalized(QString::NormalizationForm_KD);
+    // remove all invalid characters
+    ret.remove(QRegularExpression("[^-._ 0-9A-Za-z]"));
     // remove leading and trailing spaces
     ret = ret.trimmed();
-    // replace spaces with underscore
+    // replace remaining spaces with underscore (if corresponding option set)
     if (options.testFlag(CleanFileNameOption::ReplaceSpaces)) ret.replace(' ', '_');
-    // remove all invalid characters
-    QString validChars("_\\-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-    ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
-    // make all characters lowerspace
+    // change case of all characters (if corresponding options set)
     if (options.testFlag(CleanFileNameOption::ToLowerCase)) ret = ret.toLower();
-    // limit length to 120 characters
+    if (options.testFlag(CleanFileNameOption::ToUpperCase)) ret = ret.toUpper();
+    // limit length of string to a reasonable number of characters
     ret.truncate(120);
     return ret;
 }

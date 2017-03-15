@@ -121,11 +121,12 @@ class FilePath final
 
         enum CleanFileNameOption {
             // spaces
-            KeepSpaces      = 0<<1,
+            KeepSpaces      = 0,
             ReplaceSpaces   = 1<<1,
             // case
-            KeepCase        = 0<<2,
+            KeepCase        = 0,
             ToLowerCase     = 1<<2,
+            ToUpperCase     = 1<<3,
             // default
             Default         = KeepSpaces | KeepCase,
         };
@@ -379,7 +380,7 @@ class FilePath final
          * input), you must use this function to replace/remove all characters which are
          * not allowed for file/dir paths.
          *
-         * These are the only allowed characters: A–Z a–z 0–9 . _ -
+         * These are the only allowed characters: "-._ 0-9A-Za-z"
          *
          * In addition, the length of the filename will be limited to 120 characters.
          *
