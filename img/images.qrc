@@ -43,6 +43,8 @@
         <file>actions/export_gerber.png</file>
         <file>actions/schematic.png</file>
         <file>actions/recent.png</file>
+        <file>actions/down.png</file>
+        <file>actions/up.png</file>
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>
         <file>command_toolbars/via_octagon.png</file>

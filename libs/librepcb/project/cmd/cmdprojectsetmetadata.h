@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/attributes/attributelist.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -53,6 +54,7 @@ class CmdProjectSetMetadata final : public UndoCommand
         void setName(const QString& newName) noexcept;
         void setAuthor(const QString& newAuthor) noexcept;
         void setVersion(const QString& newVersion) noexcept;
+        void setAttributes(const AttributeList& attributes) noexcept;
 
 
     private:
@@ -81,6 +83,8 @@ class CmdProjectSetMetadata final : public UndoCommand
         QString mNewAuthor;
         QString mOldVersion;
         QString mNewVersion;
+        AttributeList mOldAttributes;
+        AttributeList mNewAttributes;
 };
 
 /*****************************************************************************************

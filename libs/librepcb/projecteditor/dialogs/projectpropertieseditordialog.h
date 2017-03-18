@@ -57,29 +57,26 @@ class ProjectPropertiesEditorDialog final : public QDialog
     public:
 
         // Constructors / Destructor
-        explicit ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack,
-                                               QWidget* parent);
+        ProjectPropertiesEditorDialog() = delete;
+        ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) = delete;
+        ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack, QWidget* parent) noexcept;
         ~ProjectPropertiesEditorDialog() noexcept;
 
 
-    private:
+        // Operator Overloadings
+        ProjectPropertiesEditorDialog& operator=(const ProjectPropertiesEditorDialog& rhs) = delete;
 
-        // make some methods inaccessible...
-        ProjectPropertiesEditorDialog();
-        ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other);
-        ProjectPropertiesEditorDialog& operator=(const ProjectPropertiesEditorDialog& rhs);
 
-        // Private Methods
+    private: // Methods
         void keyPressEvent(QKeyEvent* e);
         void accept();
         bool applyChanges() noexcept;
 
 
-        // General
+    private: // Data
         Project& mProject;
-        Ui::ProjectPropertiesEditorDialog* mUi;
         UndoStack& mUndoStack;
-        bool mCommandActive;
+        QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
 };
 
 /*****************************************************************************************

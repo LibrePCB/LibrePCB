@@ -17,59 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_ATTRIBUTETYPECOMBOBOX_H
+#define LIBREPCB_ATTRIBUTETYPECOMBOBOX_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdcompattrinstremove.h"
-#include "../componentinstance.h"
-#include "../componentattributeinstance.h"
+#include <QtWidgets>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace project {
+
+class AttributeType;
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class AttributeTypeComboBox
  ****************************************************************************************/
 
-CmdCompAttrInstRemove::CmdCompAttrInstRemove(ComponentInstance& cmp,
-                                             ComponentAttributeInstance& attr) noexcept :
-    UndoCommand(tr("Remove component attribute")),
-    mComponentInstance(cmp), mAttrInstance(attr)
+/**
+ * @brief The AttributeTypeComboBox class
+ *
+ * @author ubruhin
+ * @date 2017-03-10
+ */
+class AttributeTypeComboBox final : public QWidget
 {
-}
+        Q_OBJECT
 
-CmdCompAttrInstRemove::~CmdCompAttrInstRemove() noexcept
-{
-}
+    public:
+        // Constructors / Destructor
+        explicit AttributeTypeComboBox(QWidget* parent = nullptr) noexcept;
+        AttributeTypeComboBox(const AttributeTypeComboBox& other) = delete;
+        ~AttributeTypeComboBox() noexcept;
 
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
 
-bool CmdCompAttrInstRemove::performExecute() throw (Exception)
-{
-    performRedo(); // can throw
+        // Getters
+        const AttributeType& getCurrentItem() const noexcept;
 
-    return true;
-}
 
-void CmdCompAttrInstRemove::performUndo() throw (Exception)
-{
-    mComponentInstance.addAttribute(mAttrInstance); // can throw
-}
+        // Setters
+        void setCurrentItem(const AttributeType& type) noexcept;
 
-void CmdCompAttrInstRemove::performRedo() throw (Exception)
-{
-    mComponentInstance.removeAttribute(mAttrInstance); // can throw
-}
+
+        // Operator Overloadings
+        AttributeTypeComboBox& operator=(const AttributeTypeComboBox& rhs) = delete;
+
+
+    signals:
+        void currentItemChanged(const AttributeType* type);
+
+
+    private: // Methods
+        void currentIndexChanged(int index) noexcept;
+
+
+    private: // Data
+        QComboBox* mComboBox;
+};
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_ATTRIBUTETYPECOMBOBOX_H

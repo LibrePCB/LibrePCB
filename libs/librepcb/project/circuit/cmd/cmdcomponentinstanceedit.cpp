@@ -38,7 +38,8 @@ namespace project {
 CmdComponentInstanceEdit::CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept :
     UndoCommand(tr("Edit Component")), mCircuit(circuit), mComponentInstance(cmp),
     mOldName(cmp.getName()), mNewName(mOldName),
-    mOldValue(cmp.getValue()), mNewValue(mOldValue)
+    mOldValue(cmp.getValue()), mNewValue(mOldValue),
+    mOldAttributes(cmp.getAttributes()), mNewAttributes(mOldAttributes)
 {
 }
 
@@ -62,6 +63,12 @@ void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
     mNewValue = value;
 }
 
+void CmdComponentInstanceEdit::setAttributes(const AttributeList& attributes) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewAttributes = attributes;
+}
+
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
@@ -70,19 +77,24 @@ bool CmdComponentInstanceEdit::performExecute() throw (Exception)
 {
     performRedo(); // can throw
 
-    return true; // TODO: determine if the component was really modified
+    if (mNewName != mOldName)               return true;
+    if (mNewValue != mOldValue)             return true;
+    if (mNewAttributes != mOldAttributes)   return true;
+    return false;
 }
 
 void CmdComponentInstanceEdit::performUndo() throw (Exception)
 {
     mCircuit.setComponentInstanceName(mComponentInstance, mOldName); // can throw
     mComponentInstance.setValue(mOldValue);
+    mComponentInstance.setAttributes(mOldAttributes);
 }
 
 void CmdComponentInstanceEdit::performRedo() throw (Exception)
 {
     mCircuit.setComponentInstanceName(mComponentInstance, mNewName); // can throw
     mComponentInstance.setValue(mNewValue);
+    mComponentInstance.setAttributes(mNewAttributes);
 }
 
 /*****************************************************************************************

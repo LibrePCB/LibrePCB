@@ -69,6 +69,15 @@ const AttributeUnit* AttributeType::getUnitFromString(const QString& unit) const
         QString(tr("Unknown unit of attribute type \"%1\": \"%2\"")).arg(mTypeName, unit));
 }
 
+bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept
+{
+    if (mAvailableUnits.isEmpty()) {
+        return (unit == nullptr);
+    } else {
+        return mAvailableUnits.contains(unit);
+    }
+}
+
 void AttributeType::throwIfValueInvalid(const QString& value) const throw (Exception)
 {
     if (!isValueValid(value))

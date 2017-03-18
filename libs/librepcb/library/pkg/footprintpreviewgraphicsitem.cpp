@@ -328,8 +328,7 @@ bool FootprintPreviewGraphicsItem::getAttributeValue(const QString& attrNS, cons
             return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
-        const LibraryElementAttribute* attr = mComponent->getAttributeByKey(attrKey);
-        if (attr) {
+        if (mComponent->getAttributes().contains(attrKey)) {
             value = attrKey;
             return true;
         }

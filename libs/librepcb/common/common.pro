@@ -29,6 +29,8 @@ DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abb
 HEADERS += \
     alignment.h \
     application.h \
+    attributes/attribute.h \
+    attributes/attributelist.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
@@ -89,10 +91,15 @@ HEADERS += \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
+    widgets/attributelisteditorwidget.h \
+    widgets/attributetypecombobox.h \
+    widgets/attributeunitcombobox.h \
 
 SOURCES += \
     alignment.cpp \
     application.cpp \
+    attributes/attribute.cpp \
+    attributes/attributelist.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -146,6 +153,9 @@ SOURCES += \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
+    widgets/attributelisteditorwidget.cpp \
+    widgets/attributetypecombobox.cpp \
+    widgets/attributeunitcombobox.cpp \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \

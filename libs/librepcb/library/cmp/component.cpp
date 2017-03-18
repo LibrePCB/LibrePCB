@@ -40,13 +40,13 @@ Component::Component(const Uuid& uuid, const Version& version, const QString& au
                      const QString& keywords_en_US) throw (Exception) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mSchematicOnly(false), mDefaultSymbolVariantUuid()
+    mSchematicOnly(false), mAttributes(new AttributeList()), mDefaultSymbolVariantUuid()
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mSchematicOnly(false), mDefaultSymbolVariantUuid()
+    mSchematicOnly(false), mAttributes(), mDefaultSymbolVariantUuid()
 {
     try
     {
@@ -56,17 +56,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
 
         // Load all attributes
-        for (XmlDomElement* node = root.getFirstChild("attributes/attribute", true, false);
-             node; node = node->getNextSibling("attribute"))
-        {
-            LibraryElementAttribute* attribute = new LibraryElementAttribute(*node); // throws an exception on error
-            if (getAttributeByKey(attribute->getKey())) {
-                throw RuntimeError(__FILE__, __LINE__, attribute->getKey(),
-                    QString(tr("The attribute \"%1\" exists multiple times in \"%2\"."))
-                    .arg(attribute->getKey(), root.getDocFilePath().toNative()));
-            }
-            mAttributes.append(attribute);
-        }
+        mAttributes.reset(new AttributeList(*root.getFirstChild("attributes", true))); // can throw
 
         // Load default values in all available languages
         readLocaleDomNodes(*root.getFirstChild("properties", true, true),
@@ -133,7 +123,6 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
     {
         qDeleteAll(mSymbolVariants);    mSymbolVariants.clear();
         qDeleteAll(mSignals);           mSignals.clear();
-        qDeleteAll(mAttributes);        mAttributes.clear();
         throw;
     }
 }
@@ -142,37 +131,6 @@ Component::~Component() noexcept
 {
     qDeleteAll(mSymbolVariants);    mSymbolVariants.clear();
     qDeleteAll(mSignals);           mSignals.clear();
-    qDeleteAll(mAttributes);        mAttributes.clear();
-}
-
-/*****************************************************************************************
- *  Attribute Methods
- ****************************************************************************************/
-
-LibraryElementAttribute* Component::getAttributeByKey(const QString& key) noexcept
-{
-    const Component* const_this = this;
-    return const_cast<LibraryElementAttribute*>(const_this->getAttributeByKey(key));
-}
-
-const LibraryElementAttribute* Component::getAttributeByKey(const QString& key) const noexcept
-{
-    foreach (LibraryElementAttribute* attr, mAttributes) {
-        if (attr->getKey() == key) return attr;
-    }
-    return nullptr;
-}
-
-void Component::addAttribute(LibraryElementAttribute& attr) noexcept
-{
-    Q_ASSERT(!mAttributes.contains(&attr));
-    mAttributes.append(&attr);
-}
-
-void Component::removeAttribute(LibraryElementAttribute& attr) noexcept
-{
-    Q_ASSERT(mAttributes.contains(&attr));
-    mAttributes.removeAll(&attr);
 }
 
 /*****************************************************************************************
@@ -343,9 +301,7 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
 XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    XmlDomElement* attributes = root->appendChild("attributes");
-    foreach (const LibraryElementAttribute* attribute, mAttributes)
-        attributes->appendChild(attribute->serializeToXmlDomElement());
+    root->appendChild(mAttributes->serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
     foreach (const QString& locale, mDefaultValues.keys()) {

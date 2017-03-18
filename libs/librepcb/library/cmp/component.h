@@ -24,10 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/attributes/attributelist.h>
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
-#include "../libraryelementattribute.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -62,14 +62,8 @@ class Component final : public LibraryElement
         void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
 
         // Attribute Methods
-        const QList<LibraryElementAttribute*>& getAttributes() noexcept {return mAttributes;}
-        int getAttributeCount() const noexcept {return mAttributes.count();}
-        LibraryElementAttribute* getAttribute(int index) noexcept {return mAttributes.value(index);}
-        const LibraryElementAttribute* getAttribute(int index) const noexcept {return mAttributes.value(index);}
-        LibraryElementAttribute* getAttributeByKey(const QString& key) noexcept;
-        const LibraryElementAttribute* getAttributeByKey(const QString& key) const noexcept;
-        void addAttribute(LibraryElementAttribute& attr) noexcept;
-        void removeAttribute(LibraryElementAttribute& attr) noexcept;
+        const AttributeList& getAttributes() const noexcept {return *mAttributes;}
+        void setAttributes(const AttributeList& attributes) noexcept {*mAttributes = attributes;}
 
         // Default Value Methods
         const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
@@ -133,7 +127,7 @@ class Component final : public LibraryElement
 
         // Conponent Attributes
         bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
-        QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
+        QScopedPointer<AttributeList> mAttributes; ///< all attributes in a specific order
         QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
         QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
         QList<ComponentSignal*> mSignals; ///< empty if the component has no signals

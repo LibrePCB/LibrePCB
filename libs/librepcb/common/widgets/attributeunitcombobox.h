@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H
-#define LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H
+#ifndef LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H
+#define LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommand.h>
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,63 +34,57 @@ namespace librepcb {
 class AttributeType;
 class AttributeUnit;
 
-namespace project {
-
-class ComponentInstance;
-class ComponentAttributeInstance;
-
 /*****************************************************************************************
- *  Class CmdCompAttrInstEdit
+ *  Class AttributeUnitComboBox
  ****************************************************************************************/
 
 /**
- * @brief The CmdCompAttrInstEdit class
+ * @brief The AttributeUnitComboBox class
+ *
+ * @author ubruhin
+ * @date 2017-03-10
  */
-class CmdCompAttrInstEdit final : public UndoCommand
+class AttributeUnitComboBox final : public QWidget
 {
+        Q_OBJECT
+
     public:
-
         // Constructors / Destructor
-        CmdCompAttrInstEdit(ComponentInstance& cmp, ComponentAttributeInstance& attr,
-                            const AttributeType& newType, const QString& newValue,
-                            const AttributeUnit* newUnit) noexcept;
-        ~CmdCompAttrInstEdit() noexcept;
+        explicit AttributeUnitComboBox(QWidget* parent = nullptr) noexcept;
+        AttributeUnitComboBox(const AttributeUnitComboBox& other) = delete;
+        ~AttributeUnitComboBox() noexcept;
 
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
+        // Getters
+        const AttributeUnit* getCurrentItem() const noexcept;
 
 
-        // Private Member Variables
+        // Setters
+        void setAttributeType(const AttributeType& type) noexcept;
+        void setCurrentItem(const AttributeUnit* unit) noexcept;
 
-        // Attributes from the constructor
-        ComponentInstance& mComponentInstance;
-        ComponentAttributeInstance& mAttrInst;
 
-        // General Attributes
-        const AttributeType* mOldType;
-        const AttributeType* mNewType;
-        QString mOldValue;
-        QString mNewValue;
-        const AttributeUnit* mOldUnit;
-        const AttributeUnit* mNewUnit;
+        // Operator Overloadings
+        AttributeUnitComboBox& operator=(const AttributeUnitComboBox& rhs) = delete;
+
+
+    signals:
+        void currentItemChanged(const AttributeUnit* unit);
+
+
+    private: // Methods
+        void currentIndexChanged(int index) noexcept;
+
+
+    private: // Data
+        QComboBox* mComboBox;
+        const AttributeType* mAttributeType;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPATTRINSTEDIT_H
+#endif // LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H

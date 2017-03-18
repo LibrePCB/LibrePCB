@@ -21,39 +21,44 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "libraryelementattribute.h"
-#include "librarybaseelement.h"
-#include <librepcb/common/fileio/xmldomelement.h>
-#include <librepcb/common/attributes/attributetype.h>
-#include <librepcb/common/attributes/attributeunit.h>
+#include "attribute.h"
+#include "attributetype.h"
+#include "attributeunit.h"
+#include "../fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryElementAttribute::LibraryElementAttribute(const XmlDomElement& domElement) throw (Exception) :
-    mKey(), mType(nullptr), mDefaultUnit(nullptr)
+Attribute::Attribute(const Attribute& other) noexcept :
+    mKey(other.mKey), mType(other.mType), mValue(other.mValue), mUnit(other.mUnit)
 {
-    // read attributes
+}
+
+Attribute::Attribute(const XmlDomElement& domElement) throw (Exception) :
+    mKey(), mType(nullptr), mValue(), mUnit(nullptr)
+{
     mKey = domElement.getAttribute<QString>("key", true);
     mType = &AttributeType::fromString(domElement.getAttribute<QString>("type", true));
-    mDefaultUnit = mType->getUnitFromString(domElement.getAttribute<QString>("unit", false));
-
-    // read names, descriptions and default values in all available languages
-    LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
-    LibraryBaseElement::readLocaleDomNodes(domElement, "default_value", mDefaultValues, false);
+    mUnit = mType->getUnitFromString(domElement.getAttribute<QString>("unit", false));
+    mValue = domElement.getText<QString>(false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-LibraryElementAttribute::~LibraryElementAttribute() noexcept
+Attribute::Attribute(const QString& key, const AttributeType& type, const QString& value,
+                     const AttributeUnit* unit) throw (Exception) :
+    mKey(key), mType(&type), mValue(value), mUnit(unit)
+{
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
+
+Attribute::~Attribute() noexcept
 {
 }
 
@@ -61,56 +66,73 @@ LibraryElementAttribute::~LibraryElementAttribute() noexcept
  *  Getters
  ****************************************************************************************/
 
-QString LibraryElementAttribute::getName(const QStringList& localeOrder ) const noexcept
+QString Attribute::getValueTr(bool showUnit) const noexcept
 {
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
+    return mType->printableValueTr(mValue, showUnit ? mUnit : nullptr);
 }
 
-QString LibraryElementAttribute::getDescription(const QStringList& localeOrder) const noexcept
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Attribute::setKey(const QString& key) throw (Exception)
 {
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
+    if (key.trimmed().isEmpty()) {
+        throw RuntimeError(__FILE__, __LINE__, key, tr("The key must not be empty!"));
+    }
+    mKey = key;
 }
 
-QString LibraryElementAttribute::getDefaultValue(const QStringList& localeOrder ) const noexcept
+void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value,
+                                 const AttributeUnit* unit) throw (Exception)
 {
-    return LibraryBaseElement::localeStringFromList(mDefaultValues, localeOrder);
+    if ((!type.isUnitAvailable(unit)) || (!type.isValueValid(value))) {
+        throw LogicError(__FILE__, __LINE__, QString("%1,%2,%3")
+        .arg(type.getName(), value, unit ? unit->getName() : "-"));
+    }
+    mType = &type;
+    mValue = value;
+    mUnit = unit;
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* LibraryElementAttribute::serializeToXmlDomElement() const throw (Exception)
+XmlDomElement* Attribute::serializeToXmlDomElement() const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
     root->setAttribute("key", mKey);
     root->setAttribute("type", mType->getName());
-    root->setAttribute("unit", mDefaultUnit ? mDefaultUnit->getName() : "");
-    foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDefaultValues.keys())
-        root->appendTextChild("default_value", mDefaultValues.value(locale))->setAttribute("locale", locale);
+    root->setAttribute("unit", mUnit ? mUnit->getName() : "");
+    root->setText(mValue);
     return root.take();
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool Attribute::operator==(const Attribute& rhs) const noexcept
+{
+    if (mKey != rhs.mKey)       return false;
+    if (mType != rhs.mType)     return false;
+    if (mValue != rhs.mValue)   return false;
+    if (mUnit != rhs.mUnit)     return false;
+    return true;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool LibraryElementAttribute::checkAttributesValidity() const noexcept
+bool Attribute::checkAttributesValidity() const noexcept
 {
-    if (mKey.isEmpty())                     return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
-    if (!mDefaultValues.contains("en_US"))  return false;
-    if ((mType->getAvailableUnits().isEmpty()) && (mDefaultUnit != nullptr))    return false;
-    if ((mDefaultUnit) && (!mType->getAvailableUnits().contains(mDefaultUnit))) return false;
-    foreach (const QString& value, mDefaultValues)
-        if (!mType->isValueValid(value))                                        return false;
+    if (mKey.trimmed().isEmpty())           return false;
+    if (!mType->isUnitAvailable(mUnit))     return false;
+    if (!mType->isValueValid(mValue))       return false;
     return true;
 }
 
@@ -118,5 +140,4 @@ bool LibraryElementAttribute::checkAttributesValidity() const noexcept
  *  End of File
  ****************************************************************************************/
 
-} // namespace library
 } // namespace librepcb

@@ -188,12 +188,14 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             mVersion = "v1";
             mCreated = QDateTime::currentDateTime();
             mLastModified = QDateTime::currentDateTime();
+            mAttributes.reset(new AttributeList());
         } else {
             mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
             mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
             mVersion = root->getFirstChild("meta/version", true, true)->getText<QString>(false);
             mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
             mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
+            mAttributes.reset(new AttributeList(*root->getFirstChild("attributes", true))); // can throw
         }
 
         // Create all needed objects
@@ -301,6 +303,14 @@ void Project::setLastModified(const QDateTime& newLastModified) noexcept
 {
     if (newLastModified != mLastModified) {
         mLastModified = newLastModified;
+        emit attributesChanged();
+    }
+}
+
+void Project::setAttributes(const AttributeList& newAttributes) noexcept
+{
+    if (newAttributes != *mAttributes) {
+        *mAttributes = newAttributes;
         emit attributesChanged();
     }
 }
@@ -574,6 +584,8 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
             return value = mCreated.toString(Qt::SystemLocaleShortDate), true;
         else if (attrKey == QLatin1String("LAST_MODIFIED"))
             return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
+        else if (mAttributes->contains(attrKey))
+            return value = mAttributes->value(attrKey)->getValueTr(true), true;
     }
 
     return false;
@@ -617,6 +629,9 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
     meta->appendTextChild("last_modified", mLastModified);
+
+    // attributes
+    root->appendChild(mAttributes->serializeToXmlDomElement());
 
     // schematics
     FilePath schematicsPath(mPath.getPathTo("schematics"));

@@ -21,61 +21,74 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdcompattrinstedit.h"
-#include "../componentinstance.h"
-#include "../componentattributeinstance.h"
+#include <QtWidgets>
+#include "attributetypecombobox.h"
+#include "../attributes/attributetype.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdCompAttrInstEdit::CmdCompAttrInstEdit(ComponentInstance& cmp,
-        ComponentAttributeInstance& attr, const AttributeType& newType,
-        const QString& newValue, const AttributeUnit* newUnit) noexcept :
-    UndoCommand(tr("Edit component attribute")),
-    mComponentInstance(cmp), mAttrInst(attr),
-    mOldType(&attr.getType()), mNewType(&newType),
-    mOldValue(attr.getValue()), mNewValue(newValue),
-    mOldUnit(attr.getUnit()), mNewUnit(newUnit)
+AttributeTypeComboBox::AttributeTypeComboBox(QWidget* parent) noexcept :
+    QWidget(parent), mComboBox(new QComboBox(this))
 {
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(mComboBox);
+
+    foreach (const AttributeType* type, AttributeType::getAllTypes()) {
+        mComboBox->addItem(type->getNameTr());
+    }
+    mComboBox->setCurrentIndex(0);
+    connect(mComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &AttributeTypeComboBox::currentIndexChanged);
 }
 
-CmdCompAttrInstEdit::~CmdCompAttrInstEdit() noexcept
+AttributeTypeComboBox::~AttributeTypeComboBox() noexcept
 {
 }
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Getters
  ****************************************************************************************/
 
-bool CmdCompAttrInstEdit::performExecute() throw (Exception)
+const AttributeType& AttributeTypeComboBox::getCurrentItem() const noexcept
 {
-    performRedo(); // can throw
-
-    return true; // TODO: determine if the attribute was really modified
+    int index = mComboBox->currentIndex();
+    Q_ASSERT(index >= 0);
+    Q_ASSERT(index < AttributeType::getAllTypes().count());
+    return *AttributeType::getAllTypes().value(index);
 }
 
-void CmdCompAttrInstEdit::performUndo() throw (Exception)
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void AttributeTypeComboBox::setCurrentItem(const AttributeType& type) noexcept
 {
-    mAttrInst.setTypeValueUnit(*mOldType, mOldValue, mOldUnit); // can throw
-    emit mComponentInstance.attributesChanged();
+    int index = AttributeType::getAllTypes().indexOf(&type);
+    Q_ASSERT(index >= 0);
+    Q_ASSERT(index < AttributeType::getAllTypes().count());
+    mComboBox->setCurrentIndex(index);
 }
 
-void CmdCompAttrInstEdit::performRedo() throw (Exception)
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void AttributeTypeComboBox::currentIndexChanged(int index) noexcept
 {
-    mAttrInst.setTypeValueUnit(*mNewType, mNewValue, mNewUnit); // can throw
-    emit mComponentInstance.attributesChanged();
+    Q_UNUSED(index);
+    emit currentItemChanged(&getCurrentItem()); // passing a reference does not work with Qt5.2
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb

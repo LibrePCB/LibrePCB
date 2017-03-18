@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPATTRINSTADD_H
-#define LIBREPCB_PROJECT_CMDCOMPATTRINSTADD_H
+#ifndef LIBREPCB_ATTRIBUTE_H
+#define LIBREPCB_ATTRIBUTE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommand.h>
+#include "../fileio/if_xmlserializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,61 +34,67 @@ namespace librepcb {
 class AttributeType;
 class AttributeUnit;
 
-namespace project {
-
-class ComponentInstance;
-class ComponentAttributeInstance;
-
 /*****************************************************************************************
- *  Class CmdCompAttrInstAdd
+ *  Class Attribute
  ****************************************************************************************/
 
 /**
- * @brief The CmdCompAttrInstAdd class
+ * @brief The Attribute class
  */
-class CmdCompAttrInstAdd final : public UndoCommand
+class Attribute final : public IF_XmlSerializableObject
 {
+        Q_DECLARE_TR_FUNCTIONS(Attribute)
+
     public:
 
         // Constructors / Destructor
-        CmdCompAttrInstAdd(ComponentInstance& cmp, const QString& key,
-                           const AttributeType& type, const QString& value,
-                           const AttributeUnit* unit) noexcept;
-        ~CmdCompAttrInstAdd() noexcept;
+        Attribute() = delete;
+        Attribute(const Attribute& other) noexcept;
+        explicit Attribute(const XmlDomElement& domElement) throw (Exception);
+        Attribute(const QString& key, const AttributeType& type, const QString& value,
+                  const AttributeUnit* unit) throw (Exception);
+        ~Attribute() noexcept;
 
         // Getters
-        ComponentAttributeInstance* getAttrInstance() const noexcept {return mAttrInstance;}
+        const QString& getKey() const noexcept {return mKey;}
+        const AttributeType& getType() const noexcept {return *mType;}
+        const AttributeUnit* getUnit() const noexcept {return mUnit;}
+        const QString& getValue() const noexcept {return mValue;}
+        QString getValueTr(bool showUnit) const noexcept;
+
+        // Setters
+        void setKey(const QString& key) throw (Exception);
+        void setTypeValueUnit(const AttributeType& type, const QString& value,
+                              const AttributeUnit* unit) throw (Exception);
+
+        // General Methods
+
+        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+
+        // Operator Overloadings
+        bool operator==(const Attribute& rhs) const noexcept;
+        bool operator!=(const Attribute& rhs) const noexcept {return !(*this == rhs);}
+        Attribute& operator=(const Attribute& rhs) = delete;
 
 
-    private:
+    private: // Methods
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Private Member Variables
-
-        ComponentInstance& mComponentInstance;
+    private: // Data
         QString mKey;
-        const AttributeType& mType;
+        const AttributeType* mType;
         QString mValue;
         const AttributeUnit* mUnit;
-        ComponentAttributeInstance* mAttrInstance;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPATTRINSTADD_H
+#endif // LIBREPCB_ATTRIBUTE_H
