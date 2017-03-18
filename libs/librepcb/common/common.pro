@@ -91,6 +91,7 @@ HEADERS += \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
+    widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
 
@@ -152,6 +153,7 @@ SOURCES += \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
+    widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
 
