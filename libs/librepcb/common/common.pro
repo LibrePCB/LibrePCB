@@ -89,6 +89,7 @@ SOURCES += \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
+    widgets/centeredcheckbox.cpp \
     widgets/statusbar.cpp \
 
 HEADERS += \
@@ -164,6 +165,7 @@ HEADERS += \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
+    widgets/centeredcheckbox.h \
     widgets/statusbar.h \
 
 FORMS += \
