@@ -41,6 +41,17 @@ SOURCES += \
     lib/librarylisteditorwidget.cpp \
     lib/libraryoverviewwidget.cpp \
     libraryeditor.cpp \
+    newelementwizard/newelementwizard.cpp \
+    newelementwizard/newelementwizardcontext.cpp \
+    newelementwizard/newelementwizardpage_choosetype.cpp \
+    newelementwizard/newelementwizardpage_componentpinsignalmap.cpp \
+    newelementwizard/newelementwizardpage_componentproperties.cpp \
+    newelementwizard/newelementwizardpage_componentsignals.cpp \
+    newelementwizard/newelementwizardpage_componentsymbols.cpp \
+    newelementwizard/newelementwizardpage_copyfrom.cpp \
+    newelementwizard/newelementwizardpage_deviceproperties.cpp \
+    newelementwizard/newelementwizardpage_entermetadata.cpp \
+    newelementwizard/newelementwizardpage_packagepads.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintlisteditorwidget.cpp \
     pkg/fsm/cmd/cmdmoveselectedfootprintitems.cpp \
@@ -107,6 +118,17 @@ HEADERS += \
     lib/librarylisteditorwidget.h \
     lib/libraryoverviewwidget.h \
     libraryeditor.h \
+    newelementwizard/newelementwizard.h \
+    newelementwizard/newelementwizardcontext.h \
+    newelementwizard/newelementwizardpage_choosetype.h \
+    newelementwizard/newelementwizardpage_componentpinsignalmap.h \
+    newelementwizard/newelementwizardpage_componentproperties.h \
+    newelementwizard/newelementwizardpage_componentsignals.h \
+    newelementwizard/newelementwizardpage_componentsymbols.h \
+    newelementwizard/newelementwizardpage_copyfrom.h \
+    newelementwizard/newelementwizardpage_deviceproperties.h \
+    newelementwizard/newelementwizardpage_entermetadata.h \
+    newelementwizard/newelementwizardpage_packagepads.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintlisteditorwidget.h \
     pkg/fsm/cmd/cmdmoveselectedfootprintitems.h \
@@ -164,6 +186,16 @@ FORMS += \
     lib/librarylisteditorwidget.ui \
     lib/libraryoverviewwidget.ui \
     libraryeditor.ui \
+    newelementwizard/newelementwizard.ui \
+    newelementwizard/newelementwizardpage_choosetype.ui \
+    newelementwizard/newelementwizardpage_componentpinsignalmap.ui \
+    newelementwizard/newelementwizardpage_componentproperties.ui \
+    newelementwizard/newelementwizardpage_componentsignals.ui \
+    newelementwizard/newelementwizardpage_componentsymbols.ui \
+    newelementwizard/newelementwizardpage_copyfrom.ui \
+    newelementwizard/newelementwizardpage_deviceproperties.ui \
+    newelementwizard/newelementwizardpage_entermetadata.ui \
+    newelementwizard/newelementwizardpage_packagepads.ui \
     pkg/dialogs/footprintpadpropertiesdialog.ui \
     pkg/packageeditorwidget.ui \
     pkgcat/packagecategoryeditorwidget.ui \
