@@ -13,6 +13,12 @@ GENERATED_DIR = ../../../generated
 # Use common project definitions
 include(../../../common.pri)
 
+# Set preprocessor defines
+DEFINES += APP_VERSION="\\\"0.1.0\\\""
+DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
+DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
+#DEFINES += USE_32BIT_LENGTH_UNITS          # see units/length.h
+
 QT += core widgets xml opengl network sql
 
 CONFIG += staticlib
@@ -20,11 +26,67 @@ CONFIG += staticlib
 INCLUDEPATH += \
     ../../quazip
 
-# set preprocessor defines
-DEFINES += APP_VERSION="\\\"0.1.0\\\""
-DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
-DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
-#DEFINES += USE_32BIT_LENGTH_UNITS          # see units/length.h
+SOURCES += \
+    alignment.cpp \
+    application.cpp \
+    attributes/attribute.cpp \
+    attributes/attributelist.cpp \
+    attributes/attributetype.cpp \
+    attributes/attributeunit.cpp \
+    attributes/attrtypecapacitance.cpp \
+    attributes/attrtypefrequency.cpp \
+    attributes/attrtypeinductance.cpp \
+    attributes/attrtyperesistance.cpp \
+    attributes/attrtypestring.cpp \
+    attributes/attrtypevoltage.cpp \
+    boarddesignrules.cpp \
+    boardlayer.cpp \
+    cam/excellongenerator.cpp \
+    cam/gerberaperturelist.cpp \
+    cam/gerbergenerator.cpp \
+    debug.cpp \
+    dialogs/boarddesignrulesdialog.cpp \
+    dialogs/gridsettingsdialog.cpp \
+    exceptions.cpp \
+    fileio/directorylock.cpp \
+    fileio/filepath.cpp \
+    fileio/fileutils.cpp \
+    fileio/smartfile.cpp \
+    fileio/smarttextfile.cpp \
+    fileio/smartversionfile.cpp \
+    fileio/smartxmlfile.cpp \
+    fileio/xmldomdocument.cpp \
+    fileio/xmldomelement.cpp \
+    geometry/ellipse.cpp \
+    geometry/hole.cpp \
+    geometry/polygon.cpp \
+    geometry/text.cpp \
+    graphics/graphicsitem.cpp \
+    graphics/graphicsscene.cpp \
+    graphics/graphicsview.cpp \
+    gridproperties.cpp \
+    if_attributeprovider.cpp \
+    network/filedownload.cpp \
+    network/networkaccessmanager.cpp \
+    network/networkrequest.cpp \
+    network/networkrequestbase.cpp \
+    network/repository.cpp \
+    schematiclayer.cpp \
+    sqlitedatabase.cpp \
+    systeminfo.cpp \
+    undocommand.cpp \
+    undocommandgroup.cpp \
+    undostack.cpp \
+    units/angle.cpp \
+    units/length.cpp \
+    units/lengthunit.cpp \
+    units/point.cpp \
+    utils/undostackactiongroup.cpp \
+    uuid.cpp \
+    version.cpp \
+    widgets/attributelisteditorwidget.cpp \
+    widgets/attributetypecombobox.cpp \
+    widgets/attributeunitcombobox.cpp \
 
 HEADERS += \
     alignment.h \
@@ -94,68 +156,6 @@ HEADERS += \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
-
-SOURCES += \
-    alignment.cpp \
-    application.cpp \
-    attributes/attribute.cpp \
-    attributes/attributelist.cpp \
-    attributes/attributetype.cpp \
-    attributes/attributeunit.cpp \
-    attributes/attrtypecapacitance.cpp \
-    attributes/attrtypefrequency.cpp \
-    attributes/attrtypeinductance.cpp \
-    attributes/attrtyperesistance.cpp \
-    attributes/attrtypestring.cpp \
-    attributes/attrtypevoltage.cpp \
-    boarddesignrules.cpp \
-    boardlayer.cpp \
-    cam/excellongenerator.cpp \
-    cam/gerberaperturelist.cpp \
-    cam/gerbergenerator.cpp \
-    debug.cpp \
-    dialogs/boarddesignrulesdialog.cpp \
-    dialogs/gridsettingsdialog.cpp \
-    exceptions.cpp \
-    fileio/directorylock.cpp \
-    fileio/filepath.cpp \
-    fileio/fileutils.cpp \
-    fileio/smartfile.cpp \
-    fileio/smarttextfile.cpp \
-    fileio/smartversionfile.cpp \
-    fileio/smartxmlfile.cpp \
-    fileio/xmldomdocument.cpp \
-    fileio/xmldomelement.cpp \
-    geometry/ellipse.cpp \
-    geometry/hole.cpp \
-    geometry/polygon.cpp \
-    geometry/text.cpp \
-    graphics/graphicsitem.cpp \
-    graphics/graphicsscene.cpp \
-    graphics/graphicsview.cpp \
-    gridproperties.cpp \
-    if_attributeprovider.cpp \
-    network/filedownload.cpp \
-    network/networkaccessmanager.cpp \
-    network/networkrequest.cpp \
-    network/networkrequestbase.cpp \
-    network/repository.cpp \
-    schematiclayer.cpp \
-    sqlitedatabase.cpp \
-    systeminfo.cpp \
-    undocommand.cpp \
-    undocommandgroup.cpp \
-    undostack.cpp \
-    units/angle.cpp \
-    units/length.cpp \
-    units/lengthunit.cpp \
-    units/point.cpp \
-    utils/undostackactiongroup.cpp \
-    uuid.cpp \
-    version.cpp \
-    widgets/attributelisteditorwidget.cpp \
-    widgets/attributetypecombobox.cpp \
-    widgets/attributeunitcombobox.cpp \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \

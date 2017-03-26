@@ -13,9 +13,10 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets opengl network xml printsupport sql
-
+# Set preprocessor defines
 exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
+
+QT += core widgets opengl network xml printsupport sql
 
 win32 {
     # Windows-specific configurations
@@ -103,7 +104,6 @@ FORMS += \
     firstrunwizard/firstrunwizard.ui \
     firstrunwizard/firstrunwizardpage_welcome.ui \
     firstrunwizard/firstrunwizardpage_workspacepath.ui \
-
 
 # Custom compiler "lrelease" for qm generation
 isEmpty(QMAKE_LRELEASE) {

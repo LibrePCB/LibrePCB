@@ -20,6 +20,32 @@ CONFIG += staticlib
 INCLUDEPATH += \
     ../../
 
+SOURCES += \
+    cat/componentcategory.cpp \
+    cat/librarycategory.cpp \
+    cat/packagecategory.cpp \
+    cmp/component.cpp \
+    cmp/componentpinsignalmapitem.cpp \
+    cmp/componentsignal.cpp \
+    cmp/componentsymbolvariant.cpp \
+    cmp/componentsymbolvariantitem.cpp \
+    dev/device.cpp \
+    library.cpp \
+    librarybaseelement.cpp \
+    libraryelement.cpp \
+    pkg/footprint.cpp \
+    pkg/footprintpad.cpp \
+    pkg/footprintpadpreviewgraphicsitem.cpp \
+    pkg/footprintpadsmt.cpp \
+    pkg/footprintpadtht.cpp \
+    pkg/footprintpreviewgraphicsitem.cpp \
+    pkg/package.cpp \
+    pkg/packagepad.cpp \
+    sym/symbol.cpp \
+    sym/symbolpin.cpp \
+    sym/symbolpinpreviewgraphicsitem.cpp \
+    sym/symbolpreviewgraphicsitem.cpp \
+
 HEADERS += \
     cat/componentcategory.h \
     cat/librarycategory.h \
@@ -47,29 +73,5 @@ HEADERS += \
     sym/symbolpinpreviewgraphicsitem.h \
     sym/symbolpreviewgraphicsitem.h \
 
-SOURCES += \
-    cat/componentcategory.cpp \
-    cat/librarycategory.cpp \
-    cat/packagecategory.cpp \
-    cmp/component.cpp \
-    cmp/componentpinsignalmapitem.cpp \
-    cmp/componentsignal.cpp \
-    cmp/componentsymbolvariant.cpp \
-    cmp/componentsymbolvariantitem.cpp \
-    dev/device.cpp \
-    library.cpp \
-    librarybaseelement.cpp \
-    libraryelement.cpp \
-    pkg/footprint.cpp \
-    pkg/footprintpad.cpp \
-    pkg/footprintpadpreviewgraphicsitem.cpp \
-    pkg/footprintpadsmt.cpp \
-    pkg/footprintpadtht.cpp \
-    pkg/footprintpreviewgraphicsitem.cpp \
-    pkg/package.cpp \
-    pkg/packagepad.cpp \
-    sym/symbol.cpp \
-    sym/symbolpin.cpp \
-    sym/symbolpinpreviewgraphicsitem.cpp \
-    sym/symbolpreviewgraphicsitem.cpp \
+FORMS += \
 

@@ -67,3 +67,5 @@ SOURCES += \
 HEADERS += \
     common/networkrequestbasesignalreceiver.h \
 
+FORMS += \
+

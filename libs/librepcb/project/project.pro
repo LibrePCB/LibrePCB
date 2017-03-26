@@ -187,4 +187,5 @@ HEADERS += \
     settings/cmd/cmdprojectsettingschange.h \
     settings/projectsettings.h \
 
-FORMS +=
+FORMS += \
+
