@@ -81,11 +81,9 @@ class FootprintPad : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        virtual bool checkAttributesValidity() const noexcept override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
+        virtual bool checkAttributesValidity() const noexcept;
 
         // Static Methods
         static Technology_t stringToTechnology(const QString& technology) throw (Exception);

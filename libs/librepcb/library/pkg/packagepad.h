@@ -60,8 +60,8 @@ class PackagePad final : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
     private:
@@ -72,9 +72,7 @@ class PackagePad final : public SerializableObject
         PackagePad& operator=(const PackagePad& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Pin Attributes

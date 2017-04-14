@@ -230,8 +230,8 @@ class BoardLayer final : public QObject, public SerializableObject
         void setVisible(bool visible) noexcept {mIsVisible = visible; emit attributesChanged();}
 
         // General Methods
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         BoardLayer& operator=(const BoardLayer& rhs) = delete;
@@ -247,10 +247,6 @@ class BoardLayer final : public QObject, public SerializableObject
 
 
     private:
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
 
         // Attributes
         int mId;

@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarynormorder.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -160,18 +159,11 @@ void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
     mListWidget->addItems(mListTmp);
 }
 
-XmlDomElement* WSI_LibraryNormOrder::serializeToXmlDomElement() const throw (Exception)
+void WSI_LibraryNormOrder::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
     foreach (const QString& norm, mList) {
-        root->appendTextChild("norm", norm);
+        root.appendTextChild("norm", norm);
     }
-    return root.take();
-}
-
-bool WSI_LibraryNormOrder::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

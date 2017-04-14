@@ -193,12 +193,10 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         Schematic(Project& project, const FilePath& filepath, bool restore,
                   bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
+        bool checkAttributesValidity() const noexcept;
 
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // General

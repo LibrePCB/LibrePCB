@@ -28,7 +28,6 @@
 #include "../../circuit/netsignal.h"
 #include "si_symbol.h"
 #include "si_symbolpin.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguard.h>
 
@@ -171,16 +170,14 @@ void SI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-XmlDomElement* SI_NetLine::serializeToXmlDomElement() const throw (Exception)
+void SI_NetLine::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netline"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("start_point", mStartPoint->getUuid());
-    root->setAttribute("end_point", mEndPoint->getUuid());
-    root->setAttribute("width", mWidth);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("start_point", mStartPoint->getUuid());
+    root.setAttribute("end_point", mEndPoint->getUuid());
+    root.setAttribute("width", mWidth);
 }
 
 /*****************************************************************************************

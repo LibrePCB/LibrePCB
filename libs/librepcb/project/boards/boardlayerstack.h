@@ -69,8 +69,8 @@ class BoardLayerStack final : public QObject, public SerializableObject,
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
@@ -87,9 +87,6 @@ class BoardLayerStack final : public QObject, public SerializableObject,
         void addAllRequiredLayers() noexcept;
         void addLayer(int id) noexcept;
         void addLayer(BoardLayer& layer) noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // General

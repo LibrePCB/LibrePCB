@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "librarycategory.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -64,11 +63,10 @@ LibraryCategory::~LibraryCategory() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-XmlDomElement* LibraryCategory::serializeToXmlDomElement() const throw (Exception)
+void LibraryCategory::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
-    root->getFirstChild("meta", true)->appendTextChild("parent", mParentUuid);
-    return root.take();
+    LibraryBaseElement::serialize(root);
+    root.getFirstChild("meta", true)->appendTextChild("parent", mParentUuid);
 }
 
 /*****************************************************************************************

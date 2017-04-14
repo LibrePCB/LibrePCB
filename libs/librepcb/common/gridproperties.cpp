@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "gridproperties.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -63,15 +62,11 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* GridProperties::serializeToXmlDomElement() const throw (Exception)
+void GridProperties::serialize(XmlDomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("grid_properties"));
-    root->setAttribute("type", typeToString(mType));
-    root->setAttribute("interval", mInterval);
-    root->setAttribute("unit", mUnit);
-    return root.take();
+    root.setAttribute("type", typeToString(mType));
+    root.setAttribute("interval", mInterval);
+    root.setAttribute("unit", mUnit);
 }
 
 /*****************************************************************************************
@@ -84,15 +79,6 @@ GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept
     mInterval = rhs.mInterval;
     mUnit = rhs.mUnit;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool GridProperties::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

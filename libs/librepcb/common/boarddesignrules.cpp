@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "boarddesignrules.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -124,32 +123,29 @@ void BoardDesignRules::restoreDefaults() noexcept
     mRestringViaMax = Length(2000000);              // 2.0mm
 }
 
-XmlDomElement* BoardDesignRules::serializeToXmlDomElement() const throw (Exception)
+void BoardDesignRules::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("board_design_rules"));
     // general attributes
-    root->appendTextChild("name",                               mName);
-    root->appendTextChild("description",                        mDescription);
+    root.appendTextChild("name",                               mName);
+    root.appendTextChild("description",                        mDescription);
     // stop mask
-    root->appendTextChild("stopmask_clearance_ratio",           mStopMaskClearanceRatio);
-    root->appendTextChild("stopmask_clearance_min",             mStopMaskClearanceMin);
-    root->appendTextChild("stopmask_clearance_max",             mStopMaskClearanceMax);
-    root->appendTextChild("stopmask_max_via_drill_diameter",    mStopMaskMaxViaDrillDiameter);
+    root.appendTextChild("stopmask_clearance_ratio",           mStopMaskClearanceRatio);
+    root.appendTextChild("stopmask_clearance_min",             mStopMaskClearanceMin);
+    root.appendTextChild("stopmask_clearance_max",             mStopMaskClearanceMax);
+    root.appendTextChild("stopmask_max_via_drill_diameter",    mStopMaskMaxViaDrillDiameter);
     // cream mask
-    root->appendTextChild("creammask_clearance_ratio",          mCreamMaskClearanceRatio);
-    root->appendTextChild("creammask_clearance_min",            mCreamMaskClearanceMin);
-    root->appendTextChild("creammask_clearance_max",            mCreamMaskClearanceMax);
+    root.appendTextChild("creammask_clearance_ratio",          mCreamMaskClearanceRatio);
+    root.appendTextChild("creammask_clearance_min",            mCreamMaskClearanceMin);
+    root.appendTextChild("creammask_clearance_max",            mCreamMaskClearanceMax);
     // restring
-    root->appendTextChild("restring_pad_ratio",                 mRestringPadRatio);
-    root->appendTextChild("restring_pad_min",                   mRestringPadMin);
-    root->appendTextChild("restring_pad_max",                   mRestringPadMax);
-    root->appendTextChild("restring_via_ratio",                 mRestringViaRatio);
-    root->appendTextChild("restring_via_min",                   mRestringViaMin);
-    root->appendTextChild("restring_via_max",                   mRestringViaMax);
-    // end
-    return root.take();
+    root.appendTextChild("restring_pad_ratio",                 mRestringPadRatio);
+    root.appendTextChild("restring_pad_min",                   mRestringPadMin);
+    root.appendTextChild("restring_pad_max",                   mRestringPadMax);
+    root.appendTextChild("restring_via_ratio",                 mRestringViaRatio);
+    root.appendTextChild("restring_via_min",                   mRestringViaMin);
+    root.appendTextChild("restring_via_max",                   mRestringViaMax);
 }
 
 /*****************************************************************************************

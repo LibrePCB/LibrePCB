@@ -89,8 +89,8 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Helper Methods
@@ -122,9 +122,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
     private:
 
         void init(const Uuid& symbVarItemUuid) throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

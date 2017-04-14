@@ -73,8 +73,8 @@ class AttributeList final : public SerializableObject
             {int i = indexOf(key); if (contains(i)) mAttributes.removeAt(i);}
         void clear() noexcept {mAttributes.clear();}
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         bool operator==(const AttributeList& rhs) const noexcept;
@@ -83,9 +83,7 @@ class AttributeList final : public SerializableObject
 
 
     private: // Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

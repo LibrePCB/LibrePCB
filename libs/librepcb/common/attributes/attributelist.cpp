@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "attributelist.h"
-#include "../fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -81,15 +80,11 @@ int AttributeList::indexOf(const QString& key) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* AttributeList::serializeToXmlDomElement() const throw (Exception)
+void AttributeList::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("attributes"));
-    foreach (const QSharedPointer<Attribute>& attr, mAttributes) {
-        root->appendChild(attr->serializeToXmlDomElement());
-    }
-    return root.take();
+    serializePointerContainer(root, mAttributes, "attribute");
 }
 
 /*****************************************************************************************

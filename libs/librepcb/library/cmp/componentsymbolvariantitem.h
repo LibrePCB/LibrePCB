@@ -67,8 +67,8 @@ class ComponentSymbolVariantItem final : public SerializableObject
         void addPinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
         void removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
     private:
@@ -79,9 +79,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
         ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Symbol Variant Item Attributes

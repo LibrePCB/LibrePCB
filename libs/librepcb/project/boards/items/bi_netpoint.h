@@ -107,8 +107,8 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         void updateLines() const noexcept;
 
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -127,9 +127,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

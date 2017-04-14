@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "component.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -298,11 +297,11 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
+void Component::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->appendChild(mAttributes->serializeToXmlDomElement());
-    XmlDomElement* properties = root->appendChild("properties");
+    LibraryElement::serialize(root);
+    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
+    XmlDomElement* properties = root.appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
     foreach (const QString& locale, mDefaultValues.keys()) {
         XmlDomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
@@ -312,16 +311,10 @@ XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
         XmlDomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
         child->setAttribute("norm", norm);
     }
-    XmlDomElement* signalsNode = root->appendChild("signals");
-    foreach (const ComponentSignal* signal, mSignals) {
-        signalsNode->appendChild(signal->serializeToXmlDomElement());
-    }
-    XmlDomElement* symbol_variants = root->appendChild("symbol_variants");
-    symbol_variants->setAttribute("default", mDefaultSymbolVariantUuid);
-    foreach (const ComponentSymbolVariant* variant, mSymbolVariants) {
-        symbol_variants->appendChild(variant->serializeToXmlDomElement());
-    }
-    return root.take();
+    root.appendChild(serializePointerContainer(mSignals, "signals", "signal"));
+    XmlDomElement* symbVars = serializePointerContainer(mSymbolVariants, "symbol_variants", "variant");
+    symbVars->setAttribute("default", mDefaultSymbolVariantUuid);
+    root.appendChild(symbVars);
 }
 
 bool Component::checkAttributesValidity() const noexcept

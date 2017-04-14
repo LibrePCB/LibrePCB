@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_repositories.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/network/repository.h>
 
 /*****************************************************************************************
@@ -180,18 +179,9 @@ void WSI_Repositories::updateListWidgetItems() noexcept
     }
 }
 
-XmlDomElement* WSI_Repositories::serializeToXmlDomElement() const throw (Exception)
+void WSI_Repositories::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    foreach (const Repository* repository, mList) {
-        root->appendChild(repository->serializeToXmlDomElement()); // can throw
-    }
-    return root.take();
-}
-
-bool WSI_Repositories::checkAttributesValidity() const noexcept
-{
-    return true;
+    serializePointerContainer(root, mList, "repository");
 }
 
 /*****************************************************************************************

@@ -24,7 +24,6 @@
 #include "attribute.h"
 #include "attributetype.h"
 #include "attributeunit.h"
-#include "../fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -99,16 +98,13 @@ void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Attribute::serializeToXmlDomElement() const throw (Exception)
+void Attribute::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("attribute"));
-    root->setAttribute("key", mKey);
-    root->setAttribute("type", mType->getName());
-    root->setAttribute("unit", mUnit ? mUnit->getName() : "");
-    root->setText(mValue);
-    return root.take();
+    root.setAttribute("key", mKey);
+    root.setAttribute("type", mType->getName());
+    root.setAttribute("unit", mUnit ? mUnit->getName() : "");
+    root.setText(mValue);
 }
 
 /*****************************************************************************************

@@ -64,8 +64,8 @@ class Repository final : public QObject, public SerializableObject
         // General Methods
         void requestLibraryList() const noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operators
         Repository& operator=(const Repository& rhs) = delete;
@@ -81,9 +81,7 @@ class Repository final : public QObject, public SerializableObject
 
         void requestLibraryList(const QUrl& url) const noexcept;
         void requestedDataReceived(const QByteArray& data) noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

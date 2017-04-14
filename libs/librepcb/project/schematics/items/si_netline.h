@@ -74,8 +74,8 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
         void updateLine() noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -91,9 +91,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

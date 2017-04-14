@@ -25,7 +25,6 @@
 #include "board.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/boardlayer.h>
@@ -804,7 +803,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement());
+            XmlDomDocument doc(*serializeToXmlDomElement("board"));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -902,44 +901,31 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
+void Board::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("board"));
     // meta data
-    XmlDomElement* meta = root->appendChild("meta");
+    XmlDomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     // properties: grid
-    XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement());
+    XmlDomElement* properties = root.appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToXmlDomElement("grid_properties"));
     // layer stack
-    root->appendChild(mLayerStack->serializeToXmlDomElement());
+    root.appendChild(mLayerStack->serializeToXmlDomElement("layer_stack"));
     // design rules
-    root->appendChild(mDesignRules->serializeToXmlDomElement());
+    root.appendChild(mDesignRules->serializeToXmlDomElement("board_design_rules"));
     // devices
-    XmlDomElement* devices = root->appendChild("devices");
-    foreach (BI_Device* device, mDeviceInstances)
-        devices->appendChild(device->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mDeviceInstances, "devices", "device"));
     // vias
-    XmlDomElement* vias = root->appendChild("vias");
-    foreach (BI_Via* via, mVias)
-        vias->appendChild(via->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mVias, "vias", "via"));
     // netpoints
-    XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-        netpoints->appendChild(netpoint->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
     // netlines
-    XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (BI_NetLine* netline, mNetLines)
-        netlines->appendChild(netline->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
     // polygons
-    XmlDomElement* polygons = root->appendChild("polygons");
-    foreach (BI_Polygon* polygon, mPolygons)
-        polygons->appendChild(polygon->serializeToXmlDomElement());
-    // end
-    return root.take();
+    root.appendChild(serializePointerContainer(mPolygons, "polygons", "polygon"));
 }
 
 void Board::updateErcMessages() noexcept

@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_debugtools.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -77,15 +76,9 @@ void WSI_DebugTools::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* WSI_DebugTools::serializeToXmlDomElement() const throw (Exception)
+void WSI_DebugTools::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    return root.take();
-}
-
-bool WSI_DebugTools::checkAttributesValidity() const noexcept
-{
-    return true;
+    Q_UNUSED(root);
 }
 
 /*****************************************************************************************

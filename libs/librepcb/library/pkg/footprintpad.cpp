@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/boardlayer.h>
 #include "footprintpad.h"
 #include "footprintpadsmt.h"
@@ -103,19 +102,17 @@ void FootprintPad::setHeight(const Length& height) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
+void FootprintPad::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("technology", technologyToString(mTechnology));
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("rotation", mRotation);
-    root->setAttribute("width", mWidth);
-    root->setAttribute("height", mHeight);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("technology", technologyToString(mTechnology));
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("rotation", mRotation);
+    root.setAttribute("width", mWidth);
+    root.setAttribute("height", mHeight);
 }
 
 /*****************************************************************************************

@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "library.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "cat/componentcategory.h"
@@ -149,15 +148,14 @@ void Library::copyTo(const FilePath& destination, bool removeSource) throw (Exce
     LibraryBaseElement::copyTo(destination, removeSource);
 }
 
-XmlDomElement* Library::serializeToXmlDomElement() const throw (Exception)
+void Library::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
-    XmlDomElement* properties = root->appendChild("properties");
+    LibraryBaseElement::serialize(root);
+    XmlDomElement* properties = root.appendChild("properties");
     properties->appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));
     foreach (const Uuid& uuid, mDependencies) {
         properties->appendTextChild("dependency", uuid);
     }
-    return root.take();
 }
 
 bool Library::checkAttributesValidity() const noexcept

@@ -79,8 +79,8 @@ class ComponentSymbolVariant final : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
     private:
@@ -91,9 +91,7 @@ class ComponentSymbolVariant final : public SerializableObject
         ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Symbol Variant Attributes

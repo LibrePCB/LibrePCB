@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarylocaleorder.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -196,18 +195,11 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
     }
 }
 
-XmlDomElement* WSI_LibraryLocaleOrder::serializeToXmlDomElement() const throw (Exception)
+void WSI_LibraryLocaleOrder::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
     foreach (const QString& locale, mList) {
-        root->appendTextChild("locale", locale);
+        root.appendTextChild("locale", locale);
     }
-    return root.take();
-}
-
-bool WSI_LibraryLocaleOrder::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

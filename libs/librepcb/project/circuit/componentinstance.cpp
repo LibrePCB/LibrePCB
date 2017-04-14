@@ -31,7 +31,6 @@
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
 #include <librepcb/common/attributes/attributelist.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"
@@ -340,21 +339,17 @@ void ComponentInstance::unregisterDevice(BI_Device& device) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Exception)
+void ComponentInstance::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("component"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("component", mLibComponent->getUuid());
-    root->setAttribute("symbol_variant", mCompSymbVar->getUuid());
-    root->appendTextChild("name", mName);
-    root->appendTextChild("value", mValue);
-    root->appendChild(mAttributes->serializeToXmlDomElement());
-    XmlDomElement* signalMapping = root->appendChild("signal_mapping");
-    foreach (ComponentSignalInstance* signalInstance, mSignals)
-        signalMapping->appendChild(signalInstance->serializeToXmlDomElement());
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("component", mLibComponent->getUuid());
+    root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
+    root.appendTextChild("name", mName);
+    root.appendTextChild("value", mValue);
+    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
+    root.appendChild(serializePointerContainer(mSignals, "signal_mapping", "map"));
 }
 
 /*****************************************************************************************

@@ -72,8 +72,8 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
@@ -93,9 +93,7 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

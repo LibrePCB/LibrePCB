@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "package.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -149,19 +148,13 @@ void Package::removeFootprint(Footprint& footprint) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
+void Package::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    XmlDomElement* padsNode = root->appendChild("pads");
-    foreach (const PackagePad* pad, mPads) {
-        padsNode->appendChild(pad->serializeToXmlDomElement());
-    }
-    XmlDomElement* footprintsNode = root->appendChild("footprints");
+    LibraryElement::serialize(root);
+    root.appendChild(serializePointerContainer(mPads, "pads", "pad"));
+    XmlDomElement* footprintsNode = serializePointerContainer(mFootprints, "footprints", "footprint");
     footprintsNode->setAttribute("default", mDefaultFootprintUuid);
-    foreach (const Footprint* footprint, mFootprints) {
-        footprintsNode->appendChild(footprint->serializeToXmlDomElement());
-    }
-    return root.take();
+    root.appendChild(footprintsNode);
 }
 
 bool Package::checkAttributesValidity() const noexcept

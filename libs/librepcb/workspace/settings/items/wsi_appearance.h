@@ -65,17 +65,11 @@ class WSI_Appearance final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_Appearance& operator=(const WSI_Appearance& rhs) = delete;
-
-
-    private: // Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

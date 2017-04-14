@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "symbol.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -169,24 +168,14 @@ void Symbol::removeText(Text& text) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Symbol::serializeToXmlDomElement() const throw (Exception)
+void Symbol::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    XmlDomElement* pins = root->appendChild("pins");
-    foreach (const SymbolPin* pin, mPins) {
-        pins->appendChild(pin->serializeToXmlDomElement());
-    }
-    XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const Polygon* polygon, mPolygons) {
-        geometry->appendChild(polygon->serializeToXmlDomElement());
-    }
-    foreach (const Text* text, mTexts) {
-        geometry->appendChild(text->serializeToXmlDomElement());
-    }
-    foreach (const Ellipse* ellipse, mEllipses) {
-        geometry->appendChild(ellipse->serializeToXmlDomElement());
-    }
-    return root.take();
+    LibraryElement::serialize(root);
+    root.appendChild(serializePointerContainer(mPins, "pins", "pin"));
+    XmlDomElement* geometry = root.appendChild("geometry");
+    serializePointerContainer(*geometry, mPolygons, "polygon");
+    serializePointerContainer(*geometry, mTexts, "text");
+    serializePointerContainer(*geometry, mEllipses, "ellipse");
 }
 
 /*****************************************************************************************

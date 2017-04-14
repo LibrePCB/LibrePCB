@@ -24,7 +24,6 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -91,8 +90,6 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
                 addComponentInstance(*component);
             }
         }
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -374,7 +371,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/circuit.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        XmlDomDocument doc(*serializeToXmlDomElement("circuit"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -390,27 +387,11 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool Circuit::checkAttributesValidity() const noexcept
+void Circuit::serialize(XmlDomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
-    //XmlDomElement* meta = root->appendChild("meta");
-    XmlDomElement* netclasses = root->appendChild("netclasses");
-    foreach (NetClass* netclass, mNetClasses)
-        netclasses->appendChild(netclass->serializeToXmlDomElement());
-    XmlDomElement* netsignals = root->appendChild("netsignals");
-    foreach (NetSignal* netsignal, mNetSignals)
-        netsignals->appendChild(netsignal->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("components");
-    foreach (ComponentInstance* instance, mComponentInstances)
-        components->appendChild(instance->serializeToXmlDomElement());
-    return root.take();
+    root.appendChild(serializePointerContainer(mNetClasses, "netclasses", "netclass"));
+    root.appendChild(serializePointerContainer(mNetSignals, "netsignals", "netsignal"));
+    root.appendChild(serializePointerContainer(mComponentInstances, "components", "component"));
 }
 
 /*****************************************************************************************

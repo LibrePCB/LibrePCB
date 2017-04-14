@@ -68,8 +68,8 @@ class FootprintPadTht final : public FootprintPad
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Static Methods
         static Shape_t stringToShape(const QString& shape) throw (Exception);
@@ -84,8 +84,6 @@ class FootprintPadTht final : public FootprintPad
         FootprintPadTht& operator=(const FootprintPadTht& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

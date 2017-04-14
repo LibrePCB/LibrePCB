@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "ellipse.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -150,21 +149,19 @@ Ellipse Ellipse::rotated(const Angle& angle, const Point& center) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Ellipse::serializeToXmlDomElement() const throw (Exception)
+void Ellipse::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
-    root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mLineWidth);
-    root->setAttribute("fill", mIsFilled);
-    root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("x", mCenter.getX());
-    root->setAttribute("y", mCenter.getY());
-    root->setAttribute("radius_x", mRadiusX);
-    root->setAttribute("radius_y", mRadiusY);
-    root->setAttribute("rotation", mRotation);
-    return root.take();
+    root.setAttribute("layer", mLayerId);
+    root.setAttribute("width", mLineWidth);
+    root.setAttribute("fill", mIsFilled);
+    root.setAttribute("grab_area", mIsGrabArea);
+    root.setAttribute("x", mCenter.getX());
+    root.setAttribute("y", mCenter.getY());
+    root.setAttribute("radius_x", mRadiusX);
+    root.setAttribute("radius_y", mRadiusY);
+    root.setAttribute("rotation", mRotation);
 }
 
 /*****************************************************************************************

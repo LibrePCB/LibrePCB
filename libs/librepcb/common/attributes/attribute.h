@@ -69,8 +69,8 @@ class Attribute final : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         bool operator==(const Attribute& rhs) const noexcept;
@@ -79,9 +79,7 @@ class Attribute final : public SerializableObject
 
 
     private: // Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

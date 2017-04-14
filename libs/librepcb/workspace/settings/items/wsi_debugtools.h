@@ -58,17 +58,11 @@ class WSI_DebugTools final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_DebugTools& operator=(const WSI_DebugTools& rhs) = delete;
-
-
-    private: // Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

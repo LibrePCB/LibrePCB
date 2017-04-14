@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "polygon.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -43,8 +42,6 @@ PolygonSegment::PolygonSegment(const XmlDomElement& domElement) throw (Exception
     mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
     mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
     mAngle = domElement.getAttribute<Angle>("angle", true);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
@@ -71,20 +68,11 @@ Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
     }
 }
 
-XmlDomElement* PolygonSegment::serializeToXmlDomElement() const throw (Exception)
+void PolygonSegment::serialize(XmlDomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("segment"));
-    root->setAttribute("end_x", mEndPos.getX());
-    root->setAttribute("end_y", mEndPos.getY());
-    root->setAttribute("angle", mAngle);
-    return root.take();
-}
-
-bool PolygonSegment::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.setAttribute("end_x", mEndPos.getX());
+    root.setAttribute("end_y", mEndPos.getY());
+    root.setAttribute("angle", mAngle);
 }
 
 /*****************************************************************************************
@@ -316,20 +304,17 @@ void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-XmlDomElement* Polygon::serializeToXmlDomElement() const throw (Exception)
+void Polygon::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("polygon"));
-    root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mLineWidth);
-    root->setAttribute("fill", mIsFilled);
-    root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("start_x", mStartPos.getX());
-    root->setAttribute("start_y", mStartPos.getY());
-    foreach (const PolygonSegment* segment, mSegments)
-        root->appendChild(segment->serializeToXmlDomElement());
-    return root.take();
+    root.setAttribute("layer", mLayerId);
+    root.setAttribute("width", mLineWidth);
+    root.setAttribute("fill", mIsFilled);
+    root.setAttribute("grab_area", mIsGrabArea);
+    root.setAttribute("start_x", mStartPos.getX());
+    root.setAttribute("start_y", mStartPos.getY());
+    serializePointerContainer(root, mSegments, "segment");
 }
 
 /*****************************************************************************************

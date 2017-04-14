@@ -188,10 +188,9 @@ class LibraryBaseElement : public QObject, public SerializableObject
         virtual void cleanupAfterLoadingElementFromFile() noexcept;
         virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        virtual bool checkAttributesValidity() const noexcept override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
+        virtual bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes

@@ -105,8 +105,8 @@ class BoardDesignRules final : public SerializableObject
         // General Methods
         void restoreDefaults() noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
@@ -120,9 +120,7 @@ class BoardDesignRules final : public SerializableObject
 
 
     private:
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes

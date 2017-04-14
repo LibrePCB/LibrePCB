@@ -66,23 +66,19 @@ class WSI_LibraryNormOrder final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_LibraryNormOrder& operator=(const WSI_LibraryNormOrder& rhs) = delete;
 
 
     private: // Methods
-
         void btnUpClicked() noexcept;
         void btnDownClicked() noexcept;
         void btnAddClicked() noexcept;
         void btnRemoveClicked() noexcept;
         void updateListWidgetItems() noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

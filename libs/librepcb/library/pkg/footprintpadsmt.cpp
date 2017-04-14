@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/boardlayer.h>
 #include "footprintpadsmt.h"
 
@@ -105,11 +104,10 @@ void FootprintPadSmt::setBoardSide(BoardSide_t side) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPadSmt::serializeToXmlDomElement() const throw (Exception)
+void FootprintPadSmt::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(FootprintPad::serializeToXmlDomElement());
-    root->setAttribute("side", boardSideToString(mBoardSide));
-    return root.take();
+    FootprintPad::serialize(root);
+    root.setAttribute("side", boardSideToString(mBoardSide));
 }
 
 /*****************************************************************************************
@@ -131,16 +129,6 @@ QString FootprintPadSmt::boardSideToString(BoardSide_t side) noexcept
         case BoardSide_t::BOTTOM: return QString("bottom");
         default: Q_ASSERT(false); return QString();
     }
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool FootprintPadSmt::checkAttributesValidity() const noexcept
-{
-    if (!FootprintPad::checkAttributesValidity())   return false;
-    return true;
 }
 
 /*****************************************************************************************

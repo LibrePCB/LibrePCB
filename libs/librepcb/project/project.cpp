@@ -28,7 +28,6 @@
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/systeminfo.h>
 #include <librepcb/common/schematiclayer.h>
@@ -607,35 +606,31 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
+void Project::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
-
     // meta
-    XmlDomElement* meta = root->appendChild("meta");
+    XmlDomElement* meta = root.appendChild("meta");
     meta->appendTextChild("name", mName);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
 
     // attributes
-    root->appendChild(mAttributes->serializeToXmlDomElement());
+    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
 
     // schematics
     FilePath schematicsPath(mPath.getPathTo("schematics"));
-    XmlDomElement* schematics = root->appendChild("schematics");
+    XmlDomElement* schematics = root.appendChild("schematics");
     foreach (Schematic* schematic, mSchematics)
         schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
 
     // boards
     FilePath boardsPath(mPath.getPathTo("boards"));
-    XmlDomElement* boards = root->appendChild("boards");
+    XmlDomElement* boards = root.appendChild("boards");
     foreach (Board* board, mBoards)
         boards->appendTextChild("board", board->getFilePath().toRelative(boardsPath));
-
-    return root.take();
 }
 
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
@@ -662,7 +657,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.lpp project file
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        XmlDomDocument doc(*serializeToXmlDomElement("project"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

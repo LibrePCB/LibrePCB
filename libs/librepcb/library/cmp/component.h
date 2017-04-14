@@ -118,10 +118,8 @@ class Component final : public LibraryElement
 
         // Private Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
         bool checkAttributesValidity() const noexcept override;
 
 

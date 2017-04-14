@@ -30,7 +30,6 @@
 #include "../../circuit/componentinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
 
@@ -192,19 +191,17 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-XmlDomElement* SI_Symbol::serializeToXmlDomElement() const throw (Exception)
+void SI_Symbol::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("symbol"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("component_instance", mComponentInstance->getUuid());
-    root->setAttribute("symbol_item", mSymbVarItem->getUuid());
-    XmlDomElement* position = root->appendChild("position");
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("component_instance", mComponentInstance->getUuid());
+    root.setAttribute("symbol_item", mSymbVarItem->getUuid());
+    XmlDomElement* position = root.appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());
     position->setAttribute("rotation", mRotation);
-    return root.take();
 }
 
 /*****************************************************************************************

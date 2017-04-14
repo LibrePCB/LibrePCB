@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "hole.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -71,15 +70,13 @@ void Hole::setDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Hole::serializeToXmlDomElement() const throw (Exception)
+void Hole::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("hole"));
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("diameter", mDiameter);
-    return root.take();
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("diameter", mDiameter);
 }
 
 /*****************************************************************************************

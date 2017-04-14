@@ -24,7 +24,6 @@
 #include "projectsettings.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../project.h"
 
 /*****************************************************************************************
@@ -78,8 +77,6 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         }
 
         triggerSettingsChanged();
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -118,7 +115,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/settings.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        XmlDomDocument doc(*serializeToXmlDomElement("settings"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -134,23 +131,14 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool ProjectSettings::checkAttributesValidity() const noexcept
+void ProjectSettings::serialize(XmlDomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* ProjectSettings::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("settings"));
-    XmlDomElement* locale_order = root->appendChild("locale_order");
+    XmlDomElement* locale_order = root.appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)
         locale_order->appendTextChild("locale", locale);
-    XmlDomElement* norm_order = root->appendChild("norm_order");
+    XmlDomElement* norm_order = root.appendChild("norm_order");
     foreach (const QString& norm, mNormOrder)
         norm_order->appendTextChild("norm", norm);
-    return root.take();
 }
 
 /*****************************************************************************************

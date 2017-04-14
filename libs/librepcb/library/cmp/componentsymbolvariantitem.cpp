@@ -25,7 +25,6 @@
 #include "component.h"
 #include "componentsymbolvariant.h"
 #include "componentpinsignalmapitem.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -105,21 +104,15 @@ void ComponentSymbolVariantItem::removePinSignalMapItem(ComponentPinSignalMapIte
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const throw (Exception)
+void ComponentSymbolVariantItem::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("item"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("symbol", mSymbolUuid);
-    root->setAttribute("required", mIsRequired);
-    root->setAttribute("suffix", mSuffix);
-    XmlDomElement* pin_signal_map = root->appendChild("pin_signal_map");
-    foreach (const ComponentPinSignalMapItem* item, mPinSignalMap) {
-        pin_signal_map->appendChild(item->serializeToXmlDomElement());
-    }
-
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("symbol", mSymbolUuid);
+    root.setAttribute("required", mIsRequired);
+    root.setAttribute("suffix", mSuffix);
+    root.appendChild(serializePointerContainer(mPinSignalMap, "pin_signal_map", "map"));
 }
 
 /*****************************************************************************************

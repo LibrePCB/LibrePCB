@@ -83,8 +83,8 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
@@ -120,9 +120,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
 
         void init() throw (Exception);
         void updateGraphicsItemTransform() noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

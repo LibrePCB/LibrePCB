@@ -94,8 +94,8 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -127,10 +127,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
                                               const Uuid& footprintUuid) throw (Exception);
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

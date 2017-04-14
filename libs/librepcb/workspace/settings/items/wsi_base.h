@@ -62,13 +62,14 @@ class WSI_Base : public QObject, public SerializableObject
         explicit WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
         virtual ~WSI_Base() noexcept;
 
+        // Getters
+        const QString& getXmlElementTagName() const noexcept {return mXmlElementTagName;}
+
         // General Methods
         virtual void restoreDefault() noexcept = 0;
         virtual void apply() noexcept = 0;
         virtual void revert() noexcept = 0;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
         WSI_Base& operator=(const WSI_Base& rhs) = delete;

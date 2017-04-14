@@ -66,20 +66,16 @@ class WSI_AppLocale final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_AppLocale& operator=(const WSI_AppLocale& rhs) = delete;
 
 
     private: // Methods
-
         void comboBoxIndexChanged(int index) noexcept;
         void updateComboBoxIndex() noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

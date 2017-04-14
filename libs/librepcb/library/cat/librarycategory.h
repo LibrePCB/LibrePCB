@@ -71,8 +71,8 @@ class LibraryCategory : public LibraryBaseElement
 
         // Protected Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // General Library Category Attributes
         Uuid mParentUuid;

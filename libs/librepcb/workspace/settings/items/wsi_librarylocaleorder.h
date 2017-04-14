@@ -66,8 +66,8 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_LibraryLocaleOrder& operator=(const WSI_LibraryLocaleOrder& rhs) = delete;
@@ -80,9 +80,6 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         void btnAddClicked() noexcept;
         void btnRemoveClicked() noexcept;
         void updateListWidgetItems() noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

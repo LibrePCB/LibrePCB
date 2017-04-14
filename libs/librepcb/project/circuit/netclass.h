@@ -77,18 +77,15 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         void registerNetSignal(NetSignal& signal) throw (Exception);
         void unregisterNetSignal(NetSignal& signal) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         NetClass& operator=(const NetClass& rhs) = delete;
 
 
     private:
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

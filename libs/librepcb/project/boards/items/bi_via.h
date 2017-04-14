@@ -96,8 +96,8 @@ class BI_Via final : public BI_Base, public SerializableObject
         void unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception);
         void updateNetPoints() const noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -117,9 +117,7 @@ class BI_Via final : public BI_Base, public SerializableObject
 
         void init() throw (Exception);
         void boardAttributesChanged();
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "boardlayer.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -341,26 +340,13 @@ const QColor& BoardLayer::getColor(bool highlighted) const
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* BoardLayer::serializeToXmlDomElement() const throw (Exception)
+void BoardLayer::serialize(XmlDomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer"));
-    root->setAttribute("id", mId);
-    root->setText(mName);
-    root->setAttribute("color", mColor);
-    root->setAttribute("color_hl", mColorHighlighted);
-    root->setAttribute("visible", mIsVisible);
-    return root.take();
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool BoardLayer::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.setAttribute("id", mId);
+    root.setText(mName);
+    root.setAttribute("color", mColor);
+    root.setAttribute("color_hl", mColorHighlighted);
+    root.setAttribute("visible", mIsVisible);
 }
 
 /*****************************************************************************************

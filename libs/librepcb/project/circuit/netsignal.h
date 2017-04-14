@@ -102,8 +102,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         void registerBoardVia(BI_Via& via) throw (Exception);
         void unregisterBoardVia(BI_Via& via) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         NetSignal& operator=(const NetSignal& rhs) = delete;
@@ -116,10 +116,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
 
 
     private:
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

@@ -88,8 +88,8 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         void unregisterNetLine(SI_NetLine& netline) throw (Exception);
         void updateLines() const noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -107,9 +107,7 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

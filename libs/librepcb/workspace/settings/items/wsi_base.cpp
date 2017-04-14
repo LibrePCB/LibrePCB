@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_base.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../workspacesettings.h"
 #include "../../workspace.h"
 
@@ -45,16 +44,6 @@ WSI_Base::WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (
 
 WSI_Base::~WSI_Base() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Public Methods
- ****************************************************************************************/
-
-XmlDomElement* WSI_Base::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    return new XmlDomElement(mXmlElementTagName);
 }
 
 /*****************************************************************************************

@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/boardlayer.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "boardlayerstack.h"
 #include "board.h"
 
@@ -92,17 +91,9 @@ BoardLayerStack::~BoardLayerStack() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* BoardLayerStack::serializeToXmlDomElement() const throw (Exception)
+void BoardLayerStack::serialize(XmlDomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer_stack"));
-    XmlDomElement* layers = root->appendChild("layers");
-    foreach (const BoardLayer* layer, mLayers) {
-        layers->appendChild(layer->serializeToXmlDomElement());
-    }
-
-    return root.take();
+    root.appendChild(serializePointerContainer(mLayers, "layers", "layer"));
 }
 
 /*****************************************************************************************
@@ -186,11 +177,6 @@ void BoardLayerStack::addLayer(BoardLayer& layer) noexcept
             this, &BoardLayerStack::layerAttributesChanged,
             Qt::QueuedConnection);
     mLayers.insert(layer.getId(), &layer);
-}
-
-bool BoardLayerStack::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

@@ -69,8 +69,8 @@ class ComponentPinSignalMapItem final : public SerializableObject
         void setSignalUuid(const Uuid& uuid) noexcept {mSignalUuid = uuid;}
         void setDisplayType(PinDisplayType_t type) noexcept {mDisplayType = type;}
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Static Methods
         static PinDisplayType_t stringToDisplayType(const QString& type) throw (Exception);
@@ -85,9 +85,7 @@ class ComponentPinSignalMapItem final : public SerializableObject
         ComponentPinSignalMapItem& operator=(const ComponentPinSignalMapItem& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Attributes

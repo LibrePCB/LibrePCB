@@ -64,8 +64,8 @@ class PolygonSegment final : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
     private:
@@ -73,11 +73,6 @@ class PolygonSegment final : public SerializableObject
         // make some methods inaccessible...
         PolygonSegment();
         PolygonSegment& operator=(const PolygonSegment& rhs);
-
-        // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes
@@ -138,8 +133,8 @@ class Polygon final : public SerializableObject
         void appendSegment(PolygonSegment& segment) noexcept;
         void removeSegment(PolygonSegment& segment) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Static Methods
         static Polygon* createLine(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
@@ -155,9 +150,7 @@ class Polygon final : public SerializableObject
         Polygon& operator=(const Polygon& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Polygon Attributes

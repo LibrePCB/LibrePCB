@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "workspacesettings.h"
@@ -131,26 +130,17 @@ void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QStrin
 
 void WorkspaceSettings::saveToFile() const throw (Exception)
 {
-    XmlDomDocument doc(*serializeToXmlDomElement());
+    XmlDomDocument doc(*serializeToXmlDomElement("workspace_settings"));
 
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
     file->save(doc, true); // can throw
 }
 
-XmlDomElement* WorkspaceSettings::serializeToXmlDomElement() const throw (Exception)
+void WorkspaceSettings::serialize(XmlDomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("workspace_settings"));
     foreach (WSI_Base* item, mItems) {
-        root->appendChild(item->serializeToXmlDomElement());
+        root.appendChild(item->serializeToXmlDomElement(item->getXmlElementTagName()));
     }
-    return root.take();
-}
-
-bool WorkspaceSettings::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

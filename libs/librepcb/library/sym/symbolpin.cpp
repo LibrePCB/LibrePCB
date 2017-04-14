@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "symbolpin.h"
 
 /*****************************************************************************************
@@ -91,18 +90,16 @@ void SymbolPin::setRotation(const Angle& rotation) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* SymbolPin::serializeToXmlDomElement() const throw (Exception)
+void SymbolPin::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("pin"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("length", mLength);
-    root->setAttribute("rotation", mRotation);
-    root->setText(mName);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("length", mLength);
+    root.setAttribute("rotation", mRotation);
+    root.setText(mName);
 }
 
 /*****************************************************************************************

@@ -23,14 +23,13 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include "../exceptions.h"
+#include <QtCore>
+#include "xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class XmlDomElement;
 
 /*****************************************************************************************
  *  Class SerializableObject
@@ -46,49 +45,87 @@ class XmlDomElement;
 class SerializableObject
 {
     public:
-
-        /**
-         * @brief Default Constructor
-         */
-        explicit SerializableObject() noexcept {}
-
-        /**
-         * @brief Destructor
-         */
+        SerializableObject() noexcept {}
         virtual ~SerializableObject() noexcept {}
 
 
         /**
-         * @brief Serialize the object to a XML DOM element
+         * @brief Serialize the object to a new DOM element
          *
-         * This is a pure virtual method which must be implemented in all subclasses of
-         * the interface #SerializableObject. The generated XML DOM element has
-         * always the format of the application's major version (it's not possible to
-         * generate XML files of older versions).
+         * This method creates a new DOM element, serializes the whole object into it and
+         * then returns the whole DOM element. See #serialize() for details.
+         *
+         * @param name          The root name of the returned DOM element
          *
          * @return The created XML DOM element (the caller takes the ownership!)
          *
          * @throw Exception     This method throws an exception if an error occurs.
          *
-         * @todo maybe better return a QSharedPointer instead of a raw pointer?
+         * @see #serialize()
          */
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) = 0;
-
-
-    protected:
+        XmlDomElement* serializeToXmlDomElement(const QString& name) const throw (Exception) {
+            QScopedPointer<XmlDomElement> root(new XmlDomElement(name));
+            serialize(*root);
+            return root.take();
+        }
 
         /**
-         * @brief Check the validity of all attributes of the object
+         * @brief Serialize the object into an existing DOM element
          *
-         * This method is useful to check the validity of all object attributes after
-         * deserialization and before serialization to avoid loading or creating invalid
-         * XML files.
+         * This method inserts/appends all attributes and childs of the object to an
+         * existing DOM element. The content which already exists in the given DOM element
+         * will not be removed.
          *
-         * @retval true     If all attributes are valid
-         * @retval false    If at least one attribute is invalid
+         * @note    The generated DOM element has always the format of the application's
+         *          major version (it's not possible to generate DOMs of older versions).
+         *
+         * @param root          The target DOM root node
+         *
+         * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual bool checkAttributesValidity() const noexcept = 0;
+        virtual void serialize(XmlDomElement& root) const throw (Exception) = 0;
+
+        template <typename T>
+        static void serializeObjectContainer(XmlDomElement& root, const T& container,
+            const QString& itemName) throw (Exception)
+        {
+            for (const auto& object : container) {
+                root.appendChild(object.serializeToXmlDomElement(itemName)); // can throw
+            }
+        }
+
+        template <typename T>
+        static void serializePointerContainer(XmlDomElement& root, const T& container,
+            const QString& itemName) throw (Exception)
+        {
+            for (const auto& pointer : container) {
+                root.appendChild(pointer->serializeToXmlDomElement(itemName)); // can throw
+            }
+        }
+
+        template <typename T>
+        static XmlDomElement* serializeObjectContainer(const T& container,
+            const QString& rootName, const QString& itemName) throw (Exception)
+        {
+            QScopedPointer<XmlDomElement> root(new XmlDomElement(rootName));
+            serializeObjectContainer(*root, container, itemName); // can throw
+            return root.take();
+        }
+
+        template <typename T>
+        static XmlDomElement* serializePointerContainer(const T& container,
+            const QString& rootName, const QString& itemName) throw (Exception)
+        {
+            QScopedPointer<XmlDomElement> root(new XmlDomElement(rootName));
+            serializePointerContainer(*root, container, itemName); // can throw
+            return root.take();
+        }
 };
+
+// Make sure that the SerializableObject class does not contain any data (except the vptr).
+// Otherwise it could introduce issues when using multiple inheritance.
+static_assert(sizeof(SerializableObject) == sizeof(void*),
+              "SerializableObject must not contain any data!");
 
 /*****************************************************************************************
  *  End of File

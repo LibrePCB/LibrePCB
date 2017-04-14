@@ -27,7 +27,6 @@
 #include "../project.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -49,8 +48,6 @@ ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool creat
     } else {
         mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ErcMsgList::~ErcMsgList() noexcept
@@ -122,7 +119,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/erc.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        XmlDomDocument doc(*serializeToXmlDomElement("erc"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -138,17 +135,9 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool ErcMsgList::checkAttributesValidity() const noexcept
+void ErcMsgList::serialize(XmlDomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
-    XmlDomElement* ignoreNode = root->appendChild("ignore");
+    XmlDomElement* ignoreNode = root.appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)
     {
         if (ercMsg->isIgnored())
@@ -159,7 +148,6 @@ XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
             itemNode->setAttribute("msg_key", ercMsg->getMsgKey());
         }
     }
-    return root.take();
 }
 
 /*****************************************************************************************

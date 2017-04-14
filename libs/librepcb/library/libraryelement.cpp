@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "libraryelement.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -66,13 +65,12 @@ LibraryElement::~LibraryElement() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
+void LibraryElement::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
+    LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, mCategories) {
-        root->getFirstChild("meta", true)->appendTextChild("category", uuid);
+        root.getFirstChild("meta", true)->appendTextChild("category", uuid);
     }
-    return root.take();
 }
 
 bool LibraryElement::checkAttributesValidity() const noexcept

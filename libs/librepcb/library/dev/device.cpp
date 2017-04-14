@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "device.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -91,18 +90,17 @@ void Device::removePadSignalMapping(const Uuid& pad) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
+void Device::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
-    root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
-    XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
+    LibraryElement::serialize(root);
+    root.getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
+    root.getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
+    XmlDomElement* padSignalMap = root.appendChild("pad_signal_map");
     foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
         XmlDomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
         child->setText(mPadSignalMap.value(padUuid));
     }
-    return root.take();
 }
 
 bool Device::checkAttributesValidity() const noexcept

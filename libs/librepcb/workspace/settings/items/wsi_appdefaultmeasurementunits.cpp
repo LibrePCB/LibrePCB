@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_appdefaultmeasurementunits.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -100,16 +99,9 @@ void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept
     mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
 }
 
-XmlDomElement* WSI_AppDefaultMeasurementUnits::serializeToXmlDomElement() const throw (Exception)
+void WSI_AppDefaultMeasurementUnits::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    root->appendTextChild("length_unit", mLengthUnit);
-    return root.take();
-}
-
-bool WSI_AppDefaultMeasurementUnits::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.appendTextChild("length_unit", mLengthUnit);
 }
 
 /*****************************************************************************************

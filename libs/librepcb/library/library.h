@@ -85,9 +85,8 @@ class Library final : public LibraryBaseElement
 
         // Private Methods
         virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception) override;
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc SerializableObject#checkAttributesValidity()
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
         virtual bool checkAttributesValidity() const noexcept override;
 
 

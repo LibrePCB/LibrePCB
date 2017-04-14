@@ -129,8 +129,8 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void registerDevice(BI_Device& device) throw (Exception);
         void unregisterDevice(BI_Device& device) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // Helper Methods
@@ -150,10 +150,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

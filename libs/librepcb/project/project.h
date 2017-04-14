@@ -528,13 +528,12 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         explicit Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception);
 
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
         /**
-         * @copydoc SerializableObject#serializeToXmlDomElement()
+         * @copydoc librepcb::SerializableObject::serialize()
          */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

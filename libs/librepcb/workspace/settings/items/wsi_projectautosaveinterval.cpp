@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_projectautosaveinterval.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -100,16 +99,9 @@ void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
     mIntervalTmp = value * 60;
 }
 
-XmlDomElement* WSI_ProjectAutosaveInterval::serializeToXmlDomElement() const throw (Exception)
+void WSI_ProjectAutosaveInterval::serialize(XmlDomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    root->setText(mInterval);
-    return root.take();
-}
-
-bool WSI_ProjectAutosaveInterval::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.setText(mInterval);
 }
 
 /*****************************************************************************************

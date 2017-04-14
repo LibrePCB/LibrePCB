@@ -109,8 +109,8 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void registerFootprintPad(BI_FootprintPad& pad) throw (Exception);
         void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
@@ -125,9 +125,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

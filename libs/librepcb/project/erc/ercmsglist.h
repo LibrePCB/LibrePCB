@@ -80,15 +80,10 @@ class ErcMsgList final : public QObject, public SerializableObject
         void ercMsgChanged(ErcMsg* ercMsg);
 
 
-    private:
+    private: // Methods
 
-        // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // General

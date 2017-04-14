@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "repository.h"
-#include "fileio/xmldomelement.h"
 #include "network/networkrequest.h"
 
 /*****************************************************************************************
@@ -77,13 +76,11 @@ void Repository::requestLibraryList() const noexcept
     requestLibraryList(QUrl(mUrl.toString() % "/api/v1/libraries"));
 }
 
-XmlDomElement* Repository::serializeToXmlDomElement() const throw (Exception)
+void Repository::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("repository"));
-    root->setAttribute("url", mUrl);
-    return root.take();
+    root.setAttribute("url", mUrl);
 }
 
 /*****************************************************************************************

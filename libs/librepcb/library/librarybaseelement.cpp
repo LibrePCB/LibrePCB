@@ -25,7 +25,6 @@
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/application.h>
 
@@ -178,7 +177,8 @@ void LibraryBaseElement::save() throw (Exception)
 
     // save xml file
     FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
-    QScopedPointer<XmlDomDocument> doc(new XmlDomDocument(*serializeToXmlDomElement()));
+    QScopedPointer<XmlDomElement> root(serializeToXmlDomElement(mLongElementName));
+    QScopedPointer<XmlDomDocument> doc(new XmlDomDocument(*root.take()));
     QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(xmlFilePath));
     xmlFile->save(*doc, true);
 
@@ -261,15 +261,14 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
     }
 }
 
-XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
+void LibraryBaseElement::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) {
         throw LogicError(__FILE__, __LINE__, QString(),
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement(mLongElementName));
-    XmlDomElement* meta = root->appendChild("meta");
+    XmlDomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("author", mAuthor);
@@ -285,7 +284,6 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Excep
     foreach (const QString& locale, mKeywords.keys()) {
         meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
     }
-    return root.take();
 }
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept

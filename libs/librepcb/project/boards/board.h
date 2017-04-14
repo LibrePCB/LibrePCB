@@ -207,14 +207,11 @@ class Board final : public QObject, public IF_AttributeProvider,
         Board(Project& project, const FilePath& filepath, bool restore,
               bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
 
         // General

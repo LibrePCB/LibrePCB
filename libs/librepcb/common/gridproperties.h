@@ -67,21 +67,14 @@ class GridProperties final : public SerializableObject
 
         // General Methods
 
-        /// @copydoc SerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(XmlDomElement& root) const throw (Exception) override;
 
         // Operators
         GridProperties& operator=(const GridProperties& rhs) noexcept;
 
 
     private:
-
-
-        // Private Methods
-
-        /// @copydoc SerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
 
         // Private Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);

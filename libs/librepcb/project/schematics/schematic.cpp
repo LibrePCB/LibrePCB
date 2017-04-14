@@ -24,7 +24,6 @@
 #include "schematic.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "../project.h"
 #include <librepcb/library/sym/symbolpin.h>
@@ -594,7 +593,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement());
+            XmlDomDocument doc(*serializeToXmlDomElement("schematic"));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -710,29 +709,19 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
+void Schematic::serialize(XmlDomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
-    XmlDomElement* meta = root->appendChild("meta");
+    XmlDomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
-    XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement());
-    XmlDomElement* symbols = root->appendChild("symbols");
-    foreach (SI_Symbol* symbolInstance, mSymbols)
-        symbols->appendChild(symbolInstance->serializeToXmlDomElement());
-    XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (SI_NetPoint* netpoint, mNetPoints)
-        netpoints->appendChild(netpoint->serializeToXmlDomElement());
-    XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (SI_NetLine* netline, mNetLines)
-        netlines->appendChild(netline->serializeToXmlDomElement());
-    XmlDomElement* netlabels = root->appendChild("netlabels");
-    foreach (SI_NetLabel* netlabel, mNetLabels)
-        netlabels->appendChild(netlabel->serializeToXmlDomElement());
-    return root.take();
+    XmlDomElement* properties = root.appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToXmlDomElement("grid_properties"));
+    root.appendChild(serializePointerContainer(mSymbols, "symbols", "symbol"));
+    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
+    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
+    root.appendChild(serializePointerContainer(mNetLabels, "netlabels", "netlabel"));
 }
 
 /*****************************************************************************************
