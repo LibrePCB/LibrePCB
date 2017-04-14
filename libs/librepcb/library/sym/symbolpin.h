@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +41,7 @@ namespace library {
 /**
  * @brief The SymbolPin class
  */
-class SymbolPin final : public IF_XmlSerializableObject
+class SymbolPin final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(SymbolPin)
 
@@ -68,7 +68,7 @@ class SymbolPin final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
     private:
@@ -80,7 +80,7 @@ class SymbolPin final : public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include <librepcb/common/if_schematiclayerprovider.h>
 #include <librepcb/common/if_boardlayerprovider.h>
@@ -79,7 +79,7 @@ class Board;
  * @date 2014-06-24
  */
 class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_SchematicLayerProvider, public IF_XmlSerializableObject
+                      public IF_SchematicLayerProvider, public SerializableObject
 {
         Q_OBJECT
 
@@ -528,11 +528,11 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         explicit Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
         /**
-         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         * @copydoc SerializableObject#serializeToXmlDomElement()
          */
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 

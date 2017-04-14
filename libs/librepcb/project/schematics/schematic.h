@@ -27,7 +27,7 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/if_attributeprovider.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/exceptions.h>
@@ -73,7 +73,7 @@ class SI_NetLabel;
  *  - text:             TODO
  */
 class Schematic final : public QObject, public IF_AttributeProvider,
-                        public IF_XmlSerializableObject
+                        public SerializableObject
 {
         Q_OBJECT
 
@@ -194,10 +194,10 @@ class Schematic final : public QObject, public IF_AttributeProvider,
                   bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 

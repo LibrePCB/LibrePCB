@@ -102,7 +102,7 @@ class Symbol final : public LibraryElement
 
         // Private Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 

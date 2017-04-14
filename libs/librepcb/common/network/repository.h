@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +41,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-08-10
  */
-class Repository final : public QObject, public IF_XmlSerializableObject
+class Repository final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -64,7 +64,7 @@ class Repository final : public QObject, public IF_XmlSerializableObject
         // General Methods
         void requestLibraryList() const noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operators
@@ -82,7 +82,7 @@ class Repository final : public QObject, public IF_XmlSerializableObject
         void requestLibraryList(const QUrl& url) const noexcept;
         void requestedDataReceived(const QByteArray& data) noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

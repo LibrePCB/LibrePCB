@@ -68,9 +68,9 @@ class LibraryElement : public LibraryBaseElement
 
         // Protected Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes

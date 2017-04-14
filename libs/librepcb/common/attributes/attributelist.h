@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 #include "attribute.h"
 
 /*****************************************************************************************
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The AttributeList class
  */
-class AttributeList final : public IF_XmlSerializableObject
+class AttributeList final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(AttributeList)
 
@@ -73,7 +73,7 @@ class AttributeList final : public IF_XmlSerializableObject
             {int i = indexOf(key); if (contains(i)) mAttributes.removeAt(i);}
         void clear() noexcept {mAttributes.clear();}
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -84,7 +84,7 @@ class AttributeList final : public IF_XmlSerializableObject
 
     private: // Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

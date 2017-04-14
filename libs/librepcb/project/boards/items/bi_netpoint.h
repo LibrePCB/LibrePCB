@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/uuid.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_netpoint.h"
@@ -55,7 +55,7 @@ class ErcMsg;
 /**
  * @brief The BI_NetPoint class
  */
-class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
+class BI_NetPoint final : public BI_Base, public SerializableObject,
                           public IF_ErcMsgProvider
 {
         Q_OBJECT
@@ -107,7 +107,7 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
         void updateLines() const noexcept;
 
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -128,7 +128,7 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

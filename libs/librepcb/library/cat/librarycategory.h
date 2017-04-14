@@ -71,7 +71,7 @@ class LibraryCategory : public LibraryBaseElement
 
         // Protected Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // General Library Category Attributes

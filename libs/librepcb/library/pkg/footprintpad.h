@@ -27,7 +27,7 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -44,7 +44,7 @@ namespace library {
  *
  * @todo add subclasses for each footprint type
  */
-class FootprintPad : public IF_XmlSerializableObject
+class FootprintPad : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
@@ -81,10 +81,10 @@ class FootprintPad : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 
         // Static Methods

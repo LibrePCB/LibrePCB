@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +41,7 @@ class AttributeUnit;
 /**
  * @brief The Attribute class
  */
-class Attribute final : public IF_XmlSerializableObject
+class Attribute final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Attribute)
 
@@ -69,7 +69,7 @@ class Attribute final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -80,7 +80,7 @@ class Attribute final : public IF_XmlSerializableObject
 
     private: // Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

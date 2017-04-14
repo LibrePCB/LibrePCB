@@ -114,7 +114,7 @@ HEADERS += \
     fileio/directorylock.h \
     fileio/filepath.h \
     fileio/fileutils.h \
-    fileio/if_xmlserializableobject.h \
+    fileio/serializableobject.h \
     fileio/smartfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \

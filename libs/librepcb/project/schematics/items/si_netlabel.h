@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/sgi_netlabel.h"
 
 /*****************************************************************************************
@@ -45,7 +45,7 @@ class NetSignal;
 /**
  * @brief The SI_NetLabel class
  */
-class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
+class SI_NetLabel final : public SI_Base, public SerializableObject
 {
         Q_OBJECT
 
@@ -72,7 +72,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Inherited from SI_Base
@@ -94,7 +94,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

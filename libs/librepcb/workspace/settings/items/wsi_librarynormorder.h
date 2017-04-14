@@ -66,7 +66,7 @@ class WSI_LibraryNormOrder final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -81,7 +81,7 @@ class WSI_LibraryNormOrder final : public WSI_Base
         void btnRemoveClicked() noexcept;
         void updateListWidgetItems() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

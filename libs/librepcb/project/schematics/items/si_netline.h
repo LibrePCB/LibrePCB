@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/sgi_netline.h"
 
 /*****************************************************************************************
@@ -44,7 +44,7 @@ class SI_NetPoint;
 /**
  * @brief The SI_NetLine class
  */
-class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
+class SI_NetLine final : public SI_Base, public SerializableObject
 {
         Q_OBJECT
 
@@ -74,7 +74,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
         void updateLine() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -92,7 +92,7 @@ class SI_NetLine final : public SI_Base, public IF_XmlSerializableObject
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

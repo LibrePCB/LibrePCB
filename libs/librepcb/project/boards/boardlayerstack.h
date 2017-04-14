@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/if_boardlayerprovider.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -43,7 +43,7 @@ class Board;
 /**
  * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
-class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
+class BoardLayerStack final : public QObject, public SerializableObject,
                               public IF_BoardLayerProvider
 {
         Q_OBJECT
@@ -69,7 +69,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -88,7 +88,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         void addLayer(int id) noexcept;
         void addLayer(BoardLayer& layer) noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

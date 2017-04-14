@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
 
@@ -50,7 +50,7 @@ class ErcMsg;
 /**
  * @brief The SI_NetPoint class
  */
-class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
+class SI_NetPoint final : public SI_Base, public SerializableObject,
                           public IF_ErcMsgProvider
 {
         Q_OBJECT
@@ -88,7 +88,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         void unregisterNetLine(SI_NetLine& netline) throw (Exception);
         void updateLines() const noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -108,7 +108,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

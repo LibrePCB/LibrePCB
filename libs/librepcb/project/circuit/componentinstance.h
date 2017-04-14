@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 
@@ -59,7 +59,7 @@ class ErcMsg;
  * @brief The ComponentInstance class
  */
 class ComponentInstance : public QObject, public IF_AttributeProvider,
-                          public IF_ErcMsgProvider, public IF_XmlSerializableObject
+                          public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
@@ -129,7 +129,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void registerDevice(BI_Device& device) throw (Exception);
         void unregisterDevice(BI_Device& device) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -151,7 +151,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
         void updateErcMessages() noexcept;

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -56,7 +56,7 @@ class ErcMsg;
  * @brief The ComponentSignalInstance class
  */
 class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
-                                      public IF_XmlSerializableObject
+                                      public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
@@ -109,7 +109,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void registerFootprintPad(BI_FootprintPad& pad) throw (Exception);
         void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -126,7 +126,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

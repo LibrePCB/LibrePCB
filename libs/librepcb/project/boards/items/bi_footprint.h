@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../graphicsitems/bgi_footprint.h"
 
@@ -54,7 +54,7 @@ class BI_FootprintPad;
  * @author ubruhin
  * @date 2015-05-24
  */
-class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
+class BI_Footprint final : public BI_Base, public SerializableObject,
                            public IF_AttributeProvider
 {
         Q_OBJECT
@@ -83,7 +83,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Helper Methods
@@ -121,7 +121,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         void init() throw (Exception);
         void updateGraphicsItemTransform() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -50,7 +50,7 @@ namespace workspace {
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_Base : public QObject, public IF_XmlSerializableObject
+class WSI_Base : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -67,7 +67,7 @@ class WSI_Base : public QObject, public IF_XmlSerializableObject
         virtual void apply() noexcept = 0;
         virtual void revert() noexcept = 0;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings

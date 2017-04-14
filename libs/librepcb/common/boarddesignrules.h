@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "fileio/if_xmlserializableobject.h"
+#include "fileio/serializableobject.h"
 #include "exceptions.h"
 #include "units/all_length_units.h"
 
@@ -43,7 +43,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-04-01
  */
-class BoardDesignRules final : public IF_XmlSerializableObject
+class BoardDesignRules final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(BoardDesignRules)
 
@@ -105,7 +105,7 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         // General Methods
         void restoreDefaults() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Helper Methods
@@ -121,7 +121,7 @@ class BoardDesignRules final : public IF_XmlSerializableObject
 
     private:
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

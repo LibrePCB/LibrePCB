@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "fileio/if_xmlserializableobject.h"
+#include "fileio/serializableobject.h"
 #include "units/all_length_units.h"
 
 /*****************************************************************************************
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The GridProperties class
  */
-class GridProperties final : public IF_XmlSerializableObject
+class GridProperties final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(GridProperties)
 
@@ -67,7 +67,7 @@ class GridProperties final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operators
@@ -79,7 +79,7 @@ class GridProperties final : public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

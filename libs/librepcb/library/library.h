@@ -85,9 +85,9 @@ class Library final : public LibraryBaseElement
 
         // Private Methods
         virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 
 

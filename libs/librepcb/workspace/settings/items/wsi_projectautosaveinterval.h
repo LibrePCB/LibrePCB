@@ -69,7 +69,7 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -80,7 +80,7 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
 
         void spinBoxValueChanged(int value) noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

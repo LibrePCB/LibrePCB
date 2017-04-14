@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ class BGI_Polygon;
  * @author ubruhin
  * @date 2016-01-12
  */
-class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
+class BI_Polygon final : public BI_Base, public SerializableObject,
                          public IF_AttributeProvider
 {
         Q_OBJECT
@@ -75,7 +75,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -107,7 +107,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

@@ -67,7 +67,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -79,7 +79,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         void lengthUnitComboBoxIndexChanged(int index) noexcept;
         void updateLengthUnitComboBoxIndex() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

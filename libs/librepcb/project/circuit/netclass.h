@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -47,7 +47,7 @@ class ErcMsg;
  * @brief The NetClass class
  */
 class NetClass final : public QObject, public IF_ErcMsgProvider,
-                       public IF_XmlSerializableObject
+                       public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(NetClass)
@@ -77,7 +77,7 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         void registerNetSignal(NetSignal& signal) throw (Exception);
         void unregisterNetSignal(NetSignal& signal) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
@@ -86,7 +86,7 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
 
     private:
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
         void updateErcMessages() noexcept;

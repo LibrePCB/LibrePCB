@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "../units/all_length_units.h"
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The PolygonSegment class
  */
-class PolygonSegment final : public IF_XmlSerializableObject
+class PolygonSegment final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(PolygonSegment)
 
@@ -64,7 +64,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -76,7 +76,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
@@ -92,7 +92,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
 /**
  * @brief The Polygon class
  */
-class Polygon final : public IF_XmlSerializableObject
+class Polygon final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Polygon)
 
@@ -138,7 +138,7 @@ class Polygon final : public IF_XmlSerializableObject
         void appendSegment(PolygonSegment& segment) noexcept;
         void removeSegment(PolygonSegment& segment) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Static Methods
@@ -156,7 +156,7 @@ class Polygon final : public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

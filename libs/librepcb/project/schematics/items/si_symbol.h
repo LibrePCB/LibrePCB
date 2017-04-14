@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
@@ -55,7 +55,7 @@ class SI_SymbolPin;
  * @author ubruhin
  * @date 2014-08-23
  */
-class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
+class SI_Symbol final : public SI_Base, public SerializableObject,
                         public IF_AttributeProvider
 {
         Q_OBJECT
@@ -89,7 +89,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -123,7 +123,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
 
         void init(const Uuid& symbVarItemUuid) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

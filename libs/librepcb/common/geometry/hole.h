@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../units/all_length_units.h"
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The Hole class
  */
-class Hole final : public IF_XmlSerializableObject
+class Hole final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Hole)
 
@@ -60,7 +60,7 @@ class Hole final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
@@ -73,7 +73,7 @@ class Hole final : public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

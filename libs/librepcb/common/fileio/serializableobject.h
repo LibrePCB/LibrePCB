@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H
-#define LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H
+#ifndef LIBREPCB_XMLSERIALIZABLEOBJECT_H
+#define LIBREPCB_XMLSERIALIZABLEOBJECT_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,36 +33,36 @@ namespace librepcb {
 class XmlDomElement;
 
 /*****************************************************************************************
- *  Class IF_XmlSerializableObject
+ *  Class SerializableObject
  ****************************************************************************************/
 
 /**
- * @brief The IF_XmlSerializableObject class provides an interface for classes which
- *          are serializable/deserializable from/to XML DOM elements
+ * @brief The SerializableObject class is the base class for all classes which need to be
+ *        serializable/deserializable from/to DOM elements
  *
  * @author ubruhin
  * @date 2015-02-06
  */
-class IF_XmlSerializableObject
+class SerializableObject
 {
     public:
 
         /**
          * @brief Default Constructor
          */
-        explicit IF_XmlSerializableObject() noexcept {}
+        explicit SerializableObject() noexcept {}
 
         /**
          * @brief Destructor
          */
-        virtual ~IF_XmlSerializableObject() noexcept {}
+        virtual ~SerializableObject() noexcept {}
 
 
         /**
          * @brief Serialize the object to a XML DOM element
          *
          * This is a pure virtual method which must be implemented in all subclasses of
-         * the interface #IF_XmlSerializableObject. The generated XML DOM element has
+         * the interface #SerializableObject. The generated XML DOM element has
          * always the format of the application's major version (it's not possible to
          * generate XML files of older versions).
          *
@@ -96,4 +96,4 @@ class IF_XmlSerializableObject
 
 } // namespace librepcb
 
-#endif // LIBREPCB_IF_XMLSERIALIZABLEOBJECT_H
+#endif // LIBREPCB_XMLSERIALIZABLEOBJECT_H

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 
@@ -68,7 +68,7 @@ class ComponentInstance;
  * @author ubruhin
  * @date 2014-07-03
  */
-class Circuit final : public QObject, public IF_XmlSerializableObject
+class Circuit final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -131,10 +131,10 @@ class Circuit final : public QObject, public IF_XmlSerializableObject
 
     private:
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 

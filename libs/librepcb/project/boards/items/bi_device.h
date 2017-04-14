@@ -28,7 +28,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/bgi_footprint.h"
 
 /*****************************************************************************************
@@ -57,7 +57,7 @@ class BI_Footprint;
  * @brief The BI_Device class
  */
 class BI_Device final : public BI_Base, public IF_AttributeProvider,
-                        public IF_ErcMsgProvider, public IF_XmlSerializableObject
+                        public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
@@ -94,7 +94,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+        /// @copydoc SerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Helper Methods
@@ -128,7 +128,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
                                               const Uuid& footprintUuid) throw (Exception);
         void init() throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc SerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
         void updateErcMessages() noexcept;
