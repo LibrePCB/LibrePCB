@@ -32,10 +32,14 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+Hole::Hole(const Hole& other) noexcept :
+    mPosition(other.mPosition), mDiameter(other.mDiameter)
+{
+}
+
 Hole::Hole(const Point& position, const Length& diameter) noexcept :
     mPosition(position), mDiameter(diameter)
 {
-    Q_ASSERT(diameter > 0);
 }
 
 Hole::Hole(const DomElement& domElement)
@@ -49,6 +53,7 @@ Hole::Hole(const DomElement& domElement)
 
 Hole::~Hole() noexcept
 {
+    Q_ASSERT(mObservers.isEmpty());
 }
 
 /*****************************************************************************************
@@ -57,18 +62,35 @@ Hole::~Hole() noexcept
 
 void Hole::setPosition(const Point& position) noexcept
 {
+    if (position == mPosition) return;
     mPosition = position;
+    foreach (IF_HoleObserver* object, mObservers) {
+        object->holePositionChanged(mPosition);
+    }
 }
 
 void Hole::setDiameter(const Length& diameter) noexcept
 {
-    Q_ASSERT(diameter > 0);
+    if (diameter == mDiameter) return;
     mDiameter = diameter;
+    foreach (IF_HoleObserver* object, mObservers) {
+        object->holeDiameterChanged(mDiameter);
+    }
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void Hole::registerObserver(IF_HoleObserver& object) const noexcept
+{
+    mObservers.insert(&object);
+}
+
+void Hole::unregisterObserver(IF_HoleObserver& object) const noexcept
+{
+    mObservers.remove(&object);
+}
 
 void Hole::serialize(DomElement& root) const
 {
@@ -77,6 +99,24 @@ void Hole::serialize(DomElement& root) const
     root.setAttribute("x", mPosition.getX());
     root.setAttribute("y", mPosition.getY());
     root.setAttribute("diameter", mDiameter);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool Hole::operator==(const Hole& rhs) const noexcept
+{
+    if (mPosition != rhs.mPosition)             return false;
+    if (mDiameter != rhs.mDiameter)             return false;
+    return true;
+}
+
+Hole& Hole::operator=(const Hole& rhs) noexcept
+{
+    mPosition = rhs.mPosition;
+    mDiameter = rhs.mDiameter;
+    return *this;
 }
 
 /*****************************************************************************************

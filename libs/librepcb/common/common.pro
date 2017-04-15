@@ -46,6 +46,7 @@ SOURCES += \
     dialogs/boarddesignrulesdialog.cpp \
     dialogs/ellipsepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
+    dialogs/holepropertiesdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
     fileio/domdocument.cpp \
@@ -57,6 +58,7 @@ SOURCES += \
     fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
     geometry/cmd/cmdellipseedit.cpp \
+    geometry/cmd/cmdholeedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/polygon.cpp \
@@ -115,6 +117,7 @@ HEADERS += \
     dialogs/boarddesignrulesdialog.h \
     dialogs/ellipsepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
+    dialogs/holepropertiesdialog.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
@@ -132,6 +135,7 @@ HEADERS += \
     fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
     geometry/cmd/cmdellipseedit.h \
+    geometry/cmd/cmdholeedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/polygon.h \
@@ -178,5 +182,6 @@ FORMS += \
     dialogs/boarddesignrulesdialog.ui \
     dialogs/ellipsepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \
+    dialogs/holepropertiesdialog.ui \
     widgets/alignmentselector.ui \
 
