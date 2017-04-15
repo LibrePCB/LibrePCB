@@ -54,15 +54,13 @@ template <typename LibElemType>
 void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept
 {
     QList<Polygon*> lines;
-    while (findLineRectangle(lines))
-    {
+    while (findLineRectangle(lines)) {
         QSet<LengthBase_t> xValues, yValues;
-        foreach (const Polygon* line, lines)
-        {
+        foreach (const Polygon* line, lines) {
             xValues.insert(line->getStartPos().getX().toNm());
-            xValues.insert(line->getSegment(0)->getEndPos().getX().toNm());
+            xValues.insert(line->getSegments().first()->getEndPos().getX().toNm());
             yValues.insert(line->getStartPos().getY().toNm());
-            yValues.insert(line->getSegment(0)->getEndPos().getY().toNm());
+            yValues.insert(line->getSegments().first()->getEndPos().getY().toNm());
         }
         if (xValues.count() != 2 || yValues.count() != 2) break;
         //Q_ASSERT(xValues.count() == 2 && yValues.count() == 2);
@@ -76,10 +74,10 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         Length lineWidth = lines.first()->getLineWidth();
 
         Polygon* rect = new Polygon(layerName, lineWidth, fillArea, isGrabArea, p1);
-        rect->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-        rect->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-        rect->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-        rect->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+        rect->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+        rect->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+        rect->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+        rect->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
         mLibraryElement.addPolygon(*rect);
 
         // remove all lines
@@ -97,31 +95,25 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
 {
     // find lines
     QList<Polygon*> linePolygons;
-    foreach (Polygon* polygon, mLibraryElement.getPolygons())
-    {
-        if (polygon->getSegmentCount() == 1)
+    foreach (Polygon* polygon, mLibraryElement.getPolygons()) {
+        if (polygon->getSegments().count() == 1)
             linePolygons.append(polygon);
     }
 
     // find rectangle
     Polygon* line;
     Length width;
-    for (int i=0; i<linePolygons.count(); i++)
-    {
+    for (int i=0; i<linePolygons.count(); i++) {
         lines.clear();
         Point p = linePolygons.at(i)->getStartPos();
-        if (findHLine(linePolygons, p, nullptr, &line))
-        {
+        if (findHLine(linePolygons, p, nullptr, &line)) {
             lines.append(line);
             width = line->getLineWidth();
-            if (findVLine(linePolygons, p, &width, &line))
-            {
+            if (findVLine(linePolygons, p, &width, &line)) {
                 lines.append(line);
-                if (findHLine(linePolygons, p, &width, &line))
-                {
+                if (findHLine(linePolygons, p, &width, &line)) {
                     lines.append(line);
-                    if (findVLine(linePolygons, p, &width, &line))
-                    {
+                    if (findVLine(linePolygons, p, &width, &line)) {
                         lines.append(line);
                         return true;
                     }
@@ -138,19 +130,15 @@ template <typename LibElemType>
 bool PolygonSimplifier<LibElemType>::findHLine(const QList<Polygon*>& lines, Point& p,
                                                Length* width, Polygon** line) noexcept
 {
-    foreach (Polygon* polygon, lines)
-    {
+    foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
-        Point p2 = polygon->getSegment(0)->getEndPos();
-        if ((p1 == p) && (p2.getY() == p.getY()))
-        {
+        Point p2 = polygon->getSegments().first()->getEndPos();
+        if ((p1 == p) && (p2.getY() == p.getY())) {
             *line = polygon;
             p = p2;
             return true;
-        }
-        else if ((p2 == p) && (p1.getY() == p.getY()))
-        {
+        } else if ((p2 == p) && (p1.getY() == p.getY())) {
             *line = polygon;
             p = p1;
             return true;
@@ -163,19 +151,15 @@ template <typename LibElemType>
 bool PolygonSimplifier<LibElemType>::findVLine(const QList<Polygon*>& lines, Point& p,
                                                Length* width, Polygon** line) noexcept
 {
-    foreach (Polygon* polygon, lines)
-    {
+    foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}
         Point p1 = polygon->getStartPos();
-        Point p2 = polygon->getSegment(0)->getEndPos();
-        if ((p1 == p) && (p2.getX() == p.getX()))
-        {
+        Point p2 = polygon->getSegments().first()->getEndPos();
+        if ((p1 == p) && (p2.getX() == p.getX())) {
             *line = polygon;
             p = p2;
             return true;
-        }
-        else if ((p2 == p) && (p1.getX() == p.getX()))
-        {
+        } else if ((p2 == p) && (p1.getX() == p.getX())) {
             *line = polygon;
             p = p1;
             return true;

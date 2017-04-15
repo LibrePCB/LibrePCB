@@ -25,13 +25,40 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include "../fileio/serializableobjectlist.h"
+#include "../fileio/cmd/cmdlistelementinsert.h"
+#include "../fileio/cmd/cmdlistelementremove.h"
+#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../units/all_length_units.h"
-#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class PolygonSegment;
+
+/*****************************************************************************************
+ *  Interface IF_PolygonSegmentObserver
+ ****************************************************************************************/
+
+/**
+ * @brief The IF_PolygonSegmentObserver class
+ *
+ * @author ubruhin
+ * @date 2017-01-05
+ */
+class IF_PolygonSegmentObserver
+{
+    public:
+        virtual void polygonSegmentEndPosChanged(const PolygonSegment& segment, const Point& newEndPos) noexcept = 0;
+        virtual void polygonSegmentAngleChanged(const PolygonSegment& segment, const Angle& newAngle) noexcept = 0;
+
+    protected:
+        IF_PolygonSegmentObserver() noexcept {}
+        virtual ~IF_PolygonSegmentObserver() noexcept {}
+        IF_PolygonSegmentObserver& operator=(const IF_PolygonSegmentObserver& rhs) = delete;
+};
 
 /*****************************************************************************************
  *  Class PolygonSegment
@@ -47,8 +74,9 @@ class PolygonSegment final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit PolygonSegment(const PolygonSegment& other) noexcept;
-        explicit PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
+        PolygonSegment() = delete;
+        PolygonSegment(const PolygonSegment& other) noexcept;
+        PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
         explicit PolygonSegment(const DomElement& domElement);
         ~PolygonSegment() noexcept {}
@@ -59,25 +87,68 @@ class PolygonSegment final : public SerializableObject
         Point calcArcCenter(const Point& startPos) const noexcept;
 
         // Setters
-        void setEndPos(const Point& pos) noexcept {mEndPos = pos;}
-        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
+        void setEndPos(const Point& pos) noexcept;
+        void setAngle(const Angle& angle) noexcept;
 
         // General Methods
+        void registerObserver(IF_PolygonSegmentObserver& object) const noexcept;
+        void unregisterObserver(IF_PolygonSegmentObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        PolygonSegment();
-        PolygonSegment& operator=(const PolygonSegment& rhs);
+        // Operator Overloadings
+        bool operator==(const PolygonSegment& rhs) const noexcept;
+        bool operator!=(const PolygonSegment& rhs) const noexcept {return !(*this == rhs);}
+        PolygonSegment& operator=(const PolygonSegment& rhs) noexcept;
 
 
-        // Attributes
+    private: // Data
         Point mEndPos;
         Angle mAngle;
+
+        // Misc
+        mutable QSet<IF_PolygonSegmentObserver*> mObservers; ///< A list of all observer objects
+};
+
+/*****************************************************************************************
+ *  Class PolygonSegmentList
+ ****************************************************************************************/
+
+struct PolygonSegmentListNameProvider {static constexpr const char* tagname = "segment";};
+using PolygonSegmentList = SerializableObjectList<PolygonSegment, PolygonSegmentListNameProvider>;
+using CmdPolygonSegmentInsert = CmdListElementInsert<PolygonSegment, PolygonSegmentListNameProvider>;
+using CmdPolygonSegmentRemove = CmdListElementRemove<PolygonSegment, PolygonSegmentListNameProvider>;
+using CmdPolygonSegmentsSwap = CmdListElementsSwap<PolygonSegment, PolygonSegmentListNameProvider>;
+
+/*****************************************************************************************
+ *  Interface IF_PolygonObserver
+ ****************************************************************************************/
+
+/**
+ * @brief The IF_PolygonObserver class
+ *
+ * @author ubruhin
+ * @date 2017-01-05
+ */
+class IF_PolygonObserver
+{
+    public:
+        virtual void polygonLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void polygonLineWidthChanged(const Length& newLineWidth) noexcept = 0;
+        virtual void polygonIsFilledChanged(bool newIsFilled) noexcept = 0;
+        virtual void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
+        virtual void polygonStartPosChanged(const Point& newStartPos) noexcept = 0;
+        virtual void polygonSegmentAdded(int newSegmentIndex) noexcept = 0;
+        virtual void polygonSegmentRemoved(int oldSegmentIndex) noexcept = 0;
+        virtual void polygonSegmentEndPosChanged(int segmentIndex, const Point& newEndPos) noexcept = 0;
+        virtual void polygonSegmentAngleChanged(int segmentIndex, const Angle& newAngle) noexcept = 0;
+
+    protected:
+        IF_PolygonObserver() noexcept {}
+        explicit IF_PolygonObserver(const IF_PolygonObserver& other) = delete;
+        virtual ~IF_PolygonObserver() noexcept {}
+        IF_PolygonObserver& operator=(const IF_PolygonObserver& rhs) = delete;
 };
 
 /*****************************************************************************************
@@ -87,16 +158,18 @@ class PolygonSegment final : public SerializableObject
 /**
  * @brief The Polygon class
  */
-class Polygon final : public SerializableObject
+class Polygon final : public SerializableObject, private PolygonSegmentList::IF_Observer,
+                      private IF_PolygonSegmentObserver
 {
         Q_DECLARE_TR_FUNCTIONS(Polygon)
 
     public:
 
         // Constructors / Destructor
+        Polygon() = delete;
         Polygon(const Polygon& other) noexcept;
-        Polygon(const QString& layerName, const Length& lineWidth, bool fill,
-                bool isGrabArea, const Point& startPos) noexcept;
+        Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
+                const Point& startPos) noexcept;
         explicit Polygon(const DomElement& domElement);
         ~Polygon() noexcept;
 
@@ -107,16 +180,15 @@ class Polygon final : public SerializableObject
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         bool isClosed() const noexcept;
         const Point& getStartPos() const noexcept {return mStartPos;}
-        const QList<PolygonSegment*>& getSegments() noexcept {return mSegments;}
-        int getSegmentCount() const noexcept {return mSegments.count();}
-        PolygonSegment* getSegment(int index) noexcept {return mSegments.value(index);}
-        const PolygonSegment* getSegment(int index) const noexcept {return mSegments.value(index);}
+        PolygonSegmentList& getSegments() noexcept {return mSegments;}
+        const PolygonSegmentList& getSegments() const noexcept {return mSegments;}
         Point getStartPointOfSegment(int index) const noexcept;
         Point calcCenterOfArcSegment(int index) const noexcept;
+        Point calcCenter() const noexcept;
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
-        void setLayerName(const QString& layerName) noexcept;
+        void setLayerName(const QString& name) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
@@ -129,41 +201,64 @@ class Polygon final : public SerializableObject
         Polygon rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
-        PolygonSegment* close() noexcept;
-        void appendSegment(PolygonSegment& segment) noexcept;
-        void removeSegment(PolygonSegment& segment);
+        bool close() noexcept;
+        void registerObserver(IF_PolygonObserver& object) const noexcept;
+        void unregisterObserver(IF_PolygonObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const Polygon& rhs) const noexcept;
+        bool operator!=(const Polygon& rhs) const noexcept {return !(*this == rhs);}
+        Polygon& operator=(const Polygon& rhs) noexcept;
+
         // Static Methods
-        static Polygon* createLine(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
-        static Polygon* createCurve(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
-        static Polygon* createRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
-        static Polygon* createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& center, const Length& width, const Length& height) noexcept;
+        static Polygon* createLine(const QString& layerName, const Length& lineWidth, bool fill,
+                                   bool isGrabArea, const Point& p1, const Point& p2) noexcept;
+        static Polygon* createCurve(const QString& layerName, const Length& lineWidth, bool fill,
+                                    bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
+        static Polygon* createRect(const QString& layerName, const Length& lineWidth, bool fill,
+                                   bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
+        static Polygon* createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill,
+                                           bool isGrabArea, const Point& center,
+                                           const Length& width, const Length& height) noexcept;
 
 
-    private:
-
-        // make some methods inaccessible...
-        Polygon() = delete;
-        Polygon& operator=(const Polygon& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
+        void listObjectAdded(const PolygonSegmentList& list, int newIndex,
+                             const std::shared_ptr<PolygonSegment>& ptr) noexcept override;
+        void listObjectRemoved(const PolygonSegmentList& list, int oldIndex,
+                               const std::shared_ptr<PolygonSegment>& ptr) noexcept override;
+        void polygonSegmentEndPosChanged(const PolygonSegment& segment, const Point& newEndPos) noexcept override;
+        void polygonSegmentAngleChanged(const PolygonSegment& segment, const Angle& newAngle) noexcept override;
         bool checkAttributesValidity() const noexcept;
 
 
-        // Polygon Attributes
+    private: // Data
         QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
         Point mStartPos;
-        QList<PolygonSegment*> mSegments;
+        PolygonSegmentList mSegments;
+
+        // Misc
+        mutable QSet<IF_PolygonObserver*> mObservers; ///< A list of all observer objects
 
         // Cached Attributes
         mutable QPainterPath mPainterPathPx;
 };
+
+/*****************************************************************************************
+ *  Class PolygonList
+ ****************************************************************************************/
+
+struct PolygonListNameProvider {static constexpr const char* tagname = "polygon";};
+using PolygonList = SerializableObjectList<Polygon, PolygonListNameProvider>;
+using CmdPolygonInsert = CmdListElementInsert<Polygon, PolygonListNameProvider>;
+using CmdPolygonRemove = CmdListElementRemove<Polygon, PolygonListNameProvider>;
+using CmdPolygonsSwap = CmdListElementsSwap<Polygon, PolygonListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

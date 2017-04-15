@@ -98,8 +98,8 @@ void GerberGenerator::drawPolygonOutline(const Polygon& polygon) noexcept
 {
     setCurrentAperture(mApertureList->setCircle(polygon.getLineWidth(), Length(0)));
     moveToPosition(polygon.getStartPos());
-    for (int i = 0; i < polygon.getSegmentCount(); ++i) {
-        const PolygonSegment* segment = polygon.getSegment(i); Q_ASSERT(segment);
+    for (int i = 0; i < polygon.getSegments().count(); ++i) {
+        std::shared_ptr<const PolygonSegment> segment = polygon.getSegments().at(i);
         if (segment->getAngle() == 0) {
             // linear segment
             linearInterpolateToPosition(segment->getEndPos());
@@ -128,8 +128,8 @@ void GerberGenerator::drawPolygonArea(const Polygon& polygon) noexcept
     setCurrentAperture(mApertureList->setCircle(Length(0), Length(0)));
     setRegionModeOn();
     moveToPosition(polygon.getStartPos());
-    for (int i = 0; i < polygon.getSegmentCount(); ++i) {
-        const PolygonSegment* segment = polygon.getSegment(i); Q_ASSERT(segment);
+    for (int i = 0; i < polygon.getSegments().count(); ++i) {
+        std::shared_ptr<const PolygonSegment> segment = polygon.getSegments().at(i);
         if (segment->getAngle() == 0) {
             // linear segment
             linearInterpolateToPosition(segment->getEndPos());

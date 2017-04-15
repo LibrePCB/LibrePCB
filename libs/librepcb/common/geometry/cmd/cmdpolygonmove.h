@@ -17,53 +17,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGONSIMPLIFIER_H
-#define POLYGONSIMPLIFIER_H
+#ifndef LIBREPCB_CMDPOLYGONMOVE_H
+#define LIBREPCB_CMDPOLYGONMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
-#include <librepcb/common/geometry/polygon.h>
+#include "../../undocommandgroup.h"
+#include "../../units/all_length_units.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
+class Polygon;
+class CmdPolygonEdit;
+class CmdPolygonSegmentEdit;
+
 /*****************************************************************************************
- *  Class PolygonSimplifier
+ *  Class CmdPolygonMove
  ****************************************************************************************/
 
 /**
- * @brief The PolygonSimplifier class
+ * @brief The CmdPolygonMove class
  */
-template <typename LibElemType>
-class PolygonSimplifier
+class CmdPolygonMove final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        PolygonSimplifier(LibElemType& libraryElement);
-        ~PolygonSimplifier();
+        CmdPolygonMove() = delete;
+        CmdPolygonMove(const CmdPolygonMove& other) = delete;
+        explicit CmdPolygonMove(Polygon& polygon) noexcept;
+        ~CmdPolygonMove() noexcept;
 
-        // General Methods
-        void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
+        // Setters
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-
-    private:
-
-        // Private Methods
-        bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
+        // Operator Overloadings
+        CmdPolygonMove& operator=(const CmdPolygonMove& rhs) = delete;
 
 
-        // Attributes
-        LibElemType& mLibraryElement;
+    private: // Data
+        CmdPolygonEdit* mPolygonEditCmd;
+        QList<CmdPolygonSegmentEdit*> mSegmentEditCmds;
 };
 
 /*****************************************************************************************
@@ -72,4 +72,4 @@ class PolygonSimplifier
 
 } // namespace librepcb
 
-#endif // POLYGONSIMPLIFIER_H
+#endif // LIBREPCB_CMDPOLYGONMOVE_H

@@ -17,53 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGONSIMPLIFIER_H
-#define POLYGONSIMPLIFIER_H
+#ifndef LIBREPCB_POLYGONPROPERTIESDIALOG_H
+#define LIBREPCB_POLYGONPROPERTIESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
-#include <librepcb/common/geometry/polygon.h>
+#include <QtWidgets>
+#include "../units/all_length_units.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
+class UndoStack;
+class Polygon;
+class GraphicsLayer;
+
+namespace Ui {
+class PolygonPropertiesDialog;
+}
+
 /*****************************************************************************************
- *  Class PolygonSimplifier
+ *  Class PolygonPropertiesDialog
  ****************************************************************************************/
 
 /**
- * @brief The PolygonSimplifier class
+ * @brief The PolygonPropertiesDialog class
  */
-template <typename LibElemType>
-class PolygonSimplifier
+class PolygonPropertiesDialog final : public QDialog
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        PolygonSimplifier(LibElemType& libraryElement);
-        ~PolygonSimplifier();
+        PolygonPropertiesDialog() = delete;
+        PolygonPropertiesDialog(const PolygonPropertiesDialog& other) = delete;
+        PolygonPropertiesDialog(Polygon& polygon, UndoStack& undoStack,
+                                QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
+        ~PolygonPropertiesDialog() noexcept;
 
-        // General Methods
-        void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
-
-
-    private:
-
-        // Private Methods
-        bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
+        // Operator Overloadings
+        PolygonPropertiesDialog& operator=(const PolygonPropertiesDialog& rhs) = delete;
 
 
-        // Attributes
-        LibElemType& mLibraryElement;
+    private: // GUI Events
+        void buttonBoxClicked(QAbstractButton* button) noexcept;
+
+    private: // Methods
+        bool applyChanges() noexcept;
+        void setSegmentsTableRow(int row, const Point& pos, const Angle& angle) noexcept;
+        Point getSegmentsTableRowPos(int row);
+        Angle getSegmentsTableRowAngle(int row);
+        void selectLayerNameInCombobox(const QString& name) noexcept;
+
+
+    private: // Data
+        Polygon& mPolygon;
+        UndoStack& mUndoStack;
+        QScopedPointer<Ui::PolygonPropertiesDialog> mUi;
 };
 
 /*****************************************************************************************
@@ -72,4 +87,4 @@ class PolygonSimplifier
 
 } // namespace librepcb
 
-#endif // POLYGONSIMPLIFIER_H
+#endif // LIBREPCB_POLYGONPROPERTIESDIALOG_H

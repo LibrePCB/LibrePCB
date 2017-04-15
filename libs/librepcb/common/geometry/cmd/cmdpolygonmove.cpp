@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGONSIMPLIFIER_H
-#define POLYGONSIMPLIFIER_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
-#include <librepcb/common/geometry/polygon.h>
+#include "cmdpolygonmove.h"
+#include "cmdpolygonedit.h"
+#include "cmdpolygonsegmentedit.h"
+#include "../polygon.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,43 +32,50 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class PolygonSimplifier
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The PolygonSimplifier class
- */
-template <typename LibElemType>
-class PolygonSimplifier
+CmdPolygonMove::CmdPolygonMove(Polygon& polygon) noexcept :
+    UndoCommandGroup(tr("Edit polygon"))
 {
-    public:
+    mPolygonEditCmd = new CmdPolygonEdit(polygon);
+    appendChild(mPolygonEditCmd);
 
-        // Constructors / Destructor
-        PolygonSimplifier(LibElemType& libraryElement);
-        ~PolygonSimplifier();
+    for (PolygonSegment& segment : polygon.getSegments()) {
+        CmdPolygonSegmentEdit* cmd = new CmdPolygonSegmentEdit(segment);
+        mSegmentEditCmds.append(cmd);
+        appendChild(cmd);
+    }
+}
 
-        // General Methods
-        void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
+CmdPolygonMove::~CmdPolygonMove() noexcept
+{
+}
 
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
 
-    private:
+void CmdPolygonMove::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mPolygonEditCmd->setDeltaToStartPos(deltaPos, immediate);
+    foreach (CmdPolygonSegmentEdit* cmd, mSegmentEditCmds) { Q_ASSERT(cmd);
+        cmd->setDeltaToStartPos(deltaPos, immediate);
+    }
+}
 
-        // Private Methods
-        bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
-
-
-        // Attributes
-        LibElemType& mLibraryElement;
-};
+void CmdPolygonMove::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mPolygonEditCmd->rotate(angle, center, immediate);
+    foreach (CmdPolygonSegmentEdit* cmd, mSegmentEditCmds) { Q_ASSERT(cmd);
+        cmd->rotate(angle, center, immediate);
+    }
+}
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
 } // namespace librepcb
-
-#endif // POLYGONSIMPLIFIER_H

@@ -47,6 +47,7 @@ SOURCES += \
     dialogs/ellipsepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
     dialogs/holepropertiesdialog.cpp \
+    dialogs/polygonpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
@@ -60,6 +61,9 @@ SOURCES += \
     fileio/smartxmlfile.cpp \
     geometry/cmd/cmdellipseedit.cpp \
     geometry/cmd/cmdholeedit.cpp \
+    geometry/cmd/cmdpolygonedit.cpp \
+    geometry/cmd/cmdpolygonmove.cpp \
+    geometry/cmd/cmdpolygonsegmentedit.cpp \
     geometry/cmd/cmdtextedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
@@ -120,6 +124,7 @@ HEADERS += \
     dialogs/ellipsepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
     dialogs/holepropertiesdialog.h \
+    dialogs/polygonpropertiesdialog.h \
     dialogs/textpropertiesdialog.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
@@ -139,6 +144,9 @@ HEADERS += \
     fileio/smartxmlfile.h \
     geometry/cmd/cmdellipseedit.h \
     geometry/cmd/cmdholeedit.h \
+    geometry/cmd/cmdpolygonedit.h \
+    geometry/cmd/cmdpolygonmove.h \
+    geometry/cmd/cmdpolygonsegmentedit.h \
     geometry/cmd/cmdtextedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
@@ -187,6 +195,7 @@ FORMS += \
     dialogs/ellipsepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \
     dialogs/holepropertiesdialog.ui \
+    dialogs/polygonpropertiesdialog.ui \
     dialogs/textpropertiesdialog.ui \
     widgets/alignmentselector.ui \
 

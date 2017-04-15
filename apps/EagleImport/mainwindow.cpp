@@ -274,10 +274,10 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
                 Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-                polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
                 symbol->addPolygon(*polygon);
             }
             else if (child->getName() == "polygon")
@@ -293,7 +293,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
-                        polygon->appendSegment(*new PolygonSegment(p, Angle::deg0()));
+                        polygon->getSegments().append(std::make_shared<PolygonSegment>(p, Angle::deg0()));
                 }
                 polygon->close();
                 symbol->addPolygon(*polygon);
@@ -440,10 +440,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
                 Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-                polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
                 footprint->addPolygon(*polygon);
             }
             else if (child->getName() == "polygon")
@@ -459,7 +459,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
-                        polygon->appendSegment(*new PolygonSegment(p, Angle::deg0()));
+                        polygon->getSegments().append(std::make_shared<PolygonSegment>(p, Angle::deg0()));
                 }
                 polygon->close();
                 footprint->addPolygon(*polygon);

@@ -17,53 +17,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGONSIMPLIFIER_H
-#define POLYGONSIMPLIFIER_H
+#ifndef LIBREPCB_CMDPOLYGONSEGMENTEDIT_H
+#define LIBREPCB_CMDPOLYGONSEGMENTEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-
 #include <QtCore>
-#include <librepcb/common/geometry/polygon.h>
+#include "../../undocommand.h"
+#include "../../units/all_length_units.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
+class PolygonSegment;
+
 /*****************************************************************************************
- *  Class PolygonSimplifier
+ *  Class CmdPolygonSegmentEdit
  ****************************************************************************************/
 
 /**
- * @brief The PolygonSimplifier class
+ * @brief The CmdPolygonSegmentEdit class
  */
-template <typename LibElemType>
-class PolygonSimplifier
+class CmdPolygonSegmentEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        PolygonSimplifier(LibElemType& libraryElement);
-        ~PolygonSimplifier();
+        CmdPolygonSegmentEdit() = delete;
+        CmdPolygonSegmentEdit(const CmdPolygonSegmentEdit& other) = delete;
+        explicit CmdPolygonSegmentEdit(PolygonSegment& segment) noexcept;
+        ~CmdPolygonSegmentEdit() noexcept;
 
-        // General Methods
-        void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
+        // Setters
+        void setEndPos(const Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void setAngle(const Angle& angle, bool immediate) noexcept;
+
+        // Operator Overloadings
+        CmdPolygonSegmentEdit& operator=(const CmdPolygonSegmentEdit& rhs) = delete;
 
 
     private:
 
         // Private Methods
-        bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       librepcb::Length* width, librepcb::Polygon** line) noexcept;
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
 
 
-        // Attributes
-        LibElemType& mLibraryElement;
+        // Private Member Variables
+
+        // Attributes from the constructor
+        PolygonSegment& mSegment;
+
+        // General Attributes
+        Point mOldEndPos;
+        Point mNewEndPos;
+        Angle mOldAngle;
+        Angle mNewAngle;
 };
 
 /*****************************************************************************************
@@ -72,4 +93,4 @@ class PolygonSimplifier
 
 } // namespace librepcb
 
-#endif // POLYGONSIMPLIFIER_H
+#endif // LIBREPCB_CMDPOLYGONSEGMENTEDIT_H
