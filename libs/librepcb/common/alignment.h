@@ -59,6 +59,7 @@ class HAlign final
         static HAlign right() noexcept {return HAlign(Qt::AlignRight);}
         HAlign& operator=(const HAlign& rhs) noexcept {mAlign = rhs.mAlign; return *this;}
         bool operator==(const HAlign& rhs) const noexcept {return mAlign == rhs.mAlign;}
+        bool operator!=(const HAlign& rhs) const noexcept {return mAlign != rhs.mAlign;}
 
     private:
 
@@ -95,6 +96,7 @@ class VAlign final
         static VAlign bottom() noexcept {return VAlign(Qt::AlignBottom);}
         VAlign& operator=(const VAlign& rhs) noexcept {mAlign = rhs.mAlign; return *this;}
         bool operator==(const VAlign& rhs) const noexcept {return mAlign == rhs.mAlign;}
+        bool operator!=(const VAlign& rhs) const noexcept {return mAlign != rhs.mAlign;}
 
     private:
 
@@ -135,6 +137,7 @@ class Alignment final
         Alignment mirroredV() const noexcept {return Alignment(*this).mirrorV();}
         Alignment& operator=(const Alignment& rhs) noexcept {mH = rhs.mH; mV = rhs.mV; return *this;}
         bool operator==(const Alignment& rhs) const noexcept {return mH == rhs.mH && mV == rhs.mV;}
+        bool operator!=(const Alignment& rhs) const noexcept {return mH != rhs.mH || mV != rhs.mV;}
 
     private:
 

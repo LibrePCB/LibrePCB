@@ -32,13 +32,17 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+Text::Text(const Text& other) noexcept :
+    mLayerName(other.mLayerName), mText(other.mText), mPosition(other.mPosition),
+    mRotation(other.mRotation), mHeight(other.mHeight), mAlign(other.mAlign)
+{
+}
+
 Text::Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
            const Length& height, const Alignment& align) noexcept :
     mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation), mHeight(height),
     mAlign(align)
 {
-    Q_ASSERT(!text.isEmpty());
-    Q_ASSERT(height > 0);
 }
 
 Text::Text(const DomElement& domElement)
@@ -72,41 +76,73 @@ Text::~Text() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Text::setLayerName(const QString& layerName) noexcept
+void Text::setLayerName(const QString& name) noexcept
 {
-    mLayerName = layerName;
+    if (name == mLayerName) return;
+    mLayerName = name;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textLayerNameChanged(mLayerName);
+    }
 }
 
 void Text::setText(const QString& text) noexcept
 {
-    Q_ASSERT(!text.isEmpty());
+    if (text == mText) return;
     mText = text;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textTextChanged(mText);
+    }
 }
 
 void Text::setPosition(const Point& pos) noexcept
 {
+    if (pos == mPosition) return;
     mPosition = pos;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textPositionChanged(mPosition);
+    }
 }
 
 void Text::setRotation(const Angle& rotation) noexcept
 {
+    if (rotation == mRotation) return;
     mRotation = rotation;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textRotationChanged(mRotation);
+    }
 }
 
 void Text::setHeight(const Length& height) noexcept
 {
-    Q_ASSERT(height > 0);
+    if (height == mHeight) return;
     mHeight = height;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textHeightChanged(mHeight);
+    }
 }
 
 void Text::setAlign(const Alignment& align) noexcept
 {
+    if (align == mAlign) return;
     mAlign = align;
+    foreach (IF_TextObserver* object, mObservers) {
+        object->textAlignChanged(mAlign);
+    }
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void Text::registerObserver(IF_TextObserver& object) const noexcept
+{
+    mObservers.insert(&object);
+}
+
+void Text::unregisterObserver(IF_TextObserver& object) const noexcept
+{
+    mObservers.remove(&object);
+}
 
 void Text::serialize(DomElement& root) const
 {
@@ -120,6 +156,32 @@ void Text::serialize(DomElement& root) const
     root.setAttribute("align_h", mAlign.getH());
     root.setAttribute("align_v", mAlign.getV());
     root.setText(mText);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool Text::operator==(const Text& rhs) const noexcept
+{
+    if (mLayerName != rhs.mLayerName)           return false;
+    if (mText != rhs.mText)                 return false;
+    if (mPosition != rhs.mPosition)         return false;
+    if (mRotation != rhs.mRotation)         return false;
+    if (mHeight != rhs.mHeight)             return false;
+    if (mAlign != rhs.mAlign)               return false;
+    return true;
+}
+
+Text& Text::operator=(const Text& rhs) noexcept
+{
+    mLayerName = rhs.mLayerName;
+    mText = rhs.mText;
+    mPosition = rhs.mPosition;
+    mRotation = rhs.mRotation;
+    mHeight = rhs.mHeight;
+    mAlign = rhs.mAlign;
+    return *this;
 }
 
 /*****************************************************************************************
