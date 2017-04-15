@@ -24,13 +24,45 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../fileio/serializableobjectlist.h"
+#include "../fileio/cmd/cmdlistelementinsert.h"
+#include "../fileio/cmd/cmdlistelementremove.h"
+#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../units/all_length_units.h"
-#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+/*****************************************************************************************
+ *  Interface IF_EllipseObserver
+ ****************************************************************************************/
+
+/**
+ * @brief The IF_EllipseObserver class
+ *
+ * @author ubruhin
+ * @date 2017-01-01
+ */
+class IF_EllipseObserver
+{
+    public:
+        virtual void ellipseLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void ellipseLineWidthChanged(const Length& newLineWidth) noexcept = 0;
+        virtual void ellipseIsFilledChanged(bool newIsFilled) noexcept = 0;
+        virtual void ellipseIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
+        virtual void ellipseCenterChanged(const Point& newCenter) noexcept = 0;
+        virtual void ellipseRadiusXChanged(const Length& newRadiusX) noexcept = 0;
+        virtual void ellipseRadiusYChanged(const Length& newRadiusY) noexcept = 0;
+        virtual void ellipseRotationChanged(const Angle& newRotation) noexcept = 0;
+
+    protected:
+        IF_EllipseObserver() noexcept {}
+        explicit IF_EllipseObserver(const IF_EllipseObserver& other) = delete;
+        virtual ~IF_EllipseObserver() noexcept {}
+        IF_EllipseObserver& operator=(const IF_EllipseObserver& rhs) = delete;
+};
 
 /*****************************************************************************************
  *  Class Ellipse
@@ -39,19 +71,20 @@ namespace librepcb {
 /**
  * @brief The Ellipse class
  */
-class Ellipse final : public SerializableObject
+class Ellipse : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Ellipse)
 
     public:
 
         // Constructors / Destructor
+        Ellipse() = delete;
         Ellipse(const Ellipse& other) noexcept;
-        Ellipse(const QString& layerName, const Length& lineWidth, bool fill,
-                bool isGrabArea, const Point& center, const Length& radiusX,
-                const Length& radiusY, const Angle& rotation) noexcept;
+        Ellipse(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
+                const Point& center, const Length& radiusX, const Length& radiusY,
+                const Angle& rotation) noexcept;
         explicit Ellipse(const DomElement& domElement);
-        ~Ellipse() noexcept;
+        virtual ~Ellipse() noexcept;
 
         // Getters
         const QString& getLayerName() const noexcept {return mLayerName;}
@@ -62,9 +95,10 @@ class Ellipse final : public SerializableObject
         const Length& getRadiusX() const noexcept {return mRadiusX;}
         const Length& getRadiusY() const noexcept {return mRadiusY;}
         const Angle& getRotation() const noexcept {return mRotation;}
+        bool isRound() const noexcept {return mRadiusX == mRadiusY;}
 
         // Setters
-        void setLayerName(const QString& layerName) noexcept;
+        void setLayerName(const QString& name) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
@@ -80,22 +114,23 @@ class Ellipse final : public SerializableObject
         Ellipse rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
+        void registerObserver(IF_EllipseObserver& object) const noexcept;
+        void unregisterObserver(IF_EllipseObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const Ellipse& rhs) const noexcept;
+        bool operator!=(const Ellipse& rhs) const noexcept {return !(*this == rhs);}
+        Ellipse& operator=(const Ellipse& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        Ellipse() = delete;
-        Ellipse& operator=(const Ellipse& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Polygon Attributes
+    private: // Data
         QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;
@@ -104,7 +139,20 @@ class Ellipse final : public SerializableObject
         Length mRadiusX;
         Length mRadiusY;
         Angle mRotation;
+
+        // Misc
+        mutable QSet<IF_EllipseObserver*> mObservers; ///< A list of all observer objects
 };
+
+/*****************************************************************************************
+ *  Class EllipseList
+ ****************************************************************************************/
+
+struct EllipseListNameProvider {static constexpr const char* tagname = "ellipse";};
+using EllipseList = SerializableObjectList<Ellipse, EllipseListNameProvider>;
+using CmdEllipseInsert = CmdListElementInsert<Ellipse, EllipseListNameProvider>;
+using CmdEllipseRemove = CmdListElementRemove<Ellipse, EllipseListNameProvider>;
+using CmdEllipsesSwap = CmdListElementsSwap<Ellipse, EllipseListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

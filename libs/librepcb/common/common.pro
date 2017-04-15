@@ -44,6 +44,7 @@ SOURCES += \
     cam/gerbergenerator.cpp \
     debug.cpp \
     dialogs/boarddesignrulesdialog.cpp \
+    dialogs/ellipsepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
@@ -55,6 +56,7 @@ SOURCES += \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
+    geometry/cmd/cmdellipseedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/polygon.cpp \
@@ -111,6 +113,7 @@ HEADERS += \
     cam/gerbergenerator.h \
     debug.h \
     dialogs/boarddesignrulesdialog.h \
+    dialogs/ellipsepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
@@ -128,6 +131,7 @@ HEADERS += \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
+    geometry/cmd/cmdellipseedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/polygon.h \
@@ -172,6 +176,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
+    dialogs/ellipsepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \
     widgets/alignmentselector.ui \
 
