@@ -6,6 +6,8 @@ notifications:
     on_success: change
     on_failure: change
 
+dist: trusty
+
 matrix:
   fast_finish: true
   include:
