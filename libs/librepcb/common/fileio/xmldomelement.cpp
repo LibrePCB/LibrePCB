@@ -826,27 +826,20 @@ XmlDomElement* XmlDomElement::getNextSibling(const QString& name, bool throwIfNo
  *  QDomElement Converter Methods
  ****************************************************************************************/
 
-QDomElement XmlDomElement::toQDomElement(QDomDocument& domDocument) const noexcept
+void XmlDomElement::writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noexcept
 {
-    QDomElement element = domDocument.createElement(mName);
-
-    if (hasChilds())
-    {
-        foreach (XmlDomElement* child, mChilds)
-            element.appendChild(child->toQDomElement(domDocument));
+    writer.writeStartElement(mName);
+    foreach (const QString& key, mAttributes.keys()) {
+        writer.writeAttribute(key, mAttributes[key]);
     }
-    else if (!mText.isNull())
-    {
-        QDomText textNode = domDocument.createTextNode(mText);
-        element.appendChild(textNode);
+    if (hasChilds()) {
+        foreach (XmlDomElement* child, mChilds) {
+            child->writeToQXmlStreamWriter(writer);
+        }
+    } else if (!mText.isNull()) {
+        writer.writeCharacters(mText);
     }
-
-    foreach (const QString& key, mAttributes.keys())
-    {
-        element.setAttribute(key, mAttributes.value(key));
-    }
-
-    return element;
+    writer.writeEndElement();
 }
 
 XmlDomElement* XmlDomElement::fromQDomElement(QDomElement domElement, XmlDomDocument* doc) noexcept
