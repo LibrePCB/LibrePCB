@@ -183,7 +183,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         QScopedPointer<AttributeList> mAttributes;
 
         /// @brief All signal instances (Key: component signal UUID)
-        QHash<Uuid, ComponentSignalInstance*> mSignals;
+        QMap<Uuid, ComponentSignalInstance*> mSignals;
 
 
         // Registered Elements

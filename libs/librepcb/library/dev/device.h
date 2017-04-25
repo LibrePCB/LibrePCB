@@ -63,7 +63,7 @@ class Device final : public LibraryElement
         void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
 
         // Pad-Signal-Map Methods
-        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        const QMap<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
         Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
         void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
         void removePadSignalMapping(const Uuid& pad) noexcept;
@@ -90,7 +90,7 @@ class Device final : public LibraryElement
         // Attributes
         Uuid mComponentUuid;
         Uuid mPackageUuid;
-        QHash<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
+        QMap<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
 /*****************************************************************************************
