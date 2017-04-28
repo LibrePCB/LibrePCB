@@ -200,6 +200,9 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @brief Get the date and time when the project was last modified
          *
          * @return The local date and time of last modification
+         *
+         * @todo    Dynamically determine the datetime of the last modification from
+         *          version control system, file attributes or something like that.
          */
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
 
@@ -239,15 +242,6 @@ class Project final : public QObject, public IF_AttributeProvider,
          * @undocmd{project#CmdProjectSetMetadata}
          */
         void setVersion(const QString& newVersion) noexcept;
-
-        /**
-         * @brief Set the date and time when the project was last modified
-         *
-         * @param newLastModified   The new last modified datetime
-         *
-         * @note This method is automatically called before saving the project.
-         */
-        void setLastModified(const QDateTime& newLastModified) noexcept;
 
         /**
          * @brief Set all project attributes

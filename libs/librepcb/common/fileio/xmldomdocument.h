@@ -118,7 +118,7 @@ class XmlDomDocument final
          *
          * @return The XML DOM tree which can be written into an XML file
          */
-        QByteArray toByteArray() const noexcept;
+        QByteArray toByteArray() const throw (Exception);
 
 
         // Operator Overloadings

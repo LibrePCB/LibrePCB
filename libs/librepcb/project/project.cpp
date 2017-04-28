@@ -182,19 +182,18 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // load project attributes
+        mLastModified = QDateTime::currentDateTime();
         if (create) {
             mName = mFilepath.getCompleteBasename();
             mAuthor = SystemInfo::getFullUsername();
             mVersion = "v1";
             mCreated = QDateTime::currentDateTime();
-            mLastModified = QDateTime::currentDateTime();
             mAttributes.reset(new AttributeList());
         } else {
             mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
             mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
             mVersion = root->getFirstChild("meta/version", true, true)->getText<QString>(false);
             mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
-            mLastModified = root->getFirstChild("meta/last_modified", true, true)->getText<QDateTime>(true);
             mAttributes.reset(new AttributeList(*root->getFirstChild("attributes", true))); // can throw
         }
 
@@ -295,14 +294,6 @@ void Project::setVersion(const QString& newVersion) noexcept
 {
     if (newVersion != mVersion) {
         mVersion = newVersion;
-        emit attributesChanged();
-    }
-}
-
-void Project::setLastModified(const QDateTime& newLastModified) noexcept
-{
-    if (newLastModified != mLastModified) {
-        mLastModified = newLastModified;
         emit attributesChanged();
     }
 }
@@ -628,7 +619,6 @@ XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
-    meta->appendTextChild("last_modified", mLastModified);
 
     // attributes
     root->appendChild(mAttributes->serializeToXmlDomElement());
@@ -672,7 +662,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.lpp project file
     try
     {
-        setLastModified(QDateTime::currentDateTime());
         XmlDomDocument doc(*serializeToXmlDomElement());
         mXmlFile->save(doc, toOriginal);
     }
@@ -728,6 +717,10 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // state of the project is no longer a restored backup but a properly saved project
     if (mIsRestored && success && toOriginal)
         mIsRestored = false;
+
+    // update the "last modified datetime" attribute of the project
+    mLastModified = QDateTime::currentDateTime();
+    emit attributesChanged();
 
     return success;
 }

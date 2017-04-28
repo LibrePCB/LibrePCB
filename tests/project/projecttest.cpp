@@ -128,6 +128,24 @@ TEST_F(ProjectTest, testSave)
     project.reset(new Project(mProjectFile, false));
 }
 
+TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave)
+{
+    // create new project
+    QScopedPointer<Project> project(Project::create(mProjectFile));
+    qint64 datetimeAfterCreating = project->getLastModified().toMSecsSinceEpoch();
+
+    // check if datetime has not changed
+    QThread::msleep(1000);
+    EXPECT_EQ(datetimeAfterCreating, project->getLastModified().toMSecsSinceEpoch());
+
+    // save project and verify that datetime has changed
+    QThread::msleep(1000);
+    project->save(true);
+    qint64 datetimeAfterSaving = project->getLastModified().toMSecsSinceEpoch();
+    EXPECT_NEAR(QDateTime::currentMSecsSinceEpoch(), datetimeAfterSaving, 1000); // +/- 1s
+    EXPECT_NE(datetimeAfterCreating, datetimeAfterSaving);
+}
+
 TEST_F(ProjectTest, testSettersGetters)
 {
     // create new project
@@ -137,23 +155,17 @@ TEST_F(ProjectTest, testSettersGetters)
     QString name = "test name 1234";
     QString author = "test author 1234";
     QString version = "test version 1234";
-    QDateTime lastModified = QDateTime::fromString("2013-04-13T12:43:52Z", Qt::ISODate);
     project->setName(name);
     project->setAuthor(author);
     project->setVersion(version);
-    project->setLastModified(lastModified);
 
     // get properties
     EXPECT_EQ(name, project->getName());
     EXPECT_EQ(author, project->getAuthor());
     EXPECT_EQ(version, project->getVersion());
-    EXPECT_EQ(lastModified, project->getLastModified());
 
     // save project
     project->save(true);
-
-    // the "last modified" attribute must be updated now
-    EXPECT_NE(lastModified, project->getLastModified());
 
     // close and re-open project (read-only)
     project.reset();
@@ -163,7 +175,6 @@ TEST_F(ProjectTest, testSettersGetters)
     EXPECT_EQ(name, project->getName());
     EXPECT_EQ(author, project->getAuthor());
     EXPECT_EQ(version, project->getVersion());
-    EXPECT_NE(lastModified, project->getLastModified()); // not equal!
 }
 
 /*****************************************************************************************

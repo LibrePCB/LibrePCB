@@ -415,16 +415,14 @@ class XmlDomElement final
                                       bool throwIfNotFound = false) const throw (Exception);
 
 
-        // QDomElement Converter Methods
+        // Conversion Methods
 
         /**
-         * @brief Construct a QDomElement object from this XmlDomElement (recursively)
+         * @brief Serialize this XmlDomElement into a QXmlStreamWriter (recursively)
          *
-         * @param domDocument   The DOM Document of the newly created QDomElement
-         *
-         * @return The created QDomElement (which is added to the specified DOM document)
+         * @param writer        The QXmlStreamWriter object to write into
          */
-        QDomElement toQDomElement(QDomDocument& domDocument) const noexcept;
+        void writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noexcept;
 
         /**
          * @brief Construct a XmlDomElement object from a QDomElement object (recursively)
@@ -481,7 +479,7 @@ class XmlDomElement final
         QString mName;              ///< the tag name of this element
         QString mText;              ///< the text of this element (only if there are no childs)
         QList<XmlDomElement*> mChilds;      ///< all child elements (only if there is no text)
-        QHash<QString, QString> mAttributes;///< all attributes of this element (key, value) in arbitrary order
+        QMap<QString, QString> mAttributes; ///< all attributes of this element (key, value) in alphabetical order
 };
 
 /*****************************************************************************************

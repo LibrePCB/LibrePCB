@@ -89,13 +89,18 @@ XmlDomElement& XmlDomDocument::getRoot(const QString& expectedName) const throw 
  *  General Methods
  ****************************************************************************************/
 
-QByteArray XmlDomDocument::toByteArray() const noexcept
+QByteArray XmlDomDocument::toByteArray() const throw (Exception)
 {
-    QDomDocument doc;
-    doc.implementation().setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
-    doc.setContent(QString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"));
-    doc.appendChild(mRootElement->toQDomElement(doc));
-    return doc.toByteArray(1); // indent only 1 space to save disk space
+    QByteArray data;
+    QXmlStreamWriter writer(&data);
+    writer.setAutoFormatting(true);
+    writer.setAutoFormattingIndent(1); // indent only 1 space to save disk space
+    writer.setCodec("UTF-8");
+    writer.writeStartDocument("1.0", true);
+    mRootElement->writeToQXmlStreamWriter(writer);
+    writer.writeEndDocument();
+    if (writer.hasError()) throw LogicError(__FILE__, __LINE__);
+    return data;
 }
 
 /*****************************************************************************************
