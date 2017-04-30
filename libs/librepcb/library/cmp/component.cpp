@@ -79,9 +79,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all signals
-        for (XmlDomElement* node = root.getFirstChild("signals/signal", true, false);
-             node; node = node->getNextSibling("signal"))
-        {
+        foreach (const XmlDomElement* node, root.getFirstChild("signals", true)->getChilds()) {
             ComponentSignal* signal = new ComponentSignal(*node);
             if (getSignalByUuid(signal->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
@@ -93,9 +91,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
 
         // Load all symbol variants
         XmlDomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
-        for (XmlDomElement* node = symbolVariantsNode->getFirstChild("variant", false);
-             node; node = node->getNextSibling("variant"))
-        {
+        foreach (const XmlDomElement* node, symbolVariantsNode->getChilds()) {
             ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
             if (getSymbolVariantByUuid(variant->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),

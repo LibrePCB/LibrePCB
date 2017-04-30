@@ -83,9 +83,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
 
             // Load all symbols
-            for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
-                 node; node = node->getNextSibling("symbol"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("symbols", true)->getChilds()) {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 if (getSymbolByUuid(symbol->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
@@ -96,9 +94,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
-                 node; node = node->getNextSibling("netpoint"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -109,9 +105,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
-                 node; node = node->getNextSibling("netline"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -122,9 +116,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlabels
-            for (XmlDomElement* node = root.getFirstChild("netlabels/netlabel", true, false);
-                 node; node = node->getNextSibling("netlabel"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netlabels", true)->getChilds()) {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),

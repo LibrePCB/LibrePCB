@@ -40,10 +40,8 @@ WSI_Repositories::WSI_Repositories(const QString& xmlTagName, XmlDomElement* xml
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("repository", false);
-             child; child = child->getNextSibling("repository", false))
-        {
-            mList.append(new Repository(*child)); // can throw
+        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+            mList.append(new Repository(*node)); // can throw
         }
     } else {
         // load defaults

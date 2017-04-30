@@ -40,10 +40,8 @@ WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("norm", false);
-             child; child = child->getNextSibling("norm", false))
-        {
-            mList.append(child->getText<QString>(false));
+        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+            mList.append(node->getText<QString>(false));
         }
     }
     mListTmp = mList;

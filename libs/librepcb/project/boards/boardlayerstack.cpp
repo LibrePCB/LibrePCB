@@ -51,9 +51,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) 
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // load all layers
-    for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
-         node; node = node->getNextSibling())
-    {
+    foreach (const XmlDomElement* node, domElement.getFirstChild("layers", true)->getChilds()) {
         QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
         if (!mLayers.contains(layer->getId())) {
             addLayer(*layer.take());

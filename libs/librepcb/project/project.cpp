@@ -207,9 +207,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         if (!create) {
             // Load all schematics
-            for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
-                 node; node = node->getNextSibling("schematic"))
-            {
+            foreach (const XmlDomElement* node, root->getFirstChild("schematics", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
@@ -217,9 +215,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
             // Load all boards
-            for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
-                 node; node = node->getNextSibling("board"))
-            {
+            foreach (const XmlDomElement* node, root->getFirstChild("boards", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);

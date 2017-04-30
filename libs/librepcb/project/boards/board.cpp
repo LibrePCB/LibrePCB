@@ -207,9 +207,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("board_design_rules", true)));
 
             // Load all device instances
-            for (XmlDomElement* node = root.getFirstChild("devices/device", true, false);
-                 node; node = node->getNextSibling("device"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("devices", true)->getChilds()) {
                 BI_Device* device = new BI_Device(*this, *node);
                 if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
@@ -220,9 +218,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all vias
-            for (XmlDomElement* node = root.getFirstChild("vias/via", true, false);
-                 node; node = node->getNextSibling("via"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("vias", true)->getChilds()) {
                 BI_Via* via = new BI_Via(*this, *node);
                 if (getViaByUuid(via->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, via->getUuid().toStr(),
@@ -233,9 +229,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
-                 node; node = node->getNextSibling("netpoint"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
                 BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -246,9 +240,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
-                 node; node = node->getNextSibling("netline"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
                 BI_NetLine* netline = new BI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -259,9 +251,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all polygons
-            for (XmlDomElement* node = root.getFirstChild("polygons/polygon", true, false);
-                 node; node = node->getNextSibling("polygon"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("polygons", true)->getChilds()) {
                 BI_Polygon* polygon = new BI_Polygon(*this, *node);
                 mPolygons.append(polygon);
             }

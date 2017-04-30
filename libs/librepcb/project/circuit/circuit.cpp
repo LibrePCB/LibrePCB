@@ -67,25 +67,19 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             // OK - XML file is open --> now load the whole circuit stuff
 
             // Load all netclasses
-            for (XmlDomElement* node = root.getFirstChild("netclasses/netclass", true, false);
-                 node; node = node->getNextSibling("netclass"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netclasses", true)->getChilds()) {
                 NetClass* netclass = new NetClass(*this, *node);
                 addNetClass(*netclass);
             }
 
             // Load all netsignals
-            for (XmlDomElement* node = root.getFirstChild("netsignals/netsignal", true, false);
-                 node; node = node->getNextSibling("netsignal"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("netsignals", true)->getChilds()) {
                 NetSignal* netsignal = new NetSignal(*this, *node);
                 addNetSignal(*netsignal);
             }
 
             // Load all component instances
-            for (XmlDomElement* node = root.getFirstChild("components/component", true, false);
-                 node; node = node->getNextSibling("component"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("components", true)->getChilds()) {
                 ComponentInstance* component = new ComponentInstance(*this, *node);
                 addComponentInstance(*component);
             }

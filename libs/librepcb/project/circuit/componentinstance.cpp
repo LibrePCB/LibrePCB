@@ -72,9 +72,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
 
     // load all signal instances
-    for (XmlDomElement* node = domElement.getFirstChild("signal_mapping/map", true, false);
-         node; node = node->getNextSibling("map"))
-    {
+    foreach (const XmlDomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),

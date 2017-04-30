@@ -206,8 +206,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
         ui->pbarElements->setMaximum(node->getChildCount());
 
         // Convert Elements
-        for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
-        {
+        foreach (XmlDomElement* child, node->getChilds()) {
             bool success;
             if (child->getName() == "symbol")
                 success = convertSymbol(outputSettings, filepath, child);
@@ -246,8 +245,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         // create symbol
         Symbol* symbol = new Symbol(uuid, Version("0.1"), "LibrePCB", name, desc, "");
 
-        for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
-        {
+        foreach (XmlDomElement* child, node->getChilds()) {
             if (child->getName() == "wire")
             {
                 int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
@@ -291,7 +289,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
                 Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
-                for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling()) {
+                foreach (XmlDomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
@@ -409,8 +407,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc, "");
         package->addFootprint(*footprint);
 
-        for (XmlDomElement* child = node->getFirstChild(); child; child = child->getNextSibling())
-        {
+        foreach (XmlDomElement* child, node->getChilds()) {
             if (child->getName() == "description")
             {
                 // nothing to do
@@ -458,7 +455,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
                 Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
-                for (XmlDomElement* vertex = child->getFirstChild(); vertex; vertex = vertex->getNextSibling()) {
+                foreach (XmlDomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
@@ -651,8 +648,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         }
 
         // symbol variant items
-        for (XmlDomElement* gate = node->getFirstChild("gates/*", true, true); gate; gate = gate->getNextSibling())
-        {
+        foreach (XmlDomElement* gate, node->getFirstChild("gates", true)->getChilds()) {
             QString gateName = gate->getAttribute<QString>("name", true);
             QString symbolName = gate->getAttribute<QString>("symbol", true);
             Uuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
@@ -682,8 +678,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         }
 
         // create devices
-        for (XmlDomElement* deviceNode = node->getFirstChild("devices/*", true, true); deviceNode; deviceNode = deviceNode->getNextSibling())
-        {
+        foreach (XmlDomElement* deviceNode, node->getFirstChild("devices", true)->getChilds()) {
             if (!deviceNode->hasAttribute("package")) continue;
 
             QString deviceName = deviceNode->getAttribute<QString>("name", false);

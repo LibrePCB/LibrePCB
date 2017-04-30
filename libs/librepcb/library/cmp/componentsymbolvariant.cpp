@@ -57,9 +57,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all symbol variant items
-        for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
-             node; node = node->getNextSibling("item"))
-        {
+        foreach (const XmlDomElement* node, domElement.getFirstChild("symbol_items", true)->getChilds()) {
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {

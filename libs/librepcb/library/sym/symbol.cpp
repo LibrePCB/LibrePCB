@@ -50,9 +50,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
         const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pins
-        for (XmlDomElement* node = root.getFirstChild("pins/pin", true, false);
-             node; node = node->getNextSibling("pin"))
-        {
+        foreach (const XmlDomElement* node, root.getFirstChild("pins", true)->getChilds()) {
             SymbolPin* pin = new SymbolPin(*node);
             if (mPins.contains(pin->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
@@ -63,9 +61,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
         }
 
         // Load all geometry elements
-        for (XmlDomElement* node = root.getFirstChild("geometry/*", true, false);
-             node; node = node->getNextSibling())
-        {
+        foreach (const XmlDomElement* node, root.getFirstChild("geometry", true)->getChilds()) {
             if (node->getName() == "polygon") {
                 mPolygons.append(new Polygon(*node));
             } else if (node->getName() == "text") {

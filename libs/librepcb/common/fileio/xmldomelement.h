@@ -57,7 +57,9 @@ class XmlDomDocument;
  *       We don't use method overloading because this way we don't need to include
  *       the header files for our own types (e.g. #Uuid, #Version, ...).
  *
- * @todo Use libxml2 instead of Qt's DOM classes.
+ * @todo Actually there is *very much* space for improvements ;)
+ *       For example: const correctness, exception safety, simplification, performance, ...
+ * @todo Maybe switch to a stream based concept like QXmlStreamReader and QXmlStreamWriter?
  * @todo Add more template instances (provide more type conversions from/to QString)
  *
  * @author ubruhin
@@ -227,6 +229,7 @@ class XmlDomElement final
 
 
         // Child Handling Methods
+        const QList<XmlDomElement*>& getChilds() const noexcept {return mChilds;}
 
         /**
          * @brief Check whether this element has childs or not

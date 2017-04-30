@@ -40,10 +40,8 @@ WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("locale", false);
-             child; child = child->getNextSibling("locale", false))
-        {
-            QLocale locale(child->getText<QString>(false));
+        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+            QLocale locale(node->getText<QString>(false));
             if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
                 mList.append(locale.name());
             }

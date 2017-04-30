@@ -56,9 +56,7 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all geometry elements
-        for (XmlDomElement* node = domElement.getFirstChild("geometry/*", true, false);
-             node; node = node->getNextSibling())
-        {
+        foreach (const XmlDomElement* node, domElement.getFirstChild("geometry", true)->getChilds()) {
             if (node->getName() == "polygon") {
                 mPolygons.append(new Polygon(*node));
             } else if (node->getName() == "ellipse") {

@@ -108,9 +108,7 @@ Polygon::Polygon(const XmlDomElement& domElement) throw (Exception)
     mStartPos.setY(domElement.getAttribute<Length>("start_y", true));
 
     // load all segments
-    for (const XmlDomElement* node = domElement.getFirstChild("segment", true);
-         node; node = node->getNextSibling("segment"))
-    {
+    foreach (const XmlDomElement* node, domElement.getChilds()) {
         mSegments.append(new PolygonSegment(*node));
     }
 

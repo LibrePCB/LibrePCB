@@ -56,9 +56,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
         mSuffix = domElement.getAttribute<QString>("suffix", false);
 
         // read pin signal map
-        for (XmlDomElement* node = domElement.getFirstChild("pin_signal_map/map", true, false);
-             node; node = node->getNextSibling("map"))
-        {
+        foreach (const XmlDomElement* node, domElement.getFirstChild("pin_signal_map", true)->getChilds()) {
             ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
             if (mPinSignalMap.contains(item->getPinUuid()))
             {

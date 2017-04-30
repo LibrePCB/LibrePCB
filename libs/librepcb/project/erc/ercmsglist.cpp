@@ -97,9 +97,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
         ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
-    for (XmlDomElement* node = root.getFirstChild("ignore/item", true, false);
-         node; node = node->getNextSibling("item"))
-    {
+    foreach (const XmlDomElement* node, root.getFirstChild("ignore", true)->getChilds()) {
         foreach (ErcMsg* ercMsg, mItems)
         {
             if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute<QString>("owner_class", false))

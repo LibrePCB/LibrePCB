@@ -62,16 +62,12 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
             // OK - XML file is open --> now load all settings
 
             // locale order
-            for (XmlDomElement* node = root.getFirstChild("locale_order/locale", true, false);
-                 node; node = node->getNextSibling("locale"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("locale_order", true)->getChilds()) {
                 mLocaleOrder.append(node->getText<QString>(true));
             }
 
             // norm order
-            for (XmlDomElement* node = root.getFirstChild("norm_order/norm", true, false);
-                 node; node = node->getNextSibling("norm"))
-            {
+            foreach (const XmlDomElement* node, root.getFirstChild("norm_order", true)->getChilds()) {
                 mNormOrder.append(node->getText<QString>(true));
             }
         }

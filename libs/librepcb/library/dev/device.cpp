@@ -50,9 +50,7 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception
     // load attributes
     mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
     mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
-    for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
-         node; node = node->getNextSibling("map"))
-    {
+    foreach (const XmlDomElement* node, root.getFirstChild("pad_signal_map", true)->getChilds()) {
         Uuid pad = node->getAttribute<Uuid>("pad", true);
         Uuid signal = node->getText<Uuid>(false);
         if (mPadSignalMap.contains(pad)) {

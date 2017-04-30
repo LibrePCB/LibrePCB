@@ -45,9 +45,7 @@ AttributeList::AttributeList(const AttributeList& other) noexcept
 
 AttributeList::AttributeList(const XmlDomElement& domElement) throw (Exception)
 {
-    for (XmlDomElement* node = domElement.getFirstChild("attribute", false);
-         node; node = node->getNextSibling("attribute"))
-    {
+    foreach (const XmlDomElement* node, domElement.getChilds()) {
         QSharedPointer<Attribute> attr = QSharedPointer<Attribute>::create(*node); // can throw
         if (value(attr->getKey())) {
             throw RuntimeError(__FILE__, __LINE__, attr->getKey(),
