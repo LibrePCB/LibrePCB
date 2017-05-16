@@ -571,7 +571,7 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
         else if (attrKey == QLatin1String("LAST_MODIFIED"))
             return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
         else if (mAttributes->contains(attrKey))
-            return value = mAttributes->value(attrKey)->getValueTr(true), true;
+            return value = mAttributes->find(attrKey)->getValueTr(true), true;
     }
 
     return false;

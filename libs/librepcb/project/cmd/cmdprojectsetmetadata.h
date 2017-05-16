@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/attributes/attributelist.h>
+#include <librepcb/common/attributes/attribute.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

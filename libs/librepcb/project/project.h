@@ -32,7 +32,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/attributes/attributelist.h>
+#include <librepcb/common/attributes/attribute.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

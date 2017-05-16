@@ -30,7 +30,6 @@ SOURCES += \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
-    attributes/attributelist.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -93,7 +92,6 @@ HEADERS += \
     alignment.h \
     application.h \
     attributes/attribute.h \
-    attributes/attributelist.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \

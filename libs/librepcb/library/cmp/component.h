@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/attributes/attributelist.h>
+#include <librepcb/common/attributes/attribute.h>
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"

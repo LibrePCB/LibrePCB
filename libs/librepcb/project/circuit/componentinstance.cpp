@@ -30,7 +30,6 @@
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include <librepcb/common/attributes/attributelist.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"
@@ -363,7 +362,7 @@ bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& 
         else if (attrKey == QLatin1String("VALUE"))
             return value = mValue, true;
         else if (mAttributes->contains(attrKey))
-            return value = mAttributes->value(attrKey)->getValueTr(true), true;
+            return value = mAttributes->find(attrKey)->getValueTr(true), true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))

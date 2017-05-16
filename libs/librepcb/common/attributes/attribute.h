@@ -24,7 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/serializableobject.h"
+#include "../fileio/serializableobjectlist.h"
+#include "../fileio/cmd/cmdlistelementinsert.h"
+#include "../fileio/cmd/cmdlistelementremove.h"
+#include "../fileio/cmd/cmdlistelementsswap.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -57,6 +60,7 @@ class Attribute final : public SerializableObject
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
+        const QString& getName() const noexcept {return mKey;} // required for SerializableObjectList
         const AttributeType& getType() const noexcept {return *mType;}
         const AttributeUnit* getUnit() const noexcept {return mUnit;}
         const QString& getValue() const noexcept {return mValue;}
@@ -88,6 +92,16 @@ class Attribute final : public SerializableObject
         QString mValue;
         const AttributeUnit* mUnit;
 };
+
+/*****************************************************************************************
+ *  Class AttributeList
+ ****************************************************************************************/
+
+struct AttributeListNameProvider {static constexpr const char* tagname = "attribute";};
+using AttributeList = SerializableObjectList<Attribute, AttributeListNameProvider>;
+using CmdAttributeInsert = CmdListElementInsert<Attribute, AttributeListNameProvider>;
+using CmdAttributeRemove = CmdListElementRemove<Attribute, AttributeListNameProvider>;
+using CmdAttributesSwap = CmdListElementsSwap<Attribute, AttributeListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

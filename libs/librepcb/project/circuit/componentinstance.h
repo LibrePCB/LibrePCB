@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
@@ -35,7 +36,6 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class AttributeList;
 class XmlDomElement;
 
 namespace library {
