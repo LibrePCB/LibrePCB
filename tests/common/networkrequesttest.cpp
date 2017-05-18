@@ -20,6 +20,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QtCore>
 #include <gtest/gtest.h>
 #include <librepcb/common/network/networkaccessmanager.h>
@@ -52,20 +53,19 @@ class NetworkRequestTest : public ::testing::TestWithParam<NetworkRequestTestDat
     public:
 
         static void SetUpTestCase() {
-            sDownloadManager = new NetworkAccessManager();
+            sDownloadManager = std::unique_ptr<NetworkAccessManager>(new NetworkAccessManager());
         }
 
         static void TearDownTestCase() {
-            delete sDownloadManager;
         }
 
     protected:
 
         NetworkRequestBaseSignalReceiver mSignalReceiver;
-        static NetworkAccessManager* sDownloadManager;
+        static std::unique_ptr<NetworkAccessManager> sDownloadManager;
 };
 
-NetworkAccessManager* NetworkRequestTest::sDownloadManager = nullptr;
+std::unique_ptr<NetworkAccessManager> NetworkRequestTest::sDownloadManager = nullptr;
 
 /*****************************************************************************************
  *  Test Methods
