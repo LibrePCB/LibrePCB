@@ -21,11 +21,19 @@ INCLUDEPATH += \
     ../../
 
 SOURCES += \
+    cmp/cmpsigpindisplaytypecombobox.cpp \
+    cmp/componenteditorwidget.cpp \
+    cmp/componentsignallisteditorwidget.cpp \
+    cmp/componentsymbolvarianteditdialog.cpp \
+    cmp/componentsymbolvariantitemlisteditorwidget.cpp \
+    cmp/componentsymbolvariantlistwidget.cpp \
+    cmp/compsymbvarpinsignalmapeditorwidget.cpp \
     cmpcat/componentcategoryeditorwidget.cpp \
     common/categorychooserdialog.cpp \
     common/categorylisteditorwidget.cpp \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
+    common/symbolchooserdialog.cpp \
     libraryeditor.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintlisteditorwidget.cpp \
@@ -72,11 +80,20 @@ SOURCES += \
     sym/symboleditorwidget.cpp \
 
 HEADERS += \
+    cmp/cmpsigpindisplaytypecombobox.h \
+    cmp/componenteditorwidget.h \
+    cmp/componentsignallisteditorwidget.h \
+    cmp/componentsymbolvarianteditdialog.h \
+    cmp/componentsymbolvariantitemlisteditorwidget.h \
+    cmp/componentsymbolvariantlistwidget.h \
+    cmp/compsymbvarpinsignalmapeditorwidget.h \
+    cmp/if_componentsymbolvarianteditorprovider.h \
     cmpcat/componentcategoryeditorwidget.h \
     common/categorychooserdialog.h \
     common/categorylisteditorwidget.h \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
+    common/symbolchooserdialog.h \
     libraryeditor.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintlisteditorwidget.h \
@@ -123,9 +140,12 @@ HEADERS += \
     sym/symboleditorwidget.h \
 
 FORMS += \
+    cmp/componenteditorwidget.ui \
+    cmp/componentsymbolvarianteditdialog.ui \
     cmpcat/componentcategoryeditorwidget.ui \
     common/categorychooserdialog.ui \
     common/categorylisteditorwidget.ui \
+    common/symbolchooserdialog.ui \
     libraryeditor.ui \
     pkg/dialogs/footprintpadpropertiesdialog.ui \
     pkg/packageeditorwidget.ui \
