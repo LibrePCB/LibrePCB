@@ -23,6 +23,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QtCore>
 #include "smartfile.h"
 
@@ -89,7 +90,7 @@ class SmartXmlFile final : public SmartFile
          * @return  A pointer to the created DOM tree. The caller takes the ownership of
          *          the DOM document.
          */
-        QSharedPointer<XmlDomDocument> parseFileAndBuildDomTree() const throw (Exception);
+        std::unique_ptr<XmlDomDocument> parseFileAndBuildDomTree() const throw (Exception);
 
         /**
          * @brief Write the XML DOM tree to the file system

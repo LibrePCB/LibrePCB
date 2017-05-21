@@ -56,7 +56,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings

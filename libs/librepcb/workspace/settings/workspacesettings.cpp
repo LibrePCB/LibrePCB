@@ -44,7 +44,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     qDebug("Load workspace settings...");
 
     // load settings if the settings file exists
-    QSharedPointer<XmlDomDocument> doc;
+    std::unique_ptr<XmlDomDocument> doc;
     if (mXmlFilePath.isExistingFile()) {
         SmartXmlFile file(mXmlFilePath, false, true);
         doc = file.parseFileAndBuildDomTree();
@@ -57,7 +57,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     }
 
     // load all settings
-    XmlDomElement* root = doc.data() ? &doc->getRoot() : nullptr;
+    XmlDomElement* root = doc.get() ? &doc->getRoot() : nullptr;
     loadSettingsItem(mAppLocale,                "app_locale",                   root);
     loadSettingsItem(mAppDefMeasUnits,          "app_default_meas_units",       root);
     loadSettingsItem(mProjectAutosaveInterval,  "project_autosave_interval",    root);

@@ -48,9 +48,9 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-QSharedPointer<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
+std::unique_ptr<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
 {
-    return QSharedPointer<XmlDomDocument>(
+    return std::unique_ptr<XmlDomDocument>(
         new XmlDomDocument(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath));
 }
 

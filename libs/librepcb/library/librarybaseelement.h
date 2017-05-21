@@ -23,6 +23,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QObject>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/filepath.h>
@@ -203,7 +204,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         // Members required for loading elements from file
         Version mLoadingElementFileVersion;
-        QSharedPointer<XmlDomDocument> mLoadingXmlFileDocument;
+        std::unique_ptr<XmlDomDocument> mLoadingXmlFileDocument;
 
         // General Library Element Attributes
         Uuid mUuid;

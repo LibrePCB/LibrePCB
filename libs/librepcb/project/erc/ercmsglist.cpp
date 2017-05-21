@@ -89,7 +89,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
-    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+    std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
     XmlDomElement& root = doc->getRoot();
 
     // reset all ignore attributes

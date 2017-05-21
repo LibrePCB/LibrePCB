@@ -85,7 +85,7 @@ void MainWindow::on_pushButton_2_clicked()
             // open the project xml file
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
             SmartXmlFile projectFile(projectFilepath, false, true);
-            QSharedPointer<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
+            std::unique_ptr<XmlDomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
 
             // remove the whole library directory
             FilePath libDir = projectFilepath.getParentDir().getPathTo("library");
@@ -93,7 +93,7 @@ void MainWindow::on_pushButton_2_clicked()
 
             // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
-            QSharedPointer<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
+            std::unique_ptr<XmlDomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
             foreach (XmlDomElement* node, circuitDoc->getRoot().getFirstChild("components", true)->getChilds()) {
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
                 FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
@@ -130,7 +130,7 @@ void MainWindow::on_pushButton_2_clicked()
             foreach (XmlDomElement* node, projectDoc->getRoot().getFirstChild("boards", true)->getChilds()) {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
-                QSharedPointer<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
+                std::unique_ptr<XmlDomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
                 foreach (XmlDomElement* node, boardDoc->getRoot().getFirstChild("devices", true)->getChilds()) {
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
                     FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);

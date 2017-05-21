@@ -189,7 +189,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // the board seems to be ready to open, so we will create all needed objects

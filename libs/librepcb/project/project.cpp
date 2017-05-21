@@ -170,7 +170,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // try to create/open the XML project file
-        QSharedPointer<XmlDomDocument> doc;
+        std::unique_ptr<XmlDomDocument> doc;
         XmlDomElement* root = nullptr;
         if (create) {
             mXmlFile.reset(SmartXmlFile::create(mFilepath));
