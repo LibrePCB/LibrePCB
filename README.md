@@ -4,6 +4,7 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jq41j14jlgs6rxsn/branch/master?svg=true)](https://ci.appveyor.com/project/librepcb/librepcb/branch/master)
 [![Flattr this project](https://img.shields.io/badge/flattr-donate-yellow.svg)](https://flattr.com/submit/auto?user_id=LibrePCB&url=https://github.com/LibrePCB/LibrePCB&title=LibrePCB&language=&tags=github&category=software)
 [![Donate with Bitcoin](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](https://blockchain.info/address/1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8)
+[![irc.freenode.net](https://img.shields.io/badge/IRC-%23librepcb-blue.svg)](https://webchat.freenode.net/?channels=#librepcb)
 
 
 ## About LibrePCB
