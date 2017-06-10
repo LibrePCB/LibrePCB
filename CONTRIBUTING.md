@@ -8,7 +8,8 @@
   [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
   Some issues even have a mentor assigned:
   [Browse all mentored issues](https://github.com/LibrePCB/LibrePCB/labels/mentored).
-- To contact us use either GitHub or join our [Telegram chat](https://telegram.me/LibrePCB_dev).
+- To contact us use either GitHub or join our [IRC](https://webchat.freenode.net/?channels=#librepcb)
+  or [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically synchronized).
 
 ## Getting Started
 
