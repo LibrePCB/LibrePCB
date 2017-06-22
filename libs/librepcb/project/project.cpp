@@ -27,7 +27,7 @@
 #include <librepcb/common/fileio/smarttextfile.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/smartversionfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/systeminfo.h>
 #include <librepcb/common/schematiclayer.h>
@@ -170,7 +170,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // try to create/open the XML project file
-        std::unique_ptr<XmlDomDocument> doc;
+        std::unique_ptr<DomDocument> doc;
         XmlDomElement* root = nullptr;
         if (create) {
             mXmlFile.reset(SmartXmlFile::create(mFilepath));
@@ -653,7 +653,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.lpp project file
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement("project"));
+        DomDocument doc(*serializeToXmlDomElement("project"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

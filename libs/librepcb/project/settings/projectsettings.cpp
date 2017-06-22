@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "projectsettings.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include "../project.h"
 
 /*****************************************************************************************
@@ -56,7 +56,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings
@@ -111,7 +111,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/settings.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement("settings"));
+        DomDocument doc(*serializeToXmlDomElement("settings"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

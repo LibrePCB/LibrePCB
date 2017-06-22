@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "smartxmlfile.h"
 #include "fileutils.h"
-#include "xmldomdocument.h"
+#include "domdocument.h"
 #include "xmldomelement.h"
 
 /*****************************************************************************************
@@ -48,13 +48,13 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-std::unique_ptr<XmlDomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
+std::unique_ptr<DomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
 {
-    return std::unique_ptr<XmlDomDocument>(
-        new XmlDomDocument(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath));
+    return std::unique_ptr<DomDocument>(
+        new DomDocument(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath));
 }
 
-void SmartXmlFile::save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception)
+void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal) throw (Exception)
 {
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     FileUtils::writeFile(filepath, domDocument.toByteArray());

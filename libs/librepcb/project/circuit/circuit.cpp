@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -61,7 +61,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load the whole circuit stuff
@@ -365,7 +365,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/circuit.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement("circuit"));
+        DomDocument doc(*serializeToXmlDomElement("circuit"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

@@ -24,7 +24,7 @@
 #include "librarybaseelement.h"
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/application.h>
 
@@ -178,7 +178,7 @@ void LibraryBaseElement::save() throw (Exception)
     // save xml file
     FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
     QScopedPointer<XmlDomElement> root(serializeToXmlDomElement(mLongElementName));
-    QScopedPointer<XmlDomDocument> doc(new XmlDomDocument(*root.take()));
+    QScopedPointer<DomDocument> doc(new DomDocument(*root.take()));
     QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(xmlFilePath));
     xmlFile->save(*doc, true);
 

@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "xmldomelement.h"
-#include "xmldomdocument.h"
+#include "domdocument.h"
 #include "../units/all_length_units.h"
 #include "../uuid.h"
 #include "../version.h"
@@ -44,7 +44,7 @@ XmlDomElement::XmlDomElement(const QString& name, const QString& text) noexcept 
     Q_ASSERT(isValidXmlTagName(mName) == true);
 }
 
-XmlDomElement::XmlDomElement(QDomElement domElement, XmlDomElement* parent, XmlDomDocument* doc) noexcept :
+XmlDomElement::XmlDomElement(QDomElement domElement, XmlDomElement* parent, DomDocument* doc) noexcept :
     mDocument(doc), mParent(parent), mName(domElement.tagName()), mText()
 {
     Q_ASSERT(isValidXmlTagName(mName) == true);
@@ -76,7 +76,7 @@ XmlDomElement::~XmlDomElement() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomDocument* XmlDomElement::getDocument(bool docOfTree) const noexcept
+DomDocument* XmlDomElement::getDocument(bool docOfTree) const noexcept
 {
     if (mParent && docOfTree)
         return mParent->getDocument(docOfTree);
@@ -84,7 +84,7 @@ XmlDomDocument* XmlDomElement::getDocument(bool docOfTree) const noexcept
         return mDocument;
 }
 
-void XmlDomElement::setDocument(XmlDomDocument* doc) noexcept
+void XmlDomElement::setDocument(DomDocument* doc) noexcept
 {
     Q_ASSERT((mParent == nullptr) || (doc == nullptr));
     mDocument = doc;
@@ -92,7 +92,7 @@ void XmlDomElement::setDocument(XmlDomDocument* doc) noexcept
 
 FilePath XmlDomElement::getDocFilePath() const noexcept
 {
-    XmlDomDocument* doc = getDocument(true);
+    DomDocument* doc = getDocument(true);
     if (doc)
         return doc->getFilePath();
     else
@@ -845,7 +845,7 @@ void XmlDomElement::writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noex
     writer.writeEndElement();
 }
 
-XmlDomElement* XmlDomElement::fromQDomElement(QDomElement domElement, XmlDomDocument* doc) noexcept
+XmlDomElement* XmlDomElement::fromQDomElement(QDomElement domElement, DomDocument* doc) noexcept
 {
     return new XmlDomElement(domElement, nullptr, doc);
 }

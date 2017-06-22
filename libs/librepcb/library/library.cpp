@@ -23,7 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "library.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"

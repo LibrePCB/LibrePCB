@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_XMLDOMDOCUMENT_H
-#define LIBREPCB_XMLDOMDOCUMENT_H
+#ifndef LIBREPCB_DOMDOCUMENT_H
+#define LIBREPCB_DOMDOCUMENT_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,28 +36,24 @@ namespace librepcb {
 class XmlDomElement;
 
 /*****************************************************************************************
- *  Class XmlDomDocument
+ *  Class DomDocument
  ****************************************************************************************/
 
 /**
- * @brief The XmlDomDocument class represents a XML DOM document with the whole DOM tree
- *
- * @todo Use libxml2 instead of Qt's DOM classes
- * @todo Use XSD schema files to validate the opened XML file (with libxml2)
- * @todo Save the DOM document as canonical XML to file (with libxml2 c14n)
+ * @brief The DomDocument class represents a DOM document with the whole DOM tree
  *
  * @author ubruhin
  * @date 2015-02-01
  */
-class XmlDomDocument final
+class DomDocument final
 {
-        Q_DECLARE_TR_FUNCTIONS(XmlDomDocument)
+        Q_DECLARE_TR_FUNCTIONS(DomDocument)
 
     public:
 
         // Constructors / Destructor
-        XmlDomDocument() = delete;
-        XmlDomDocument(const XmlDomDocument& other) = delete;
+        DomDocument() = delete;
+        DomDocument(const DomDocument& other) = delete;
 
         /**
          * @brief Constructor to create a new DOM document with a root element
@@ -66,22 +62,22 @@ class XmlDomDocument final
          *                          The document will take the ownership over the root
          *                          element object!
          */
-        explicit XmlDomDocument(XmlDomElement& root) noexcept;
+        explicit DomDocument(XmlDomElement& root) noexcept;
 
         /**
-         * @brief Constructor to create the whole DOM tree from the content of a XML file
+         * @brief Constructor to create the whole DOM tree from the content of a file
          *
-         * @param xmlFileContent    The content of the XML file to load
-         * @param filepath          The filepath of the XML file (needed for the exceptions)
+         * @param fileContent       The content of the file to load
+         * @param filepath          The filepath of the file (needed for the exceptions)
          *
-         * @throw Exception         If parsing the XML file has failed.
+         * @throw Exception         If parsing the file has failed.
          */
-        explicit XmlDomDocument(const QByteArray& xmlFileContent, const FilePath& filepath) throw (Exception);
+        explicit DomDocument(const QByteArray& fileContent, const FilePath& filepath) throw (Exception);
 
         /**
          * @brief Destructor (destroys the whole DOM tree)
          */
-        ~XmlDomDocument() noexcept;
+        ~DomDocument() noexcept;
 
 
         // Getters
@@ -94,14 +90,14 @@ class XmlDomDocument final
         const FilePath& getFilePath() const noexcept {return mFilePath;}
 
         /**
-         * @brief Get the root XML DOM element
+         * @brief Get the root DOM element
          *
          * @return The root element of the document
          */
         XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
 
         /**
-         * @brief Get the root XML DOM element and check it's tag name
+         * @brief Get the root DOM element and check it's tag name
          *
          * @param expectedName  The expected name of the root element. If it differs,
          *                      an exception will be thrown.
@@ -114,15 +110,15 @@ class XmlDomDocument final
         // General Methods
 
         /**
-         * @brief Export the whole DOM tree as a QByteArray to write back to the XML file
+         * @brief Export the whole DOM tree as a QByteArray to write back to the file
          *
-         * @return The XML DOM tree which can be written into an XML file
+         * @return The DOM tree which can be written into a file
          */
         QByteArray toByteArray() const throw (Exception);
 
 
         // Operator Overloadings
-        XmlDomDocument& operator=(const XmlDomDocument& rhs) = delete;
+        DomDocument& operator=(const DomDocument& rhs) = delete;
 
 
     private:
@@ -138,4 +134,4 @@ class XmlDomDocument final
 
 } // namespace librepcb
 
-#endif // LIBREPCB_XMLDOMDOCUMENT_H
+#endif // LIBREPCB_DOMDOCUMENT_H

@@ -3,7 +3,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/pkg/footprint.h>
@@ -184,7 +184,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
     {
         // Check input file and read XML content
         SmartXmlFile file(filepath, false, true);
-        std::unique_ptr<XmlDomDocument> doc = file.parseFileAndBuildDomTree();
+        std::unique_ptr<DomDocument> doc = file.parseFileAndBuildDomTree();
         XmlDomElement* node = doc->getRoot().getFirstChild("drawing/library", true, true);
 
         switch (type)

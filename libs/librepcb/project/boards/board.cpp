@@ -24,7 +24,7 @@
 #include <QtWidgets>
 #include "board.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/boardlayer.h>
@@ -189,7 +189,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // the board seems to be ready to open, so we will create all needed objects
@@ -793,7 +793,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement("board"));
+            DomDocument doc(*serializeToXmlDomElement("board"));
             mXmlFile->save(doc, toOriginal);
         }
         else

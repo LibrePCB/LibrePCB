@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "schematic.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "../project.h"
 #include <librepcb/library/sym/symbolpin.h>
@@ -71,7 +71,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
             XmlDomElement& root = doc->getRoot();
 
             // the schematic seems to be ready to open, so we will create all needed objects
@@ -585,7 +585,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement("schematic"));
+            DomDocument doc(*serializeToXmlDomElement("schematic"));
             mXmlFile->save(doc, toOriginal);
         }
         else

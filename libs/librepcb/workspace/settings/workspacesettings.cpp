@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
@@ -44,7 +44,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     qDebug("Load workspace settings...");
 
     // load settings if the settings file exists
-    std::unique_ptr<XmlDomDocument> doc;
+    std::unique_ptr<DomDocument> doc;
     if (mXmlFilePath.isExistingFile()) {
         SmartXmlFile file(mXmlFilePath, false, true);
         doc = file.parseFileAndBuildDomTree();
@@ -130,7 +130,7 @@ void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QStrin
 
 void WorkspaceSettings::saveToFile() const throw (Exception)
 {
-    XmlDomDocument doc(*serializeToXmlDomElement("workspace_settings"));
+    DomDocument doc(*serializeToXmlDomElement("workspace_settings"));
 
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
     file->save(doc, true); // can throw

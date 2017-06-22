@@ -26,7 +26,7 @@
 #include "if_ercmsgprovider.h"
 #include "../project.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -89,7 +89,7 @@ void ErcMsgList::restoreIgnoreState() noexcept
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
-    std::unique_ptr<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+    std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
     XmlDomElement& root = doc->getRoot();
 
     // reset all ignore attributes
@@ -117,7 +117,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/erc.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement("erc"));
+        DomDocument doc(*serializeToXmlDomElement("erc"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

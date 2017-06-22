@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "device.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace

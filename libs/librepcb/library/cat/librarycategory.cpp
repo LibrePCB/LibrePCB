@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarycategory.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace

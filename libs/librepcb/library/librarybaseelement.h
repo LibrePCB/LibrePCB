@@ -35,7 +35,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomDocument;
+class DomDocument;
 class XmlDomElement;
 
 namespace library {
@@ -204,7 +204,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         // Members required for loading elements from file
         Version mLoadingElementFileVersion;
-        std::unique_ptr<XmlDomDocument> mLoadingXmlFileDocument;
+        std::unique_ptr<DomDocument> mLoadingXmlFileDocument;
 
         // General Library Element Attributes
         Uuid mUuid;

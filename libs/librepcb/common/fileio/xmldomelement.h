@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomDocument;
+class DomDocument;
 
 /*****************************************************************************************
  *  Class XmlDomElement
@@ -95,21 +95,21 @@ class XmlDomElement final
          * @param docOfTree     If true and this element is not the root element, this
          *                      method will try to return the document of the whole tree.
          *
-         * @retval XmlDomDocument*  A pointer to the DOM document of this DOM element.
+         * @retval DomDocument*  A pointer to the DOM document of this DOM element.
          * @retval nullptr          If "docOfTree == false" and this element has no
          *                          document or is not the root element in the document.
          * @retval nullptr          If the whole DOM tree of this element has no document.
          */
-        XmlDomDocument* getDocument(bool docOfTree) const noexcept;
+        DomDocument* getDocument(bool docOfTree) const noexcept;
 
         /**
          * @brief Set the document of this element
          *
-         * @warning This method should be called only from class #XmlDomDocument!
+         * @warning This method should be called only from class #DomDocument!
          *
          * @param doc   The document or nullptr
          */
-        void setDocument(XmlDomDocument* doc) noexcept;
+        void setDocument(DomDocument* doc) noexcept;
 
         /**
          * @brief Get the filepath of the DOM documents XML file (if available)
@@ -436,7 +436,7 @@ class XmlDomElement final
          *
          * @return The created XmlDomElement (the caller takes the ownership!)
          */
-        static XmlDomElement* fromQDomElement(QDomElement domElement, XmlDomDocument* doc = nullptr) noexcept;
+        static XmlDomElement* fromQDomElement(QDomElement domElement, DomDocument* doc = nullptr) noexcept;
 
 
     private:
@@ -458,7 +458,7 @@ class XmlDomElement final
          *                      needed for the root element)
          */
         explicit XmlDomElement(QDomElement domElement, XmlDomElement* parent = nullptr,
-                               XmlDomDocument* doc = nullptr) noexcept;
+                               DomDocument* doc = nullptr) noexcept;
 
         /**
          * @brief Check if a QString represents a valid XML tag name for elements and attributes
@@ -477,7 +477,7 @@ class XmlDomElement final
 
 
         // Attributes
-        XmlDomDocument* mDocument;  ///< the DOM document of the tree (only needed in the root node, otherwise nullptr)
+        DomDocument* mDocument;  ///< the DOM document of the tree (only needed in the root node, otherwise nullptr)
         XmlDomElement* mParent;     ///< the parent element (if available, otherwise nullptr)
         QString mName;              ///< the tag name of this element
         QString mText;              ///< the text of this element (only if there are no childs)
