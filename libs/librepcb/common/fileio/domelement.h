@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_XMLDOMELEMENT_H
-#define LIBREPCB_XMLDOMELEMENT_H
+#ifndef LIBREPCB_DOMELEMENT_H
+#define LIBREPCB_DOMELEMENT_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,13 +36,13 @@ namespace librepcb {
 class DomDocument;
 
 /*****************************************************************************************
- *  Class XmlDomElement
+ *  Class DomElement
  ****************************************************************************************/
 
 /**
- * @brief The XmlDomElement class represents one element in a XML DOM tree
+ * @brief The DomElement class represents one element in a DOM tree
  *
- * Each #XmlDomElement represents either a text element or an element with childs.
+ * Each #DomElement represents either a text element or an element with childs.
  * Example:
  * @code{.xml}
  * <root_element>                   <!-- element with childs (cannot include text) -->
@@ -65,9 +65,9 @@ class DomDocument;
  * @author ubruhin
  * @date 2015-02-01
  */
-class XmlDomElement final
+class DomElement final
 {
-        Q_DECLARE_TR_FUNCTIONS(XmlDomElement)
+        Q_DECLARE_TR_FUNCTIONS(DomElement)
 
     public:
 
@@ -79,12 +79,12 @@ class XmlDomElement final
          * @param name      The tag name of the element
          * @param text      The text if a text element should be created
          */
-        explicit XmlDomElement(const QString& name, const QString& text = QString()) noexcept;
+        explicit DomElement(const QString& name, const QString& text = QString()) noexcept;
 
         /**
          * @brief Destructor (destroys all child elements)
          */
-        ~XmlDomElement() noexcept;
+        ~DomElement() noexcept;
 
 
         // General Methods
@@ -112,9 +112,9 @@ class XmlDomElement final
         void setDocument(DomDocument* doc) noexcept;
 
         /**
-         * @brief Get the filepath of the DOM documents XML file (if available)
+         * @brief Get the filepath of the DOM documents file (if available)
          *
-         * @return The filepath of the documents XML file (invalid if no document available)
+         * @return The filepath of the documents file (invalid if no document available)
          *
          * @note If no document is available or the document is not saved to disc (newly
          *       created document), this method will return an invalid #FilePath object!
@@ -124,10 +124,10 @@ class XmlDomElement final
         /**
          * @brief Get the parent element
          *
-         * @retval XmlDomElement*   Pointer to the parent element
+         * @retval DomElement*   Pointer to the parent element
          * @retval nullptr          If this element has no parent
          */
-        XmlDomElement* getParent() const noexcept {return mParent;}
+        DomElement* getParent() const noexcept {return mParent;}
 
         /**
          * @brief Get the tag name of this element
@@ -139,9 +139,9 @@ class XmlDomElement final
         /**
          * @brief Set the tag name of this element
          *
-         * @param name  The new name (see #isValidXmlTagName() for allowed characters)
+         * @param name  The new name (see #isValidTagName() for allowed characters)
          */
-        void setName(const QString& name) noexcept {Q_ASSERT(isValidXmlTagName(name)); mName = name;}
+        void setName(const QString& name) noexcept {Q_ASSERT(isValidTagName(name)); mName = name;}
 
 
         // Text Handling Methods
@@ -190,7 +190,7 @@ class XmlDomElement final
          *                  bool, const char*, QString, QColor, QUrl, #Uuid, #LengthUnit,
          *                  #Length, #Angle, #HAlign, #VAlign (tbc)
          *
-         * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
+         * @param name      The tag name (see #isValidTagName() for allowed characters)
          * @param value     The attribute value
          */
         template <typename T>
@@ -199,7 +199,7 @@ class XmlDomElement final
         /**
          * @brief Check whether this element has a specific attribute or not
          *
-         * @param name  The tag name (see #isValidXmlTagName() for allowed characters)
+         * @param name  The tag name (see #isValidTagName() for allowed characters)
          *
          * @retval true     If the attribute exists
          * @retval false    If the attribute does not exist
@@ -213,7 +213,7 @@ class XmlDomElement final
          *              bool, uint, int, QString, QColor, QUrl, #Uuid, #LengthUnit,
          *              #Length, #Angle, #HAlign, #VAlign (tbc)
          *
-         * @param name          The tag name (see #isValidXmlTagName() for allowed characters)
+         * @param name          The tag name (see #isValidTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
          *                      If false and the value is empty, defaultValue will be returned.
          *
@@ -229,7 +229,7 @@ class XmlDomElement final
 
 
         // Child Handling Methods
-        const QList<XmlDomElement*>& getChilds() const noexcept {return mChilds;}
+        const QList<DomElement*>& getChilds() const noexcept {return mChilds;}
 
         /**
          * @brief Check whether this element has childs or not
@@ -252,14 +252,14 @@ class XmlDomElement final
          * @param child         The child to remove
          * @param deleteChild   If true, this method will also delete the child object
          */
-        void removeChild(XmlDomElement* child, bool deleteChild) noexcept;
+        void removeChild(DomElement* child, bool deleteChild) noexcept;
 
         /**
          * @brief Append a child to the end of the child list of this element
          *
          * @param child     The child to append
          */
-        void appendChild(XmlDomElement* child) noexcept;
+        void appendChild(DomElement* child) noexcept;
 
         /**
          * @brief Create and append the new child to the end of the child list of this element
@@ -268,7 +268,7 @@ class XmlDomElement final
          *
          * @return The created and appended child element
          */
-        XmlDomElement* appendChild(const QString& name) noexcept;
+        DomElement* appendChild(const QString& name) noexcept;
 
         /**
          * @brief Create a new text child and append it to the list of childs
@@ -277,11 +277,11 @@ class XmlDomElement final
          *                  bool, QString, QDateTime, #Uuid, #Version, #Length,
          *                  #LengthUnit, #Ratio (tbc)
          *
-         * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
+         * @param name      The tag name (see #isValidTagName() for allowed characters)
          * @param value     The attribute value which will be converted to a QString
          */
         template <typename T>
-        XmlDomElement* appendTextChild(const QString& name, const T& value) noexcept;
+        DomElement* appendTextChild(const QString& name, const T& value) noexcept;
 
         /**
          * @brief Get the first child element of this element
@@ -289,12 +289,12 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and this element has no childs, an exception
          *                          will be thrown
          *
-         * @retval XmlDomElement*   The first child element
+         * @retval DomElement*   The first child element
          * @retval nullptr          If there is no child and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no child element
          */
-        XmlDomElement* getFirstChild(bool throwIfNotFound = false) const throw (Exception);
+        DomElement* getFirstChild(bool throwIfNotFound = false) const throw (Exception);
 
         /**
          * @brief Get the first child element with a specific name
@@ -303,12 +303,12 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and this element has no childs with the
          *                          specified name, an exception will be thrown
          *
-         * @retval XmlDomElement*   The first child element with the specified name
+         * @retval DomElement*   The first child element with the specified name
          * @retval nullptr          If there is no such child and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such child element
          */
-        XmlDomElement* getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception);
+        DomElement* getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception);
 
         /**
          * @brief Get the first child element with a specific path/name (recursive)
@@ -318,7 +318,7 @@ class XmlDomElement final
          * Example:
          * @code{.cpp}
          * // "root" contains the root node of a DOM document (or any other node in a DOM tree)
-         * XmlDomElement* root = doc.getRoot();
+         * DomElement* root = doc.getRoot();
          * // get the text of the first "category" child of the element "meta/categories".
          * // the return value of getFirstChild() is always a valid pointer as the method
          * // would throw an exception of the specified path or child does not exist.
@@ -338,14 +338,14 @@ class XmlDomElement final
          * @param throwIfChildNotFound  If true and the specified child (the right part of
          *                              the last slash in pathName) does not exist
          *
-         * @retval XmlDomElement*   The first child element with the specified path/name
+         * @retval DomElement*   The first child element with the specified path/name
          * @retval nullptr          If there is no such path and "throwIfPathNotExist == false"
          * @retval nullptr          If there is no such child and "throwIfChildNotFound == false"
          *
          * @throw Exception If "throwIfPathNotExist == true" and the path does not exist
          * @throw Exception If "throwIfChildNotFound == true" and the child does not exist
          */
-        XmlDomElement* getFirstChild(const QString& pathName, bool throwIfPathNotExist,
+        DomElement* getFirstChild(const QString& pathName, bool throwIfPathNotExist,
                                      bool throwIfChildNotFound) const throw (Exception);
 
         /**
@@ -357,12 +357,12 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and there is no such previous child, an
          *                          exception will be thrown
          *
-         * @retval XmlDomElement*   The previous child (with the specified name)
+         * @retval DomElement*   The previous child (with the specified name)
          * @retval nullptr          If there is no such child and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such previous child
          */
-        XmlDomElement* getPreviousChild(const XmlDomElement* child, const QString& name = QString(),
+        DomElement* getPreviousChild(const DomElement* child, const QString& name = QString(),
                                         bool throwIfNotFound = false) const throw (Exception);
 
         /**
@@ -374,12 +374,12 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and there is no such next child, an
          *                          exception will be thrown
          *
-         * @retval XmlDomElement*   The next child (with the specified name)
+         * @retval DomElement*   The next child (with the specified name)
          * @retval nullptr          If there is no such child and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such next child
          */
-        XmlDomElement* getNextChild(const XmlDomElement* child, const QString& name = QString(),
+        DomElement* getNextChild(const DomElement* child, const QString& name = QString(),
                                     bool throwIfNotFound = false) const throw (Exception);
 
 
@@ -393,12 +393,12 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and there is no such previous sibling, an
          *                          exception will be thrown
          *
-         * @retval XmlDomElement*   The previous sibling element (with the specified name)
+         * @retval DomElement*   The previous sibling element (with the specified name)
          * @retval nullptr          If there is no such sibling and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such previous sibling
          */
-        XmlDomElement* getPreviousSibling(const QString& name = QString(),
+        DomElement* getPreviousSibling(const QString& name = QString(),
                                           bool throwIfNotFound = false) const throw (Exception);
 
         /**
@@ -409,59 +409,59 @@ class XmlDomElement final
          * @param throwIfNotFound   If true and there is no such next sibling, an
          *                          exception will be thrown
          *
-         * @retval XmlDomElement*   The next sibling element (with the specified name)
+         * @retval DomElement*   The next sibling element (with the specified name)
          * @retval nullptr          If there is no such sibling and "throwIfNotFound == false"
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such next sibling
          */
-        XmlDomElement* getNextSibling(const QString& name = QString(),
+        DomElement* getNextSibling(const QString& name = QString(),
                                       bool throwIfNotFound = false) const throw (Exception);
 
 
         // Conversion Methods
 
         /**
-         * @brief Serialize this XmlDomElement into a QXmlStreamWriter (recursively)
+         * @brief Serialize this DomElement into a QXmlStreamWriter (recursively)
          *
          * @param writer        The QXmlStreamWriter object to write into
          */
         void writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noexcept;
 
         /**
-         * @brief Construct a XmlDomElement object from a QDomElement object (recursively)
+         * @brief Construct a DomElement object from a QDomElement object (recursively)
          *
          * @param domElement    The QDomElement to copy
-         * @param doc           The DOM Document of the newly created XmlDomElement (only
+         * @param doc           The DOM Document of the newly created DomElement (only
          *                      needed for the root element)
          *
-         * @return The created XmlDomElement (the caller takes the ownership!)
+         * @return The created DomElement (the caller takes the ownership!)
          */
-        static XmlDomElement* fromQDomElement(QDomElement domElement, DomDocument* doc = nullptr) noexcept;
+        static DomElement* fromQDomElement(QDomElement domElement, DomDocument* doc = nullptr) noexcept;
 
 
     private:
 
         // make some methods inaccessible...
-        XmlDomElement() = delete;
-        XmlDomElement(const XmlDomElement& other) = delete;
-        XmlDomElement& operator=(const XmlDomElement& rhs) = delete;
+        DomElement() = delete;
+        DomElement(const DomElement& other) = delete;
+        DomElement& operator=(const DomElement& rhs) = delete;
 
 
         // Private Methods
 
         /**
-         * @brief Private constructor to create a XmlDomElement from a QDomElement
+         * @brief Private constructor to create a DomElement from a QDomElement
          *
          * @param domElement    The QDomElement to copy
-         * @param parent        The parent of the newly created XmlDomElement
-         * @param doc           The DOM Document of the newly created XmlDomElement (only
+         * @param parent        The parent of the newly created DomElement
+         * @param doc           The DOM Document of the newly created DomElement (only
          *                      needed for the root element)
          */
-        explicit XmlDomElement(QDomElement domElement, XmlDomElement* parent = nullptr,
+        explicit DomElement(QDomElement domElement, DomElement* parent = nullptr,
                                DomDocument* doc = nullptr) noexcept;
 
         /**
-         * @brief Check if a QString represents a valid XML tag name for elements and attributes
+         * @brief Check if a QString represents a valid tag name for elements and attributes
          *
          * Valid characters:
          *  - a-z
@@ -473,15 +473,15 @@ class XmlDomElement final
          * @retval true     If valid
          * @retval false    If invalid
          */
-        static bool isValidXmlTagName(const QString& name) noexcept;
+        static bool isValidTagName(const QString& name) noexcept;
 
 
         // Attributes
         DomDocument* mDocument;  ///< the DOM document of the tree (only needed in the root node, otherwise nullptr)
-        XmlDomElement* mParent;     ///< the parent element (if available, otherwise nullptr)
+        DomElement* mParent;     ///< the parent element (if available, otherwise nullptr)
         QString mName;              ///< the tag name of this element
         QString mText;              ///< the text of this element (only if there are no childs)
-        QList<XmlDomElement*> mChilds;      ///< all child elements (only if there is no text)
+        QList<DomElement*> mChilds;      ///< all child elements (only if there is no text)
         QMap<QString, QString> mAttributes; ///< all attributes of this element (key, value) in alphabetical order
 };
 
@@ -491,4 +491,4 @@ class XmlDomElement final
 
 } // namespace librepcb
 
-#endif // LIBREPCB_XMLDOMELEMENT_H
+#endif // LIBREPCB_DOMELEMENT_H

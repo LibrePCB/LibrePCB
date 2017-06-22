@@ -35,12 +35,12 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Repositories::WSI_Repositories(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+WSI_Repositories::WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+        foreach (const DomElement* node, xmlElement->getChilds()) {
             mList.append(new Repository(*node)); // can throw
         }
     } else {
@@ -177,7 +177,7 @@ void WSI_Repositories::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_Repositories::serialize(XmlDomElement& root) const throw (Exception)
+void WSI_Repositories::serialize(DomElement& root) const throw (Exception)
 {
     serializePointerContainer(root, mList, "repository");
 }

@@ -49,7 +49,7 @@ LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
                                  const QString& longElementName, bool readOnly) throw (Exception) :
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
-    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+    DomElement& root = mLoadingXmlFileDocument->getRoot();
 
     // read parent uuid
     mParentUuid = root.getFirstChild("meta/parent", true, true)->getText<Uuid>(false);
@@ -63,7 +63,7 @@ LibraryCategory::~LibraryCategory() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-void LibraryCategory::serialize(XmlDomElement& root) const throw (Exception)
+void LibraryCategory::serialize(DomElement& root) const throw (Exception)
 {
     LibraryBaseElement::serialize(root);
     root.getFirstChild("meta", true)->appendTextChild("parent", mParentUuid);

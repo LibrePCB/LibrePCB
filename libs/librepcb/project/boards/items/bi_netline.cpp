@@ -49,7 +49,7 @@ BI_NetLine::BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& start
     init();
 }
 
-BI_NetLine::BI_NetLine(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
@@ -206,7 +206,7 @@ void BI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_NetLine::serialize(XmlDomElement& root) const throw (Exception)
+void BI_NetLine::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

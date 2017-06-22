@@ -50,7 +50,7 @@ class PolygonSegment final : public SerializableObject
         explicit PolygonSegment(const PolygonSegment& other) noexcept;
         explicit PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
-        explicit PolygonSegment(const XmlDomElement& domElement) throw (Exception);
+        explicit PolygonSegment(const DomElement& domElement) throw (Exception);
         ~PolygonSegment() noexcept {}
 
         // Getters
@@ -65,7 +65,7 @@ class PolygonSegment final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -97,7 +97,7 @@ class Polygon final : public SerializableObject
         Polygon(const Polygon& other) noexcept;
         Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& startPos) noexcept;
-        explicit Polygon(const XmlDomElement& domElement) throw (Exception);
+        explicit Polygon(const DomElement& domElement) throw (Exception);
         ~Polygon() noexcept;
 
         // Getters
@@ -134,7 +134,7 @@ class Polygon final : public SerializableObject
         void removeSegment(PolygonSegment& segment) throw (Exception);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Static Methods
         static Polygon* createLine(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;

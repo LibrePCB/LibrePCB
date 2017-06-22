@@ -45,7 +45,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -56,7 +56,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
         mSuffix = domElement.getAttribute<QString>("suffix", false);
 
         // read pin signal map
-        foreach (const XmlDomElement* node, domElement.getFirstChild("pin_signal_map", true)->getChilds()) {
+        foreach (const DomElement* node, domElement.getFirstChild("pin_signal_map", true)->getChilds()) {
             ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
             if (mPinSignalMap.contains(item->getPinUuid()))
             {
@@ -102,7 +102,7 @@ void ComponentSymbolVariantItem::removePinSignalMapItem(ComponentPinSignalMapIte
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariantItem::serialize(XmlDomElement& root) const throw (Exception)
+void ComponentSymbolVariantItem::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

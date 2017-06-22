@@ -59,7 +59,7 @@ class ComponentSignal final : public SerializableObject
 
         // Constructors / Destructor
         explicit ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
-        explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSignal(const DomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
         // Getters
@@ -83,7 +83,7 @@ class ComponentSignal final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:

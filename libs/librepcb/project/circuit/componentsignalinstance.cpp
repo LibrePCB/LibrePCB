@@ -45,7 +45,7 @@ namespace project {
  ****************************************************************************************/
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                                 const XmlDomElement& domElement) throw (Exception) :
+                                                 const DomElement& domElement) throw (Exception) :
     QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
     mComponentSignal(nullptr), mIsAddedToCircuit(false), mNetSignal(nullptr)
 {
@@ -255,7 +255,7 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) throw
     mRegisteredFootprintPads.removeOne(&pad);
 }
 
-void ComponentSignalInstance::serialize(XmlDomElement& root) const throw (Exception)
+void ComponentSignalInstance::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

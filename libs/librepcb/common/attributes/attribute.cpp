@@ -39,7 +39,7 @@ Attribute::Attribute(const Attribute& other) noexcept :
 {
 }
 
-Attribute::Attribute(const XmlDomElement& domElement) throw (Exception) :
+Attribute::Attribute(const DomElement& domElement) throw (Exception) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
     mKey = domElement.getAttribute<QString>("key", true);
@@ -98,7 +98,7 @@ void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value
  *  General Methods
  ****************************************************************************************/
 
-void Attribute::serialize(XmlDomElement& root) const throw (Exception)
+void Attribute::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     root.setAttribute("key", mKey);

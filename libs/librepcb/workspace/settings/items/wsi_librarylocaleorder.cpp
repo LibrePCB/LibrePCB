@@ -35,12 +35,12 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
-                                               XmlDomElement* xmlElement) throw (Exception) :
+                                               DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+        foreach (const DomElement* node, xmlElement->getChilds()) {
             QLocale locale(node->getText<QString>(false));
             if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
                 mList.append(locale.name());
@@ -193,7 +193,7 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_LibraryLocaleOrder::serialize(XmlDomElement& root) const throw (Exception)
+void WSI_LibraryLocaleOrder::serialize(DomElement& root) const throw (Exception)
 {
     foreach (const QString& locale, mList) {
         root.appendTextChild("locale", locale);

@@ -44,7 +44,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception) :
     SI_Base(schematic), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
@@ -279,7 +279,7 @@ void SI_NetPoint::updateLines() const noexcept
     }
 }
 
-void SI_NetPoint::serialize(XmlDomElement& root) const throw (Exception)
+void SI_NetPoint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

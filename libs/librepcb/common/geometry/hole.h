@@ -47,7 +47,7 @@ class Hole final : public SerializableObject
 
         // Constructors / Destructor
         explicit Hole(const Point& position, const Length& diameter) noexcept;
-        explicit Hole(const XmlDomElement& domElement) throw (Exception);
+        explicit Hole(const DomElement& domElement) throw (Exception);
         ~Hole() noexcept;
 
         // Getters
@@ -61,7 +61,7 @@ class Hole final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:

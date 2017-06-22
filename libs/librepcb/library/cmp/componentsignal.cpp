@@ -41,7 +41,7 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
+ComponentSignal::ComponentSignal(const DomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -63,7 +63,7 @@ ComponentSignal::~ComponentSignal() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSignal::serialize(XmlDomElement& root) const throw (Exception)
+void ComponentSignal::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

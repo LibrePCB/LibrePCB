@@ -69,7 +69,7 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
 {
     Q_ASSERT(symbols.isEmpty() == true);
 
-    foreach (XmlDomElement* element, mSymbolInstances)
+    foreach (DomElement* element, mSymbolInstances)
     {
         symbols.append(new SymbolInstance(schematic, *element));
     }
@@ -86,7 +86,7 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
     clear();
 
     foreach (SymbolInstance* symbol, symbols)
-        mSymbolInstances.append(symbol->serializeToXmlDomElement());
+        mSymbolInstances.append(symbol->serializeToDomElement());
 }*/
 
 /*****************************************************************************************

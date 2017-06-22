@@ -39,7 +39,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) throw (Exception) :
     SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
 {
     // read attributes
@@ -146,7 +146,7 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 
-void SI_NetLabel::serialize(XmlDomElement& root) const throw (Exception)
+void SI_NetLabel::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -37,7 +37,7 @@ PolygonSegment::PolygonSegment(const PolygonSegment& other) noexcept :
 {
 }
 
-PolygonSegment::PolygonSegment(const XmlDomElement& domElement) throw (Exception)
+PolygonSegment::PolygonSegment(const DomElement& domElement) throw (Exception)
 {
     mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
     mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
@@ -68,7 +68,7 @@ Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
     }
 }
 
-void PolygonSegment::serialize(XmlDomElement& root) const throw (Exception)
+void PolygonSegment::serialize(DomElement& root) const throw (Exception)
 {
     root.setAttribute("end_x", mEndPos.getX());
     root.setAttribute("end_y", mEndPos.getY());
@@ -97,7 +97,7 @@ Polygon::Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabAre
     Q_ASSERT(lineWidth >= 0);
 }
 
-Polygon::Polygon(const XmlDomElement& domElement) throw (Exception)
+Polygon::Polygon(const DomElement& domElement) throw (Exception)
 {
     // load general attributes
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
@@ -108,7 +108,7 @@ Polygon::Polygon(const XmlDomElement& domElement) throw (Exception)
     mStartPos.setY(domElement.getAttribute<Length>("start_y", true));
 
     // load all segments
-    foreach (const XmlDomElement* node, domElement.getChilds()) {
+    foreach (const DomElement* node, domElement.getChilds()) {
         mSegments.append(new PolygonSegment(*node));
     }
 
@@ -302,7 +302,7 @@ void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-void Polygon::serialize(XmlDomElement& root) const throw (Exception)
+void Polygon::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -533,7 +533,7 @@ class Project final : public QObject, public IF_AttributeProvider,
         /**
          * @copydoc librepcb::SerializableObject::serialize()
          */
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

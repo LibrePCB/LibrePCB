@@ -112,10 +112,10 @@ class WorkspaceSettings final : public QObject, public SerializableObject
 
         template<typename T>
         void loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                              XmlDomElement* xmlRoot) throw (Exception);
+                              DomElement* xmlRoot) throw (Exception);
         void saveToFile() const throw (Exception);
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private: // Data

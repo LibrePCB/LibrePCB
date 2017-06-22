@@ -46,13 +46,13 @@ class MinimalSerializableObjectMock final : public SerializableObject
         MinimalSerializableObjectMock() = delete;
         MinimalSerializableObjectMock(const QString& value) :
             mValue(value) {}
-        MinimalSerializableObjectMock(const XmlDomElement& root) :
+        MinimalSerializableObjectMock(const DomElement& root) :
             mValue(root.getText<QString>(false)) {}
         MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
         MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) = delete;
         ~MinimalSerializableObjectMock() {}
 
-        void serialize(XmlDomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const throw (Exception) override {
             root.setText(mValue);
         }
 
@@ -77,14 +77,14 @@ class SerializableObjectMock final : public SerializableObject
             mUuid(std::move(other.mUuid)), mName(std::move(other.mName)) {}
         SerializableObjectMock(const Uuid& uuid, const QString& name) :
             mUuid(uuid), mName(name) {}
-        SerializableObjectMock(const XmlDomElement& root) :
+        SerializableObjectMock(const DomElement& root) :
             mUuid(root.getAttribute<Uuid>("uuid", true)), mName(root.getText<QString>(false)) {}
         ~SerializableObjectMock() {}
 
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
 
-        void serialize(XmlDomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const throw (Exception) override {
             root.setAttribute("uuid", mUuid);
             root.setText(mName);
         }

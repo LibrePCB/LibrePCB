@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "domdocument.h"
-#include "xmldomelement.h"
+#include "domelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,7 +33,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-DomDocument::DomDocument(XmlDomElement& root) noexcept :
+DomDocument::DomDocument(DomElement& root) noexcept :
     mFilePath(), mRootElement(&root)
 {
     mRootElement->setDocument(this);
@@ -63,7 +63,7 @@ DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath
             QString(tr("No root node found in \"%1\"!")).arg(mFilePath.toNative()));
     }
 
-    mRootElement.reset(XmlDomElement::fromQDomElement(root, this));
+    mRootElement.reset(DomElement::fromQDomElement(root, this));
 }
 
 DomDocument::~DomDocument() noexcept
@@ -74,9 +74,9 @@ DomDocument::~DomDocument() noexcept
  *  Getters
  ****************************************************************************************/
 
-XmlDomElement& DomDocument::getRoot(const QString& expectedName) const throw (Exception)
+DomElement& DomDocument::getRoot(const QString& expectedName) const throw (Exception)
 {
-    XmlDomElement& root = getRoot();
+    DomElement& root = getRoot();
     if (root.getName() != expectedName) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             QString(tr("Root node name mismatch in file \"%1\": %2 != %3"))

@@ -49,8 +49,8 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read category UUIDs
-    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
-    for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
+    DomElement& root = mLoadingXmlFileDocument->getRoot();
+    for (DomElement* node = root.getFirstChild("meta/category", true, false);
          node; node = node->getNextSibling("category"))
     {
         mCategories.append(node->getText<Uuid>(true));
@@ -65,7 +65,7 @@ LibraryElement::~LibraryElement() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-void LibraryElement::serialize(XmlDomElement& root) const throw (Exception)
+void LibraryElement::serialize(DomElement& root) const throw (Exception)
 {
     LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, mCategories) {

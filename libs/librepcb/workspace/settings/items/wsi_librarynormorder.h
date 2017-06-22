@@ -51,7 +51,7 @@ class WSI_LibraryNormOrder final : public WSI_Base
         // Constructors / Destructor
         WSI_LibraryNormOrder() = delete;
         WSI_LibraryNormOrder(const WSI_LibraryNormOrder& other) = delete;
-        WSI_LibraryNormOrder(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        WSI_LibraryNormOrder(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
         ~WSI_LibraryNormOrder() noexcept;
 
         // Getters
@@ -67,7 +67,7 @@ class WSI_LibraryNormOrder final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_LibraryNormOrder& operator=(const WSI_LibraryNormOrder& rhs) = delete;

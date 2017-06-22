@@ -49,13 +49,13 @@ SOURCES += \
     exceptions.cpp \
     fileio/directorylock.cpp \
     fileio/domdocument.cpp \
+    fileio/domelement.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
     fileio/smartfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
-    fileio/xmldomelement.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/polygon.cpp \
@@ -114,6 +114,7 @@ HEADERS += \
     fileio/cmd/cmdlistelementsswap.h \
     fileio/directorylock.h \
     fileio/domdocument.h \
+    fileio/domelement.h \
     fileio/filepath.h \
     fileio/fileutils.h \
     fileio/serializableobject.h \
@@ -122,7 +123,6 @@ HEADERS += \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
-    fileio/xmldomelement.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/polygon.h \

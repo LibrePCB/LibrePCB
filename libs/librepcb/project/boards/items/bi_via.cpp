@@ -51,7 +51,7 @@ BI_Via::BI_Via(Board& board, const BI_Via& other) throw (Exception) :
     init();
 }
 
-BI_Via::BI_Via(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mNetSignal(nullptr)
 {
     // read attributes
@@ -277,7 +277,7 @@ void BI_Via::updateNetPoints() const noexcept
     }
 }
 
-void BI_Via::serialize(XmlDomElement& root) const throw (Exception)
+void BI_Via::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

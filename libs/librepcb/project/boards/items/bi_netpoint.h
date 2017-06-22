@@ -68,7 +68,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         BI_NetPoint(const BI_NetPoint& other) = delete;
         BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
                     BI_Via* via) throw (Exception);
-        BI_NetPoint(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
                     const Point& position) throw (Exception);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
@@ -108,7 +108,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
 
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base

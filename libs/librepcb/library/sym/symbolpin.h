@@ -50,7 +50,7 @@ class SymbolPin final : public SerializableObject
         // Constructors / Destructor
         explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
                            const Length& length, const Angle& rotation) noexcept;
-        explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
+        explicit SymbolPin(const DomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
         // Getters
@@ -69,7 +69,7 @@ class SymbolPin final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
     private:
 

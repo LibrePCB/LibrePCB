@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "xmldomelement.h"
+#include "domelement.h"
 #include "domdocument.h"
 #include "../units/all_length_units.h"
 #include "../uuid.h"
@@ -38,16 +38,16 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-XmlDomElement::XmlDomElement(const QString& name, const QString& text) noexcept :
+DomElement::DomElement(const QString& name, const QString& text) noexcept :
     mDocument(nullptr), mParent(nullptr), mName(name), mText(text)
 {
-    Q_ASSERT(isValidXmlTagName(mName) == true);
+    Q_ASSERT(isValidTagName(mName) == true);
 }
 
-XmlDomElement::XmlDomElement(QDomElement domElement, XmlDomElement* parent, DomDocument* doc) noexcept :
+DomElement::DomElement(QDomElement domElement, DomElement* parent, DomDocument* doc) noexcept :
     mDocument(doc), mParent(parent), mName(domElement.tagName()), mText()
 {
-    Q_ASSERT(isValidXmlTagName(mName) == true);
+    Q_ASSERT(isValidTagName(mName) == true);
 
     QDomNamedNodeMap map = domElement.attributes();
     for (int i = 0; i < map.count(); i++)
@@ -56,7 +56,7 @@ XmlDomElement::XmlDomElement(QDomElement domElement, XmlDomElement* parent, DomD
     QDomElement child = domElement.firstChildElement();
     while (!child.isNull())
     {
-        mChilds.append(new XmlDomElement(child, this));
+        mChilds.append(new DomElement(child, this));
         child = child.nextSiblingElement();
     }
 
@@ -64,7 +64,7 @@ XmlDomElement::XmlDomElement(QDomElement domElement, XmlDomElement* parent, DomD
         mText = domElement.text();
 }
 
-XmlDomElement::~XmlDomElement() noexcept
+DomElement::~DomElement() noexcept
 {
     qDeleteAll(mChilds);        mChilds.clear();
 
@@ -76,7 +76,7 @@ XmlDomElement::~XmlDomElement() noexcept
  *  General Methods
  ****************************************************************************************/
 
-DomDocument* XmlDomElement::getDocument(bool docOfTree) const noexcept
+DomDocument* DomElement::getDocument(bool docOfTree) const noexcept
 {
     if (mParent && docOfTree)
         return mParent->getDocument(docOfTree);
@@ -84,13 +84,13 @@ DomDocument* XmlDomElement::getDocument(bool docOfTree) const noexcept
         return mDocument;
 }
 
-void XmlDomElement::setDocument(DomDocument* doc) noexcept
+void DomElement::setDocument(DomDocument* doc) noexcept
 {
     Q_ASSERT((mParent == nullptr) || (doc == nullptr));
     mDocument = doc;
 }
 
-FilePath XmlDomElement::getDocFilePath() const noexcept
+FilePath DomElement::getDocFilePath() const noexcept
 {
     DomDocument* doc = getDocument(true);
     if (doc)
@@ -104,50 +104,50 @@ FilePath XmlDomElement::getDocFilePath() const noexcept
  ****************************************************************************************/
 
 template <>
-void XmlDomElement::setText<QString>(const QString& value) noexcept
+void DomElement::setText<QString>(const QString& value) noexcept
 {
     Q_ASSERT(mChilds.isEmpty() == true);
     mText = value;
 }
 
 template <>
-void XmlDomElement::setText<bool>(const bool& value) noexcept
+void DomElement::setText<bool>(const bool& value) noexcept
 {
     setText(value ? QString("true") : QString("false"));
 }
 
 template <>
-void XmlDomElement::setText<uint>(const uint& value) noexcept
+void DomElement::setText<uint>(const uint& value) noexcept
 {
     setText(QString::number(value));
 }
 
 template <>
-void XmlDomElement::setText<QDateTime>(const QDateTime& value) noexcept
+void DomElement::setText<QDateTime>(const QDateTime& value) noexcept
 {
     setText(value.toUTC().toString(Qt::ISODate));
 }
 
 template <>
-void XmlDomElement::setText<Uuid>(const Uuid& value) noexcept
+void DomElement::setText<Uuid>(const Uuid& value) noexcept
 {
     setText(value.toStr());
 }
 
 template <>
-void XmlDomElement::setText<Version>(const Version& value) noexcept
+void DomElement::setText<Version>(const Version& value) noexcept
 {
     setText(value.toStr());
 }
 
 template <>
-void XmlDomElement::setText<Length>(const Length& value) noexcept
+void DomElement::setText<Length>(const Length& value) noexcept
 {
     setText(value.toMmString());
 }
 
 template <>
-QString XmlDomElement::getText<QString>(bool throwIfEmpty, const QString& defaultValue) const throw (Exception)
+QString DomElement::getText<QString>(bool throwIfEmpty, const QString& defaultValue) const throw (Exception)
 {
     Q_UNUSED(defaultValue);
     Q_ASSERT(defaultValue == QString()); // defaultValue makes no sense in this method
@@ -166,7 +166,7 @@ QString XmlDomElement::getText<QString>(bool throwIfEmpty, const QString& defaul
 }
 
 template <>
-bool XmlDomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) const throw (Exception)
+bool DomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     if (text == "true")
@@ -183,7 +183,7 @@ bool XmlDomElement::getText<bool>(bool throwIfEmpty, const bool& defaultValue) c
 }
 
 template <>
-uint XmlDomElement::getText<uint>(bool throwIfEmpty, const uint& defaultValue) const throw (Exception)
+uint DomElement::getText<uint>(bool throwIfEmpty, const uint& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     bool ok = false;
@@ -200,7 +200,7 @@ uint XmlDomElement::getText<uint>(bool throwIfEmpty, const uint& defaultValue) c
 }
 
 template <>
-QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& defaultValue) const throw (Exception)
+QDateTime DomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     QDateTime obj = QDateTime::fromString(text, Qt::ISODate).toLocalTime();
@@ -216,7 +216,7 @@ QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& 
 }
 
 template <>
-Uuid XmlDomElement::getText<Uuid>(bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
+Uuid DomElement::getText<Uuid>(bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     Uuid obj(text);
@@ -232,7 +232,7 @@ Uuid XmlDomElement::getText<Uuid>(bool throwIfEmpty, const Uuid& defaultValue) c
 }
 
 template <>
-Version XmlDomElement::getText<Version>(bool throwIfEmpty, const Version& defaultValue) const throw (Exception)
+Version DomElement::getText<Version>(bool throwIfEmpty, const Version& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     Version obj(text);
@@ -248,7 +248,7 @@ Version XmlDomElement::getText<Version>(bool throwIfEmpty, const Version& defaul
 }
 
 template <>
-Length XmlDomElement::getText<Length>(bool throwIfEmpty, const Length& defaultValue) const throw (Exception)
+Length DomElement::getText<Length>(bool throwIfEmpty, const Length& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     try
@@ -269,7 +269,7 @@ Length XmlDomElement::getText<Length>(bool throwIfEmpty, const Length& defaultVa
 }
 
 template <>
-LengthUnit XmlDomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUnit& defaultValue) const throw (Exception)
+LengthUnit DomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUnit& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     try
@@ -290,7 +290,7 @@ LengthUnit XmlDomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUni
 }
 
 template <>
-Ratio XmlDomElement::getText<Ratio>(bool throwIfEmpty, const Ratio& defaultValue) const throw (Exception)
+Ratio DomElement::getText<Ratio>(bool throwIfEmpty, const Ratio& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
     try
@@ -315,90 +315,90 @@ Ratio XmlDomElement::getText<Ratio>(bool throwIfEmpty, const Ratio& defaultValue
  ****************************************************************************************/
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const QString& value) noexcept
+void DomElement::setAttribute(const QString& name, const QString& value) noexcept
 {
     mAttributes.insert(name, value);
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const bool& value) noexcept
+void DomElement::setAttribute(const QString& name, const bool& value) noexcept
 {
     setAttribute<QString>(name, value ? "true" : "false");
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const char* const& value) noexcept
+void DomElement::setAttribute(const QString& name, const char* const& value) noexcept
 {
     setAttribute<QString>(name, value);
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const int& value) noexcept
+void DomElement::setAttribute(const QString& name, const int& value) noexcept
 {
     setAttribute<QString>(name, QString::number(value));
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const uint& value) noexcept
+void DomElement::setAttribute(const QString& name, const uint& value) noexcept
 {
     setAttribute<QString>(name, QString::number(value));
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const QColor& value) noexcept
+void DomElement::setAttribute(const QString& name, const QColor& value) noexcept
 {
     setAttribute<QString>(name, value.isValid() ? value.name(QColor::HexArgb) : "");
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const QUrl& value) noexcept
+void DomElement::setAttribute(const QString& name, const QUrl& value) noexcept
 {
     setAttribute<QString>(name, value.isValid() ? value.toString(QUrl::PrettyDecoded) : "");
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const Uuid& value) noexcept
+void DomElement::setAttribute(const QString& name, const Uuid& value) noexcept
 {
     setAttribute<QString>(name, value.isNull() ? "" : value.toStr());
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const LengthUnit& value) noexcept
+void DomElement::setAttribute(const QString& name, const LengthUnit& value) noexcept
 {
     setAttribute<QString>(name, value.toString());
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const Length& value) noexcept
+void DomElement::setAttribute(const QString& name, const Length& value) noexcept
 {
     setAttribute<QString>(name, value.toMmString());
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const Angle& value) noexcept
+void DomElement::setAttribute(const QString& name, const Angle& value) noexcept
 {
     setAttribute<QString>(name, value.toDegString());
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const HAlign& value) noexcept
+void DomElement::setAttribute(const QString& name, const HAlign& value) noexcept
 {
     setAttribute<QString>(name, value.toString());
 }
 
 template <>
-void XmlDomElement::setAttribute(const QString& name, const VAlign& value) noexcept
+void DomElement::setAttribute(const QString& name, const VAlign& value) noexcept
 {
     setAttribute<QString>(name, value.toString());
 }
 
-bool XmlDomElement::hasAttribute(const QString& name) const noexcept
+bool DomElement::hasAttribute(const QString& name) const noexcept
 {
     return mAttributes.contains(name);
 }
 
 template <>
-QString XmlDomElement::getAttribute<QString>(const QString& name, bool throwIfEmpty, const QString& defaultValue) const throw (Exception)
+QString DomElement::getAttribute<QString>(const QString& name, bool throwIfEmpty, const QString& defaultValue) const throw (Exception)
 {
     Q_UNUSED(defaultValue);
     Q_ASSERT(defaultValue == QString()); // defaultValue makes no sense in this method
@@ -417,7 +417,7 @@ QString XmlDomElement::getAttribute<QString>(const QString& name, bool throwIfEm
 }
 
 template <>
-bool XmlDomElement::getAttribute<bool>(const QString& name, bool throwIfEmpty, const bool& defaultValue) const throw (Exception)
+bool DomElement::getAttribute<bool>(const QString& name, bool throwIfEmpty, const bool& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     if (attr == "true")
@@ -434,7 +434,7 @@ bool XmlDomElement::getAttribute<bool>(const QString& name, bool throwIfEmpty, c
 }
 
 template <>
-uint XmlDomElement::getAttribute<uint>(const QString& name, bool throwIfEmpty, const uint& defaultValue) const throw (Exception)
+uint DomElement::getAttribute<uint>(const QString& name, bool throwIfEmpty, const uint& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     bool ok = false;
@@ -451,7 +451,7 @@ uint XmlDomElement::getAttribute<uint>(const QString& name, bool throwIfEmpty, c
 }
 
 template <>
-int XmlDomElement::getAttribute<int>(const QString& name, bool throwIfEmpty, const int& defaultValue) const throw (Exception)
+int DomElement::getAttribute<int>(const QString& name, bool throwIfEmpty, const int& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     bool ok = false;
@@ -468,7 +468,7 @@ int XmlDomElement::getAttribute<int>(const QString& name, bool throwIfEmpty, con
 }
 
 template <>
-QColor XmlDomElement::getAttribute<QColor>(const QString& name, bool throwIfEmpty, const QColor& defaultValue) const throw (Exception)
+QColor DomElement::getAttribute<QColor>(const QString& name, bool throwIfEmpty, const QColor& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     QColor obj(attr);
@@ -484,7 +484,7 @@ QColor XmlDomElement::getAttribute<QColor>(const QString& name, bool throwIfEmpt
 }
 
 template <>
-QUrl XmlDomElement::getAttribute<QUrl>(const QString& name, bool throwIfEmpty, const QUrl& defaultValue) const throw (Exception)
+QUrl DomElement::getAttribute<QUrl>(const QString& name, bool throwIfEmpty, const QUrl& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     QUrl obj(attr, QUrl::StrictMode);
@@ -500,7 +500,7 @@ QUrl XmlDomElement::getAttribute<QUrl>(const QString& name, bool throwIfEmpty, c
 }
 
 template <>
-Uuid XmlDomElement::getAttribute<Uuid>(const QString& name, bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
+Uuid DomElement::getAttribute<Uuid>(const QString& name, bool throwIfEmpty, const Uuid& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     Uuid obj(attr);
@@ -516,7 +516,7 @@ Uuid XmlDomElement::getAttribute<Uuid>(const QString& name, bool throwIfEmpty, c
 }
 
 template <>
-LengthUnit XmlDomElement::getAttribute<LengthUnit>(const QString& name, bool throwIfEmpty, const LengthUnit& defaultValue) const throw (Exception)
+LengthUnit DomElement::getAttribute<LengthUnit>(const QString& name, bool throwIfEmpty, const LengthUnit& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     try
@@ -537,7 +537,7 @@ LengthUnit XmlDomElement::getAttribute<LengthUnit>(const QString& name, bool thr
 }
 
 template <>
-Length XmlDomElement::getAttribute<Length>(const QString& name, bool throwIfEmpty, const Length& defaultValue) const throw (Exception)
+Length DomElement::getAttribute<Length>(const QString& name, bool throwIfEmpty, const Length& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     try
@@ -558,7 +558,7 @@ Length XmlDomElement::getAttribute<Length>(const QString& name, bool throwIfEmpt
 }
 
 template <>
-Angle XmlDomElement::getAttribute<Angle>(const QString& name, bool throwIfEmpty, const Angle& defaultValue) const throw (Exception)
+Angle DomElement::getAttribute<Angle>(const QString& name, bool throwIfEmpty, const Angle& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     try
@@ -579,7 +579,7 @@ Angle XmlDomElement::getAttribute<Angle>(const QString& name, bool throwIfEmpty,
 }
 
 template <>
-HAlign XmlDomElement::getAttribute<HAlign>(const QString& name, bool throwIfEmpty, const HAlign& defaultValue) const throw (Exception)
+HAlign DomElement::getAttribute<HAlign>(const QString& name, bool throwIfEmpty, const HAlign& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     try
@@ -600,7 +600,7 @@ HAlign XmlDomElement::getAttribute<HAlign>(const QString& name, bool throwIfEmpt
 }
 
 template <>
-VAlign XmlDomElement::getAttribute<VAlign>(const QString& name, bool throwIfEmpty, const VAlign& defaultValue) const throw (Exception)
+VAlign DomElement::getAttribute<VAlign>(const QString& name, bool throwIfEmpty, const VAlign& defaultValue) const throw (Exception)
 {
     QString attr = getAttribute<QString>(name, throwIfEmpty);
     try
@@ -624,7 +624,7 @@ VAlign XmlDomElement::getAttribute<VAlign>(const QString& name, bool throwIfEmpt
  *  Child Handling Methods
  ****************************************************************************************/
 
-void XmlDomElement::removeChild(XmlDomElement* child, bool deleteChild) noexcept
+void DomElement::removeChild(DomElement* child, bool deleteChild) noexcept
 {
     Q_ASSERT(child);
     Q_ASSERT(mChilds.contains(child) == true);
@@ -636,7 +636,7 @@ void XmlDomElement::removeChild(XmlDomElement* child, bool deleteChild) noexcept
     }
 }
 
-void XmlDomElement::appendChild(XmlDomElement* child) noexcept
+void DomElement::appendChild(DomElement* child) noexcept
 {
     Q_ASSERT(mText.isNull() == true);
     Q_ASSERT(child);
@@ -647,64 +647,64 @@ void XmlDomElement::appendChild(XmlDomElement* child) noexcept
     mChilds.append(child);
 }
 
-XmlDomElement* XmlDomElement::appendChild(const QString& name) noexcept
+DomElement* DomElement::appendChild(const QString& name) noexcept
 {
-    QScopedPointer<XmlDomElement> child(new XmlDomElement(name));
+    QScopedPointer<DomElement> child(new DomElement(name));
     appendChild(child.data());
     return child.take();
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QString& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const QString& value) noexcept
 {
-    QScopedPointer<XmlDomElement> child(new XmlDomElement(name, value));
+    QScopedPointer<DomElement> child(new DomElement(name, value));
     appendChild(child.data());
     return child.take();
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const bool& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const bool& value) noexcept
 {
     return appendTextChild<QString>(name, value ? "true" : "false");
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QDateTime& value) noexcept
+XmlDomElement* DomElement::appendTextChild(const QString& name, const QDateTime& value) noexcept
 {
     return appendTextChild<QString>(name, value.toUTC().toString(Qt::ISODate));
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Uuid& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const Uuid& value) noexcept
 {
     return appendTextChild<QString>(name, value.isNull() ? "" : value.toStr());
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Version& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const Version& value) noexcept
 {
     return appendTextChild<QString>(name, value.toStr());
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Length& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const Length& value) noexcept
 {
     return appendTextChild<QString>(name, value.toMmString());
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const LengthUnit& value) noexcept
+DomElement* DomElement::appendTextChild(const QString& name, const LengthUnit& value) noexcept
 {
     return appendTextChild<QString>(name, value.toString());
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Ratio& value) noexcept
+XmlDomElement* DomElement::appendTextChild(const QString& name, const Ratio& value) noexcept
 {
     return appendTextChild<QString>(name, value.toNormalizedString());
 }
 
-XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
 {
     if (!mChilds.isEmpty())
         return mChilds.first();
@@ -717,9 +717,9 @@ XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (E
     }
 }
 
-XmlDomElement* XmlDomElement::getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception)
 {
-    foreach (XmlDomElement* child, mChilds)
+    foreach (DomElement* child, mChilds)
     {
         if (child->getName() == name)
             return child;
@@ -733,13 +733,13 @@ XmlDomElement* XmlDomElement::getFirstChild(const QString& name, bool throwIfNot
     }
 }
 
-XmlDomElement* XmlDomElement::getFirstChild(const QString& pathName, bool throwIfPathNotExist,
+DomElement* DomElement::getFirstChild(const QString& pathName, bool throwIfPathNotExist,
                                             bool throwIfChildNotFound) const throw (Exception)
 {
     int separatorPos = pathName.indexOf("/");
     if (separatorPos > -1)
     {
-        XmlDomElement* child = getFirstChild(pathName.left(separatorPos), throwIfPathNotExist);
+        DomElement* child = getFirstChild(pathName.left(separatorPos), throwIfPathNotExist);
         if (!child) return nullptr;
         return child->getFirstChild(pathName.right(pathName.length() - separatorPos - 1),
                                     throwIfPathNotExist, throwIfChildNotFound);
@@ -753,13 +753,13 @@ XmlDomElement* XmlDomElement::getFirstChild(const QString& pathName, bool throwI
     }
 }
 
-XmlDomElement* XmlDomElement::getPreviousChild(const XmlDomElement* child, const QString& name,
+DomElement* DomElement::getPreviousChild(const DomElement* child, const QString& name,
                                                bool throwIfNotFound) const throw (Exception)
 {
-    XmlDomElement* previousChild = const_cast<XmlDomElement*>(child);
+    DomElement* previousChild = const_cast<DomElement*>(child);
     do
     {
-        int index = mChilds.indexOf(const_cast<XmlDomElement*>(previousChild));
+        int index = mChilds.indexOf(const_cast<DomElement*>(previousChild));
         Q_ASSERT(index > -1);
         if (index > 0)
             previousChild = mChilds.at(index-1);
@@ -774,13 +774,13 @@ XmlDomElement* XmlDomElement::getPreviousChild(const XmlDomElement* child, const
     return previousChild;
 }
 
-XmlDomElement* XmlDomElement::getNextChild(const XmlDomElement* child, const QString& name,
+DomElement* DomElement::getNextChild(const DomElement* child, const QString& name,
                                            bool throwIfNotFound) const throw (Exception)
 {
-    XmlDomElement* nextChild = const_cast<XmlDomElement*>(child);
+    DomElement* nextChild = const_cast<DomElement*>(child);
     do
     {
-        int index = mChilds.indexOf(const_cast<XmlDomElement*>(nextChild));
+        int index = mChilds.indexOf(const_cast<DomElement*>(nextChild));
         Q_ASSERT(index > -1);
         if (index < mChilds.count()-1)
             nextChild = mChilds.at(index+1);
@@ -799,7 +799,7 @@ XmlDomElement* XmlDomElement::getNextChild(const XmlDomElement* child, const QSt
  *  Sibling Handling Methods
  ****************************************************************************************/
 
-XmlDomElement* XmlDomElement::getPreviousSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getPreviousSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
 {
     if (mParent)
         return mParent->getPreviousChild(this, name, throwIfNotFound);
@@ -812,7 +812,7 @@ XmlDomElement* XmlDomElement::getPreviousSibling(const QString& name, bool throw
     }
 }
 
-XmlDomElement* XmlDomElement::getNextSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getNextSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
 {
     if (mParent)
         return mParent->getNextChild(this, name, throwIfNotFound);
@@ -829,14 +829,14 @@ XmlDomElement* XmlDomElement::getNextSibling(const QString& name, bool throwIfNo
  *  QDomElement Converter Methods
  ****************************************************************************************/
 
-void XmlDomElement::writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noexcept
+void DomElement::writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noexcept
 {
     writer.writeStartElement(mName);
     foreach (const QString& key, mAttributes.keys()) {
         writer.writeAttribute(key, mAttributes[key]);
     }
     if (hasChilds()) {
-        foreach (XmlDomElement* child, mChilds) {
+        foreach (DomElement* child, mChilds) {
             child->writeToQXmlStreamWriter(writer);
         }
     } else if (!mText.isNull()) {
@@ -845,16 +845,16 @@ void XmlDomElement::writeToQXmlStreamWriter(QXmlStreamWriter& writer) const noex
     writer.writeEndElement();
 }
 
-XmlDomElement* XmlDomElement::fromQDomElement(QDomElement domElement, DomDocument* doc) noexcept
+DomElement* DomElement::fromQDomElement(QDomElement domElement, DomDocument* doc) noexcept
 {
-    return new XmlDomElement(domElement, nullptr, doc);
+    return new DomElement(domElement, nullptr, doc);
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-bool XmlDomElement::isValidXmlTagName(const QString& name) noexcept
+bool DomElement::isValidTagName(const QString& name) noexcept
 {
     bool valid = !name.isEmpty();
     if (name.startsWith("xml", Qt::CaseInsensitive)) valid = false;

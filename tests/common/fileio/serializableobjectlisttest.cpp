@@ -73,7 +73,7 @@ TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass)
 {
     MinimalList l1;                         // default ctor
     MinimalList l2(std::move(l1));          // move ctor
-    MinimalList l3(XmlDomElement("list"));  // XmlDomElement ctor
+    MinimalList l3(DomElement("list"));  // DomElement ctor
     l3.append(std::make_shared<MinimalMock>("foo"));
     EXPECT_TRUE(l1.isEmpty());
     EXPECT_EQ(0, l2.count());
@@ -121,9 +121,9 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor)
     EXPECT_EQ("bar", l[1]->mName);
 }
 
-TEST_F(SerializableObjectListTest, testXmlDomElementConstructor)
+TEST_F(SerializableObjectListTest, testDomElementConstructor)
 {
-    XmlDomElement e("list");
+    DomElement e("list");
     e.appendTextChild<QString>("test", "foo")->setAttribute("uuid", mMocks[0]->mUuid);
     e.appendTextChild<QString>("test", "bar")->setAttribute("uuid", mMocks[1]->mUuid);
     e.appendTextChild<QString>("none", "bar")->setAttribute("uuid", mMocks[2]->mUuid);
@@ -285,7 +285,7 @@ TEST_F(SerializableObjectListTest, testClear)
 
 TEST_F(SerializableObjectListTest, testSerialize)
 {
-    XmlDomElement e("list");
+    DomElement e("list");
     List l{mMocks[0], mMocks[1], mMocks[2]};
     l.serialize(e);
     EXPECT_EQ(3, e.getChildCount());

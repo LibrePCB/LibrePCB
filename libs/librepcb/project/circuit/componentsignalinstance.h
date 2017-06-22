@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 class ComponentSignal;
@@ -67,7 +67,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ComponentSignalInstance() = delete;
         ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const XmlDomElement& domElement) throw (Exception);
+                                         const DomElement& domElement) throw (Exception);
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const library::ComponentSignal& cmpSignal,
                                          NetSignal* netsignal = nullptr) throw (Exception);
@@ -110,7 +110,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;

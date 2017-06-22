@@ -68,7 +68,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         BI_Device() = delete;
         BI_Device(const BI_Device& other) = delete;
         BI_Device(Board& board, const BI_Device& other) throw (Exception);
-        BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Device(Board& board, const DomElement& domElement) throw (Exception);
         BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
                   const Uuid& footprintUuid, const Point& position, const Angle& rotation,
                   bool mirror) throw (Exception);
@@ -95,7 +95,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,

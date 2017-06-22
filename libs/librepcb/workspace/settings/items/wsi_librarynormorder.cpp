@@ -35,12 +35,12 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
-                                           XmlDomElement* xmlElement) throw (Exception) :
+                                           DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        foreach (const XmlDomElement* node, xmlElement->getChilds()) {
+        foreach (const DomElement* node, xmlElement->getChilds()) {
             mList.append(node->getText<QString>(false));
         }
     }
@@ -157,7 +157,7 @@ void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
     mListWidget->addItems(mListTmp);
 }
 
-void WSI_LibraryNormOrder::serialize(XmlDomElement& root) const throw (Exception)
+void WSI_LibraryNormOrder::serialize(DomElement& root) const throw (Exception)
 {
     foreach (const QString& norm, mList) {
         root.appendTextChild("norm", norm);

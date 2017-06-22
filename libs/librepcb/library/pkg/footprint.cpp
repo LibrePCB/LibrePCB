@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domelement.h>
 #include "footprint.h"
 #include "package.h"
 
@@ -44,7 +44,7 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
     mDescriptions.insert("en_US", description_en_US);
 }
 
-Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
+Footprint::Footprint(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -56,7 +56,7 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all geometry elements
-        foreach (const XmlDomElement* node, domElement.getFirstChild("geometry", true)->getChilds()) {
+        foreach (const DomElement* node, domElement.getFirstChild("geometry", true)->getChilds()) {
             if (node->getName() == "polygon") {
                 mPolygons.append(new Polygon(*node));
             } else if (node->getName() == "ellipse") {
@@ -200,7 +200,7 @@ void Footprint::removeHole(Hole& hole) noexcept
  *  Public Methods
  ****************************************************************************************/
 
-void Footprint::serialize(XmlDomElement& root) const throw (Exception)
+void Footprint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -209,7 +209,7 @@ void Footprint::serialize(XmlDomElement& root) const throw (Exception)
         root.appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
         root.appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    XmlDomElement* geometry = root.appendChild("geometry");
+    DomElement* geometry = root.appendChild("geometry");
     serializePointerContainer(*geometry, mPolygons, "polygon");
     serializePointerContainer(*geometry, mTexts, "text");
     serializePointerContainer(*geometry, mEllipses, "ellipse");

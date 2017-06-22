@@ -52,7 +52,7 @@ class BoardDesignRules final : public SerializableObject
         // Constructors / Destructor
         BoardDesignRules() noexcept;
         BoardDesignRules(const BoardDesignRules& other);
-        explicit BoardDesignRules(const XmlDomElement& domElement) throw (Exception);
+        explicit BoardDesignRules(const DomElement& domElement) throw (Exception);
         ~BoardDesignRules() noexcept;
 
         // Getters : General Attributes
@@ -106,7 +106,7 @@ class BoardDesignRules final : public SerializableObject
         void restoreDefaults() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool doesViaRequireStopMask(const Length& drillDia) const noexcept;

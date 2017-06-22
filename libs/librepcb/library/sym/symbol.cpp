@@ -47,10 +47,10 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
 {
     try
     {
-        const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+        const DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pins
-        foreach (const XmlDomElement* node, root.getFirstChild("pins", true)->getChilds()) {
+        foreach (const DomElement* node, root.getFirstChild("pins", true)->getChilds()) {
             SymbolPin* pin = new SymbolPin(*node);
             if (mPins.contains(pin->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
@@ -61,7 +61,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
         }
 
         // Load all geometry elements
-        foreach (const XmlDomElement* node, root.getFirstChild("geometry", true)->getChilds()) {
+        foreach (const DomElement* node, root.getFirstChild("geometry", true)->getChilds()) {
             if (node->getName() == "polygon") {
                 mPolygons.append(new Polygon(*node));
             } else if (node->getName() == "text") {
@@ -164,11 +164,11 @@ void Symbol::removeText(Text& text) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Symbol::serialize(XmlDomElement& root) const throw (Exception)
+void Symbol::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
     root.appendChild(serializePointerContainer(mPins, "pins", "pin"));
-    XmlDomElement* geometry = root.appendChild("geometry");
+    DomElement* geometry = root.appendChild("geometry");
     serializePointerContainer(*geometry, mPolygons, "polygon");
     serializePointerContainer(*geometry, mTexts, "text");
     serializePointerContainer(*geometry, mEllipses, "ellipse");

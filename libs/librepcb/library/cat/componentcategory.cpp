@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "componentcategory.h"
 #include <librepcb/common/fileio/domdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domelement.h>
 
 /*****************************************************************************************
  *  Namespace

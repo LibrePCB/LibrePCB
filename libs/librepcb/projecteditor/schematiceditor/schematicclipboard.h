@@ -31,7 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace project {
 
@@ -75,7 +75,7 @@ class SchematicClipboard final : public QObject
 
         // Attributes
         bool mCutActive;
-        //QList<XmlDomElement*> mSymbolInstances;
+        //QList<DomElement*> mSymbolInstances;
 
 };
 

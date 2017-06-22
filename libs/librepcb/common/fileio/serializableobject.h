@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "xmldomelement.h"
+#include "domelement.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -63,8 +63,8 @@ class SerializableObject
          *
          * @see #serialize()
          */
-        XmlDomElement* serializeToXmlDomElement(const QString& name) const throw (Exception) {
-            QScopedPointer<XmlDomElement> root(new XmlDomElement(name));
+        DomElement* serializeToDomElement(const QString& name) const throw (Exception) {
+            QScopedPointer<DomElement> root(new DomElement(name));
             serialize(*root);
             return root.take();
         }
@@ -83,40 +83,40 @@ class SerializableObject
          *
          * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual void serialize(XmlDomElement& root) const throw (Exception) = 0;
+        virtual void serialize(DomElement& root) const throw (Exception) = 0;
 
         template <typename T>
-        static void serializeObjectContainer(XmlDomElement& root, const T& container,
+        static void serializeObjectContainer(DomElement& root, const T& container,
             const QString& itemName) throw (Exception)
         {
             for (const auto& object : container) {
-                root.appendChild(object.serializeToXmlDomElement(itemName)); // can throw
+                root.appendChild(object.serializeToDomElement(itemName)); // can throw
             }
         }
 
         template <typename T>
-        static void serializePointerContainer(XmlDomElement& root, const T& container,
+        static void serializePointerContainer(DomElement& root, const T& container,
             const QString& itemName) throw (Exception)
         {
             for (const auto& pointer : container) {
-                root.appendChild(pointer->serializeToXmlDomElement(itemName)); // can throw
+                root.appendChild(pointer->serializeToDomElement(itemName)); // can throw
             }
         }
 
         template <typename T>
-        static XmlDomElement* serializeObjectContainer(const T& container,
+        static DomElement* serializeObjectContainer(const T& container,
             const QString& rootName, const QString& itemName) throw (Exception)
         {
-            QScopedPointer<XmlDomElement> root(new XmlDomElement(rootName));
+            QScopedPointer<DomElement> root(new DomElement(rootName));
             serializeObjectContainer(*root, container, itemName); // can throw
             return root.take();
         }
 
         template <typename T>
-        static XmlDomElement* serializePointerContainer(const T& container,
+        static DomElement* serializePointerContainer(const T& container,
             const QString& rootName, const QString& itemName) throw (Exception)
         {
-            QScopedPointer<XmlDomElement> root(new XmlDomElement(rootName));
+            QScopedPointer<DomElement> root(new DomElement(rootName));
             serializePointerContainer(*root, container, itemName); // can throw
             return root.take();
         }

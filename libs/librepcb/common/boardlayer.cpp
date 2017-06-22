@@ -39,7 +39,7 @@ BoardLayer::BoardLayer(const BoardLayer& other) throw (Exception) :
 {
 }
 
-BoardLayer::BoardLayer(const XmlDomElement& domElement) throw (Exception) :
+BoardLayer::BoardLayer(const DomElement& domElement) throw (Exception) :
     QObject(0), mId(-1), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
     mId = domElement.getAttribute<uint>("id", true);
@@ -340,7 +340,7 @@ const QColor& BoardLayer::getColor(bool highlighted) const
  *  General Methods
  ****************************************************************************************/
 
-void BoardLayer::serialize(XmlDomElement& root) const throw (Exception)
+void BoardLayer::serialize(DomElement& root) const throw (Exception)
 {
     root.setAttribute("id", mId);
     root.setText(mName);

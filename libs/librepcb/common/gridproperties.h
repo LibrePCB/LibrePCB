@@ -50,7 +50,7 @@ class GridProperties final : public SerializableObject
 
         // Constructors / Destructor
         GridProperties() noexcept;
-        explicit GridProperties(const XmlDomElement& domElement) throw (Exception);
+        explicit GridProperties(const DomElement& domElement) throw (Exception);
         GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept;
         GridProperties(const GridProperties& other) noexcept;
         ~GridProperties() noexcept;
@@ -68,7 +68,7 @@ class GridProperties final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operators
         GridProperties& operator=(const GridProperties& rhs) noexcept;

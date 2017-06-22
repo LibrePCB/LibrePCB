@@ -36,7 +36,7 @@
 namespace librepcb {
 
 class DomDocument;
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 
@@ -145,7 +145,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
          *
          * @see #localeStringFromList()
          */
-        static void readLocaleDomNodes(const XmlDomElement& parentNode,
+        static void readLocaleDomNodes(const DomElement& parentNode,
                                        const QString& childNodesName,
                                        QMap<QString, QString>& list,
                                        bool throwIfValueEmpty) throw (Exception);
@@ -190,7 +190,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
         virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
+        virtual void serialize(DomElement& root) const throw (Exception) override;
         virtual bool checkAttributesValidity() const noexcept;
 
 

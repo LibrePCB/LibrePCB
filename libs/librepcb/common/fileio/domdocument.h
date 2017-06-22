@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 /*****************************************************************************************
  *  Class DomDocument
@@ -62,7 +62,7 @@ class DomDocument final
          *                          The document will take the ownership over the root
          *                          element object!
          */
-        explicit DomDocument(XmlDomElement& root) noexcept;
+        explicit DomDocument(DomElement& root) noexcept;
 
         /**
          * @brief Constructor to create the whole DOM tree from the content of a file
@@ -94,7 +94,7 @@ class DomDocument final
          *
          * @return The root element of the document
          */
-        XmlDomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
+        DomElement& getRoot() const noexcept {Q_ASSERT(mRootElement); return *mRootElement;}
 
         /**
          * @brief Get the root DOM element and check it's tag name
@@ -104,7 +104,7 @@ class DomDocument final
          *
          * @return The root element of the document
          */
-        XmlDomElement& getRoot(const QString& expectedName) const throw (Exception);
+        DomElement& getRoot(const QString& expectedName) const throw (Exception);
 
 
         // General Methods
@@ -125,7 +125,7 @@ class DomDocument final
 
         // General
         FilePath mFilePath;                         ///< the filepath from the constructor
-        QScopedPointer<XmlDomElement> mRootElement; ///< the root DOM element
+        QScopedPointer<DomElement> mRootElement; ///< the root DOM element
 };
 
 /*****************************************************************************************

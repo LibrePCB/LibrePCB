@@ -4,7 +4,7 @@
 #include "ui_mainwindow.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/domdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domelement.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/library/elements.h>
 

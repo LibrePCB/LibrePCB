@@ -45,7 +45,7 @@ BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception) 
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board)
 {
     mPolygon.reset(new Polygon(domElement));
@@ -96,7 +96,7 @@ void BI_Polygon::removeFromBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-void BI_Polygon::serialize(XmlDomElement& root) const throw (Exception)
+void BI_Polygon::serialize(DomElement& root) const throw (Exception)
 {
     mPolygon->serialize(root);
 }

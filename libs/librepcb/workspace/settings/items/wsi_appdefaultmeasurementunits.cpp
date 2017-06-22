@@ -35,7 +35,7 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(const QString& xmlTagName,
-                                                               XmlDomElement* xmlElement) throw (Exception) :
+                                                               DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement),
     mLengthUnit(LengthUnit::millimeters()), mLengthUnitTmp(mLengthUnit)
 {
@@ -99,7 +99,7 @@ void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept
     mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
 }
 
-void WSI_AppDefaultMeasurementUnits::serialize(XmlDomElement& root) const throw (Exception)
+void WSI_AppDefaultMeasurementUnits::serialize(DomElement& root) const throw (Exception)
 {
     root.appendTextChild("length_unit", mLengthUnit);
 }

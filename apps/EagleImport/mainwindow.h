@@ -5,7 +5,7 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domelement.h>
 
 namespace Ui {
 class MainWindow;
@@ -59,11 +59,11 @@ class MainWindow : public QMainWindow
         void convertFile(ConvertFileType_t type, QSettings& outputSettings,
                          const librepcb::FilePath& filepath);
         bool convertSymbol(QSettings& outputSettings, const librepcb::FilePath& filepath,
-                           librepcb::XmlDomElement* node);
+                           librepcb::DomElement* node);
         bool convertPackage(QSettings& outputSettings, const librepcb::FilePath& filepath,
-                            librepcb::XmlDomElement* node);
+                            librepcb::DomElement* node);
         bool convertDevice(QSettings& outputSettings, const librepcb::FilePath& filepath,
-                           librepcb::XmlDomElement* node);
+                           librepcb::DomElement* node);
 
         // Attributes
         Ui::MainWindow *ui;

@@ -48,7 +48,7 @@ class PackagePad final : public SerializableObject
 
         // Constructors / Destructor
         explicit PackagePad(const Uuid& uuid, const QString& name) noexcept;
-        explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
+        explicit PackagePad(const DomElement& domElement) throw (Exception);
         ~PackagePad() noexcept;
 
         // Getters
@@ -61,7 +61,7 @@ class PackagePad final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:

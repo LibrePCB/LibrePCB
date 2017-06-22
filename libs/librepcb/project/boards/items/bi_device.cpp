@@ -52,7 +52,7 @@ BI_Device::BI_Device(Board& board, const BI_Device& other) throw (Exception) :
     init();
 }
 
-BI_Device::BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_Device::BI_Device(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibPackage(nullptr),
     mLibFootprint(nullptr)
 {
@@ -221,15 +221,15 @@ void BI_Device::removeFromBoard(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-void BI_Device::serialize(XmlDomElement& root) const throw (Exception)
+void BI_Device::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.setAttribute("component", mCompInstance->getUuid());
     root.setAttribute("device", mLibDevice->getUuid());
     root.setAttribute("footprint", mLibFootprint->getUuid());
-    root.appendChild(mFootprint->serializeToXmlDomElement("footprint"));
-    XmlDomElement* position = root.appendChild("position");
+    root.appendChild(mFootprint->serializeToDomElement("footprint"));
+    DomElement* position = root.appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());
     position->setAttribute("rotation", mRotation);

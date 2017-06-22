@@ -42,7 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -259,7 +259,7 @@ void NetSignal::unregisterBoardVia(BI_Via& via) throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::serialize(XmlDomElement& root) const throw (Exception)
+void NetSignal::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

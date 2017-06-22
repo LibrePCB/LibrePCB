@@ -185,7 +185,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
         // Check input file and read XML content
         SmartXmlFile file(filepath, false, true);
         std::unique_ptr<DomDocument> doc = file.parseFileAndBuildDomTree();
-        XmlDomElement* node = doc->getRoot().getFirstChild("drawing/library", true, true);
+        DomElement* node = doc->getRoot().getFirstChild("drawing/library", true, true);
 
         switch (type)
         {
@@ -206,7 +206,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
         ui->pbarElements->setMaximum(node->getChildCount());
 
         // Convert Elements
-        foreach (XmlDomElement* child, node->getChilds()) {
+        foreach (DomElement* child, node->getChilds()) {
             bool success;
             if (child->getName() == "symbol")
                 success = convertSymbol(outputSettings, filepath, child);
@@ -231,7 +231,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
     }
 }
 
-bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node)
+bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepath, DomElement* node)
 {
     try
     {
@@ -245,7 +245,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         // create symbol
         Symbol* symbol = new Symbol(uuid, Version("0.1"), "LibrePCB", name, desc, "");
 
-        foreach (XmlDomElement* child, node->getChilds()) {
+        foreach (DomElement* child, node->getChilds()) {
             if (child->getName() == "wire")
             {
                 int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
@@ -289,7 +289,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
                 Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
-                foreach (XmlDomElement* vertex, child->getChilds()) {
+                foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
@@ -387,7 +387,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     return true;
 }
 
-bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node)
+bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filepath, DomElement* node)
 {
     try
     {
@@ -407,7 +407,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc, "");
         package->addFootprint(*footprint);
 
-        foreach (XmlDomElement* child, node->getChilds()) {
+        foreach (DomElement* child, node->getChilds()) {
             if (child->getName() == "description")
             {
                 // nothing to do
@@ -455,7 +455,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
                 Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
-                foreach (XmlDomElement* vertex, child->getChilds()) {
+                foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
@@ -603,7 +603,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
     return true;
 }
 
-bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepath, XmlDomElement* node)
+bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepath, DomElement* node)
 {
     try
     {
@@ -629,8 +629,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         component->addSymbolVariant(*symbvar);
 
         // signals
-        XmlDomElement* device = node->getFirstChild("devices/device", true, true);
-        for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
+        DomElement* device = node->getFirstChild("devices/device", true, true);
+        for (DomElement* connect = device->getFirstChild("connects/connect", false, false);
              connect; connect = connect->getNextSibling())
         {
             QString gateName = connect->getAttribute<QString>("gate", true);
@@ -648,7 +648,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         }
 
         // symbol variant items
-        foreach (XmlDomElement* gate, node->getFirstChild("gates", true)->getChilds()) {
+        foreach (DomElement* gate, node->getFirstChild("gates", true)->getChilds()) {
             QString gateName = gate->getAttribute<QString>("name", true);
             QString symbolName = gate->getAttribute<QString>("symbol", true);
             Uuid symbolUuid = getOrCreateUuid(outputSettings, filepath, "symbols", symbolName);
@@ -658,7 +658,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
 
             // connect pins
-            for (XmlDomElement* connect = device->getFirstChild("connects/connect", false, false);
+            for (DomElement* connect = device->getFirstChild("connects/connect", false, false);
                  connect; connect = connect->getNextSibling())
             {
                 if (connect->getAttribute<QString>("gate", true) == gateName)
@@ -678,7 +678,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         }
 
         // create devices
-        foreach (XmlDomElement* deviceNode, node->getFirstChild("devices", true)->getChilds()) {
+        foreach (DomElement* deviceNode, node->getFirstChild("devices", true)->getChilds()) {
             if (!deviceNode->hasAttribute("package")) continue;
 
             QString deviceName = deviceNode->getAttribute<QString>("name", false);
@@ -693,7 +693,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             device->setPackageUuid(pkgUuid);
 
             // connect pads
-            for (XmlDomElement* connect = deviceNode->getFirstChild("connects/*", false, false);
+            for (DomElement* connect = deviceNode->getFirstChild("connects/*", false, false);
                  connect; connect = connect->getNextSibling())
             {
                 QString gateName = connect->getAttribute<QString>("gate", true);

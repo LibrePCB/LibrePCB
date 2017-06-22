@@ -42,8 +42,8 @@ namespace librepcb {
  *
  * This template class lets you hold a list of serializable objects and provides some
  * useful features:
- * - The method #loadFromDomElement() to deserialize from a librepcb::XmlDomElement.
- * - The method #serialize() to serialize the whole list into a librepcb::XmlDomElement.
+ * - The method #loadFromDomElement() to deserialize from a librepcb::DomElement.
+ * - The method #serialize() to serialize the whole list into a librepcb::DomElement.
  * - Iterators (for example to use in C++11 range based for loops).
  * - Methods to find elements by UUID and/or name (if supported by template type `T`).
  * - Method #sortedByUuid() to create a copy of the list with elements sorted by UUID.
@@ -54,7 +54,7 @@ namespace librepcb {
  *
  * @tparam T  The type of the list items. The type must provide following functionality:
  *              - Optional: A nothrow copy constructor (to make the list copyable)
- *              - Optional: A constructor with one parameter of type `const XmlDomElement&`
+ *              - Optional: A constructor with one parameter of type `const DomElement&`
  *              - Optional: A method `serialize()` according to librepcb::SerializableObject
  *              - Optional: Comparison operator overloadings
  *              - Optional: A method `Uuid getUuid() const noexcept`
@@ -130,7 +130,7 @@ class SerializableObjectList : public SerializableObject
             for (const T& obj : elements) { append(std::make_shared<T>(obj)); } // copy element
             if (observer) registerObserver(observer);
         }
-        explicit SerializableObjectList(const XmlDomElement& domElement, IF_Observer* observer = nullptr) throw (Exception) {
+        explicit SerializableObjectList(const DomElement& domElement, IF_Observer* observer = nullptr) throw (Exception) {
             loadFromDomElement(domElement); // can throw
             if (observer) registerObserver(observer);
         }
@@ -219,9 +219,9 @@ class SerializableObjectList : public SerializableObject
         iterator end() noexcept {return mObjects.end();}
 
         // General Methods
-        int loadFromDomElement(const XmlDomElement& domElement) throw (Exception) {
+        int loadFromDomElement(const DomElement& domElement) throw (Exception) {
             clear();
-            for (XmlDomElement* node = domElement.getFirstChild(P::tagname, false);
+            for (DomElement* node = domElement.getFirstChild(P::tagname, false);
                  node; node = node->getNextSibling(P::tagname))
             {
                 append(std::make_shared<T>(*node)); // can throw
@@ -281,7 +281,7 @@ class SerializableObjectList : public SerializableObject
             for (int i = count() - 1; i >= 0; --i) { remove(i); }
         }
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const throw (Exception) override {
             serializePointerContainer(root, mObjects, P::tagname); // can throw
         }
 

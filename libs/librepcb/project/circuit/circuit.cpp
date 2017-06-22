@@ -62,24 +62,24 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
             std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            DomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load the whole circuit stuff
 
             // Load all netclasses
-            foreach (const XmlDomElement* node, root.getFirstChild("netclasses", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("netclasses", true)->getChilds()) {
                 NetClass* netclass = new NetClass(*this, *node);
                 addNetClass(*netclass);
             }
 
             // Load all netsignals
-            foreach (const XmlDomElement* node, root.getFirstChild("netsignals", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("netsignals", true)->getChilds()) {
                 NetSignal* netsignal = new NetSignal(*this, *node);
                 addNetSignal(*netsignal);
             }
 
             // Load all component instances
-            foreach (const XmlDomElement* node, root.getFirstChild("components", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("components", true)->getChilds()) {
                 ComponentInstance* component = new ComponentInstance(*this, *node);
                 addComponentInstance(*component);
             }
@@ -365,7 +365,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/circuit.xml"
     try
     {
-        DomDocument doc(*serializeToXmlDomElement("circuit"));
+        DomDocument doc(*serializeToDomElement("circuit"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -381,7 +381,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Circuit::serialize(XmlDomElement& root) const throw (Exception)
+void Circuit::serialize(DomElement& root) const throw (Exception)
 {
     root.appendChild(serializePointerContainer(mNetClasses, "netclasses", "netclass"));
     root.appendChild(serializePointerContainer(mNetSignals, "netsignals", "netsignal"));

@@ -42,7 +42,7 @@ Text::Text(int layerId, const QString& text, const Point& pos, const Angle& rota
     Q_ASSERT(height > 0);
 }
 
-Text::Text(const XmlDomElement& domElement) throw (Exception)
+Text::Text(const DomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
     mText = domElement.getText<QString>(true); // empty string --> exception
@@ -110,7 +110,7 @@ void Text::setAlign(const Alignment& align) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void Text::serialize(XmlDomElement& root) const throw (Exception)
+void Text::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

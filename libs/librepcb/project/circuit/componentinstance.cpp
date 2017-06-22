@@ -44,7 +44,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
@@ -71,7 +71,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
 
     // load all signal instances
-    foreach (const XmlDomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
+    foreach (const DomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
@@ -336,7 +336,7 @@ void ComponentInstance::unregisterDevice(BI_Device& device) throw (Exception)
     updateErcMessages();
 }
 
-void ComponentInstance::serialize(XmlDomElement& root) const throw (Exception)
+void ComponentInstance::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -345,7 +345,7 @@ void ComponentInstance::serialize(XmlDomElement& root) const throw (Exception)
     root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
     root.appendTextChild("name", mName);
     root.appendTextChild("value", mValue);
-    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
     root.appendChild(serializePointerContainer(mSignals, "signal_mapping", "map"));
 }
 

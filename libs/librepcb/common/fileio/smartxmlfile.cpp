@@ -24,7 +24,7 @@
 #include "smartxmlfile.h"
 #include "fileutils.h"
 #include "domdocument.h"
-#include "xmldomelement.h"
+#include "domelement.h"
 
 /*****************************************************************************************
  *  Namespace

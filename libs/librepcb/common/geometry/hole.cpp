@@ -38,7 +38,7 @@ Hole::Hole(const Point& position, const Length& diameter) noexcept :
     Q_ASSERT(diameter > 0);
 }
 
-Hole::Hole(const XmlDomElement& domElement) throw (Exception)
+Hole::Hole(const DomElement& domElement) throw (Exception)
 {
     mPosition.setX(domElement.getAttribute<Length>("x", true));
     mPosition.setY(domElement.getAttribute<Length>("y", true));
@@ -70,7 +70,7 @@ void Hole::setDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void Hole::serialize(XmlDomElement& root) const throw (Exception)
+void Hole::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

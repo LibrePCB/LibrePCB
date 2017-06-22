@@ -59,7 +59,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         BI_NetLine(const BI_NetLine& other) = delete;
         BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& startPoint,
                    BI_NetPoint& endPoint) throw (Exception);
-        BI_NetLine(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_NetLine(Board& board, const DomElement& domElement) throw (Exception);
         BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
                    const Length& width) throw (Exception);
         ~BI_NetLine() noexcept;
@@ -85,7 +85,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base

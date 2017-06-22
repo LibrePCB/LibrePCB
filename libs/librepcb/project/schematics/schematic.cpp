@@ -72,7 +72,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
             std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            DomElement& root = doc->getRoot();
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
@@ -83,7 +83,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
 
             // Load all symbols
-            foreach (const XmlDomElement* node, root.getFirstChild("symbols", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("symbols", true)->getChilds()) {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 if (getSymbolByUuid(symbol->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
@@ -94,7 +94,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            foreach (const XmlDomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -105,7 +105,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            foreach (const XmlDomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -116,7 +116,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlabels
-            foreach (const XmlDomElement* node, root.getFirstChild("netlabels", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("netlabels", true)->getChilds()) {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),
@@ -585,7 +585,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            DomDocument doc(*serializeToXmlDomElement("schematic"));
+            DomDocument doc(*serializeToDomElement("schematic"));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -701,15 +701,15 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Schematic::serialize(XmlDomElement& root) const throw (Exception)
+void Schematic::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    XmlDomElement* meta = root.appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
-    XmlDomElement* properties = root.appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement("grid_properties"));
+    DomElement* properties = root.appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToDomElement("grid_properties"));
     root.appendChild(serializePointerContainer(mSymbols, "symbols", "symbol"));
     root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
     root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));

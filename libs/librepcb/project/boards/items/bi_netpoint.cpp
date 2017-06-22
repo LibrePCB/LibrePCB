@@ -65,7 +65,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mLayer(nullptr), mNetSignal(nullptr), mFootprintPad(nullptr),
     mVia(nullptr)
 {
@@ -391,7 +391,7 @@ void BI_NetPoint::updateLines() const noexcept
     }
 }
 
-void BI_NetPoint::serialize(XmlDomElement& root) const throw (Exception)
+void BI_NetPoint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

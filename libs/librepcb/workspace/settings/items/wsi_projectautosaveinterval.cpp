@@ -35,7 +35,7 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const QString& xmlTagName,
-                                                         XmlDomElement* xmlElement) throw (Exception) :
+                                                         DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement),
     mInterval(600), mIntervalTmp(mInterval)
 {
@@ -99,7 +99,7 @@ void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
     mIntervalTmp = value * 60;
 }
 
-void WSI_ProjectAutosaveInterval::serialize(XmlDomElement& root) const throw (Exception)
+void WSI_ProjectAutosaveInterval::serialize(DomElement& root) const throw (Exception)
 {
     root.setText(mInterval);
 }

@@ -49,7 +49,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
 {
     try
     {
-        XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+        DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all properties
         mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
@@ -62,7 +62,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
                            "default_value", mDefaultValues, false);
 
         // Load all prefixes
-        for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
+        for (DomElement* node = root.getFirstChild("properties/prefix", true, false);
              node; node = node->getNextSibling("prefix"))
         {
             if (mPrefixes.contains(node->getAttribute<QString>("norm", false))) {
@@ -79,7 +79,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all signals
-        foreach (const XmlDomElement* node, root.getFirstChild("signals", true)->getChilds()) {
+        foreach (const DomElement* node, root.getFirstChild("signals", true)->getChilds()) {
             ComponentSignal* signal = new ComponentSignal(*node);
             if (getSignalByUuid(signal->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
@@ -90,8 +90,8 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all symbol variants
-        XmlDomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
-        foreach (const XmlDomElement* node, symbolVariantsNode->getChilds()) {
+        DomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
+        foreach (const DomElement* node, symbolVariantsNode->getChilds()) {
             ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
             if (getSymbolVariantByUuid(variant->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
@@ -293,22 +293,22 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
  *  Private Methods
  ****************************************************************************************/
 
-void Component::serialize(XmlDomElement& root) const throw (Exception)
+void Component::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
-    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
-    XmlDomElement* properties = root.appendChild("properties");
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
+    DomElement* properties = root.appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
     foreach (const QString& locale, mDefaultValues.keys()) {
-        XmlDomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
+        DomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
         child->setAttribute("locale", locale);
     }
     foreach (const QString& norm, mPrefixes.keys()) {
-        XmlDomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
+        DomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
         child->setAttribute("norm", norm);
     }
     root.appendChild(serializePointerContainer(mSignals, "signals", "signal"));
-    XmlDomElement* symbVars = serializePointerContainer(mSymbolVariants, "symbol_variants", "variant");
+    DomElement* symbVars = serializePointerContainer(mSymbolVariants, "symbol_variants", "variant");
     symbVars->setAttribute("default", mDefaultSymbolVariantUuid);
     root.appendChild(symbVars);
 }

@@ -72,7 +72,7 @@ class LibraryCategory : public LibraryBaseElement
         // Protected Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(XmlDomElement& root) const throw (Exception) override;
+        virtual void serialize(DomElement& root) const throw (Exception) override;
 
         // General Library Category Attributes
         Uuid mParentUuid;

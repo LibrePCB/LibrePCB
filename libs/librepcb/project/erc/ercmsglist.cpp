@@ -90,14 +90,14 @@ void ErcMsgList::restoreIgnoreState() noexcept
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
     std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-    XmlDomElement& root = doc->getRoot();
+    DomElement& root = doc->getRoot();
 
     // reset all ignore attributes
     foreach (ErcMsg* ercMsg, mItems)
         ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
-    foreach (const XmlDomElement* node, root.getFirstChild("ignore", true)->getChilds()) {
+    foreach (const DomElement* node, root.getFirstChild("ignore", true)->getChilds()) {
         foreach (ErcMsg* ercMsg, mItems)
         {
             if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute<QString>("owner_class", false))
@@ -117,7 +117,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/erc.xml"
     try
     {
-        DomDocument doc(*serializeToXmlDomElement("erc"));
+        DomDocument doc(*serializeToDomElement("erc"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -133,14 +133,14 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ErcMsgList::serialize(XmlDomElement& root) const throw (Exception)
+void ErcMsgList::serialize(DomElement& root) const throw (Exception)
 {
-    XmlDomElement* ignoreNode = root.appendChild("ignore");
+    DomElement* ignoreNode = root.appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)
     {
         if (ercMsg->isIgnored())
         {
-            XmlDomElement* itemNode = ignoreNode->appendChild("item");
+            DomElement* itemNode = ignoreNode->appendChild("item");
             itemNode->setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
             itemNode->setAttribute("owner_key", ercMsg->getOwnerKey());
             itemNode->setAttribute("msg_key", ercMsg->getMsgKey());

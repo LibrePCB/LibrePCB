@@ -83,7 +83,7 @@ class ErcMsgList final : public QObject, public SerializableObject
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

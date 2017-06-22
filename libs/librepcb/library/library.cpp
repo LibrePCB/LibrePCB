@@ -61,11 +61,11 @@ Library::Library(const FilePath& libDir, bool readOnly) throw (Exception) :
     }
 
     // read properties
-    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+    DomElement& root = mLoadingXmlFileDocument->getRoot();
     mUrl = QUrl(root.getFirstChild("properties/url", true, true)->getText<QString>(false), QUrl::StrictMode);
 
     // read dependency UUIDs
-    for (XmlDomElement* node = root.getFirstChild("properties/dependency", true, false);
+    for (DomElement* node = root.getFirstChild("properties/dependency", true, false);
          node; node = node->getNextSibling("dependency"))
     {
         mDependencies.append(node->getText<Uuid>(true));
@@ -148,10 +148,10 @@ void Library::copyTo(const FilePath& destination, bool removeSource) throw (Exce
     LibraryBaseElement::copyTo(destination, removeSource);
 }
 
-void Library::serialize(XmlDomElement& root) const throw (Exception)
+void Library::serialize(DomElement& root) const throw (Exception)
 {
     LibraryBaseElement::serialize(root);
-    XmlDomElement* properties = root.appendChild("properties");
+    DomElement* properties = root.appendChild("properties");
     properties->appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));
     foreach (const Uuid& uuid, mDependencies) {
         properties->appendTextChild("dependency", uuid);

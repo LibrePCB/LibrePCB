@@ -54,7 +54,7 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
         // Constructors / Destructor
         WSI_ProjectAutosaveInterval() = delete;
         WSI_ProjectAutosaveInterval(const WSI_ProjectAutosaveInterval& other) = delete;
-        WSI_ProjectAutosaveInterval(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        WSI_ProjectAutosaveInterval(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
         ~WSI_ProjectAutosaveInterval() noexcept;
 
         // Getters
@@ -70,7 +70,7 @@ class WSI_ProjectAutosaveInterval final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_ProjectAutosaveInterval& operator=(const WSI_ProjectAutosaveInterval& rhs) = delete;

@@ -37,7 +37,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+NetClass::NetClass(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -128,7 +128,7 @@ void NetClass::unregisterNetSignal(NetSignal& signal) throw (Exception)
     updateErcMessages();
 }
 
-void NetClass::serialize(XmlDomElement& root) const throw (Exception)
+void NetClass::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

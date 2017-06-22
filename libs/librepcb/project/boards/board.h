@@ -211,7 +211,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         void updateErcMessages() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

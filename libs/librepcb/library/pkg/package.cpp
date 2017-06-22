@@ -49,10 +49,10 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
 {
     try
     {
-        const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+        const DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pads
-        foreach (const XmlDomElement* node, root.getFirstChild("pads", true)->getChilds()) {
+        foreach (const DomElement* node, root.getFirstChild("pads", true)->getChilds()) {
             PackagePad* pad = new PackagePad(*node);
             if (getPadByUuid(pad->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
@@ -63,8 +63,8 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
         }
 
         // Load all footprints
-        XmlDomElement* footprintsNode = root.getFirstChild("footprints", true);
-        foreach (const XmlDomElement* node, footprintsNode->getChilds()) {
+        DomElement* footprintsNode = root.getFirstChild("footprints", true);
+        foreach (const DomElement* node, footprintsNode->getChilds()) {
             Footprint* footprint = new Footprint(*node);
             if (getFootprintByUuid(footprint->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
@@ -144,11 +144,11 @@ void Package::removeFootprint(Footprint& footprint) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Package::serialize(XmlDomElement& root) const throw (Exception)
+void Package::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
     root.appendChild(serializePointerContainer(mPads, "pads", "pad"));
-    XmlDomElement* footprintsNode = serializePointerContainer(mFootprints, "footprints", "footprint");
+    DomElement* footprintsNode = serializePointerContainer(mFootprints, "footprints", "footprint");
     footprintsNode->setAttribute("default", mDefaultFootprintUuid);
     root.appendChild(footprintsNode);
 }

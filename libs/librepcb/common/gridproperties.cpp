@@ -37,7 +37,7 @@ GridProperties::GridProperties() noexcept :
 {
 }
 
-GridProperties::GridProperties(const XmlDomElement& domElement) throw (Exception)
+GridProperties::GridProperties(const DomElement& domElement) throw (Exception)
 {
     mType = stringToType(domElement.getAttribute<QString>("type", true));
     mInterval = domElement.getAttribute<Length>("interval", true);
@@ -62,7 +62,7 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GridProperties::serialize(XmlDomElement& root) const throw (Exception)
+void GridProperties::serialize(DomElement& root) const throw (Exception)
 {
     root.setAttribute("type", typeToString(mType));
     root.setAttribute("interval", mInterval);

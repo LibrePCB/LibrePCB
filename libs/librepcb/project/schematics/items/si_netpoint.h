@@ -61,7 +61,7 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         // Constructors / Destructor
         SI_NetPoint() = delete;
         SI_NetPoint(const SI_NetPoint& other) = delete;
-        SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception);
         SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
         SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
         ~SI_NetPoint() noexcept;
@@ -89,7 +89,7 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         void updateLines() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base

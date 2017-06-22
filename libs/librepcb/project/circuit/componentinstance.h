@@ -36,7 +36,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 class Component;
@@ -69,7 +69,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         ComponentInstance() = delete;
         ComponentInstance(const ComponentInstance& other) = delete;
-        explicit ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
                                    const Uuid& symbVar, const QString& name) throw (Exception);
         ~ComponentInstance() noexcept;
@@ -130,7 +130,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void unregisterDevice(BI_Device& device) throw (Exception);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Helper Methods

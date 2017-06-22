@@ -171,7 +171,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         // try to create/open the XML project file
         std::unique_ptr<DomDocument> doc;
-        XmlDomElement* root = nullptr;
+        DomElement* root = nullptr;
         if (create) {
             mXmlFile.reset(SmartXmlFile::create(mFilepath));
         } else {
@@ -207,7 +207,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         if (!create) {
             // Load all schematics
-            foreach (const XmlDomElement* node, root->getFirstChild("schematics", true)->getChilds()) {
+            foreach (const DomElement* node, root->getFirstChild("schematics", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
@@ -215,7 +215,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
             // Load all boards
-            foreach (const XmlDomElement* node, root->getFirstChild("boards", true)->getChilds()) {
+            foreach (const DomElement* node, root->getFirstChild("boards", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
@@ -602,29 +602,29 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Project::serialize(XmlDomElement& root) const throw (Exception)
+void Project::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     // meta
-    XmlDomElement* meta = root.appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("name", mName);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
 
     // attributes
-    root.appendChild(mAttributes->serializeToXmlDomElement("attributes"));
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
 
     // schematics
     FilePath schematicsPath(mPath.getPathTo("schematics"));
-    XmlDomElement* schematics = root.appendChild("schematics");
+    DomElement* schematics = root.appendChild("schematics");
     foreach (Schematic* schematic, mSchematics)
         schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
 
     // boards
     FilePath boardsPath(mPath.getPathTo("boards"));
-    XmlDomElement* boards = root.appendChild("boards");
+    DomElement* boards = root.appendChild("boards");
     foreach (Board* board, mBoards)
         boards->appendTextChild("board", board->getFilePath().toRelative(boardsPath));
 }
@@ -653,7 +653,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.lpp project file
     try
     {
-        DomDocument doc(*serializeToXmlDomElement("project"));
+        DomDocument doc(*serializeToDomElement("project"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

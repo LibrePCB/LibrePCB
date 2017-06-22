@@ -62,7 +62,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
         BI_Polygon() = delete;
         BI_Polygon(const BI_Polygon& other) = delete;
         BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception);
-        BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Polygon(Board& board, const DomElement& domElement) throw (Exception);
         BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
                    bool isGrabArea, const Point& startPos) throw (Exception);
         ~BI_Polygon() noexcept;
@@ -76,7 +76,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept override;

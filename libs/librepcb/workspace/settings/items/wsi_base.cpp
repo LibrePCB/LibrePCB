@@ -36,7 +36,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Base::WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+WSI_Base::WSI_Base(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
     QObject(0), mXmlElementTagName(xmlTagName)
 {
     Q_ASSERT((!xmlElement) || (xmlElement->getName() == xmlTagName));

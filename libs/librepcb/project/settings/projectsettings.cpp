@@ -57,17 +57,17 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
             std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            DomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings
 
             // locale order
-            foreach (const XmlDomElement* node, root.getFirstChild("locale_order", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("locale_order", true)->getChilds()) {
                 mLocaleOrder.append(node->getText<QString>(true));
             }
 
             // norm order
-            foreach (const XmlDomElement* node, root.getFirstChild("norm_order", true)->getChilds()) {
+            foreach (const DomElement* node, root.getFirstChild("norm_order", true)->getChilds()) {
                 mNormOrder.append(node->getText<QString>(true));
             }
         }
@@ -111,7 +111,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/settings.xml"
     try
     {
-        DomDocument doc(*serializeToXmlDomElement("settings"));
+        DomDocument doc(*serializeToDomElement("settings"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -127,12 +127,12 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ProjectSettings::serialize(XmlDomElement& root) const throw (Exception)
+void ProjectSettings::serialize(DomElement& root) const throw (Exception)
 {
-    XmlDomElement* locale_order = root.appendChild("locale_order");
+    DomElement* locale_order = root.appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)
         locale_order->appendTextChild("locale", locale);
-    XmlDomElement* norm_order = root.appendChild("norm_order");
+    DomElement* norm_order = root.appendChild("norm_order");
     foreach (const QString& norm, mNormOrder)
         norm_order->appendTextChild("norm", norm);
 }

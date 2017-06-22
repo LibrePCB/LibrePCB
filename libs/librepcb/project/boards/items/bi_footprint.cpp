@@ -51,7 +51,7 @@ BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (
     init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception) :
+BI_Footprint::BI_Footprint(BI_Device& device, const DomElement& domElement) throw (Exception) :
     BI_Base(device.getBoard()), mDevice(device)
 {
     Q_UNUSED(domElement);
@@ -167,7 +167,7 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void BI_Footprint::serialize(XmlDomElement& root) const throw (Exception)
+void BI_Footprint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

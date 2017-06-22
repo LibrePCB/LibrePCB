@@ -41,7 +41,7 @@ FootprintPadSmt::FootprintPadSmt(const Uuid& padUuid, const Point& pos, const An
 {
 }
 
-FootprintPadSmt::FootprintPadSmt(const XmlDomElement& domElement) throw (Exception) :
+FootprintPadSmt::FootprintPadSmt(const DomElement& domElement) throw (Exception) :
     FootprintPad(domElement)
 {
     // read attributes
@@ -104,7 +104,7 @@ void FootprintPadSmt::setBoardSide(BoardSide_t side) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void FootprintPadSmt::serialize(XmlDomElement& root) const throw (Exception)
+void FootprintPadSmt::serialize(DomElement& root) const throw (Exception)
 {
     FootprintPad::serialize(root);
     root.setAttribute("side", boardSideToString(mBoardSide));

@@ -131,7 +131,7 @@ class Circuit final : public QObject, public SerializableObject
 
     private:
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

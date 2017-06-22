@@ -44,7 +44,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& 
     setDescription("en_US", desc_en_US);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -57,7 +57,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all symbol variant items
-        foreach (const XmlDomElement* node, domElement.getFirstChild("symbol_items", true)->getChilds()) {
+        foreach (const DomElement* node, domElement.getFirstChild("symbol_items", true)->getChilds()) {
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
@@ -159,7 +159,7 @@ void ComponentSymbolVariant::removeItem(ComponentSymbolVariantItem& item) noexce
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariant::serialize(XmlDomElement& root) const throw (Exception)
+void ComponentSymbolVariant::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

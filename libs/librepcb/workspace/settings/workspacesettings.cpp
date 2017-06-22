@@ -57,7 +57,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     }
 
     // load all settings
-    XmlDomElement* root = doc.get() ? &doc->getRoot() : nullptr;
+    DomElement* root = doc.get() ? &doc->getRoot() : nullptr;
     loadSettingsItem(mAppLocale,                "app_locale",                   root);
     loadSettingsItem(mAppDefMeasUnits,          "app_default_meas_units",       root);
     loadSettingsItem(mProjectAutosaveInterval,  "project_autosave_interval",    root);
@@ -121,25 +121,25 @@ void WorkspaceSettings::showSettingsDialog() noexcept
 
 template<typename T>
 void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                                         XmlDomElement* xmlRoot) throw (Exception)
+                                         DomElement* xmlRoot) throw (Exception)
 {
-    XmlDomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
+    DomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
     member.reset(new T(xmlTagName, node));
     mItems.append(member.data());
 }
 
 void WorkspaceSettings::saveToFile() const throw (Exception)
 {
-    DomDocument doc(*serializeToXmlDomElement("workspace_settings"));
+    DomDocument doc(*serializeToDomElement("workspace_settings"));
 
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
     file->save(doc, true); // can throw
 }
 
-void WorkspaceSettings::serialize(XmlDomElement& root) const throw (Exception)
+void WorkspaceSettings::serialize(DomElement& root) const throw (Exception)
 {
     foreach (WSI_Base* item, mItems) {
-        root.appendChild(item->serializeToXmlDomElement(item->getXmlElementTagName()));
+        root.appendChild(item->serializeToDomElement(item->getXmlElementTagName()));
     }
 }
 

@@ -50,7 +50,7 @@ class ComponentSymbolVariant final : public SerializableObject
         explicit ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                                         const QString& name_en_US,
                                         const QString& desc_en_US) noexcept;
-        explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSymbolVariant(const DomElement& domElement) throw (Exception);
         ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
@@ -80,7 +80,7 @@ class ComponentSymbolVariant final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(XmlDomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
