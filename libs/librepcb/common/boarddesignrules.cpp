@@ -51,7 +51,7 @@ BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) throw (Excep
     mDescription = domElement.getFirstChild("description", true)->getText<QString>(false);
     // stop mask
     if (XmlDomElement* e = domElement.getFirstChild("stopmask_clearance_ratio", false)) {
-        mStopMaskClearanceRatio = e->getText<qreal>(true);
+        mStopMaskClearanceRatio = e->getText<Ratio>(true);
     }
     if (XmlDomElement* e = domElement.getFirstChild("stopmask_clearance_min", false)) {
         mStopMaskClearanceMin = e->getText<Length>(true);
@@ -64,7 +64,7 @@ BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) throw (Excep
     }
     // cream mask
     if (XmlDomElement* e = domElement.getFirstChild("creammask_clearance_ratio", false)) {
-        mCreamMaskClearanceRatio = e->getText<qreal>(true);
+        mCreamMaskClearanceRatio = e->getText<Ratio>(true);
     }
     if (XmlDomElement* e = domElement.getFirstChild("creammask_clearance_min", false)) {
         mCreamMaskClearanceMin = e->getText<Length>(true);
@@ -74,7 +74,7 @@ BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) throw (Excep
     }
     // restring
     if (XmlDomElement* e = domElement.getFirstChild("restring_pad_ratio", false)) {
-        mRestringPadRatio = e->getText<qreal>(true);
+        mRestringPadRatio = e->getText<Ratio>(true);
     }
     if (XmlDomElement* e = domElement.getFirstChild("restring_pad_min", false)) {
         mRestringPadMin = e->getText<Length>(true);
@@ -83,7 +83,7 @@ BoardDesignRules::BoardDesignRules(const XmlDomElement& domElement) throw (Excep
         mRestringPadMax = e->getText<Length>(true);
     }
     if (XmlDomElement* e = domElement.getFirstChild("restring_via_ratio", false)) {
-        mRestringViaRatio = e->getText<qreal>(true);
+        mRestringViaRatio = e->getText<Ratio>(true);
     }
     if (XmlDomElement* e = domElement.getFirstChild("restring_via_min", false)) {
         mRestringViaMin = e->getText<Length>(true);
@@ -107,19 +107,19 @@ void BoardDesignRules::restoreDefaults() noexcept
     mName = tr("LibrePCB Default Design Rules");
     mDescription = QString();
     // stop mask
-    mStopMaskClearanceRatio = qreal(0);             // 0%
+    mStopMaskClearanceRatio = Ratio(0);             // 0%
     mStopMaskClearanceMin = Length(100000);         // 0.1mm
     mStopMaskClearanceMax = Length(100000);         // 0.1mm
     mStopMaskMaxViaDrillDiameter = Length(500000);  // 0.5mm
     // cream mask
-    mCreamMaskClearanceRatio = qreal(0.1);          // 10%
+    mCreamMaskClearanceRatio = Ratio(100000);       // 10%
     mCreamMaskClearanceMin = Length(0);             // 0.0mm
     mCreamMaskClearanceMax = Length(1000000);       // 1.0mm
     // restring
-    mRestringPadRatio = qreal(0.25);                // 25%
+    mRestringPadRatio = Ratio(250000);              // 25%
     mRestringPadMin = Length(250000);               // 0.25mm
     mRestringPadMax = Length(2000000);              // 2.0mm
-    mRestringViaRatio = qreal(0.25);                // 25%
+    mRestringViaRatio = Ratio(250000);              // 25%
     mRestringViaMin = Length(200000);               // 0.2mm
     mRestringViaMax = Length(2000000);              // 2.0mm
 }

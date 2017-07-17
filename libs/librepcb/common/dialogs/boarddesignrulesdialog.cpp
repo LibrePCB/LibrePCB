@@ -81,19 +81,19 @@ void BoardDesignRulesDialog::updateWidgets() noexcept
     mUi->edtName->setText(mDesignRules.getName());
     mUi->txtDescription->setPlainText(mDesignRules.getDescription());
     // stop mask
-    mUi->spbxStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio()*100);
+    mUi->spbxStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio().toPercent());
     mUi->spbxStopMaskClrMin->setValue(mDesignRules.getStopMaskClearanceMin().toMm());
     mUi->spbxStopMaskClrMax->setValue(mDesignRules.getStopMaskClearanceMax().toMm());
     mUi->spbxStopMaskMaxViaDia->setValue(mDesignRules.getStopMaskMaxViaDiameter().toMm());
     // cream mask
-    mUi->spbxCreamMaskClrRatio->setValue(mDesignRules.getCreamMaskClearanceRatio()*100);
+    mUi->spbxCreamMaskClrRatio->setValue(mDesignRules.getCreamMaskClearanceRatio().toPercent());
     mUi->spbxCreamMaskClrMin->setValue(mDesignRules.getCreamMaskClearanceMin().toMm());
     mUi->spbxCreamMaskClrMax->setValue(mDesignRules.getCreamMaskClearanceMax().toMm());
     // restring
-    mUi->spbxRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio()*100);
+    mUi->spbxRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio().toPercent());
     mUi->spbxRestringPadsMin->setValue(mDesignRules.getRestringPadMin().toMm());
     mUi->spbxRestringPadsMax->setValue(mDesignRules.getRestringPadMax().toMm());
-    mUi->spbxRestringViasRatio->setValue(mDesignRules.getRestringViaRatio()*100);
+    mUi->spbxRestringViasRatio->setValue(mDesignRules.getRestringViaRatio().toPercent());
     mUi->spbxRestringViasMin->setValue(mDesignRules.getRestringViaMin().toMm());
     mUi->spbxRestringViasMax->setValue(mDesignRules.getRestringViaMax().toMm());
 }
@@ -104,19 +104,19 @@ void BoardDesignRulesDialog::applyRules() noexcept
     mDesignRules.setName(mUi->edtName->text());
     mDesignRules.setDescription(mUi->txtDescription->toPlainText());
     // stop mask
-    mDesignRules.setStopMaskClearanceRatio(mUi->spbxStopMaskClrRatio->value()/100);
+    mDesignRules.setStopMaskClearanceRatio(Ratio::fromPercent(mUi->spbxStopMaskClrRatio->value()));
     mDesignRules.setStopMaskClearanceMin(Length::fromMm(mUi->spbxStopMaskClrMin->value()));
     mDesignRules.setStopMaskClearanceMax(Length::fromMm(mUi->spbxStopMaskClrMax->value()));
     mDesignRules.setStopMaskMaxViaDiameter(Length::fromMm(mUi->spbxStopMaskMaxViaDia->value()));
     // cream mask
-    mDesignRules.setCreamMaskClearanceRatio(mUi->spbxCreamMaskClrRatio->value()/100);
+    mDesignRules.setCreamMaskClearanceRatio(Ratio::fromPercent(mUi->spbxCreamMaskClrRatio->value()));
     mDesignRules.setCreamMaskClearanceMin(Length::fromMm(mUi->spbxCreamMaskClrMin->value()));
     mDesignRules.setCreamMaskClearanceMax(Length::fromMm(mUi->spbxCreamMaskClrMax->value()));
     // restring
-    mDesignRules.setRestringPadRatio(mUi->spbxRestringPadsRatio->value()/100);
+    mDesignRules.setRestringPadRatio(Ratio::fromPercent(mUi->spbxRestringPadsRatio->value()));
     mDesignRules.setRestringPadMin(Length::fromMm(mUi->spbxRestringPadsMin->value()));
     mDesignRules.setRestringPadMax(Length::fromMm(mUi->spbxRestringPadsMax->value()));
-    mDesignRules.setRestringViaRatio(mUi->spbxRestringViasRatio->value()/100);
+    mDesignRules.setRestringViaRatio(Ratio::fromPercent(mUi->spbxRestringViasRatio->value()));
     mDesignRules.setRestringViaMin(Length::fromMm(mUi->spbxRestringViasMin->value()));
     mDesignRules.setRestringViaMax(Length::fromMm(mUi->spbxRestringViasMax->value()));
 }

@@ -60,21 +60,21 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         const QString& getDescription() const noexcept {return mDescription;}
 
         // Getters: Stop Mask
-        qreal getStopMaskClearanceRatio() const noexcept {return mStopMaskClearanceRatio;}
+        const Ratio& getStopMaskClearanceRatio() const noexcept {return mStopMaskClearanceRatio;}
         const Length& getStopMaskClearanceMin() const noexcept {return mStopMaskClearanceMin;}
         const Length& getStopMaskClearanceMax() const noexcept {return mStopMaskClearanceMax;}
         const Length& getStopMaskMaxViaDiameter() const noexcept {return mStopMaskMaxViaDrillDiameter;}
 
         // Getters: Cream Mask
-        qreal getCreamMaskClearanceRatio() const noexcept {return mCreamMaskClearanceRatio;}
+        const Ratio& getCreamMaskClearanceRatio() const noexcept {return mCreamMaskClearanceRatio;}
         const Length& getCreamMaskClearanceMin() const noexcept {return mCreamMaskClearanceMin;}
         const Length& getCreamMaskClearanceMax() const noexcept {return mCreamMaskClearanceMax;}
 
         // Getters: Restring
-        qreal getRestringPadRatio() const noexcept {return mRestringPadRatio;}
+        const Ratio& getRestringPadRatio() const noexcept {return mRestringPadRatio;}
         const Length& getRestringPadMin() const noexcept {return mRestringPadMin;}
         const Length& getRestringPadMax() const noexcept {return mRestringPadMax;}
-        qreal getRestringViaRatio() const noexcept {return mRestringViaRatio;}
+        const Ratio& getRestringViaRatio() const noexcept {return mRestringViaRatio;}
         const Length& getRestringViaMin() const noexcept {return mRestringViaMin;}
         const Length& getRestringViaMax() const noexcept {return mRestringViaMax;}
 
@@ -84,21 +84,21 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         void setDescription(const QString& desc) noexcept {mDescription = desc;}
 
         // Setters: Stop Mask
-        void setStopMaskClearanceRatio(qreal ratio) noexcept {if (ratio > 0) mStopMaskClearanceRatio = ratio;}
+        void setStopMaskClearanceRatio(const Ratio& ratio) noexcept {if (ratio > 0) mStopMaskClearanceRatio = ratio;}
         void setStopMaskClearanceMin(const Length& min) noexcept {if (min >= 0) mStopMaskClearanceMin = min;}
         void setStopMaskClearanceMax(const Length& max) noexcept {if (max >= 0) mStopMaskClearanceMax = max;}
         void setStopMaskMaxViaDiameter(const Length& dia) noexcept {if (dia >= 0) mStopMaskMaxViaDrillDiameter = dia;}
 
         // Setters: Clear Mask
-        void setCreamMaskClearanceRatio(qreal ratio) noexcept {if (ratio > 0) mCreamMaskClearanceRatio = ratio;}
+        void setCreamMaskClearanceRatio(const Ratio& ratio) noexcept {if (ratio > 0) mCreamMaskClearanceRatio = ratio;}
         void setCreamMaskClearanceMin(const Length& min) noexcept {if (min >= 0) mCreamMaskClearanceMin = min;}
         void setCreamMaskClearanceMax(const Length& max) noexcept {if (max >= 0) mCreamMaskClearanceMax = max;}
 
         // Setters: Restring
-        void setRestringPadRatio(qreal ratio) noexcept {if (ratio > 0) mRestringPadRatio = ratio;}
+        void setRestringPadRatio(const Ratio& ratio) noexcept {if (ratio > 0) mRestringPadRatio = ratio;}
         void setRestringPadMin(const Length& min) noexcept {if (min >= 0) mRestringPadMin = min;}
         void setRestringPadMax(const Length& max) noexcept {if (max >= 0) mRestringPadMax = max;}
-        void setRestringViaRatio(qreal ratio) noexcept {if (ratio > 0) mRestringViaRatio = ratio;}
+        void setRestringViaRatio(const Ratio& ratio) noexcept {if (ratio > 0) mRestringViaRatio = ratio;}
         void setRestringViaMin(const Length& min) noexcept {if (min >= 0) mRestringViaMin = min;}
         void setRestringViaMax(const Length& max) noexcept {if (max >= 0) mRestringViaMax = max;}
 
@@ -130,21 +130,21 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         QString mDescription;
 
         // Stop Mask
-        qreal mStopMaskClearanceRatio;
+        Ratio mStopMaskClearanceRatio;
         Length mStopMaskClearanceMin;
         Length mStopMaskClearanceMax;
         Length mStopMaskMaxViaDrillDiameter;
 
         // Cream Mask
-        qreal mCreamMaskClearanceRatio;
+        Ratio mCreamMaskClearanceRatio;
         Length mCreamMaskClearanceMin;
         Length mCreamMaskClearanceMax;
 
         // Restring
-        qreal mRestringPadRatio;
+        Ratio mRestringPadRatio;
         Length mRestringPadMin;
         Length mRestringPadMax;
-        qreal mRestringViaRatio;
+        Ratio mRestringViaRatio;
         Length mRestringViaMin;
         Length mRestringViaMax;
 };
