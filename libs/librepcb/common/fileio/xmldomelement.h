@@ -163,7 +163,7 @@ class XmlDomElement final
          *
          * @tparam T    The text will be converted to this type. Available types:
          *              bool, uint, qreal, QString, QDateTime, #Uuid, #Version, #Length,
-         *              #LengthUnit (tbc)
+         *              #LengthUnit, #Ratio (tbc)
          *
          * @param throwIfEmpty  If true and the text is empty, an exception will be thrown.
          *                      If false and the text is empty, defaultValue will be returned.
@@ -272,7 +272,7 @@ class XmlDomElement final
          *
          * @tparam T        This type will be converted to the text string. Available types:
          *                  bool, qreal, QString, QDateTime, #Uuid, #Version, #Length,
-         *                  #LengthUnit (tbc)
+         *                  #LengthUnit, #Ratio (tbc)
          *
          * @param name      The tag name (see #isValidXmlTagName() for allowed characters)
          * @param value     The attribute value which will be converted to a QString

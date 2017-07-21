@@ -55,6 +55,7 @@ SOURCES += \
     common/filepathtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
+    common/ratiotest.cpp \
     common/scopeguardtest.cpp \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \

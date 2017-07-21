@@ -307,6 +307,27 @@ LengthUnit XmlDomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUni
     }
 }
 
+template <>
+Ratio XmlDomElement::getText<Ratio>(bool throwIfEmpty, const Ratio& defaultValue) const throw (Exception)
+{
+    QString text = getText<QString>(throwIfEmpty);
+    try
+    {
+        Ratio obj = Ratio::fromNormalized(text);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((text.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                                 QString(tr("Invalid ratio in node \"%1\".")).arg(mName));
+        }
+    }
+}
+
 /*****************************************************************************************
  *  Attribute Handling Methods
  ****************************************************************************************/
@@ -699,6 +720,12 @@ template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const LengthUnit& value) noexcept
 {
     return appendTextChild<QString>(name, value.toString());
+}
+
+template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Ratio& value) noexcept
+{
+    return appendTextChild<QString>(name, value.toNormalizedString());
 }
 
 XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
