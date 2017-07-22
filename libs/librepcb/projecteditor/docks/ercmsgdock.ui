@@ -10,9 +10,6 @@
     <height>456</height>
    </rect>
   </property>
-  <property name="features">
-   <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-  </property>
   <property name="allowedAreas">
    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
   </property>
