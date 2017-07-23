@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
 #include <QDomElement>
 #include "../exceptions.h"
 #include "filepath.h"
@@ -52,15 +53,6 @@ class DomDocument;
  *     <empty_child></empty_child>  <!-- could be a text element or an element with childs -->
  * </root_element>
  * @endcode
- *
- * @note This class provides some template methods to call them with different types.
- *       We don't use method overloading because this way we don't need to include
- *       the header files for our own types (e.g. #Uuid, #Version, ...).
- *
- * @todo Actually there is *very much* space for improvements ;)
- *       For example: const correctness, exception safety, simplification, performance, ...
- * @todo Maybe switch to a stream based concept like QXmlStreamReader and QXmlStreamWriter?
- * @todo Add more template instances (provide more type conversions from/to QString)
  *
  * @author ubruhin
  * @date 2015-02-01
@@ -141,7 +133,10 @@ class DomElement final
          *
          * @param name  The new name (see #isValidTagName() for allowed characters)
          */
-        void setName(const QString& name) noexcept {Q_ASSERT(isValidTagName(name)); mName = name;}
+        void setName(const QString& name) noexcept {
+            Q_ASSERT(isValidTagName(name));
+            mName = name;
+        }
 
 
         // Text Handling Methods
@@ -150,22 +145,21 @@ class DomElement final
          * @brief Set the text of this text element
          *
          * @tparam T    The value of this type will be converted to a QString.
-         *              Available types:
-         *              bool, uint, QString, QDateTime, #Uuid, #Version, #Length (tbc)
          *
          * @warning This method must be called only on elements without child elements!
          *
          * @param value         The value in the template type T
          */
         template <typename T>
-        void setText(const T& value) noexcept;
+        void setText(const T& value) noexcept {
+            Q_ASSERT(mChilds.isEmpty() == true);
+            mText = objectToString(value);
+        }
 
         /**
          * @brief Get the text of this text element in the specified type
          *
-         * @tparam T    The text will be converted to this type. Available types:
-         *              bool, uint, QString, QDateTime, #Uuid, #Version, #Length,
-         *              #LengthUnit, #Ratio (tbc)
+         * @tparam T    The text will be converted to this type.
          *
          * @param throwIfEmpty  If true and the text is empty, an exception will be thrown.
          *                      If false and the text is empty, defaultValue will be returned.
@@ -178,7 +172,19 @@ class DomElement final
          * @throw Exception     If the text is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getText(bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception);
+        T getText(bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception) {
+            if (hasChilds()) {
+                throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, mName,
+                                     tr("A node with child elements cannot have a text."));
+            }
+            try {
+                return stringToObject<T>(mText, throwIfEmpty, defaultValue);
+            } catch (const Exception& e) {
+                throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
+                    QString(tr("Text \"%1\" in node \"%2\" is invalid: %3"))
+                    .arg(mText, mName, e.getUserMsg()));
+            }
+        }
 
 
         // Attribute Handling Methods
@@ -186,15 +192,15 @@ class DomElement final
         /**
          * @brief Set or add an attribute to this element
          *
-         * @tparam T        The text will be converted in this type. Available types:
-         *                  bool, const char*, QString, QColor, QUrl, #Uuid, #LengthUnit,
-         *                  #Length, #Angle, #HAlign, #VAlign (tbc)
+         * @tparam T        The text will be converted in this type.
          *
          * @param name      The tag name (see #isValidTagName() for allowed characters)
          * @param value     The attribute value
          */
         template <typename T>
-        void setAttribute(const QString& name, const T& value) noexcept;
+        void setAttribute(const QString& name, const T& value) noexcept {
+            mAttributes.insert(name, objectToString(value));
+        }
 
         /**
          * @brief Check whether this element has a specific attribute or not
@@ -209,9 +215,7 @@ class DomElement final
         /**
          * @brief Get the value of a specific attribute in the specified type
          *
-         * @tparam T    The value will be converted in this type. Available types:
-         *              bool, uint, int, QString, QColor, QUrl, #Uuid, #LengthUnit,
-         *              #Length, #Angle, #HAlign, #VAlign (tbc)
+         * @tparam T    The value will be converted in this type.
          *
          * @param name          The tag name (see #isValidTagName() for allowed characters)
          * @param throwIfEmpty  If true and the value is empty, an exception will be thrown
@@ -225,7 +229,20 @@ class DomElement final
          * @throw Exception     If the value is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getAttribute(const QString& name, bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception);
+        T getAttribute(const QString& name, bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception) {
+            if (!mAttributes.contains(name)) {
+                throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
+                    QString(tr("Attribute \"%1\" not found in node \"%2\".")).arg(name, mName));
+            }
+            QString value = mAttributes.value(name);
+            try {
+                return stringToObject<T>(value, throwIfEmpty, defaultValue);
+            } catch (const Exception& e) {
+                throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
+                    QString(tr("Invalid attribute %1=\"%2\" in node \"%3\": %4"))
+                    .arg(name, value, mName, e.getUserMsg()));
+            }
+        }
 
 
         // Child Handling Methods
@@ -273,15 +290,17 @@ class DomElement final
         /**
          * @brief Create a new text child and append it to the list of childs
          *
-         * @tparam T        This type will be converted to the text string. Available types:
-         *                  bool, QString, QDateTime, #Uuid, #Version, #Length,
-         *                  #LengthUnit, #Ratio (tbc)
+         * @tparam T        This type will be converted to the text string.
          *
          * @param name      The tag name (see #isValidTagName() for allowed characters)
          * @param value     The attribute value which will be converted to a QString
          */
         template <typename T>
-        DomElement* appendTextChild(const QString& name, const T& value) noexcept;
+        DomElement* appendTextChild(const QString& name, const T& value) noexcept {
+            QScopedPointer<DomElement> child(new DomElement(name, objectToString(value)));
+            appendChild(child.data());
+            return child.take();
+        }
 
         /**
          * @brief Get the first child element of this element
@@ -475,6 +494,35 @@ class DomElement final
          */
         static bool isValidTagName(const QString& name) noexcept;
 
+        /**
+         * @brief Serialization template method
+         *
+         * @tparam T    Type of the object to be serialized
+         *
+         * @param obj   Input object
+         *
+         * @return      Output string
+         */
+        template <typename T>
+        static QString objectToString(const T& obj) noexcept;
+
+        /**
+         * @brief Deserialization template method
+         *
+         * @tparam T            Type of the object to be deserialized
+         *
+         * @param str           Input string
+         * @param throwIfEmpty  If true and the string is empty, an exception will be thrown.
+         *                      If false and the string is empty, defaultValue will be returned.
+         *
+         * @retval T            The created element of type T
+         * @retval defaultValue If the string is empty and "throwIfEmpty == false"
+         *
+         * @throws Exception if an error occurs
+         */
+        template <typename T>
+        static T stringToObject(const QString& str, bool throwIfEmpty, const T& defaultValue = T());
+
 
         // Attributes
         DomDocument* mDocument;  ///< the DOM document of the tree (only needed in the root node, otherwise nullptr)
@@ -484,6 +532,141 @@ class DomElement final
         QList<DomElement*> mChilds;      ///< all child elements (only if there is no text)
         QMap<QString, QString> mAttributes; ///< all attributes of this element (key, value) in alphabetical order
 };
+
+/*****************************************************************************************
+ *  Serialization Methods
+ ****************************************************************************************/
+
+template <>
+inline QString DomElement::objectToString(const QString& obj) noexcept {
+    return obj;
+}
+
+template <>
+inline QString DomElement::objectToString(const char* const& obj) noexcept {
+    return QString(obj);
+}
+
+template <>
+inline QString DomElement::objectToString(const bool& obj) noexcept {
+    return obj ? QString("true") : QString("false");
+}
+
+template <>
+inline QString DomElement::objectToString(const int& obj) noexcept {
+    return QString::number(obj);
+}
+
+template <>
+inline QString DomElement::objectToString(const uint& obj) noexcept {
+    return QString::number(obj);
+}
+
+template <>
+inline QString DomElement::objectToString(const QColor& obj) noexcept {
+    return obj.isValid() ? obj.name(QColor::HexArgb) : "";
+}
+
+template <>
+inline QString DomElement::objectToString(const QUrl& obj) noexcept {
+    return obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "";
+}
+
+template <>
+inline QString DomElement::objectToString(const QDateTime& obj) noexcept {
+    return obj.toUTC().toString(Qt::ISODate);
+}
+
+// all other types need to have a method "QString serializeToString() const noexcept"
+template <typename T>
+inline QString DomElement::objectToString(const T& obj) noexcept {
+    return obj.serializeToString();
+}
+
+/*****************************************************************************************
+ *  Deserialization Methods
+ ****************************************************************************************/
+
+template <>
+inline QString DomElement::stringToObject(const QString& str, bool throwIfEmpty, const QString& defaultValue) {
+    Q_UNUSED(defaultValue);
+    Q_ASSERT(defaultValue == QString()); // defaultValue makes no sense in this method
+    if (str.isEmpty() && throwIfEmpty) {
+        throw RuntimeError(__FILE__, __LINE__, QString(), tr("String is empty."));
+    }
+    return str;
+}
+
+template <>
+inline bool DomElement::stringToObject(const QString& str, bool throwIfEmpty, const bool& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    if      (s == "true")   { return true;          }
+    else if (s == "false")  { return false;         }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid boolean.")); }
+}
+
+template <>
+inline int DomElement::stringToObject(const QString& str, bool throwIfEmpty, const int& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    bool ok = false;
+    int value = s.toInt(&ok);
+    if      (ok)            { return value;         }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid integer.")); }
+}
+
+template <>
+inline uint DomElement::stringToObject(const QString& str, bool throwIfEmpty, const uint& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    bool ok = false;
+    uint value = s.toUInt(&ok);
+    if (ok)                 { return value;         }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid unsigned integer.")); }
+}
+
+template <>
+inline QDateTime DomElement::stringToObject(const QString& str, bool throwIfEmpty, const QDateTime& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    QDateTime obj = QDateTime::fromString(s, Qt::ISODate).toLocalTime();
+    if (obj.isValid())      { return obj;           }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid datetime.")); }
+}
+
+template <>
+inline QColor DomElement::stringToObject(const QString& str, bool throwIfEmpty, const QColor& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    QColor obj(s);
+    if (obj.isValid())      { return obj;           }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid color.")); }
+}
+
+template <>
+inline QUrl DomElement::stringToObject(const QString& str, bool throwIfEmpty, const QUrl& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    QUrl obj(s, QUrl::StrictMode);
+    if (obj.isValid())      { return obj;           }
+    else if (s.isEmpty())   { return defaultValue;  }
+    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid URL.")); }
+}
+
+// all other types need to have a static method "T deserializeFromString(const QString& str)"
+template <typename T>
+inline T DomElement::stringToObject(const QString& str, bool throwIfEmpty, const T& defaultValue) {
+    QString s = stringToObject<QString>(str, throwIfEmpty);
+    try {
+        return T::deserializeFromString(str); // can throw
+    } catch (const Exception& e) {
+        if (str.isEmpty()) {
+            return defaultValue;
+        } else {
+            throw;
+        }
+    }
+}
 
 /*****************************************************************************************
  *  End of File

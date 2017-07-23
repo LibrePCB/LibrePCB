@@ -260,6 +260,13 @@ class Length
          */
         qreal toPx() const noexcept {return mNanometers * sPixelsPerNm;}
 
+        /**
+         * @brief Serialize this object into a string
+         *
+         * @return This object as a string
+         */
+        QString serializeToString() const noexcept {return toMmString();}
+
 
         // General Methods
 
@@ -430,6 +437,19 @@ class Length
          *                      will be thrown
          */
         static Length fromPx(qreal pixels, const Length& gridInterval = Length(0)) throw (RangeError);
+
+        /**
+         * @brief Deserialize object from a string
+         *
+         * @param str           Input string
+         *
+         * @return The created element
+         *
+         * @throws Exception if the string was invalid
+         */
+        static Length deserializeFromString(const QString& str) throw (Exception) {
+            return fromMm(str); // can throw
+        }
 
 
         // Operators

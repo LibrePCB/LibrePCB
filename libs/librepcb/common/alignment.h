@@ -49,11 +49,11 @@ class HAlign final
 
         HAlign() noexcept : mAlign(Qt::AlignLeft) {}
         HAlign(const HAlign& other) noexcept : mAlign(other.mAlign) {}
-        QString toString() const noexcept;
+        QString serializeToString() const noexcept;
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         HAlign& mirror() noexcept;
         HAlign mirrored() const noexcept {return HAlign(*this).mirror();}
-        static HAlign fromString(const QString& align) throw (Exception);
+        static HAlign deserializeFromString(const QString& str) throw (Exception);
         static HAlign left() noexcept {return HAlign(Qt::AlignLeft);}
         static HAlign center() noexcept {return HAlign(Qt::AlignHCenter);}
         static HAlign right() noexcept {return HAlign(Qt::AlignRight);}
@@ -85,11 +85,11 @@ class VAlign final
 
         VAlign() noexcept : mAlign(Qt::AlignTop) {}
         VAlign(const VAlign& other) noexcept : mAlign(other.mAlign) {}
-        QString toString() const noexcept;
+        QString serializeToString() const noexcept;
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         VAlign& mirror() noexcept;
         VAlign mirrored() const noexcept {return VAlign(*this).mirror();}
-        static VAlign fromString(const QString& align) throw (Exception);
+        static VAlign deserializeFromString(const QString& str) throw (Exception);
         static VAlign top() noexcept {return VAlign(Qt::AlignTop);}
         static VAlign center() noexcept {return VAlign(Qt::AlignVCenter);}
         static VAlign bottom() noexcept {return VAlign(Qt::AlignBottom);}
