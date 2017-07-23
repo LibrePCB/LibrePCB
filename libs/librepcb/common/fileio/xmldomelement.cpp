@@ -200,24 +200,6 @@ uint XmlDomElement::getText<uint>(bool throwIfEmpty, const uint& defaultValue) c
 }
 
 template <>
-qreal XmlDomElement::getText<qreal>(bool throwIfEmpty, const qreal& defaultValue) const throw (Exception)
-{
-    QString text = getText<QString>(throwIfEmpty);
-    bool ok = false;
-    static_assert(sizeof(qreal) == sizeof(double), "Unsupported size of qreal type!");
-    qreal value = text.toDouble(&ok);
-    if (ok)
-        return value;
-    else if ((text.isEmpty()) && (!throwIfEmpty))
-        return defaultValue;
-    else
-    {
-        throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
-                             QString(tr("Invalid number in node \"%1\".")).arg(mName));
-    }
-}
-
-template <>
 QDateTime XmlDomElement::getText<QDateTime>(bool throwIfEmpty, const QDateTime& defaultValue) const throw (Exception)
 {
     QString text = getText<QString>(throwIfEmpty);
@@ -303,6 +285,27 @@ LengthUnit XmlDomElement::getText<LengthUnit>(bool throwIfEmpty, const LengthUni
         {
             throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
                                  QString(tr("Invalid length unit in node \"%1\".")).arg(mName));
+        }
+    }
+}
+
+template <>
+Ratio XmlDomElement::getText<Ratio>(bool throwIfEmpty, const Ratio& defaultValue) const throw (Exception)
+{
+    QString text = getText<QString>(throwIfEmpty);
+    try
+    {
+        Ratio obj = Ratio::fromNormalized(text);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((text.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, text,
+                                 QString(tr("Invalid ratio in node \"%1\".")).arg(mName));
         }
     }
 }
@@ -666,12 +669,6 @@ XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const bool& v
 }
 
 template <>
-XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const qreal& value) noexcept
-{
-    return appendTextChild<QString>(name, QString::number(value, 'g', 6));
-}
-
-template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const QDateTime& value) noexcept
 {
     return appendTextChild<QString>(name, value.toUTC().toString(Qt::ISODate));
@@ -699,6 +696,12 @@ template <>
 XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const LengthUnit& value) noexcept
 {
     return appendTextChild<QString>(name, value.toString());
+}
+
+template <>
+XmlDomElement* XmlDomElement::appendTextChild(const QString& name, const Ratio& value) noexcept
+{
+    return appendTextChild<QString>(name, value.toNormalizedString());
 }
 
 XmlDomElement* XmlDomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
