@@ -111,10 +111,14 @@ HEADERS += \
     dialogs/boarddesignrulesdialog.h \
     dialogs/gridsettingsdialog.h \
     exceptions.h \
+    fileio/cmd/cmdlistelementinsert.h \
+    fileio/cmd/cmdlistelementremove.h \
+    fileio/cmd/cmdlistelementsswap.h \
     fileio/directorylock.h \
     fileio/filepath.h \
     fileio/fileutils.h \
     fileio/serializableobject.h \
+    fileio/serializableobjectlist.h \
     fileio/smartfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
