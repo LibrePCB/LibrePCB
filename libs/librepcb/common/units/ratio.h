@@ -205,9 +205,34 @@ class Ratio
 
         // Operators
         Ratio&  operator=(const Ratio& rhs)         {mPpm = rhs.mPpm; return *this;}
+        Ratio& operator+=(const Ratio& rhs)         {mPpm += rhs.mPpm; return *this;}
+        Ratio& operator-=(const Ratio& rhs)         {mPpm -= rhs.mPpm; return *this;}
+        Ratio& operator*=(const Ratio& rhs)         {mPpm *= rhs.mPpm; return *this;}
+        Ratio& operator*=(qint32 rhs)               {mPpm *= rhs; return *this;}
+        Ratio& operator/=(const Ratio& rhs)         {mPpm /= rhs.mPpm; return *this;}
+        Ratio& operator/=(qint32 rhs)               {mPpm /= rhs; return *this;}
+        Ratio  operator+(const Ratio& rhs) const    {return Ratio(mPpm + rhs.mPpm);}
+        Ratio  operator-() const                    {return Ratio(-mPpm);}
+        Ratio  operator-(const Ratio& rhs) const    {return Ratio(mPpm - rhs.mPpm);}
+        Ratio  operator*(const Ratio& rhs) const    {return Ratio(mPpm * rhs.mPpm);}
+        Ratio  operator*(qint32 rhs) const          {return Ratio(mPpm * rhs);}
+        Ratio  operator/(const Ratio& rhs) const    {return Ratio(mPpm / rhs.mPpm);}
+        Ratio  operator/(qint32 rhs) const          {return Ratio(mPpm / rhs);}
+        Ratio  operator%(const Ratio& rhs) const    {return Ratio(mPpm % rhs.mPpm);}
+        bool    operator>(const Ratio& rhs) const   {return mPpm > rhs.mPpm;}
+        bool    operator>(qint32 rhs) const         {return mPpm > rhs;}
+        bool    operator<(const Ratio& rhs) const   {return mPpm < rhs.mPpm;}
+        bool    operator<(qint32 rhs) const         {return mPpm < rhs;}
+        bool    operator>=(const Ratio& rhs) const  {return mPpm >= rhs.mPpm;}
+        bool    operator>=(qint32 rhs) const        {return mPpm >= rhs;}
+        bool    operator<=(const Ratio& rhs) const  {return mPpm <= rhs.mPpm;}
+        bool    operator<=(qint32 rhs) const        {return mPpm <= rhs;}
         bool    operator==(const Ratio& rhs) const  {return mPpm == rhs.mPpm;}
+        bool    operator==(qint32 rhs) const        {return mPpm == rhs;}
         bool    operator!=(const Ratio& rhs) const  {return mPpm != rhs.mPpm;}
-        operator bool() const {return mPpm != 0;}
+        bool    operator!=(qint32 rhs) const        {return mPpm != rhs;}
+        operator bool() const                       {return mPpm != 0;}
+
 
     private:
 
