@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "text.h"
-#include "../fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -43,7 +42,7 @@ Text::Text(int layerId, const QString& text, const Point& pos, const Angle& rota
     Q_ASSERT(height > 0);
 }
 
-Text::Text(const XmlDomElement& domElement) throw (Exception)
+Text::Text(const DomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
     mText = domElement.getText<QString>(true); // empty string --> exception
@@ -111,20 +110,18 @@ void Text::setAlign(const Alignment& align) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Text::serializeToXmlDomElement() const throw (Exception)
+void Text::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("text"));
-    root->setAttribute("layer", mLayerId);
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("rotation", mRotation);
-    root->setAttribute("height", mHeight);
-    root->setAttribute("h_align", mAlign.getH());
-    root->setAttribute("v_align", mAlign.getV());
-    root->setText(mText);
-    return root.take();
+    root.setAttribute("layer", mLayerId);
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("rotation", mRotation);
+    root.setAttribute("height", mHeight);
+    root.setAttribute("h_align", mAlign.getH());
+    root.setAttribute("v_align", mAlign.getV());
+    root.setText(mText);
 }
 
 /*****************************************************************************************

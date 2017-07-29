@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domelement.h>
 #include "footprint.h"
 #include "package.h"
 
@@ -44,7 +44,7 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
     mDescriptions.insert("en_US", description_en_US);
 }
 
-Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
+Footprint::Footprint(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -56,9 +56,7 @@ Footprint::Footprint(const XmlDomElement& domElement) throw (Exception)
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all geometry elements
-        for (XmlDomElement* node = domElement.getFirstChild("geometry/*", true, false);
-             node; node = node->getNextSibling())
-        {
+        foreach (const DomElement* node, domElement.getFirstChild("geometry", true)->getChilds()) {
             if (node->getName() == "polygon") {
                 mPolygons.append(new Polygon(*node));
             } else if (node->getName() == "ellipse") {
@@ -202,28 +200,21 @@ void Footprint::removeHole(Hole& hole) noexcept
  *  Public Methods
  ****************************************************************************************/
 
-XmlDomElement* Footprint::serializeToXmlDomElement() const throw (Exception)
+void Footprint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("footprint"));
-    root->setAttribute("uuid", mUuid);
+    root.setAttribute("uuid", mUuid);
     foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+        root.appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    XmlDomElement* geometry = root->appendChild("geometry");
-    foreach (const Polygon* polygon, mPolygons)
-        geometry->appendChild(polygon->serializeToXmlDomElement());
-    foreach (const Text* text, mTexts)
-        geometry->appendChild(text->serializeToXmlDomElement());
-    foreach (const Ellipse* ellipse, mEllipses)
-        geometry->appendChild(ellipse->serializeToXmlDomElement());
-    foreach (const Hole* hole, mHoles)
-        geometry->appendChild(hole->serializeToXmlDomElement());
-    foreach (const FootprintPad* pad, mPads)
-        geometry->appendChild(pad->serializeToXmlDomElement());
-    return root.take();
+        root.appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    DomElement* geometry = root.appendChild("geometry");
+    serializePointerContainer(*geometry, mPolygons, "polygon");
+    serializePointerContainer(*geometry, mTexts, "text");
+    serializePointerContainer(*geometry, mEllipses, "ellipse");
+    serializePointerContainer(*geometry, mHoles, "hole");
+    serializePointerContainer(*geometry, mPads, "pad");
 }
 
 /*****************************************************************************************

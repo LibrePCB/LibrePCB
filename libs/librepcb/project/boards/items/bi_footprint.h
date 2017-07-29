@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../graphicsitems/bgi_footprint.h"
 
@@ -54,7 +54,7 @@ class BI_FootprintPad;
  * @author ubruhin
  * @date 2015-05-24
  */
-class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
+class BI_Footprint final : public BI_Base, public SerializableObject,
                            public IF_AttributeProvider
 {
         Q_OBJECT
@@ -65,7 +65,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         BI_Footprint() = delete;
         BI_Footprint(const BI_Footprint& other) = delete;
         BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (Exception);
-        BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception);
+        BI_Footprint(BI_Device& device, const DomElement& domElement) throw (Exception);
         explicit BI_Footprint(BI_Device& device) throw (Exception);
         ~BI_Footprint() noexcept;
 
@@ -83,8 +83,8 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
@@ -120,9 +120,7 @@ class BI_Footprint final : public BI_Base, public IF_XmlSerializableObject,
 
         void init() throw (Exception);
         void updateGraphicsItemTransform() noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

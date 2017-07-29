@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarylocaleorder.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -36,15 +35,13 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
-                                               XmlDomElement* xmlElement) throw (Exception) :
+                                               DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("locale", false);
-             child; child = child->getNextSibling("locale", false))
-        {
-            QLocale locale(child->getText<QString>(false));
+        foreach (const DomElement* node, xmlElement->getChilds()) {
+            QLocale locale(node->getText<QString>(false));
             if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
                 mList.append(locale.name());
             }
@@ -196,18 +193,11 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
     }
 }
 
-XmlDomElement* WSI_LibraryLocaleOrder::serializeToXmlDomElement() const throw (Exception)
+void WSI_LibraryLocaleOrder::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
     foreach (const QString& locale, mList) {
-        root->appendTextChild("locale", locale);
+        root.appendTextChild("locale", locale);
     }
-    return root.take();
-}
-
-bool WSI_LibraryLocaleOrder::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

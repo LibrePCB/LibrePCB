@@ -23,8 +23,7 @@
 #include <QtCore>
 #include "schematic.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "../project.h"
 #include <librepcb/library/sym/symbolpin.h>
@@ -72,8 +71,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            DomElement& root = doc->getRoot();
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
@@ -84,9 +83,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
 
             // Load all symbols
-            for (XmlDomElement* node = root.getFirstChild("symbols/symbol", true, false);
-                 node; node = node->getNextSibling("symbol"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("symbols", true)->getChilds()) {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 if (getSymbolByUuid(symbol->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
@@ -97,9 +94,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
-                 node; node = node->getNextSibling("netpoint"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -110,9 +105,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
-                 node; node = node->getNextSibling("netline"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -123,9 +116,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlabels
-            for (XmlDomElement* node = root.getFirstChild("netlabels/netlabel", true, false);
-                 node; node = node->getNextSibling("netlabel"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netlabels", true)->getChilds()) {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),
@@ -594,7 +585,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement());
+            DomDocument doc(*serializeToDomElement("schematic"));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -710,29 +701,19 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Schematic::serializeToXmlDomElement() const throw (Exception)
+void Schematic::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("schematic"));
-    XmlDomElement* meta = root->appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
-    XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement());
-    XmlDomElement* symbols = root->appendChild("symbols");
-    foreach (SI_Symbol* symbolInstance, mSymbols)
-        symbols->appendChild(symbolInstance->serializeToXmlDomElement());
-    XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (SI_NetPoint* netpoint, mNetPoints)
-        netpoints->appendChild(netpoint->serializeToXmlDomElement());
-    XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (SI_NetLine* netline, mNetLines)
-        netlines->appendChild(netline->serializeToXmlDomElement());
-    XmlDomElement* netlabels = root->appendChild("netlabels");
-    foreach (SI_NetLabel* netlabel, mNetLabels)
-        netlabels->appendChild(netlabel->serializeToXmlDomElement());
-    return root.take();
+    DomElement* properties = root.appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToDomElement("grid_properties"));
+    root.appendChild(serializePointerContainer(mSymbols, "symbols", "symbol"));
+    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
+    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
+    root.appendChild(serializePointerContainer(mNetLabels, "netlabels", "netlabel"));
 }
 
 /*****************************************************************************************

@@ -25,8 +25,8 @@
 #include <librepcb/common/sqlitedatabase.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/domelement.h>
 #include <librepcb/library/library.h>
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cat/packagecategory.h>

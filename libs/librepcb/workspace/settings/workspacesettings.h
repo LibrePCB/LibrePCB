@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 // All Settings Classes
 #include "items/wsi_applocale.h"
@@ -64,7 +64,7 @@ class WorkspaceSettingsDialog;
  * @author ubruhin
  * @date 2014-07-12
  */
-class WorkspaceSettings final : public QObject, public IF_XmlSerializableObject
+class WorkspaceSettings final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -112,12 +112,10 @@ class WorkspaceSettings final : public QObject, public IF_XmlSerializableObject
 
         template<typename T>
         void loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                              XmlDomElement* xmlRoot) throw (Exception);
+                              DomElement* xmlRoot) throw (Exception);
         void saveToFile() const throw (Exception);
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private: // Data

@@ -23,8 +23,7 @@
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -62,37 +61,29 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            DomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load the whole circuit stuff
 
             // Load all netclasses
-            for (XmlDomElement* node = root.getFirstChild("netclasses/netclass", true, false);
-                 node; node = node->getNextSibling("netclass"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netclasses", true)->getChilds()) {
                 NetClass* netclass = new NetClass(*this, *node);
                 addNetClass(*netclass);
             }
 
             // Load all netsignals
-            for (XmlDomElement* node = root.getFirstChild("netsignals/netsignal", true, false);
-                 node; node = node->getNextSibling("netsignal"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netsignals", true)->getChilds()) {
                 NetSignal* netsignal = new NetSignal(*this, *node);
                 addNetSignal(*netsignal);
             }
 
             // Load all component instances
-            for (XmlDomElement* node = root.getFirstChild("components/component", true, false);
-                 node; node = node->getNextSibling("component"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("components", true)->getChilds()) {
                 ComponentInstance* component = new ComponentInstance(*this, *node);
                 addComponentInstance(*component);
             }
         }
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -374,7 +365,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/circuit.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        DomDocument doc(*serializeToDomElement("circuit"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -390,27 +381,11 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool Circuit::checkAttributesValidity() const noexcept
+void Circuit::serialize(DomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* Circuit::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("circuit"));
-    //XmlDomElement* meta = root->appendChild("meta");
-    XmlDomElement* netclasses = root->appendChild("netclasses");
-    foreach (NetClass* netclass, mNetClasses)
-        netclasses->appendChild(netclass->serializeToXmlDomElement());
-    XmlDomElement* netsignals = root->appendChild("netsignals");
-    foreach (NetSignal* netsignal, mNetSignals)
-        netsignals->appendChild(netsignal->serializeToXmlDomElement());
-    XmlDomElement* components = root->appendChild("components");
-    foreach (ComponentInstance* instance, mComponentInstances)
-        components->appendChild(instance->serializeToXmlDomElement());
-    return root.take();
+    root.appendChild(serializePointerContainer(mNetClasses, "netclasses", "netclass"));
+    root.appendChild(serializePointerContainer(mNetSignals, "netsignals", "netsignal"));
+    root.appendChild(serializePointerContainer(mComponentInstances, "components", "component"));
 }
 
 /*****************************************************************************************

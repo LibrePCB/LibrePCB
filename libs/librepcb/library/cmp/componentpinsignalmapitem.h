@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +40,7 @@ namespace library {
 /**
  * @brief The ComponentPinSignalMapItem class
  */
-class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
+class ComponentPinSignalMapItem final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(ComponentPinSignalMapItem)
 
@@ -57,7 +57,7 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
                                            PinDisplayType_t displayType) noexcept;
-        explicit ComponentPinSignalMapItem(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentPinSignalMapItem(const DomElement& domElement) throw (Exception);
         ~ComponentPinSignalMapItem() noexcept;
 
         // Getters
@@ -69,8 +69,8 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         void setSignalUuid(const Uuid& uuid) noexcept {mSignalUuid = uuid;}
         void setDisplayType(PinDisplayType_t type) noexcept {mDisplayType = type;}
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Static Methods
         static PinDisplayType_t stringToDisplayType(const QString& type) throw (Exception);
@@ -85,9 +85,7 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         ComponentPinSignalMapItem& operator=(const ComponentPinSignalMapItem& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Attributes

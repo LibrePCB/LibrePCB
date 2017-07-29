@@ -29,7 +29,6 @@
 #include "netsignal.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../project.h"
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbolpin.h"
@@ -46,7 +45,7 @@ namespace project {
  ****************************************************************************************/
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                                 const XmlDomElement& domElement) throw (Exception) :
+                                                 const DomElement& domElement) throw (Exception) :
     QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
     mComponentSignal(nullptr), mIsAddedToCircuit(false), mNetSignal(nullptr)
 {
@@ -256,14 +255,12 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) throw
     mRegisteredFootprintPads.removeOne(&pad);
 }
 
-XmlDomElement* ComponentSignalInstance::serializeToXmlDomElement() const throw (Exception)
+void ComponentSignalInstance::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
-    root->setAttribute("comp_signal", mComponentSignal->getUuid());
-    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
-    return root.take();
+    root.setAttribute("comp_signal", mComponentSignal->getUuid());
+    root.setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
 }
 
 /*****************************************************************************************

@@ -26,7 +26,6 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/circuit.h"
 #include "../../project.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguard.h>
 
@@ -40,7 +39,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) throw (Exception) :
     SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
 {
     // read attributes
@@ -147,17 +146,15 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 
-XmlDomElement* SI_NetLabel::serializeToXmlDomElement() const throw (Exception)
+void SI_NetLabel::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netlabel"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("rotation", mRotation);
-    root->setAttribute("netsignal", mNetSignal->getUuid());
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("rotation", mRotation);
+    root.setAttribute("netsignal", mNetSignal->getUuid());
 }
 
 /*****************************************************************************************

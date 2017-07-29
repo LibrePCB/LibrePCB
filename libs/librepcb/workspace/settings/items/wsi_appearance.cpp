@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_appearance.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -35,7 +34,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Appearance::WSI_Appearance(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+WSI_Appearance::WSI_Appearance(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement), mUseOpenGl(false)
 {
     if (xmlElement) {
@@ -81,16 +80,9 @@ void WSI_Appearance::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* WSI_Appearance::serializeToXmlDomElement() const throw (Exception)
+void WSI_Appearance::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    root->appendTextChild("use_opengl", mUseOpenGlCheckBox->isChecked());
-    return root.take();
-}
-
-bool WSI_Appearance::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.appendTextChild("use_opengl", mUseOpenGlCheckBox->isChecked());
 }
 
 /*****************************************************************************************

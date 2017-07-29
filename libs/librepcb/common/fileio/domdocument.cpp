@@ -21,8 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "xmldomdocument.h"
-#include "xmldomelement.h"
+#include "domdocument.h"
+#include "domelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,13 +33,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-XmlDomDocument::XmlDomDocument(XmlDomElement& root) noexcept :
+DomDocument::DomDocument(DomElement& root) noexcept :
     mFilePath(), mRootElement(&root)
 {
     mRootElement->setDocument(this);
 }
 
-XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath& filepath) throw (Exception) :
+DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath) throw (Exception) :
     mFilePath(filepath), mRootElement(nullptr)
 {
     QDomDocument doc;
@@ -48,11 +48,11 @@ XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath&
     QString errMsg;
     int errLine;
     int errColumn;
-    if (!doc.setContent(xmlFileContent, &errMsg, &errLine, &errColumn)) {
-        QString line = xmlFileContent.split('\n').at(errLine-1);
+    if (!doc.setContent(fileContent, &errMsg, &errLine, &errColumn)) {
+        QString line = fileContent.split('\n').at(errLine-1);
         throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
             .arg(filepath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
-            QString(tr("Error while parsing XML in file \"%1\": %2 [%3:%4]"))
+            QString(tr("Error while parsing file \"%1\": %2 [%3:%4]"))
             .arg(filepath.toNative(), errMsg).arg(errLine).arg(errColumn));
     }
 
@@ -60,13 +60,13 @@ XmlDomDocument::XmlDomDocument(const QByteArray& xmlFileContent, const FilePath&
     QDomElement root = doc.documentElement();
     if (root.isNull()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("No XML root node found in \"%1\"!")).arg(mFilePath.toNative()));
+            QString(tr("No root node found in \"%1\"!")).arg(mFilePath.toNative()));
     }
 
-    mRootElement.reset(XmlDomElement::fromQDomElement(root, this));
+    mRootElement.reset(DomElement::fromQDomElement(root, this));
 }
 
-XmlDomDocument::~XmlDomDocument() noexcept
+DomDocument::~DomDocument() noexcept
 {
 }
 
@@ -74,12 +74,12 @@ XmlDomDocument::~XmlDomDocument() noexcept
  *  Getters
  ****************************************************************************************/
 
-XmlDomElement& XmlDomDocument::getRoot(const QString& expectedName) const throw (Exception)
+DomElement& DomDocument::getRoot(const QString& expectedName) const throw (Exception)
 {
-    XmlDomElement& root = getRoot();
+    DomElement& root = getRoot();
     if (root.getName() != expectedName) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
-            QString(tr("XML root node name mismatch in file \"%1\": %2 != %3"))
+            QString(tr("Root node name mismatch in file \"%1\": %2 != %3"))
             .arg(mFilePath.toNative(), root.getName(), expectedName));
     }
     return root;
@@ -89,7 +89,7 @@ XmlDomElement& XmlDomDocument::getRoot(const QString& expectedName) const throw 
  *  General Methods
  ****************************************************************************************/
 
-QByteArray XmlDomDocument::toByteArray() const throw (Exception)
+QByteArray DomDocument::toByteArray() const throw (Exception)
 {
     QByteArray data;
     QXmlStreamWriter writer(&data);

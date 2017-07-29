@@ -27,7 +27,6 @@
 #include "circuit.h"
 #include "../erc/ercmsg.h"
 #include "componentsignalinstance.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../schematics/items/si_netlabel.h"
 #include "../schematics/items/si_netpoint.h"
 #include "../boards/items/bi_netpoint.h"
@@ -43,7 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -260,16 +259,14 @@ void NetSignal::unregisterBoardVia(BI_Via& via) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* NetSignal::serializeToXmlDomElement() const throw (Exception)
+void NetSignal::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netsignal"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("name", mName);
-    root->setAttribute("auto_name", mHasAutoName);
-    root->setAttribute("netclass", mNetClass->getUuid());
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("name", mName);
+    root.setAttribute("auto_name", mHasAutoName);
+    root.setAttribute("netclass", mNetClass->getUuid());
 }
 
 /*****************************************************************************************

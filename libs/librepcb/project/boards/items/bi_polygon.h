@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ class BGI_Polygon;
  * @author ubruhin
  * @date 2016-01-12
  */
-class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
+class BI_Polygon final : public BI_Base, public SerializableObject,
                          public IF_AttributeProvider
 {
         Q_OBJECT
@@ -62,7 +62,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         BI_Polygon() = delete;
         BI_Polygon(const BI_Polygon& other) = delete;
         BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception);
-        BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Polygon(Board& board, const DomElement& domElement) throw (Exception);
         BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
                    bool isGrabArea, const Point& startPos) throw (Exception);
         ~BI_Polygon() noexcept;
@@ -75,8 +75,8 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept override;
@@ -104,11 +104,7 @@ class BI_Polygon final : public BI_Base, public IF_XmlSerializableObject,
 
 
     private:
-
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // General

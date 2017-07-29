@@ -102,8 +102,8 @@ class Symbol final : public LibraryElement
 
         // Private Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Symbol Attributes

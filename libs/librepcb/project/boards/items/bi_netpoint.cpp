@@ -34,7 +34,6 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/boardlayer.h>
 #include <librepcb/library/pkg/footprint.h>
@@ -66,7 +65,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mLayer(nullptr), mNetSignal(nullptr), mFootprintPad(nullptr),
     mVia(nullptr)
 {
@@ -392,27 +391,25 @@ void BI_NetPoint::updateLines() const noexcept
     }
 }
 
-XmlDomElement* BI_NetPoint::serializeToXmlDomElement() const throw (Exception)
+void BI_NetPoint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("layer", mLayer->getId());
-    root->setAttribute("netsignal", mNetSignal->getUuid());
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("layer", mLayer->getId());
+    root.setAttribute("netsignal", mNetSignal->getUuid());
     if (isAttachedToPad()) {
-        root->setAttribute("attached_to", QString("pad"));
-        root->setAttribute("component", mFootprintPad->getFootprint().getComponentInstanceUuid());
-        root->setAttribute("pad", mFootprintPad->getLibPadUuid());
+        root.setAttribute("attached_to", QString("pad"));
+        root.setAttribute("component", mFootprintPad->getFootprint().getComponentInstanceUuid());
+        root.setAttribute("pad", mFootprintPad->getLibPadUuid());
     } else if (isAttachedToVia()) {
-        root->setAttribute("attached_to", QString("via"));
-        root->setAttribute("via", mVia->getUuid());
+        root.setAttribute("attached_to", QString("via"));
+        root.setAttribute("via", mVia->getUuid());
     } else {
-        root->setAttribute("attached_to", QString("none"));
-        root->setAttribute("x", mPosition.getX());
-        root->setAttribute("y", mPosition.getY());
+        root.setAttribute("attached_to", QString("none"));
+        root.setAttribute("x", mPosition.getX());
+        root.setAttribute("y", mPosition.getY());
     }
-    return root.take();
 }
 
 /*****************************************************************************************

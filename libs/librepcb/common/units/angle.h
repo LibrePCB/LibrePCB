@@ -189,6 +189,13 @@ class Angle
          */
         qreal toRad() const noexcept {return (qreal)mMicrodegrees * (qreal)M_PI / 180e6;}
 
+        /**
+         * @brief Serialize this object into a string
+         *
+         * @return This object as a string
+         */
+        QString serializeToString() const noexcept {return toDegString();}
+
 
         // General Methods
 
@@ -284,6 +291,19 @@ class Angle
          * @return A new Angle object with the specified angle
          */
         static Angle fromRad(qreal radians) noexcept;
+
+        /**
+         * @brief Deserialize object from a string
+         *
+         * @param str           Input string
+         *
+         * @return The created element
+         *
+         * @throws Exception if the string was invalid
+         */
+        static Angle deserializeFromString(const QString& str) throw (Exception) {
+            return fromDeg(str); // can throw
+        }
 
 
         // Static Methods to create often used angles

@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "componentsignal.h"
 #include "component.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -42,7 +41,7 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSignal::ComponentSignal(const XmlDomElement& domElement) throw (Exception)
+ComponentSignal::ComponentSignal(const DomElement& domElement) throw (Exception)
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -64,19 +63,17 @@ ComponentSignal::~ComponentSignal() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* ComponentSignal::serializeToXmlDomElement() const throw (Exception)
+void ComponentSignal::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("signal"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("role", signalRoleToString(mRole));
-    root->setAttribute("forced_net_name", mForcedNetName);
-    root->setAttribute("required", mIsRequired);
-    root->setAttribute("negated", mIsNegated);
-    root->setAttribute("clock", mIsClock);
-    root->setText(mName);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("role", signalRoleToString(mRole));
+    root.setAttribute("forced_net_name", mForcedNetName);
+    root.setAttribute("required", mIsRequired);
+    root.setAttribute("negated", mIsNegated);
+    root.setAttribute("clock", mIsClock);
+    root.setText(mName);
 }
 
 /*****************************************************************************************

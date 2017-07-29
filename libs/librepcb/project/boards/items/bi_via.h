@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/uuid.h>
 #include "../graphicsitems/bgi_via.h"
 
@@ -51,7 +51,7 @@ class ErcMsg;
 /**
  * @brief The BI_Via class
  */
-class BI_Via final : public BI_Base, public IF_XmlSerializableObject
+class BI_Via final : public BI_Base, public SerializableObject
 {
         Q_OBJECT
 
@@ -64,7 +64,7 @@ class BI_Via final : public BI_Base, public IF_XmlSerializableObject
         BI_Via() = delete;
         BI_Via(const BI_Via& other) = delete;
         BI_Via(Board& board, const BI_Via& other) throw (Exception);
-        BI_Via(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Via(Board& board, const DomElement& domElement) throw (Exception);
         BI_Via(Board& board, const Point& position, BI_Via::Shape shape,
                const Length& size, const Length& drillDiameter, NetSignal* netsignal) throw (Exception);
         ~BI_Via() noexcept;
@@ -96,8 +96,8 @@ class BI_Via final : public BI_Base, public IF_XmlSerializableObject
         void unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception);
         void updateNetPoints() const noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -117,9 +117,7 @@ class BI_Via final : public BI_Base, public IF_XmlSerializableObject
 
         void init() throw (Exception);
         void boardAttributesChanged();
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

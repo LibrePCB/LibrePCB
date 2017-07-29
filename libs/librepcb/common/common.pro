@@ -30,7 +30,6 @@ SOURCES += \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
-    attributes/attributelist.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -49,14 +48,14 @@ SOURCES += \
     dialogs/gridsettingsdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
+    fileio/domdocument.cpp \
+    fileio/domelement.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
     fileio/smartfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
-    fileio/xmldomdocument.cpp \
-    fileio/xmldomelement.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/polygon.cpp \
@@ -93,7 +92,6 @@ HEADERS += \
     alignment.h \
     application.h \
     attributes/attribute.h \
-    attributes/attributelist.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
@@ -111,16 +109,20 @@ HEADERS += \
     dialogs/boarddesignrulesdialog.h \
     dialogs/gridsettingsdialog.h \
     exceptions.h \
+    fileio/cmd/cmdlistelementinsert.h \
+    fileio/cmd/cmdlistelementremove.h \
+    fileio/cmd/cmdlistelementsswap.h \
     fileio/directorylock.h \
+    fileio/domdocument.h \
+    fileio/domelement.h \
     fileio/filepath.h \
     fileio/fileutils.h \
-    fileio/if_xmlserializableobject.h \
+    fileio/serializableobject.h \
+    fileio/serializableobjectlist.h \
     fileio/smartfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
-    fileio/xmldomdocument.h \
-    fileio/xmldomelement.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/polygon.h \

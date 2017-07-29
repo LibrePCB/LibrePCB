@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "../attributes/attributelist.h"
+#include "../attributes/attribute.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

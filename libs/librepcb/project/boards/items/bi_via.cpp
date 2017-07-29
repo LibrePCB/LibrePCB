@@ -29,7 +29,6 @@
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/boardlayer.h>
 #include <librepcb/common/scopeguardlist.h>
@@ -52,7 +51,7 @@ BI_Via::BI_Via(Board& board, const BI_Via& other) throw (Exception) :
     init();
 }
 
-BI_Via::BI_Via(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mNetSignal(nullptr)
 {
     // read attributes
@@ -278,25 +277,23 @@ void BI_Via::updateNetPoints() const noexcept
     }
 }
 
-XmlDomElement* BI_Via::serializeToXmlDomElement() const throw (Exception)
+void BI_Via::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("via"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
     switch (mShape)
     {
-        case Shape::Round:      root->setAttribute<QString>("shape", "round"); break;
-        case Shape::Square:     root->setAttribute<QString>("shape", "square"); break;
-        case Shape::Octagon:    root->setAttribute<QString>("shape", "octagon"); break;
+        case Shape::Round:      root.setAttribute<QString>("shape", "round"); break;
+        case Shape::Square:     root.setAttribute<QString>("shape", "square"); break;
+        case Shape::Octagon:    root.setAttribute<QString>("shape", "octagon"); break;
         default: throw LogicError(__FILE__, __LINE__);
     }
-    root->setAttribute("size", mSize);
-    root->setAttribute("drill", mDrillDiameter);
-    root->setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
-    return root.take();
+    root.setAttribute("size", mSize);
+    root.setAttribute("drill", mDrillDiameter);
+    root.setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
 }
 
 /*****************************************************************************************

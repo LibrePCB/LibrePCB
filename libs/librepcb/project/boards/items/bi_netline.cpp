@@ -28,7 +28,6 @@
 #include "../../circuit/netsignal.h"
 #include "bi_footprint.h"
 #include "bi_footprintpad.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguard.h>
 
@@ -50,7 +49,7 @@ BI_NetLine::BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& start
     init();
 }
 
-BI_NetLine::BI_NetLine(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
@@ -207,16 +206,14 @@ void BI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-XmlDomElement* BI_NetLine::serializeToXmlDomElement() const throw (Exception)
+void BI_NetLine::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netline"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("start_point", mStartPoint->getUuid());
-    root->setAttribute("end_point", mEndPoint->getUuid());
-    root->setAttribute("width", mWidth);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("start_point", mStartPoint->getUuid());
+    root.setAttribute("end_point", mEndPoint->getUuid());
+    root.setAttribute("width", mWidth);
 }
 
 /*****************************************************************************************

@@ -22,8 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "component.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,7 +49,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
 {
     try
     {
-        XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+        DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all properties
         mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
@@ -63,7 +62,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
                            "default_value", mDefaultValues, false);
 
         // Load all prefixes
-        for (XmlDomElement* node = root.getFirstChild("properties/prefix", true, false);
+        for (DomElement* node = root.getFirstChild("properties/prefix", true, false);
              node; node = node->getNextSibling("prefix"))
         {
             if (mPrefixes.contains(node->getAttribute<QString>("norm", false))) {
@@ -80,9 +79,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all signals
-        for (XmlDomElement* node = root.getFirstChild("signals/signal", true, false);
-             node; node = node->getNextSibling("signal"))
-        {
+        foreach (const DomElement* node, root.getFirstChild("signals", true)->getChilds()) {
             ComponentSignal* signal = new ComponentSignal(*node);
             if (getSignalByUuid(signal->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
@@ -93,10 +90,8 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all symbol variants
-        XmlDomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
-        for (XmlDomElement* node = symbolVariantsNode->getFirstChild("variant", false);
-             node; node = node->getNextSibling("variant"))
-        {
+        DomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
+        foreach (const DomElement* node, symbolVariantsNode->getChilds()) {
             ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
             if (getSymbolVariantByUuid(variant->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
@@ -298,30 +293,24 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Component::serializeToXmlDomElement() const throw (Exception)
+void Component::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->appendChild(mAttributes->serializeToXmlDomElement());
-    XmlDomElement* properties = root->appendChild("properties");
+    LibraryElement::serialize(root);
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
+    DomElement* properties = root.appendChild("properties");
     properties->appendTextChild("schematic_only", mSchematicOnly);
     foreach (const QString& locale, mDefaultValues.keys()) {
-        XmlDomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
+        DomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
         child->setAttribute("locale", locale);
     }
     foreach (const QString& norm, mPrefixes.keys()) {
-        XmlDomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
+        DomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
         child->setAttribute("norm", norm);
     }
-    XmlDomElement* signalsNode = root->appendChild("signals");
-    foreach (const ComponentSignal* signal, mSignals) {
-        signalsNode->appendChild(signal->serializeToXmlDomElement());
-    }
-    XmlDomElement* symbol_variants = root->appendChild("symbol_variants");
-    symbol_variants->setAttribute("default", mDefaultSymbolVariantUuid);
-    foreach (const ComponentSymbolVariant* variant, mSymbolVariants) {
-        symbol_variants->appendChild(variant->serializeToXmlDomElement());
-    }
-    return root.take();
+    root.appendChild(serializePointerContainer(mSignals, "signals", "signal"));
+    DomElement* symbVars = serializePointerContainer(mSymbolVariants, "symbol_variants", "variant");
+    symbVars->setAttribute("default", mDefaultSymbolVariantUuid);
+    root.appendChild(symbVars);
 }
 
 bool Component::checkAttributesValidity() const noexcept

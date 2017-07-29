@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../units/all_length_units.h"
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The Ellipse class
  */
-class Ellipse final : public IF_XmlSerializableObject
+class Ellipse final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Ellipse)
 
@@ -50,7 +50,7 @@ class Ellipse final : public IF_XmlSerializableObject
         Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& center, const Length& radiusX, const Length& radiusY,
                 const Angle& rotation) noexcept;
-        explicit Ellipse(const XmlDomElement& domElement) throw (Exception);
+        explicit Ellipse(const DomElement& domElement) throw (Exception);
         ~Ellipse() noexcept;
 
         // Getters
@@ -81,8 +81,8 @@ class Ellipse final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -92,9 +92,7 @@ class Ellipse final : public IF_XmlSerializableObject
         Ellipse& operator=(const Ellipse& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Polygon Attributes

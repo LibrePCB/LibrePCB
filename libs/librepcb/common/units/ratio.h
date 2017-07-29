@@ -157,6 +157,13 @@ class Ratio
             return QLocale::c().toString(toNormalized(), 'f', 6);
         }
 
+        /**
+         * @brief Serialize this object into a string
+         *
+         * @return This object as a string
+         */
+        QString serializeToString() const noexcept {return toNormalizedString();}
+
 
         // Static Methods
 
@@ -195,6 +202,19 @@ class Ratio
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
         static Ratio fromNormalized(const QString& normalized) throw (Exception);
+
+        /**
+         * @brief Deserialize object from a string
+         *
+         * @param str           Input string
+         *
+         * @return The created element
+         *
+         * @throws Exception if the string was invalid
+         */
+        static Ratio deserializeFromString(const QString& str) throw (Exception) {
+            return fromNormalized(str);
+        }
 
 
         // Static Methods to create often used ratios

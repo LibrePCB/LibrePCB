@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_librarynormorder.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -36,15 +35,13 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
-                                           XmlDomElement* xmlElement) throw (Exception) :
+                                           DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("norm", false);
-             child; child = child->getNextSibling("norm", false))
-        {
-            mList.append(child->getText<QString>(false));
+        foreach (const DomElement* node, xmlElement->getChilds()) {
+            mList.append(node->getText<QString>(false));
         }
     }
     mListTmp = mList;
@@ -160,18 +157,11 @@ void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
     mListWidget->addItems(mListTmp);
 }
 
-XmlDomElement* WSI_LibraryNormOrder::serializeToXmlDomElement() const throw (Exception)
+void WSI_LibraryNormOrder::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
     foreach (const QString& norm, mList) {
-        root->appendTextChild("norm", norm);
+        root.appendTextChild("norm", norm);
     }
-    return root.take();
-}
-
-bool WSI_LibraryNormOrder::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

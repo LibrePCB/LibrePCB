@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/sgi_netlabel.h"
 
 /*****************************************************************************************
@@ -45,7 +45,7 @@ class NetSignal;
 /**
  * @brief The SI_NetLabel class
  */
-class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
+class SI_NetLabel final : public SI_Base, public SerializableObject
 {
         Q_OBJECT
 
@@ -54,7 +54,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         // Constructors / Destructor
         SI_NetLabel() = delete;
         SI_NetLabel(const SI_NetLabel& other) = delete;
-        explicit SI_NetLabel(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SI_NetLabel(Schematic& schematic, const DomElement& domElement) throw (Exception);
         explicit SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
         ~SI_NetLabel() noexcept;
 
@@ -72,8 +72,8 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
@@ -93,9 +93,7 @@ class SI_NetLabel final : public SI_Base, public IF_XmlSerializableObject
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

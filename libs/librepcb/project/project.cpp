@@ -27,8 +27,7 @@
 #include <librepcb/common/fileio/smarttextfile.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include <librepcb/common/fileio/smartversionfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/systeminfo.h>
 #include <librepcb/common/schematiclayer.h>
@@ -171,8 +170,8 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         }
 
         // try to create/open the XML project file
-        QSharedPointer<XmlDomDocument> doc;
-        XmlDomElement* root = nullptr;
+        std::unique_ptr<DomDocument> doc;
+        DomElement* root = nullptr;
         if (create) {
             mXmlFile.reset(SmartXmlFile::create(mFilepath));
         } else {
@@ -208,9 +207,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         if (!create) {
             // Load all schematics
-            for (XmlDomElement* node = root->getFirstChild("schematics/schematic", true, false);
-                 node; node = node->getNextSibling("schematic"))
-            {
+            foreach (const DomElement* node, root->getFirstChild("schematics", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
@@ -218,9 +215,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
             // Load all boards
-            for (XmlDomElement* node = root->getFirstChild("boards/board", true, false);
-                 node; node = node->getNextSibling("board"))
-            {
+            foreach (const DomElement* node, root->getFirstChild("boards", true)->getChilds()) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
@@ -576,7 +571,7 @@ bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
         else if (attrKey == QLatin1String("LAST_MODIFIED"))
             return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
         else if (mAttributes->contains(attrKey))
-            return value = mAttributes->value(attrKey)->getValueTr(true), true;
+            return value = mAttributes->find(attrKey)->getValueTr(true), true;
     }
 
     return false;
@@ -607,35 +602,31 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Project::serializeToXmlDomElement() const throw (Exception)
+void Project::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("project"));
-
     // meta
-    XmlDomElement* meta = root->appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("name", mName);
     meta->appendTextChild("author", mAuthor);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("created", mCreated);
 
     // attributes
-    root->appendChild(mAttributes->serializeToXmlDomElement());
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
 
     // schematics
     FilePath schematicsPath(mPath.getPathTo("schematics"));
-    XmlDomElement* schematics = root->appendChild("schematics");
+    DomElement* schematics = root.appendChild("schematics");
     foreach (Schematic* schematic, mSchematics)
         schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
 
     // boards
     FilePath boardsPath(mPath.getPathTo("boards"));
-    XmlDomElement* boards = root->appendChild("boards");
+    DomElement* boards = root.appendChild("boards");
     foreach (Board* board, mBoards)
         boards->appendTextChild("board", board->getFilePath().toRelative(boardsPath));
-
-    return root.take();
 }
 
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
@@ -662,7 +653,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     // Save *.lpp project file
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        DomDocument doc(*serializeToDomElement("project"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)

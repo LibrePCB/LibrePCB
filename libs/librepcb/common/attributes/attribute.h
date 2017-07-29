@@ -24,7 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobjectlist.h"
+#include "../fileio/cmd/cmdlistelementinsert.h"
+#include "../fileio/cmd/cmdlistelementremove.h"
+#include "../fileio/cmd/cmdlistelementsswap.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +44,7 @@ class AttributeUnit;
 /**
  * @brief The Attribute class
  */
-class Attribute final : public IF_XmlSerializableObject
+class Attribute final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Attribute)
 
@@ -50,13 +53,14 @@ class Attribute final : public IF_XmlSerializableObject
         // Constructors / Destructor
         Attribute() = delete;
         Attribute(const Attribute& other) noexcept;
-        explicit Attribute(const XmlDomElement& domElement) throw (Exception);
+        explicit Attribute(const DomElement& domElement) throw (Exception);
         Attribute(const QString& key, const AttributeType& type, const QString& value,
                   const AttributeUnit* unit) throw (Exception);
         ~Attribute() noexcept;
 
         // Getters
         const QString& getKey() const noexcept {return mKey;}
+        const QString& getName() const noexcept {return mKey;} // required for SerializableObjectList
         const AttributeType& getType() const noexcept {return *mType;}
         const AttributeUnit* getUnit() const noexcept {return mUnit;}
         const QString& getValue() const noexcept {return mValue;}
@@ -69,8 +73,8 @@ class Attribute final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         bool operator==(const Attribute& rhs) const noexcept;
@@ -79,9 +83,7 @@ class Attribute final : public IF_XmlSerializableObject
 
 
     private: // Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data
@@ -90,6 +92,16 @@ class Attribute final : public IF_XmlSerializableObject
         QString mValue;
         const AttributeUnit* mUnit;
 };
+
+/*****************************************************************************************
+ *  Class AttributeList
+ ****************************************************************************************/
+
+struct AttributeListNameProvider {static constexpr const char* tagname = "attribute";};
+using AttributeList = SerializableObjectList<Attribute, AttributeListNameProvider>;
+using CmdAttributeInsert = CmdListElementInsert<Attribute, AttributeListNameProvider>;
+using CmdAttributeRemove = CmdListElementRemove<Attribute, AttributeListNameProvider>;
+using CmdAttributesSwap = CmdListElementsSwap<Attribute, AttributeListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

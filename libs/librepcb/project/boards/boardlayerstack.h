@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/if_boardlayerprovider.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -43,7 +43,7 @@ class Board;
 /**
  * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
-class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
+class BoardLayerStack final : public QObject, public SerializableObject,
                               public IF_BoardLayerProvider
 {
         Q_OBJECT
@@ -54,7 +54,7 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         BoardLayerStack() = delete;
         BoardLayerStack(const BoardLayerStack& other) = delete;
         BoardLayerStack(Board& board, const BoardLayerStack& other) throw (Exception);
-        BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BoardLayerStack(Board& board, const DomElement& domElement) throw (Exception);
         explicit BoardLayerStack(Board& board) throw (Exception);
         ~BoardLayerStack() noexcept;
 
@@ -69,8 +69,8 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
@@ -87,9 +87,6 @@ class BoardLayerStack final : public QObject, public IF_XmlSerializableObject,
         void addAllRequiredLayers() noexcept;
         void addLayer(int id) noexcept;
         void addLayer(BoardLayer& layer) noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // General

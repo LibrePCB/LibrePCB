@@ -28,7 +28,6 @@
 #include "../../circuit/netsignal.h"
 #include "si_symbol.h"
 #include "si_symbolpin.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguard.h>
 
@@ -42,7 +41,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLine::SI_NetLine(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) throw (Exception) :
     SI_Base(schematic), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
@@ -171,16 +170,14 @@ void SI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-XmlDomElement* SI_NetLine::serializeToXmlDomElement() const throw (Exception)
+void SI_NetLine::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netline"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("start_point", mStartPoint->getUuid());
-    root->setAttribute("end_point", mEndPoint->getUuid());
-    root->setAttribute("width", mWidth);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("start_point", mStartPoint->getUuid());
+    root.setAttribute("end_point", mEndPoint->getUuid());
+    root.setAttribute("width", mWidth);
 }
 
 /*****************************************************************************************

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/uuid.h>
 #include "../graphicsitems/bgi_netline.h"
 
@@ -48,7 +48,7 @@ class BI_NetPoint;
 /**
  * @brief The BI_NetLine class
  */
-class BI_NetLine final : public BI_Base, public IF_XmlSerializableObject
+class BI_NetLine final : public BI_Base, public SerializableObject
 {
         Q_OBJECT
 
@@ -59,7 +59,7 @@ class BI_NetLine final : public BI_Base, public IF_XmlSerializableObject
         BI_NetLine(const BI_NetLine& other) = delete;
         BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& startPoint,
                    BI_NetPoint& endPoint) throw (Exception);
-        BI_NetLine(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_NetLine(Board& board, const DomElement& domElement) throw (Exception);
         BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
                    const Length& width) throw (Exception);
         ~BI_NetLine() noexcept;
@@ -84,8 +84,8 @@ class BI_NetLine final : public BI_Base, public IF_XmlSerializableObject
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
         void updateLine() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -102,9 +102,7 @@ class BI_NetLine final : public BI_Base, public IF_XmlSerializableObject
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

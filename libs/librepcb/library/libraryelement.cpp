@@ -22,8 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "libraryelement.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,8 +49,8 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read category UUIDs
-    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
-    for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
+    DomElement& root = mLoadingXmlFileDocument->getRoot();
+    for (DomElement* node = root.getFirstChild("meta/category", true, false);
          node; node = node->getNextSibling("category"))
     {
         mCategories.append(node->getText<Uuid>(true));
@@ -66,13 +65,12 @@ LibraryElement::~LibraryElement() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
+void LibraryElement::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
+    LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, mCategories) {
-        root->getFirstChild("meta", true)->appendTextChild("category", uuid);
+        root.getFirstChild("meta", true)->appendTextChild("category", uuid);
     }
-    return root.take();
 }
 
 bool LibraryElement::checkAttributesValidity() const noexcept

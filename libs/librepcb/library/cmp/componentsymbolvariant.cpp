@@ -23,7 +23,6 @@
 #include <QtCore>
 #include "componentsymbolvariant.h"
 #include "component.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -45,7 +44,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& 
     setDescription("en_US", desc_en_US);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -58,9 +57,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const XmlDomElement& domElement) 
         LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
 
         // Load all symbol variant items
-        for (XmlDomElement* node = domElement.getFirstChild("symbol_items/item", true, false);
-             node; node = node->getNextSibling("item"))
-        {
+        foreach (const DomElement* node, domElement.getFirstChild("symbol_items", true)->getChilds()) {
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
@@ -162,21 +159,17 @@ void ComponentSymbolVariant::removeItem(ComponentSymbolVariantItem& item) noexce
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* ComponentSymbolVariant::serializeToXmlDomElement() const throw (Exception)
+void ComponentSymbolVariant::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("variant"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("norm", mNorm);
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("norm", mNorm);
     foreach (const QString& locale, mNames.keys())
-        root->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
+        root.appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
     foreach (const QString& locale, mDescriptions.keys())
-        root->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    XmlDomElement* symbol_items = root->appendChild("symbol_items");
-    foreach (const ComponentSymbolVariantItem* item, mSymbolItems)
-        symbol_items->appendChild(item->serializeToXmlDomElement());
-    return root.take();
+        root.appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
+    root.appendChild(serializePointerContainer(mSymbolItems, "symbol_items", "item"));
 }
 
 /*****************************************************************************************

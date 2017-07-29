@@ -22,8 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "device.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -46,14 +45,12 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
 Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
-    XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+    DomElement& root = mLoadingXmlFileDocument->getRoot();
 
     // load attributes
     mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
     mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
-    for (XmlDomElement* node = root.getFirstChild("pad_signal_map/map", true, false);
-         node; node = node->getNextSibling("map"))
-    {
+    foreach (const DomElement* node, root.getFirstChild("pad_signal_map", true)->getChilds()) {
         Uuid pad = node->getAttribute<Uuid>("pad", true);
         Uuid signal = node->getText<Uuid>(false);
         if (mPadSignalMap.contains(pad)) {
@@ -91,18 +88,17 @@ void Device::removePadSignalMapping(const Uuid& pad) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Device::serializeToXmlDomElement() const throw (Exception)
+void Device::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    root->getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
-    root->getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
-    XmlDomElement* padSignalMap = root->appendChild("pad_signal_map");
+    LibraryElement::serialize(root);
+    root.getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
+    root.getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
+    DomElement* padSignalMap = root.appendChild("pad_signal_map");
     foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
-        XmlDomElement* child = padSignalMap->appendChild("map");
+        DomElement* child = padSignalMap->appendChild("map");
         child->setAttribute("pad", padUuid);
         child->setText(mPadSignalMap.value(padUuid));
     }
-    return root.take();
 }
 
 bool Device::checkAttributesValidity() const noexcept

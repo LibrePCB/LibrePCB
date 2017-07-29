@@ -51,7 +51,7 @@ class FootprintPadTht final : public FootprintPad
         explicit FootprintPadTht(const Uuid& padUuid, const Point& pos, const Angle& rot,
                                  const Length& width, const Length& height,
                                  Shape_t shape, const Length& drillDiameter) noexcept;
-        explicit FootprintPadTht(const XmlDomElement& domElement) throw (Exception);
+        explicit FootprintPadTht(const DomElement& domElement) throw (Exception);
         ~FootprintPadTht() noexcept;
 
         // Getters
@@ -68,8 +68,8 @@ class FootprintPadTht final : public FootprintPad
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Static Methods
         static Shape_t stringToShape(const QString& shape) throw (Exception);
@@ -84,8 +84,6 @@ class FootprintPadTht final : public FootprintPad
         FootprintPadTht& operator=(const FootprintPadTht& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 

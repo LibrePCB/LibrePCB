@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
 
@@ -50,7 +50,7 @@ class ErcMsg;
 /**
  * @brief The SI_NetPoint class
  */
-class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
+class SI_NetPoint final : public SI_Base, public SerializableObject,
                           public IF_ErcMsgProvider
 {
         Q_OBJECT
@@ -61,7 +61,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         SI_NetPoint() = delete;
         SI_NetPoint(const SI_NetPoint& other) = delete;
-        SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception);
         SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
         SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
         ~SI_NetPoint() noexcept;
@@ -88,8 +88,8 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
         void unregisterNetLine(SI_NetLine& netline) throw (Exception);
         void updateLines() const noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -107,9 +107,7 @@ class SI_NetPoint final : public SI_Base, public IF_XmlSerializableObject,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

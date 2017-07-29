@@ -24,9 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 
@@ -35,8 +36,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class AttributeList;
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 class Component;
@@ -59,7 +59,7 @@ class ErcMsg;
  * @brief The ComponentInstance class
  */
 class ComponentInstance : public QObject, public IF_AttributeProvider,
-                          public IF_ErcMsgProvider, public IF_XmlSerializableObject
+                          public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
@@ -69,7 +69,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         ComponentInstance() = delete;
         ComponentInstance(const ComponentInstance& other) = delete;
-        explicit ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
                                    const Uuid& symbVar, const QString& name) throw (Exception);
         ~ComponentInstance() noexcept;
@@ -129,8 +129,8 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void registerDevice(BI_Device& device) throw (Exception);
         void unregisterDevice(BI_Device& device) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Helper Methods
@@ -150,10 +150,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

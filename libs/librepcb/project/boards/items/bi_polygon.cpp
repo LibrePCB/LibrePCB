@@ -24,7 +24,6 @@
 #include "bi_polygon.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/geometry/polygon.h>
 #include "../graphicsitems/bgi_polygon.h"
@@ -46,7 +45,7 @@ BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception) 
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const XmlDomElement& domElement) throw (Exception) :
+BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) throw (Exception) :
     BI_Base(board)
 {
     mPolygon.reset(new Polygon(domElement));
@@ -69,8 +68,6 @@ void BI_Polygon::init() throw (Exception)
 
     // connect to the "attributes changed" signal of the board
     connect(&mBoard, &Board::attributesChanged, this, &BI_Polygon::boardAttributesChanged);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 BI_Polygon::~BI_Polygon() noexcept
@@ -99,12 +96,9 @@ void BI_Polygon::removeFromBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-XmlDomElement* BI_Polygon::serializeToXmlDomElement() const throw (Exception)
+void BI_Polygon::serialize(DomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(mPolygon->serializeToXmlDomElement());
-    return root.take();
+    mPolygon->serialize(root);
 }
 
 bool BI_Polygon::getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -144,15 +138,6 @@ void BI_Polygon::setSelected(bool selected) noexcept
 void BI_Polygon::boardAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool BI_Polygon::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

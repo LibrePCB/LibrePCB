@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "fileio/if_xmlserializableobject.h"
+#include "fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -44,7 +44,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2015-06-05
  */
-class BoardLayer final : public QObject, public IF_XmlSerializableObject
+class BoardLayer final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -214,7 +214,7 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         // Constructors / Destructor
         BoardLayer() = delete;
         explicit BoardLayer(const BoardLayer& other) throw (Exception);
-        explicit BoardLayer(const XmlDomElement& domElement) throw (Exception);
+        explicit BoardLayer(const DomElement& domElement) throw (Exception);
         explicit BoardLayer(int id);
         ~BoardLayer();
 
@@ -230,8 +230,8 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         void setVisible(bool visible) noexcept {mIsVisible = visible; emit attributesChanged();}
 
         // General Methods
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         BoardLayer& operator=(const BoardLayer& rhs) = delete;
@@ -247,10 +247,6 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
 
 
     private:
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
 
         // Attributes
         int mId;

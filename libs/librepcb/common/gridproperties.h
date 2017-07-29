@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "fileio/if_xmlserializableobject.h"
+#include "fileio/serializableobject.h"
 #include "units/all_length_units.h"
 
 /*****************************************************************************************
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The GridProperties class
  */
-class GridProperties final : public IF_XmlSerializableObject
+class GridProperties final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(GridProperties)
 
@@ -50,7 +50,7 @@ class GridProperties final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         GridProperties() noexcept;
-        explicit GridProperties(const XmlDomElement& domElement) throw (Exception);
+        explicit GridProperties(const DomElement& domElement) throw (Exception);
         GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept;
         GridProperties(const GridProperties& other) noexcept;
         ~GridProperties() noexcept;
@@ -67,21 +67,14 @@ class GridProperties final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operators
         GridProperties& operator=(const GridProperties& rhs) noexcept;
 
 
     private:
-
-
-        // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
 
         // Private Static Methods
         static Type_t stringToType(const QString& type) throw (Exception);

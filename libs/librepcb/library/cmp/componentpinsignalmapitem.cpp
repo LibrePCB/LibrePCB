@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "componentpinsignalmapitem.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -40,7 +39,7 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const XmlDomElement& domElement) throw (Exception)
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const DomElement& domElement) throw (Exception)
 {
     // read attributes
     mPinUuid = domElement.getAttribute<Uuid>("pin", true);
@@ -58,15 +57,13 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* ComponentPinSignalMapItem::serializeToXmlDomElement() const throw (Exception)
+void ComponentPinSignalMapItem::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
-    root->setAttribute("pin", mPinUuid);
-    root->setAttribute<QString>("display", displayTypeToString(mDisplayType));
-    root->setText(mSignalUuid);
-    return root.take();
+    root.setAttribute("pin", mPinUuid);
+    root.setAttribute<QString>("display", displayTypeToString(mDisplayType));
+    root.setText(mSignalUuid);
 }
 
 /*****************************************************************************************

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
@@ -48,7 +48,7 @@ class Project;
  * @author ubruhin
  * @date 2015-03-22
  */
-class ProjectSettings final : public QObject, public IF_XmlSerializableObject
+class ProjectSettings final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -89,11 +89,8 @@ class ProjectSettings final : public QObject, public IF_XmlSerializableObject
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

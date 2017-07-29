@@ -23,8 +23,7 @@
 #include <QtCore>
 #include "projectsettings.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include "../project.h"
 
 /*****************************************************************************************
@@ -57,29 +56,23 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         else
         {
             mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            DomElement& root = doc->getRoot();
 
             // OK - XML file is open --> now load all settings
 
             // locale order
-            for (XmlDomElement* node = root.getFirstChild("locale_order/locale", true, false);
-                 node; node = node->getNextSibling("locale"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("locale_order", true)->getChilds()) {
                 mLocaleOrder.append(node->getText<QString>(true));
             }
 
             // norm order
-            for (XmlDomElement* node = root.getFirstChild("norm_order/norm", true, false);
-                 node; node = node->getNextSibling("norm"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("norm_order", true)->getChilds()) {
                 mNormOrder.append(node->getText<QString>(true));
             }
         }
 
         triggerSettingsChanged();
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -118,7 +111,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/settings.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        DomDocument doc(*serializeToDomElement("settings"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -134,23 +127,14 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool ProjectSettings::checkAttributesValidity() const noexcept
+void ProjectSettings::serialize(DomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* ProjectSettings::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("settings"));
-    XmlDomElement* locale_order = root->appendChild("locale_order");
+    DomElement* locale_order = root.appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)
         locale_order->appendTextChild("locale", locale);
-    XmlDomElement* norm_order = root->appendChild("norm_order");
+    DomElement* norm_order = root.appendChild("norm_order");
     foreach (const QString& norm, mNormOrder)
         norm_order->appendTextChild("norm", norm);
-    return root.take();
 }
 
 /*****************************************************************************************

@@ -28,7 +28,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/bgi_footprint.h"
 
 /*****************************************************************************************
@@ -57,7 +57,7 @@ class BI_Footprint;
  * @brief The BI_Device class
  */
 class BI_Device final : public BI_Base, public IF_AttributeProvider,
-                        public IF_ErcMsgProvider, public IF_XmlSerializableObject
+                        public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
@@ -68,7 +68,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         BI_Device() = delete;
         BI_Device(const BI_Device& other) = delete;
         BI_Device(Board& board, const BI_Device& other) throw (Exception);
-        BI_Device(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_Device(Board& board, const DomElement& domElement) throw (Exception);
         BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
                   const Uuid& footprintUuid, const Point& position, const Angle& rotation,
                   bool mirror) throw (Exception);
@@ -94,8 +94,8 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void addToBoard(GraphicsScene& scene) throw (Exception) override;
         void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -127,10 +127,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
                                               const Uuid& footprintUuid) throw (Exception);
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

@@ -23,8 +23,9 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QObject>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/uuid.h>
@@ -34,8 +35,8 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomDocument;
-class XmlDomElement;
+class DomDocument;
+class DomElement;
 
 namespace library {
 
@@ -46,7 +47,7 @@ namespace library {
 /**
  * @brief The LibraryBaseElement class
  */
-class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
+class LibraryBaseElement : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -144,7 +145,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
          *
          * @see #localeStringFromList()
          */
-        static void readLocaleDomNodes(const XmlDomElement& parentNode,
+        static void readLocaleDomNodes(const DomElement& parentNode,
                                        const QString& childNodesName,
                                        QMap<QString, QString>& list,
                                        bool throwIfValueEmpty) throw (Exception);
@@ -188,10 +189,9 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
         virtual void cleanupAfterLoadingElementFromFile() noexcept;
         virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        virtual bool checkAttributesValidity() const noexcept override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(DomElement& root) const throw (Exception) override;
+        virtual bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes
@@ -204,7 +204,7 @@ class LibraryBaseElement : public QObject, public IF_XmlSerializableObject
 
         // Members required for loading elements from file
         Version mLoadingElementFileVersion;
-        QSharedPointer<XmlDomDocument> mLoadingXmlFileDocument;
+        std::unique_ptr<DomDocument> mLoadingXmlFileDocument;
 
         // General Library Element Attributes
         Uuid mUuid;

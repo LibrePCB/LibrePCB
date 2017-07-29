@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/boardlayer.h>
 #include "footprintpadtht.h"
 
@@ -43,7 +42,7 @@ FootprintPadTht::FootprintPadTht(const Uuid& padUuid, const Point& pos, const An
 {
 }
 
-FootprintPadTht::FootprintPadTht(const XmlDomElement& domElement) throw (Exception) :
+FootprintPadTht::FootprintPadTht(const DomElement& domElement) throw (Exception) :
     FootprintPad(domElement)
 {
     // read attributes
@@ -169,12 +168,11 @@ void FootprintPadTht::setDrillDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPadTht::serializeToXmlDomElement() const throw (Exception)
+void FootprintPadTht::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(FootprintPad::serializeToXmlDomElement());
-    root->setAttribute("shape", shapeToString(mShape));
-    root->setAttribute("drill", mDrillDiameter);
-    return root.take();
+    FootprintPad::serialize(root);
+    root.setAttribute("shape", shapeToString(mShape));
+    root.setAttribute("drill", mDrillDiameter);
 }
 
 /*****************************************************************************************

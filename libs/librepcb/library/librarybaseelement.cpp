@@ -24,8 +24,7 @@
 #include "librarybaseelement.h"
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/application.h>
 
@@ -100,8 +99,8 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
     SmartXmlFile xmlFile(xmlFilePath, false, true);
     mLoadingXmlFileDocument = xmlFile.parseFileAndBuildDomTree();
-    const XmlDomElement& root = mLoadingXmlFileDocument->getRoot(mLongElementName);
-    const XmlDomElement& metaElement = *root.getFirstChild("meta", true);
+    const DomElement& root = mLoadingXmlFileDocument->getRoot(mLongElementName);
+    const DomElement& metaElement = *root.getFirstChild("meta", true);
 
     // read attributes
     mUuid = metaElement.getFirstChild("uuid", true)->getText<Uuid>(true);
@@ -178,7 +177,8 @@ void LibraryBaseElement::save() throw (Exception)
 
     // save xml file
     FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
-    QScopedPointer<XmlDomDocument> doc(new XmlDomDocument(*serializeToXmlDomElement()));
+    QScopedPointer<DomElement> root(serializeToDomElement(mLongElementName));
+    QScopedPointer<DomDocument> doc(new DomDocument(*root.take()));
     QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(xmlFilePath));
     xmlFile->save(*doc, true);
 
@@ -261,15 +261,14 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
     }
 }
 
-XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Exception)
+void LibraryBaseElement::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) {
         throw LogicError(__FILE__, __LINE__, QString(),
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement(mLongElementName));
-    XmlDomElement* meta = root->appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("version", mVersion);
     meta->appendTextChild("author", mAuthor);
@@ -285,7 +284,6 @@ XmlDomElement* LibraryBaseElement::serializeToXmlDomElement() const throw (Excep
     foreach (const QString& locale, mKeywords.keys()) {
         meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
     }
-    return root.take();
 }
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept
@@ -302,12 +300,12 @@ bool LibraryBaseElement::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::readLocaleDomNodes(const XmlDomElement& parentNode,
+void LibraryBaseElement::readLocaleDomNodes(const DomElement& parentNode,
                                             const QString& childNodesName,
                                             QMap<QString, QString>& list,
                                             bool throwIfValueEmpty) throw (Exception)
 {
-    for (XmlDomElement* node = parentNode.getFirstChild(childNodesName, false); node;
+    for (DomElement* node = parentNode.getFirstChild(childNodesName, false); node;
          node = node->getNextSibling(childNodesName))
     {
         QString locale = node->getAttribute<QString>("locale", true);

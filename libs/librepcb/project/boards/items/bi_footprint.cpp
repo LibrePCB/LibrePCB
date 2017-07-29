@@ -30,7 +30,6 @@
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/library/dev/device.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "bi_device.h"
@@ -52,7 +51,7 @@ BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (
     init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device, const XmlDomElement& domElement) throw (Exception) :
+BI_Footprint::BI_Footprint(BI_Device& device, const DomElement& domElement) throw (Exception) :
     BI_Base(device.getBoard()), mDevice(device)
 {
     Q_UNUSED(domElement);
@@ -168,15 +167,14 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-XmlDomElement* BI_Footprint::serializeToXmlDomElement() const throw (Exception)
+void BI_Footprint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("footprint"));
-    //root->setAttribute("uuid", mUuid);
-    //root->setAttribute("gen_comp_instance", mComponentInstance->getUuid());
-    //root->setAttribute("symbol_item", mSymbVarItem->getUuid());
-    return root.take();
+    Q_UNUSED(root);
+    //root.setAttribute("uuid", mUuid);
+    //root.setAttribute("gen_comp_instance", mComponentInstance->getUuid());
+    //root.setAttribute("symbol_item", mSymbVarItem->getUuid());
 }
 
 /*****************************************************************************************

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include <librepcb/common/if_schematiclayerprovider.h>
 #include <librepcb/common/if_boardlayerprovider.h>
@@ -32,7 +32,7 @@
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/attributes/attributelist.h>
+#include <librepcb/common/attributes/attribute.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -79,7 +79,7 @@ class Board;
  * @date 2014-06-24
  */
 class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_SchematicLayerProvider, public IF_XmlSerializableObject
+                      public IF_SchematicLayerProvider, public SerializableObject
 {
         Q_OBJECT
 
@@ -528,13 +528,12 @@ class Project final : public QObject, public IF_AttributeProvider,
          */
         explicit Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
         /**
-         * @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
+         * @copydoc librepcb::SerializableObject::serialize()
          */
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        void serialize(DomElement& root) const throw (Exception) override;
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

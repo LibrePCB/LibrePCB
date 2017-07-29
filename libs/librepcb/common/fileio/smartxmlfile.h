@@ -23,6 +23,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QtCore>
 #include "smartfile.h"
 
@@ -31,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomDocument;
+class DomDocument;
 
 /*****************************************************************************************
  *  Class SmartXmlFile
@@ -39,7 +40,7 @@ class XmlDomDocument;
 
 /**
  * @brief The SmartXmlFile class represents a XML file and provides methods to load/save
- *        XML DOM trees (#XmlDomDocument)
+ *        XML DOM trees (#DomDocument)
  *
  * With #parseFileAndBuildDomTree() the XML file can be parsed and a DOM tree is created.
  * With #save() the DOM tree can be saved back to the XML file.
@@ -89,7 +90,7 @@ class SmartXmlFile final : public SmartFile
          * @return  A pointer to the created DOM tree. The caller takes the ownership of
          *          the DOM document.
          */
-        QSharedPointer<XmlDomDocument> parseFileAndBuildDomTree() const throw (Exception);
+        std::unique_ptr<DomDocument> parseFileAndBuildDomTree() const throw (Exception);
 
         /**
          * @brief Write the XML DOM tree to the file system
@@ -100,7 +101,7 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        void save(const XmlDomDocument& domDocument, bool toOriginal) throw (Exception);
+        void save(const DomDocument& domDocument, bool toOriginal) throw (Exception);
 
 
         // Operator Overloadings

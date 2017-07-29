@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "../units/all_length_units.h"
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The PolygonSegment class
  */
-class PolygonSegment final : public IF_XmlSerializableObject
+class PolygonSegment final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(PolygonSegment)
 
@@ -50,7 +50,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
         explicit PolygonSegment(const PolygonSegment& other) noexcept;
         explicit PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
-        explicit PolygonSegment(const XmlDomElement& domElement) throw (Exception);
+        explicit PolygonSegment(const DomElement& domElement) throw (Exception);
         ~PolygonSegment() noexcept {}
 
         // Getters
@@ -64,8 +64,8 @@ class PolygonSegment final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -73,11 +73,6 @@ class PolygonSegment final : public IF_XmlSerializableObject
         // make some methods inaccessible...
         PolygonSegment();
         PolygonSegment& operator=(const PolygonSegment& rhs);
-
-        // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
         // Attributes
@@ -92,7 +87,7 @@ class PolygonSegment final : public IF_XmlSerializableObject
 /**
  * @brief The Polygon class
  */
-class Polygon final : public IF_XmlSerializableObject
+class Polygon final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Polygon)
 
@@ -102,7 +97,7 @@ class Polygon final : public IF_XmlSerializableObject
         Polygon(const Polygon& other) noexcept;
         Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& startPos) noexcept;
-        explicit Polygon(const XmlDomElement& domElement) throw (Exception);
+        explicit Polygon(const DomElement& domElement) throw (Exception);
         ~Polygon() noexcept;
 
         // Getters
@@ -138,8 +133,8 @@ class Polygon final : public IF_XmlSerializableObject
         void appendSegment(PolygonSegment& segment) noexcept;
         void removeSegment(PolygonSegment& segment) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Static Methods
         static Polygon* createLine(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
@@ -155,9 +150,7 @@ class Polygon final : public IF_XmlSerializableObject
         Polygon& operator=(const Polygon& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Polygon Attributes

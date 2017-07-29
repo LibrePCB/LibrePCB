@@ -22,8 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "package.h"
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,12 +49,10 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
 {
     try
     {
-        const XmlDomElement& root = mLoadingXmlFileDocument->getRoot();
+        const DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pads
-        for (XmlDomElement* node = root.getFirstChild("pads/pad", true, false);
-             node; node = node->getNextSibling("pad"))
-        {
+        foreach (const DomElement* node, root.getFirstChild("pads", true)->getChilds()) {
             PackagePad* pad = new PackagePad(*node);
             if (getPadByUuid(pad->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
@@ -66,10 +63,8 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
         }
 
         // Load all footprints
-        XmlDomElement* footprintsNode = root.getFirstChild("footprints", true);
-        for (XmlDomElement* node = footprintsNode->getFirstChild("footprint", true);
-             node; node = node->getNextSibling("footprint"))
-        {
+        DomElement* footprintsNode = root.getFirstChild("footprints", true);
+        foreach (const DomElement* node, footprintsNode->getChilds()) {
             Footprint* footprint = new Footprint(*node);
             if (getFootprintByUuid(footprint->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
@@ -149,19 +144,13 @@ void Package::removeFootprint(Footprint& footprint) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-XmlDomElement* Package::serializeToXmlDomElement() const throw (Exception)
+void Package::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(LibraryElement::serializeToXmlDomElement());
-    XmlDomElement* padsNode = root->appendChild("pads");
-    foreach (const PackagePad* pad, mPads) {
-        padsNode->appendChild(pad->serializeToXmlDomElement());
-    }
-    XmlDomElement* footprintsNode = root->appendChild("footprints");
+    LibraryElement::serialize(root);
+    root.appendChild(serializePointerContainer(mPads, "pads", "pad"));
+    DomElement* footprintsNode = serializePointerContainer(mFootprints, "footprints", "footprint");
     footprintsNode->setAttribute("default", mDefaultFootprintUuid);
-    foreach (const Footprint* footprint, mFootprints) {
-        footprintsNode->appendChild(footprint->serializeToXmlDomElement());
-    }
-    return root.take();
+    root.appendChild(footprintsNode);
 }
 
 bool Package::checkAttributesValidity() const noexcept

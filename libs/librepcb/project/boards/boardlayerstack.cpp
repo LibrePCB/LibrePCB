@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/boardlayer.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "boardlayerstack.h"
 #include "board.h"
 
@@ -48,13 +47,11 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) thr
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const XmlDomElement& domElement) throw (Exception):
+BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) throw (Exception):
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // load all layers
-    for (XmlDomElement* node = domElement.getFirstChild("layers/*", true, false);
-         node; node = node->getNextSibling())
-    {
+    foreach (const DomElement* node, domElement.getFirstChild("layers", true)->getChilds()) {
         QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
         if (!mLayers.contains(layer->getId())) {
             addLayer(*layer.take());
@@ -92,17 +89,9 @@ BoardLayerStack::~BoardLayerStack() noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* BoardLayerStack::serializeToXmlDomElement() const throw (Exception)
+void BoardLayerStack::serialize(DomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer_stack"));
-    XmlDomElement* layers = root->appendChild("layers");
-    foreach (const BoardLayer* layer, mLayers) {
-        layers->appendChild(layer->serializeToXmlDomElement());
-    }
-
-    return root.take();
+    root.appendChild(serializePointerContainer(mLayers, "layers", "layer"));
 }
 
 /*****************************************************************************************
@@ -186,11 +175,6 @@ void BoardLayerStack::addLayer(BoardLayer& layer) noexcept
             this, &BoardLayerStack::layerAttributesChanged,
             Qt::QueuedConnection);
     mLayers.insert(layer.getId(), &layer);
-}
-
-bool BoardLayerStack::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

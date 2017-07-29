@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "componentsymbolvariantitem.h"
 
 /*****************************************************************************************
@@ -40,7 +40,7 @@ namespace library {
 /**
  * @brief The ComponentSymbolVariant class
  */
-class ComponentSymbolVariant final : public IF_XmlSerializableObject
+class ComponentSymbolVariant final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariant)
 
@@ -50,7 +50,7 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
         explicit ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                                         const QString& name_en_US,
                                         const QString& desc_en_US) noexcept;
-        explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSymbolVariant(const DomElement& domElement) throw (Exception);
         ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
@@ -79,8 +79,8 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -91,9 +91,7 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
         ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Symbol Variant Attributes

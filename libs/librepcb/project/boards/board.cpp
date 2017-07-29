@@ -24,8 +24,7 @@
 #include <QtWidgets>
 #include "board.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/boardlayer.h>
@@ -190,8 +189,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         else
         {
             mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            XmlDomElement& root = doc->getRoot();
+            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+            DomElement& root = doc->getRoot();
 
             // the board seems to be ready to open, so we will create all needed objects
 
@@ -208,9 +207,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("board_design_rules", true)));
 
             // Load all device instances
-            for (XmlDomElement* node = root.getFirstChild("devices/device", true, false);
-                 node; node = node->getNextSibling("device"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("devices", true)->getChilds()) {
                 BI_Device* device = new BI_Device(*this, *node);
                 if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
@@ -221,9 +218,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all vias
-            for (XmlDomElement* node = root.getFirstChild("vias/via", true, false);
-                 node; node = node->getNextSibling("via"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("vias", true)->getChilds()) {
                 BI_Via* via = new BI_Via(*this, *node);
                 if (getViaByUuid(via->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, via->getUuid().toStr(),
@@ -234,9 +229,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            for (XmlDomElement* node = root.getFirstChild("netpoints/netpoint", true, false);
-                 node; node = node->getNextSibling("netpoint"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
                 BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -247,9 +240,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            for (XmlDomElement* node = root.getFirstChild("netlines/netline", true, false);
-                 node; node = node->getNextSibling("netline"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
                 BI_NetLine* netline = new BI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -260,9 +251,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all polygons
-            for (XmlDomElement* node = root.getFirstChild("polygons/polygon", true, false);
-                 node; node = node->getNextSibling("polygon"))
-            {
+            foreach (const DomElement* node, root.getFirstChild("polygons", true)->getChilds()) {
                 BI_Polygon* polygon = new BI_Polygon(*this, *node);
                 mPolygons.append(polygon);
             }
@@ -804,7 +793,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     {
         if (mIsAddedToProject)
         {
-            XmlDomDocument doc(*serializeToXmlDomElement());
+            DomDocument doc(*serializeToDomElement("board"));
             mXmlFile->save(doc, toOriginal);
         }
         else
@@ -902,44 +891,31 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-XmlDomElement* Board::serializeToXmlDomElement() const throw (Exception)
+void Board::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("board"));
     // meta data
-    XmlDomElement* meta = root->appendChild("meta");
+    DomElement* meta = root.appendChild("meta");
     meta->appendTextChild("uuid", mUuid);
     meta->appendTextChild("name", mName);
     // properties: grid
-    XmlDomElement* properties = root->appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToXmlDomElement());
+    DomElement* properties = root.appendChild("properties");
+    properties->appendChild(mGridProperties->serializeToDomElement("grid_properties"));
     // layer stack
-    root->appendChild(mLayerStack->serializeToXmlDomElement());
+    root.appendChild(mLayerStack->serializeToDomElement("layer_stack"));
     // design rules
-    root->appendChild(mDesignRules->serializeToXmlDomElement());
+    root.appendChild(mDesignRules->serializeToDomElement("board_design_rules"));
     // devices
-    XmlDomElement* devices = root->appendChild("devices");
-    foreach (BI_Device* device, mDeviceInstances)
-        devices->appendChild(device->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mDeviceInstances, "devices", "device"));
     // vias
-    XmlDomElement* vias = root->appendChild("vias");
-    foreach (BI_Via* via, mVias)
-        vias->appendChild(via->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mVias, "vias", "via"));
     // netpoints
-    XmlDomElement* netpoints = root->appendChild("netpoints");
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-        netpoints->appendChild(netpoint->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
     // netlines
-    XmlDomElement* netlines = root->appendChild("netlines");
-    foreach (BI_NetLine* netline, mNetLines)
-        netlines->appendChild(netline->serializeToXmlDomElement());
+    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
     // polygons
-    XmlDomElement* polygons = root->appendChild("polygons");
-    foreach (BI_Polygon* polygon, mPolygons)
-        polygons->appendChild(polygon->serializeToXmlDomElement());
-    // end
-    return root.take();
+    root.appendChild(serializePointerContainer(mPolygons, "polygons", "polygon"));
 }
 
 void Board::updateErcMessages() noexcept

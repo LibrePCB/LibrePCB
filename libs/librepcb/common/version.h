@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "exceptions.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -55,6 +56,8 @@ namespace librepcb {
  */
 class Version final
 {
+        Q_DECLARE_TR_FUNCTIONS(Version)
+
     public:
 
         // Constructors / Destructor
@@ -148,6 +151,13 @@ class Version final
          */
         QString toComparableStr() const noexcept;
 
+        /**
+         * @brief Serialize this object into a string
+         *
+         * @return This object as a string
+         */
+        QString serializeToString() const noexcept {return toStr();}
+
 
         // Setters
 
@@ -183,6 +193,27 @@ class Version final
         bool operator==(const Version& rhs) const noexcept;
         bool operator!=(const Version& rhs) const noexcept;
         //@}
+
+
+        // Static Methods
+
+        /**
+         * @brief Deserialize object from a string
+         *
+         * @param str           Input string
+         *
+         * @return The created element
+         *
+         * @throws Exception if the string was invalid
+         */
+        static Version deserializeFromString(const QString& str) throw (Exception) {
+            Version version(str);
+            if ((!version.isValid()) && (!str.isEmpty())) {
+                throw RuntimeError(__FILE__, __LINE__, QString(),
+                                   QString(tr("Invalid version number: \"%1\"")).arg(str));
+            }
+            return version;
+        }
 
 
     private:

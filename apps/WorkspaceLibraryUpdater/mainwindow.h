@@ -11,7 +11,7 @@ class MainWindow;
 
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 class Library;

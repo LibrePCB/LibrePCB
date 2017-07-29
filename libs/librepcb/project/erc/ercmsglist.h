@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 
@@ -47,7 +47,7 @@ class ErcMsg;
 /**
  * @brief The ErcMsgList class contains a list of ERC messages which are visible for the user
  */
-class ErcMsgList final : public QObject, public IF_XmlSerializableObject
+class ErcMsgList final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -80,15 +80,10 @@ class ErcMsgList final : public QObject, public IF_XmlSerializableObject
         void ercMsgChanged(ErcMsg* ercMsg);
 
 
-    private:
+    private: // Methods
 
-        // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

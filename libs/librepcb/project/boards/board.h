@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/if_attributeprovider.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/exceptions.h>
@@ -66,7 +66,7 @@ class BoardLayerStack;
  * @brief The Board class represents a PCB of a project and is always part of a circuit
  */
 class Board final : public QObject, public IF_AttributeProvider,
-                    public IF_ErcMsgProvider, public IF_XmlSerializableObject
+                    public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(Board)
@@ -207,14 +207,11 @@ class Board final : public QObject, public IF_AttributeProvider,
         Board(Project& project, const FilePath& filepath, bool restore,
               bool readOnly, bool create, const QString& newName) throw (Exception);
         void updateIcon() noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // General

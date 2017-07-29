@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -51,7 +51,7 @@ class ErcMsg;
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlSerializableObject
+class NetSignal final : public QObject, public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
@@ -61,7 +61,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         // Constructors / Destructor
         NetSignal() = delete;
         NetSignal(const NetSignal& other) = delete;
-        explicit NetSignal(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exception);
         explicit NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
                            bool autoName) throw (Exception);
         ~NetSignal() noexcept;
@@ -102,8 +102,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
         void registerBoardVia(BI_Via& via) throw (Exception);
         void unregisterBoardVia(BI_Via& via) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         NetSignal& operator=(const NetSignal& rhs) = delete;
@@ -116,10 +116,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public IF_XmlS
 
 
     private:
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

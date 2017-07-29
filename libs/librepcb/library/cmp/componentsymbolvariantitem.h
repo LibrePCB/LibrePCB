@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include "componentpinsignalmapitem.h"
 
 /*****************************************************************************************
@@ -41,7 +41,7 @@ namespace library {
 /**
  * @brief The ComponentSymbolVariantItem class
  */
-class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
+class ComponentSymbolVariantItem final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariantItem)
 
@@ -50,7 +50,7 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         // Constructors / Destructor
         explicit ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
                                             bool isRequired, const QString& suffix) noexcept;
-        explicit ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSymbolVariantItem(const DomElement& domElement) throw (Exception);
         ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
@@ -67,8 +67,8 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         void addPinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
         void removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -79,9 +79,7 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Symbol Variant Item Attributes

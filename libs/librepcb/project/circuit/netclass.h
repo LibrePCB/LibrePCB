@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -47,7 +47,7 @@ class ErcMsg;
  * @brief The NetClass class
  */
 class NetClass final : public QObject, public IF_ErcMsgProvider,
-                       public IF_XmlSerializableObject
+                       public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(NetClass)
@@ -57,7 +57,7 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         // Constructors / Destructor
         NetClass() = delete;
         NetClass(const NetClass& other) = delete;
-        explicit NetClass(Circuit& circuit, const XmlDomElement& domElement) throw (Exception);
+        explicit NetClass(Circuit& circuit, const DomElement& domElement) throw (Exception);
         explicit NetClass(Circuit& circuit, const QString& name) throw (Exception);
         ~NetClass() noexcept;
 
@@ -77,18 +77,15 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         void registerNetSignal(NetSignal& signal) throw (Exception);
         void unregisterNetSignal(NetSignal& signal) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         NetClass& operator=(const NetClass& rhs) = delete;
 
 
     private:
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
+        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 

@@ -52,6 +52,7 @@ SOURCES += \
     common/applicationtest.cpp \
     common/directorylocktest.cpp \
     common/filedownloadtest.cpp \
+    common/fileio/serializableobjectlisttest.cpp \
     common/filepathtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
@@ -66,6 +67,7 @@ SOURCES += \
     workspace/workspacetest.cpp \
 
 HEADERS += \
+    common/fileio/serializableobjectmock.h \
     common/networkrequestbasesignalreceiver.h \
 
 FORMS += \

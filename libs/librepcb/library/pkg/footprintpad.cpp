@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/boardlayer.h>
 #include "footprintpad.h"
 #include "footprintpadsmt.h"
@@ -45,7 +44,7 @@ FootprintPad::FootprintPad(Technology_t technology, const Uuid& padUuid,
 {
 }
 
-FootprintPad::FootprintPad(const XmlDomElement& domElement) throw (Exception)
+FootprintPad::FootprintPad(const DomElement& domElement) throw (Exception)
 {
     // read attributes
     mTechnology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
@@ -103,19 +102,17 @@ void FootprintPad::setHeight(const Length& height) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* FootprintPad::serializeToXmlDomElement() const throw (Exception)
+void FootprintPad::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("technology", technologyToString(mTechnology));
-    root->setAttribute("x", mPosition.getX());
-    root->setAttribute("y", mPosition.getY());
-    root->setAttribute("rotation", mRotation);
-    root->setAttribute("width", mWidth);
-    root->setAttribute("height", mHeight);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("technology", technologyToString(mTechnology));
+    root.setAttribute("x", mPosition.getX());
+    root.setAttribute("y", mPosition.getY());
+    root.setAttribute("rotation", mRotation);
+    root.setAttribute("width", mWidth);
+    root.setAttribute("height", mHeight);
 }
 
 /*****************************************************************************************
@@ -152,7 +149,7 @@ QString FootprintPad::technologyToString(Technology_t technology) noexcept
     }
 }
 
-FootprintPad* FootprintPad::fromDomElement(const XmlDomElement& domElement) throw (Exception)
+FootprintPad* FootprintPad::fromDomElement(const DomElement& domElement) throw (Exception)
 {
     Technology_t technology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
     switch (technology)

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace library {
 class ComponentSignal;
@@ -56,7 +56,7 @@ class ErcMsg;
  * @brief The ComponentSignalInstance class
  */
 class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
-                                      public IF_XmlSerializableObject
+                                      public SerializableObject
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
@@ -67,7 +67,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ComponentSignalInstance() = delete;
         ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const XmlDomElement& domElement) throw (Exception);
+                                         const DomElement& domElement) throw (Exception);
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const library::ComponentSignal& cmpSignal,
                                          NetSignal* netsignal = nullptr) throw (Exception);
@@ -109,8 +109,8 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void registerFootprintPad(BI_FootprintPad& pad) throw (Exception);
         void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
@@ -125,9 +125,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

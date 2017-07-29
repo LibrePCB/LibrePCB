@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +40,7 @@ namespace library {
 /**
  * @brief The ComponentSignal class
  */
-class ComponentSignal final : public IF_XmlSerializableObject
+class ComponentSignal final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(ComponentSignal)
 
@@ -59,7 +59,7 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         explicit ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
-        explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
+        explicit ComponentSignal(const DomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
         // Getters
@@ -82,8 +82,8 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -94,9 +94,7 @@ class ComponentSignal final : public IF_XmlSerializableObject
         ComponentSignal& operator=(const ComponentSignal& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Private Static Methods

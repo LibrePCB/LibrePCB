@@ -31,7 +31,6 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
 
@@ -45,7 +44,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, const XmlDomElement& domElement) throw (Exception) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception) :
     SI_Base(schematic), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
@@ -280,22 +279,20 @@ void SI_NetPoint::updateLines() const noexcept
     }
 }
 
-XmlDomElement* SI_NetPoint::serializeToXmlDomElement() const throw (Exception)
+void SI_NetPoint::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netpoint"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("netsignal", mNetSignal->getUuid());
-    root->setAttribute("attached", isAttachedToPin());
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("netsignal", mNetSignal->getUuid());
+    root.setAttribute("attached", isAttachedToPin());
     if (isAttachedToPin()) {
-        root->setAttribute("symbol", mSymbolPin->getSymbol().getUuid());
-        root->setAttribute("pin", mSymbolPin->getLibPinUuid());
+        root.setAttribute("symbol", mSymbolPin->getSymbol().getUuid());
+        root.setAttribute("pin", mSymbolPin->getLibPinUuid());
     } else {
-        root->setAttribute("x", mPosition.getX());
-        root->setAttribute("y", mPosition.getY());
+        root.setAttribute("x", mPosition.getX());
+        root.setAttribute("y", mPosition.getY());
     }
-    return root.take();
 }
 
 /*****************************************************************************************

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 #include "../units/all_length_units.h"
 #include "../alignment.h"
 
@@ -40,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The Text class
  */
-class Text final : public IF_XmlSerializableObject
+class Text final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Text)
 
@@ -50,7 +50,7 @@ class Text final : public IF_XmlSerializableObject
         explicit Text(int layerId, const QString& text, const Point& pos,
                       const Angle& rotation, const Length& height,
                       const Alignment& align) noexcept;
-        explicit Text(const XmlDomElement& domElement) throw (Exception);
+        explicit Text(const DomElement& domElement) throw (Exception);
         ~Text() noexcept;
 
         // Getters
@@ -71,8 +71,8 @@ class Text final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -83,9 +83,7 @@ class Text final : public IF_XmlSerializableObject
         Text& operator=(const Text& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Text Attributes

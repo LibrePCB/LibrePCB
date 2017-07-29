@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +41,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-08-10
  */
-class Repository final : public QObject, public IF_XmlSerializableObject
+class Repository final : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -51,7 +51,7 @@ class Repository final : public QObject, public IF_XmlSerializableObject
         Repository() = delete;
         explicit Repository(const Repository& other) noexcept;
         explicit Repository(const QUrl& url) noexcept;
-        explicit Repository(const XmlDomElement& domElement) throw (Exception);
+        explicit Repository(const DomElement& domElement) throw (Exception);
         ~Repository() noexcept;
 
         // Getters
@@ -64,8 +64,8 @@ class Repository final : public QObject, public IF_XmlSerializableObject
         // General Methods
         void requestLibraryList() const noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operators
         Repository& operator=(const Repository& rhs) = delete;
@@ -81,9 +81,7 @@ class Repository final : public QObject, public IF_XmlSerializableObject
 
         void requestLibraryList(const QUrl& url) const noexcept;
         void requestedDataReceived(const QByteArray& data) noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

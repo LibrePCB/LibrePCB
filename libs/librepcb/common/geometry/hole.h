@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../units/all_length_units.h"
-#include "../fileio/if_xmlserializableobject.h"
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The Hole class
  */
-class Hole final : public IF_XmlSerializableObject
+class Hole final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Hole)
 
@@ -47,7 +47,7 @@ class Hole final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         explicit Hole(const Point& position, const Length& diameter) noexcept;
-        explicit Hole(const XmlDomElement& domElement) throw (Exception);
+        explicit Hole(const DomElement& domElement) throw (Exception);
         ~Hole() noexcept;
 
         // Getters
@@ -60,8 +60,8 @@ class Hole final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -72,9 +72,7 @@ class Hole final : public IF_XmlSerializableObject
         Hole& operator=(const Hole& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Polygon Attributes

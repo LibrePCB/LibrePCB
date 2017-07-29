@@ -51,7 +51,7 @@ class WSI_AppLocale final : public WSI_Base
         // Constructors / Destructor
         WSI_AppLocale() = delete;
         WSI_AppLocale(const WSI_AppLocale& other) = delete;
-        WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
         ~WSI_AppLocale() noexcept;
 
         // Getters
@@ -66,20 +66,16 @@ class WSI_AppLocale final : public WSI_Base
         void apply() noexcept override;
         void revert() noexcept override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Operator Overloadings
         WSI_AppLocale& operator=(const WSI_AppLocale& rhs) = delete;
 
 
     private: // Methods
-
         void comboBoxIndexChanged(int index) noexcept;
         void updateComboBoxIndex() noexcept;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

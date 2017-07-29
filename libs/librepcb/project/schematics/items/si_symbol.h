@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
@@ -55,7 +55,7 @@ class SI_SymbolPin;
  * @author ubruhin
  * @date 2014-08-23
  */
-class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
+class SI_Symbol final : public SI_Base, public SerializableObject,
                         public IF_AttributeProvider
 {
         Q_OBJECT
@@ -65,7 +65,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         // Constructors / Destructor
         SI_Symbol() = delete;
         SI_Symbol(const SI_Symbol& other) = delete;
-        explicit SI_Symbol(Schematic& schematic, const XmlDomElement& domElement) throw (Exception);
+        explicit SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (Exception);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
                            const Angle& rotation = Angle()) throw (Exception);
@@ -89,8 +89,8 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
         void addToSchematic(GraphicsScene& scene) throw (Exception) override;
         void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Helper Methods
@@ -122,9 +122,7 @@ class SI_Symbol final : public SI_Base, public IF_XmlSerializableObject,
     private:
 
         void init(const Uuid& symbVarItemUuid) throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

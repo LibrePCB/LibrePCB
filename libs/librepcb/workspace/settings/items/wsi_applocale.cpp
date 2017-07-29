@@ -24,7 +24,6 @@
 #include <QtWidgets>
 #include "wsi_applocale.h"
 #include <librepcb/common/application.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -36,7 +35,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement),
     mAppLocale(), mAppLocaleTmp(mAppLocale)
 {
@@ -141,16 +140,9 @@ void WSI_AppLocale::updateComboBoxIndex() noexcept
     }
 }
 
-XmlDomElement* WSI_AppLocale::serializeToXmlDomElement() const throw (Exception)
+void WSI_AppLocale::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    root->setText(mAppLocale);
-    return root.take();
-}
-
-bool WSI_AppLocale::checkAttributesValidity() const noexcept
-{
-    return true;
+    root.setText(mAppLocale);
 }
 
 /*****************************************************************************************

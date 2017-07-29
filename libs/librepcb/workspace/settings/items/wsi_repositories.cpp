@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "wsi_repositories.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/network/repository.h>
 
 /*****************************************************************************************
@@ -36,15 +35,13 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Repositories::WSI_Repositories(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception) :
+WSI_Repositories::WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
         // load setting
-        for (XmlDomElement* child = xmlElement->getFirstChild("repository", false);
-             child; child = child->getNextSibling("repository", false))
-        {
-            mList.append(new Repository(*child)); // can throw
+        foreach (const DomElement* node, xmlElement->getChilds()) {
+            mList.append(new Repository(*node)); // can throw
         }
     } else {
         // load defaults
@@ -180,18 +177,9 @@ void WSI_Repositories::updateListWidgetItems() noexcept
     }
 }
 
-XmlDomElement* WSI_Repositories::serializeToXmlDomElement() const throw (Exception)
+void WSI_Repositories::serialize(DomElement& root) const throw (Exception)
 {
-    QScopedPointer<XmlDomElement> root(WSI_Base::serializeToXmlDomElement());
-    foreach (const Repository* repository, mList) {
-        root->appendChild(repository->serializeToXmlDomElement()); // can throw
-    }
-    return root.take();
-}
-
-bool WSI_Repositories::checkAttributesValidity() const noexcept
-{
-    return true;
+    serializePointerContainer(root, mList, "repository");
 }
 
 /*****************************************************************************************

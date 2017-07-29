@@ -30,8 +30,6 @@
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include <librepcb/common/attributes/attributelist.h>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"
@@ -46,7 +44,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
@@ -73,9 +71,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const XmlDomElement& domE
     mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
 
     // load all signal instances
-    for (XmlDomElement* node = domElement.getFirstChild("signal_mapping/map", true, false);
-         node; node = node->getNextSibling("map"))
-    {
+    foreach (const DomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
@@ -340,21 +336,17 @@ void ComponentInstance::unregisterDevice(BI_Device& device) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* ComponentInstance::serializeToXmlDomElement() const throw (Exception)
+void ComponentInstance::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("component"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("component", mLibComponent->getUuid());
-    root->setAttribute("symbol_variant", mCompSymbVar->getUuid());
-    root->appendTextChild("name", mName);
-    root->appendTextChild("value", mValue);
-    root->appendChild(mAttributes->serializeToXmlDomElement());
-    XmlDomElement* signalMapping = root->appendChild("signal_mapping");
-    foreach (ComponentSignalInstance* signalInstance, mSignals)
-        signalMapping->appendChild(signalInstance->serializeToXmlDomElement());
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("component", mLibComponent->getUuid());
+    root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
+    root.appendTextChild("name", mName);
+    root.appendTextChild("value", mValue);
+    root.appendChild(mAttributes->serializeToDomElement("attributes"));
+    root.appendChild(serializePointerContainer(mSignals, "signal_mapping", "map"));
 }
 
 /*****************************************************************************************
@@ -370,7 +362,7 @@ bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& 
         else if (attrKey == QLatin1String("VALUE"))
             return value = mValue, true;
         else if (mAttributes->contains(attrKey))
-            return value = mAttributes->value(attrKey)->getValueTr(true), true;
+            return value = mAttributes->find(attrKey)->getValueTr(true), true;
     }
 
     if ((attrNS != QLatin1String("CMP")) && (passToParents))

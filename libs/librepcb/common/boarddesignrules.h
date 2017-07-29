@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "fileio/if_xmlserializableobject.h"
+#include "fileio/serializableobject.h"
 #include "exceptions.h"
 #include "units/all_length_units.h"
 
@@ -43,7 +43,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-04-01
  */
-class BoardDesignRules final : public IF_XmlSerializableObject
+class BoardDesignRules final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(BoardDesignRules)
 
@@ -52,7 +52,7 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         // Constructors / Destructor
         BoardDesignRules() noexcept;
         BoardDesignRules(const BoardDesignRules& other);
-        explicit BoardDesignRules(const XmlDomElement& domElement) throw (Exception);
+        explicit BoardDesignRules(const DomElement& domElement) throw (Exception);
         ~BoardDesignRules() noexcept;
 
         // Getters : General Attributes
@@ -105,8 +105,8 @@ class BoardDesignRules final : public IF_XmlSerializableObject
         // General Methods
         void restoreDefaults() noexcept;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
         // Helper Methods
         bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
@@ -120,9 +120,7 @@ class BoardDesignRules final : public IF_XmlSerializableObject
 
 
     private:
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes

@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "ellipse.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -52,7 +51,7 @@ Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabAre
     Q_ASSERT(radiusY > 0);
 }
 
-Ellipse::Ellipse(const XmlDomElement& domElement) throw (Exception)
+Ellipse::Ellipse(const DomElement& domElement) throw (Exception)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
     mLineWidth = domElement.getAttribute<Length>("width", true);
@@ -150,21 +149,19 @@ Ellipse Ellipse::rotated(const Angle& angle, const Point& center) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* Ellipse::serializeToXmlDomElement() const throw (Exception)
+void Ellipse::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("ellipse"));
-    root->setAttribute("layer", mLayerId);
-    root->setAttribute("width", mLineWidth);
-    root->setAttribute("fill", mIsFilled);
-    root->setAttribute("grab_area", mIsGrabArea);
-    root->setAttribute("x", mCenter.getX());
-    root->setAttribute("y", mCenter.getY());
-    root->setAttribute("radius_x", mRadiusX);
-    root->setAttribute("radius_y", mRadiusY);
-    root->setAttribute("rotation", mRotation);
-    return root.take();
+    root.setAttribute("layer", mLayerId);
+    root.setAttribute("width", mLineWidth);
+    root.setAttribute("fill", mIsFilled);
+    root.setAttribute("grab_area", mIsGrabArea);
+    root.setAttribute("x", mCenter.getX());
+    root.setAttribute("y", mCenter.getY());
+    root.setAttribute("radius_x", mRadiusX);
+    root.setAttribute("radius_y", mRadiusY);
+    root.setAttribute("rotation", mRotation);
 }
 
 /*****************************************************************************************

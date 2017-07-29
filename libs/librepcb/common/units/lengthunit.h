@@ -131,18 +131,11 @@ class LengthUnit final
         int getIndex() const noexcept {return static_cast<int>(mUnit);}
 
         /**
-         * @brief Convert the length unit to a string (for example to save it in files)
+         * @brief Serialize this object into a string
          *
-         * This method is useful to save a length unit in text files (like ini or xml).
-         * As the return value of this method is independent from the user's locale
-         * settings and the application's version, this is the only way to store a
-         * LengthUnit object to files!
-         *
-         * @return The length unit as a string (like "millimeters" or "inches")
-         *
-         * @see #fromString()
+         * @return This object as a string
          */
-        QString toString() const noexcept;
+        QString serializeToString() const noexcept;
 
         /**
          * @brief Convert the length unit to a localized string
@@ -238,17 +231,15 @@ class LengthUnit final
         static LengthUnit fromIndex(int index) throw (Exception);
 
         /**
-         * @brief Convert a string to a LengthUnit object (for example to load from files)
+         * @brief Deserialize object from a string
          *
-         * This method is useful to load a length unit from text files (like ini or xml).
+         * @param str           Input string
          *
-         * @param unitString    The unit as a string (must be generated with #toString()!)
+         * @return The created element
          *
-         * @return The converted LengthUnit value
-         *
-         * @throw Exception     If unitString was invalid
+         * @throws Exception if the string was invalid
          */
-        static LengthUnit fromString(const QString& unitString) throw (Exception);
+        static LengthUnit deserializeFromString(const QString& str) throw (Exception);
 
         /**
          * @brief Get all available length units

@@ -44,7 +44,7 @@ HAlign& HAlign::mirror() noexcept
     return *this;
 }
 
-QString HAlign::toString() const noexcept
+QString HAlign::serializeToString() const noexcept
 {
     switch (mAlign)
     {
@@ -56,7 +56,7 @@ QString HAlign::toString() const noexcept
 }
 
 
-HAlign HAlign::fromString(const QString& align) throw (Exception)
+HAlign HAlign::deserializeFromString(const QString& align) throw (Exception)
 {
     if (align == "left")
         return HAlign(Qt::AlignLeft);
@@ -87,7 +87,7 @@ VAlign& VAlign::mirror() noexcept
     return *this;
 }
 
-QString VAlign::toString() const noexcept
+QString VAlign::serializeToString() const noexcept
 {
     switch (mAlign)
     {
@@ -98,7 +98,7 @@ QString VAlign::toString() const noexcept
     }
 }
 
-VAlign VAlign::fromString(const QString& align) throw (Exception)
+VAlign VAlign::deserializeFromString(const QString& align) throw (Exception)
 {
     if (align == "top")
         return VAlign(Qt::AlignTop);

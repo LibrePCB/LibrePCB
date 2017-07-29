@@ -25,14 +25,14 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class XmlDomElement;
+class DomElement;
 
 namespace workspace {
 
@@ -50,7 +50,7 @@ namespace workspace {
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_Base : public QObject, public IF_XmlSerializableObject
+class WSI_Base : public QObject, public SerializableObject
 {
         Q_OBJECT
 
@@ -59,16 +59,17 @@ class WSI_Base : public QObject, public IF_XmlSerializableObject
         // Constructors / Destructor
         WSI_Base() = delete;
         WSI_Base(const WSI_Base& other) = delete;
-        explicit WSI_Base(const QString& xmlTagName, XmlDomElement* xmlElement) throw (Exception);
+        explicit WSI_Base(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
         virtual ~WSI_Base() noexcept;
+
+        // Getters
+        const QString& getXmlElementTagName() const noexcept {return mXmlElementTagName;}
 
         // General Methods
         virtual void restoreDefault() noexcept = 0;
         virtual void apply() noexcept = 0;
         virtual void revert() noexcept = 0;
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
         WSI_Base& operator=(const WSI_Base& rhs) = delete;

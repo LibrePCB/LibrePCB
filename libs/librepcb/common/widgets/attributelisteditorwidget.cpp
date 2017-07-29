@@ -95,7 +95,7 @@ void AttributeListEditorWidget::currentCellChanged(int currentRow, int currentCo
     Q_UNUSED(currentColumn);
     Q_UNUSED(previousRow);
     Q_UNUSED(previousColumn);
-    mSelectedAttribute = mAttributeList.value(rowToIndex(currentRow));
+    mSelectedAttribute = mAttributeList.value(rowToIndex(currentRow)).get();
 }
 
 void AttributeListEditorWidget::tableCellChanged(int row, int column) noexcept
@@ -193,10 +193,10 @@ void AttributeListEditorWidget::updateTable(const Attribute* selected) noexcept
 
     // existing attributes
     for (int i = 0; i < mAttributeList.count(); ++i) {
-        const Attribute* attr = mAttributeList.value(i); Q_ASSERT(attr);
+        std::shared_ptr<const Attribute> attr = mAttributeList.at(i);
         setTableRowContent(indexToRow(i), attr->getKey(), attr->getType(),
                            attr->getValueTr(false), attr->getUnit());
-        if (attr == selected) {
+        if (attr.get() == selected) {
             selectedRow = indexToRow(i);
         }
     }
@@ -314,7 +314,7 @@ void AttributeListEditorWidget::addAttribute(const QString& key, const Attribute
     try {
         throwIfKeyEmptyOrExists(key);
         throwIfValueInvalid(type, value);
-        mAttributeList.append(Attribute(key, type, value, unit)); // can throw
+        mAttributeList.append(std::make_shared<Attribute>(key, type, value, unit)); // can throw
         updateTable();
         emit edited(mAttributeList);
     } catch (const Exception& e) {
@@ -348,41 +348,41 @@ void AttributeListEditorWidget::moveAttributeDown(int index) noexcept
 
 QString AttributeListEditorWidget::setKey(int index, const QString& key) noexcept
 {
-    Attribute* attr = mAttributeList.value(index); Q_ASSERT(attr);
-    if (attr->getKey() == key) {
-        return attr->getKey();
+    Attribute& attr = *mAttributeList[index];
+    if (attr.getKey() == key) {
+        return attr.getKey();
     }
 
     try {
         throwIfKeyEmptyOrExists(key);
-        attr->setKey(key);
+        attr.setKey(key);
         emit edited(mAttributeList);
         return key;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Invalid key"), e.getUserMsg());
-        return attr->getKey();
+        return attr.getKey();
     }
 }
 
 void AttributeListEditorWidget::setType(int index, const AttributeType& type) noexcept
 {
     try {
-        Attribute* attr = mAttributeList.value(index); Q_ASSERT(attr);
+        Attribute& attr = *mAttributeList[index];
 
         // clear value if it is no longer valid
-        QString value = attr->getValue();
+        QString value = attr.getValue();
         if (!type.isValueValid(value)) {
             value = QString();
         }
 
         // reset unit if it is no longer valid
-        const AttributeUnit* unit = attr->getUnit();
+        const AttributeUnit* unit = attr.getUnit();
         if (!type.isUnitAvailable(unit)) {
             unit = type.getDefaultUnit();
         }
 
         // apply values
-        attr->setTypeValueUnit(type, value, unit);
+        attr.setTypeValueUnit(type, value, unit);
 
         // update table
         mTable->setItem(indexToRow(index), COLUMN_VALUE, new QTableWidgetItem(value));
@@ -399,27 +399,27 @@ void AttributeListEditorWidget::setType(int index, const AttributeType& type) no
 
 QString AttributeListEditorWidget::setValue(int index, const QString& value) noexcept
 {
-    Attribute* attr = mAttributeList.value(index); Q_ASSERT(attr);
-    if (attr->getValue() == value) {
-        return attr->getValue();
+    Attribute& attr = *mAttributeList[index];
+    if (attr.getValue() == value) {
+        return attr.getValue();
     }
 
     try {
-        throwIfValueInvalid(attr->getType(), value);
-        attr->setTypeValueUnit(attr->getType(), value, attr->getUnit());
+        throwIfValueInvalid(attr.getType(), value);
+        attr.setTypeValueUnit(attr.getType(), value, attr.getUnit());
         emit edited(mAttributeList);
         return value;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());
-        return attr->getValue();
+        return attr.getValue();
     }
 }
 
 void AttributeListEditorWidget::setUnit(int index, const AttributeUnit* unit) noexcept
 {
     try {
-        Attribute* attr = mAttributeList.value(index); Q_ASSERT(attr);
-        attr->setTypeValueUnit(attr->getType(), attr->getValue(), unit);
+        Attribute& attr = *mAttributeList[index];
+        attr.setTypeValueUnit(attr.getType(), attr.getValue(), unit);
         emit edited(mAttributeList);
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getUserMsg());

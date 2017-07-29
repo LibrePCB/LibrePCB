@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/uuid.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_netpoint.h"
@@ -55,7 +55,7 @@ class ErcMsg;
 /**
  * @brief The BI_NetPoint class
  */
-class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
+class BI_NetPoint final : public BI_Base, public SerializableObject,
                           public IF_ErcMsgProvider
 {
         Q_OBJECT
@@ -68,7 +68,7 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
         BI_NetPoint(const BI_NetPoint& other) = delete;
         BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
                     BI_Via* via) throw (Exception);
-        BI_NetPoint(Board& board, const XmlDomElement& domElement) throw (Exception);
+        BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
                     const Point& position) throw (Exception);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
@@ -107,8 +107,8 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
         void updateLines() const noexcept;
 
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
         // Inherited from SI_Base
@@ -127,9 +127,7 @@ class BI_NetPoint final : public BI_Base, public IF_XmlSerializableObject,
     private:
 
         void init() throw (Exception);
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // General

@@ -88,10 +88,8 @@ class Package final : public LibraryElement
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
         bool checkAttributesValidity() const noexcept override;
 
 

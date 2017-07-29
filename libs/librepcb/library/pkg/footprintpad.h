@@ -27,7 +27,7 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -44,7 +44,7 @@ namespace library {
  *
  * @todo add subclasses for each footprint type
  */
-class FootprintPad : public IF_XmlSerializableObject
+class FootprintPad : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
@@ -57,7 +57,7 @@ class FootprintPad : public IF_XmlSerializableObject
         explicit FootprintPad(Technology_t technology, const Uuid& padUuid,
                               const Point& pos, const Angle& rot, const Length& width,
                               const Length& height) noexcept;
-        explicit FootprintPad(const XmlDomElement& domElement) throw (Exception);
+        explicit FootprintPad(const DomElement& domElement) throw (Exception);
         virtual ~FootprintPad() noexcept;
 
         // Getters
@@ -81,16 +81,14 @@ class FootprintPad : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        virtual bool checkAttributesValidity() const noexcept override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(DomElement& root) const throw (Exception) override;
+        virtual bool checkAttributesValidity() const noexcept;
 
         // Static Methods
         static Technology_t stringToTechnology(const QString& technology) throw (Exception);
         static QString technologyToString(Technology_t technology) noexcept;
-        static FootprintPad* fromDomElement(const XmlDomElement& domElement) throw (Exception);
+        static FootprintPad* fromDomElement(const DomElement& domElement) throw (Exception);
 
 
     private:

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/attributes/attributelist.h>
+#include <librepcb/common/attributes/attribute.h>
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
@@ -118,10 +118,8 @@ class Component final : public LibraryElement
 
         // Private Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
         bool checkAttributesValidity() const noexcept override;
 
 

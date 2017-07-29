@@ -68,9 +68,8 @@ class LibraryElement : public LibraryBaseElement
 
         // Protected Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        /// @copydoc librepcb::SerializableObject::serialize()
+        virtual void serialize(DomElement& root) const throw (Exception) override;
         virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes

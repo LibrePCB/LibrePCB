@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/xmldomelement.h>
 #include "packagepad.h"
 
 /*****************************************************************************************
@@ -40,7 +39,7 @@ PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-PackagePad::PackagePad(const XmlDomElement& domElement) throw (Exception) :
+PackagePad::PackagePad(const DomElement& domElement) throw (Exception) :
     mUuid()
 {
     // read attributes
@@ -67,14 +66,12 @@ void PackagePad::setName(const QString& name) noexcept
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* PackagePad::serializeToXmlDomElement() const throw (Exception)
+void PackagePad::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("pad"));
-    root->setAttribute("uuid", mUuid);
-    root->setText(mName);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setText(mName);
 }
 
 /*****************************************************************************************

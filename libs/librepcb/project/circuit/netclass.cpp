@@ -26,7 +26,6 @@
 #include "netsignal.h"
 #include "circuit.h"
 #include "../erc/ercmsg.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -38,7 +37,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const XmlDomElement& domElement) throw (Exception) :
+NetClass::NetClass(Circuit& circuit, const DomElement& domElement) throw (Exception) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -129,14 +128,12 @@ void NetClass::unregisterNetSignal(NetSignal& signal) throw (Exception)
     updateErcMessages();
 }
 
-XmlDomElement* NetClass::serializeToXmlDomElement() const throw (Exception)
+void NetClass::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("netclass"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("name", mName);
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("name", mName);
 }
 
 /*****************************************************************************************

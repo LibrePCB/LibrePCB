@@ -26,8 +26,7 @@
 #include "if_ercmsgprovider.h"
 #include "../project.h"
 #include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
-#include <librepcb/common/fileio/xmldomelement.h>
+#include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -49,8 +48,6 @@ ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool creat
     } else {
         mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ErcMsgList::~ErcMsgList() noexcept
@@ -92,17 +89,15 @@ void ErcMsgList::restoreIgnoreState() noexcept
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
-    QSharedPointer<XmlDomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-    XmlDomElement& root = doc->getRoot();
+    std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+    DomElement& root = doc->getRoot();
 
     // reset all ignore attributes
     foreach (ErcMsg* ercMsg, mItems)
         ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
-    for (XmlDomElement* node = root.getFirstChild("ignore/item", true, false);
-         node; node = node->getNextSibling("item"))
-    {
+    foreach (const DomElement* node, root.getFirstChild("ignore", true)->getChilds()) {
         foreach (ErcMsg* ercMsg, mItems)
         {
             if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute<QString>("owner_class", false))
@@ -122,7 +117,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     // Save "core/erc.xml"
     try
     {
-        XmlDomDocument doc(*serializeToXmlDomElement());
+        DomDocument doc(*serializeToDomElement("erc"));
         mXmlFile->save(doc, toOriginal);
     }
     catch (Exception& e)
@@ -138,28 +133,19 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool ErcMsgList::checkAttributesValidity() const noexcept
+void ErcMsgList::serialize(DomElement& root) const throw (Exception)
 {
-    return true;
-}
-
-XmlDomElement* ErcMsgList::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("erc"));
-    XmlDomElement* ignoreNode = root->appendChild("ignore");
+    DomElement* ignoreNode = root.appendChild("ignore");
     foreach (ErcMsg* ercMsg, mItems)
     {
         if (ercMsg->isIgnored())
         {
-            XmlDomElement* itemNode = ignoreNode->appendChild("item");
+            DomElement* itemNode = ignoreNode->appendChild("item");
             itemNode->setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
             itemNode->setAttribute("owner_key", ercMsg->getOwnerKey());
             itemNode->setAttribute("msg_key", ercMsg->getMsgKey());
         }
     }
-    return root.take();
 }
 
 /*****************************************************************************************

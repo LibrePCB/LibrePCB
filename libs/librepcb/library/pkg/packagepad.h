@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +40,7 @@ namespace library {
 /**
  * @brief The PackagePad class
  */
-class PackagePad final : public IF_XmlSerializableObject
+class PackagePad final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(PackagePad)
 
@@ -48,7 +48,7 @@ class PackagePad final : public IF_XmlSerializableObject
 
         // Constructors / Destructor
         explicit PackagePad(const Uuid& uuid, const QString& name) noexcept;
-        explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
+        explicit PackagePad(const DomElement& domElement) throw (Exception);
         ~PackagePad() noexcept;
 
         // Getters
@@ -60,8 +60,8 @@ class PackagePad final : public IF_XmlSerializableObject
 
         // General Methods
 
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const throw (Exception) override;
 
 
     private:
@@ -72,9 +72,7 @@ class PackagePad final : public IF_XmlSerializableObject
         PackagePad& operator=(const PackagePad& rhs) = delete;
 
         // Private Methods
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
+        bool checkAttributesValidity() const noexcept;
 
 
         // Pin Attributes

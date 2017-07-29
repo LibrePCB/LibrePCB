@@ -25,7 +25,6 @@
 #include "component.h"
 #include "componentsymbolvariant.h"
 #include "componentpinsignalmapitem.h"
-#include <librepcb/common/fileio/xmldomelement.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -46,7 +45,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement) throw (Exception)
 {
     try
     {
@@ -57,9 +56,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const XmlDomElement& domE
         mSuffix = domElement.getAttribute<QString>("suffix", false);
 
         // read pin signal map
-        for (XmlDomElement* node = domElement.getFirstChild("pin_signal_map/map", true, false);
-             node; node = node->getNextSibling("map"))
-        {
+        foreach (const DomElement* node, domElement.getFirstChild("pin_signal_map", true)->getChilds()) {
             ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
             if (mPinSignalMap.contains(item->getPinUuid()))
             {
@@ -105,21 +102,15 @@ void ComponentSymbolVariantItem::removePinSignalMapItem(ComponentPinSignalMapIte
  *  General Methods
  ****************************************************************************************/
 
-XmlDomElement* ComponentSymbolVariantItem::serializeToXmlDomElement() const throw (Exception)
+void ComponentSymbolVariantItem::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("item"));
-    root->setAttribute("uuid", mUuid);
-    root->setAttribute("symbol", mSymbolUuid);
-    root->setAttribute("required", mIsRequired);
-    root->setAttribute("suffix", mSuffix);
-    XmlDomElement* pin_signal_map = root->appendChild("pin_signal_map");
-    foreach (const ComponentPinSignalMapItem* item, mPinSignalMap) {
-        pin_signal_map->appendChild(item->serializeToXmlDomElement());
-    }
-
-    return root.take();
+    root.setAttribute("uuid", mUuid);
+    root.setAttribute("symbol", mSymbolUuid);
+    root.setAttribute("required", mIsRequired);
+    root.setAttribute("suffix", mSuffix);
+    root.appendChild(serializePointerContainer(mPinSignalMap, "pin_signal_map", "map"));
 }
 
 /*****************************************************************************************

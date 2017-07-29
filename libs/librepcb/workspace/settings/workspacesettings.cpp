@@ -22,8 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/xmldomelement.h>
-#include <librepcb/common/fileio/xmldomdocument.h>
+#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
@@ -45,7 +44,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     qDebug("Load workspace settings...");
 
     // load settings if the settings file exists
-    QSharedPointer<XmlDomDocument> doc;
+    std::unique_ptr<DomDocument> doc;
     if (mXmlFilePath.isExistingFile()) {
         SmartXmlFile file(mXmlFilePath, false, true);
         doc = file.parseFileAndBuildDomTree();
@@ -58,7 +57,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exceptio
     }
 
     // load all settings
-    XmlDomElement* root = doc.data() ? &doc->getRoot() : nullptr;
+    DomElement* root = doc.get() ? &doc->getRoot() : nullptr;
     loadSettingsItem(mAppLocale,                "app_locale",                   root);
     loadSettingsItem(mAppDefMeasUnits,          "app_default_meas_units",       root);
     loadSettingsItem(mProjectAutosaveInterval,  "project_autosave_interval",    root);
@@ -122,35 +121,26 @@ void WorkspaceSettings::showSettingsDialog() noexcept
 
 template<typename T>
 void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                                         XmlDomElement* xmlRoot) throw (Exception)
+                                         DomElement* xmlRoot) throw (Exception)
 {
-    XmlDomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
+    DomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
     member.reset(new T(xmlTagName, node));
     mItems.append(member.data());
 }
 
 void WorkspaceSettings::saveToFile() const throw (Exception)
 {
-    XmlDomDocument doc(*serializeToXmlDomElement());
+    DomDocument doc(*serializeToDomElement("workspace_settings"));
 
     QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
     file->save(doc, true); // can throw
 }
 
-XmlDomElement* WorkspaceSettings::serializeToXmlDomElement() const throw (Exception)
+void WorkspaceSettings::serialize(DomElement& root) const throw (Exception)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("workspace_settings"));
     foreach (WSI_Base* item, mItems) {
-        root->appendChild(item->serializeToXmlDomElement());
+        root.appendChild(item->serializeToDomElement(item->getXmlElementTagName()));
     }
-    return root.take();
-}
-
-bool WorkspaceSettings::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************
