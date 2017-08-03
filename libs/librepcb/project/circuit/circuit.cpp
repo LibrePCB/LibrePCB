@@ -67,19 +67,19 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) thr
             // OK - XML file is open --> now load the whole circuit stuff
 
             // Load all netclasses
-            foreach (const DomElement* node, root.getFirstChild("netclasses", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netclass")) {
                 NetClass* netclass = new NetClass(*this, *node);
                 addNetClass(*netclass);
             }
 
             // Load all netsignals
-            foreach (const DomElement* node, root.getFirstChild("netsignals", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netsignal")) {
                 NetSignal* netsignal = new NetSignal(*this, *node);
                 addNetSignal(*netsignal);
             }
 
             // Load all component instances
-            foreach (const DomElement* node, root.getFirstChild("components", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("component")) {
                 ComponentInstance* component = new ComponentInstance(*this, *node);
                 addComponentInstance(*component);
             }
@@ -383,9 +383,9 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 
 void Circuit::serialize(DomElement& root) const throw (Exception)
 {
-    root.appendChild(serializePointerContainer(mNetClasses, "netclasses", "netclass"));
-    root.appendChild(serializePointerContainer(mNetSignals, "netsignals", "netsignal"));
-    root.appendChild(serializePointerContainer(mComponentInstances, "components", "component"));
+    serializePointerContainer(root, mNetClasses, "netclass");
+    serializePointerContainer(root, mNetSignals, "netsignal");
+    serializePointerContainer(root, mComponentInstances,"component");
 }
 
 /*****************************************************************************************

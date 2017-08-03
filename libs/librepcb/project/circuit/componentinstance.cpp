@@ -67,10 +67,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
     }
 
     // load all component attributes
-    mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
+    mAttributes.reset(new AttributeList(domElement)); // can throw
 
     // load all signal instances
-    foreach (const DomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
+    foreach (const DomElement* node, domElement.getChilds("signal_map")) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
@@ -342,8 +342,8 @@ void ComponentInstance::serialize(DomElement& root) const throw (Exception)
     root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
     root.appendTextChild("name", mName);
     root.appendTextChild("value", mValue);
-    root.appendChild(mAttributes->serializeToDomElement("attributes"));
-    root.appendChild(serializePointerContainer(mSignals, "signal_mapping", "map"));
+    mAttributes->serialize(root);
+    serializePointerContainer(root, mSignals, "signal_map");
 }
 
 /*****************************************************************************************

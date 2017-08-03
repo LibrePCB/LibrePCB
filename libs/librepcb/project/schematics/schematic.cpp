@@ -76,14 +76,14 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
-            mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
+            mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
+            mName = root.getFirstChild("name", true)->getText<QString>(true);
 
             // Load grid properties
-            mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
+            mGridProperties.reset(new GridProperties(*root.getFirstChild("grid", true)));
 
             // Load all symbols
-            foreach (const DomElement* node, root.getFirstChild("symbols", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("symbol")) {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 if (getSymbolByUuid(symbol->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
@@ -94,7 +94,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            foreach (const DomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netpoint")) {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -105,7 +105,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            foreach (const DomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netline")) {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -116,7 +116,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlabels
-            foreach (const DomElement* node, root.getFirstChild("netlabels", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netlabel")) {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),
@@ -705,15 +705,13 @@ void Schematic::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    DomElement* meta = root.appendChild("meta");
-    meta->appendTextChild("uuid", mUuid);
-    meta->appendTextChild("name", mName);
-    DomElement* properties = root.appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToDomElement("grid_properties"));
-    root.appendChild(serializePointerContainer(mSymbols, "symbols", "symbol"));
-    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
-    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
-    root.appendChild(serializePointerContainer(mNetLabels, "netlabels", "netlabel"));
+    root.appendTextChild("uuid", mUuid);
+    root.appendTextChild("name", mName);
+    root.appendChild(mGridProperties->serializeToDomElement("grid"));
+    serializePointerContainer(root, mSymbols, "symbol");
+    serializePointerContainer(root, mNetPoints, "netpoint");
+    serializePointerContainer(root, mNetLines, "netline");
+    serializePointerContainer(root, mNetLabels, "netlabel");
 }
 
 /*****************************************************************************************
