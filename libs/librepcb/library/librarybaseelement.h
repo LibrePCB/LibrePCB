@@ -26,6 +26,7 @@
 #include <memory>
 #include <QObject>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/uuid.h>
@@ -77,12 +78,9 @@ class LibraryBaseElement : public QObject, public SerializableObject
         const QDateTime& getCreated() const noexcept {return mCreated;}
         const QDateTime& getLastModified() const noexcept {return mLastModified;}
         bool isDeprecated() const noexcept {return mIsDeprecated;}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        QString getKeywords(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
-        const QMap<QString, QString>& getKeywords() const noexcept {return mKeywords;}
+        const LocalizedNameMap& getNames() const noexcept {return mNames;}
+        const LocalizedDescriptionMap& getDescriptions() const noexcept {return mDescriptions;}
+        const LocalizedKeywordsMap& getKeywords() const noexcept {return mKeywords;}
         QStringList getAllAvailableLocales() const noexcept;
 
         // Setters
@@ -90,9 +88,9 @@ class LibraryBaseElement : public QObject, public SerializableObject
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
         void setLastModified(const QDateTime& modified) noexcept {mLastModified = modified.toUTC();}
         void setDeprecated(bool deprecated) noexcept {mIsDeprecated = deprecated;}
-        void setName(const QString& locale, const QString& name) noexcept {mNames[locale] = name;}
-        void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions[locale] = desc;}
-        void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords[locale] = keywords;}
+        void setName(const QString& locale, const QString& name) noexcept {mNames.insert(locale, name);}
+        void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions.insert(locale, desc);}
+        void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords.insert(locale, keywords);}
 
         // General Methods
         virtual void save() throw (Exception);
@@ -105,79 +103,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
         LibraryBaseElement& operator=(const LibraryBaseElement& rhs) = delete;
 
         // Static Methods
-
-        /**
-         * @brief Read locale-dependent strings from a DOM node and insert them in a QMap
-         *
-         * If you have DOM nodes with strings in different languages, this method helps
-         * you to read these strings and create a QMap with all entries. This method will
-         * also check if an entry with the language "en_US" exists in the DOM node.
-         *
-         * Example of a valid DOM node:
-         * @code
-         * <my_parent_node>
-         *     <my_subnode locale="en_US">the value</my_subnode>
-         *     <my_subnode locale="de_DE">der wert</my_subnode>
-         * </my_parent_node>
-         * @endcode
-         *
-         * @note
-         *  - The parent node name ("my_parent_node") is arbitrary
-         *  - The subnode name ("my_subnode") is arbitrary
-         *  - It's allowed to have other subnodes, they will not be parsed/modified
-         *  - The subnode must contain at least the attribute which is called "locale"
-         *  - At least one entry with the locale "en_US" must exist!
-         *
-         * @param parentNode        The parent node ("my_parent_node" in the example)
-         * @param childNodesName    The name of the subnodes to read ("my_subnode" in the example)
-         * @param list              The QMap where the new locale/text pair will be
-         *                          inserted. The locales (values of "locale" attributes)
-         *                          are the keys of the list, the node texts ("the value"
-         *                          in the example) are the values of the list.
-         * @param throwIfValueEmpty If true and at least one value is an empty string,
-         *                          an exception will be thrown.
-         *
-         * @throw Exception     This method will throw an exception in the following cases:
-         *  - The attribute "locale" of a node does not exist or its value is empty
-         *  - There are multiple nodes with the same locale
-         *  - There is no entry with the locale "en_US"
-         *  - There was an empty entry and "throwIfValueEmpty" is set to "true"
-         *
-         * @see #localeStringFromList()
-         */
-        static void readLocaleDomNodes(const DomElement& parentNode,
-                                       const QString& childNodesName,
-                                       QMap<QString, QString>& list,
-                                       bool throwIfValueEmpty) throw (Exception);
-
-        /**
-         * @brief Get the string of a specific locale from a QMap
-         *
-         * This method can be used to extract a text in a specific language from a QMap
-         * which was generated with #readLocaleDomNodes(). If the list doesn't contain a
-         * translation for the selected language, the "nearest" other language will be
-         * used instead. Therefore you can to pass a QStringList with the locales to use.
-         * If all these languages are not available in the QMap, always the language
-         * "en_US" is used instead (if available, otherwise an exception will be thrown).
-         *
-         * @param list          The list which contains all locales and their translations
-         *                      (created with #readLocaleDomNodes())
-         * @param localeOrder   The locale you want to read (for example "de_CH") must be
-         *                      on top (index 0) of this list. To use fallback locales,
-         *                      the list can have more than one item (order is important!).
-         * @param usedLocale    The locale which was really used (locale of the returned
-         *                      string). Pass nullptr if this return value is not needed.
-         *
-         * @return              The string from the list in the specified language
-         *
-         * @throw Exception     If no translation is found in the list (not even "en_US")
-         *
-         * @see #readLocaleDomNodes(), #WSI_LibraryLocaleOrder
-         */
-        static QString localeStringFromList(const QMap<QString, QString>& list,
-                                            const QStringList& localeOrder,
-                                            QString* usedLocale = nullptr) throw (Exception);
-
         template <typename ElementType>
         static bool isValidElementDirectory(const FilePath& dir) noexcept
         {return dir.getPathTo(".librepcb-" % ElementType::getShortElementName()).isExistingFile();}
@@ -213,9 +138,9 @@ class LibraryBaseElement : public QObject, public SerializableObject
         QDateTime mCreated;
         QDateTime mLastModified;
         bool mIsDeprecated;
-        QMap<QString, QString> mNames;        ///< key: locale (like "en_US"), value: name
-        QMap<QString, QString> mDescriptions; ///< key: locale (like "en_US"), value: description
-        QMap<QString, QString> mKeywords;     ///< key: locale (like "en_US"), value: keywords
+        LocalizedNameMap mNames;
+        LocalizedDescriptionMap mDescriptions;
+        LocalizedKeywordsMap mKeywords;
 };
 
 /*****************************************************************************************

@@ -69,11 +69,11 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->lblCompLibUuid->setText(htmlLink.arg(mComponentInstance.getLibComponent().getFilePath().toQUrl().toString(),
                                               mComponentInstance.getLibComponent().getUuid().toStr()));
     mUi->lblCompLibUuid->setToolTip(mComponentInstance.getLibComponent().getFilePath().toNative());
-    mUi->lblCompLibName->setText(mComponentInstance.getLibComponent().getName(localeOrder));
-    mUi->lblCompLibName->setToolTip(mComponentInstance.getLibComponent().getDescription(localeOrder));
+    mUi->lblCompLibName->setText(mComponentInstance.getLibComponent().getNames().value(localeOrder));
+    mUi->lblCompLibName->setToolTip(mComponentInstance.getLibComponent().getDescriptions().value(localeOrder));
     mUi->lblSymbVarUuid->setText(mComponentInstance.getSymbolVariant().getUuid().toStr());
-    mUi->lblSymbVarName->setText(mComponentInstance.getSymbolVariant().getName(localeOrder));
-    mUi->lblSymbVarName->setToolTip(mComponentInstance.getSymbolVariant().getDescription(localeOrder));
+    mUi->lblSymbVarName->setText(mComponentInstance.getSymbolVariant().getNames().value(localeOrder));
+    mUi->lblSymbVarName->setToolTip(mComponentInstance.getSymbolVariant().getDescriptions().value(localeOrder));
 
     // Symbol Instance Attributes
     mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toStr());
@@ -86,8 +86,8 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getFilePath().toQUrl().toString(),
                                               mSymbol.getLibSymbol().getUuid().toStr()));
     mUi->lblSymbLibUuid->setToolTip(mSymbol.getLibSymbol().getFilePath().toNative());
-    mUi->lblSymbLibName->setText(mSymbol.getLibSymbol().getName(localeOrder));
-    mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescription(localeOrder));
+    mUi->lblSymbLibName->setText(mSymbol.getLibSymbol().getNames().value(localeOrder));
+    mUi->lblSymbLibName->setToolTip(mSymbol.getLibSymbol().getDescriptions().value(localeOrder));
 
     // set focus to component instance name
     mUi->edtCompInstName->selectAll();

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/ellipse.h>
 #include <librepcb/common/geometry/text.h>
@@ -59,10 +60,8 @@ class Footprint final : public SerializableObject
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        const LocalizedNameMap& getNames() const noexcept {return mNames;}
+        const LocalizedDescriptionMap& getDescriptions() const noexcept {return mDescriptions;}
 
         // FootprintPad Methods
         const QMap<Uuid, FootprintPad*>& getPads() noexcept {return mPads;}
@@ -125,8 +124,8 @@ class Footprint final : public SerializableObject
 
         // Footprint Attributes
         Uuid mUuid;
-        QMap<QString, QString> mNames;
-        QMap<QString, QString> mDescriptions;
+        LocalizedNameMap mNames;
+        LocalizedDescriptionMap mDescriptions;
         QMap<Uuid, FootprintPad*> mPads;
         QList<Polygon*> mPolygons;
         QList<Ellipse*> mEllipses;

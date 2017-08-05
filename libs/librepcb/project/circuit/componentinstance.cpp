@@ -30,7 +30,6 @@
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"
 
@@ -97,13 +96,11 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr),
     mAttributes()
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
-
     if (mName.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The name of the component must not be empty."));
     }
-    mValue = cmp.getDefaultValue(localeOrder);
+    mValue = cmp.getDefaultValue();
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVar);
     if (!mCompSymbVar) {
         throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),

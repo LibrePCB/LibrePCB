@@ -40,8 +40,8 @@ ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& 
     mUuid(uuid), mNorm(norm)
 {
     Q_ASSERT(!mUuid.isNull());
-    setName("en_US", name_en_US);
-    setDescription("en_US", desc_en_US);
+    mNames.setDefaultValue(name_en_US);
+    mDescriptions.setDefaultValue(desc_en_US);
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) throw (Exception)
@@ -51,13 +51,11 @@ ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) thr
         // read attributes
         mUuid = domElement.getAttribute<Uuid>("uuid", true);
         mNorm = domElement.getAttribute<QString>("norm", false);
-
-        // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
-        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
+        mNames.loadFromDomElement(domElement);
+        mDescriptions.loadFromDomElement(domElement);
 
         // Load all symbol variant items
-        foreach (const DomElement* node, domElement.getFirstChild("symbol_items", true)->getChilds()) {
+        foreach (const DomElement* node, domElement.getChilds("symbol_item")) {
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
@@ -80,20 +78,6 @@ ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) thr
 ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
 {
     qDeleteAll(mSymbolItems);       mSymbolItems.clear();
-}
-
-/*****************************************************************************************
- *  Getters: Attributes
- ****************************************************************************************/
-
-QString ComponentSymbolVariant::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString ComponentSymbolVariant::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
 /*****************************************************************************************
@@ -165,11 +149,9 @@ void ComponentSymbolVariant::serialize(DomElement& root) const throw (Exception)
 
     root.setAttribute("uuid", mUuid);
     root.setAttribute("norm", mNorm);
-    foreach (const QString& locale, mNames.keys())
-        root.appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root.appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    root.appendChild(serializePointerContainer(mSymbolItems, "symbol_items", "item"));
+    mNames.serialize(root);
+    mDescriptions.serialize(root);
+    serializePointerContainer(root, mSymbolItems, "symbol_item");
 }
 
 /*****************************************************************************************
@@ -179,8 +161,7 @@ void ComponentSymbolVariant::serialize(DomElement& root) const throw (Exception)
 bool ComponentSymbolVariant::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
+    if (mNames.getDefaultValue().isEmpty()) return false;
     if (mSymbolItems.isEmpty())             return false;
     return true;
 }

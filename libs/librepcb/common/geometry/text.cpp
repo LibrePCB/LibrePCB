@@ -59,8 +59,8 @@ Text::Text(const DomElement& domElement) throw (Exception)
     }
 
     // text alignment
-    mAlign.setH(domElement.getAttribute<HAlign>("h_align", true));
-    mAlign.setV(domElement.getAttribute<VAlign>("v_align", true));
+    mAlign.setH(domElement.getAttribute<HAlign>("align_h", true));
+    mAlign.setV(domElement.getAttribute<VAlign>("align_v", true));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -119,8 +119,8 @@ void Text::serialize(DomElement& root) const throw (Exception)
     root.setAttribute("y", mPosition.getY());
     root.setAttribute("rotation", mRotation);
     root.setAttribute("height", mHeight);
-    root.setAttribute("h_align", mAlign.getH());
-    root.setAttribute("v_align", mAlign.getV());
+    root.setAttribute("align_h", mAlign.getH());
+    root.setAttribute("align_v", mAlign.getV());
     root.setText(mText);
 }
 

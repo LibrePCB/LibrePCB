@@ -56,7 +56,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElem
         mSuffix = domElement.getAttribute<QString>("suffix", false);
 
         // read pin signal map
-        foreach (const DomElement* node, domElement.getFirstChild("pin_signal_map", true)->getChilds()) {
+        foreach (const DomElement* node, domElement.getChilds("pin_signal_map")) {
             ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
             if (mPinSignalMap.contains(item->getPinUuid()))
             {
@@ -110,7 +110,7 @@ void ComponentSymbolVariantItem::serialize(DomElement& root) const throw (Except
     root.setAttribute("symbol", mSymbolUuid);
     root.setAttribute("required", mIsRequired);
     root.setAttribute("suffix", mSuffix);
-    root.appendChild(serializePointerContainer(mPinSignalMap, "pin_signal_map", "map"));
+    serializePointerContainer(root, mPinSignalMap, "pin_signal_map");
 }
 
 /*****************************************************************************************

@@ -325,7 +325,7 @@ bool FootprintPreviewGraphicsItem::getAttributeValue(const QString& attrNS, cons
     if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
     {
         if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
+            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
         if (mComponent->getAttributes().contains(attrKey)) {

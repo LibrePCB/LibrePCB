@@ -40,8 +40,8 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
     mUuid(uuid)
 {
     Q_ASSERT(mUuid.isNull() == false);
-    mNames.insert("en_US", name_en_US);
-    mDescriptions.insert("en_US", description_en_US);
+    mNames.setDefaultValue(name_en_US);
+    mDescriptions.setDefaultValue(description_en_US);
 }
 
 Footprint::Footprint(const DomElement& domElement) throw (Exception)
@@ -50,34 +50,38 @@ Footprint::Footprint(const DomElement& domElement) throw (Exception)
     {
         // read attributes
         mUuid = domElement.getAttribute<Uuid>("uuid", true);
+        mNames.loadFromDomElement(domElement);
+        mDescriptions.loadFromDomElement(domElement);
 
-        // read names and descriptions in all available languages
-        LibraryBaseElement::readLocaleDomNodes(domElement, "name", mNames, true);
-        LibraryBaseElement::readLocaleDomNodes(domElement, "description", mDescriptions, false);
-
-        // Load all geometry elements
-        foreach (const DomElement* node, domElement.getFirstChild("geometry", true)->getChilds()) {
-            if (node->getName() == "polygon") {
-                mPolygons.append(new Polygon(*node));
-            } else if (node->getName() == "ellipse") {
-                mEllipses.append(new Ellipse(*node));
-            } else if (node->getName() == "text") {
-                mTexts.append(new Text(*node));
-            } else if (node->getName() == "hole") {
-                mHoles.append(new Hole(*node));
-            } else if (node->getName() == "pad") {
-                FootprintPad* pad = FootprintPad::fromDomElement(*node);
-                if (mPads.contains(pad->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
-                        QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                        .arg(pad->getUuid().toStr(), domElement.getDocFilePath().toNative()));
-                }
-                mPads.insert(pad->getUuid(), pad);
-            } else {
-                throw RuntimeError(__FILE__, __LINE__, node->getName(),
-                    QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                    .arg(node->getName(), domElement.getDocFilePath().toNative()));
+        // Load all pads
+        foreach (const DomElement* node, domElement.getChilds("pad")) {
+            FootprintPad* pad = FootprintPad::fromDomElement(*node);
+            if (mPads.contains(pad->getUuid())) {
+                throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
+                    QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
+                    .arg(pad->getUuid().toStr(), domElement.getDocFilePath().toNative()));
             }
+            mPads.insert(pad->getUuid(), pad);
+        }
+
+        // Load all polygons
+        foreach (const DomElement* node, domElement.getChilds("polygon")) {
+            mPolygons.append(new Polygon(*node));
+        }
+
+        // Load all ellipses
+        foreach (const DomElement* node, domElement.getChilds("ellipse")) {
+            mEllipses.append(new Ellipse(*node));
+        }
+
+        // Load all texts
+        foreach (const DomElement* node, domElement.getChilds("text")) {
+            mTexts.append(new Text(*node));
+        }
+
+        // Load all holes
+        foreach (const DomElement* node, domElement.getChilds("hole")) {
+            mHoles.append(new Hole(*node));
         }
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -99,20 +103,6 @@ Footprint::~Footprint() noexcept
     qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
     qDeleteAll(mPads);          mPads.clear();
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-QString Footprint::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString Footprint::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
 }
 
 /*****************************************************************************************
@@ -205,16 +195,13 @@ void Footprint::serialize(DomElement& root) const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.setAttribute("uuid", mUuid);
-    foreach (const QString& locale, mNames.keys())
-        root.appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    foreach (const QString& locale, mDescriptions.keys())
-        root.appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    DomElement* geometry = root.appendChild("geometry");
-    serializePointerContainer(*geometry, mPolygons, "polygon");
-    serializePointerContainer(*geometry, mTexts, "text");
-    serializePointerContainer(*geometry, mEllipses, "ellipse");
-    serializePointerContainer(*geometry, mHoles, "hole");
-    serializePointerContainer(*geometry, mPads, "pad");
+    mNames.serialize(root);
+    mDescriptions.serialize(root);
+    serializePointerContainer(root, mPads,     "pad");
+    serializePointerContainer(root, mPolygons, "polygon");
+    serializePointerContainer(root, mEllipses, "ellipse");
+    serializePointerContainer(root, mTexts,    "text");
+    serializePointerContainer(root, mHoles,    "hole");
 }
 
 /*****************************************************************************************

@@ -48,9 +48,11 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception
     DomElement& root = mLoadingXmlFileDocument->getRoot();
 
     // load attributes
-    mComponentUuid = root.getFirstChild("meta/component", true, true)->getText<Uuid>(true);
-    mPackageUuid = root.getFirstChild("meta/package", true, true)->getText<Uuid>(true);
-    foreach (const DomElement* node, root.getFirstChild("pad_signal_map", true)->getChilds()) {
+    mComponentUuid = root.getFirstChild("component", true)->getText<Uuid>(true);
+    mPackageUuid = root.getFirstChild("package", true)->getText<Uuid>(true);
+
+    // load pad signal map
+    foreach (const DomElement* node, root.getChilds("pad_signal_map")) {
         Uuid pad = node->getAttribute<Uuid>("pad", true);
         Uuid signal = node->getText<Uuid>(false);
         if (mPadSignalMap.contains(pad)) {
@@ -91,11 +93,10 @@ void Device::removePadSignalMapping(const Uuid& pad) noexcept
 void Device::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
-    root.getFirstChild("meta", true)->appendTextChild("component", mComponentUuid);
-    root.getFirstChild("meta", true)->appendTextChild("package", mPackageUuid);
-    DomElement* padSignalMap = root.appendChild("pad_signal_map");
+    root.appendTextChild("component", mComponentUuid);
+    root.appendTextChild("package", mPackageUuid);
     foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
-        DomElement* child = padSignalMap->appendChild("map");
+        DomElement* child = root.appendChild("pad_signal_map");
         child->setAttribute("pad", padUuid);
         child->setText(mPadSignalMap.value(padUuid));
     }

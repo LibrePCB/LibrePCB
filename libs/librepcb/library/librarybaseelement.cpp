@@ -54,9 +54,9 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
 {
     FileUtils::makePath(mDirectory); // can throw
 
-    mNames.insert("en_US", name_en_US);
-    mDescriptions.insert("en_US", description_en_US);
-    mKeywords.insert("en_US", keywords_en_US);
+    mNames.setDefaultValue(name_en_US);
+    mDescriptions.setDefaultValue(description_en_US);
+    mKeywords.setDefaultValue(keywords_en_US);
 }
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
@@ -100,20 +100,19 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     SmartXmlFile xmlFile(xmlFilePath, false, true);
     mLoadingXmlFileDocument = xmlFile.parseFileAndBuildDomTree();
     const DomElement& root = mLoadingXmlFileDocument->getRoot(mLongElementName);
-    const DomElement& metaElement = *root.getFirstChild("meta", true);
 
     // read attributes
-    mUuid = metaElement.getFirstChild("uuid", true)->getText<Uuid>(true);
-    mVersion = metaElement.getFirstChild("version", true)->getText<Version>(true);
-    mAuthor = metaElement.getFirstChild("author", true)->getText<QString>(true);
-    mCreated = metaElement.getFirstChild("created", true)->getText<QDateTime>(true);
-    mLastModified = metaElement.getFirstChild("last_modified", true)->getText<QDateTime>(true);
-    mIsDeprecated = metaElement.getFirstChild("deprecated", true)->getText<bool>(true);
+    mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
+    mVersion = root.getFirstChild("version", true)->getText<Version>(true);
+    mAuthor = root.getFirstChild("author", true)->getText<QString>(true);
+    mCreated = root.getFirstChild("created", true)->getText<QDateTime>(true);
+    mLastModified = root.getFirstChild("last_modified", true)->getText<QDateTime>(true);
+    mIsDeprecated = root.getFirstChild("deprecated", true)->getText<bool>(true);
 
     // read names, descriptions and keywords in all available languages
-    readLocaleDomNodes(metaElement, "name", mNames, true);
-    readLocaleDomNodes(metaElement, "description", mDescriptions, false);
-    readLocaleDomNodes(metaElement, "keywords", mKeywords, false);
+    mNames.loadFromDomElement(root);
+    mDescriptions.loadFromDomElement(root);
+    mKeywords.loadFromDomElement(root);
 
     // check if the UUID equals to the directory basename
     if (mDirectoryNameMustBeUuid && (mUuid != dirUuid)) {
@@ -136,21 +135,6 @@ LibraryBaseElement::~LibraryBaseElement() noexcept
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
-
-QString LibraryBaseElement::getName(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mNames, localeOrder);
-}
-
-QString LibraryBaseElement::getDescription(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mDescriptions, localeOrder);
-}
-
-QString LibraryBaseElement::getKeywords(const QStringList& localeOrder) const noexcept
-{
-    return LibraryBaseElement::localeStringFromList(mKeywords, localeOrder);
-}
 
 QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
 {
@@ -268,82 +252,23 @@ void LibraryBaseElement::serialize(DomElement& root) const throw (Exception)
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    DomElement* meta = root.appendChild("meta");
-    meta->appendTextChild("uuid", mUuid);
-    meta->appendTextChild("version", mVersion);
-    meta->appendTextChild("author", mAuthor);
-    meta->appendTextChild("created", mCreated);
-    meta->appendTextChild("last_modified", mLastModified);
-    meta->appendTextChild("deprecated", mIsDeprecated);
-    foreach (const QString& locale, mNames.keys()) {
-        meta->appendTextChild("name", mNames.value(locale))->setAttribute("locale", locale);
-    }
-    foreach (const QString& locale, mDescriptions.keys()) {
-        meta->appendTextChild("description", mDescriptions.value(locale))->setAttribute("locale", locale);
-    }
-    foreach (const QString& locale, mKeywords.keys()) {
-        meta->appendTextChild("keywords", mKeywords.value(locale))->setAttribute("locale", locale);
-    }
+    root.appendTextChild("uuid", mUuid);
+    root.appendTextChild("version", mVersion);
+    root.appendTextChild("author", mAuthor);
+    root.appendTextChild("created", mCreated);
+    root.appendTextChild("last_modified", mLastModified);
+    root.appendTextChild("deprecated", mIsDeprecated);
+    mNames.serialize(root);
+    mDescriptions.serialize(root);
+    mKeywords.serialize(root);
 }
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (!mVersion.isValid())                return false;
-    if (mNames.value("en_US").isEmpty())    return false;
-    if (!mDescriptions.contains("en_US"))   return false;
-    if (!mKeywords.contains("en_US"))       return false;
+    if (mNames.getDefaultValue().isEmpty()) return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-void LibraryBaseElement::readLocaleDomNodes(const DomElement& parentNode,
-                                            const QString& childNodesName,
-                                            QMap<QString, QString>& list,
-                                            bool throwIfValueEmpty) throw (Exception)
-{
-    for (DomElement* node = parentNode.getFirstChild(childNodesName, false); node;
-         node = node->getNextSibling(childNodesName))
-    {
-        QString locale = node->getAttribute<QString>("locale", true);
-        Q_ASSERT(!locale.isEmpty());
-        if (list.contains(locale)) {
-            throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(),
-                QString(tr("Locale \"%1\" defined multiple times in \"%2\"."))
-                .arg(locale, parentNode.getDocFilePath().toNative()));
-        }
-        list.insert(locale, node->getText<QString>(throwIfValueEmpty));
-    }
-
-    if (!list.contains("en_US")) {
-        throw RuntimeError(__FILE__, __LINE__, parentNode.getDocFilePath().toStr(), QString(
-            tr("At least one entry in \"%1\" has no translation for locale \"en_US\"."))
-            .arg(parentNode.getDocFilePath().toNative()));
-    }
-}
-
-QString LibraryBaseElement::localeStringFromList(const QMap<QString, QString>& list,
-                                                 const QStringList& localeOrder,
-                                                 QString* usedLocale) throw (Exception)
-{
-    // search in the specified locale order
-    foreach (const QString& locale, localeOrder) {
-        if (list.contains(locale)) {
-            if (usedLocale) *usedLocale = locale;
-            return list.value(locale);
-        }
-    }
-
-    // try the fallback locale "en_US"
-    if (list.contains("en_US")) {
-        if (usedLocale) *usedLocale = "en_US";
-        return list.value("en_US");
-    }
-
-    throw RuntimeError(__FILE__, __LINE__, QString(), tr("No translation found."));
 }
 
 /*****************************************************************************************

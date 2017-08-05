@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/attributes/attribute.h>
+#include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
@@ -34,6 +35,16 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
+
+/*****************************************************************************************
+ *  Class NormDependentPrefixMap
+ ****************************************************************************************/
+
+struct NormDependentPrefixMapConstants {
+    static constexpr const char* tagname = "prefix";
+    static constexpr const char* keyname = "norm";
+};
+using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapConstants>;
 
 /*****************************************************************************************
  *  Class Component
@@ -66,15 +77,11 @@ class Component final : public LibraryElement
         void setAttributes(const AttributeList& attributes) noexcept {*mAttributes = attributes;}
 
         // Default Value Methods
-        const QMap<QString, QString>& getDefaultValues() const noexcept {return mDefaultValues;}
-        QString getDefaultValue(const QStringList& localeOrder) const throw (Exception);
-        void addDefaultValue(const QString& locale, const QString& value) noexcept;
-        void removeDefaultValue(const QString& locale) noexcept;
+        const QString& getDefaultValue() const noexcept {return mDefaultValue;}
+        void setDefaultValue(const QString& value) noexcept {mDefaultValue = value;}
 
         // Prefix Methods
-        const QMap<QString, QString>& getPrefixes() const noexcept {return mPrefixes;}
-        QString getPrefix(const QStringList& normOrder) const noexcept;
-        QString getDefaultPrefix() const noexcept;
+        const NormDependentPrefixMap& getPrefixes() const noexcept {return mPrefixes;}
         void addPrefix(const QString& norm, const QString& prefix) noexcept;
 
         // Signal Methods
@@ -96,9 +103,6 @@ class Component final : public LibraryElement
         const ComponentSymbolVariant* getSymbolVariant(int index) const noexcept {return mSymbolVariants.value(index);}
         ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) noexcept;
         const ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) const noexcept;
-        const Uuid& getDefaultSymbolVariantUuid() const noexcept {return mDefaultSymbolVariantUuid;}
-        ComponentSymbolVariant* getDefaultSymbolVariant() noexcept;
-        const ComponentSymbolVariant* getDefaultSymbolVariant() const noexcept;
         void addSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
         void removeSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
 
@@ -125,12 +129,11 @@ class Component final : public LibraryElement
 
         // Conponent Attributes
         bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
+        QString mDefaultValue;
+        NormDependentPrefixMap mPrefixes;
         QScopedPointer<AttributeList> mAttributes; ///< all attributes in a specific order
-        QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value
-        QMap<QString, QString> mPrefixes; ///< key: norm, value: prefix
         QList<ComponentSignal*> mSignals; ///< empty if the component has no signals
         QList<ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
-        Uuid mDefaultSymbolVariantUuid; ///< must be an existing key of #mSymbolVariants
 };
 
 /*****************************************************************************************

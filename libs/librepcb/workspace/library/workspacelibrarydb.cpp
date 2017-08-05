@@ -272,22 +272,22 @@ void WorkspaceLibraryDb::getElementTranslations(const QString& table,
     query.bindValue(":filepath", elemDir.toRelative(mWorkspace.getLibrariesPath()));
     mDb->exec(query);
 
-    QMap<QString, QString> nameList;
-    QMap<QString, QString> descriptionList;
-    QMap<QString, QString> keywordsList;
+    LocalizedNameMap nameMap;
+    LocalizedDescriptionMap descriptionMap;
+    LocalizedKeywordsMap keywordsMap;
     while (query.next()) {
         QString locale      = query.value(0).toString();
         QString name        = query.value(1).toString();
         QString description = query.value(2).toString();;
         QString keywords    = query.value(3).toString();
-        if (!name.isNull())          nameList.insert(locale, name);
-        if (!description.isNull())   descriptionList.insert(locale, description);
-        if (!keywords.isNull())      keywordsList.insert(locale, keywords);
+        if (!name.isNull())          nameMap.insert(locale, name);
+        if (!description.isNull())   descriptionMap.insert(locale, description);
+        if (!keywords.isNull())      keywordsMap.insert(locale, keywords);
     }
 
-    if (name) *name = LibraryBaseElement::localeStringFromList(nameList, localeOrder);
-    if (desc) *desc = LibraryBaseElement::localeStringFromList(descriptionList, localeOrder);
-    if (keywords) *keywords = LibraryBaseElement::localeStringFromList(keywordsList, localeOrder);
+    if (name) *name = nameMap.value(localeOrder);
+    if (desc) *desc = descriptionMap.value(localeOrder);
+    if (keywords) *keywords = keywordsMap.value(localeOrder);
 }
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(

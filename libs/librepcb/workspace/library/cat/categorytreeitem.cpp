@@ -101,7 +101,7 @@ QVariant CategoryTreeItem::data(int role) const noexcept
             if (mUuid.isNull())
                 return "(Without Category)";
             else if (mCategory)
-                return mCategory->getName(mLocaleOrder);
+                return mCategory->getNames().value(mLocaleOrder);
             else
                 return "(ERROR)";
 
@@ -116,7 +116,7 @@ QVariant CategoryTreeItem::data(int role) const noexcept
             if (mUuid.isNull())
                 return "All library elements without a category";
             else if (mCategory)
-                return mCategory->getDescription(mLocaleOrder);
+                return mCategory->getDescriptions().value(mLocaleOrder);
             else
                 return mExceptionMessage;
 

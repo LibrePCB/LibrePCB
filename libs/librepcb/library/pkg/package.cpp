@@ -38,21 +38,19 @@ Package::Package(const Uuid& uuid, const Version& version, const QString& author
                  const QString& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) throw (Exception) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US),
-    mDefaultFootprintUuid()
+                   name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mDefaultFootprintUuid()
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     try
     {
         const DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pads
-        foreach (const DomElement* node, root.getFirstChild("pads", true)->getChilds()) {
+        foreach (const DomElement* node, root.getChilds("pad")) {
             PackagePad* pad = new PackagePad(*node);
             if (getPadByUuid(pad->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
@@ -63,8 +61,7 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
         }
 
         // Load all footprints
-        DomElement* footprintsNode = root.getFirstChild("footprints", true);
-        foreach (const DomElement* node, footprintsNode->getChilds()) {
+        foreach (const DomElement* node, root.getChilds("footprint")) {
             Footprint* footprint = new Footprint(*node);
             if (getFootprintByUuid(footprint->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
@@ -72,14 +69,6 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
                     .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
             }
             mFootprints.insert(footprint->getUuid(), footprint);
-        }
-
-        // load default footprint
-        mDefaultFootprintUuid = footprintsNode->getAttribute<Uuid>("default", true);
-        if (!mFootprints.contains(mDefaultFootprintUuid)) {
-            throw RuntimeError(__FILE__, __LINE__, mDefaultFootprintUuid.toStr(),
-                QString(tr("The package \"%1\" has no valid default footprint set."))
-                .arg(root.getDocFilePath().toNative()));
         }
 
         cleanupAfterLoadingElementFromFile();
@@ -120,12 +109,6 @@ void Package::removePad(PackagePad& pad) noexcept
  *  Footprint Methods
  ****************************************************************************************/
 
-void Package::setDefaultFootprint(const Uuid& uuid) noexcept
-{
-    Q_ASSERT(mFootprints.contains(uuid));
-    mDefaultFootprintUuid = uuid;
-}
-
 void Package::addFootprint(Footprint& footprint) noexcept
 {
     Q_ASSERT(!mFootprints.contains(footprint.getUuid()));
@@ -147,18 +130,14 @@ void Package::removeFootprint(Footprint& footprint) noexcept
 void Package::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
-    root.appendChild(serializePointerContainer(mPads, "pads", "pad"));
-    DomElement* footprintsNode = serializePointerContainer(mFootprints, "footprints", "footprint");
-    footprintsNode->setAttribute("default", mDefaultFootprintUuid);
-    root.appendChild(footprintsNode);
+    serializePointerContainer(root, mPads, "pad");
+    serializePointerContainer(root, mFootprints, "footprint");
 }
 
 bool Package::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())             return false;
     if (mFootprints.isEmpty())                                  return false;
-    if (mDefaultFootprintUuid.isNull())                         return false;
-    if (!mFootprints.contains(mDefaultFootprintUuid))           return false;
     return true;
 }
 

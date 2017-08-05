@@ -620,7 +620,6 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         Component* component = new Component(uuid, Version("0.1"), "LibrePCB", name, desc, "");
 
         // properties
-        component->addDefaultValue("en_US", "");
         component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute<QString>("prefix", false) : "");
 
         // symbol variant

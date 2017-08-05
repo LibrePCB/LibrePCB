@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include "componentsymbolvariantitem.h"
 
 /*****************************************************************************************
@@ -56,10 +57,8 @@ class ComponentSymbolVariant final : public SerializableObject
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getNorm() const noexcept {return mNorm;}
-        QString getName(const QStringList& localeOrder) const noexcept;
-        QString getDescription(const QStringList& localeOrder) const noexcept;
-        const QMap<QString, QString>& getNames() const noexcept {return mNames;}
-        const QMap<QString, QString>& getDescriptions() const noexcept {return mDescriptions;}
+        const LocalizedNameMap& getNames() const noexcept {return mNames;}
+        const LocalizedDescriptionMap& getDescriptions() const noexcept {return mDescriptions;}
 
         // Setters
         void setNorm(const QString& norm) noexcept;
@@ -97,8 +96,8 @@ class ComponentSymbolVariant final : public SerializableObject
         // Symbol Variant Attributes
         Uuid mUuid;
         QString mNorm;
-        QMap<QString, QString> mNames;
-        QMap<QString, QString> mDescriptions;
+        LocalizedNameMap mNames;
+        LocalizedDescriptionMap mDescriptions;
         QList<ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
 };
 

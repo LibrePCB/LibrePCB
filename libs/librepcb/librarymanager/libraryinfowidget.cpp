@@ -59,8 +59,8 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     }
 
     // general attributes
-    mUi->lblName->setText(lib->getName(localeOrder));
-    mUi->lblDescription->setText(lib->getDescription(localeOrder));
+    mUi->lblName->setText(lib->getNames().value(localeOrder));
+    mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
     mUi->lblVersion->setText(lib->getVersion().toStr());
     mUi->lblAuthor->setText(lib->getAuthor());
     mUi->lblUrl->setText(QString("<a href='%1'>%2</a>").arg(
