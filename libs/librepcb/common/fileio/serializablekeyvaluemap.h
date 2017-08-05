@@ -115,14 +115,14 @@ class SerializableKeyValueMap final : public SerializableObject
                 QString key = child->getAttribute<QString>(T::keyname, false);
                 QString value = child->getText<QString>(false);
                 if (mValues.contains(key)) {
-                    throw RuntimeError(__FILE__, __LINE__, QString(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("Key \"%1\" defined multiple times in \"%2\"."))
                         .arg(key, domElement.getDocFilePath().toNative()));
                 }
                 mValues.insert(key, value);
             }
             if (!mValues.contains(QString(""))) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The file \"%1\" has no default %2 defined."))
                     .arg(domElement.getDocFilePath().toNative(), T::tagname));
             }

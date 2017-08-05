@@ -100,7 +100,7 @@ void GridSettingsDialog::cbxUnitsChanged(int index)
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 

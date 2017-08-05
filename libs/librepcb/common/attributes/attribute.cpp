@@ -77,7 +77,8 @@ QString Attribute::getValueTr(bool showUnit) const noexcept
 void Attribute::setKey(const QString& key) throw (Exception)
 {
     if (key.trimmed().isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, key, tr("The key must not be empty!"));
+        qDebug() << key;
+        throw RuntimeError(__FILE__, __LINE__, tr("The key must not be empty!"));
     }
     mKey = key;
 }

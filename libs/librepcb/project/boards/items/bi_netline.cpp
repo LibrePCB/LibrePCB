@@ -59,7 +59,7 @@ BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Except
     Uuid spUuid = domElement.getAttribute<Uuid>("start_point", true);
     mStartPoint = mBoard.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
-        throw RuntimeError(__FILE__, __LINE__, spUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(spUuid.toStr()));
     }
@@ -67,7 +67,7 @@ BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Except
     Uuid epUuid = domElement.getAttribute<Uuid>("end_point", true);
     mEndPoint = mBoard.getNetPointByUuid(epUuid);
     if(!mEndPoint) {
-        throw RuntimeError(__FILE__, __LINE__, epUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(epUuid.toStr()));
     }
@@ -86,25 +86,25 @@ BI_NetLine::BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPo
 void BI_NetLine::init() throw (Exception)
 {
     if(mWidth < 0) {
-        throw RuntimeError(__FILE__, __LINE__, mWidth.toMmString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid trace width: \"%1\"")).arg(mWidth.toMmString()));
     }
 
     // check if both netpoints have the same netsignal
     if (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("BI_NetLine: endpoints netsignal mismatch."));
     }
 
     // check if both netpoints have the same layer
     if (&mStartPoint->getLayer() != &mEndPoint->getLayer()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("BI_NetLine: endpoints layer mismatch."));
     }
 
     // check if both netpoints are different
     if (mStartPoint == mEndPoint) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("BI_NetLine: both endpoints are the same."));
     }
 

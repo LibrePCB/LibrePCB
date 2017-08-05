@@ -257,7 +257,7 @@ ProjectEditor* ControlPanel::openProject(Project& project) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Could not open project"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
         return nullptr;
     }
 }
@@ -286,7 +286,7 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Could not open project"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
         return nullptr;
     }
 }
@@ -364,7 +364,7 @@ void ControlPanel::on_actionNew_Project_triggered()
             QScopedPointer<Project> project(wizard.createProject()); // can throw
             openProject(*project.take());
         } catch (Exception& e) {
-            QMessageBox::critical(this, tr("Could not create project"), e.getUserMsg());
+            QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
         }
     }
 }

@@ -51,7 +51,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) throw
     Uuid spUuid = domElement.getAttribute<Uuid>("start_point", true);
     mStartPoint = mSchematic.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
-        throw RuntimeError(__FILE__, __LINE__, spUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(spUuid.toStr()));
     }
@@ -59,7 +59,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) throw
     Uuid epUuid = domElement.getAttribute<Uuid>("end_point", true);
     mEndPoint = mSchematic.getNetPointByUuid(epUuid);
     if(!mEndPoint) {
-        throw RuntimeError(__FILE__, __LINE__, epUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
             .arg(epUuid.toStr()));
     }
@@ -78,19 +78,19 @@ SI_NetLine::SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoin
 void SI_NetLine::init() throw (Exception)
 {
     if(mWidth < 0) {
-        throw RuntimeError(__FILE__, __LINE__, mWidth.toMmString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net line width: \"%1\"")).arg(mWidth.toMmString()));
     }
 
     // check if both netpoints have the same netsignal
     if (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("SI_NetLine: endpoints netsignal mismatch."));
     }
 
     // check if both netpoints are different
     if (mStartPoint == mEndPoint) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("SI_NetLine: both endpoints are the same."));
     }
 

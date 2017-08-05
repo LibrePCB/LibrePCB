@@ -61,7 +61,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         foreach (const DomElement* node, root.getChilds("signal")) {
             ComponentSignal* signal = new ComponentSignal(*node);
             if (getSignalByUuid(signal->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The signal \"%1\" exists multiple times in \"%2\"."))
                     .arg(signal->getUuid().toStr(), root.getDocFilePath().toNative()));
             }
@@ -72,14 +72,14 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         foreach (const DomElement* node, root.getChilds("symbol_variant")) {
             ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
             if (getSymbolVariantByUuid(variant->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The symbol variant \"%1\" exists multiple times in \"%2\"."))
                     .arg(variant->getUuid().toStr(), root.getDocFilePath().toNative()));
             }
             mSymbolVariants.append(variant);
         }
         if (mSymbolVariants.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The file \"%1\" has no symbol variants defined."))
                 .arg(root.getDocFilePath().toNative()));
         }

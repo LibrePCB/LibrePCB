@@ -92,7 +92,7 @@ class SQLiteDatabaseTest : public ::testing::Test
                 }
                 return WorkerResult{count, QString()};
             } catch (const Exception& e) {
-                return WorkerResult{-1, e.getUserMsg()};
+                return WorkerResult{-1, e.getMsg()};
             }
         }
 

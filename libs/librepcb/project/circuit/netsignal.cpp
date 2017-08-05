@@ -51,7 +51,7 @@ NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exce
     Uuid netclassUuid = domElement.getAttribute<Uuid>("netclass", true);
     mNetClass = circuit.getNetClassByUuid(netclassUuid);
     if (!mNetClass) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid netclass UUID: \"%1\""))
             .arg(netclassUuid.toStr()));
     }
@@ -113,7 +113,7 @@ void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
         return;
     }
     if(name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The new netsignal name must not be empty!"));
     }
     mName = name;
@@ -150,7 +150,7 @@ void NetSignal::removeFromCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (isUsed()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The net signal \"%1\" cannot be removed because it is still in use!"))
             .arg(mName));
     }

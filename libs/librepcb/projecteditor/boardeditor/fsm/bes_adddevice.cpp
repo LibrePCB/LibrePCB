@@ -77,7 +77,7 @@ BES_Base::ProcRetVal BES_AddDevice::process(BEE_Base* event) noexcept
             }
             catch (Exception& exc)
             {
-                QMessageBox::critical(&mEditor, tr("Error"), exc.getUserMsg());
+                QMessageBox::critical(&mEditor, tr("Error"), exc.getMsg());
             }
             return PassToParentState;
         }
@@ -116,7 +116,7 @@ bool BES_AddDevice::entry(BEE_Base* event) noexcept
     }
     catch (Exception& exc)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), QString(tr("Could not add device:\n\n%1")).arg(exc.getUserMsg()));
+        QMessageBox::critical(&mEditor, tr("Error"), QString(tr("Could not add device:\n\n%1")).arg(exc.getMsg()));
         if (mIsUndoCmdActive) abortCommand(false);
         return false;
     }
@@ -188,7 +188,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
                     }
                     catch (Exception& e)
                     {
-                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                         abortCommand(false);
                         return ForceLeaveState;
                     }
@@ -288,7 +288,7 @@ bool BES_AddDevice::abortCommand(bool showErrMsgBox) noexcept
     }
     catch (Exception& e)
     {
-        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -311,7 +311,7 @@ void BES_AddDevice::mirrorDevice(Qt::Orientation orientation) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     }
 }
 

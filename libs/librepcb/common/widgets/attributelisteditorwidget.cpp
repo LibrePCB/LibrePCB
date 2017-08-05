@@ -318,7 +318,7 @@ void AttributeListEditorWidget::addAttribute(const QString& key, const Attribute
         updateTable();
         emit edited(mAttributeList);
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not add attribute"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not add attribute"), e.getMsg());
     }
 }
 
@@ -359,7 +359,7 @@ QString AttributeListEditorWidget::setKey(int index, const QString& key) noexcep
         emit edited(mAttributeList);
         return key;
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Invalid key"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Invalid key"), e.getMsg());
         return attr.getKey();
     }
 }
@@ -393,7 +393,7 @@ void AttributeListEditorWidget::setType(int index, const AttributeType& type) no
 
         emit edited(mAttributeList);
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -410,7 +410,7 @@ QString AttributeListEditorWidget::setValue(int index, const QString& value) noe
         emit edited(mAttributeList);
         return value;
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return attr.getValue();
     }
 }
@@ -422,7 +422,7 @@ void AttributeListEditorWidget::setUnit(int index, const AttributeUnit* unit) no
         attr.setTypeValueUnit(attr.getType(), attr.getValue(), unit);
         emit edited(mAttributeList);
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -437,11 +437,11 @@ int AttributeListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexc
 void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) const throw (Exception)
 {
     if (key.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, key,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The key must not be empty.")).arg(key));
     }
     if (mAttributeList.contains(key)) {
-        throw RuntimeError(__FILE__, __LINE__, key,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already an attribute with the key \"%1\".")).arg(key));
     }
 }
@@ -450,7 +450,7 @@ void AttributeListEditorWidget::throwIfValueInvalid(const AttributeType& type,
                                                     const QString& value) const throw (Exception)
 {
     if (!type.isValueValid(value)) {
-        throw RuntimeError(__FILE__, __LINE__, value,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The value \"%1\" is invalid.")).arg(value));
     }
 }

@@ -325,7 +325,7 @@ void BoardEditor::on_actionNewBoard_triggered()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -348,7 +348,7 @@ void BoardEditor::on_actionCopyBoard_triggered()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -383,7 +383,7 @@ void BoardEditor::on_actionExportAsPdf_triggered()
     }
     catch (Exception& e)
     {
-        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+        QMessageBox::warning(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -421,7 +421,7 @@ void BoardEditor::on_actionModifyDesignRules_triggered()
             mProjectEditor.getUndoStack().execCmd(cmd);
         }
     } catch (Exception& e) {
-        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+        QMessageBox::warning(this, tr("Error"), e.getMsg());
     }
 }
 

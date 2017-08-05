@@ -108,7 +108,7 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
             }
             catch (Exception& e)
             {
-                QMessageBox::critical(this, tr("Could not change netclass name"), e.getUserMsg());
+                QMessageBox::critical(this, tr("Could not change netclass name"), e.getMsg());
             }
             item->setText(netclass->getName());
             break;
@@ -137,7 +137,7 @@ void EditNetClassesDialog::on_btnAdd_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Could not add netclass"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not add netclass"), e.getMsg());
     }
 }
 
@@ -157,7 +157,7 @@ void EditNetClassesDialog::on_btnRemove_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Could not remove netclass"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Could not remove netclass"), e.getMsg());
     }
 }
 

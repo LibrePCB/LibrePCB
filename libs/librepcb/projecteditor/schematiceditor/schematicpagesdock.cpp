@@ -127,7 +127,7 @@ void SchematicPagesDock::on_btnNewSchematic_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -144,7 +144,7 @@ void SchematicPagesDock::on_btnRemoveSchematic_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 

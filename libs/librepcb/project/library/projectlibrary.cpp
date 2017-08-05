@@ -224,7 +224,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         ElementType* element = new ElementType(subdirPath, false);
 
         if (elementList.contains(element->getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__, element->getUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("There are multiple library elements with the same "
                 "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
         }
@@ -242,7 +242,7 @@ void ProjectLibrary::addElement(ElementType& element,
                                 QList<ElementType*>& removedElementsList) throw (Exception)
 {
     if (elementList.contains(element.getUuid())) {
-        throw LogicError(__FILE__, __LINE__, QString(), QString(tr(
+        throw LogicError(__FILE__, __LINE__, QString(tr(
             "There is already an element with the same UUID in the project's library: %1"))
             .arg(element.getUuid().toStr()));
     }
@@ -285,7 +285,7 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
             }
             catch (Exception& e) {
                 success = false;
-                errors.append(e.getUserMsg());
+                errors.append(e.getMsg());
             }
         }
     }
@@ -300,7 +300,7 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
         }
         catch (Exception& e) {
             success = false;
-            errors.append(e.getUserMsg());
+            errors.append(e.getMsg());
         }
     }
 

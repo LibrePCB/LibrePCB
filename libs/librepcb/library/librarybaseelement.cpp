@@ -72,7 +72,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // check if the directory is a library element
     if (!versionFilePath.isExistingFile()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Directory is not a library element of type %1: \"%2\""))
             .arg(mLongElementName, mDirectory.toNative()));
     }
@@ -80,7 +80,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     // check directory name
     Uuid dirUuid(mDirectory.getFilename());
     if (mDirectoryNameMustBeUuid && dirUuid.isNull()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Directory name is not a valid UUID: \"%1\""))
             .arg(mDirectory.toNative()));
     }
@@ -89,7 +89,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     SmartVersionFile versionFile(versionFilePath, false, true);
     mLoadingElementFileVersion = versionFile.getVersion();
     if (mLoadingElementFileVersion != qApp->getAppVersion()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The library element %1 was created with a newer application "
                        "version. You need at least LibrePCB version %2 to open it."))
             .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toPrettyStr(3)));
@@ -116,8 +116,8 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // check if the UUID equals to the directory basename
     if (mDirectoryNameMustBeUuid && (mUuid != dirUuid)) {
+        qDebug() << mUuid << "!=" << dirUuid;
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1/%2").arg(mUuid.toStr(), dirUuid.toStr()),
             QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
             .arg(xmlFilePath.toNative()));
     }
@@ -154,7 +154,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
 void LibraryBaseElement::save() throw (Exception)
 {
     if (mOpenedReadOnly) {
-        throw RuntimeError(__FILE__, __LINE__, mDirectory.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Library element was opened in read-only mode: \"%1\""))
             .arg(mDirectory.toNative()));
     }
@@ -211,14 +211,14 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
     if (destination != mDirectory) {
         // check destination directory name validity
         if (mDirectoryNameMustBeUuid && (destination.getFilename() != mUuid.toStr())) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                  QString(tr("Library element directory name is not a valid UUID: \"%1\""))
                 .arg(destination.getFilename()));
         }
 
         // check if destination directory exists already
         if (destination.isExistingDir() || destination.isExistingFile()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not copy "
+            throw RuntimeError(__FILE__, __LINE__, QString(tr("Could not copy "
                 "library element \"%1\" to \"%2\" because the directory exists already."))
                 .arg(mDirectory.toNative(), destination.toNative()));
         }
@@ -248,7 +248,7 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
 void LibraryBaseElement::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             tr("The library element cannot be saved because it is not valid."));
     }
 

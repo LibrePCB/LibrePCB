@@ -46,7 +46,8 @@ SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool 
         QStringList lines = content.split("\n", QString::KeepEmptyParts);
         mVersion.setVersion((lines.count() > 0) ? lines.first() : QString());
         if (!mVersion.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, content,
+            qDebug() << "content:" << content;
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid version number in file \"%1\".")).arg(filepath.toNative()));
         }
     }
@@ -67,7 +68,8 @@ void SmartVersionFile::save(bool toOriginal) throw (Exception)
         FileUtils::writeFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
         updateMembersAfterSaving(toOriginal);
     } else {
-        throw LogicError(__FILE__, __LINE__, mVersion.toStr(), tr("Invalid version number"));
+        qDebug() << mVersion.toStr();
+        throw LogicError(__FILE__, __LINE__, tr("Invalid version number"));
     }
 }
 

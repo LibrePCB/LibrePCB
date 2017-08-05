@@ -194,7 +194,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
                 FilePath destination = directory.getPathTo("LICENSE.txt");
                 FileUtils::copyFile(source, destination); // can throw
             } catch (Exception& e) {
-                qCritical() << "Could not copy the license file:" << e.getUserMsg();
+                qCritical() << "Could not copy the license file:" << e.getMsg();
             }
         }
 
@@ -212,7 +212,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
             }
             FileUtils::writeFile(destination, content); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the readme file:" << e.getUserMsg();
+            qCritical() << "Could not copy the readme file:" << e.getMsg();
         }
 
         // copy .gitignore
@@ -221,7 +221,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
             FilePath destination = directory.getPathTo(".gitignore");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitignore file:" << e.getUserMsg();
+            qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
         }
 
         // copy .gitattributes
@@ -230,7 +230,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
             FilePath destination = directory.getPathTo(".gitattributes");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitattributes file:" << e.getUserMsg();
+            qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
         }
 
         // add the new library to the workspace
@@ -246,7 +246,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
         mUi->edtLocalDirectory->clear();
         emit libraryAdded(directory, true);
     } catch (Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -314,7 +314,7 @@ void AddLibraryWidget::downloadZipFinished(bool success, const QString& errMsg) 
             mUi->lblDownloadZipStatusMsg->setText("");
             emit libraryAdded(mManualLibraryDownload->getDestinationDir(), true);
         } catch (const Exception& e) {
-            mUi->lblDownloadZipStatusMsg->setText(e.getUserMsg());
+            mUi->lblDownloadZipStatusMsg->setText(e.getMsg());
         }
     } else {
         mUi->lblDownloadZipStatusMsg->setText(errMsg);

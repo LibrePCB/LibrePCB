@@ -122,7 +122,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     return success;

@@ -151,7 +151,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         transaction.commit(); // can throw
         return true;
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
 }

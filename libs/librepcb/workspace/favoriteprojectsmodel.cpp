@@ -55,7 +55,7 @@ FavoriteProjectsModel::FavoriteProjectsModel(const Workspace& workspace) noexcep
             mFile.reset(SmartTextFile::create(filepath));
         }
     } catch (Exception& e) {
-        qWarning() << "Could not read favorite projects file:" << e.getUserMsg();
+        qWarning() << "Could not read favorite projects file:" << e.getMsg();
     }
 }
 
@@ -79,7 +79,7 @@ void FavoriteProjectsModel::save() noexcept
         mFile->setContent(lines.join('\n').toUtf8());
         mFile->save(true); // can throw
     } catch (Exception& e) {
-        qWarning() << "Could not save favorite projects file:" << e.getUserMsg();
+        qWarning() << "Could not save favorite projects file:" << e.getMsg();
     }
 }
 

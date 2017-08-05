@@ -53,7 +53,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
         foreach (const DomElement* node, root.getChilds("pin")) {
             SymbolPin* pin = new SymbolPin(*node);
             if (mPins.contains(pin->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The pin \"%1\" exists multiple times in \"%2\"."))
                     .arg(pin->getUuid().toStr(), root.getDocFilePath().toNative()));
             }

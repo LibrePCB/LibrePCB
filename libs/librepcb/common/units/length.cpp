@@ -118,10 +118,8 @@ void Length::setLengthFromFloat(qreal nanometers) throw (RangeError)
     LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
     LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
     qreal value = qRound(nanometers);
-    if ((value > max) || (value < min))
-    {
-        throw RangeError(__FILE__, __LINE__, QString("value=%1; min=%2; max=%3")
-            .arg(value).arg(min).arg(max), tr("Range error!"));
+    if ((value > max) || (value < min)) {
+        throw RangeError(__FILE__, __LINE__, value, min, max);
     }
 
     mNanometers = value;
@@ -145,7 +143,7 @@ LengthBase_t Length::mmStringToNm(const QString& millimeters) throw (Exception)
     qreal nm = qRound(QLocale::c().toDouble(millimeters, &ok) * 1e6);
     if (!ok)
     {
-        throw Exception(__FILE__, __LINE__, millimeters,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid length string: \"%1\"")).arg(millimeters));
     }
     return nm;

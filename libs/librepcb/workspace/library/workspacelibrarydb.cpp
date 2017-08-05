@@ -203,7 +203,7 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid
 
     Uuid uuid = query.first() ? Uuid(query.value(0).toString()) : Uuid();
     if (uuid.isNull()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+        throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Device not found in workspace library: \"%1\"")).arg(devDir.toNative()));
     }
 

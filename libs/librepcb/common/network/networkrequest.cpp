@@ -53,7 +53,7 @@ void NetworkRequest::prepareRequest() throw (Exception)
 void NetworkRequest::finalizeRequest() throw (Exception)
 {
     if (mReceivedData.size() > 100*1000*1000) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The received content exceeds the 100MB size limit."));
     }
 }

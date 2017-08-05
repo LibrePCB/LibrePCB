@@ -60,7 +60,7 @@ SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool
 
         // check if the file exists
         if (!mOpenedFilePath.isExistingFile()) {
-            throw RuntimeError(__FILE__, __LINE__, mOpenedFilePath.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The file \"%1\" does not exist!")).arg(mOpenedFilePath.toNative()));
         }
     }
@@ -73,7 +73,7 @@ SmartFile::~SmartFile() noexcept
         try {
             FileUtils::removeFile(mTmpFilePath);
         } catch (const Exception& e) {
-            qWarning() << "Could not remove temporary file:" << e.getUserMsg();
+            qWarning() << "Could not remove temporary file:" << e.getMsg();
         }
     }
 }
@@ -85,7 +85,7 @@ SmartFile::~SmartFile() noexcept
 void SmartFile::removeFile(bool original) throw (Exception)
 {
     if (mIsReadOnly) {
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot remove read-only file!"));
+        throw LogicError(__FILE__, __LINE__, tr("Cannot remove read-only file!"));
     }
 
     FilePath filepath(original ? mFilePath : mTmpFilePath);
@@ -101,7 +101,7 @@ void SmartFile::removeFile(bool original) throw (Exception)
 const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception)
 {
     if (mIsReadOnly) {
-        throw LogicError(__FILE__, __LINE__, QString(), tr("Cannot save read-only file!"));
+        throw LogicError(__FILE__, __LINE__, tr("Cannot save read-only file!"));
     }
 
     return toOriginal ? mFilePath : mTmpFilePath;

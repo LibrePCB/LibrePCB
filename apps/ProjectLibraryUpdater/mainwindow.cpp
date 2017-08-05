@@ -98,7 +98,8 @@ void MainWindow::on_pushButton_2_clicked()
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
                 FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
                 if (!filepath.isExistingDir()) {
-                    throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                    qDebug() << filepath.toStr();
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString("Missing component: %1").arg(compUuid.toStr()));
                 }
                 // open & copy component
@@ -114,7 +115,8 @@ void MainWindow::on_pushButton_2_clicked()
                     {
                         FilePath filepath = workspace.getLibraryDb().getLatestSymbol(symbolUuid);
                         if (!filepath.isExistingDir()) {
-                            throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                            qDebug() << filepath.toStr();
+                            throw RuntimeError(__FILE__, __LINE__,
                                 QString("Missing symbol: %1").arg(symbolUuid.toStr()));
                         }
                         // open & copy symbol
@@ -135,7 +137,8 @@ void MainWindow::on_pushButton_2_clicked()
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
                     FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);
                     if (!filepath.isExistingDir()) {
-                        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                        qDebug() << filepath.toStr();
+                        throw RuntimeError(__FILE__, __LINE__,
                             QString("Missing device: %1").arg(deviceUuid.toStr()));
                     }
                     // open & copy device
@@ -148,7 +151,8 @@ void MainWindow::on_pushButton_2_clicked()
                     Uuid packUuid = latestDevice.getPackageUuid();
                     filepath = workspace.getLibraryDb().getLatestPackage(packUuid);
                     if (!filepath.isExistingDir()) {
-                        throw RuntimeError(__FILE__, __LINE__, filepath.toStr(),
+                        qDebug() << filepath.toStr();
+                        throw RuntimeError(__FILE__, __LINE__,
                             QString("Missing package: %1").arg(packUuid.toStr()));
                     }
                     // open & copy package
@@ -162,7 +166,7 @@ void MainWindow::on_pushButton_2_clicked()
     }
     catch (Exception& e)
     {
-        ui->log->addItem("ERROR: " % e.getUserMsg());
+        ui->log->addItem("ERROR: " % e.getMsg());
     }
 
     ui->log->addItem("FINISHED");
@@ -181,6 +185,6 @@ void MainWindow::on_rescanlib_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }

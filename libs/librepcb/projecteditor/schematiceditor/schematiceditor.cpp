@@ -267,7 +267,7 @@ void SchematicEditor::on_actionNew_Schematic_Page_triggered()
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -308,7 +308,7 @@ void SchematicEditor::on_actionPDF_Export_triggered()
     }
     catch (Exception& e)
     {
-        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+        QMessageBox::warning(this, tr("Error"), e.getMsg());
     }
 }
 

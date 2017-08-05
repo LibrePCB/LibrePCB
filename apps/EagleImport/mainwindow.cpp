@@ -156,7 +156,7 @@ void MainWindow::convertAllFiles(ConvertFileType_t type)
     try {
         FileUtils::makePath(outputDir); // can throw
     } catch (const Exception& e) {
-        addError("Fatal Error: " % e.getUserMsg());
+        addError("Fatal Error: " % e.getMsg());
     }
 
     QSettings outputSettings(UUID_LIST_FILEPATH, QSettings::IniFormat);
@@ -226,7 +226,7 @@ void MainWindow::convertFile(ConvertFileType_t type, QSettings& outputSettings, 
     }
     catch (Exception& e)
     {
-        addError(e.getUserMsg() % " [" % e.getDebugMsg() % "]");
+        addError(e.getMsg());
         return;
     }
 }
@@ -380,7 +380,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
     }
     catch (Exception& e)
     {
-        addError(e.getUserMsg() % " [" % e.getDebugMsg() % "]");
+        addError(e.getMsg());
         return false;
     }
 
@@ -596,7 +596,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
     }
     catch (Exception& e)
     {
-        addError(e.getUserMsg() % " [" % e.getDebugMsg() % "]");
+        addError(e.getMsg());
         return false;
     }
 
@@ -724,7 +724,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
     }
     catch (Exception& e)
     {
-        addError(e.getUserMsg() % " [" % e.getDebugMsg() % "]");
+        addError(e.getMsg());
         return false;
     }
 

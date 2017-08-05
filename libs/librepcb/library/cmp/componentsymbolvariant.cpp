@@ -59,7 +59,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) thr
             ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
             if (getItemByUuid(item->getUuid()))
             {
-                throw RuntimeError(__FILE__, __LINE__, item->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
                     .arg(item->getUuid().toStr(), domElement.getDocFilePath().toNative()));
             }

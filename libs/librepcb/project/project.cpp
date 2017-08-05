@@ -60,32 +60,33 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
     // Check if the file extension is correct
     if (mFilepath.getSuffix() != "lpp") {
-        throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+        qDebug() << mFilepath.toStr();
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The suffix of the project file must be \"lpp\"!"));
     }
 
     // Check if the filepath is valid
     if (create) {
         if (mPath.isExistingDir() && (!mPath.isEmptyDir())) {
-            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(), QString(tr(
+            throw RuntimeError(__FILE__, __LINE__, QString(tr(
                 "The directory \"%1\" is not empty!")).arg(mFilepath.toNative()));
         }
         FileUtils::makePath(mPath); // can throw
     } else {
         // check if the project does exist
         if (!isValidProjectDirectory(mPath)) {
-            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The directory \"%1\" does not contain a LibrePCB project."))
                 .arg(mPath.toNative()));
         }
         if (!mFilepath.isExistingFile()) {
-            throw RuntimeError(__FILE__, __LINE__, mFilepath.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The file \"%1\" does not exist.")).arg(mFilepath.toNative()));
         }
         // check the project's file format version
         Version version = getProjectFileFormatVersion(mPath);
         if ((!version.isValid()) || (version != qApp->getFileFormatVersion())) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("This project was created with a newer application version.\n"
                            "You need at least LibrePCB %1 to open it.\n\n%2"))
                 .arg(version.toPrettyStr(3)).arg(mFilepath.toNative()));
@@ -337,12 +338,12 @@ Schematic* Project::createSchematic(const QString& name) throw (Exception)
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid schematic name: \"%1\"")).arg(name));
     }
     FilePath filepath = mPath.getPathTo("schematics/" % basename % ".xml");
     if (filepath.isExistingFile()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The schematic exists already: \"%1\"")).arg(filepath.toNative()));
     }
     return Schematic::create(*this, filepath, name);
@@ -354,12 +355,12 @@ void Project::addSchematic(Schematic& schematic, int newIndex) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (getSchematicByUuid(schematic.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, schematic.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a schematic with the UUID \"%1\"!"))
             .arg(schematic.getUuid().toStr()));
     }
     if (getSchematicByName(schematic.getName())) {
-        throw RuntimeError(__FILE__, __LINE__, schematic.getName(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a schematic with the name \"%1\"!"))
             .arg(schematic.getName()));
     }
@@ -385,7 +386,7 @@ void Project::removeSchematic(Schematic& schematic, bool deleteSchematic) throw 
         throw LogicError(__FILE__, __LINE__);
     }
     if ((!deleteSchematic) && (!schematic.isEmpty())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There are still elements in the schematic \"%1\"!"))
             .arg(schematic.getName()));
     }
@@ -455,12 +456,12 @@ Board* Project::createBoard(const QString& name) throw (Exception)
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
     FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
     if (filepath.isExistingFile()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
     }
     return Board::create(*this, filepath, name);
@@ -470,12 +471,12 @@ Board* Project::createBoard(const Board& other, const QString& name) throw (Exce
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
     FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
     if (filepath.isExistingFile()) {
-        throw RuntimeError(__FILE__ , __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
     }
     return new Board(other, filepath, name);
@@ -487,12 +488,12 @@ void Project::addBoard(Board& board, int newIndex) throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (getBoardByUuid(board.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, board.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a board with the UUID \"%1\"!"))
             .arg(board.getUuid().toStr()));
     }
     if (getBoardByName(board.getName())) {
-        throw RuntimeError(__FILE__, __LINE__, board.getName(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a board with the name \"%1\"!"))
             .arg(board.getName()));
     }
@@ -546,7 +547,7 @@ void Project::save(bool toOriginal) throw (Exception)
     {
         QString msg = QString(tr("The project could not be saved!\n\nError Message:\n%1",
             "variable count of error messages", errors.count())).arg(errors.join("\n"));
-        throw RuntimeError(__FILE__, __LINE__, QString(), msg);
+        throw RuntimeError(__FILE__, __LINE__, msg);
     }
     Q_ASSERT(errors.isEmpty());
 }
@@ -644,7 +645,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     // Save *.lpp project file
@@ -656,7 +657,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     // Save circuit
@@ -716,7 +717,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
 void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (Exception)
 {
     if (pages.isEmpty())
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("No schematic pages selected."));
+        throw RuntimeError(__FILE__, __LINE__, tr("No schematic pages selected."));
 
     QPainter painter(&printer);
 
@@ -725,7 +726,7 @@ void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (E
         Schematic* schematic = getSchematicByIndex(pages[i]);
         if (!schematic)
         {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("No schematic page with the index %1 found.")).arg(pages[i]));
         }
         schematic->clearSelection();
@@ -735,7 +736,7 @@ void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (E
         {
             if (!printer.newPage())
             {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                     tr("Unknown error while printing."));
             }
         }

@@ -54,7 +54,7 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept
             mVia.setDrillDiameter(mOldDrillDiameter);
             mVia.setNetSignal(mOldNetSignal); // can throw
         } catch (Exception& e) {
-            qCritical() << "Unexpected exception thrown:" << e.getUserMsg();
+            qCritical() << "Unexpected exception thrown:" << e.getMsg();
         }
     }
 }

@@ -57,7 +57,7 @@ Footprint::Footprint(const DomElement& domElement) throw (Exception)
         foreach (const DomElement* node, domElement.getChilds("pad")) {
             FootprintPad* pad = FootprintPad::fromDomElement(*node);
             if (mPads.contains(pad->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
                     .arg(pad->getUuid().toStr(), domElement.getDocFilePath().toNative()));
             }

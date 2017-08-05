@@ -44,40 +44,35 @@ class FilePath;
  * std::exception. There are several subclasses of the class Exception, see inheritance
  * diagram.
  *
- * @note Exceptions must always be thrown by value and caught by reference!
+ * @note Exceptions must always be thrown by value and caught by (const) reference!
  *
  * For more information about the QException class read the Qt documentation.
  *
  * Each Exception object holds following attributes:
- *  - a debug message (#mDebugMsg): contains debugging information (in english, do not
- *    need to be a complete sentence, could consists only of values of variables)
- *  - a user message (#mUserMsg): error message in the user's language (can be printed
- *    directly to a QMessageBox or similar)
+ *  - a message (#mMsg): error message in the user's language (can be printed directly to
+ *    a QMessageBox or similar)
  *  - the filename of the source file where the exception was thrown (#mFile)
  *  - the line number where the exception was thrown (#mLine)
  *
- * @note Every exception will automatically print a debug message (see ::Debug) of type
- *       Debug::DebugLevel::Exception (see Debug::DebugLevel).
+ * @note Every exception will automatically print a debug message (see librepcb::Debug)
+ *       of type librepcb::Debug::DebugLevel_t::Exception.
  *
  * Example how to use exceptions:
  *
  * @code
- * void foo(int i) throw (Exception)
+ * void foo(int i)
  * {
  *     if (i < 0) {
- *         throw Exception(__FILE__, __LINE__, QString("i=%1").arg(i), tr("Invalid argument!"));
- *      }
+ *         throw Exception(__FILE__, __LINE__, QString(tr("Invalid argument: %1")).arg(i));
+ *     }
  * }
  *
  * void bar() noexcept
  * {
- *     try
- *     {
+ *     try {
  *         foo(-5);
- *     }
- *     catch (Exception& e)
- *     {
- *         QMessageBox::critical(0, tr("Error"), e.getUserMsg());
+ *     } catch (const Exception& e) {
+ *         QMessageBox::critical(0, tr("Error"), e.getMsg());
  *     }
  * }
  * @endcode
@@ -107,16 +102,11 @@ class Exception : public QException
          *
          * @param file      The source file where the exception was thrown (use __FILE__)
          * @param line      The line number where the exception was thrown (use __LINE__)
-         * @param debugMsg  Debugging information which will be written only to the debug
-         *                  log (see class ::Debug). The user will normally not see this
-         *                  information, so it should be always in english.
-         * @param userMsg   An error message in the user's language (use QObject::tr()).
-         *                  This message can be used in message boxes. Do not include too
-         *                  much technical information about the exception here, use the
-         *                  parameter debugMsg instead.
+         * @param msg       An error message in the user's language (use QObject::tr()).
+         *                  This message can be used in message boxes.
          */
-        Exception(const char* file, int line, const QString& debugMsg = QString(),
-                  const QString& userMsg = QString("Exception")) noexcept;
+        Exception(const char* file, int line,
+                  const QString& msg = QString("Exception")) noexcept;
 
         /**
          * @brief The destructor
@@ -127,18 +117,11 @@ class Exception : public QException
         // Getters
 
         /**
-         * @brief Get the debug error message (always in english)
+         * @brief Get the error message (translated)
          *
-         * @return The debug error message / technical information about the exception
+         * @return The error message in the user's language
          */
-        const QString&  getDebugMsg()   const {return mDebugMsg;}
-
-        /**
-         * @brief Get the user error message (translated)
-         *
-         * @return The user error message in the user's language
-         */
-        const QString&  getUserMsg()    const {return mUserMsg;}
+        const QString&  getMsg()        const {return mMsg;}
 
         /**
          * @brief Get the source file where the exception was thrown
@@ -158,12 +141,12 @@ class Exception : public QException
          * @brief reimplemented from std::exception::what()
          *
          * @warning This method is only for compatibility reasons with the base class
-         *          std::exception. Normally, you should not use this method. Use
-         *          #getDebugMsg() or #getUserMsg() instead.
+         *          std::exception. Normally, you should not use this method.
+         *          Use #getMsg() instead.
          *
          * @note The returned pointer is valid as long as the exception object exists
          *
-         * @return the user error message as a C-string (const char*) in the local encoding
+         * @return the error message as a C-string (const char*) in the local encoding
          */
         const char* what() const noexcept override;
 
@@ -176,13 +159,12 @@ class Exception : public QException
     private:
 
         // Attributes
-        QString mDebugMsg;  ///< the debug message (in english)
-        QString mUserMsg;   ///< the user message (translated)
+        QString mMsg;       ///< the error message (translated)
         QString mFile;      ///< the source filename where the exception was thrown
         int mLine;          ///< the line number where the exception was thrown
 
         // Cached Attributes
-        mutable QByteArray mUserMsgUtf8;    ///< the user message as an UTF8 byte array
+        mutable QByteArray mMsgUtf8;    ///< the message as an UTF8 byte array
 };
 
 /*****************************************************************************************
@@ -209,8 +191,8 @@ class LogicError final : public Exception
         /**
          * @copydoc Exception::Exception
          */
-        LogicError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString("Logic Error")) noexcept;
+        LogicError(const char* file, int line,
+                   const QString& msg = QString("Logic Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -247,8 +229,8 @@ class RuntimeError : public Exception
         /**
          * @copydoc Exception::Exception
          */
-        RuntimeError(const char* file, int line, const QString& debugMsg = QString(),
-                     const QString& userMsg = QString("Runtime Error")) noexcept;
+        RuntimeError(const char* file, int line,
+                     const QString& msg = QString("Runtime Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -272,7 +254,7 @@ class RuntimeError : public Exception
 /**
  * @brief The RangeError class
  *
- * This exception class is used for range under-/overflows, for example in units.cpp.
+ * This exception class is used for range under-/overflows.
  *
  * @see Exception
  */
@@ -288,8 +270,24 @@ class RangeError final : public RuntimeError
         /**
          * @copydoc Exception::Exception
          */
-        RangeError(const char* file, int line, const QString& debugMsg = QString(),
-                   const QString& userMsg = QString("Range Error")) noexcept;
+        RangeError(const char* file, int line,
+                   const QString& msg = QString("Range Error")) noexcept;
+
+        /**
+         * Constructor which produces a message like "42 not in range [13..37]"
+         *
+         * @param file                  See Exception#Exception()
+         * @param line                  See Exception#Exception()
+         * @param value                 The invalid value
+         * @param min                   The lower value limit
+         * @param max                   The upper value limit
+         */
+        template <typename Tval, typename Tmin, typename Tmax>
+        RangeError(const char* file, int line, const Tval& value,
+                   const Tmin& min, const Tmax& max) noexcept :
+            RangeError(file, line, QString("Range error: %1 not in [%2..%3]")
+                       .arg(value).arg(min).arg(max))
+        {}
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -331,12 +329,12 @@ class FileParseError final : public RuntimeError
          * @param fileLine              The line number of the parse error (-1 if unknown)
          * @param fileColumn            The column of the parse error (-1 if unknown)
          * @param invalidFileContent    The parsed string which is invalid (optional)
-         * @param userMsg               See Exception#Exception()
+         * @param msg                   See Exception#Exception()
          */
         FileParseError(const char* file, int line, const FilePath& filePath,
                        int fileLine = -1, int fileColumn = -1,
                        const QString& invalidFileContent = QString(),
-                       const QString& userMsg = QString("File Parse Error")) noexcept;
+                       const QString& msg = QString("File Parse Error")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())
@@ -365,8 +363,8 @@ class FileParseError final : public RuntimeError
  * do not need to appear! So we can throw an exception of type "UserCanceled" to indicate
  * that this was a user's decision and the catcher will not show an error message box.
  *
- * @note    Normally, a UserCanceled exception do not need the attribute #mUserMsg, so you
- *          do not need to pass the parameter "userMsg" to the constructor. This is because
+ * @note    Normally, a UserCanceled exception do not need the attribute #mMsg, so you do
+ *          not need to pass the parameter "msg" to the constructor. This is because
  *          such an exception will never produce a message box with the error message
  *          (as there is not really an error - the user has simply canceled something).
  *
@@ -384,8 +382,8 @@ class UserCanceled final : public Exception
         /**
          * @copydoc Exception::Exception
          */
-        UserCanceled(const char* file, int line, const QString& debugMsg = QString(),
-                    const QString& userMsg = QString("User Canceled")) noexcept;
+        UserCanceled(const char* file, int line,
+                     const QString& msg = QString("User Canceled")) noexcept;
 
         /**
          * @brief The copy constructor (needed for #clone())

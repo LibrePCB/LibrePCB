@@ -82,7 +82,7 @@ bool CmdAddDeviceToBoard::performExecute() throw (Exception)
     if (!dev) {
         FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(mDeviceUuid);
         if (!devFp.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The device with the UUID \"%1\" does not exist in the "
                 "workspace library!")).arg(mDeviceUuid.toStr()));
         }
@@ -100,7 +100,7 @@ bool CmdAddDeviceToBoard::performExecute() throw (Exception)
     if (!pkg) {
         FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
         if (!pkgFp.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The package with the UUID \"%1\" does not exist in the "
                 "workspace library!")).arg(pkgUuid.toStr()));
         }

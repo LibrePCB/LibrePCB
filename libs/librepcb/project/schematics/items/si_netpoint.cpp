@@ -53,18 +53,18 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) thr
         Uuid symbolUuid = domElement.getAttribute<Uuid>("symbol", true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
         if (!symbol) {
-            throw RuntimeError(__FILE__, __LINE__, symbolUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toStr()));
         }
         Uuid pinUuid = domElement.getAttribute<Uuid>("pin", true);
         mSymbolPin = symbol->getPin(pinUuid);
         if (!mSymbolPin) {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
         }
         mNetSignal = mSymbolPin->getCompSigInstNetSignal();
         if (!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(), QString(tr("The pin "
+            throw RuntimeError(__FILE__, __LINE__, QString(tr("The pin "
                 "of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
         }
         mPosition = mSymbolPin->getPosition();
@@ -72,7 +72,7 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) thr
         Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
         mPosition.setX(domElement.getAttribute<Length>("x", true));

@@ -147,7 +147,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) throw (Exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
 
     if (isCommandGroupActive()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Another command is active "
+        throw RuntimeError(__FILE__, __LINE__, tr("Another command is active "
                            "at the moment. Please finish that command to continue."));
     }
 
@@ -185,7 +185,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) throw (Exception)
 void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
 {
     if (isCommandGroupActive()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Another command is active "
+        throw RuntimeError(__FILE__, __LINE__, tr("Another command is active "
                            "at the moment. Please finish that command to continue."));
     }
 
@@ -204,7 +204,7 @@ void UndoStack::appendToCmdGroup(UndoCommand* cmd) throw (Exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
 
     if (!isCommandGroupActive()) {
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+        throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
     }
     Q_ASSERT(mCurrentIndex == mCommands.count());
     Q_ASSERT(mActiveCommandGroup);
@@ -217,7 +217,7 @@ void UndoStack::appendToCmdGroup(UndoCommand* cmd) throw (Exception)
 void UndoStack::commitCmdGroup() throw (Exception)
 {
     if (!isCommandGroupActive()) {
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+        throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
     }
     Q_ASSERT(mCurrentIndex == mCommands.count());
     Q_ASSERT(mActiveCommandGroup);
@@ -240,7 +240,7 @@ void UndoStack::commitCmdGroup() throw (Exception)
 void UndoStack::abortCmdGroup() throw (Exception)
 {
     if (!isCommandGroupActive()) {
-        throw LogicError(__FILE__, __LINE__, QString(), tr("No command group active!"));
+        throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
     }
     Q_ASSERT(mCurrentIndex == mCommands.count());
     Q_ASSERT(mActiveCommandGroup);
@@ -252,7 +252,7 @@ void UndoStack::abortCmdGroup() throw (Exception)
         mCurrentIndex--;
         delete mCommands.takeLast(); // delete and remove the aborted command group from the stack
     } catch (Exception& e) {
-        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getUserMsg();
+        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getMsg();
         throw;
     }
 
@@ -275,7 +275,7 @@ void UndoStack::undo() throw (Exception)
         mCommands[mCurrentIndex-1]->undo(); // can throw (but should usually not)
         mCurrentIndex--;
     } catch (Exception& e) {
-        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getUserMsg();
+        qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getMsg();
         throw;
     }
 
@@ -297,7 +297,7 @@ void UndoStack::redo() throw (Exception)
         mCommands[mCurrentIndex]->redo(); // can throw (but should usually not)
         mCurrentIndex++;
     } catch (Exception& e) {
-        qCritical() << "UndoCommand::redo() has thrown an exception:" << e.getUserMsg();
+        qCritical() << "UndoCommand::redo() has thrown an exception:" << e.getMsg();
         throw;
     }
 

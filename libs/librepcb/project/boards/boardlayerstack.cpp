@@ -56,7 +56,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) thr
         if (!mLayers.contains(layer->getId())) {
             addLayer(*layer.take());
         } else {
-            throw RuntimeError(__FILE__, __LINE__, node->getName(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Layer ID \"%1\" is defined multiple times in \"%2\"."))
                 .arg(layer->getId()).arg(domElement.getDocFilePath().toNative()));
         }

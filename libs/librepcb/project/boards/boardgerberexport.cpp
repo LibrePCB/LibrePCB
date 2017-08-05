@@ -334,7 +334,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
                 }
                 case library::FootprintPadTht::Shape_t::OCTAGON: {
                     if (width != height) {
-                        throw LogicError(__FILE__, __LINE__, QString(),
+                        throw LogicError(__FILE__, __LINE__,
                             tr("Sorry, non-square octagons are not yet supported."));
                     }
                     gen.flashRegularPolygon(pad.getPosition(), width, 8, rot, Length(0));

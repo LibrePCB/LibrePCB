@@ -66,7 +66,7 @@ BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
     } else if (shapeStr == "octagon") {
         mShape = Shape::Octagon;
     } else {
-        throw RuntimeError(__FILE__, __LINE__, shapeStr,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid via shape: \"%1\"")).arg(shapeStr));
     }
     mSize = domElement.getAttribute<Length>("size", true);
@@ -75,7 +75,7 @@ BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
     if (!netSignalUuid.isNull()) {
         mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
     }

@@ -295,7 +295,7 @@ void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
 {
     Q_ASSERT(mSegments.contains(&segment));
     if (mSegments.count() <= 1) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The last segment of a polygon cannot be removed."));
     }
     mSegments.removeAll(&segment);

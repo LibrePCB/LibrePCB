@@ -334,7 +334,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                     }
                     catch (Exception& e)
                     {
-                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                     }
                 }
                 break;
@@ -375,7 +375,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
                 try {
                     mUndoStack.execCmd(mSelectedItemsMoveCommand.take()); // can throw
                 } catch (Exception& e) {
-                    QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                 }
                 mSelectedItemsMoveCommand.reset();
                 mSubState = SubState_Idle;
@@ -428,7 +428,7 @@ bool SES_Select::rotateSelectedItems(const Angle& angle) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -446,7 +446,7 @@ bool SES_Select::removeSelectedItems() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

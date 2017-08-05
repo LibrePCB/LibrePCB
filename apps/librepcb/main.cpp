@@ -208,7 +208,7 @@ static FilePath determineWorkspacePath() noexcept
                     Workspace::createNewWorkspace(wsPath); // can throw
                 } catch (const Exception& e) {
                     QMessageBox::critical(0, Application::translate("Workspace", "Error"),
-                                          e.getUserMsg());
+                                          e.getMsg());
                     return FilePath(); // TODO: Show the wizard again instead of closing the application
                 }
             }
@@ -243,7 +243,7 @@ static int openWorkspace(const FilePath& path) noexcept
         QMessageBox::critical(0, Application::translate("Workspace",
             "Cannot open the workspace"), QString(Application::translate(
             "Workspace", "The workspace \"%1\" cannot be opened: %2"))
-            .arg(path.toNative(), e.getUserMsg()));
+            .arg(path.toNative(), e.getMsg()));
         return 0;
     }
 }

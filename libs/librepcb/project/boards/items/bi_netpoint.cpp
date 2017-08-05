@@ -75,7 +75,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
     int layerId = domElement.getAttribute<uint>("layer", true);
     mLayer = mBoard.getLayerStack().getBoardLayer(layerId);
     if (!mLayer) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board layer ID: \"%1\""))
             .arg(layerId));
     }
@@ -83,7 +83,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
     Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
     mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
 
@@ -92,7 +92,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
         Uuid viaUuid = domElement.getAttribute<Uuid>("via", true);
         mVia = mBoard.getViaByUuid(viaUuid);
         if (!mVia) {
-            throw RuntimeError(__FILE__, __LINE__, viaUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid via UUID: \"%1\"")).arg(viaUuid.toStr()));
         }
         mPosition = mVia->getPosition();
@@ -100,13 +100,13 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
         Uuid componentUuid = domElement.getAttribute<Uuid>("component", true);
         BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(componentUuid);
         if (!device) {
-            throw RuntimeError(__FILE__, __LINE__, componentUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid component UUID: \"%1\"")).arg(componentUuid.toStr()));
         }
         Uuid padUuid = domElement.getAttribute<Uuid>("pad", true);
         mFootprintPad = device->getFootprint().getPad(padUuid);
         if (!mFootprintPad) {
-            throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
         }
         mPosition = mFootprintPad->getPosition();
@@ -114,7 +114,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
         mPosition.setX(domElement.getAttribute<Length>("x", true));
         mPosition.setY(domElement.getAttribute<Length>("y", true));
     } else {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid 'attached_to' attribute: \"%1\"")).arg(attachedTo));
     }
 
@@ -149,14 +149,14 @@ void BI_NetPoint::init() throw (Exception)
 {
     // check layer
     if (!mLayer->isCopperLayer()) {
-        throw RuntimeError(__FILE__, __LINE__, mLayer->getName(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
             .arg(mUuid.toStr()).arg(mLayer->getId()));
     }
     if (mFootprintPad) {
         if (mFootprintPad->getLibPad().getTechnology() == library::FootprintPad::Technology_t::SMT) {
             if (mLayer->getId() != mFootprintPad->getLayerId()) {
-                throw RuntimeError(__FILE__, __LINE__, mLayer->getName(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
                     .arg(mUuid.toStr()).arg(mLayer->getId()));
             }

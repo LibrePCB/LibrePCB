@@ -110,7 +110,7 @@ void MainWindow::on_updateBtn_clicked()
         }
         catch (Exception& e)
         {
-            ui->log->addItem("ERROR: " % e.getUserMsg());
+            ui->log->addItem("ERROR: " % e.getMsg());
             errorCount++;
         }
     }
@@ -135,7 +135,7 @@ void MainWindow::updateElements(const library::Library& lib) noexcept
             ui->log->addItem(fp.toNative());
             elementCount++;
         } catch (const Exception& e) {
-            ui->log->addItem("ERROR: " % e.getUserMsg());
+            ui->log->addItem("ERROR: " % e.getMsg());
             errorCount++;
         }
     }

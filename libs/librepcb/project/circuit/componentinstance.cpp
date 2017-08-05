@@ -54,14 +54,14 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
     Uuid cmpUuid = domElement.getAttribute<Uuid>("component", true);
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent) {
-        throw RuntimeError(__FILE__, __LINE__, cmpUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(cmpUuid.toStr()));
     }
     Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant", true);
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVarUuid);
     if (!mCompSymbVar) {
-        throw RuntimeError(__FILE__, __LINE__, symbVarUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No symbol variant with the UUID \"%1\" found."))
             .arg(symbVarUuid.toStr()));
     }
@@ -73,15 +73,15 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
     foreach (const DomElement* node, domElement.getChilds("signal_map")) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The signal with the UUID \"%1\" is defined multiple times."))
                 .arg(signal->getCompSignal().getUuid().toStr()));
         }
         mSignals.insert(signal->getCompSignal().getUuid(), signal);
     }
     if (mSignals.count() != mLibComponent->getSignalCount()) {
+        qDebug() << mSignals.count() << "!=" << mLibComponent->getSignalCount();
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1!=%2").arg(mSignals.count()).arg(mLibComponent->getSignalCount()),
             QString(tr("The signal count of the component instance \"%1\" does "
             "not match with the signal count of the component \"%2\"."))
             .arg(mUuid.toStr()).arg(mLibComponent->getUuid().toStr()));
@@ -97,13 +97,13 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     mAttributes()
 {
     if (mName.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The name of the component must not be empty."));
     }
     mValue = cmp.getDefaultValue();
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVar);
     if (!mCompSymbVar) {
-        throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No symbol variant with the UUID \"%1\" found."))
             .arg(symbVar.toStr()));
     }
@@ -219,7 +219,7 @@ void ComponentInstance::setName(const QString& name) throw (Exception)
 {
     if (name != mName) {
         if(name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, name,
+            throw RuntimeError(__FILE__, __LINE__,
                 tr("The new component name must not be empty!"));
         }
         mName = name;
@@ -269,7 +269,7 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (isUsed()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component \"%1\" cannot be removed because it is still in use!"))
             .arg(mName));
     }
@@ -290,11 +290,11 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol) throw (Exception)
     }
     Uuid itemUuid = symbol.getCompSymbVarItem().getUuid();
     if (!mCompSymbVar->getItemByUuid(itemUuid)) {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toStr(), QString(tr(
+        throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Invalid symbol item in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }
     if (mRegisteredSymbols.contains(itemUuid)) {
-        throw RuntimeError(__FILE__, __LINE__, itemUuid.toStr(), QString(tr(
+        throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Symbol item UUID already exists in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }
     mRegisteredSymbols.insert(itemUuid, &symbol);

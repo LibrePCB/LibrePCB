@@ -70,7 +70,7 @@ void UndoStackActionGroup::undoTriggered() noexcept
     try {
         if (mStack) mStack->undo();
     } catch (const Exception& e) {
-        QMessageBox::critical(mMsgBoxParent, tr("Undo failed"), e.getUserMsg());
+        QMessageBox::critical(mMsgBoxParent, tr("Undo failed"), e.getMsg());
     }
 }
 
@@ -79,7 +79,7 @@ void UndoStackActionGroup::redoTriggered() noexcept
     try {
         if (mStack) mStack->redo();
     } catch (const Exception& e) {
-        QMessageBox::critical(mMsgBoxParent, tr("Redo failed"), e.getUserMsg());
+        QMessageBox::critical(mMsgBoxParent, tr("Redo failed"), e.getMsg());
     }
 }
 

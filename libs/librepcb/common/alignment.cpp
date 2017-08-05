@@ -66,8 +66,8 @@ HAlign HAlign::deserializeFromString(const QString& align) throw (Exception)
         return HAlign(Qt::AlignRight);
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, align,
-            QString(tr("Invalid horizontal alignment: \"%1\"")).arg(align));
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString(tr("Invalid horizontal alignment: \"%1\"")).arg(align));
     }
 }
 
@@ -108,8 +108,8 @@ VAlign VAlign::deserializeFromString(const QString& align) throw (Exception)
         return VAlign(Qt::AlignBottom);
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, align,
-            QString(tr("Invalid vertical alignment: \"%1\"")).arg(align));
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString(tr("Invalid vertical alignment: \"%1\"")).arg(align));
     }
 }
 

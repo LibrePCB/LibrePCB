@@ -70,7 +70,7 @@ void FileDownload::prepareRequest() throw (Exception)
 {
     // check destination filepath
     if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString("The destination file exists already: %1")
             .arg(mDestination.toNative()));
     }
@@ -78,7 +78,7 @@ void FileDownload::prepareRequest() throw (Exception)
     // create destination directory
     if (!mDestination.getParentDir().isEmptyDir()) {
         if (!QDir().mkpath(mDestination.getParentDir().toStr())) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString("Could not create directory \"%1\".")
                 .arg(mDestination.getParentDir().toNative()));
         }
@@ -87,7 +87,7 @@ void FileDownload::prepareRequest() throw (Exception)
     // open temporary destination file
     mFile.reset(new QSaveFile(mDestination.toStr(), this));
     if (!mFile->open(QIODevice::WriteOnly)) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString("Could not open file \"%1\": %2")
             .arg(mDestination.toNative(), mFile->errorString()));
     }
@@ -97,14 +97,14 @@ void FileDownload::finalizeRequest() throw (Exception)
 {
     // check destination filepath again
     if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString("The destination file exists already: %1")
             .arg(mDestination.toNative()));
     }
 
     // save to destination file
     if (!mFile->commit()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Error while writing file \"%1\": %2"))
             .arg(mDestination.toNative(), mFile->errorString()));
     }
@@ -117,7 +117,7 @@ void FileDownload::finalizeRequest() throw (Exception)
         emit progressState(tr("Verify checksum..."));
         QFile file(mDestination.toStr());
         if (!file.open(QFile::ReadOnly)) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Error while readback file \"%1\": %2"))
                 .arg(mDestination.toNative(), file.errorString()));
         }
@@ -126,8 +126,8 @@ void FileDownload::finalizeRequest() throw (Exception)
         QString result = hash.result().toHex();
         QString expected = mExpectedChecksum.toHex();
         if (result != expected) {
+            qDebug() << "expected" << expected << "but got" << result;
             throw RuntimeError(__FILE__, __LINE__,
-                QString("%1 != %2").arg(result, expected),
                 tr("Checksum verification of downloaded file failed!"));
         } else {
             qDebug() << "Checksum verification of downloaded file was successful.";
@@ -140,7 +140,7 @@ void FileDownload::finalizeRequest() throw (Exception)
         QStringList files = JlCompress::extractDir(mDestination.toStr(),
                                                    mExtractZipToDir.toStr());
         if (files.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Error while extracting the ZIP file \"%1\"."))
                 .arg(mDestination.toNative()));
         }

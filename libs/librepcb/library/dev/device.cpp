@@ -56,7 +56,7 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception
         Uuid pad = node->getAttribute<Uuid>("pad", true);
         Uuid signal = node->getText<Uuid>(false);
         if (mPadSignalMap.contains(pad)) {
-            throw RuntimeError(__FILE__, __LINE__, pad.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
                 .arg(pad.toStr(), root.getDocFilePath().toNative()));
         }

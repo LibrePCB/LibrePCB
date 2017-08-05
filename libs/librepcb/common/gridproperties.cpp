@@ -90,7 +90,7 @@ GridProperties::Type_t GridProperties::stringToType(const QString& type) throw (
     if (type == "off")          return Type_t::Off;
     else if (type == "lines")   return Type_t::Lines;
     else if (type == "dots")    return Type_t::Dots;
-    else throw RuntimeError(__FILE__, __LINE__, type, QString(tr("Unknown grid type: \"%1\"")).arg(type));
+    else throw RuntimeError(__FILE__, __LINE__, QString(tr("Unknown grid type: \"%1\"")).arg(type));
 }
 
 QString GridProperties::typeToString(Type_t type) throw (Exception)

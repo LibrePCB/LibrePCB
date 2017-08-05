@@ -214,7 +214,7 @@ bool ProjectSettingsDialog::applySettings() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -231,7 +231,7 @@ bool ProjectSettingsDialog::restoreDefaultSettings() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
 }

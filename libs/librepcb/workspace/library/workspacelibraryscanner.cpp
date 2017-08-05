@@ -110,7 +110,7 @@ void WorkspaceLibraryScanner::run() noexcept
             emit succeeded(count);
         }
     } catch (const Exception& e) {
-        emit failed(e.getUserMsg());
+        emit failed(e.getMsg());
     }
 }
 

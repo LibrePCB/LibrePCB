@@ -187,7 +187,7 @@ void RepositoryLibraryListWidgetItem::downloadFinished(bool success, const QStri
             // finish
             emit libraryAdded(mLibraryDownload->getDestinationDir(), false);
         } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Download failed"), e.getUserMsg());
+            QMessageBox::critical(this, tr("Download failed"), e.getMsg());
         }
     } else if (!errMsg.isEmpty()) {
         QMessageBox::critical(this, tr("Download failed"), errMsg);

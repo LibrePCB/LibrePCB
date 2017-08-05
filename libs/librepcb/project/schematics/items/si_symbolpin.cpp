@@ -56,12 +56,12 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
     if (!mSymbolPin) {
-        throw RuntimeError(__FILE__, __LINE__, pinUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
     }
     mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMapItemOfPin(pinUuid);
     if (!mPinSignalMapItem) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Pin \"%1\" not found in pin-signal-map of symbol instance \"%2\"."))
             .arg(pinUuid.toStr(), symbol.getUuid().toStr()));
     }

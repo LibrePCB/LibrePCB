@@ -79,7 +79,7 @@ void FabricationOutputDialog::on_btnGenerate_clicked()
     }
     catch (Exception& e)
     {
-        QMessageBox::warning(this, tr("Error"), e.getUserMsg());
+        QMessageBox::warning(this, tr("Error"), e.getMsg());
     }
 }
 

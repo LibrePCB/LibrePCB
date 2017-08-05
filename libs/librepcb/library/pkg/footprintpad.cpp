@@ -136,7 +136,7 @@ FootprintPad::Technology_t FootprintPad::stringToTechnology(const QString& techn
 {
     if      (technology == QLatin1String("tht")) return Technology_t::THT;
     else if (technology == QLatin1String("smt")) return Technology_t::SMT;
-    else throw RuntimeError(__FILE__, __LINE__, QString(), technology);
+    else throw RuntimeError(__FILE__, __LINE__, technology);
 }
 
 QString FootprintPad::technologyToString(Technology_t technology) noexcept

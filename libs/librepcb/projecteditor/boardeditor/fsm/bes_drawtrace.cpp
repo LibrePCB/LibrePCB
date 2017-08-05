@@ -350,7 +350,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
         } else {
             BoardLayer* layer = board.getLayerStack().getBoardLayer(mCurrentLayerId);
             if (!layer) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("No layer selected.")));
             }
             CmdPlaceBoardNetPoint* cmd = new CmdPlaceBoardNetPoint(board, pos, *layer);
@@ -403,7 +403,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     }
     catch (Exception e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState_Idle) {
             abortPositioning(false);
         }
@@ -442,7 +442,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept
         }
         catch (Exception& e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
         }
 
@@ -463,7 +463,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept
         }
         catch (Exception e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             if (mSubState != SubState_Idle) {
                 abortPositioning(false);
             }
@@ -488,7 +488,7 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept
     }
     catch (Exception& e)
     {
-        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

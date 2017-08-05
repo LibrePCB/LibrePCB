@@ -62,7 +62,7 @@ qint32 Ratio::normalizedStringToPpm(const QString& normalized) throw (Exception)
     bool ok;
     qreal ratio = qRound(QLocale::c().toDouble(normalized, &ok) * 1e6);
     if (!ok) {
-        throw Exception(__FILE__, __LINE__, normalized,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid ratio string: \"%1\"")).arg(normalized));
     }
     return ratio;

@@ -53,7 +53,7 @@ Text::Text(const DomElement& domElement) throw (Exception)
     mRotation = domElement.getAttribute<Angle>("rotation", true);
     mHeight = domElement.getAttribute<Length>("height", true);
     if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The height of a text element in the file \"%1\" is <= 0."))
             .arg(domElement.getDocFilePath().toNative()));
     }

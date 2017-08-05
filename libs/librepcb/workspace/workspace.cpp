@@ -63,12 +63,12 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
 {
     // check if the workspace is valid
     if (!isValidWorkspacePath(mPath)) {
-        throw RuntimeError(__FILE__, __LINE__, mPath.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
     }
     SmartVersionFile wsVersionFile(mPath.getPathTo(".librepcb-workspace"), false, true); // can throw
     if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+        throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "The workspace version %1 is not compatible with this application version."))
             .arg(wsVersionFile.getVersion().toStr()));
     }
@@ -87,7 +87,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
         }
         case DirectoryLock::LockStatus::Locked: {
             // the workspace is locked by another application instance
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("The workspace is already "
+            throw RuntimeError(__FILE__, __LINE__, tr("The workspace is already "
                                "opened by another application instance or user!"));
         }
         case DirectoryLock::LockStatus::StaleLock:{
@@ -119,7 +119,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
                 // @todo do not show a message box here, better use something like a
                 // getLastError() method which is used by the ControlPanel to show errors
                 QMessageBox::critical(nullptr, tr("Error"), QString(tr(
-                    "Could not open local library %1: %2")).arg(dir, e.getUserMsg()));
+                    "Could not open local library %1: %2")).arg(dir, e.getMsg()));
             }
         } else {
             qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
@@ -139,7 +139,7 @@ Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
                 // @todo do not show a message box here, better use something like a
                 // getLastError() method which is used by the ControlPanel to show errors
                 QMessageBox::critical(nullptr, tr("Error"), QString(tr(
-                    "Could not open remote library %1: %2")).arg(dir, e.getUserMsg()));
+                    "Could not open remote library %1: %2")).arg(dir, e.getMsg()));
             }
         } else {
             qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();

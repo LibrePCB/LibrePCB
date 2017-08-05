@@ -36,13 +36,13 @@ namespace librepcb {
 QByteArray FileUtils::readFile(const FilePath& filepath) throw (Exception)
 {
     if (!filepath.isExistingFile()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file \"%1\" does not exist."))
             .arg(filepath.toNative()));
     }
     QFile file(filepath.toStr());
     if (!file.open(QIODevice::ReadOnly)) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Cannot "
+        throw RuntimeError(__FILE__, __LINE__, QString(tr("Cannot "
             "open file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
     }
     return file.readAll();
@@ -53,21 +53,19 @@ void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) t
     makePath(filepath.getParentDir()); // can throw
     QSaveFile file(filepath.toStr());
     if (!file.open(QIODevice::WriteOnly)) {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3]")
-            .arg(filepath.toStr(), file.errorString()).arg(file.error()),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not open or create file \"%1\": %2"))
             .arg(filepath.toNative(), file.errorString()));
     }
     qint64 written = file.write(content);
     if (written != content.size()) {
+        qDebug() << "only" << written << "of" << content.size() << "bytes written";
         throw RuntimeError(__FILE__, __LINE__,
-            QString("%1: %2 (only %3 of %4 bytes written)")
-            .arg(filepath.toStr(), file.errorString()).arg(written).arg(content.size()),
             QString(tr("Could not write to file \"%1\": %2"))
             .arg(filepath.toNative(), file.errorString()));
     }
     if (!file.commit()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Could not write to "
+        throw RuntimeError(__FILE__, __LINE__, QString(tr("Could not write to "
             "file \"%1\": %2")).arg(filepath.toNative(), file.errorString()));
     }
 }
@@ -75,17 +73,17 @@ void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) t
 void FileUtils::copyFile(const FilePath& source, const FilePath& dest) throw (Exception)
 {
     if (!source.isExistingFile()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file \"%1\" does not exist."))
             .arg(source.toNative()));
     }
     if (dest.isExistingFile() || dest.isExistingDir()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file or directory \"%1\" exists already."))
             .arg(dest.toNative()));
     }
     if (!QFile::copy(source.toStr(), dest.toStr())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not copy file \"%1\" to \"%2\"."))
             .arg(source.toNative(), dest.toNative()));
     }
@@ -94,12 +92,12 @@ void FileUtils::copyFile(const FilePath& source, const FilePath& dest) throw (Ex
 void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest) throw (Exception)
 {
     if (!source.isExistingDir()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The directory \"%1\" does not exist."))
             .arg(source.toNative()));
     }
     if (dest.isExistingFile() || dest.isExistingDir()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file or directory \"%1\" exists already."))
             .arg(dest.toNative()));
     }
@@ -116,17 +114,17 @@ void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest)
 void FileUtils::move(const FilePath& source, const FilePath& dest) throw (Exception)
 {
     if ((!source.isExistingFile()) && (!source.isExistingDir())) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file or directory \"%1\" does not exist."))
             .arg(source.toNative()));
     }
     if (dest.isExistingFile() || dest.isExistingDir()) {
-        throw LogicError(__FILE__, __LINE__, QString(),
+        throw LogicError(__FILE__, __LINE__,
             QString(tr("The file or directory \"%1\" exists already."))
             .arg(dest.toNative()));
     }
     if (!QDir().rename(source.toStr(), dest.toStr())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr(
+        throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Could not move \"%1\" to \"%2\".")).arg(source.toNative(), dest.toNative()));
     }
 }
@@ -134,7 +132,7 @@ void FileUtils::move(const FilePath& source, const FilePath& dest) throw (Except
 void FileUtils::removeFile(const FilePath& file) throw (Exception)
 {
     if (!QFile::remove(file.toStr())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not remove file \"%1\".")).arg(file.toNative()));
     }
 }
@@ -142,7 +140,7 @@ void FileUtils::removeFile(const FilePath& file) throw (Exception)
 void FileUtils::removeDirRecursively(const FilePath& dir) throw (Exception)
 {
     if (!QDir(dir.toStr()).removeRecursively()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not remove directory \"%1\"."))
             .arg(dir.toNative()));
     }
@@ -151,7 +149,7 @@ void FileUtils::removeDirRecursively(const FilePath& dir) throw (Exception)
 void FileUtils::makePath(const FilePath& path) throw (Exception)
 {
     if (!QDir().mkpath(path.toStr())) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not create directory or path \"%1\"."))
             .arg(path.toNative()));
     }

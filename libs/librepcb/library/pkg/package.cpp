@@ -53,7 +53,7 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
         foreach (const DomElement* node, root.getChilds("pad")) {
             PackagePad* pad = new PackagePad(*node);
             if (getPadByUuid(pad->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, pad->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
                     .arg(pad->getUuid().toStr(), root.getDocFilePath().toNative()));
             }
@@ -64,7 +64,7 @@ Package::Package(const FilePath& elementDirectory, bool readOnly) throw (Excepti
         foreach (const DomElement* node, root.getChilds("footprint")) {
             Footprint* footprint = new Footprint(*node);
             if (getFootprintByUuid(footprint->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__, footprint->getUuid().toStr(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
                     .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
             }

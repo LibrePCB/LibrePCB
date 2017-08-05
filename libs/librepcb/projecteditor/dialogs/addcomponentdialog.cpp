@@ -117,7 +117,7 @@ void AddComponentDialog::treeCategories_currentItemChanged(const QModelIndex& cu
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }
 
@@ -139,7 +139,7 @@ void AddComponentDialog::on_listComponents_currentItemChanged(QListWidgetItem *c
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         setSelectedComponent(nullptr);
     }
 }

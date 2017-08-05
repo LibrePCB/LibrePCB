@@ -122,7 +122,7 @@ void NetworkRequestBase::executeRequest() noexcept
     try {
         prepareRequest(); // can throw
     } catch (const Exception& e) {
-        finalize(e.getUserMsg());
+        finalize(e.getMsg());
         return;
     }
 
@@ -230,7 +230,7 @@ void NetworkRequestBase::replyFinishedSlot() noexcept
     try {
         finalizeRequest(); // can throw
     } catch (const Exception& e) {
-        finalize(e.getUserMsg());
+        finalize(e.getMsg());
         return;
     }
 

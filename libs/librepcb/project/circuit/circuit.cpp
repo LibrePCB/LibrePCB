@@ -144,13 +144,13 @@ void Circuit::addNetClass(NetClass& netclass) throw (Exception)
     }
     // check if there is no netclass with the same uuid in the list
     if (getNetClassByUuid(netclass.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net class with the UUID \"%1\"!"))
             .arg(netclass.getUuid().toStr()));
     }
     // check if there is no netclass with the same name in the list
     if (getNetClassByName(netclass.getName())) {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net class with the name \"%1\"!"))
             .arg(netclass.getName()));
     }
@@ -180,7 +180,7 @@ void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw 
     }
     // check if there is no netclass with the same name in the list
     if (getNetClassByName(newName)) {
-        throw RuntimeError(__FILE__, __LINE__, netclass.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net class with the name \"%1\"!")).arg(newName));
     }
     // apply the new name
@@ -223,13 +223,13 @@ void Circuit::addNetSignal(NetSignal& netsignal) throw (Exception)
     }
     // check if there is no netsignal with the same uuid in the list
     if (getNetSignalByUuid(netsignal.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net signal with the UUID \"%1\"!"))
             .arg(netsignal.getUuid().toStr()));
     }
     // check if there is no netsignal with the same name in the list
     if (getNetSignalByName(netsignal.getName())) {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net signal with the name \"%1\"!"))
             .arg(netsignal.getName()));
     }
@@ -260,9 +260,8 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName,
     }
     // check if there is no netsignal with the same name in the list
     if (getNetSignalByName(newName)) {
-        throw RuntimeError(__FILE__, __LINE__, netsignal.getUuid().toStr(),
-            QString(tr("There is already a net signal with the name \"%1\"!"))
-            .arg(newName));
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(tr("There is already a net signal with the name \"%1\"!")).arg(newName));
     }
     // apply the new name
     netsignal.setName(newName, isAutoName); // can throw
@@ -311,13 +310,13 @@ void Circuit::addComponentInstance(ComponentInstance& cmp) throw (Exception)
     }
     // check if there is no component with the same uuid in the list
     if (getComponentInstanceByUuid(cmp.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a component with the UUID \"%1\"!"))
             .arg(cmp.getUuid().toStr()));
     }
     // check if there is no component with the same name in the list
     if (getComponentInstanceByName(cmp.getName())) {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a component with the name \"%1\"!"))
             .arg(cmp.getName()));
     }
@@ -347,7 +346,7 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& ne
     }
     // check if there is no component with the same name in the list
     if ((newName != cmp.getName()) && getComponentInstanceByName(newName)) {
-        throw RuntimeError(__FILE__, __LINE__, cmp.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
     }
     // apply the new name
@@ -371,7 +370,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     return success;

@@ -123,7 +123,7 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exce
         nameOfResultingNetSignal = forcedNetNames.first();
     } else if (forcedNetNames.count() > 1) {
         // TODO: what should we do here?
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
              tr("There are multiple different nets with forced names at this position."));
     }
 
@@ -181,12 +181,12 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exce
                 }
                 mHasCombinedSomeItems = true;
             } else {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                                    tr("Sorry, not yet implemented..."));
             }
         }
     } else if (pinsUnderCursor.count() > 1) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
                            tr("Sorry, not yet implemented..."));
     }
     /*foreach (SI_SymbolPin* pin, pinsUnderCursor) {
@@ -205,12 +205,12 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exce
                     execNewChildCmd(cmd); // can throw
                 } else {
                     // TODO: attach pin to netpoint
-                    throw RuntimeError(__FILE__, __LINE__, QString(),
+                    throw RuntimeError(__FILE__, __LINE__,
                                        tr("Sorry, not yet implemented..."));
                 }
             }
         } else {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 tr("There is at least one pin at this position cannot be connected to a net."));
         }
     }*/

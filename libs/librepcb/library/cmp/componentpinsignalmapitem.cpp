@@ -86,7 +86,7 @@ ComponentPinSignalMapItem::PinDisplayType_t ComponentPinSignalMapItem::stringToD
     else if (type == QLatin1String("pin_name"))         return PinDisplayType_t::PIN_NAME;
     else if (type == QLatin1String("component_signal")) return PinDisplayType_t::COMPONENT_SIGNAL;
     else if (type == QLatin1String("net_signal"))       return PinDisplayType_t::NET_SIGNAL;
-    else throw RuntimeError(__FILE__, __LINE__, QString(), type);
+    else throw RuntimeError(__FILE__, __LINE__, type);
 }
 
 QString ComponentPinSignalMapItem::displayTypeToString(PinDisplayType_t type) noexcept

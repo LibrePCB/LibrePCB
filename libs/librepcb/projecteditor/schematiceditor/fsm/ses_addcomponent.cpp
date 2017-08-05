@@ -87,7 +87,7 @@ SES_Base::ProcRetVal SES_AddComponent::process(SEE_Base* event) noexcept
                 }
                 catch (Exception& exc)
                 {
-                    QMessageBox::critical(&mEditor, tr("Error"), exc.getUserMsg());
+                    QMessageBox::critical(&mEditor, tr("Error"), exc.getMsg());
                 }
             }
             return PassToParentState;
@@ -109,7 +109,7 @@ SES_Base::ProcRetVal SES_AddComponent::process(SEE_Base* event) noexcept
             }
             catch (Exception& exc)
             {
-                QMessageBox::critical(&mEditor, tr("Error"), exc.getUserMsg());
+                QMessageBox::critical(&mEditor, tr("Error"), exc.getMsg());
             }
             return PassToParentState;
         }
@@ -149,7 +149,7 @@ bool SES_AddComponent::entry(SEE_Base* event) noexcept
     }
     catch (Exception& exc)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), QString(tr("Could not add component:\n\n%1")).arg(exc.getUserMsg()));
+        QMessageBox::critical(&mEditor, tr("Error"), QString(tr("Could not add component:\n\n%1")).arg(exc.getMsg()));
         if (mIsUndoCmdActive) abortCommand(false);
         delete mAddComponentDialog; mAddComponentDialog = nullptr;
         return false;
@@ -253,7 +253,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
                     }
                     catch (Exception& e)
                     {
-                        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                         abortCommand(false);
                         return ForceLeaveState;
                     }
@@ -345,7 +345,8 @@ void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar
         auto* currentSymbVarItem = mCurrentComponent->getSymbolVariant().getItem(mCurrentSymbVarItemIndex);
         if (!currentSymbVarItem)
         {
-            throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
+            qDebug() << symbVar;
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The component with the UUID \"%1\" does not have any symbol."))
                 .arg(cmp.toStr()));
         }
@@ -391,7 +392,7 @@ bool SES_AddComponent::abortCommand(bool showErrMsgBox) noexcept
     }
     catch (Exception& e)
     {
-        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

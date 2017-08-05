@@ -210,7 +210,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("device")) {
                 BI_Device* device = new BI_Device(*this, *node);
                 if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, QString(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a device of the component instance \"%1\"!"))
                         .arg(device->getComponentInstanceUuid().toStr()));
                 }
@@ -221,7 +221,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("via")) {
                 BI_Via* via = new BI_Via(*this, *node);
                 if (getViaByUuid(via->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, via->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a via with the UUID \"%1\"!"))
                         .arg(via->getUuid().toStr()));
                 }
@@ -232,7 +232,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("netpoint")) {
                 BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netpoint with the UUID \"%1\"!"))
                         .arg(netpoint->getUuid().toStr()));
                 }
@@ -243,7 +243,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("netline")) {
                 BI_NetLine* netline = new BI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netline with the UUID \"%1\"!"))
                         .arg(netline->getUuid().toStr()));
                 }
@@ -578,7 +578,7 @@ void Board::addDeviceInstance(BI_Device& instance) throw (Exception)
     }
     // check if there is no device with the same component instance in the list
     if (getDeviceInstanceByComponentUuid(instance.getComponentInstance().getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, instance.getComponentInstance().getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a device with the component instance \"%1\"!"))
             .arg(instance.getComponentInstance().getUuid().toStr()));
     }
@@ -621,7 +621,7 @@ void Board::addVia(BI_Via& via) throw (Exception)
     }
     // check if there is no via with the same uuid in the list
     if (getViaByUuid(via.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, via.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a via with the UUID \"%1\"!"))
             .arg(via.getUuid().toStr()));
     }
@@ -662,7 +662,7 @@ void Board::addNetPoint(BI_NetPoint& netpoint) throw (Exception)
     }
     // check if there is no netpoint with the same uuid in the list
     if (getNetPointByUuid(netpoint.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a netpoint with the UUID \"%1\"!"))
             .arg(netpoint.getUuid().toStr()));
     }
@@ -703,7 +703,7 @@ void Board::addNetLine(BI_NetLine& netline) throw (Exception)
     }
     // check if there is no netline with the same uuid in the list
     if (getNetLineByUuid(netline.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a netline with the UUID \"%1\"!"))
             .arg(netline.getUuid().toStr()));
     }
@@ -804,7 +804,7 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     return success;

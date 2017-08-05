@@ -357,12 +357,12 @@ class SerializableObjectList : public SerializableObject
             }
         }
         void throwKeyNotFoundException(const Uuid& key) const throw (Exception) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("There is "
+            throw RuntimeError(__FILE__, __LINE__, QString(tr("There is "
                 "no element of type \"%1\" with the UUID \"%2\" in the list."))
                 .arg(P::tagname).arg(key.toStr()));
         }
         void throwNameNotFoundException(const QString& name) const throw (Exception) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("There is "
+            throw RuntimeError(__FILE__, __LINE__, QString(tr("There is "
                 "no element of type \"%1\" with the name \"%2\" in the list."))
                 .arg(P::tagname).arg(name));
         }

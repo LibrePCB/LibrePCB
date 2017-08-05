@@ -50,7 +50,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (
     Uuid gcUuid = domElement.getAttribute<Uuid>("component", true);
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
-        throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No component with the UUID \"%1\" found in the circuit!"))
             .arg(gcUuid.toStr()));
     }
@@ -73,13 +73,13 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
 {
     mSymbVarItem = mComponentInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem) {
-        throw RuntimeError(__FILE__, __LINE__, symbVarItemUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The symbol variant item UUID \"%1\" is invalid."))
             .arg(symbVarItemUuid.toStr()));
     }
     mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
     if (!mSymbol) {
-        throw RuntimeError(__FILE__, __LINE__, mSymbVarItem->getSymbolUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No symbol with the UUID \"%1\" found in the project's library."))
             .arg(mSymbVarItem->getSymbolUuid().toStr()));
     }
@@ -93,14 +93,14 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
         Q_ASSERT(libPin); if (!libPin) continue;
         SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin->getUuid());
         if (mPins.contains(libPin->getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__, libPin->getUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
                 .arg(libPin->getUuid().toStr()));
         }
         mPins.insert(libPin->getUuid(), pin);
     }
     if (mPins.count() != mSymbVarItem->getPinUuids().count()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The pin count of the symbol instance \"%1\" does not match with "
             "the pin-signal-map of its component.")).arg(mUuid.toStr()));
     }

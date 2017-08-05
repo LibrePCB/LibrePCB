@@ -182,7 +182,7 @@ class DomElement final
             } catch (const Exception& e) {
                 throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
                     QString(tr("Text \"%1\" in node \"%2\" is invalid: %3"))
-                    .arg(mText, mName, e.getUserMsg()));
+                    .arg(mText, mName, e.getMsg()));
             }
         }
 
@@ -240,7 +240,7 @@ class DomElement final
             } catch (const Exception& e) {
                 throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
                     QString(tr("Invalid attribute %1=\"%2\" in node \"%3\": %4"))
-                    .arg(name, value, mName, e.getUserMsg()));
+                    .arg(name, value, mName, e.getMsg()));
             }
         }
 
@@ -601,7 +601,7 @@ inline QString DomElement::stringToObject(const QString& str, bool throwIfEmpty,
     Q_UNUSED(defaultValue);
     Q_ASSERT(defaultValue == QString()); // defaultValue makes no sense in this method
     if (str.isEmpty() && throwIfEmpty) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("String is empty."));
+        throw RuntimeError(__FILE__, __LINE__, tr("String is empty."));
     }
     return str;
 }
@@ -612,7 +612,7 @@ inline bool DomElement::stringToObject(const QString& str, bool throwIfEmpty, co
     if      (s == "true")   { return true;          }
     else if (s == "false")  { return false;         }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid boolean.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid boolean.")); }
 }
 
 template <>
@@ -622,7 +622,7 @@ inline int DomElement::stringToObject(const QString& str, bool throwIfEmpty, con
     int value = s.toInt(&ok);
     if      (ok)            { return value;         }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid integer.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid integer.")); }
 }
 
 template <>
@@ -632,7 +632,7 @@ inline uint DomElement::stringToObject(const QString& str, bool throwIfEmpty, co
     uint value = s.toUInt(&ok);
     if (ok)                 { return value;         }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid unsigned integer.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid unsigned integer.")); }
 }
 
 template <>
@@ -641,7 +641,7 @@ inline QDateTime DomElement::stringToObject(const QString& str, bool throwIfEmpt
     QDateTime obj = QDateTime::fromString(s, Qt::ISODate).toLocalTime();
     if (obj.isValid())      { return obj;           }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid datetime.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid datetime.")); }
 }
 
 template <>
@@ -650,7 +650,7 @@ inline QColor DomElement::stringToObject(const QString& str, bool throwIfEmpty, 
     QColor obj(s);
     if (obj.isValid())      { return obj;           }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid color.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid color.")); }
 }
 
 template <>
@@ -659,7 +659,7 @@ inline QUrl DomElement::stringToObject(const QString& str, bool throwIfEmpty, co
     QUrl obj(s, QUrl::StrictMode);
     if (obj.isValid())      { return obj;           }
     else if (s.isEmpty())   { return defaultValue;  }
-    else { throw RuntimeError(__FILE__, __LINE__, QString(), tr("Not a valid URL.")); }
+    else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid URL.")); }
 }
 
 // all other types need to have a static method "T deserializeFromString(const QString& str)"

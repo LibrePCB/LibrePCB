@@ -57,12 +57,12 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
 {
     mFootprintPad = mFootprint.getLibFootprint().getPadByUuid(padUuid);
     if (!mFootprintPad) {
-        throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
     }
     mPackagePad = mFootprint.getDeviceInstance().getLibPackage().getPadByUuid(padUuid);
     if (!mPackagePad) {
-        throw RuntimeError(__FILE__, __LINE__, padUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid package pad UUID: \"%1\"")).arg(padUuid.toStr()));
     }
     Uuid cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getSignalOfPad(padUuid);

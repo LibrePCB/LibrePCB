@@ -90,7 +90,7 @@ void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(int index) n
     try {
         mLengthUnitTmp = LengthUnit::fromIndex(index);
     } catch (Exception& e) {
-        QMessageBox::critical(mLengthUnitComboBox.data(), tr("Error"), e.getUserMsg());
+        QMessageBox::critical(mLengthUnitComboBox.data(), tr("Error"), e.getMsg());
     }
 }
 

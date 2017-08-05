@@ -207,7 +207,7 @@ LengthUnit LengthUnit::deserializeFromString(const QString& str) throw (Exceptio
         return LengthUnit(LengthUnit_t::Mils);
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, str,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid length unit: \"%1\"")).arg(str));
     }
 }

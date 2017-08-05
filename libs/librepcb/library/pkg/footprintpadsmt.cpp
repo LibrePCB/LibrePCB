@@ -118,7 +118,7 @@ FootprintPadSmt::BoardSide_t FootprintPadSmt::stringToBoardSide(const QString& s
 {
     if      (side == QLatin1String("top"))      return BoardSide_t::TOP;
     else if (side == QLatin1String("bottom"))   return BoardSide_t::BOTTOM;
-    else throw RuntimeError(__FILE__, __LINE__, side, side);
+    else throw RuntimeError(__FILE__, __LINE__, side);
 }
 
 QString FootprintPadSmt::boardSideToString(BoardSide_t side) noexcept

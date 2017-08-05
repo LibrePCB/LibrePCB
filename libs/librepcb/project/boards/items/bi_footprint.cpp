@@ -77,12 +77,12 @@ void BI_Footprint::init() throw (Exception)
 
         BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad->getUuid());
         if (mPads.contains(libPad->getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The footprint pad UUID \"%1\" is defined multiple times."))
                 .arg(libPad->getUuid().toStr()));
         }
         if (!libDev.getPadSignalMap().contains(libPad->getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__, libPad->getUuid().toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Footprint pad \"%1\" not found in pad-signal-map of device \"%2\"."))
                 .arg(libPad->getUuid().toStr(), libDev.getUuid().toStr()));
         }

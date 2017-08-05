@@ -60,7 +60,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElem
             ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
             if (mPinSignalMap.contains(item->getPinUuid()))
             {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
                     .arg(item->getPinUuid().toStr(), domElement.getDocFilePath().toNative()));
             }

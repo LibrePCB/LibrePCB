@@ -52,7 +52,7 @@ DirectoryLock::~DirectoryLock() noexcept
         try {
             unlock(); // can throw
         } catch (const Exception& e) {
-            qCritical() << "Could not remove lock file:" << e.getUserMsg();
+            qCritical() << "Could not remove lock file:" << e.getMsg();
         }
     }
 }
@@ -76,8 +76,8 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const throw (Exception)
 {
     // check if the directory to lock does exist
     if (!mDirToLock.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),  QString(
-            tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
     }
 
     // when the directory is valid, the lock filepath must be valid too
@@ -93,8 +93,8 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const throw (Exception)
     QStringList lines = content.split("\n", QString::KeepEmptyParts);
     // check count of lines
     if (lines.count() < 6) {
-        throw RuntimeError(__FILE__, __LINE__, content, QString(tr(
-            "The lock file \"%1\" has too few lines.")).arg(mLockFilePath.toNative()));
+        throw RuntimeError(__FILE__, __LINE__, QString(
+            tr("The lock file \"%1\" has too few lines.")).arg(mLockFilePath.toNative()));
     }
     // read lock metadata
     QString lockUser = lines.at(1);
@@ -133,8 +133,8 @@ void DirectoryLock::lock() throw (Exception)
 {
     // check if the directory to lock does exist
     if (!mDirToLock.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),  QString(
-            tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
     }
 
     // when the directory is valid, the lock filepath must be valid too

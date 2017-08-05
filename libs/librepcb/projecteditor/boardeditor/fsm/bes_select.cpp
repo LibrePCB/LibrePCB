@@ -327,7 +327,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 }
                 catch (Exception& e)
                 {
-                    QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                 }
             }
             else if (action == aProperties)
@@ -396,7 +396,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
                 try {
                     mUndoStack.execCmd(mSelectedItemsMoveCommand.take()); // can throw
                 } catch (Exception& e) {
-                    QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                 }
                 mSelectedItemsMoveCommand.reset();
                 mSubState = SubState_Idle;
@@ -450,7 +450,7 @@ bool BES_Select::rotateSelectedItems(const Angle& angle) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -468,7 +468,7 @@ bool BES_Select::flipSelectedItems(Qt::Orientation orientation) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -486,7 +486,7 @@ bool BES_Select::removeSelectedItems() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

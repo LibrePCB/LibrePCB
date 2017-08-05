@@ -174,7 +174,7 @@ bool ProjectEditor::saveProject() noexcept
     }
     catch (Exception& exc)
     {
-        QMessageBox::critical(0, tr("Error while saving the project"), exc.getUserMsg());
+        QMessageBox::critical(0, tr("Error while saving the project"), exc.getMsg());
         return false;
     }
 }

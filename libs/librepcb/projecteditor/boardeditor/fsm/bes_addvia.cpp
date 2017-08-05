@@ -193,7 +193,7 @@ bool BES_AddVia::exit(BEE_Base* event) noexcept
         }
         catch (Exception& e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
         }
     }
@@ -306,7 +306,7 @@ bool BES_AddVia::addVia(Board& board) noexcept
             try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -327,7 +327,7 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -351,7 +351,7 @@ bool BES_AddVia::fixVia(const Point& pos) noexcept
             try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

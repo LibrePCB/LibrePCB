@@ -195,7 +195,7 @@ FootprintPadTht::Shape_t FootprintPadTht::stringToShape(const QString& shape) th
     if      (shape == QLatin1String("round"))   return Shape_t::ROUND;
     else if (shape == QLatin1String("rect"))    return Shape_t::RECT;
     else if (shape == QLatin1String("octagon")) return Shape_t::OCTAGON;
-    else throw RuntimeError(__FILE__, __LINE__, shape, shape);
+    else throw RuntimeError(__FILE__, __LINE__, shape);
 }
 
 QString FootprintPadTht::shapeToString(Shape_t shape) noexcept

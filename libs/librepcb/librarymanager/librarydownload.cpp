@@ -99,7 +99,7 @@ void LibraryDownload::start() noexcept
         try {
             FileUtils::removeDirRecursively(mTempDestDir);
         } catch (const Exception& e) {
-            emit finished(false, e.getUserMsg());
+            emit finished(false, e.getMsg());
             return;
         }
     }
@@ -143,7 +143,7 @@ void LibraryDownload::downloadSucceeded() noexcept
         if (mDestDir.isExistingDir()) FileUtils::move(mDestDir, backupDir); // can throw
     } catch (const Exception& e) {
         try {FileUtils::removeDirRecursively(backupDir);} catch (...) {}
-        emit finished(false, e.getUserMsg());
+        emit finished(false, e.getMsg());
         return;
     }
 
@@ -156,7 +156,7 @@ void LibraryDownload::downloadSucceeded() noexcept
             FileUtils::move(backupDir, mDestDir);
             FileUtils::removeDirRecursively(mTempDestDir);
         } catch (...) {}
-        emit finished(false, e.getUserMsg());
+        emit finished(false, e.getMsg());
         return;
     }
 

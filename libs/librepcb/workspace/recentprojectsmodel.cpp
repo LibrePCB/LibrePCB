@@ -55,7 +55,7 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept :
             mFile.reset(SmartTextFile::create(filepath));
         }
     } catch (Exception& e) {
-        qWarning() << "Could not read recent projects file:" << e.getUserMsg();
+        qWarning() << "Could not read recent projects file:" << e.getMsg();
     }
 }
 
@@ -79,7 +79,7 @@ void RecentProjectsModel::save() noexcept
         mFile->setContent(lines.join('\n').toUtf8());
         mFile->save(true); // can throw
     } catch (Exception& e) {
-        qWarning() << "Could not save recent projects file:" << e.getUserMsg();
+        qWarning() << "Could not save recent projects file:" << e.getMsg();
     }
 }
 

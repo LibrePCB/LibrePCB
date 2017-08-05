@@ -117,7 +117,7 @@ void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept
             }
             emit libraryRemoved(mLib->getFilePath());
         } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(this, tr("Error"), e.getMsg());
         }
     }
 }

@@ -85,7 +85,7 @@ bool CmdCombineAllItemsUnderBoardNetPoint::performExecute() throw (Exception)
 
     // TODO: connect all pads under the cursor to the netpoint
     if (padsUnderCursor.count() + viasUnderCursor.count() > 1) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Sorry, not yet implemented..."));
+        throw RuntimeError(__FILE__, __LINE__, tr("Sorry, not yet implemented..."));
     } else if (padsUnderCursor.count() == 1) {
         BI_FootprintPad* pad = padsUnderCursor.first();
         if (mNetPoint.getFootprintPad() != pad) {
@@ -103,7 +103,7 @@ bool CmdCombineAllItemsUnderBoardNetPoint::performExecute() throw (Exception)
                 }
                 mHasCombinedSomeItems = true;
             } else {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                                    tr("Sorry, not yet implemented..."));
             }
         }
@@ -124,7 +124,7 @@ bool CmdCombineAllItemsUnderBoardNetPoint::performExecute() throw (Exception)
                 }
                 mHasCombinedSomeItems = true;
             } else {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                                    tr("Sorry, not yet implemented..."));
             }
         }

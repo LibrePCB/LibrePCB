@@ -60,7 +60,7 @@ BI_Device::BI_Device(Board& board, const DomElement& domElement) throw (Exceptio
     Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance) {
-        throw RuntimeError(__FILE__, __LINE__, compInstUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Could not find the component instance with UUID \"%1\"!"))
             .arg(compInstUuid.toStr()));
     }
@@ -101,13 +101,14 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
     // get device from library
     mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
     if (!mLibDevice) {
-        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
+        qDebug() << mCompInstance->getUuid();
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No device with the UUID \"%1\" found in the project's library."))
             .arg(deviceUuid.toStr()));
     }
     // check if the device matches with the component
     if (mLibDevice->getComponentUuid() != mCompInstance->getLibComponent().getUuid()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The device \"%1\" does not match with the component"
             "instance \"%2\".")).arg(mLibDevice->getUuid().toStr(),
             mCompInstance->getUuid().toStr()));
@@ -116,14 +117,16 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
     Uuid packageUuid = mLibDevice->getPackageUuid();
     mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
     if (!mLibPackage) {
-        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
+        qDebug() << mCompInstance->getUuid();
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No package with the UUID \"%1\" found in the project's library."))
             .arg(packageUuid.toStr()));
     }
     // get footprint from package
     mLibFootprint = mLibPackage->getFootprintByUuid(footprintUuid);
     if (!mLibFootprint) {
-        throw RuntimeError(__FILE__, __LINE__, mCompInstance->getUuid().toStr(),
+        qDebug() << mCompInstance->getUuid();
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The package \"%1\" does not have a footprint with the UUID \"%2\"."))
             .arg(packageUuid.toStr()).arg(footprintUuid.toStr()));
     }
@@ -134,7 +137,7 @@ void BI_Device::init() throw (Exception)
     // check pad-signal-map
     foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap()) {
         if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid))) {
-            throw RuntimeError(__FILE__, __LINE__, signalUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
                 .arg(signalUuid.toStr(), mLibDevice->getUuid().toStr()));
         }

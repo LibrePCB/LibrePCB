@@ -50,7 +50,7 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
             mDevice.setRotation(mOldRotation);
             mDevice.setIsMirrored(mOldMirrored); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not revert all changes:" << e.getUserMsg();
+            qCritical() << "Could not revert all changes:" << e.getMsg();
         }
     }
 }

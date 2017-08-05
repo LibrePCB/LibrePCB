@@ -47,7 +47,7 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) thr
     Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
     mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__, netSignalUuid.toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
     mPosition.setX(domElement.getAttribute<Length>("x", true));

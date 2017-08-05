@@ -65,7 +65,7 @@ const AttributeUnit* AttributeType::getUnitFromString(const QString& unit) const
             return u;
     }
 
-    throw RuntimeError(__FILE__, __LINE__, QString("%1 / %2").arg(mTypeName, unit),
+    throw RuntimeError(__FILE__, __LINE__,
         QString(tr("Unknown unit of attribute type \"%1\": \"%2\"")).arg(mTypeName, unit));
 }
 
@@ -82,7 +82,7 @@ void AttributeType::throwIfValueInvalid(const QString& value) const throw (Excep
 {
     if (!isValueValid(value))
     {
-        throw RuntimeError(__FILE__, __LINE__, QString("%1 / %2").arg(mTypeName, value),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid %1 value: \"%2\"")).arg(mTypeNameTr, value));
     }
 }
@@ -110,7 +110,8 @@ const AttributeType& AttributeType::fromString(const QString &type) throw (Excep
         if (t->getName() == type)
             return *t;
     }
-    throw RuntimeError(__FILE__, __LINE__, type, QString(tr("Invalid attribute type: \"%1\"")).arg(type));
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("Invalid attribute type: \"%1\"")).arg(type));
 }
 
 /*****************************************************************************************

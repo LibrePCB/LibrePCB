@@ -154,7 +154,7 @@ class Uuid final
         static Uuid deserializeFromString(const QString& str) throw (Exception) {
             Uuid uuid(str);
             if (uuid.isNull() && (!str.isEmpty())) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                                    QString(tr("Invalid UUID: \"%1\"")).arg(str));
             }
             return uuid;

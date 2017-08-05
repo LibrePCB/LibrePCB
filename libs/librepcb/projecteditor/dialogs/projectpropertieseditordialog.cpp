@@ -96,7 +96,7 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
         mUndoStack.execCmd(cmd);
         return true;
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
 }

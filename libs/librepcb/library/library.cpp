@@ -55,7 +55,7 @@ Library::Library(const FilePath& libDir, bool readOnly) throw (Exception) :
 {
     // check directory suffix
     if (libDir.getSuffix() != "lplib") {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The library directory does not have the suffix '.lplib':\n\n%1"))
             .arg(libDir.toNative()));
     }
@@ -138,7 +138,8 @@ void Library::copyTo(const FilePath& destination, bool removeSource) throw (Exce
 {
     // check directory suffix
     if (destination.getSuffix() != "lplib") {
-        throw RuntimeError(__FILE__, __LINE__, destination.toNative(),
+        qDebug() << destination.toStr();
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("A library directory name must have the suffix '.lplib'.")));
     }
 

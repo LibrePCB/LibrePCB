@@ -121,7 +121,7 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept
         QString netsignalStr = mUi->cbxNetSignal->currentText();
         NetSignal* netsignal = mProject.getCircuit().getNetSignalByName(netsignalStr);
         if ((!netsignal) && (!netsignalStr.isEmpty())) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("Invalid net signal."));
+            throw RuntimeError(__FILE__, __LINE__, tr("Invalid net signal."));
         }
         QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
         cmd->setShape(static_cast<BI_Via::Shape>(mUi->cbxShape->currentData().toInt()), false);
@@ -135,7 +135,7 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
 }

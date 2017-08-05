@@ -79,7 +79,7 @@ bool CmdPlaceBoardNetPoint::performExecute() throw (Exception)
     } else if (netpointsUnderCursor.count() == 1) {
         mNetPoint = netpointsUnderCursor.first();
     } else {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Sorry, not yet implemented..."));
+        throw RuntimeError(__FILE__, __LINE__, tr("Sorry, not yet implemented..."));
     }
     Q_ASSERT(mNetPoint);
 
@@ -105,14 +105,14 @@ BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPoint() throw (Exception)
         } else {
             NetSignal* netsignal = via->getNetSignal();
             if (!netsignal) {
-                throw RuntimeError(__FILE__, __LINE__, QString(), tr("The via is not connected to any net."));
+                throw RuntimeError(__FILE__, __LINE__, tr("The via is not connected to any net."));
             }
             CmdBoardNetPointAdd* cmd = new CmdBoardNetPointAdd(mBoard, mLayer, *netsignal, *via);
             execNewChildCmd(cmd); // can throw
             return cmd->getNetPoint();
         }
     } else {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Sorry, not yet implemented..."));
+        throw RuntimeError(__FILE__, __LINE__, tr("Sorry, not yet implemented..."));
     }
 }
 
@@ -122,18 +122,18 @@ BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPointAtPad() throw (Exception)
     QList<BI_FootprintPad*> padsUnderCursor = mBoard.getPadsAtScenePos(mPosition, &mLayer, nullptr);
 
     if (padsUnderCursor.count() == 0) {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("No pads or vias at given position."));
+        throw RuntimeError(__FILE__, __LINE__, tr("No pads or vias at given position."));
     } else if (padsUnderCursor.count() == 1) {
         BI_FootprintPad* pad = padsUnderCursor.first();
         NetSignal* netsignal = pad->getCompSigInstNetSignal();
         if (!netsignal) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("The pin is not connected to any net."));
+            throw RuntimeError(__FILE__, __LINE__, tr("The pin is not connected to any net."));
         }
         CmdBoardNetPointAdd* cmd = new CmdBoardNetPointAdd(mBoard, mLayer, *netsignal, *pad);
         execNewChildCmd(cmd); // can throw
         return cmd->getNetPoint();
     } else {
-        throw RuntimeError(__FILE__, __LINE__, QString(), tr("Sorry, not yet implemented..."));
+        throw RuntimeError(__FILE__, __LINE__, tr("Sorry, not yet implemented..."));
     }
 }
 

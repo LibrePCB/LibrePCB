@@ -426,7 +426,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
     }
     catch (Exception e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState_Idle) {
             abortPositioning(false);
         }
@@ -465,7 +465,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         }
         catch (Exception& e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
         }
 
@@ -486,7 +486,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
         }
         catch (Exception e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             if (mSubState != SubState_Idle) {
                 abortPositioning(false);
             }
@@ -512,7 +512,7 @@ bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept
     }
     catch (Exception& e)
     {
-        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }

@@ -49,9 +49,8 @@ DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath
     int errLine;
     int errColumn;
     if (!doc.setContent(fileContent, &errMsg, &errLine, &errColumn)) {
-        QString line = fileContent.split('\n').at(errLine-1);
-        throw RuntimeError(__FILE__, __LINE__, QString("%1: %2 [%3:%4] LINE:%5")
-            .arg(filepath.toStr(), errMsg).arg(errLine).arg(errColumn).arg(line),
+        qDebug() << "line:" << fileContent.split('\n').at(errLine-1);
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Error while parsing file \"%1\": %2 [%3:%4]"))
             .arg(filepath.toNative(), errMsg).arg(errLine).arg(errColumn));
     }
@@ -59,7 +58,7 @@ DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath
     // check if the root node exists
     QDomElement root = doc.documentElement();
     if (root.isNull()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No root node found in \"%1\"!")).arg(mFilePath.toNative()));
     }
 
@@ -78,7 +77,7 @@ DomElement& DomDocument::getRoot(const QString& expectedName) const throw (Excep
 {
     DomElement& root = getRoot();
     if (root.getName() != expectedName) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Root node name mismatch in file \"%1\": %2 != %3"))
             .arg(mFilePath.toNative(), root.getName(), expectedName));
     }

@@ -71,7 +71,7 @@ CategoryTreeItem::CategoryTreeItem(const WorkspaceLibraryDb& library, const QStr
     }
     catch (Exception& e)
     {
-        mExceptionMessage = e.getUserMsg();
+        mExceptionMessage = e.getMsg();
     }
 }
 

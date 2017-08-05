@@ -209,7 +209,7 @@ class Version final
         static Version deserializeFromString(const QString& str) throw (Exception) {
             Version version(str);
             if ((!version.isValid()) && (!str.isEmpty())) {
-                throw RuntimeError(__FILE__, __LINE__, QString(),
+                throw RuntimeError(__FILE__, __LINE__,
                                    QString(tr("Invalid version number: \"%1\"")).arg(str));
             }
             return version;

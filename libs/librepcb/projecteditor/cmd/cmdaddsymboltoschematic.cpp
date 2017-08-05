@@ -77,7 +77,7 @@ bool CmdAddSymbolToSchematic::performExecute() throw (Exception)
     // get the symbol UUID
     const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);
     if (!item) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component instance \"%1\" has no symbol variant item with "
             "the uuid \"%2\"!")).arg(mComponentInstance.getUuid().toStr(), mSymbolItemUuid.toStr()));
     }
@@ -88,7 +88,7 @@ bool CmdAddSymbolToSchematic::performExecute() throw (Exception)
     if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
         FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);
         if (!symFp.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The symbol with the UUID \"%1\" does not exist in the "
                 "workspace library!")).arg(symbolUuid.toStr()));
         }

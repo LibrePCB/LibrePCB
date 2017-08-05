@@ -108,7 +108,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
             FilePath destination = projectFilePath.getParentDir().getPathTo("LICENSE.txt");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the license file:" << e.getUserMsg();
+            qCritical() << "Could not copy the license file:" << e.getMsg();
         }
     }
 
@@ -125,7 +125,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
         }
         FileUtils::writeFile(destination, content); // can throw
     } catch (Exception& e) {
-        qCritical() << "Could not copy the readme file:" << e.getUserMsg();
+        qCritical() << "Could not copy the readme file:" << e.getMsg();
     }
 
     // initialize git repository
@@ -136,7 +136,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
             FilePath destination = projectFilePath.getParentDir().getPathTo(".gitignore");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitignore file:" << e.getUserMsg();
+            qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
         }
         // copy .gitattributes
         try {
@@ -144,7 +144,7 @@ Project* NewProjectWizard::createProject() const throw (Exception)
             FilePath destination = projectFilePath.getParentDir().getPathTo(".gitattributes");
             FileUtils::copyFile(source, destination); // can throw
         } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitattributes file:" << e.getUserMsg();
+            qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
         }
         // TODO: git init
         // TODO: create initial commit

@@ -53,14 +53,14 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
     Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal", true);
     mComponentSignal = mComponentInstance.getLibComponent().getSignalByUuid(compSignalUuid);
     if(!mComponentSignal) {
-        throw RuntimeError(__FILE__, __LINE__, compSignalUuid.toStr(), QString(
+        throw RuntimeError(__FILE__, __LINE__, QString(
             tr("Invalid component signal UUID: \"%1\"")).arg(compSignalUuid.toStr()));
     }
     Uuid netsignalUuid = domElement.getAttribute<Uuid>("netsignal", false, Uuid());
     if (!netsignalUuid.isNull()) {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
         if(!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__, netsignalUuid.toStr(),
+            throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toStr()));
         }
     }
@@ -160,7 +160,7 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exceptio
         throw LogicError(__FILE__, __LINE__);
     }
     if (arePinsOrPadsUsed()) {
-        throw LogicError(__FILE__, __LINE__, QString(), QString(tr("The net signal of the "
+        throw LogicError(__FILE__, __LINE__, QString(tr("The net signal of the "
             "component signal \"%1:%2\" cannot be changed because it is still in use!"))
             .arg(mComponentInstance.getName(), mComponentSignal->getName()));
     }
@@ -208,7 +208,7 @@ void ComponentSignalInstance::removeFromCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (isUsed()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component \"%1\" cannot be removed because it is still in use!"))
             .arg(mComponentInstance.getName()));
     }

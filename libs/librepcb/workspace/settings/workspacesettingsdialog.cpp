@@ -117,7 +117,7 @@ void WorkspaceSettingsDialog::accept()
         mSettings.applyAll(); // can throw
         QDialog::accept();
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         QDialog::reject();
     }
 }
@@ -141,7 +141,7 @@ void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
             try {
                 mSettings.applyAll(); // can throw
             } catch (const Exception& e) {
-                QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+                QMessageBox::critical(this, tr("Error"), e.getMsg());
             }
             break;
 

@@ -86,7 +86,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("symbol")) {
                 SI_Symbol* symbol = new SI_Symbol(*this, *node);
                 if (getSymbolByUuid(symbol->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, symbol->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a symbol with the UUID \"%1\"!"))
                         .arg(symbol->getUuid().toStr()));
                 }
@@ -97,7 +97,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("netpoint")) {
                 SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netpoint with the UUID \"%1\"!"))
                         .arg(netpoint->getUuid().toStr()));
                 }
@@ -108,7 +108,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("netline")) {
                 SI_NetLine* netline = new SI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netline with the UUID \"%1\"!"))
                         .arg(netline->getUuid().toStr()));
                 }
@@ -119,7 +119,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             foreach (const DomElement* node, root.getChilds("netlabel")) {
                 SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__, netlabel->getUuid().toStr(),
+                    throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netlabel with the UUID \"%1\"!"))
                         .arg(netlabel->getUuid().toStr()));
                 }
@@ -397,7 +397,7 @@ void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
     }
     // check if there is no symbol with the same uuid in the list
     if (getSymbolByUuid(symbol.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, symbol.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a symbol with the UUID \"%1\"!"))
             .arg(symbol.getUuid().toStr()));
     }
@@ -438,7 +438,7 @@ void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
     }
     // check if there is no netpoint with the same uuid in the list
     if (getNetPointByUuid(netpoint.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netpoint.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a netpoint with the UUID \"%1\"!"))
             .arg(netpoint.getUuid().toStr()));
     }
@@ -479,7 +479,7 @@ void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
     }
     // check if there is no netline with the same uuid in the list
     if (getNetLineByUuid(netline.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netline.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a netline with the UUID \"%1\"!"))
             .arg(netline.getUuid().toStr()));
     }
@@ -520,7 +520,7 @@ void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
     }
     // check if there is no netlabel with the same uuid in the list
     if (getNetLabelByUuid(netlabel.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__, netlabel.getUuid().toStr(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a netlabel with the UUID \"%1\"!"))
             .arg(netlabel.getUuid().toStr()));
     }
@@ -596,7 +596,7 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
     catch (Exception& e)
     {
         success = false;
-        errors.append(e.getUserMsg());
+        errors.append(e.getMsg());
     }
 
     return success;

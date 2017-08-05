@@ -101,7 +101,7 @@ ComponentSignal::SignalRole_t ComponentSignal::stringToSignalRole(const QString&
     else if (role == "passive")     return SignalRole_t::PASSIVE;
     else
     {
-        throw RuntimeError(__FILE__, __LINE__, role,
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid signal role: \"%1\"")).arg(role));
     }
 }

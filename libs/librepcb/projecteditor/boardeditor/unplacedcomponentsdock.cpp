@@ -367,7 +367,7 @@ void UnplacedComponentsDock::commitUndoCmdGroup() noexcept
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
     mDisableListUpdate = false;
 }

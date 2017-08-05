@@ -51,7 +51,7 @@ NetClass::NetClass(Circuit& circuit, const QString& name) throw (Exception) :
     mUuid(Uuid::createRandom()), mName(name)
 {
     if (mName.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The new netclass name must not be empty!"));
     }
 
@@ -74,7 +74,7 @@ void NetClass::setName(const QString& name) throw (Exception)
         return;
     }
     if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             tr("The new netclass name must not be empty!"));
     }
     mName = name;
@@ -100,7 +100,7 @@ void NetClass::removeFromCircuit() throw (Exception)
         throw LogicError(__FILE__, __LINE__);
     }
     if (isUsed()) {
-        throw RuntimeError(__FILE__, __LINE__, QString(),
+        throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The net class \"%1\" cannot be removed because it is still in use!"))
             .arg(mName));
     }

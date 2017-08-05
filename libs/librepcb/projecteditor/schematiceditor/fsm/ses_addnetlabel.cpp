@@ -98,7 +98,7 @@ bool SES_AddNetLabel::exit(SEE_Base* event) noexcept
         }
         catch (Exception& e)
         {
-            QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
         }
     }
@@ -186,7 +186,7 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
     try
     {
         if (mCircuit.getNetSignals().isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, QString(), tr("No net signal found."));
+            throw RuntimeError(__FILE__, __LINE__, tr("No net signal found."));
         }
         NetSignal* signal = mCircuit.getNetSignals().values().first();
         mUndoStack.beginCmdGroup(tr("Add net label to schematic"));
@@ -204,7 +204,7 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic) noexcept
             try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -223,7 +223,7 @@ bool SES_AddNetLabel::updateLabel(Schematic& schematic, const Point& pos) noexce
     }
     catch (Exception& e)
     {
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
@@ -247,7 +247,7 @@ bool SES_AddNetLabel::fixLabel(const Point& pos) noexcept
             try {mUndoStack.abortCmdGroup();} catch (...) {}
             mUndoCmdActive = false;
         }
-        QMessageBox::critical(&mEditor, tr("Error"), e.getUserMsg());
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
 }
