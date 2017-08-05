@@ -85,7 +85,7 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
     emit ercMsgChanged(ercMsg);
 }
 
-void ErcMsgList::restoreIgnoreState() noexcept
+void ErcMsgList::restoreIgnoreState() throw (Exception)
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 

@@ -226,7 +226,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
         // at this point, the whole circuit with all schematics and boards is successfully
         // loaded, so the ERC list now contains all the correct ERC messages.
         // So we can now restore the ignore state of each ERC message from the XML file.
-        mErcMsgList->restoreIgnoreState();
+        mErcMsgList->restoreIgnoreState(); // can throw
 
         if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

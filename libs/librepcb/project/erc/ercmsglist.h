@@ -66,7 +66,7 @@ class ErcMsgList final : public QObject, public SerializableObject
         void add(ErcMsg* ercMsg) noexcept;
         void remove(ErcMsg* ercMsg) noexcept;
         void update(ErcMsg* ercMsg) noexcept;
-        void restoreIgnoreState() noexcept;
+        void restoreIgnoreState() throw (Exception);
         bool save(bool toOriginal, QStringList& errors) noexcept;
         
         // Operator Overloadings
