@@ -107,6 +107,17 @@ bool DomElement::hasAttribute(const QString& name) const noexcept
  *  Child Handling Methods
  ****************************************************************************************/
 
+QList<DomElement*> DomElement::getChilds(const QString& name) const noexcept
+{
+    QList<DomElement*> childs;
+    foreach (DomElement* child, mChilds) {
+        if (child->getName() == name) {
+            childs.append(child);
+        }
+    }
+    return childs;
+}
+
 void DomElement::removeChild(DomElement* child, bool deleteChild) noexcept
 {
     Q_ASSERT(child);
