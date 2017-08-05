@@ -116,11 +116,7 @@ static void setApplicationMetadata() noexcept
 {
     Application::setOrganizationName("LibrePCB");
     Application::setOrganizationDomain("librepcb.org");
-#ifdef GIT_BRANCH
-    Application::setApplicationName(QString("LibrePCB_git-%1").arg(GIT_BRANCH));
-#else
     Application::setApplicationName("LibrePCB");
-#endif
 }
 
 /*****************************************************************************************

@@ -16,7 +16,7 @@ RUN /opt/LibrePCB/dev/docker/make_librepcb.sh
 
 # copy default config file
 RUN mkdir -p /root/.config/LibrePCB/ \
-  && cp /opt/LibrePCB/dev/docker/LibrePCB_git-master.conf /root/.config/LibrePCB/LibrePCB_git-master.conf
+  && cp /opt/LibrePCB/dev/docker/LibrePCB.conf /root/.config/LibrePCB/LibrePCB.conf
 
 # set working directory and default command to execute
 WORKDIR /opt/LibrePCB
