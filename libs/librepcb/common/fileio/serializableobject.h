@@ -102,24 +102,6 @@ class SerializableObject
                 root.appendChild(pointer->serializeToDomElement(itemName)); // can throw
             }
         }
-
-        template <typename T>
-        static DomElement* serializeObjectContainer(const T& container,
-            const QString& rootName, const QString& itemName) throw (Exception)
-        {
-            QScopedPointer<DomElement> root(new DomElement(rootName));
-            serializeObjectContainer(*root, container, itemName); // can throw
-            return root.take();
-        }
-
-        template <typename T>
-        static DomElement* serializePointerContainer(const T& container,
-            const QString& rootName, const QString& itemName) throw (Exception)
-        {
-            QScopedPointer<DomElement> root(new DomElement(rootName));
-            serializePointerContainer(*root, container, itemName); // can throw
-            return root.take();
-        }
 };
 
 // Make sure that the SerializableObject class does not contain any data (except the vptr).
