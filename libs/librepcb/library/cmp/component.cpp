@@ -39,47 +39,26 @@ Component::Component(const Uuid& uuid, const Version& version, const QString& au
                      const QString& keywords_en_US) throw (Exception) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mSchematicOnly(false), mAttributes(new AttributeList()), mDefaultSymbolVariantUuid()
+    mSchematicOnly(false), mDefaultValue(), mAttributes(new AttributeList())
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mSchematicOnly(false), mAttributes(), mDefaultSymbolVariantUuid()
+    mSchematicOnly(false), mDefaultValue(), mAttributes()
 {
     try
     {
         DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all properties
-        mSchematicOnly = root.getFirstChild("properties/schematic_only", true, true)->getText<bool>(true);
-
-        // Load all attributes
-        mAttributes.reset(new AttributeList(*root.getFirstChild("attributes", true))); // can throw
-
-        // Load default values in all available languages
-        readLocaleDomNodes(*root.getFirstChild("properties", true, true),
-                           "default_value", mDefaultValues, false);
-
-        // Load all prefixes
-        for (DomElement* node = root.getFirstChild("properties/prefix", true, false);
-             node; node = node->getNextSibling("prefix"))
-        {
-            if (mPrefixes.contains(node->getAttribute<QString>("norm", false))) {
-                throw RuntimeError(__FILE__, __LINE__, node->getAttribute<QString>("norm", false),
-                    QString(tr("The prefix \"%1\" exists multiple times in \"%2\"."))
-                    .arg(node->getAttribute<QString>("norm", false), root.getDocFilePath().toNative()));
-            }
-            mPrefixes.insert(node->getAttribute<QString>("norm", false), node->getText<QString>(false));
-        }
-        if (!mPrefixes.contains(QString(""))) {
-            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
-                QString(tr("The file \"%1\" has no default prefix defined."))
-                .arg(root.getDocFilePath().toNative()));
-        }
+        mSchematicOnly = root.getFirstChild("schematic_only", true)->getText<bool>(true);
+        mAttributes.reset(new AttributeList(root)); // can throw
+        mDefaultValue = root.getFirstChild("default_value", true)->getText<QString>(false);
+        mPrefixes.loadFromDomElement(root);
 
         // Load all signals
-        foreach (const DomElement* node, root.getFirstChild("signals", true)->getChilds()) {
+        foreach (const DomElement* node, root.getChilds("signal")) {
             ComponentSignal* signal = new ComponentSignal(*node);
             if (getSignalByUuid(signal->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, signal->getUuid().toStr(),
@@ -90,8 +69,7 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         }
 
         // Load all symbol variants
-        DomElement* symbolVariantsNode = root.getFirstChild("symbol_variants", true);
-        foreach (const DomElement* node, symbolVariantsNode->getChilds()) {
+        foreach (const DomElement* node, root.getChilds("symbol_variant")) {
             ComponentSymbolVariant* variant = new ComponentSymbolVariant(*node);
             if (getSymbolVariantByUuid(variant->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, variant->getUuid().toStr(),
@@ -103,12 +81,6 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) throw (Exc
         if (mSymbolVariants.isEmpty()) {
             throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
                 QString(tr("The file \"%1\" has no symbol variants defined."))
-                .arg(root.getDocFilePath().toNative()));
-        }
-        mDefaultSymbolVariantUuid = symbolVariantsNode->getAttribute<Uuid>("default", true);
-        if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid)) {
-            throw RuntimeError(__FILE__, __LINE__, root.getDocFilePath().toStr(),
-                QString(tr("The file \"%1\" has no valid default symbol variant defined."))
                 .arg(root.getDocFilePath().toNative()));
         }
 
@@ -129,44 +101,8 @@ Component::~Component() noexcept
 }
 
 /*****************************************************************************************
- *  Default Value Methods
- ****************************************************************************************/
-
-QString Component::getDefaultValue(const QStringList& localeOrder) const throw (Exception)
-{
-    return LibraryBaseElement::localeStringFromList(mDefaultValues, localeOrder);
-}
-
-void Component::addDefaultValue(const QString& locale, const QString& value) noexcept
-{
-    mDefaultValues.insert(locale, value);
-}
-
-void Component::removeDefaultValue(const QString& locale) noexcept
-{
-    mDefaultValues.remove(locale);
-}
-
-/*****************************************************************************************
  *  Prefix Methods
  ****************************************************************************************/
-
-QString Component::getPrefix(const QStringList& normOrder) const noexcept
-{
-    // search in the specified norm order
-    foreach (const QString& norm, normOrder) {
-        if (mPrefixes.contains(norm))
-            return mPrefixes.value(norm);
-    }
-
-    // return the prefix of the default norm
-    return getDefaultPrefix();
-}
-
-QString Component::getDefaultPrefix() const noexcept
-{
-    return mPrefixes.value(QString(""));
-}
 
 void Component::addPrefix(const QString& norm, const QString& prefix) noexcept
 {
@@ -248,17 +184,6 @@ const ComponentSymbolVariant* Component::getSymbolVariantByUuid(const Uuid& uuid
     return nullptr;
 }
 
-ComponentSymbolVariant* Component::getDefaultSymbolVariant() noexcept
-{
-    const Component* const_this = this;
-    return const_cast<ComponentSymbolVariant*>(const_this->getDefaultSymbolVariant());
-}
-
-const ComponentSymbolVariant* Component::getDefaultSymbolVariant() const noexcept
-{
-    return getSymbolVariantByUuid(mDefaultSymbolVariantUuid);
-}
-
 void Component::addSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept
 {
     Q_ASSERT(!mSymbolVariants.contains(&symbolVariant));
@@ -296,31 +221,19 @@ const ComponentSymbolVariantItem* Component::getSymbVarItem(const Uuid& symbVar,
 void Component::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
-    root.appendChild(mAttributes->serializeToDomElement("attributes"));
-    DomElement* properties = root.appendChild("properties");
-    properties->appendTextChild("schematic_only", mSchematicOnly);
-    foreach (const QString& locale, mDefaultValues.keys()) {
-        DomElement* child = properties->appendTextChild("default_value", mDefaultValues.value(locale));
-        child->setAttribute("locale", locale);
-    }
-    foreach (const QString& norm, mPrefixes.keys()) {
-        DomElement* child = properties->appendTextChild("prefix", mPrefixes.value(norm));
-        child->setAttribute("norm", norm);
-    }
-    root.appendChild(serializePointerContainer(mSignals, "signals", "signal"));
-    DomElement* symbVars = serializePointerContainer(mSymbolVariants, "symbol_variants", "variant");
-    symbVars->setAttribute("default", mDefaultSymbolVariantUuid);
-    root.appendChild(symbVars);
+    root.appendTextChild("schematic_only", mSchematicOnly);
+    root.appendTextChild("default_value", mDefaultValue);
+    mPrefixes.serialize(root);
+    mAttributes->serialize(root);
+    serializePointerContainer(root, mSignals, "signal");
+    serializePointerContainer(root, mSymbolVariants, "symbol_variant");
 }
 
 bool Component::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())             return false;
-    if (!mDefaultValues.contains("en_US"))                      return false;
     if (!mPrefixes.contains(QString("")))                       return false;
     if (mSymbolVariants.isEmpty())                              return false;
-    if (mDefaultSymbolVariantUuid.isNull())                     return false;
-    if (!getSymbolVariantByUuid(mDefaultSymbolVariantUuid))     return false;
     foreach (ComponentSymbolVariant* var, mSymbolVariants) {
         foreach (ComponentSymbolVariantItem* item, var->getItems()) {
             foreach (ComponentPinSignalMapItem* map, item->getPinSignalMappings()) {

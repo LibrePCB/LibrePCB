@@ -189,11 +189,11 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             mCreated = QDateTime::currentDateTime();
             mAttributes.reset(new AttributeList());
         } else {
-            mName = root->getFirstChild("meta/name", true, true)->getText<QString>(false);
-            mAuthor = root->getFirstChild("meta/author", true, true)->getText<QString>(false);
-            mVersion = root->getFirstChild("meta/version", true, true)->getText<QString>(false);
-            mCreated = root->getFirstChild("meta/created", true, true)->getText<QDateTime>(true);
-            mAttributes.reset(new AttributeList(*root->getFirstChild("attributes", true))); // can throw
+            mName = root->getFirstChild("name", true)->getText<QString>(false);
+            mAuthor = root->getFirstChild("author", true)->getText<QString>(false);
+            mVersion = root->getFirstChild("version", true)->getText<QString>(false);
+            mCreated = root->getFirstChild("created", true)->getText<QDateTime>(true);
+            mAttributes.reset(new AttributeList(*root)); // can throw
         }
 
         // Create all needed objects
@@ -207,7 +207,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
 
         if (!create) {
             // Load all schematics
-            foreach (const DomElement* node, root->getFirstChild("schematics", true)->getChilds()) {
+            foreach (const DomElement* node, root->getChilds("schematic")) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
@@ -215,7 +215,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Ex
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
 
             // Load all boards
-            foreach (const DomElement* node, root->getFirstChild("boards", true)->getChilds()) {
+            foreach (const DomElement* node, root->getChilds("board")) {
                 FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
@@ -606,27 +606,24 @@ void Project::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    // meta
-    DomElement* meta = root.appendChild("meta");
-    meta->appendTextChild("name", mName);
-    meta->appendTextChild("author", mAuthor);
-    meta->appendTextChild("version", mVersion);
-    meta->appendTextChild("created", mCreated);
+    // metadata
+    root.appendTextChild("name", mName);
+    root.appendTextChild("author", mAuthor);
+    root.appendTextChild("version", mVersion);
+    root.appendTextChild("created", mCreated);
 
     // attributes
-    root.appendChild(mAttributes->serializeToDomElement("attributes"));
+    mAttributes->serialize(root);
 
     // schematics
     FilePath schematicsPath(mPath.getPathTo("schematics"));
-    DomElement* schematics = root.appendChild("schematics");
     foreach (Schematic* schematic, mSchematics)
-        schematics->appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
+        root.appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
 
     // boards
     FilePath boardsPath(mPath.getPathTo("boards"));
-    DomElement* boards = root.appendChild("boards");
     foreach (Board* board, mBoards)
-        boards->appendTextChild("board", board->getFilePath().toRelative(boardsPath));
+        root.appendTextChild("board", board->getFilePath().toRelative(boardsPath));
 }
 
 bool Project::save(bool toOriginal, QStringList& errors) noexcept

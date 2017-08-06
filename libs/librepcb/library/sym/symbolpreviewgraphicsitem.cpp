@@ -330,13 +330,13 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
     if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
     {
         if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem))
-            return value = mComponent->getPrefix(mLocaleOrder) % "?" % mSymbVarItem->getSuffix(), true;
+            return value = mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix(), true;
     }
 
     if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
     {
         if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefix(mLocaleOrder) % "?", true;
+            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
         if (attrKey == QLatin1String("VALUE"))
             return value = "VALUE", true;
         if (mComponent->getAttributes().contains(attrKey)) {

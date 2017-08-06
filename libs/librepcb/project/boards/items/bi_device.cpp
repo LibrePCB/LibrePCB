@@ -76,7 +76,8 @@ BI_Device::BI_Device(Board& board, const DomElement& domElement) throw (Exceptio
     mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror", true);
 
     // load footprint
-    mFootprint.reset(new BI_Footprint(*this, *domElement.getFirstChild("footprint", true)));
+    mFootprint.reset(new BI_Footprint(*this));
+    //mFootprint.reset(new BI_Footprint(*this, *domElement.getFirstChild("footprint", true)));
 
     init();
 }
@@ -228,7 +229,7 @@ void BI_Device::serialize(DomElement& root) const throw (Exception)
     root.setAttribute("component", mCompInstance->getUuid());
     root.setAttribute("device", mLibDevice->getUuid());
     root.setAttribute("footprint", mLibFootprint->getUuid());
-    root.appendChild(mFootprint->serializeToDomElement("footprint"));
+    //root.appendChild(mFootprint->serializeToDomElement("footprint"));
     DomElement* position = root.appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());

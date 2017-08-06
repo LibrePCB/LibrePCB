@@ -194,20 +194,20 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // the board seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("meta/uuid", true, true)->getText<Uuid>(true);
-            mName = root.getFirstChild("meta/name", true, true)->getText<QString>(true);
-
-            // Load layer stack
-            mLayerStack.reset(new BoardLayerStack(*this, *root.getFirstChild("layer_stack", true)));
+            mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
+            mName = root.getFirstChild("name", true)->getText<QString>(true);
 
             // Load grid properties
-            mGridProperties.reset(new GridProperties(*root.getFirstChild("properties/grid_properties", true, true)));
+            mGridProperties.reset(new GridProperties(*root.getFirstChild("grid", true)));
+
+            // Load layer stack
+            mLayerStack.reset(new BoardLayerStack(*this, *root.getFirstChild("layers", true)));
 
             // load design rules
-            mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("board_design_rules", true)));
+            mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("design_rules", true)));
 
             // Load all device instances
-            foreach (const DomElement* node, root.getFirstChild("devices", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("device")) {
                 BI_Device* device = new BI_Device(*this, *node);
                 if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, QString(),
@@ -218,7 +218,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all vias
-            foreach (const DomElement* node, root.getFirstChild("vias", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("via")) {
                 BI_Via* via = new BI_Via(*this, *node);
                 if (getViaByUuid(via->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, via->getUuid().toStr(),
@@ -229,7 +229,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            foreach (const DomElement* node, root.getFirstChild("netpoints", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netpoint")) {
                 BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netpoint->getUuid().toStr(),
@@ -240,7 +240,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            foreach (const DomElement* node, root.getFirstChild("netlines", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("netline")) {
                 BI_NetLine* netline = new BI_NetLine(*this, *node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__, netline->getUuid().toStr(),
@@ -251,7 +251,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all polygons
-            foreach (const DomElement* node, root.getFirstChild("polygons", true)->getChilds()) {
+            foreach (const DomElement* node, root.getChilds("polygon")) {
                 BI_Polygon* polygon = new BI_Polygon(*this, *node);
                 mPolygons.append(polygon);
             }
@@ -895,27 +895,25 @@ void Board::serialize(DomElement& root) const throw (Exception)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    // meta data
-    DomElement* meta = root.appendChild("meta");
-    meta->appendTextChild("uuid", mUuid);
-    meta->appendTextChild("name", mName);
-    // properties: grid
-    DomElement* properties = root.appendChild("properties");
-    properties->appendChild(mGridProperties->serializeToDomElement("grid_properties"));
+    // metadata
+    root.appendTextChild("uuid", mUuid);
+    root.appendTextChild("name", mName);
+    // grid properties
+    root.appendChild(mGridProperties->serializeToDomElement("grid"));
     // layer stack
-    root.appendChild(mLayerStack->serializeToDomElement("layer_stack"));
+    root.appendChild(mLayerStack->serializeToDomElement("layers"));
     // design rules
-    root.appendChild(mDesignRules->serializeToDomElement("board_design_rules"));
+    root.appendChild(mDesignRules->serializeToDomElement("design_rules"));
     // devices
-    root.appendChild(serializePointerContainer(mDeviceInstances, "devices", "device"));
+    serializePointerContainer(root, mDeviceInstances, "device");
     // vias
-    root.appendChild(serializePointerContainer(mVias, "vias", "via"));
+    serializePointerContainer(root, mVias, "via");
     // netpoints
-    root.appendChild(serializePointerContainer(mNetPoints, "netpoints", "netpoint"));
+    serializePointerContainer(root, mNetPoints, "netpoint");
     // netlines
-    root.appendChild(serializePointerContainer(mNetLines, "netlines", "netline"));
+    serializePointerContainer(root, mNetLines, "netline");
     // polygons
-    root.appendChild(serializePointerContainer(mPolygons, "polygons", "polygon"));
+    serializePointerContainer(root, mPolygons, "polygon");
 }
 
 void Board::updateErcMessages() noexcept

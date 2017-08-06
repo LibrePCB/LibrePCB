@@ -50,7 +50,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
         const DomElement& root = mLoadingXmlFileDocument->getRoot();
 
         // Load all pins
-        foreach (const DomElement* node, root.getFirstChild("pins", true)->getChilds()) {
+        foreach (const DomElement* node, root.getChilds("pin")) {
             SymbolPin* pin = new SymbolPin(*node);
             if (mPins.contains(pin->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__, pin->getUuid().toStr(),
@@ -60,19 +60,19 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
             mPins.insert(pin->getUuid(), pin);
         }
 
-        // Load all geometry elements
-        foreach (const DomElement* node, root.getFirstChild("geometry", true)->getChilds()) {
-            if (node->getName() == "polygon") {
-                mPolygons.append(new Polygon(*node));
-            } else if (node->getName() == "text") {
-                mTexts.append(new Text(*node));
-            } else if (node->getName() == "ellipse") {
-                mEllipses.append(new Ellipse(*node));
-            } else {
-                throw RuntimeError(__FILE__, __LINE__, node->getName(),
-                    QString(tr("Unknown geometry element \"%1\" in \"%2\"."))
-                    .arg(node->getName(), root.getDocFilePath().toNative()));
-            }
+        // Load all polygons
+        foreach (const DomElement* node, root.getChilds("polygon")) {
+            mPolygons.append(new Polygon(*node));
+        }
+
+        // Load all ellipses
+        foreach (const DomElement* node, root.getChilds("ellipse")) {
+            mEllipses.append(new Ellipse(*node));
+        }
+
+        // Load all texts
+        foreach (const DomElement* node, root.getChilds("text")) {
+            mTexts.append(new Text(*node));
         }
 
         cleanupAfterLoadingElementFromFile();
@@ -167,11 +167,10 @@ void Symbol::removeText(Text& text) noexcept
 void Symbol::serialize(DomElement& root) const throw (Exception)
 {
     LibraryElement::serialize(root);
-    root.appendChild(serializePointerContainer(mPins, "pins", "pin"));
-    DomElement* geometry = root.appendChild("geometry");
-    serializePointerContainer(*geometry, mPolygons, "polygon");
-    serializePointerContainer(*geometry, mTexts, "text");
-    serializePointerContainer(*geometry, mEllipses, "ellipse");
+    serializePointerContainer(root, mPins,     "pin");
+    serializePointerContainer(root, mPolygons, "polygon");
+    serializePointerContainer(root, mEllipses, "ellipse");
+    serializePointerContainer(root, mTexts,    "text");
 }
 
 /*****************************************************************************************

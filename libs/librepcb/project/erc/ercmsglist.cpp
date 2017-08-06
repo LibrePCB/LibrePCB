@@ -97,9 +97,8 @@ void ErcMsgList::restoreIgnoreState() throw (Exception)
         ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
-    foreach (const DomElement* node, root.getFirstChild("ignore", true)->getChilds()) {
-        foreach (ErcMsg* ercMsg, mItems)
-        {
+    foreach (const DomElement* node, root.getChilds("ignore")) {
+        foreach (ErcMsg* ercMsg, mItems) {
             if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute<QString>("owner_class", false))
              && (ercMsg->getOwnerKey() == node->getAttribute<QString>("owner_key", false))
              && (ercMsg->getMsgKey() == node->getAttribute<QString>("msg_key", false)))
@@ -135,12 +134,9 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
 
 void ErcMsgList::serialize(DomElement& root) const throw (Exception)
 {
-    DomElement* ignoreNode = root.appendChild("ignore");
-    foreach (ErcMsg* ercMsg, mItems)
-    {
-        if (ercMsg->isIgnored())
-        {
-            DomElement* itemNode = ignoreNode->appendChild("item");
+    foreach (ErcMsg* ercMsg, mItems) {
+        if (ercMsg->isIgnored()) {
+            DomElement* itemNode = root.appendChild("ignore");
             itemNode->setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
             itemNode->setAttribute("owner_key", ercMsg->getOwnerKey());
             itemNode->setAttribute("msg_key", ercMsg->getMsgKey());

@@ -174,7 +174,7 @@ void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
         if (!cmpFp.isValid()) continue;
         library::Component component(cmpFp, true); // TODO: use library metadata instead of loading the whole component
 
-        QListWidgetItem* item = new QListWidgetItem(component.getName(localeOrder));
+        QListWidgetItem* item = new QListWidgetItem(component.getNames().value(localeOrder));
         item->setData(Qt::UserRole, cmpFp.toStr());
         mUi->listComponents->addItem(item);
     }
@@ -198,8 +198,8 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
         mUi->lblCompUuid->setText(cmp->getUuid().toStr());
-        mUi->lblCompName->setText(cmp->getName(localeOrder));
-        mUi->lblCompDescription->setText(cmp->getDescription(localeOrder));
+        mUi->lblCompName->setText(cmp->getNames().value(localeOrder));
+        mUi->lblCompDescription->setText(cmp->getDescriptions().value(localeOrder));
 
         mUi->gbxComponent->setEnabled(true);
         mUi->gbxSymbVar->setEnabled(true);
@@ -210,11 +210,10 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
             const library::ComponentSymbolVariant* symbVar = cmp->getSymbolVariant(i);
             Q_ASSERT(symbVar); if (!symbVar) continue;
 
-            QString text = symbVar->getName(localeOrder);
-            if (symbVar == cmp->getDefaultSymbolVariant()) text.append(tr(" [default]"));
-            mUi->cbxSymbVar->addItem(text, symbVar->getUuid().toStr());
+            mUi->cbxSymbVar->addItem(symbVar->getNames().value(localeOrder),
+                                     symbVar->getUuid().toStr());
         }
-        mUi->cbxSymbVar->setCurrentIndex(mUi->cbxSymbVar->findData(cmp->getDefaultSymbolVariantUuid().toStr()));
+        mUi->cbxSymbVar->setCurrentIndex(0);
     }
 }
 
@@ -234,7 +233,7 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
 
         mUi->lblSymbVarUuid->setText(symbVar->getUuid().toStr());
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
-        mUi->lblSymbVarDescription->setText(symbVar->getDescription(localeOrder));
+        mUi->lblSymbVarDescription->setText(symbVar->getDescriptions().value(localeOrder));
 
         for (int i = 0; i < symbVar->getItemCount(); i++) {
             const library::ComponentSymbolVariantItem* item = symbVar->getItem(i);

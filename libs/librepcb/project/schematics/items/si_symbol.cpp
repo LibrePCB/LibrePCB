@@ -47,7 +47,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    Uuid gcUuid = domElement.getAttribute<Uuid>("component_instance", true);
+    Uuid gcUuid = domElement.getAttribute<Uuid>("component", true);
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
         throw RuntimeError(__FILE__, __LINE__, gcUuid.toStr(),
@@ -57,7 +57,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (
     mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
     mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
     mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
-    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol_item", true);
+    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol", true);
     init(symbVarItemUuid);
 }
 
@@ -196,8 +196,8 @@ void SI_Symbol::serialize(DomElement& root) const throw (Exception)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.setAttribute("uuid", mUuid);
-    root.setAttribute("component_instance", mComponentInstance->getUuid());
-    root.setAttribute("symbol_item", mSymbVarItem->getUuid());
+    root.setAttribute("component", mComponentInstance->getUuid());
+    root.setAttribute("symbol", mSymbVarItem->getUuid());
     DomElement* position = root.appendChild("position");
     position->setAttribute("x", mPosition.getX());
     position->setAttribute("y", mPosition.getY());

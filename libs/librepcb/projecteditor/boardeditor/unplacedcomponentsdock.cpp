@@ -235,7 +235,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             int deviceCount = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
             QString name = component->getName();
             QString value = component->getValue(true).replace("\n", "|");
-            QString compName = component->getLibComponent().getName(mProject.getSettings().getLocaleOrder());
+            QString compName = component->getLibComponent().getNames().value(mProject.getSettings().getLocaleOrder());
             QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(name, value, compName);
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, component->getUuid().toStr());
@@ -272,8 +272,8 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
             FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(pkgUuid);
             const library::Package package(pkgFp, true);
 
-            QString devName = device.getName(localeOrder);
-            QString pkgName = package.getName(localeOrder);
+            QString devName = device.getNames().value(localeOrder);
+            QString pkgName = package.getNames().value(localeOrder);
             QString text = QString("%1 [%2]").arg(devName, pkgName);
             mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
         }
@@ -298,20 +298,14 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(const library::Device* 
             mSelectedDevice = device;
             mSelectedPackage = package;
             QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-            int defaultFootprintIndex = 0;
             foreach (const Uuid& uuid, mSelectedPackage->getFootprintUuids()) {
                 const library::Footprint* fpt = mSelectedPackage->getFootprintByUuid(uuid);
                 Q_ASSERT(fpt); if (!fpt) continue;
-                QString name = fpt->getName(localeOrder);
-                if (uuid == mSelectedPackage->getDefaultFootprintUuid()) {
-                    name.append(tr(" [default]"));
-                    defaultFootprintIndex = mUi->cbxSelectedFootprint->count();
-                }
-                mUi->cbxSelectedFootprint->addItem(name, uuid.toStr());
+                mUi->cbxSelectedFootprint->addItem(fpt->getNames().value(localeOrder), uuid.toStr());
             }
             if (mUi->cbxSelectedFootprint->count() > 0) {
                 Uuid footprintUuid = mLastFootprintOfDevice.value(mSelectedDevice->getUuid());
-                int index = footprintUuid.isNull() ? defaultFootprintIndex : mUi->cbxSelectedFootprint->findData(footprintUuid.toStr());
+                int index = footprintUuid.isNull() ? 0 : mUi->cbxSelectedFootprint->findData(footprintUuid.toStr());
                 mUi->cbxSelectedFootprint->setCurrentIndex(index);
             }
         }

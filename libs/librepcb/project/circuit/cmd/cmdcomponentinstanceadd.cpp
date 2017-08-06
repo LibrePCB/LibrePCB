@@ -63,7 +63,7 @@ bool CmdComponentInstanceAdd::performExecute() throw (Exception)
             "project's library!")).arg(mComponentUuid.toStr()));
     }
     const QStringList& normOrder = mCircuit.getProject().getSettings().getNormOrder();
-    QString name = mCircuit.generateAutoComponentInstanceName(cmp->getPrefix(normOrder));
+    QString name = mCircuit.generateAutoComponentInstanceName(cmp->getPrefixes().value(normOrder));
     mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid, name); // can throw
 
     performRedo(); // can throw

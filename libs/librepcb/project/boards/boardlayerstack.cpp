@@ -51,7 +51,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) thr
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // load all layers
-    foreach (const DomElement* node, domElement.getFirstChild("layers", true)->getChilds()) {
+    foreach (const DomElement* node, domElement.getChilds()) {
         QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
         if (!mLayers.contains(layer->getId())) {
             addLayer(*layer.take());
@@ -91,7 +91,7 @@ BoardLayerStack::~BoardLayerStack() noexcept
 
 void BoardLayerStack::serialize(DomElement& root) const throw (Exception)
 {
-    root.appendChild(serializePointerContainer(mLayers, "layers", "layer"));
+    serializePointerContainer(root, mLayers, "layer");
 }
 
 /*****************************************************************************************

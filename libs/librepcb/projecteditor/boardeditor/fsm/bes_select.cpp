@@ -278,7 +278,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             aChangeFootprintMenu->setEnabled(footprintsList.count() > 0);
             foreach (const Uuid& footprintUuid, footprintsList) {
                 const library::Footprint* footprint = devInst.getLibPackage().getFootprintByUuid(footprintUuid); Q_ASSERT(footprint);
-                QAction* a = aChangeFootprintMenu->addAction(footprint->getName(localeOrder));
+                QAction* a = aChangeFootprintMenu->addAction(footprint->getNames().value(localeOrder));
                 a->setData(footprintUuid.toStr());
                 if (footprintUuid == devInst.getFootprint().getLibFootprint().getUuid()) {
                     a->setCheckable(true);

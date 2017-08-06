@@ -249,6 +249,15 @@ class DomElement final
         const QList<DomElement*>& getChilds() const noexcept {return mChilds;}
 
         /**
+         * @brief Get all childs with a specific tag name
+         *
+         * @param name      Element tag name of the childs to be returned
+         *
+         * @return A list of childs
+         */
+        QList<DomElement*> getChilds(const QString& name) const noexcept;
+
+        /**
          * @brief Check whether this element has childs or not
          *
          * @retval true     If this element has child elements

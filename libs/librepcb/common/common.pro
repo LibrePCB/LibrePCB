@@ -117,6 +117,7 @@ HEADERS += \
     fileio/domelement.h \
     fileio/filepath.h \
     fileio/fileutils.h \
+    fileio/serializablekeyvaluemap.h \
     fileio/serializableobject.h \
     fileio/serializableobjectlist.h \
     fileio/smartfile.h \

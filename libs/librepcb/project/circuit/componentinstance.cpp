@@ -30,7 +30,6 @@
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
-#include "../settings/projectsettings.h"
 #include "../schematics/items/si_symbol.h"
 #include "../boards/items/bi_device.h"
 
@@ -68,10 +67,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
     }
 
     // load all component attributes
-    mAttributes.reset(new AttributeList(*domElement.getFirstChild("attributes", true))); // can throw
+    mAttributes.reset(new AttributeList(domElement)); // can throw
 
     // load all signal instances
-    foreach (const DomElement* node, domElement.getFirstChild("signal_mapping", true)->getChilds()) {
+    foreach (const DomElement* node, domElement.getChilds("signal_map")) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__, signal->getCompSignal().getUuid().toStr(),
@@ -97,13 +96,11 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr),
     mAttributes()
 {
-    const QStringList& localeOrder = mCircuit.getProject().getSettings().getLocaleOrder();
-
     if (mName.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__, QString(),
             tr("The name of the component must not be empty."));
     }
-    mValue = cmp.getDefaultValue(localeOrder);
+    mValue = cmp.getDefaultValue();
     mCompSymbVar = mLibComponent->getSymbolVariantByUuid(symbVar);
     if (!mCompSymbVar) {
         throw RuntimeError(__FILE__, __LINE__, symbVar.toStr(),
@@ -345,8 +342,8 @@ void ComponentInstance::serialize(DomElement& root) const throw (Exception)
     root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
     root.appendTextChild("name", mName);
     root.appendTextChild("value", mValue);
-    root.appendChild(mAttributes->serializeToDomElement("attributes"));
-    root.appendChild(serializePointerContainer(mSignals, "signal_mapping", "map"));
+    mAttributes->serialize(root);
+    serializePointerContainer(root, mSignals, "signal_map");
 }
 
 /*****************************************************************************************

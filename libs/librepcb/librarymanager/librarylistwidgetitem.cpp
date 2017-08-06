@@ -57,8 +57,8 @@ LibraryListWidgetItem::LibraryListWidgetItem(const workspace::Workspace& ws,
             mUi->lblLibraryType->setText(tr("(local)"));
             mUi->lblLibraryType->setStyleSheet("QLabel { color: blue; }");
         }
-        mUi->lblLibraryName->setText(lib->getName(localeOrder));
-        mUi->lblLibraryDescription->setText(lib->getDescription(localeOrder));
+        mUi->lblLibraryName->setText(lib->getNames().value(localeOrder));
+        mUi->lblLibraryDescription->setText(lib->getDescriptions().value(localeOrder));
         mUi->lblLibraryUrl->setText(lib->getFilePath().toRelative(ws.getLibrariesPath()));
     } else {
         QPixmap image(":/img/actions/add.png");
