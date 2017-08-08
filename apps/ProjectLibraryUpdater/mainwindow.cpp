@@ -94,7 +94,7 @@ void MainWindow::on_pushButton_2_clicked()
             // components & symbols
             SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
             std::unique_ptr<DomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
-            foreach (DomElement* node, circuitDoc->getRoot().getFirstChild("components", true)->getChilds()) {
+            foreach (DomElement* node, circuitDoc->getRoot().getChilds("component")) {
                 Uuid compUuid = node->getAttribute<Uuid>("component", true);
                 FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
                 if (!filepath.isExistingDir()) {
@@ -129,11 +129,11 @@ void MainWindow::on_pushButton_2_clicked()
             }
 
             // devices & packages
-            foreach (DomElement* node, projectDoc->getRoot().getFirstChild("boards", true)->getChilds()) {
+            foreach (DomElement* node, projectDoc->getRoot().getChilds("board")) {
                 FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 std::unique_ptr<DomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
-                foreach (DomElement* node, boardDoc->getRoot().getFirstChild("devices", true)->getChilds()) {
+                foreach (DomElement* node, boardDoc->getRoot().getChilds("device")) {
                     Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
                     FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);
                     if (!filepath.isExistingDir()) {
