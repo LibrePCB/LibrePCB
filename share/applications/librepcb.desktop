@@ -1,7 +1,6 @@
 [Desktop Entry]
-Version=0.1
 Name=LibrePCB
-Comment=Design Schematics and PCB's
+Comment=Design Schematics and PCBs
 Comment[de]=Entwerfen eines Schaltplans oder einer Platine
 GenericName=PCB Designer
 Categories=Development;Engineering;Electronics;
@@ -9,4 +8,4 @@ Type=Application
 Terminal=false
 Icon=librepcb
 Exec=librepcb %U
-MimeType=application/x-librepcb-project
+MimeType=application/x-librepcb-project;
