@@ -24,6 +24,7 @@ SOURCES += \
     boards/board.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
+    boards/boardusersettings.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/cmd/cmdboarddesignrulesmodify.cpp \
     boards/cmd/cmdboardlayerstackedit.cpp \
@@ -108,6 +109,7 @@ HEADERS += \
     boards/board.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
+    boards/boardusersettings.h \
     boards/cmd/cmdboardadd.h \
     boards/cmd/cmdboarddesignrulesmodify.h \
     boards/cmd/cmdboardlayerstackedit.h \

@@ -57,6 +57,7 @@ class BI_NetPoint;
 class BI_NetLine;
 class BI_Polygon;
 class BoardLayerStack;
+class BoardUserSettings;
 
 /*****************************************************************************************
  *  Class Board
@@ -224,6 +225,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         QScopedPointer<BoardLayerStack> mLayerStack;
         QScopedPointer<GridProperties> mGridProperties;
         QScopedPointer<BoardDesignRules> mDesignRules;
+        QScopedPointer<BoardUserSettings> mUserSettings;
         QRectF mViewRect;
 
         // Attributes
