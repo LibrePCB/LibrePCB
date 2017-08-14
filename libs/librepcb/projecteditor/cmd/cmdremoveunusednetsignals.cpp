@@ -50,7 +50,7 @@ CmdRemoveUnusedNetSignals::~CmdRemoveUnusedNetSignals() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveUnusedNetSignals::performExecute() throw (Exception)
+bool CmdRemoveUnusedNetSignals::performExecute()
 {
     foreach (NetSignal* netsignal, mCircuit.getNetSignals()) {
         if (!netsignal->isUsed()) {

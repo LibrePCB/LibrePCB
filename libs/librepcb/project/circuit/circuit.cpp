@@ -42,7 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
+Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(nullptr)
 {
@@ -137,7 +137,7 @@ NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
     return nullptr;
 }
 
-void Circuit::addNetClass(NetClass& netclass) throw (Exception)
+void Circuit::addNetClass(NetClass& netclass)
 {
     if (&netclass.getCircuit() != this) {
         throw LogicError(__FILE__, __LINE__);
@@ -160,7 +160,7 @@ void Circuit::addNetClass(NetClass& netclass) throw (Exception)
     emit netClassAdded(netclass);
 }
 
-void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
+void Circuit::removeNetClass(NetClass& netclass)
 {
     // check if the netclass was added to the circuit
     if (mNetClasses.value(netclass.getUuid()) != &netclass) {
@@ -172,7 +172,7 @@ void Circuit::removeNetClass(NetClass& netclass) throw (Exception)
     emit netClassRemoved(netclass);
 }
 
-void Circuit::setNetClassName(NetClass& netclass, const QString& newName) throw (Exception)
+void Circuit::setNetClassName(NetClass& netclass, const QString& newName)
 {
     // check if the netclass was added to the circuit
     if (mNetClasses.value(netclass.getUuid()) != &netclass) {
@@ -216,7 +216,7 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
     return nullptr;
 }
 
-void Circuit::addNetSignal(NetSignal& netsignal) throw (Exception)
+void Circuit::addNetSignal(NetSignal& netsignal)
 {
     if (&netsignal.getCircuit() != this) {
         throw LogicError(__FILE__, __LINE__);
@@ -239,7 +239,7 @@ void Circuit::addNetSignal(NetSignal& netsignal) throw (Exception)
     emit netSignalAdded(netsignal);
 }
 
-void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
+void Circuit::removeNetSignal(NetSignal& netsignal)
 {
     // check if the netsignal was added to the circuit
     if (mNetSignals.value(netsignal.getUuid()) != &netsignal) {
@@ -252,7 +252,7 @@ void Circuit::removeNetSignal(NetSignal& netsignal) throw (Exception)
 }
 
 void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName,
-                               bool isAutoName) throw (Exception)
+                               bool isAutoName)
 {
     // check if the netsignal was added to the circuit
     if (mNetSignals.value(netsignal.getUuid()) != &netsignal) {
@@ -303,7 +303,7 @@ ComponentInstance* Circuit::getComponentInstanceByName(const QString& name) cons
     return nullptr;
 }
 
-void Circuit::addComponentInstance(ComponentInstance& cmp) throw (Exception)
+void Circuit::addComponentInstance(ComponentInstance& cmp)
 {
     if (&cmp.getCircuit() != this) {
         throw LogicError(__FILE__, __LINE__);
@@ -326,7 +326,7 @@ void Circuit::addComponentInstance(ComponentInstance& cmp) throw (Exception)
     emit componentAdded(cmp);
 }
 
-void Circuit::removeComponentInstance(ComponentInstance& cmp) throw (Exception)
+void Circuit::removeComponentInstance(ComponentInstance& cmp)
 {
     // check if the component instance was added to the circuit
     if (mComponentInstances.value(cmp.getUuid()) != &cmp) {
@@ -338,7 +338,7 @@ void Circuit::removeComponentInstance(ComponentInstance& cmp) throw (Exception)
     emit componentRemoved(cmp);
 }
 
-void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception)
+void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& newName)
 {
     // check if the component instance was added to the circuit
     if (mComponentInstances.value(cmp.getUuid()) != &cmp) {
@@ -380,7 +380,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Circuit::serialize(DomElement& root) const throw (Exception)
+void Circuit::serialize(DomElement& root) const
 {
     serializePointerContainer(root, mNetClasses, "netclass");
     serializePointerContainer(root, mNetSignals, "netsignal");

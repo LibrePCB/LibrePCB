@@ -50,7 +50,7 @@ using namespace library;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws) throw (Exception):
+WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws):
     QObject(nullptr), mWorkspace(ws)
 {
     qDebug("Load workspace library database...");
@@ -84,32 +84,32 @@ WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept
  *  Getters: Library Elements by their UUID
  ****************************************************************************************/
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponentCategories(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponentCategories(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("component_categories", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getPackageCategories(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getPackageCategories(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("package_categories", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getSymbols(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getSymbols(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("symbols", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getPackages(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getPackages(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("packages", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponents(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponents(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("components", uuid);
 }
 
-QMultiMap<Version, FilePath> WorkspaceLibraryDb::getDevices(const Uuid& uuid) const throw (Exception)
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getDevices(const Uuid& uuid) const
 {
     return getElementFilePathsFromDb("devices", uuid);
 }
@@ -118,32 +118,32 @@ QMultiMap<Version, FilePath> WorkspaceLibraryDb::getDevices(const Uuid& uuid) co
  *  Getters: Best Match Library Elements by their UUID
  ****************************************************************************************/
 
-FilePath WorkspaceLibraryDb::getLatestComponentCategory(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestComponentCategory(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getComponentCategories(uuid));
 }
 
-FilePath WorkspaceLibraryDb::getLatestPackageCategory(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestPackageCategory(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getPackageCategories(uuid));
 }
 
-FilePath WorkspaceLibraryDb::getLatestSymbol(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestSymbol(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getSymbols(uuid));
 }
 
-FilePath WorkspaceLibraryDb::getLatestPackage(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestPackage(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getPackages(uuid));
 }
 
-FilePath WorkspaceLibraryDb::getLatestComponent(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestComponent(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getComponents(uuid));
 }
 
-FilePath WorkspaceLibraryDb::getLatestDevice(const Uuid& uuid) const throw (Exception)
+FilePath WorkspaceLibraryDb::getLatestDevice(const Uuid& uuid) const
 {
     return getLatestVersionFilePath(getDevices(uuid));
 }
@@ -154,47 +154,47 @@ FilePath WorkspaceLibraryDb::getLatestDevice(const Uuid& uuid) const throw (Exce
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<ComponentCategory>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("component_categories", "cat_id", elemDir, localeOrder, name, desc, keywords);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<PackageCategory>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("package_categories", "cat_id", elemDir, localeOrder, name, desc, keywords);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<Symbol>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("symbols", "symbol_id", elemDir, localeOrder, name, desc, keywords);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<Package>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("packages", "package_id", elemDir, localeOrder, name, desc, keywords);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<Component>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("components", "ccomponent_id", elemDir, localeOrder, name, desc, keywords);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<Device>(const FilePath& elemDir,
-    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const throw (Exception)
+    const QStringList& localeOrder, QString* name, QString* desc, QString* keywords) const
 {
     getElementTranslations("devices", "device_id", elemDir, localeOrder, name, desc, keywords);
 }
 
-void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid) const throw (Exception)
+void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT package_uuid FROM devices WHERE filepath = :filepath");
@@ -214,22 +214,22 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid
  *  Getters: Special
  ****************************************************************************************/
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentCategoryChilds(const Uuid& parent) const throw (Exception)
+QSet<Uuid> WorkspaceLibraryDb::getComponentCategoryChilds(const Uuid& parent) const
 {
     return getCategoryChilds("component_categories", parent);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getPackageCategoryChilds(const Uuid& parent) const throw (Exception)
+QSet<Uuid> WorkspaceLibraryDb::getPackageCategoryChilds(const Uuid& parent) const
 {
     return getCategoryChilds("package_categories", parent);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const Uuid& category) const throw (Exception)
+QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const Uuid& category) const
 {
     return getElementsByCategory("components", "component_id", category);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) const throw (Exception)
+QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM devices WHERE component_uuid = :uuid");
@@ -263,7 +263,7 @@ void WorkspaceLibraryDb::startLibraryRescan() noexcept
 
 void WorkspaceLibraryDb::getElementTranslations(const QString& table,
     const QString& idRow, const FilePath& elemDir, const QStringList& localeOrder,
-    QString* name, QString* desc, QString* keywords) const throw (Exception)
+    QString* name, QString* desc, QString* keywords) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT locale, name, description, keywords FROM " % table % "_tr "
@@ -291,7 +291,7 @@ void WorkspaceLibraryDb::getElementTranslations(const QString& table,
 }
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(
-    const QString& tablename, const Uuid& uuid) const throw (Exception)
+    const QString& tablename, const Uuid& uuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT version, filepath FROM " % tablename % " WHERE uuid = :uuid");
@@ -320,7 +320,7 @@ FilePath WorkspaceLibraryDb::getLatestVersionFilePath(const QMultiMap<Version, F
         return list.last(); // highest version number
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception)
+QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " WHERE parent_uuid " %
@@ -340,7 +340,7 @@ QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(const QString& tablename,
-    const QString& idrowname, const Uuid& categoryUuid) const throw (Exception)
+    const QString& idrowname, const Uuid& categoryUuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " LEFT JOIN " % tablename % "_cat "
@@ -361,7 +361,7 @@ QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(const QString& tablename,
     return elements;
 }
 
-void WorkspaceLibraryDb::createAllTables() throw (Exception)
+void WorkspaceLibraryDb::createAllTables()
 {
     QStringList queries;
 

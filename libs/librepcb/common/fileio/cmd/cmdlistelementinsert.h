@@ -60,19 +60,19 @@ class CmdListElementInsert final : public UndoCommand
     private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override {
+        bool performExecute() override {
             if (mIndex < 0) mIndex = mList.count();
             performRedo(); // can throw
             return true;
         }
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override {
+        void performUndo() override {
             mList.remove(mIndex);
         }
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override {
+        void performRedo() override {
             mIndex = mList.insert(mIndex, mElement);
         }
 

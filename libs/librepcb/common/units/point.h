@@ -127,7 +127,7 @@ class Point
          *
          * @throws Exception    If the string is not valid, an exception will be thrown.
          */
-        void setXmm(const QString& mm) throw (Exception) {mX.setLengthMm(mm);}
+        void setXmm(const QString& mm) {mX.setLengthMm(mm);}
 
         /**
          * @brief Set the Y coordinate from a string in millimeters
@@ -136,7 +136,7 @@ class Point
          *
          * @throws Exception    If the string is not valid, an exception will be thrown.
          */
-        void setYmm(const QString& mm) throw (Exception) {mY.setLengthMm(mm);}
+        void setYmm(const QString& mm) {mY.setLengthMm(mm);}
 
         /// @see Length::setLengthNm()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
@@ -145,24 +145,24 @@ class Point
 
         /// @see Length::setLengthMm()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointMm(const QPointF& millimeters) throw (RangeError) {mX.setLengthMm(millimeters.x());
+        void setPointMm(const QPointF& millimeters) {mX.setLengthMm(millimeters.x());
                                                                         mY.setLengthMm(millimeters.y());}
 
         /// @see Length::setLengthInch()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointInch(const QPointF& inches) throw (Exception) {mX.setLengthInch(inches.x());
+        void setPointInch(const QPointF& inches) {mX.setLengthInch(inches.x());
                                                                     mY.setLengthInch(inches.y());}
 
         /// @see Length::setLengthMil()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
-        void setPointMil(const QPointF& mils) throw (Exception) {mX.setLengthMil(mils.x());
+        void setPointMil(const QPointF& mils) {mX.setLengthMil(mils.x());
                                                                  mX.setLengthMil(mils.y());}
 
         /// @see Length::setLengthPx()
         /// @warning Be careful with this method! Maybe you should call mapToGrid() afterwards!
         /// @note This method is useful to read the position of a QGraphics* object.
         ///       For this purpose, this method will invert the Y-coordinate.
-        void setPointPx(const QPointF& pixels) throw (Exception) {mX.setLengthPx(pixels.x());
+        void setPointPx(const QPointF& pixels) {mX.setLengthPx(pixels.x());
                                                                   mY.setLengthPx(-pixels.y());} // invert Y!
 
 
@@ -350,22 +350,22 @@ class Point
         // Static Functions
 
         /// @see Length::fromMm(qreal, const Length&)
-        static Point fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval = Length(0)) throw (RangeError);
-        static Point fromMm(const QPointF& millimeters,             const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval = Length(0));
+        static Point fromMm(const QPointF& millimeters,             const Length& gridInterval = Length(0));
 
         /// @see Length::fromInch()
-        static Point fromInch(qreal inchesX, qreal inchesY,         const Length& gridInterval = Length(0)) throw (RangeError);
-        static Point fromInch(const QPointF& inches,                const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromInch(qreal inchesX, qreal inchesY,         const Length& gridInterval = Length(0));
+        static Point fromInch(const QPointF& inches,                const Length& gridInterval = Length(0));
 
         /// @see Length::fromMil()
-        static Point fromMil(qreal milsX, qreal milsY,              const Length& gridInterval = Length(0)) throw (RangeError);
-        static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromMil(qreal milsX, qreal milsY,              const Length& gridInterval = Length(0));
+        static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0));
 
         /// @see Length::fromPx()
         /// @note These methods are useful to read the position of a QGraphics* object.
         ///       For this purpose, these methods will invert the Y-coordinate.
-        static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0)) throw (RangeError);
-        static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0)) throw (RangeError);
+        static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0));
+        static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0));
 
         // Operators
         Point&  operator=(const Point& rhs)        {mX = rhs.mX;  mY = rhs.mY;  return *this;}

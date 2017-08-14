@@ -61,9 +61,9 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         // Constructors / Destructor
         SI_NetPoint() = delete;
         SI_NetPoint(const SI_NetPoint& other) = delete;
-        SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception);
-        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
-        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception);
+        SI_NetPoint(Schematic& schematic, const DomElement& domElement);
+        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position);
+        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin);
         ~SI_NetPoint() noexcept;
 
         // Getters
@@ -77,19 +77,19 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
 
         // Setters
-        void setNetSignal(NetSignal& netsignal) throw (Exception);
-        void setPinToAttach(SI_SymbolPin* pin) throw (Exception);
+        void setNetSignal(NetSignal& netsignal);
+        void setPinToAttach(SI_SymbolPin* pin);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
-        void registerNetLine(SI_NetLine& netline) throw (Exception);
-        void unregisterNetLine(SI_NetLine& netline) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) override;
+        void removeFromSchematic(GraphicsScene& scene) override;
+        void registerNetLine(SI_NetLine& netline);
+        void unregisterNetLine(SI_NetLine& netline);
         void updateLines() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Inherited from SI_Base
@@ -106,7 +106,7 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

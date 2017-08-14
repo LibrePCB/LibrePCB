@@ -172,7 +172,7 @@ class DomElement final
          * @throw Exception     If the text is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getText(bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception) {
+        T getText(bool throwIfEmpty, const T& defaultValue = T()) const {
             if (hasChilds()) {
                 throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, mName,
                                      tr("A node with child elements cannot have a text."));
@@ -229,7 +229,7 @@ class DomElement final
          * @throw Exception     If the value is empty and "throwIfEmpty == true"
          */
         template <typename T>
-        T getAttribute(const QString& name, bool throwIfEmpty, const T& defaultValue = T()) const throw (Exception) {
+        T getAttribute(const QString& name, bool throwIfEmpty, const T& defaultValue = T()) const {
             if (!mAttributes.contains(name)) {
                 throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, QString(),
                     QString(tr("Attribute \"%1\" not found in node \"%2\".")).arg(name, mName));
@@ -322,7 +322,7 @@ class DomElement final
          *
          * @throw Exception If "throwIfNotFound == true" and there is no child element
          */
-        DomElement* getFirstChild(bool throwIfNotFound = false) const throw (Exception);
+        DomElement* getFirstChild(bool throwIfNotFound = false) const;
 
         /**
          * @brief Get the first child element with a specific name
@@ -336,7 +336,7 @@ class DomElement final
          *
          * @throw Exception If "throwIfNotFound == true" and there is no such child element
          */
-        DomElement* getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception);
+        DomElement* getFirstChild(const QString& name, bool throwIfNotFound) const;
 
         /**
          * @brief Get the first child element with a specific path/name (recursive)
@@ -374,7 +374,7 @@ class DomElement final
          * @throw Exception If "throwIfChildNotFound == true" and the child does not exist
          */
         DomElement* getFirstChild(const QString& pathName, bool throwIfPathNotExist,
-                                     bool throwIfChildNotFound) const throw (Exception);
+                                     bool throwIfChildNotFound) const;
 
         /**
          * @brief Get the previous child (with a specific name) of a specific child
@@ -391,7 +391,7 @@ class DomElement final
          * @throw Exception If "throwIfNotFound == true" and there is no such previous child
          */
         DomElement* getPreviousChild(const DomElement* child, const QString& name = QString(),
-                                        bool throwIfNotFound = false) const throw (Exception);
+                                        bool throwIfNotFound = false) const;
 
         /**
          * @brief Get the next child (with a specific name) of a specific child
@@ -408,7 +408,7 @@ class DomElement final
          * @throw Exception If "throwIfNotFound == true" and there is no such next child
          */
         DomElement* getNextChild(const DomElement* child, const QString& name = QString(),
-                                    bool throwIfNotFound = false) const throw (Exception);
+                                    bool throwIfNotFound = false) const;
 
 
         // Sibling Handling Methods
@@ -427,7 +427,7 @@ class DomElement final
          * @throw Exception If "throwIfNotFound == true" and there is no such previous sibling
          */
         DomElement* getPreviousSibling(const QString& name = QString(),
-                                          bool throwIfNotFound = false) const throw (Exception);
+                                          bool throwIfNotFound = false) const;
 
         /**
          * @brief Get the next sibling element (with a specific name)
@@ -443,7 +443,7 @@ class DomElement final
          * @throw Exception If "throwIfNotFound == true" and there is no such next sibling
          */
         DomElement* getNextSibling(const QString& name = QString(),
-                                      bool throwIfNotFound = false) const throw (Exception);
+                                      bool throwIfNotFound = false) const;
 
 
         // Conversion Methods

@@ -145,7 +145,7 @@ bool SI_SymbolPin::isRequired() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_SymbolPin::addToSchematic(GraphicsScene& scene) throw (Exception)
+void SI_SymbolPin::addToSchematic(GraphicsScene& scene)
 {
     if (isAddedToSchematic() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -161,7 +161,7 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene)
 {
     if ((!isAddedToSchematic()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -176,7 +176,7 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint)
 {
     if ((!isAddedToSchematic()) || (!mComponentSignalInstance) || (mRegisteredNetPoint)
         || (netpoint.getSchematic() != mSchematic)
@@ -188,7 +188,7 @@ void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint) throw (Exception)
     updateErcMessages();
 }
 
-void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint)
 {
     if ((!isAddedToSchematic()) || (!mComponentSignalInstance)
         || (mRegisteredNetPoint != &netpoint)

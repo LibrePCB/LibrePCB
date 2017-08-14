@@ -67,10 +67,10 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ComponentSignalInstance() = delete;
         ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const DomElement& domElement) throw (Exception);
+                                         const DomElement& domElement);
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const library::ComponentSignal& cmpSignal,
-                                         NetSignal* netsignal = nullptr) throw (Exception);
+                                         NetSignal* netsignal = nullptr);
         ~ComponentSignalInstance() noexcept;
 
         // Getters
@@ -98,19 +98,19 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
          *
          * @throw Exception     This method throws an exception in case of an error
          */
-        void setNetSignal(NetSignal* netsignal) throw (Exception);
+        void setNetSignal(NetSignal* netsignal);
 
 
         // General Methods
-        void addToCircuit() throw (Exception);
-        void removeFromCircuit() throw (Exception);
-        void registerSymbolPin(SI_SymbolPin& pin) throw (Exception);
-        void unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception);
-        void registerFootprintPad(BI_FootprintPad& pad) throw (Exception);
-        void unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception);
+        void addToCircuit();
+        void removeFromCircuit();
+        void registerSymbolPin(SI_SymbolPin& pin);
+        void unregisterSymbolPin(SI_SymbolPin& pin);
+        void registerFootprintPad(BI_FootprintPad& pad);
+        void unregisterFootprintPad(BI_FootprintPad& pad);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
@@ -124,7 +124,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

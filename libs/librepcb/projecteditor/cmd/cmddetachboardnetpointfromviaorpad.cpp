@@ -58,7 +58,7 @@ CmdDetachBoardNetPointFromViaOrPad::~CmdDetachBoardNetPointFromViaOrPad() noexce
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdDetachBoardNetPointFromViaOrPad::performExecute() throw (Exception)
+bool CmdDetachBoardNetPointFromViaOrPad::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
@@ -78,7 +78,7 @@ bool CmdDetachBoardNetPointFromViaOrPad::performExecute() throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-void CmdDetachBoardNetPointFromViaOrPad::detachNetPoint() throw (Exception)
+void CmdDetachBoardNetPointFromViaOrPad::detachNetPoint()
 {
     // disconnect all netlines
     QList<BI_NetLine*> netlines = mNetPoint.getLines();
@@ -98,7 +98,7 @@ void CmdDetachBoardNetPointFromViaOrPad::detachNetPoint() throw (Exception)
     }
 }
 
-void CmdDetachBoardNetPointFromViaOrPad::removeNetPointWithAllNetlines() throw (Exception)
+void CmdDetachBoardNetPointFromViaOrPad::removeNetPointWithAllNetlines()
 {
     // remove all connected netlines
     foreach (BI_NetLine* netline, mNetPoint.getLines()) { Q_ASSERT(netline);
@@ -109,7 +109,7 @@ void CmdDetachBoardNetPointFromViaOrPad::removeNetPointWithAllNetlines() throw (
     Q_ASSERT(!mNetPoint.isAddedToBoard());
 }
 
-void CmdDetachBoardNetPointFromViaOrPad::removeNetLineWithUnusedNetpoints(BI_NetLine& l) throw (Exception)
+void CmdDetachBoardNetPointFromViaOrPad::removeNetLineWithUnusedNetpoints(BI_NetLine& l)
 {
     // remove the netline itself
     execNewChildCmd(new CmdBoardNetLineRemove(l)); // can throw
@@ -119,7 +119,7 @@ void CmdDetachBoardNetPointFromViaOrPad::removeNetLineWithUnusedNetpoints(BI_Net
     removeNetpointIfUnused(l.getEndPoint()); // can throw
 }
 
-void CmdDetachBoardNetPointFromViaOrPad::removeNetpointIfUnused(BI_NetPoint& p) throw (Exception)
+void CmdDetachBoardNetPointFromViaOrPad::removeNetpointIfUnused(BI_NetPoint& p)
 {
     if (p.getLines().count() == 0) {
         execNewChildCmd(new CmdBoardNetPointRemove(p)); // can throw

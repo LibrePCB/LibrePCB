@@ -44,7 +44,7 @@ using namespace library;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) throw (Exception) :
+ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) :
     QObject(&project), mProject(project),
     mLibraryPath(project.getPath().getPathTo("library"))
 {
@@ -135,42 +135,42 @@ QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& 
  *  Add/Remove Methods
  ****************************************************************************************/
 
-void ProjectLibrary::addSymbol(library::Symbol& s) throw (Exception)
+void ProjectLibrary::addSymbol(library::Symbol& s)
 {
     addElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
 }
 
-void ProjectLibrary::addPackage(library::Package& p) throw (Exception)
+void ProjectLibrary::addPackage(library::Package& p)
 {
     addElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
 }
 
-void ProjectLibrary::addComponent(library::Component& c) throw (Exception)
+void ProjectLibrary::addComponent(library::Component& c)
 {
     addElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
 }
 
-void ProjectLibrary::addDevice(library::Device& d) throw (Exception)
+void ProjectLibrary::addDevice(library::Device& d)
 {
     addElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
 }
 
-void ProjectLibrary::removeSymbol(library::Symbol& s) throw (Exception)
+void ProjectLibrary::removeSymbol(library::Symbol& s)
 {
     removeElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
 }
 
-void ProjectLibrary::removePackage(library::Package& p) throw (Exception)
+void ProjectLibrary::removePackage(library::Package& p)
 {
     removeElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
 }
 
-void ProjectLibrary::removeComponent(library::Component& c) throw (Exception)
+void ProjectLibrary::removeComponent(library::Component& c)
 {
     removeElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
 }
 
-void ProjectLibrary::removeDevice(library::Device& d) throw (Exception)
+void ProjectLibrary::removeDevice(library::Device& d)
 {
     removeElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
 }
@@ -203,7 +203,7 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
-                                  QHash<Uuid, ElementType*>& elementList) throw (Exception)
+                                  QHash<Uuid, ElementType*>& elementList)
 {
     QDir dir(directory.toStr());
 
@@ -239,7 +239,7 @@ template <typename ElementType>
 void ProjectLibrary::addElement(ElementType& element,
                                 QHash<Uuid, ElementType*>& elementList,
                                 QList<ElementType*>& addedElementsList,
-                                QList<ElementType*>& removedElementsList) throw (Exception)
+                                QList<ElementType*>& removedElementsList)
 {
     if (elementList.contains(element.getUuid())) {
         throw LogicError(__FILE__, __LINE__, QString(tr(
@@ -259,7 +259,7 @@ template <typename ElementType>
 void ProjectLibrary::removeElement(ElementType& element,
                                    QHash<Uuid, ElementType*>& elementList,
                                    QList<ElementType*>& addedElementsList,
-                                   QList<ElementType*>& removedElementsList) throw (Exception)
+                                   QList<ElementType*>& removedElementsList)
 {
     Q_ASSERT(elementList.value(element.getUuid()) == &element);
     Q_ASSERT(!removedElementsList.contains(&element));

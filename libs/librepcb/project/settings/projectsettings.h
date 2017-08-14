@@ -55,7 +55,7 @@ class ProjectSettings final : public QObject, public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectSettings(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
+        explicit ProjectSettings(Project& project, bool restore, bool readOnly, bool create);
         ~ProjectSettings() noexcept;
 
         // Getters: General
@@ -90,7 +90,7 @@ class ProjectSettings final : public QObject, public SerializableObject
         // Private Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // General

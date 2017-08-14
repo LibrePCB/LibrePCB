@@ -37,7 +37,7 @@ PolygonSegment::PolygonSegment(const PolygonSegment& other) noexcept :
 {
 }
 
-PolygonSegment::PolygonSegment(const DomElement& domElement) throw (Exception)
+PolygonSegment::PolygonSegment(const DomElement& domElement)
 {
     mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
     mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
@@ -68,7 +68,7 @@ Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
     }
 }
 
-void PolygonSegment::serialize(DomElement& root) const throw (Exception)
+void PolygonSegment::serialize(DomElement& root) const
 {
     root.setAttribute("end_x", mEndPos.getX());
     root.setAttribute("end_y", mEndPos.getY());
@@ -97,7 +97,7 @@ Polygon::Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabAre
     Q_ASSERT(lineWidth >= 0);
 }
 
-Polygon::Polygon(const DomElement& domElement) throw (Exception)
+Polygon::Polygon(const DomElement& domElement)
 {
     // load general attributes
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
@@ -291,7 +291,7 @@ void Polygon::appendSegment(PolygonSegment& segment) noexcept
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
+void Polygon::removeSegment(PolygonSegment& segment)
 {
     Q_ASSERT(mSegments.contains(&segment));
     if (mSegments.count() <= 1) {
@@ -302,7 +302,7 @@ void Polygon::removeSegment(PolygonSegment& segment) throw (Exception)
     mPainterPathPx = QPainterPath(); // invalidate painter path
 }
 
-void Polygon::serialize(DomElement& root) const throw (Exception)
+void Polygon::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

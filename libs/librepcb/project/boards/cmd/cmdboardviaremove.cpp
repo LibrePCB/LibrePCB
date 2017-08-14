@@ -49,19 +49,19 @@ CmdBoardViaRemove::~CmdBoardViaRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardViaRemove::performExecute() throw (Exception)
+bool CmdBoardViaRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdBoardViaRemove::performUndo() throw (Exception)
+void CmdBoardViaRemove::performUndo()
 {
     mBoard.addVia(mVia); // can throw
 }
 
-void CmdBoardViaRemove::performRedo() throw (Exception)
+void CmdBoardViaRemove::performRedo()
 {
     mBoard.removeVia(mVia); // can throw
 }

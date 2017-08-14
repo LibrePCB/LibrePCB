@@ -37,7 +37,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const DomElement& domElement) throw (Exception) :
+NetClass::NetClass(Circuit& circuit, const DomElement& domElement) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -46,7 +46,7 @@ NetClass::NetClass(Circuit& circuit, const DomElement& domElement) throw (Except
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-NetClass::NetClass(Circuit& circuit, const QString& name) throw (Exception) :
+NetClass::NetClass(Circuit& circuit, const QString& name) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(Uuid::createRandom()), mName(name)
 {
@@ -68,7 +68,7 @@ NetClass::~NetClass() noexcept
  *  Setters
  ****************************************************************************************/
 
-void NetClass::setName(const QString& name) throw (Exception)
+void NetClass::setName(const QString& name)
 {
     if (name == mName) {
         return;
@@ -85,7 +85,7 @@ void NetClass::setName(const QString& name) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void NetClass::addToCircuit() throw (Exception)
+void NetClass::addToCircuit()
 {
     if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -94,7 +94,7 @@ void NetClass::addToCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void NetClass::removeFromCircuit() throw (Exception)
+void NetClass::removeFromCircuit()
 {
     if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
@@ -108,7 +108,7 @@ void NetClass::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void NetClass::registerNetSignal(NetSignal& signal) throw (Exception)
+void NetClass::registerNetSignal(NetSignal& signal)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredNetSignals.contains(signal.getUuid()))
         || (signal.getCircuit() != mCircuit))
@@ -119,7 +119,7 @@ void NetClass::registerNetSignal(NetSignal& signal) throw (Exception)
     updateErcMessages();
 }
 
-void NetClass::unregisterNetSignal(NetSignal& signal) throw (Exception)
+void NetClass::unregisterNetSignal(NetSignal& signal)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredNetSignals.value(signal.getUuid()) != &signal)) {
         throw LogicError(__FILE__, __LINE__);
@@ -128,7 +128,7 @@ void NetClass::unregisterNetSignal(NetSignal& signal) throw (Exception)
     updateErcMessages();
 }
 
-void NetClass::serialize(DomElement& root) const throw (Exception)
+void NetClass::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

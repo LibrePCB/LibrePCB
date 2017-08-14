@@ -100,21 +100,21 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center, b
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelEdit::performExecute() throw (Exception)
+bool CmdSchematicNetLabelEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the netlabel was really modified
 }
 
-void CmdSchematicNetLabelEdit::performUndo() throw (Exception)
+void CmdSchematicNetLabelEdit::performUndo()
 {
     mNetLabel.setNetSignal(*mOldNetSignal);
     mNetLabel.setPosition(mOldPos);
     mNetLabel.setRotation(mOldRotation);
 }
 
-void CmdSchematicNetLabelEdit::performRedo() throw (Exception)
+void CmdSchematicNetLabelEdit::performRedo()
 {
     mNetLabel.setNetSignal(*mNewNetSignal);
     mNetLabel.setPosition(mNewPos);

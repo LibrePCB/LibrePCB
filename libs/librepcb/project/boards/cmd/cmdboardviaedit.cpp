@@ -63,7 +63,7 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdBoardViaEdit::setNetSignal(NetSignal* netsignal, bool immediate) throw (Exception)
+void CmdBoardViaEdit::setNetSignal(NetSignal* netsignal, bool immediate)
 {
     Q_ASSERT(!wasEverExecuted());
     mNewNetSignal = netsignal;
@@ -109,14 +109,14 @@ void CmdBoardViaEdit::setDrillDiameter(const Length& diameter, bool immediate) n
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardViaEdit::performExecute() throw (Exception)
+bool CmdBoardViaEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the via was really modified
 }
 
-void CmdBoardViaEdit::performUndo() throw (Exception)
+void CmdBoardViaEdit::performUndo()
 {
     mVia.setNetSignal(mOldNetSignal); // can throw
     mVia.setPosition(mOldPos);
@@ -125,7 +125,7 @@ void CmdBoardViaEdit::performUndo() throw (Exception)
     mVia.setDrillDiameter(mOldDrillDiameter);
 }
 
-void CmdBoardViaEdit::performRedo() throw (Exception)
+void CmdBoardViaEdit::performRedo()
 {
     mVia.setNetSignal(mNewNetSignal); // can throw
     mVia.setPosition(mNewPos);

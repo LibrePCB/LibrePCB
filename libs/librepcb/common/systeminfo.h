@@ -87,7 +87,7 @@ class SystemInfo final
          *
          * @throw  Exception    In case of an error.
          */
-        static bool isProcessRunning(qint64 pid) throw (Exception);
+        static bool isProcessRunning(qint64 pid);
 
         /**
          * @brief Get the process name of a given PID
@@ -99,7 +99,7 @@ class SystemInfo final
          *
          * @throw  Exception    In case of an error.
          */
-        static QString getProcessNameByPid(qint64 pid) throw (Exception);
+        static QString getProcessNameByPid(qint64 pid);
 
 
     private:

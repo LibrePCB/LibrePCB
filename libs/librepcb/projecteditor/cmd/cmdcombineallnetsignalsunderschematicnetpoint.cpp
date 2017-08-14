@@ -69,7 +69,7 @@ CmdCombineAllNetSignalsUnderSchematicNetPoint::~CmdCombineAllNetSignalsUnderSche
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() throw (Exception)
+bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

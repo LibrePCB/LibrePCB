@@ -67,14 +67,14 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         BI_NetPoint() = delete;
         BI_NetPoint(const BI_NetPoint& other) = delete;
         BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
-                    BI_Via* via) throw (Exception);
-        BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception);
+                    BI_Via* via);
+        BI_NetPoint(Board& board, const DomElement& domElement);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                    const Point& position) throw (Exception);
+                    const Point& position);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                    BI_FootprintPad& pad) throw (Exception);
+                    BI_FootprintPad& pad);
         BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                    BI_Via& via) throw (Exception);
+                    BI_Via& via);
         ~BI_NetPoint() noexcept;
 
         // Getters
@@ -93,22 +93,22 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
 
         // Setters
 
-        void setLayer(BoardLayer& layer) throw (Exception);
-        void setNetSignal(NetSignal& netsignal) throw (Exception);
-        void setPadToAttach(BI_FootprintPad* pad) throw (Exception);
-        void setViaToAttach(BI_Via* via) throw (Exception);
+        void setLayer(BoardLayer& layer);
+        void setNetSignal(NetSignal& netsignal);
+        void setPadToAttach(BI_FootprintPad* pad);
+        void setViaToAttach(BI_Via* via);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
-        void registerNetLine(BI_NetLine& netline) throw (Exception);
-        void unregisterNetLine(BI_NetLine& netline) throw (Exception);
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
+        void registerNetLine(BI_NetLine& netline);
+        void unregisterNetLine(BI_NetLine& netline);
         void updateLines() const noexcept;
 
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Inherited from SI_Base
@@ -126,7 +126,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

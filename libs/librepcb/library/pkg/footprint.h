@@ -54,8 +54,8 @@ class Footprint final : public SerializableObject
 
         // Constructors / Destructor
         explicit Footprint(const Uuid& uuid, const QString& name_en_US,
-                           const QString& description_en_US) throw (Exception);
-        explicit Footprint(const DomElement& domElement) throw (Exception);
+                           const QString& description_en_US);
+        explicit Footprint(const DomElement& domElement);
         ~Footprint() noexcept;
 
         // Getters: Attributes
@@ -107,7 +107,7 @@ class Footprint final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
     private:

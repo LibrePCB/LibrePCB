@@ -45,7 +45,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement) throw (Exception)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement)
 {
     try
     {
@@ -102,7 +102,7 @@ void ComponentSymbolVariantItem::removePinSignalMapItem(ComponentPinSignalMapIte
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariantItem::serialize(DomElement& root) const throw (Exception)
+void ComponentSymbolVariantItem::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

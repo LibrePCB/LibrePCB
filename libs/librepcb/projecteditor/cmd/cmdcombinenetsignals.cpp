@@ -70,7 +70,7 @@ CmdCombineNetSignals::~CmdCombineNetSignals() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdCombineNetSignals::performExecute() throw (Exception)
+bool CmdCombineNetSignals::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

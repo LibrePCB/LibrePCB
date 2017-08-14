@@ -80,7 +80,7 @@ void CmdProjectSetMetadata::setAttributes(const AttributeList& attributes) noexc
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdProjectSetMetadata::performExecute() throw (Exception)
+bool CmdProjectSetMetadata::performExecute()
 {
     performRedo(); // can throw
 
@@ -91,7 +91,7 @@ bool CmdProjectSetMetadata::performExecute() throw (Exception)
     return false;
 }
 
-void CmdProjectSetMetadata::performUndo() throw (Exception)
+void CmdProjectSetMetadata::performUndo()
 {
     mProject.setName(mOldName);
     mProject.setAuthor(mOldAuthor);
@@ -99,7 +99,7 @@ void CmdProjectSetMetadata::performUndo() throw (Exception)
     mProject.setAttributes(mOldAttributes);
 }
 
-void CmdProjectSetMetadata::performRedo() throw (Exception)
+void CmdProjectSetMetadata::performRedo()
 {
     mProject.setName(mNewName);
     mProject.setAuthor(mNewAuthor);

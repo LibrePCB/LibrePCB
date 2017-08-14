@@ -86,8 +86,8 @@ class GerberGenerator final
 
         // General Methods
         void reset() noexcept;
-        void generate() throw (Exception);
-        void saveToFile(const FilePath& filepath) const throw (Exception);
+        void generate();
+        void saveToFile(const FilePath& filepath) const;
 
         // Operator Overloadings
         GerberGenerator& operator=(const GerberGenerator& rhs) = delete;

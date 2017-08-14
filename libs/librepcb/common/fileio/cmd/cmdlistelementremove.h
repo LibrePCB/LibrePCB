@@ -59,19 +59,19 @@ class CmdListElementRemove final : public UndoCommand
     private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override {
+        bool performExecute() override {
             mIndex = mList.indexOf(mElement); Q_ASSERT(mIndex >= 0);
             performRedo(); // can throw
             return true;
         }
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override {
+        void performUndo() override {
              mList.insert(mIndex, mMemorizedElement);
         }
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override {
+        void performRedo() override {
             mMemorizedElement = mList.take(mIndex);
             Q_ASSERT(mMemorizedElement.get() == mElement);
         }

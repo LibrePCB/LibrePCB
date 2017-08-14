@@ -48,7 +48,7 @@ Ratio Ratio::fromNormalized(qreal normalized) noexcept
     return ratio;
 }
 
-Ratio Ratio::fromNormalized(const QString& normalized) throw (Exception)
+Ratio Ratio::fromNormalized(const QString& normalized)
 {
     Ratio ratio;
     ratio.setRatioNormalized(normalized);
@@ -57,7 +57,7 @@ Ratio Ratio::fromNormalized(const QString& normalized) throw (Exception)
 
 // Private Static Methods
 
-qint32 Ratio::normalizedStringToPpm(const QString& normalized) throw (Exception)
+qint32 Ratio::normalizedStringToPpm(const QString& normalized)
 {
     bool ok;
     qreal ratio = qRound(QLocale::c().toDouble(normalized, &ok) * 1e6);

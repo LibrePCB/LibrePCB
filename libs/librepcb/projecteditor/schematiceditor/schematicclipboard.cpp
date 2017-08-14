@@ -53,19 +53,19 @@ SchematicClipboard::~SchematicClipboard() noexcept
     qDeleteAll(mSymbolInstances);       mSymbolInstances.clear();
 }
 
-void SchematicClipboard::cut(const QList<SymbolInstance*>& symbols) throw (Exception)
+void SchematicClipboard::cut(const QList<SymbolInstance*>& symbols)
 {
     mCutActive = true;
     setElements(symbols);
 }
 
-void SchematicClipboard::copy(const QList<SymbolInstance*>& symbols) throw (Exception)
+void SchematicClipboard::copy(const QList<SymbolInstance*>& symbols)
 {
     mCutActive = false;
     setElements(symbols);
 }
 
-void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& symbols) throw (Exception)
+void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& symbols)
 {
     Q_ASSERT(symbols.isEmpty() == true);
 
@@ -81,7 +81,7 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
  *  Private Methods
  ****************************************************************************************/
 
-/*void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols) throw (Exception)
+/*void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols)
 {
     clear();
 

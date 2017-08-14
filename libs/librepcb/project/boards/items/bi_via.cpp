@@ -43,7 +43,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Via::BI_Via(Board& board, const BI_Via& other) throw (Exception) :
+BI_Via::BI_Via(Board& board, const BI_Via& other) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(other.mPosition),
     mShape(other.mShape), mSize(other.mSize), mDrillDiameter(other.mDrillDiameter),
     mNetSignal(other.mNetSignal)
@@ -51,7 +51,7 @@ BI_Via::BI_Via(Board& board, const BI_Via& other) throw (Exception) :
     init();
 }
 
-BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
+BI_Via::BI_Via(Board& board, const DomElement& domElement) :
     BI_Base(board), mNetSignal(nullptr)
 {
     // read attributes
@@ -84,14 +84,14 @@ BI_Via::BI_Via(Board& board, const DomElement& domElement) throw (Exception) :
 }
 
 BI_Via::BI_Via(Board& board, const Point& position, Shape shape, const Length& size,
-               const Length& drillDiameter, NetSignal* netsignal) throw (Exception) :
+               const Length& drillDiameter, NetSignal* netsignal) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(position), mShape(shape),
     mSize(size), mDrillDiameter(drillDiameter), mNetSignal(netsignal)
 {
     init();
 }
 
-void BI_Via::init() throw (Exception)
+void BI_Via::init()
 {
     // create the graphics item
     mGraphicsItem.reset(new BGI_Via(*this));
@@ -162,7 +162,7 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const 
  *  Setters
  ****************************************************************************************/
 
-void BI_Via::setNetSignal(NetSignal* netsignal) throw (Exception)
+void BI_Via::setNetSignal(NetSignal* netsignal)
 {
     if (netsignal == mNetSignal) {
         return;
@@ -223,7 +223,7 @@ void BI_Via::setDrillDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Via::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_Via::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -236,7 +236,7 @@ void BI_Via::addToBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
-void BI_Via::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_Via::removeFromBoard(GraphicsScene& scene)
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -248,7 +248,7 @@ void BI_Via::removeFromBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-void BI_Via::registerNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void BI_Via::registerNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (mRegisteredNetPoints.contains(netpoint.getLayer().getId()))
         || (netpoint.getBoard() != mBoard) || (&netpoint.getNetSignal() != mNetSignal))
@@ -260,7 +260,7 @@ void BI_Via::registerNetPoint(BI_NetPoint& netpoint) throw (Exception)
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_Via::unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void BI_Via::unregisterNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (getNetPointOfLayer(netpoint.getLayer().getId()) != &netpoint)) {
         throw LogicError(__FILE__, __LINE__);
@@ -277,7 +277,7 @@ void BI_Via::updateNetPoints() const noexcept
     }
 }
 
-void BI_Via::serialize(DomElement& root) const throw (Exception)
+void BI_Via::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

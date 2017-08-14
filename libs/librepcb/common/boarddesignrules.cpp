@@ -42,7 +42,7 @@ BoardDesignRules::BoardDesignRules(const BoardDesignRules& other)
     *this = other;
 }
 
-BoardDesignRules::BoardDesignRules(const DomElement& domElement) throw (Exception) :
+BoardDesignRules::BoardDesignRules(const DomElement& domElement) :
     BoardDesignRules() // this loads all default values!
 {
     // general attributes
@@ -123,7 +123,7 @@ void BoardDesignRules::restoreDefaults() noexcept
     mRestringViaMax = Length(2000000);              // 2.0mm
 }
 
-void BoardDesignRules::serialize(DomElement& root) const throw (Exception)
+void BoardDesignRules::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

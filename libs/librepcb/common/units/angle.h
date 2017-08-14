@@ -138,7 +138,7 @@ class Angle
          *
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        void setAngleDeg(const QString& degrees) throw (Exception) {mMicrodegrees = degStringToMicrodeg(degrees);}
+        void setAngleDeg(const QString& degrees) {mMicrodegrees = degStringToMicrodeg(degrees);}
 
         /**
          * @brief Set the angle in radians
@@ -281,7 +281,7 @@ class Angle
          *
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        static Angle fromDeg(const QString& degrees) throw (Exception);
+        static Angle fromDeg(const QString& degrees);
 
         /**
          * @brief Get an Angle object with a specific angle
@@ -301,7 +301,7 @@ class Angle
          *
          * @throws Exception if the string was invalid
          */
-        static Angle deserializeFromString(const QString& str) throw (Exception) {
+        static Angle deserializeFromString(const QString& str) {
             return fromDeg(str); // can throw
         }
 
@@ -362,7 +362,7 @@ class Angle
          *          and map the angle to +/- 360 degrees BEFORE converting it to microdegrees!
          *          throw an exception on range errors!
          */
-        static qint32 degStringToMicrodeg(const QString& degrees) throw (Exception);
+        static qint32 degStringToMicrodeg(const QString& degrees);
 
 
         // Private Member Variables

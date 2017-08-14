@@ -73,7 +73,7 @@ class SmartXmlFile final : public SmartFile
          * @throw Exception If the specified text file could not be opened successful, an
          *                  exception will be thrown.
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly) :
             SmartXmlFile(filepath, restore, readOnly, false) {}
 
         /**
@@ -90,7 +90,7 @@ class SmartXmlFile final : public SmartFile
          * @return  A pointer to the created DOM tree. The caller takes the ownership of
          *          the DOM document.
          */
-        std::unique_ptr<DomDocument> parseFileAndBuildDomTree() const throw (Exception);
+        std::unique_ptr<DomDocument> parseFileAndBuildDomTree() const;
 
         /**
          * @brief Write the XML DOM tree to the file system
@@ -101,7 +101,7 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        void save(const DomDocument& domDocument, bool toOriginal) throw (Exception);
+        void save(const DomDocument& domDocument, bool toOriginal);
 
 
         // Operator Overloadings
@@ -123,7 +123,7 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        static SmartXmlFile* create(const FilePath &filepath) throw (Exception);
+        static SmartXmlFile* create(const FilePath &filepath);
 
 
     private: // Methods
@@ -138,7 +138,7 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
+        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
 
 };
 

@@ -68,7 +68,7 @@ class BoardGerberExport final : public QObject
         ~BoardGerberExport() noexcept;
 
         // General Methods
-        void exportAllLayers() const throw (Exception);
+        void exportAllLayers() const;
 
         // Operator Overloadings
         BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
@@ -77,19 +77,19 @@ class BoardGerberExport final : public QObject
     private:
 
         // Private Methods
-        void exportDrillsPTH() const throw (Exception);
-        void exportLayerBoardOutlines() const throw (Exception);
-        void exportLayerTopCopper() const throw (Exception);
-        void exportLayerTopSolderMask() const throw (Exception);
-        void exportLayerTopOverlay() const throw (Exception);
-        void exportLayerBottomCopper() const throw (Exception);
-        void exportLayerBottomSolderMask() const throw (Exception);
-        void exportLayerBottomOverlay() const throw (Exception);
+        void exportDrillsPTH() const;
+        void exportLayerBoardOutlines() const;
+        void exportLayerTopCopper() const;
+        void exportLayerTopSolderMask() const;
+        void exportLayerTopOverlay() const;
+        void exportLayerBottomCopper() const;
+        void exportLayerBottomSolderMask() const;
+        void exportLayerBottomOverlay() const;
 
-        void drawLayer(GerberGenerator& gen, int layerId) const throw (Exception);
-        void drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const throw (Exception);
-        void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const throw (Exception);
-        void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const throw (Exception);
+        void drawLayer(GerberGenerator& gen, int layerId) const;
+        void drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const;
+        void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const;
+        void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const;
 
         FilePath getOutputFilePath(const QString& suffix) const noexcept;
 

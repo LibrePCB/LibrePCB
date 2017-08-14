@@ -42,7 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exception) :
+NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -60,7 +60,7 @@ NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exce
 }
 
 NetSignal::NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
-                     bool autoName) throw (Exception) :
+                     bool autoName) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false),
     mUuid(Uuid::createRandom()), mName(name), mHasAutoName(autoName), mNetClass(&netclass)
 {
@@ -107,7 +107,7 @@ bool NetSignal::isNameForced() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void NetSignal::setName(const QString& name, bool isAutoName) throw (Exception)
+void NetSignal::setName(const QString& name, bool isAutoName)
 {
     if ((name == mName) && (isAutoName == mHasAutoName)) {
         return;
@@ -134,7 +134,7 @@ void NetSignal::setHighlighted(bool hl) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void NetSignal::addToCircuit() throw (Exception)
+void NetSignal::addToCircuit()
 {
     if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -144,7 +144,7 @@ void NetSignal::addToCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::removeFromCircuit() throw (Exception)
+void NetSignal::removeFromCircuit()
 {
     if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
@@ -159,7 +159,7 @@ void NetSignal::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) throw (Exception)
+void NetSignal::registerComponentSignal(ComponentSignalInstance& signal)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredComponentSignals.contains(&signal))
         || (signal.getCircuit() != mCircuit))
@@ -170,7 +170,7 @@ void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) throw (
     updateErcMessages();
 }
 
-void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) throw (Exception)
+void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredComponentSignals.contains(&signal))) {
         throw LogicError(__FILE__, __LINE__);
@@ -179,7 +179,7 @@ void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) throw
     updateErcMessages();
 }
 
-void NetSignal::registerSchematicNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void NetSignal::registerSchematicNetPoint(SI_NetPoint& netpoint)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredSchematicNetPoints.contains(&netpoint))
         || (netpoint.getCircuit() != mCircuit))
@@ -190,7 +190,7 @@ void NetSignal::registerSchematicNetPoint(SI_NetPoint& netpoint) throw (Exceptio
     updateErcMessages();
 }
 
-void NetSignal::unregisterSchematicNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void NetSignal::unregisterSchematicNetPoint(SI_NetPoint& netpoint)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredSchematicNetPoints.contains(&netpoint))) {
         throw LogicError(__FILE__, __LINE__);
@@ -199,7 +199,7 @@ void NetSignal::unregisterSchematicNetPoint(SI_NetPoint& netpoint) throw (Except
     updateErcMessages();
 }
 
-void NetSignal::registerSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception)
+void NetSignal::registerSchematicNetLabel(SI_NetLabel& netlabel)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredSchematicNetLabels.contains(&netlabel))
         || (netlabel.getCircuit() != mCircuit))
@@ -210,7 +210,7 @@ void NetSignal::registerSchematicNetLabel(SI_NetLabel& netlabel) throw (Exceptio
     updateErcMessages();
 }
 
-void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception)
+void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredSchematicNetLabels.contains(&netlabel))) {
         throw LogicError(__FILE__, __LINE__);
@@ -219,7 +219,7 @@ void NetSignal::unregisterSchematicNetLabel(SI_NetLabel& netlabel) throw (Except
     updateErcMessages();
 }
 
-void NetSignal::registerBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void NetSignal::registerBoardNetPoint(BI_NetPoint& netpoint)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredBoardNetPoints.contains(&netpoint))
         || (netpoint.getCircuit() != mCircuit))
@@ -230,7 +230,7 @@ void NetSignal::registerBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::unregisterBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void NetSignal::unregisterBoardNetPoint(BI_NetPoint& netpoint)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredBoardNetPoints.contains(&netpoint))) {
         throw LogicError(__FILE__, __LINE__);
@@ -239,7 +239,7 @@ void NetSignal::unregisterBoardNetPoint(BI_NetPoint& netpoint) throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::registerBoardVia(BI_Via& via) throw (Exception)
+void NetSignal::registerBoardVia(BI_Via& via)
 {
     if ((!mIsAddedToCircuit) || (mRegisteredBoardVias.contains(&via))
         || (via.getCircuit() != mCircuit))
@@ -250,7 +250,7 @@ void NetSignal::registerBoardVia(BI_Via& via) throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::unregisterBoardVia(BI_Via& via) throw (Exception)
+void NetSignal::unregisterBoardVia(BI_Via& via)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredBoardVias.contains(&via))) {
         throw LogicError(__FILE__, __LINE__);
@@ -259,7 +259,7 @@ void NetSignal::unregisterBoardVia(BI_Via& via) throw (Exception)
     updateErcMessages();
 }
 
-void NetSignal::serialize(DomElement& root) const throw (Exception)
+void NetSignal::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

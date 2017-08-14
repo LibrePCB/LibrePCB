@@ -57,9 +57,9 @@ class SchematicClipboard final : public QObject
 
         // General Methods
         //void clear() noexcept;
-        //void cut(const QList<SymbolInstance*>& symbols) throw (Exception);
-        //void copy(const QList<SymbolInstance*>& symbols) throw (Exception);
-        //void paste(Schematic& schematic, QList<SymbolInstance*>& symbols) throw (Exception);
+        //void cut(const QList<SymbolInstance*>& symbols);
+        //void copy(const QList<SymbolInstance*>& symbols);
+        //void paste(Schematic& schematic, QList<SymbolInstance*>& symbols);
 
 
         // Static Methods
@@ -70,7 +70,7 @@ class SchematicClipboard final : public QObject
         // Private Methods
         SchematicClipboard() noexcept;
         ~SchematicClipboard() noexcept;
-        //void setElements(const QList<SymbolInstance*>& symbols) throw (Exception);
+        //void setElements(const QList<SymbolInstance*>& symbols);
 
 
         // Attributes

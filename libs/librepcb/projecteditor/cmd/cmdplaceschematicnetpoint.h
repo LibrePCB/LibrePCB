@@ -64,11 +64,11 @@ class CmdPlaceSchematicNetPoint final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
-        bool buildAndExecuteChildCommands() throw (Exception);
-        NetSignal* getOrCreateNewNetSignal() throw (Exception);
-        SI_NetPoint* createNewNetPoint(NetSignal& netsignal) throw (Exception);
+        bool buildAndExecuteChildCommands();
+        NetSignal* getOrCreateNewNetSignal();
+        SI_NetPoint* createNewNetPoint(NetSignal& netsignal);
 
 
         // Private Member Variables

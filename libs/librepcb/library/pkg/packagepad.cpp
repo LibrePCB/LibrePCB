@@ -39,7 +39,7 @@ PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-PackagePad::PackagePad(const DomElement& domElement) throw (Exception) :
+PackagePad::PackagePad(const DomElement& domElement) :
     mUuid()
 {
     // read attributes
@@ -66,7 +66,7 @@ void PackagePad::setName(const QString& name) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void PackagePad::serialize(DomElement& root) const throw (Exception)
+void PackagePad::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

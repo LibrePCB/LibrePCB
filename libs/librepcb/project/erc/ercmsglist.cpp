@@ -38,7 +38,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
+ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/erc.xml")), mXmlFile(nullptr)
 {
@@ -85,7 +85,7 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
     emit ercMsgChanged(ercMsg);
 }
 
-void ErcMsgList::restoreIgnoreState() throw (Exception)
+void ErcMsgList::restoreIgnoreState()
 {
     if (mXmlFile->isCreated()) return; // the XML file does not yet exist
 
@@ -132,7 +132,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ErcMsgList::serialize(DomElement& root) const throw (Exception)
+void ErcMsgList::serialize(DomElement& root) const
 {
     foreach (ErcMsg* ercMsg, mItems) {
         if (ercMsg->isIgnored()) {

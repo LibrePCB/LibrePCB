@@ -59,7 +59,7 @@ class LibraryEditor final : public QMainWindow
     public:
 
         // Constructors / Destructor
-        explicit LibraryEditor(workspace::Workspace& workspace) throw (Exception);
+        explicit LibraryEditor(workspace::Workspace& workspace);
         ~LibraryEditor() noexcept;
 
 

@@ -38,14 +38,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception) :
+BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) :
     BI_Base(board)
 {
     mPolygon.reset(new Polygon(*other.mPolygon));
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) throw (Exception) :
+BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) :
     BI_Base(board)
 {
     mPolygon.reset(new Polygon(domElement));
@@ -53,14 +53,14 @@ BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) throw (Except
 }
 
 BI_Polygon::BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
-                       bool isGrabArea, const Point& startPos) throw (Exception) :
+                       bool isGrabArea, const Point& startPos) :
     BI_Base(board)
 {
     mPolygon.reset(new Polygon(layerId, lineWidth, fill, isGrabArea, startPos));
     init();
 }
 
-void BI_Polygon::init() throw (Exception)
+void BI_Polygon::init()
 {
     mGraphicsItem.reset(new BGI_Polygon(*this));
     mGraphicsItem->setPos(getPosition().toPxQPointF());
@@ -80,7 +80,7 @@ BI_Polygon::~BI_Polygon() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Polygon::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_Polygon::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -88,7 +88,7 @@ void BI_Polygon::addToBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
-void BI_Polygon::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_Polygon::removeFromBoard(GraphicsScene& scene)
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -96,7 +96,7 @@ void BI_Polygon::removeFromBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-void BI_Polygon::serialize(DomElement& root) const throw (Exception)
+void BI_Polygon::serialize(DomElement& root) const
 {
     mPolygon->serialize(root);
 }

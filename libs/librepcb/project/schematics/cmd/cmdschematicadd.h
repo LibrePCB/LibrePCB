@@ -59,13 +59,13 @@ class CmdSchematicAdd final : public UndoCommand
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
+        void performUndo() override;
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
+        void performRedo() override;
 
 
         // Private Member Variables

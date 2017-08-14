@@ -83,15 +83,15 @@ class WorkspaceLibraryScanner final : public QThread
     private: // Methods
 
         void run() noexcept override;
-        void clearAllTables(SQLiteDatabase& db) throw (Exception);
+        void clearAllTables(SQLiteDatabase& db);
         template <typename ElementType>
         int addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                              const QString& table, const QString& idColumn) throw (Exception);
+                              const QString& table, const QString& idColumn);
         template <typename ElementType>
         int addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                            const QString& table, const QString& idColumn) throw (Exception);
+                            const QString& table, const QString& idColumn);
         int addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                           const QString& table, const QString& idColumn) throw (Exception);
+                           const QString& table, const QString& idColumn);
 
 
     private: // Data

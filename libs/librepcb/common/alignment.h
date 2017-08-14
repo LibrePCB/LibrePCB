@@ -53,7 +53,7 @@ class HAlign final
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         HAlign& mirror() noexcept;
         HAlign mirrored() const noexcept {return HAlign(*this).mirror();}
-        static HAlign deserializeFromString(const QString& str) throw (Exception);
+        static HAlign deserializeFromString(const QString& str);
         static HAlign left() noexcept {return HAlign(Qt::AlignLeft);}
         static HAlign center() noexcept {return HAlign(Qt::AlignHCenter);}
         static HAlign right() noexcept {return HAlign(Qt::AlignRight);}
@@ -89,7 +89,7 @@ class VAlign final
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         VAlign& mirror() noexcept;
         VAlign mirrored() const noexcept {return VAlign(*this).mirror();}
-        static VAlign deserializeFromString(const QString& str) throw (Exception);
+        static VAlign deserializeFromString(const QString& str);
         static VAlign top() noexcept {return VAlign(Qt::AlignTop);}
         static VAlign center() noexcept {return VAlign(Qt::AlignVCenter);}
         static VAlign bottom() noexcept {return VAlign(Qt::AlignBottom);}

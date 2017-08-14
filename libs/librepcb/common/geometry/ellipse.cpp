@@ -51,7 +51,7 @@ Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabAre
     Q_ASSERT(radiusY > 0);
 }
 
-Ellipse::Ellipse(const DomElement& domElement) throw (Exception)
+Ellipse::Ellipse(const DomElement& domElement)
 {
     mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
     mLineWidth = domElement.getAttribute<Length>("width", true);
@@ -149,7 +149,7 @@ Ellipse Ellipse::rotated(const Angle& angle, const Point& center) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void Ellipse::serialize(DomElement& root) const throw (Exception)
+void Ellipse::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

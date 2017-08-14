@@ -65,7 +65,7 @@ CmdFlipSelectedBoardItems::~CmdFlipSelectedBoardItems() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdFlipSelectedBoardItems::performExecute() throw (Exception)
+bool CmdFlipSelectedBoardItems::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
@@ -175,7 +175,7 @@ bool CmdFlipSelectedBoardItems::performExecute() throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-void CmdFlipSelectedBoardItems::flipDevice(BI_Device& device, const Point& center) throw (Exception)
+void CmdFlipSelectedBoardItems::flipDevice(BI_Device& device, const Point& center)
 {
     // disconnect all netpoints/netlines
     foreach (BI_FootprintPad* pad, device.getFootprint().getPads()) {

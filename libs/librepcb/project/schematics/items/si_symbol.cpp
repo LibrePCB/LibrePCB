@@ -43,7 +43,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (Exception) :
+SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) :
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr)
 {
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -62,14 +62,14 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (
 }
 
 SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
-                     const Uuid& symbolItem, const Point& position, const Angle& rotation) throw (Exception) :
+                     const Uuid& symbolItem, const Point& position, const Angle& rotation) :
     SI_Base(schematic), mComponentInstance(&cmpInstance), mSymbVarItem(nullptr),
     mSymbol(nullptr), mUuid(Uuid::createRandom()), mPosition(position), mRotation(rotation)
 {
     init(symbolItem);
 }
 
-void SI_Symbol::init(const Uuid& symbVarItemUuid) throw (Exception)
+void SI_Symbol::init(const Uuid& symbVarItemUuid)
 {
     mSymbVarItem = mComponentInstance->getSymbolVariant().getItemByUuid(symbVarItemUuid);
     if (!mSymbVarItem) {
@@ -159,7 +159,7 @@ void SI_Symbol::setRotation(const Angle& newRotation) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
+void SI_Symbol::addToSchematic(GraphicsScene& scene)
 {
     if (isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
@@ -175,7 +175,7 @@ void SI_Symbol::addToSchematic(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+void SI_Symbol::removeFromSchematic(GraphicsScene& scene)
 {
     if (!isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
@@ -191,7 +191,7 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void SI_Symbol::serialize(DomElement& root) const throw (Exception)
+void SI_Symbol::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

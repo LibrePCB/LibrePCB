@@ -48,7 +48,7 @@ class ComponentCategory final : public LibraryCategory
         // Constructors / Destructor
         ComponentCategory() = delete;
         ComponentCategory(const ComponentCategory& other) = delete;
-        ComponentCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        ComponentCategory(const FilePath& elementDirectory, bool readOnly);
         ~ComponentCategory() noexcept;
 
         // Operator Overloadings

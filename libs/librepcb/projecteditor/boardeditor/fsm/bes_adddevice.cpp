@@ -239,7 +239,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
     return PassToParentState;
 }
 
-void BES_AddDevice::startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) throw (Exception)
+void BES_AddDevice::startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt)
 {
     Board* board = mEditor.getActiveBoard();
     Q_ASSERT(board); if (!board) throw LogicError(__FILE__, __LINE__);

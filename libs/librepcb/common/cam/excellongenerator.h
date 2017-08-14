@@ -60,8 +60,8 @@ class ExcellonGenerator final
 
         // General Methods
         void drill(const Point& pos, const Length& dia) noexcept;
-        void generate() throw (Exception);
-        void saveToFile(const FilePath& filepath) const throw (Exception);
+        void generate();
+        void saveToFile(const FilePath& filepath) const;
         void reset() noexcept;
 
         // Operator Overloadings

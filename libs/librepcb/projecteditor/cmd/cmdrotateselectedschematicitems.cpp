@@ -59,7 +59,7 @@ CmdRotateSelectedSchematicItems::~CmdRotateSelectedSchematicItems() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRotateSelectedSchematicItems::performExecute() throw (Exception)
+bool CmdRotateSelectedSchematicItems::performExecute()
 {
     // get all selected items
     QList<SI_Base*> items = mSchematic.getSelectedItems(false, true, false, true, false, false,

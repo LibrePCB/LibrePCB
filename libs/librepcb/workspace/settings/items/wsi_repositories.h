@@ -53,7 +53,7 @@ class WSI_Repositories final : public WSI_Base
         // Constructors / Destructor
         WSI_Repositories() = delete;
         WSI_Repositories(const WSI_Repositories& other) = delete;
-        WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
+        WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement);
         ~WSI_Repositories() noexcept;
 
         // Getters
@@ -68,7 +68,7 @@ class WSI_Repositories final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         WSI_Repositories& operator=(const WSI_Repositories& rhs) = delete;

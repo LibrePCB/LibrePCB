@@ -61,19 +61,19 @@ void CmdNetSignalEdit::setName(const QString& name, bool isAutoName) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdNetSignalEdit::performExecute() throw (Exception)
+bool CmdNetSignalEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdNetSignalEdit::performUndo() throw (Exception)
+void CmdNetSignalEdit::performUndo()
 {
     mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName); // can throw
 }
 
-void CmdNetSignalEdit::performRedo() throw (Exception)
+void CmdNetSignalEdit::performRedo()
 {
     mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName); // can throw
 }

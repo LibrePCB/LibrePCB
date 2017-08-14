@@ -63,10 +63,10 @@ class BI_Via final : public BI_Base, public SerializableObject
         // Constructors / Destructor
         BI_Via() = delete;
         BI_Via(const BI_Via& other) = delete;
-        BI_Via(Board& board, const BI_Via& other) throw (Exception);
-        BI_Via(Board& board, const DomElement& domElement) throw (Exception);
+        BI_Via(Board& board, const BI_Via& other);
+        BI_Via(Board& board, const DomElement& domElement);
         BI_Via(Board& board, const Point& position, BI_Via::Shape shape,
-               const Length& size, const Length& drillDiameter, NetSignal* netsignal) throw (Exception);
+               const Length& size, const Length& drillDiameter, NetSignal* netsignal);
         ~BI_Via() noexcept;
 
         // Getters
@@ -83,21 +83,21 @@ class BI_Via final : public BI_Base, public SerializableObject
         bool isSelectable() const noexcept override;
 
         // Setters
-        void setNetSignal(NetSignal* netsignal) throw (Exception);
+        void setNetSignal(NetSignal* netsignal);
         void setPosition(const Point& position) noexcept;
         void setShape(Shape shape) noexcept;
         void setSize(const Length& size) noexcept;
         void setDrillDiameter(const Length& diameter) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
-        void registerNetPoint(BI_NetPoint& netpoint) throw (Exception);
-        void unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
+        void registerNetPoint(BI_NetPoint& netpoint);
+        void unregisterNetPoint(BI_NetPoint& netpoint);
         void updateNetPoints() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Inherited from SI_Base
@@ -115,7 +115,7 @@ class BI_Via final : public BI_Base, public SerializableObject
 
     private:
 
-        void init() throw (Exception);
+        void init();
         void boardAttributesChanged();
         bool checkAttributesValidity() const noexcept;
 

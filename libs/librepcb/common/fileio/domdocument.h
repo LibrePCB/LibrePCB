@@ -72,7 +72,7 @@ class DomDocument final
          *
          * @throw Exception         If parsing the file has failed.
          */
-        explicit DomDocument(const QByteArray& fileContent, const FilePath& filepath) throw (Exception);
+        explicit DomDocument(const QByteArray& fileContent, const FilePath& filepath);
 
         /**
          * @brief Destructor (destroys the whole DOM tree)
@@ -104,7 +104,7 @@ class DomDocument final
          *
          * @return The root element of the document
          */
-        DomElement& getRoot(const QString& expectedName) const throw (Exception);
+        DomElement& getRoot(const QString& expectedName) const;
 
 
         // General Methods
@@ -114,7 +114,7 @@ class DomDocument final
          *
          * @return The DOM tree which can be written into a file
          */
-        QByteArray toByteArray() const throw (Exception);
+        QByteArray toByteArray() const;
 
 
         // Operator Overloadings

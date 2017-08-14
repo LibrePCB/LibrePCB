@@ -61,10 +61,10 @@ class LibraryBaseElement : public QObject, public SerializableObject
                            const QString& longElementName, const Uuid& uuid,
                            const Version& version, const QString& author,
                            const QString& name_en_US, const QString& description_en_US,
-                           const QString& keywords_en_US) throw (Exception);
+                           const QString& keywords_en_US);
         LibraryBaseElement(const FilePath& elementDirectory, bool dirnameMustBeUuid,
                            const QString& shortElementName, const QString& longElementName,
-                           bool readOnly) throw (Exception);
+                           bool readOnly);
         virtual ~LibraryBaseElement() noexcept;
 
         // Getters: General
@@ -93,11 +93,11 @@ class LibraryBaseElement : public QObject, public SerializableObject
         void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords.insert(locale, keywords);}
 
         // General Methods
-        virtual void save() throw (Exception);
-        virtual void saveTo(const FilePath& destination) throw (Exception);
-        virtual void saveIntoParentDirectory(const FilePath& parentDir) throw (Exception);
-        virtual void moveTo(const FilePath& destination) throw (Exception);
-        virtual void moveIntoParentDirectory(const FilePath& parentDir) throw (Exception);
+        virtual void save();
+        virtual void saveTo(const FilePath& destination);
+        virtual void saveIntoParentDirectory(const FilePath& parentDir);
+        virtual void moveTo(const FilePath& destination);
+        virtual void moveIntoParentDirectory(const FilePath& parentDir);
 
         // Operator Overloadings
         LibraryBaseElement& operator=(const LibraryBaseElement& rhs) = delete;
@@ -112,10 +112,10 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         // Protected Methods
         virtual void cleanupAfterLoadingElementFromFile() noexcept;
-        virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception);
+        virtual void copyTo(const FilePath& destination, bool removeSource);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const throw (Exception) override;
+        virtual void serialize(DomElement& root) const override;
         virtual bool checkAttributesValidity() const noexcept;
 
 

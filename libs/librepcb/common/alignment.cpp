@@ -56,7 +56,7 @@ QString HAlign::serializeToString() const noexcept
 }
 
 
-HAlign HAlign::deserializeFromString(const QString& align) throw (Exception)
+HAlign HAlign::deserializeFromString(const QString& align)
 {
     if (align == "left")
         return HAlign(Qt::AlignLeft);
@@ -98,7 +98,7 @@ QString VAlign::serializeToString() const noexcept
     }
 }
 
-VAlign VAlign::deserializeFromString(const QString& align) throw (Exception)
+VAlign VAlign::deserializeFromString(const QString& align)
 {
     if (align == "top")
         return VAlign(Qt::AlignTop);

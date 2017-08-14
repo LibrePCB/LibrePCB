@@ -50,19 +50,19 @@ CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute() throw (Exception)
+bool CmdSchematicNetLabelRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdSchematicNetLabelRemove::performUndo() throw (Exception)
+void CmdSchematicNetLabelRemove::performUndo()
 {
     mSchematic.addNetLabel(mNetLabel); // can throw
 }
 
-void CmdSchematicNetLabelRemove::performRedo() throw (Exception)
+void CmdSchematicNetLabelRemove::performRedo()
 {
     mSchematic.removeNetLabel(mNetLabel); // can throw
 }

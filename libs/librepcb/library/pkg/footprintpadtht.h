@@ -51,7 +51,7 @@ class FootprintPadTht final : public FootprintPad
         explicit FootprintPadTht(const Uuid& padUuid, const Point& pos, const Angle& rot,
                                  const Length& width, const Length& height,
                                  Shape_t shape, const Length& drillDiameter) noexcept;
-        explicit FootprintPadTht(const DomElement& domElement) throw (Exception);
+        explicit FootprintPadTht(const DomElement& domElement);
         ~FootprintPadTht() noexcept;
 
         // Getters
@@ -69,10 +69,10 @@ class FootprintPadTht final : public FootprintPad
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Static Methods
-        static Shape_t stringToShape(const QString& shape) throw (Exception);
+        static Shape_t stringToShape(const QString& shape);
         static QString shapeToString(Shape_t shape) noexcept;
 
 

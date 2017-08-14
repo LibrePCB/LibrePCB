@@ -43,7 +43,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception) :
+ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElement) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
@@ -91,7 +91,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElem
 }
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                     const Uuid& symbVar, const QString& name) throw (Exception) :
+                                     const Uuid& symbVar, const QString& name) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr),
     mAttributes()
@@ -123,7 +123,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component&
     init();
 }
 
-void ComponentInstance::init() throw (Exception)
+void ComponentInstance::init()
 {
     // create ERC messages
     mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(),
@@ -215,7 +215,7 @@ bool ComponentInstance::isUsed() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void ComponentInstance::setName(const QString& name) throw (Exception)
+void ComponentInstance::setName(const QString& name)
 {
     if (name != mName) {
         if(name.isEmpty()) {
@@ -248,7 +248,7 @@ void ComponentInstance::setAttributes(const AttributeList& attributes) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentInstance::addToCircuit() throw (Exception)
+void ComponentInstance::addToCircuit()
 {
     if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -263,7 +263,7 @@ void ComponentInstance::addToCircuit() throw (Exception)
     sgl.dismiss();
 }
 
-void ComponentInstance::removeFromCircuit() throw (Exception)
+void ComponentInstance::removeFromCircuit()
 {
     if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
@@ -283,7 +283,7 @@ void ComponentInstance::removeFromCircuit() throw (Exception)
     sgl.dismiss();
 }
 
-void ComponentInstance::registerSymbol(SI_Symbol& symbol) throw (Exception)
+void ComponentInstance::registerSymbol(SI_Symbol& symbol)
 {
     if ((!mIsAddedToCircuit) || (symbol.getCircuit() != mCircuit)) {
         throw LogicError(__FILE__, __LINE__);
@@ -301,7 +301,7 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol) throw (Exception)
     updateErcMessages();
 }
 
-void ComponentInstance::unregisterSymbol(SI_Symbol& symbol) throw (Exception)
+void ComponentInstance::unregisterSymbol(SI_Symbol& symbol)
 {
     Uuid itemUuid = symbol.getCompSymbVarItem().getUuid();
     if ((!mIsAddedToCircuit) || (!mRegisteredSymbols.contains(itemUuid))
@@ -313,7 +313,7 @@ void ComponentInstance::unregisterSymbol(SI_Symbol& symbol) throw (Exception)
     updateErcMessages();
 }
 
-void ComponentInstance::registerDevice(BI_Device& device) throw (Exception)
+void ComponentInstance::registerDevice(BI_Device& device)
 {
     if ((!mIsAddedToCircuit) || (device.getCircuit() != mCircuit)
         || (mRegisteredDevices.contains(&device)) || (mLibComponent->isSchematicOnly()))
@@ -324,7 +324,7 @@ void ComponentInstance::registerDevice(BI_Device& device) throw (Exception)
     updateErcMessages();
 }
 
-void ComponentInstance::unregisterDevice(BI_Device& device) throw (Exception)
+void ComponentInstance::unregisterDevice(BI_Device& device)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredDevices.contains(&device))) {
         throw LogicError(__FILE__, __LINE__);
@@ -333,7 +333,7 @@ void ComponentInstance::unregisterDevice(BI_Device& device) throw (Exception)
     updateErcMessages();
 }
 
-void ComponentInstance::serialize(DomElement& root) const throw (Exception)
+void ComponentInstance::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

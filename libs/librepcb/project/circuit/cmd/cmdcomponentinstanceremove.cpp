@@ -50,19 +50,19 @@ CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdComponentInstanceRemove::performExecute() throw (Exception)
+bool CmdComponentInstanceRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdComponentInstanceRemove::performUndo() throw (Exception)
+void CmdComponentInstanceRemove::performUndo()
 {
     mCircuit.addComponentInstance(mComponentInstance); // can throw
 }
 
-void CmdComponentInstanceRemove::performRedo() throw (Exception)
+void CmdComponentInstanceRemove::performRedo()
 {
     mCircuit.removeComponentInstance(mComponentInstance); // can throw
 }

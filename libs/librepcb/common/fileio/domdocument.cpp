@@ -39,7 +39,7 @@ DomDocument::DomDocument(DomElement& root) noexcept :
     mRootElement->setDocument(this);
 }
 
-DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath) throw (Exception) :
+DomDocument::DomDocument(const QByteArray& fileContent, const FilePath& filepath) :
     mFilePath(filepath), mRootElement(nullptr)
 {
     QDomDocument doc;
@@ -73,7 +73,7 @@ DomDocument::~DomDocument() noexcept
  *  Getters
  ****************************************************************************************/
 
-DomElement& DomDocument::getRoot(const QString& expectedName) const throw (Exception)
+DomElement& DomDocument::getRoot(const QString& expectedName) const
 {
     DomElement& root = getRoot();
     if (root.getName() != expectedName) {
@@ -88,7 +88,7 @@ DomElement& DomDocument::getRoot(const QString& expectedName) const throw (Excep
  *  General Methods
  ****************************************************************************************/
 
-QByteArray DomDocument::toByteArray() const throw (Exception)
+QByteArray DomDocument::toByteArray() const
 {
     QByteArray data;
     QXmlStreamWriter writer(&data);

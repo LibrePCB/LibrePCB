@@ -97,7 +97,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception     If the project could not be opened successfully
          */
-        Project(const FilePath& filepath, bool readOnly) throw (Exception) :
+        Project(const FilePath& filepath, bool readOnly) :
             Project(filepath, false, readOnly) {}
 
         /**
@@ -310,7 +310,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception This method throws an exception on error.
          */
-        Schematic* createSchematic(const QString& name) throw (Exception);
+        Schematic* createSchematic(const QString& name);
 
         /**
          * @brief Add an existing schematic to this project
@@ -322,7 +322,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdSchematicAdd}
          */
-        void addSchematic(Schematic& schematic, int newIndex = -1) throw (Exception);
+        void addSchematic(Schematic& schematic, int newIndex = -1);
 
         /**
          * @brief Remove a schematic from this project
@@ -335,7 +335,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdSchematicRemove}
          */
-        void removeSchematic(Schematic& schematic, bool deleteSchematic = false) throw (Exception);
+        void removeSchematic(Schematic& schematic, bool deleteSchematic = false);
 
         /**
          * @brief Export the schematic pages as a PDF
@@ -347,7 +347,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @todo add more parameters (paper size, orientation, pages to print, ...)
          */
-        void exportSchematicsAsPdf(const FilePath& filepath) throw (Exception);
+        void exportSchematicsAsPdf(const FilePath& filepath);
 
 
         // Board Methods
@@ -402,7 +402,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception This method throws an exception on error.
          */
-        Board* createBoard(const QString& name) throw (Exception);
+        Board* createBoard(const QString& name);
 
         /**
          * @brief Create a new board as a copy of an existing board
@@ -414,7 +414,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception This method throws an exception on error.
          */
-        Board* createBoard(const Board& other, const QString& name) throw (Exception);
+        Board* createBoard(const Board& other, const QString& name);
 
         /**
          * @brief Add an existing board to this project
@@ -426,7 +426,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdBoardAdd}
          */
-        void addBoard(Board& board, int newIndex = -1) throw (Exception);
+        void addBoard(Board& board, int newIndex = -1);
 
         /**
          * @brief Remove a board from this project
@@ -439,7 +439,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{project#CmdBoardRemove}
          */
-        void removeBoard(Board& board, bool deleteBoard = false) throw (Exception);
+        void removeBoard(Board& board, bool deleteBoard = false);
 
 
         // General Methods
@@ -453,7 +453,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception on error
          */
-        void save(bool toOriginal) throw (Exception);
+        void save(bool toOriginal);
 
 
         // Helper Methods
@@ -471,11 +471,11 @@ class Project final : public QObject, public IF_AttributeProvider,
 
         // Static Methods
 
-        static Project* create(const FilePath& filepath) throw (Exception)
+        static Project* create(const FilePath& filepath)
         {return new Project(filepath, true, false);}
 
         static bool isValidProjectDirectory(const FilePath& dir) noexcept;
-        static Version getProjectFileFormatVersion(const FilePath& dir) throw (Exception);
+        static Version getProjectFileFormatVersion(const FilePath& dir);
 
 
     signals:
@@ -526,14 +526,14 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception     If the project could not be created/opened successfully
          */
-        explicit Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception);
+        explicit Project(const FilePath& filepath, bool create, bool readOnly);
 
         bool checkAttributesValidity() const noexcept;
 
         /**
          * @copydoc librepcb::SerializableObject::serialize()
          */
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
@@ -553,7 +553,7 @@ class Project final : public QObject, public IF_AttributeProvider,
          *
          * @throw Exception     On error
          */
-        void printSchematicPages(QPrinter& printer, QList<int>& pages) throw (Exception);
+        void printSchematicPages(QPrinter& printer, QList<int>& pages);
 
 
         // Project File (*.lpp)

@@ -59,18 +59,18 @@ class CmdListElementsSwap final : public UndoCommand
     private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override {
+        bool performExecute() override {
             performRedo(); // can throw
             return true;
         }
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override {
+        void performUndo() override {
             mList.swap(mJ, mI);
         }
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override {
+        void performRedo() override {
             mList.swap(mI, mJ);
         }
 

@@ -72,7 +72,7 @@ SI_Symbol* CmdAddSymbolToSchematic::getSymbolInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdAddSymbolToSchematic::performExecute() throw (Exception)
+bool CmdAddSymbolToSchematic::performExecute()
 {
     // get the symbol UUID
     const library::ComponentSymbolVariantItem* item = mComponentInstance.getSymbolVariant().getItemByUuid(mSymbolItemUuid);

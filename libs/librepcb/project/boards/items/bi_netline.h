@@ -58,10 +58,10 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         BI_NetLine() = delete;
         BI_NetLine(const BI_NetLine& other) = delete;
         BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& startPoint,
-                   BI_NetPoint& endPoint) throw (Exception);
-        BI_NetLine(Board& board, const DomElement& domElement) throw (Exception);
+                   BI_NetPoint& endPoint);
+        BI_NetLine(Board& board, const DomElement& domElement);
         BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
-                   const Length& width) throw (Exception);
+                   const Length& width);
         ~BI_NetLine() noexcept;
 
         // Getters
@@ -80,12 +80,12 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         void setWidth(const Length& width) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Inherited from SI_Base
@@ -101,7 +101,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

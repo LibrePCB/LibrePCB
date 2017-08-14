@@ -37,7 +37,7 @@ GridProperties::GridProperties() noexcept :
 {
 }
 
-GridProperties::GridProperties(const DomElement& domElement) throw (Exception)
+GridProperties::GridProperties(const DomElement& domElement)
 {
     mType = stringToType(domElement.getAttribute<QString>("type", true));
     mInterval = domElement.getAttribute<Length>("interval", true);
@@ -62,7 +62,7 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GridProperties::serialize(DomElement& root) const throw (Exception)
+void GridProperties::serialize(DomElement& root) const
 {
     root.setAttribute("type", typeToString(mType));
     root.setAttribute("interval", mInterval);
@@ -85,7 +85,7 @@ GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept
  *  Private Static Methods
  ****************************************************************************************/
 
-GridProperties::Type_t GridProperties::stringToType(const QString& type) throw (Exception)
+GridProperties::Type_t GridProperties::stringToType(const QString& type)
 {
     if (type == "off")          return Type_t::Off;
     else if (type == "lines")   return Type_t::Lines;
@@ -93,7 +93,7 @@ GridProperties::Type_t GridProperties::stringToType(const QString& type) throw (
     else throw RuntimeError(__FILE__, __LINE__, QString(tr("Unknown grid type: \"%1\"")).arg(type));
 }
 
-QString GridProperties::typeToString(Type_t type) throw (Exception)
+QString GridProperties::typeToString(Type_t type)
 {
     switch (type)
     {

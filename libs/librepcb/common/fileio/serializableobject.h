@@ -63,7 +63,7 @@ class SerializableObject
          *
          * @see #serialize()
          */
-        DomElement* serializeToDomElement(const QString& name) const throw (Exception) {
+        DomElement* serializeToDomElement(const QString& name) const {
             QScopedPointer<DomElement> root(new DomElement(name));
             serialize(*root);
             return root.take();
@@ -83,11 +83,11 @@ class SerializableObject
          *
          * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual void serialize(DomElement& root) const throw (Exception) = 0;
+        virtual void serialize(DomElement& root) const = 0;
 
         template <typename T>
         static void serializeObjectContainer(DomElement& root, const T& container,
-            const QString& itemName) throw (Exception)
+            const QString& itemName)
         {
             for (const auto& object : container) {
                 root.appendChild(object.serializeToDomElement(itemName)); // can throw
@@ -96,7 +96,7 @@ class SerializableObject
 
         template <typename T>
         static void serializePointerContainer(DomElement& root, const T& container,
-            const QString& itemName) throw (Exception)
+            const QString& itemName)
         {
             for (const auto& pointer : container) {
                 root.appendChild(pointer->serializeToDomElement(itemName)); // can throw

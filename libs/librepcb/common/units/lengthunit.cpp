@@ -185,7 +185,7 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept
 
 // Static Methods
 
-LengthUnit LengthUnit::fromIndex(int index) throw (Exception)
+LengthUnit LengthUnit::fromIndex(int index)
 {
     if (index >= static_cast<int>(LengthUnit_t::_COUNT))
         throw LogicError(__FILE__, __LINE__, QString::number(index));
@@ -193,7 +193,7 @@ LengthUnit LengthUnit::fromIndex(int index) throw (Exception)
     return LengthUnit(static_cast<LengthUnit_t>(index));
 }
 
-LengthUnit LengthUnit::deserializeFromString(const QString& str) throw (Exception)
+LengthUnit LengthUnit::deserializeFromString(const QString& str)
 {
     if (str == "millimeters")
         return LengthUnit(LengthUnit_t::Millimeters);

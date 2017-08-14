@@ -46,7 +46,7 @@ UndoCommand::~UndoCommand() noexcept
  *  General Methods
  ****************************************************************************************/
 
-bool UndoCommand::execute() throw (Exception)
+bool UndoCommand::execute()
 {
     if (mIsExecuted) {
         throw LogicError(__FILE__, __LINE__);
@@ -59,7 +59,7 @@ bool UndoCommand::execute() throw (Exception)
     return retval;
 }
 
-void UndoCommand::undo() throw (Exception)
+void UndoCommand::undo()
 {
     if (!isCurrentlyExecuted()) {
         throw LogicError(__FILE__, __LINE__);
@@ -69,7 +69,7 @@ void UndoCommand::undo() throw (Exception)
     mUndoCount++;
 }
 
-void UndoCommand::redo() throw (Exception)
+void UndoCommand::redo()
 {
     if ((!wasEverExecuted()) || (isCurrentlyExecuted())) {
         throw LogicError(__FILE__, __LINE__);

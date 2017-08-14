@@ -74,7 +74,7 @@ CmdBoardNetPointAdd::~CmdBoardNetPointAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetPointAdd::performExecute() throw (Exception)
+bool CmdBoardNetPointAdd::performExecute()
 {
     if (!mNetPoint) {
         // create new netpoint
@@ -92,12 +92,12 @@ bool CmdBoardNetPointAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdBoardNetPointAdd::performUndo() throw (Exception)
+void CmdBoardNetPointAdd::performUndo()
 {
     mBoard.removeNetPoint(*mNetPoint); // can throw
 }
 
-void CmdBoardNetPointAdd::performRedo() throw (Exception)
+void CmdBoardNetPointAdd::performRedo()
 {
     mBoard.addNetPoint(*mNetPoint); // can throw
 }

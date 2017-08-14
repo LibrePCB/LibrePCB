@@ -49,19 +49,19 @@ CmdBoardNetPointRemove::~CmdBoardNetPointRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetPointRemove::performExecute() throw (Exception)
+bool CmdBoardNetPointRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdBoardNetPointRemove::performUndo() throw (Exception)
+void CmdBoardNetPointRemove::performUndo()
 {
     mBoard.addNetPoint(mNetPoint); // can throw
 }
 
-void CmdBoardNetPointRemove::performRedo() throw (Exception)
+void CmdBoardNetPointRemove::performRedo()
 {
     mBoard.removeNetPoint(mNetPoint); // can throw
 }

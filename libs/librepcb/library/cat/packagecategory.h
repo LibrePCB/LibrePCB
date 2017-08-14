@@ -48,7 +48,7 @@ class PackageCategory final : public LibraryCategory
         // Constructors / Destructor
         PackageCategory() = delete;
         PackageCategory(const PackageCategory& other) = delete;
-        PackageCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+        PackageCategory(const FilePath& elementDirectory, bool readOnly);
         ~PackageCategory() noexcept;
 
         // Operator Overloadings

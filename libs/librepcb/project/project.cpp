@@ -51,7 +51,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(const FilePath& filepath, bool create, bool readOnly) throw (Exception) :
+Project::Project(const FilePath& filepath, bool create, bool readOnly) :
     QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mLock(filepath.getParentDir()), mIsRestored(false),
     mIsReadOnly(readOnly)
@@ -334,7 +334,7 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
     return nullptr;
 }
 
-Schematic* Project::createSchematic(const QString& name) throw (Exception)
+Schematic* Project::createSchematic(const QString& name)
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
@@ -349,7 +349,7 @@ Schematic* Project::createSchematic(const QString& name) throw (Exception)
     return Schematic::create(*this, filepath, name);
 }
 
-void Project::addSchematic(Schematic& schematic, int newIndex) throw (Exception)
+void Project::addSchematic(Schematic& schematic, int newIndex)
 {
     if ((mSchematics.contains(&schematic)) || (&schematic.getProject() != this)) {
         throw LogicError(__FILE__, __LINE__);
@@ -380,7 +380,7 @@ void Project::addSchematic(Schematic& schematic, int newIndex) throw (Exception)
     emit attributesChanged();
 }
 
-void Project::removeSchematic(Schematic& schematic, bool deleteSchematic) throw (Exception)
+void Project::removeSchematic(Schematic& schematic, bool deleteSchematic)
 {
     if ((!mSchematics.contains(&schematic)) || (mRemovedSchematics.contains(&schematic))) {
         throw LogicError(__FILE__, __LINE__);
@@ -407,7 +407,7 @@ void Project::removeSchematic(Schematic& schematic, bool deleteSchematic) throw 
     }
 }
 
-void Project::exportSchematicsAsPdf(const FilePath& filepath) throw (Exception)
+void Project::exportSchematicsAsPdf(const FilePath& filepath)
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPaperSize(QPrinter::A4);
@@ -452,7 +452,7 @@ Board* Project::getBoardByName(const QString& name) const noexcept
     return nullptr;
 }
 
-Board* Project::createBoard(const QString& name) throw (Exception)
+Board* Project::createBoard(const QString& name)
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
@@ -467,7 +467,7 @@ Board* Project::createBoard(const QString& name) throw (Exception)
     return Board::create(*this, filepath, name);
 }
 
-Board* Project::createBoard(const Board& other, const QString& name) throw (Exception)
+Board* Project::createBoard(const Board& other, const QString& name)
 {
     QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (basename.isEmpty()) {
@@ -482,7 +482,7 @@ Board* Project::createBoard(const Board& other, const QString& name) throw (Exce
     return new Board(other, filepath, name);
 }
 
-void Project::addBoard(Board& board, int newIndex) throw (Exception)
+void Project::addBoard(Board& board, int newIndex)
 {
     if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
         throw LogicError(__FILE__, __LINE__);
@@ -513,7 +513,7 @@ void Project::addBoard(Board& board, int newIndex) throw (Exception)
     emit attributesChanged();
 }
 
-void Project::removeBoard(Board& board, bool deleteBoard) throw (Exception)
+void Project::removeBoard(Board& board, bool deleteBoard)
 {
     if ((!mBoards.contains(&board)) || (mRemovedBoards.contains(&board))) {
         throw LogicError(__FILE__, __LINE__);
@@ -539,7 +539,7 @@ void Project::removeBoard(Board& board, bool deleteBoard) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void Project::save(bool toOriginal) throw (Exception)
+void Project::save(bool toOriginal)
 {
     QStringList errors;
 
@@ -587,7 +587,7 @@ bool Project::isValidProjectDirectory(const FilePath& dir) noexcept
     return dir.getPathTo(".librepcb-project").isExistingFile();
 }
 
-Version Project::getProjectFileFormatVersion(const FilePath& dir) throw (Exception)
+Version Project::getProjectFileFormatVersion(const FilePath& dir)
 {
     SmartVersionFile versionFile(dir.getPathTo(".librepcb-project"), false, true);
     return versionFile.getVersion();
@@ -603,7 +603,7 @@ bool Project::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Project::serialize(DomElement& root) const throw (Exception)
+void Project::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -714,7 +714,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     return success;
 }
 
-void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) throw (Exception)
+void Project::printSchematicPages(QPrinter& printer, QList<int>& pages)
 {
     if (pages.isEmpty())
         throw RuntimeError(__FILE__, __LINE__, tr("No schematic pages selected."));

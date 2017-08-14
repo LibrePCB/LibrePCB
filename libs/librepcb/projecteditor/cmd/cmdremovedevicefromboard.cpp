@@ -55,7 +55,7 @@ CmdRemoveDeviceFromBoard::~CmdRemoveDeviceFromBoard() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveDeviceFromBoard::performExecute() throw (Exception)
+bool CmdRemoveDeviceFromBoard::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

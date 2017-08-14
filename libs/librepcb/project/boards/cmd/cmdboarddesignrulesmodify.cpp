@@ -48,7 +48,7 @@ CmdBoardDesignRulesModify::~CmdBoardDesignRulesModify() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardDesignRulesModify::performExecute() throw (Exception)
+bool CmdBoardDesignRulesModify::performExecute()
 {
     mOldRules = mBoard.getDesignRules(); // memorize current design rules
 
@@ -57,13 +57,13 @@ bool CmdBoardDesignRulesModify::performExecute() throw (Exception)
     return true; // TODO: determine if the design rules were really modified
 }
 
-void CmdBoardDesignRulesModify::performUndo() throw (Exception)
+void CmdBoardDesignRulesModify::performUndo()
 {
     mBoard.getDesignRules() = mOldRules;
     emit mBoard.attributesChanged();
 }
 
-void CmdBoardDesignRulesModify::performRedo() throw (Exception)
+void CmdBoardDesignRulesModify::performRedo()
 {
     mBoard.getDesignRules() = mNewRules;
     emit mBoard.attributesChanged();

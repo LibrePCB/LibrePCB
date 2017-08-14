@@ -58,7 +58,7 @@ CmdBoardViaAdd::~CmdBoardViaAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardViaAdd::performExecute() throw (Exception)
+bool CmdBoardViaAdd::performExecute()
 {
     if (!mVia) {
         // create new via
@@ -70,12 +70,12 @@ bool CmdBoardViaAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdBoardViaAdd::performUndo() throw (Exception)
+void CmdBoardViaAdd::performUndo()
 {
     mBoard.removeVia(*mVia); // can throw
 }
 
-void CmdBoardViaAdd::performRedo() throw (Exception)
+void CmdBoardViaAdd::performRedo()
 {
     mBoard.addVia(*mVia); // can throw
 }

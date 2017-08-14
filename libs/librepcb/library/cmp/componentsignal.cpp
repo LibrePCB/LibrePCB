@@ -41,7 +41,7 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSignal::ComponentSignal(const DomElement& domElement) throw (Exception)
+ComponentSignal::ComponentSignal(const DomElement& domElement)
 {
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
@@ -63,7 +63,7 @@ ComponentSignal::~ComponentSignal() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSignal::serialize(DomElement& root) const throw (Exception)
+void ComponentSignal::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -91,7 +91,7 @@ bool ComponentSignal::checkAttributesValidity() const noexcept
  *  Private Static Methods
  ****************************************************************************************/
 
-ComponentSignal::SignalRole_t ComponentSignal::stringToSignalRole(const QString& role) throw (Exception)
+ComponentSignal::SignalRole_t ComponentSignal::stringToSignalRole(const QString& role)
 {
     if (role == "power")            return SignalRole_t::POWER;
     else if (role == "input")       return SignalRole_t::INPUT;

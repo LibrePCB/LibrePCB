@@ -50,7 +50,7 @@ class Text final : public SerializableObject
         explicit Text(int layerId, const QString& text, const Point& pos,
                       const Angle& rotation, const Length& height,
                       const Alignment& align) noexcept;
-        explicit Text(const DomElement& domElement) throw (Exception);
+        explicit Text(const DomElement& domElement);
         ~Text() noexcept;
 
         // Getters
@@ -72,7 +72,7 @@ class Text final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
     private:

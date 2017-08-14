@@ -115,7 +115,7 @@ void CmdMoveSelectedSchematicItems::setCurrentPosition(const Point& pos) noexcep
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdMoveSelectedSchematicItems::performExecute() throw (Exception)
+bool CmdMoveSelectedSchematicItems::performExecute()
 {
     if (mDeltaPos.isOrigin()) {
         // no movement required --> discard all move commands

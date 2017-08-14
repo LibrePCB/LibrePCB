@@ -103,7 +103,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         Schematic() = delete;
         Schematic(const Schematic& other) = delete;
-        Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) :
             Schematic(project, filepath, restore, readOnly, false, QString()) {}
         ~Schematic() noexcept;
 
@@ -139,27 +139,27 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Symbol Methods
         SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
-        void addSymbol(SI_Symbol& symbol) throw (Exception);
-        void removeSymbol(SI_Symbol& symbol) throw (Exception);
+        void addSymbol(SI_Symbol& symbol);
+        void removeSymbol(SI_Symbol& symbol);
 
         // NetPoint Methods
         SI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-        void addNetPoint(SI_NetPoint& netpoint) throw (Exception);
-        void removeNetPoint(SI_NetPoint& netpoint) throw (Exception);
+        void addNetPoint(SI_NetPoint& netpoint);
+        void removeNetPoint(SI_NetPoint& netpoint);
 
         // NetLine Methods
         SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
-        void addNetLine(SI_NetLine& netline) throw (Exception);
-        void removeNetLine(SI_NetLine& netline) throw (Exception);
+        void addNetLine(SI_NetLine& netline);
+        void removeNetLine(SI_NetLine& netline);
 
         // NetLabel Methods
         SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
-        void addNetLabel(SI_NetLabel& netlabel) throw (Exception);
-        void removeNetLabel(SI_NetLabel& netlabel) throw (Exception);
+        void addNetLabel(SI_NetLabel& netlabel);
+        void removeNetLabel(SI_NetLabel& netlabel);
 
         // General Methods
-        void addToProject() throw (Exception);
-        void removeFromProject() throw (Exception);
+        void addToProject();
+        void removeFromProject();
         bool save(bool toOriginal, QStringList& errors) noexcept;
         void showInView(GraphicsView& view) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
@@ -179,7 +179,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
         // Static Methods
         static Schematic* create(Project& project, const FilePath& filepath,
-                                 const QString& name) throw (Exception);
+                                 const QString& name);
 
 
     signals:
@@ -191,12 +191,12 @@ class Schematic final : public QObject, public IF_AttributeProvider,
     private:
 
         Schematic(Project& project, const FilePath& filepath, bool restore,
-                  bool readOnly, bool create, const QString& newName) throw (Exception);
+                  bool readOnly, bool create, const QString& newName);
         void updateIcon() noexcept;
         bool checkAttributesValidity() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // General

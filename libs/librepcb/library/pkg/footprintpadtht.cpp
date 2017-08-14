@@ -42,7 +42,7 @@ FootprintPadTht::FootprintPadTht(const Uuid& padUuid, const Point& pos, const An
 {
 }
 
-FootprintPadTht::FootprintPadTht(const DomElement& domElement) throw (Exception) :
+FootprintPadTht::FootprintPadTht(const DomElement& domElement) :
     FootprintPad(domElement)
 {
     // read attributes
@@ -168,7 +168,7 @@ void FootprintPadTht::setDrillDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void FootprintPadTht::serialize(DomElement& root) const throw (Exception)
+void FootprintPadTht::serialize(DomElement& root) const
 {
     FootprintPad::serialize(root);
     root.setAttribute("shape", shapeToString(mShape));
@@ -190,7 +190,7 @@ bool FootprintPadTht::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-FootprintPadTht::Shape_t FootprintPadTht::stringToShape(const QString& shape) throw (Exception)
+FootprintPadTht::Shape_t FootprintPadTht::stringToShape(const QString& shape)
 {
     if      (shape == QLatin1String("round"))   return Shape_t::ROUND;
     else if (shape == QLatin1String("rect"))    return Shape_t::RECT;

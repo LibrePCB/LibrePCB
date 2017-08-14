@@ -54,7 +54,7 @@ AttributeType::~AttributeType() noexcept
  *  Getters
  ****************************************************************************************/
 
-const AttributeUnit* AttributeType::getUnitFromString(const QString& unit) const throw (Exception)
+const AttributeUnit* AttributeType::getUnitFromString(const QString& unit) const
 {
     if (unit.isEmpty() && mAvailableUnits.isEmpty())
         return nullptr;
@@ -78,7 +78,7 @@ bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept
     }
 }
 
-void AttributeType::throwIfValueInvalid(const QString& value) const throw (Exception)
+void AttributeType::throwIfValueInvalid(const QString& value) const
 {
     if (!isValueValid(value))
     {
@@ -103,7 +103,7 @@ QList<const AttributeType*> AttributeType::getAllTypes() noexcept
     return types;
 }
 
-const AttributeType& AttributeType::fromString(const QString &type) throw (Exception)
+const AttributeType& AttributeType::fromString(const QString &type)
 {
     foreach (const AttributeType* t, getAllTypes())
     {

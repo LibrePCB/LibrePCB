@@ -72,20 +72,20 @@ void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdProjectSettingsChange::performExecute() throw (Exception)
+bool CmdProjectSettingsChange::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the settings were really modified
 }
 
-void CmdProjectSettingsChange::performUndo() throw (Exception)
+void CmdProjectSettingsChange::performUndo()
 {
     applyOldSettings(); // can throw
     mSettings.triggerSettingsChanged();
 }
 
-void CmdProjectSettingsChange::performRedo() throw (Exception)
+void CmdProjectSettingsChange::performRedo()
 {
     applyNewSettings(); // can throw
     mSettings.triggerSettingsChanged();
@@ -95,7 +95,7 @@ void CmdProjectSettingsChange::performRedo() throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-void CmdProjectSettingsChange::applyNewSettings() throw (Exception)
+void CmdProjectSettingsChange::applyNewSettings()
 {
     if (mRestoreDefaults)
     {
@@ -108,7 +108,7 @@ void CmdProjectSettingsChange::applyNewSettings() throw (Exception)
     }
 }
 
-void CmdProjectSettingsChange::applyOldSettings() throw (Exception)
+void CmdProjectSettingsChange::applyOldSettings()
 {
     mSettings.setLocaleOrder(mLocaleOrderOld);
     mSettings.setNormOrder(mNormOrderOld);

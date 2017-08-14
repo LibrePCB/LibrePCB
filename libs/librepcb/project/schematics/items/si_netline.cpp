@@ -41,7 +41,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) throw (Exception) :
+SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) :
     SI_Base(schematic), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
@@ -68,14 +68,14 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) throw
 }
 
 SI_NetLine::SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                       const Length& width) throw (Exception) :
+                       const Length& width) :
     SI_Base(schematic), mPosition(), mUuid(Uuid::createRandom()), mStartPoint(&startPoint),
     mEndPoint(&endPoint), mWidth(width)
 {
     init();
 }
 
-void SI_NetLine::init() throw (Exception)
+void SI_NetLine::init()
 {
     if(mWidth < 0) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -137,7 +137,7 @@ void SI_NetLine::setWidth(const Length& width) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetLine::addToSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetLine::addToSchematic(GraphicsScene& scene)
 {
     if (isAddedToSchematic() || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())) {
         throw LogicError(__FILE__, __LINE__);
@@ -151,7 +151,7 @@ void SI_NetLine::addToSchematic(GraphicsScene& scene) throw (Exception)
     sg.dismiss();
 }
 
-void SI_NetLine::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetLine::removeFromSchematic(GraphicsScene& scene)
 {
     if ((!isAddedToSchematic()) || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())) {
         throw LogicError(__FILE__, __LINE__);
@@ -170,7 +170,7 @@ void SI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_NetLine::serialize(DomElement& root) const throw (Exception)
+void SI_NetLine::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

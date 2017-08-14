@@ -50,7 +50,7 @@ class Ellipse final : public SerializableObject
         Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& center, const Length& radiusX, const Length& radiusY,
                 const Angle& rotation) noexcept;
-        explicit Ellipse(const DomElement& domElement) throw (Exception);
+        explicit Ellipse(const DomElement& domElement);
         ~Ellipse() noexcept;
 
         // Getters
@@ -82,7 +82,7 @@ class Ellipse final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
     private:

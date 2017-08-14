@@ -65,10 +65,10 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         // Constructors / Destructor
         SI_Symbol() = delete;
         SI_Symbol(const SI_Symbol& other) = delete;
-        explicit SI_Symbol(Schematic& schematic, const DomElement& domElement) throw (Exception);
+        explicit SI_Symbol(Schematic& schematic, const DomElement& domElement);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
-                           const Angle& rotation = Angle()) throw (Exception);
+                           const Angle& rotation = Angle());
         ~SI_Symbol() noexcept;
 
         // Getters
@@ -86,11 +86,11 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         void setRotation(const Angle& newRotation) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
+        void addToSchematic(GraphicsScene& scene) override;
+        void removeFromSchematic(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Helper Methods
@@ -121,7 +121,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
     private:
 
-        void init(const Uuid& symbVarItemUuid) throw (Exception);
+        void init(const Uuid& symbVarItemUuid);
         bool checkAttributesValidity() const noexcept;
 
 

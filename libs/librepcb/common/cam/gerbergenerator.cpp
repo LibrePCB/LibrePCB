@@ -197,7 +197,7 @@ void GerberGenerator::reset() noexcept
     mCurrentApertureNumber = -1;
 }
 
-void GerberGenerator::generate() throw (Exception)
+void GerberGenerator::generate()
 {
     mOutput.clear();
     printHeader();
@@ -206,7 +206,7 @@ void GerberGenerator::generate() throw (Exception)
     printFooter();
 }
 
-void GerberGenerator::saveToFile(const FilePath& filepath) const throw (Exception)
+void GerberGenerator::saveToFile(const FilePath& filepath) const
 {
     QScopedPointer<SmartTextFile> file(SmartTextFile::create(filepath));
     file->setContent(mOutput.toLatin1());

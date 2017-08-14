@@ -53,9 +53,9 @@ class Attribute final : public SerializableObject
         // Constructors / Destructor
         Attribute() = delete;
         Attribute(const Attribute& other) noexcept;
-        explicit Attribute(const DomElement& domElement) throw (Exception);
+        explicit Attribute(const DomElement& domElement);
         Attribute(const QString& key, const AttributeType& type, const QString& value,
-                  const AttributeUnit* unit) throw (Exception);
+                  const AttributeUnit* unit);
         ~Attribute() noexcept;
 
         // Getters
@@ -67,14 +67,14 @@ class Attribute final : public SerializableObject
         QString getValueTr(bool showUnit) const noexcept;
 
         // Setters
-        void setKey(const QString& key) throw (Exception);
+        void setKey(const QString& key);
         void setTypeValueUnit(const AttributeType& type, const QString& value,
-                              const AttributeUnit* unit) throw (Exception);
+                              const AttributeUnit* unit);
 
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         bool operator==(const Attribute& rhs) const noexcept;

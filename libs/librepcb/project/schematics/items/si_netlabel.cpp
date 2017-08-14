@@ -39,7 +39,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) throw (Exception) :
+SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) :
     SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
 {
     // read attributes
@@ -57,14 +57,14 @@ SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) thr
     init();
 }
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
+SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) :
     SI_Base(schematic), mUuid(Uuid::createRandom()), mPosition(position), mRotation(0),
     mNetSignal(&netsignal)
 {
     init();
 }
 
-void SI_NetLabel::init() throw (Exception)
+void SI_NetLabel::init()
 {
     connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
 
@@ -125,7 +125,7 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetLabel::addToSchematic(GraphicsScene& scene)
 {
     if (isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
@@ -136,7 +136,7 @@ void SI_NetLabel::addToSchematic(GraphicsScene& scene) throw (Exception)
     SI_Base::addToSchematic(scene, *mGraphicsItem);
 }
 
-void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetLabel::removeFromSchematic(GraphicsScene& scene)
 {
     if (!isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
@@ -146,7 +146,7 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 
-void SI_NetLabel::serialize(DomElement& root) const throw (Exception)
+void SI_NetLabel::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

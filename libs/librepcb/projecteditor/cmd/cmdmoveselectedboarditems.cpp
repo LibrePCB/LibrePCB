@@ -114,7 +114,7 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdMoveSelectedBoardItems::performExecute() throw (Exception)
+bool CmdMoveSelectedBoardItems::performExecute()
 {
     if (mDeltaPos.isOrigin()) {
         // no movement required --> discard all move commands

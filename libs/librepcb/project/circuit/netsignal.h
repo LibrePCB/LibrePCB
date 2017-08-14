@@ -61,9 +61,9 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         // Constructors / Destructor
         NetSignal() = delete;
         NetSignal(const NetSignal& other) = delete;
-        explicit NetSignal(Circuit& circuit, const DomElement& domElement) throw (Exception);
+        explicit NetSignal(Circuit& circuit, const DomElement& domElement);
         explicit NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
-                           bool autoName) throw (Exception);
+                           bool autoName);
         ~NetSignal() noexcept;
 
         // Getters: Attributes
@@ -85,25 +85,25 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         bool isNameForced() const noexcept;
 
         // Setters
-        void setName(const QString& name, bool isAutoName) throw (Exception);
+        void setName(const QString& name, bool isAutoName);
         void setHighlighted(bool hl) noexcept;
 
         // General Methods
-        void addToCircuit() throw (Exception);
-        void removeFromCircuit() throw (Exception);
-        void registerComponentSignal(ComponentSignalInstance& signal) throw (Exception);
-        void unregisterComponentSignal(ComponentSignalInstance& signal) throw (Exception);
-        void registerSchematicNetPoint(SI_NetPoint& netpoint) throw (Exception);
-        void unregisterSchematicNetPoint(SI_NetPoint& netpoint) throw (Exception);
-        void registerSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception);
-        void unregisterSchematicNetLabel(SI_NetLabel& netlabel) throw (Exception);
-        void registerBoardNetPoint(BI_NetPoint& netpoint) throw (Exception);
-        void unregisterBoardNetPoint(BI_NetPoint& netpoint) throw (Exception);
-        void registerBoardVia(BI_Via& via) throw (Exception);
-        void unregisterBoardVia(BI_Via& via) throw (Exception);
+        void addToCircuit();
+        void removeFromCircuit();
+        void registerComponentSignal(ComponentSignalInstance& signal);
+        void unregisterComponentSignal(ComponentSignalInstance& signal);
+        void registerSchematicNetPoint(SI_NetPoint& netpoint);
+        void unregisterSchematicNetPoint(SI_NetPoint& netpoint);
+        void registerSchematicNetLabel(SI_NetLabel& netlabel);
+        void unregisterSchematicNetLabel(SI_NetLabel& netlabel);
+        void registerBoardNetPoint(BI_NetPoint& netpoint);
+        void unregisterBoardNetPoint(BI_NetPoint& netpoint);
+        void registerBoardVia(BI_Via& via);
+        void unregisterBoardVia(BI_Via& via);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         NetSignal& operator=(const NetSignal& rhs) = delete;

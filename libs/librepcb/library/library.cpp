@@ -44,13 +44,13 @@ namespace library {
 
 Library::Library(const Uuid& uuid, const Version& version, const QString& author,
                  const QString& name_en_US, const QString& description_en_US,
-                 const QString& keywords_en_US) throw (Exception) :
+                 const QString& keywords_en_US) :
     LibraryBaseElement(false, getShortElementName(), getLongElementName(), uuid, version,
                        author, name_en_US, description_en_US, keywords_en_US)
 {
 }
 
-Library::Library(const FilePath& libDir, bool readOnly) throw (Exception) :
+Library::Library(const FilePath& libDir, bool readOnly) :
     LibraryBaseElement(libDir, false, "lib", "library", readOnly)
 {
     // check directory suffix
@@ -134,7 +134,7 @@ template QList<FilePath> Library::searchForElements<Device>() const noexcept;
  *  Private Methods
  ****************************************************************************************/
 
-void Library::copyTo(const FilePath& destination, bool removeSource) throw (Exception)
+void Library::copyTo(const FilePath& destination, bool removeSource)
 {
     // check directory suffix
     if (destination.getSuffix() != "lplib") {
@@ -147,7 +147,7 @@ void Library::copyTo(const FilePath& destination, bool removeSource) throw (Exce
     LibraryBaseElement::copyTo(destination, removeSource);
 }
 
-void Library::serialize(DomElement& root) const throw (Exception)
+void Library::serialize(DomElement& root) const
 {
     LibraryBaseElement::serialize(root);
     root.appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));

@@ -33,7 +33,7 @@ namespace librepcb {
  *  Static Methods
  ****************************************************************************************/
 
-QByteArray FileUtils::readFile(const FilePath& filepath) throw (Exception)
+QByteArray FileUtils::readFile(const FilePath& filepath)
 {
     if (!filepath.isExistingFile()) {
         throw LogicError(__FILE__, __LINE__,
@@ -48,7 +48,7 @@ QByteArray FileUtils::readFile(const FilePath& filepath) throw (Exception)
     return file.readAll();
 }
 
-void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) throw (Exception)
+void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content)
 {
     makePath(filepath.getParentDir()); // can throw
     QSaveFile file(filepath.toStr());
@@ -70,7 +70,7 @@ void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) t
     }
 }
 
-void FileUtils::copyFile(const FilePath& source, const FilePath& dest) throw (Exception)
+void FileUtils::copyFile(const FilePath& source, const FilePath& dest)
 {
     if (!source.isExistingFile()) {
         throw LogicError(__FILE__, __LINE__,
@@ -89,7 +89,7 @@ void FileUtils::copyFile(const FilePath& source, const FilePath& dest) throw (Ex
     }
 }
 
-void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest) throw (Exception)
+void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest)
 {
     if (!source.isExistingDir()) {
         throw LogicError(__FILE__, __LINE__,
@@ -111,7 +111,7 @@ void FileUtils::copyDirRecursively(const FilePath& source, const FilePath& dest)
     }
 }
 
-void FileUtils::move(const FilePath& source, const FilePath& dest) throw (Exception)
+void FileUtils::move(const FilePath& source, const FilePath& dest)
 {
     if ((!source.isExistingFile()) && (!source.isExistingDir())) {
         throw LogicError(__FILE__, __LINE__,
@@ -129,7 +129,7 @@ void FileUtils::move(const FilePath& source, const FilePath& dest) throw (Except
     }
 }
 
-void FileUtils::removeFile(const FilePath& file) throw (Exception)
+void FileUtils::removeFile(const FilePath& file)
 {
     if (!QFile::remove(file.toStr())) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -137,7 +137,7 @@ void FileUtils::removeFile(const FilePath& file) throw (Exception)
     }
 }
 
-void FileUtils::removeDirRecursively(const FilePath& dir) throw (Exception)
+void FileUtils::removeDirRecursively(const FilePath& dir)
 {
     if (!QDir(dir.toStr()).removeRecursively()) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -146,7 +146,7 @@ void FileUtils::removeDirRecursively(const FilePath& dir) throw (Exception)
     }
 }
 
-void FileUtils::makePath(const FilePath& path) throw (Exception)
+void FileUtils::makePath(const FilePath& path)
 {
     if (!QDir().mkpath(path.toStr())) {
         throw RuntimeError(__FILE__, __LINE__,

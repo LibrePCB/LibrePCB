@@ -69,8 +69,8 @@ class NetworkRequest final : public NetworkRequestBase
 
     private: // Methods
 
-        void prepareRequest() throw (Exception) override;
-        void finalizeRequest() throw (Exception) override;
+        void prepareRequest() override;
+        void finalizeRequest() override;
         void emitSuccessfullyFinishedSignals() noexcept override;
         void fetchNewData() noexcept override;
 

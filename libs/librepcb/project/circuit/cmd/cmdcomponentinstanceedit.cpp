@@ -73,7 +73,7 @@ void CmdComponentInstanceEdit::setAttributes(const AttributeList& attributes) no
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdComponentInstanceEdit::performExecute() throw (Exception)
+bool CmdComponentInstanceEdit::performExecute()
 {
     performRedo(); // can throw
 
@@ -83,14 +83,14 @@ bool CmdComponentInstanceEdit::performExecute() throw (Exception)
     return false;
 }
 
-void CmdComponentInstanceEdit::performUndo() throw (Exception)
+void CmdComponentInstanceEdit::performUndo()
 {
     mCircuit.setComponentInstanceName(mComponentInstance, mOldName); // can throw
     mComponentInstance.setValue(mOldValue);
     mComponentInstance.setAttributes(mOldAttributes);
 }
 
-void CmdComponentInstanceEdit::performRedo() throw (Exception)
+void CmdComponentInstanceEdit::performRedo()
 {
     mCircuit.setComponentInstanceName(mComponentInstance, mNewName); // can throw
     mComponentInstance.setValue(mNewValue);

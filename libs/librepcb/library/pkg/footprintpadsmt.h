@@ -51,7 +51,7 @@ class FootprintPadSmt final : public FootprintPad
         // Constructors / Destructor
         explicit FootprintPadSmt(const Uuid& padUuid, const Point& pos, const Angle& rot,
                                  const Length& width, const Length& height, BoardSide_t side) noexcept;
-        explicit FootprintPadSmt(const DomElement& domElement) throw (Exception);
+        explicit FootprintPadSmt(const DomElement& domElement);
         ~FootprintPadSmt() noexcept;
 
         // Getters
@@ -67,10 +67,10 @@ class FootprintPadSmt final : public FootprintPad
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Static Methods
-        static BoardSide_t stringToBoardSide(const QString& side) throw (Exception);
+        static BoardSide_t stringToBoardSide(const QString& side);
         static QString boardSideToString(BoardSide_t side) noexcept;
 
 

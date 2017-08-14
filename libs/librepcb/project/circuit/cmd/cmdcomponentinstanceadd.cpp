@@ -54,7 +54,7 @@ CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdComponentInstanceAdd::performExecute() throw (Exception)
+bool CmdComponentInstanceAdd::performExecute()
 {
     library::Component* cmp = mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
     if (!cmp) {
@@ -71,12 +71,12 @@ bool CmdComponentInstanceAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdComponentInstanceAdd::performUndo() throw (Exception)
+void CmdComponentInstanceAdd::performUndo()
 {
     mCircuit.removeComponentInstance(*mComponentInstance); // can throw
 }
 
-void CmdComponentInstanceAdd::performRedo() throw (Exception)
+void CmdComponentInstanceAdd::performRedo()
 {
     mCircuit.addComponentInstance(*mComponentInstance); // can throw
 }

@@ -65,7 +65,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static QByteArray readFile(const FilePath& filepath) throw (Exception);
+        static QByteArray readFile(const FilePath& filepath);
 
         /**
          * @brief Write the content of a QByteArray into a file
@@ -77,7 +77,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void writeFile(const FilePath& filepath, const QByteArray& content) throw (Exception);
+        static void writeFile(const FilePath& filepath, const QByteArray& content);
 
         /**
          * @brief Copy a single file
@@ -88,7 +88,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void copyFile(const FilePath& source, const FilePath& dest) throw (Exception);
+        static void copyFile(const FilePath& source, const FilePath& dest);
 
         /**
          * @brief Copy a directory recursively
@@ -99,7 +99,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void copyDirRecursively(const FilePath& source, const FilePath& dest) throw (Exception);
+        static void copyDirRecursively(const FilePath& source, const FilePath& dest);
 
         /**
          * @brief Move/rename a file or directory
@@ -110,7 +110,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void move(const FilePath& source, const FilePath& dest) throw (Exception);
+        static void move(const FilePath& source, const FilePath& dest);
 
         /**
          * @brief Remove a single file
@@ -119,7 +119,7 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void removeFile(const FilePath& file) throw (Exception);
+        static void removeFile(const FilePath& file);
 
         /**
          * @brief Remove a directory recursively
@@ -128,14 +128,14 @@ class FileUtils final
          *
          * @throws Exception    If an error occurs.
          */
-        static void removeDirRecursively(const FilePath& dir) throw (Exception);
+        static void removeDirRecursively(const FilePath& dir);
 
         /**
          * @brief Create a directory with all parent directories
          *
          * @param path          Filepath to a directory (may or may not exist).
          */
-        static void makePath(const FilePath& path) throw (Exception);
+        static void makePath(const FilePath& path);
 
 
         // Operator Overloadings

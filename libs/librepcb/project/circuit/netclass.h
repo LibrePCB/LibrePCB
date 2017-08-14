@@ -57,8 +57,8 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         // Constructors / Destructor
         NetClass() = delete;
         NetClass(const NetClass& other) = delete;
-        explicit NetClass(Circuit& circuit, const DomElement& domElement) throw (Exception);
-        explicit NetClass(Circuit& circuit, const QString& name) throw (Exception);
+        explicit NetClass(Circuit& circuit, const DomElement& domElement);
+        explicit NetClass(Circuit& circuit, const QString& name);
         ~NetClass() noexcept;
 
         // Getters
@@ -69,16 +69,16 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         bool isUsed() const noexcept {return (getNetSignalCount() > 0);}
 
         // Setters
-        void setName(const QString& name) throw (Exception);
+        void setName(const QString& name);
 
         // General Methods
-        void addToCircuit() throw (Exception);
-        void removeFromCircuit() throw (Exception);
-        void registerNetSignal(NetSignal& signal) throw (Exception);
-        void unregisterNetSignal(NetSignal& signal) throw (Exception);
+        void addToCircuit();
+        void removeFromCircuit();
+        void registerNetSignal(NetSignal& signal);
+        void unregisterNetSignal(NetSignal& signal);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         NetClass& operator=(const NetClass& rhs) = delete;

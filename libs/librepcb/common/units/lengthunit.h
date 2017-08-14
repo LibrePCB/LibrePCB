@@ -228,7 +228,7 @@ class LengthUnit final
          *
          * @see #getIndex(), #getAllUnits()
          */
-        static LengthUnit fromIndex(int index) throw (Exception);
+        static LengthUnit fromIndex(int index);
 
         /**
          * @brief Deserialize object from a string
@@ -239,7 +239,7 @@ class LengthUnit final
          *
          * @throws Exception if the string was invalid
          */
-        static LengthUnit deserializeFromString(const QString& str) throw (Exception);
+        static LengthUnit deserializeFromString(const QString& str);
 
         /**
          * @brief Get all available length units

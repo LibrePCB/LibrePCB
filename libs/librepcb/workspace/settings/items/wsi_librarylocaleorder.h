@@ -51,7 +51,7 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         // Constructors / Destructor
         WSI_LibraryLocaleOrder() = delete;
         WSI_LibraryLocaleOrder(const WSI_LibraryLocaleOrder& other) = delete;
-        WSI_LibraryLocaleOrder(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
+        WSI_LibraryLocaleOrder(const QString& xmlTagName, DomElement* xmlElement);
         ~WSI_LibraryLocaleOrder() noexcept;
 
         // Getters
@@ -67,7 +67,7 @@ class WSI_LibraryLocaleOrder final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         WSI_LibraryLocaleOrder& operator=(const WSI_LibraryLocaleOrder& rhs) = delete;

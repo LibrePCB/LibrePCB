@@ -56,7 +56,7 @@ CmdCombineSchematicNetPoints::~CmdCombineSchematicNetPoints() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdCombineSchematicNetPoints::performExecute() throw (Exception)
+bool CmdCombineSchematicNetPoints::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

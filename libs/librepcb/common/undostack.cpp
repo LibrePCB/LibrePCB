@@ -35,7 +35,7 @@ namespace librepcb {
  *  Class UndoStackTransaction
  ****************************************************************************************/
 
-UndoStackTransaction::UndoStackTransaction(UndoStack& stack, const QString& text) throw (Exception) :
+UndoStackTransaction::UndoStackTransaction(UndoStack& stack, const QString& text) :
     mStack(stack), mCmdActive(true)
 {
     mStack.beginCmdGroup(text); // can throw
@@ -50,20 +50,20 @@ UndoStackTransaction::~UndoStackTransaction() noexcept
     }
 }
 
-void UndoStackTransaction::append(UndoCommand* cmd) throw (Exception)
+void UndoStackTransaction::append(UndoCommand* cmd)
 {
     if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
     mStack.appendToCmdGroup(cmd); // can throw
 }
 
-void UndoStackTransaction::abort() throw (Exception)
+void UndoStackTransaction::abort()
 {
     if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
     mStack.abortCmdGroup(); // can throw
     mCmdActive = false;
 }
 
-void UndoStackTransaction::commit() throw (Exception)
+void UndoStackTransaction::commit()
 {
     if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
     mStack.commitCmdGroup(); // can throw
@@ -141,7 +141,7 @@ void UndoStack::setClean() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) throw (Exception)
+void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd)
 {
     // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -182,7 +182,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) throw (Exception)
     }
 }
 
-void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
+void UndoStack::beginCmdGroup(const QString& text)
 {
     if (isCommandGroupActive()) {
         throw RuntimeError(__FILE__, __LINE__, tr("Another command is active "
@@ -198,7 +198,7 @@ void UndoStack::beginCmdGroup(const QString& text) throw (Exception)
     emit canUndoChanged(false);
 }
 
-void UndoStack::appendToCmdGroup(UndoCommand* cmd) throw (Exception)
+void UndoStack::appendToCmdGroup(UndoCommand* cmd)
 {
     // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -214,7 +214,7 @@ void UndoStack::appendToCmdGroup(UndoCommand* cmd) throw (Exception)
     mActiveCommandGroup->appendChild(cmdScopeGuard.take()); // can throw
 }
 
-void UndoStack::commitCmdGroup() throw (Exception)
+void UndoStack::commitCmdGroup()
 {
     if (!isCommandGroupActive()) {
         throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
@@ -237,7 +237,7 @@ void UndoStack::commitCmdGroup() throw (Exception)
     emit commandGroupEnded();
 }
 
-void UndoStack::abortCmdGroup() throw (Exception)
+void UndoStack::abortCmdGroup()
 {
     if (!isCommandGroupActive()) {
         throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
@@ -265,7 +265,7 @@ void UndoStack::abortCmdGroup() throw (Exception)
     emit commandGroupAborted(); // this is important!
 }
 
-void UndoStack::undo() throw (Exception)
+void UndoStack::undo()
 {
     if ((!canUndo()) || (isCommandGroupActive())) {
         return; // if a command group is active, undo() is not allowed
@@ -287,7 +287,7 @@ void UndoStack::undo() throw (Exception)
     emit cleanChanged(isClean());
 }
 
-void UndoStack::redo() throw (Exception)
+void UndoStack::redo()
 {
     if (!canRedo()) {
         return;

@@ -65,10 +65,10 @@ class CmdPlaceBoardNetPoint final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
-        BI_NetPoint* createNewNetPoint() throw (Exception);
-        BI_NetPoint* createNewNetPointAtPad() throw (Exception);
+        BI_NetPoint* createNewNetPoint();
+        BI_NetPoint* createNewNetPointAtPad();
 
 
         // Attributes from the constructor

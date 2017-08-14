@@ -131,7 +131,7 @@ NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_FootprintPad::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_FootprintPad::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -146,7 +146,7 @@ void BI_FootprintPad::addToBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::addToBoard(scene, *mGraphicsItem);
 }
 
-void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_FootprintPad::removeFromBoard(GraphicsScene& scene)
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -160,7 +160,7 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene) throw (Exception)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
         || (netpoint.getBoard() != mBoard)
@@ -176,7 +176,7 @@ void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint) throw (Exception)
     netpoint.updateLines();
 }
 
-void BI_FootprintPad::unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void BI_FootprintPad::unregisterNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
         || (getNetPointOfLayer(netpoint.getLayer().getId()) != &netpoint)

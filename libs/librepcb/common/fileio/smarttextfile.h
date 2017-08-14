@@ -65,7 +65,7 @@ class SmartTextFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly) :
             SmartTextFile(filepath, restore, readOnly, false) {}
 
         /**
@@ -106,7 +106,7 @@ class SmartTextFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        void save(bool toOriginal) throw (Exception);
+        void save(bool toOriginal);
 
 
         // Operator Overloadings
@@ -128,7 +128,7 @@ class SmartTextFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        static SmartTextFile* create(const FilePath& filepath) throw (Exception);
+        static SmartTextFile* create(const FilePath& filepath);
 
 
     protected:
@@ -145,7 +145,7 @@ class SmartTextFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
+        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
 
 
         // General Attributes

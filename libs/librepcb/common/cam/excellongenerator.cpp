@@ -52,7 +52,7 @@ void ExcellonGenerator::drill(const Point& pos, const Length& dia) noexcept
     mDrillList.insert(dia, pos);
 }
 
-void ExcellonGenerator::generate() throw (Exception)
+void ExcellonGenerator::generate()
 {
     mOutput.clear();
     printHeader();
@@ -60,7 +60,7 @@ void ExcellonGenerator::generate() throw (Exception)
     printFooter();
 }
 
-void ExcellonGenerator::saveToFile(const FilePath& filepath) const throw (Exception)
+void ExcellonGenerator::saveToFile(const FilePath& filepath) const
 {
     QScopedPointer<SmartTextFile> file(SmartTextFile::create(filepath));
     file->setContent(mOutput.toLatin1());

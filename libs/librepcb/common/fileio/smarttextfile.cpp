@@ -33,7 +33,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
+SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
     SmartFile(filepath, restore, readOnly, create)
 {
     if (mIsCreated) {
@@ -52,7 +52,7 @@ SmartTextFile::~SmartTextFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SmartTextFile::save(bool toOriginal) throw (Exception)
+void SmartTextFile::save(bool toOriginal)
 {
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     FileUtils::writeFile(filepath, mContent);
@@ -63,7 +63,7 @@ void SmartTextFile::save(bool toOriginal) throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) throw (Exception)
+SmartTextFile* SmartTextFile::create(const FilePath& filepath)
 {
     return new SmartTextFile(filepath, false, false, true);
 }

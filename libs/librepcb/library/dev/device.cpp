@@ -36,13 +36,13 @@ namespace library {
 
 Device::Device(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US) throw (Exception) :
+               const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US)
 {
 }
 
-Device::Device(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+Device::Device(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     DomElement& root = mLoadingXmlFileDocument->getRoot();
@@ -90,7 +90,7 @@ void Device::removePadSignalMapping(const Uuid& pad) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Device::serialize(DomElement& root) const throw (Exception)
+void Device::serialize(DomElement& root) const
 {
     LibraryElement::serialize(root);
     root.appendTextChild("component", mComponentUuid);

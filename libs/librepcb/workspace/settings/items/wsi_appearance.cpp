@@ -34,7 +34,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Appearance::WSI_Appearance(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
+WSI_Appearance::WSI_Appearance(const QString& xmlTagName, DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement), mUseOpenGl(false)
 {
     if (xmlElement) {
@@ -80,7 +80,7 @@ void WSI_Appearance::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void WSI_Appearance::serialize(DomElement& root) const throw (Exception)
+void WSI_Appearance::serialize(DomElement& root) const
 {
     root.appendTextChild("use_opengl", mUseOpenGlCheckBox->isChecked());
 }

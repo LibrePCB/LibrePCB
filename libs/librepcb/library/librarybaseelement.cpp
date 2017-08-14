@@ -43,7 +43,7 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
                                        const Version& version, const QString& author,
                                        const QString& name_en_US,
                                        const QString& description_en_US,
-                                       const QString& keywords_en_US) throw (Exception) :
+                                       const QString& keywords_en_US) :
     QObject(nullptr), mDirectory(FilePath::getRandomTempPath()),
     mDirectoryIsTemporary(true), mOpenedReadOnly(false),
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
@@ -62,7 +62,7 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        bool dirnameMustBeUuid,
                                        const QString& shortElementName,
-                                       const QString& longElementName, bool readOnly) throw (Exception) :
+                                       const QString& longElementName, bool readOnly) :
     QObject(nullptr), mDirectory(elementDirectory),mDirectoryIsTemporary(false),
     mOpenedReadOnly(readOnly), mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName)
@@ -151,7 +151,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void LibraryBaseElement::save() throw (Exception)
+void LibraryBaseElement::save()
 {
     if (mOpenedReadOnly) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -173,25 +173,25 @@ void LibraryBaseElement::save() throw (Exception)
     versionFile->save(true);
 }
 
-void LibraryBaseElement::saveTo(const FilePath& destination) throw (Exception)
+void LibraryBaseElement::saveTo(const FilePath& destination)
 {
     // copy to new directory and remove source directory if it was temporary
     copyTo(destination, mDirectoryIsTemporary);
 }
 
-void LibraryBaseElement::saveIntoParentDirectory(const FilePath& parentDir) throw (Exception)
+void LibraryBaseElement::saveIntoParentDirectory(const FilePath& parentDir)
 {
     FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
     saveTo(elemDir);
 }
 
-void LibraryBaseElement::moveTo(const FilePath& destination) throw (Exception)
+void LibraryBaseElement::moveTo(const FilePath& destination)
 {
     // copy to new directory and remove source directory
     copyTo(destination, true);
 }
 
-void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir) throw (Exception)
+void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir)
 {
     FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
     moveTo(elemDir);
@@ -206,7 +206,7 @@ void LibraryBaseElement::cleanupAfterLoadingElementFromFile() noexcept
     mLoadingXmlFileDocument.reset(); // destroy the whole XML DOM tree
 }
 
-void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) throw (Exception)
+void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
 {
     if (destination != mDirectory) {
         // check destination directory name validity
@@ -245,7 +245,7 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource) 
     }
 }
 
-void LibraryBaseElement::serialize(DomElement& root) const throw (Exception)
+void LibraryBaseElement::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) {
         throw LogicError(__FILE__, __LINE__,

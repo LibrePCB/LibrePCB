@@ -48,7 +48,7 @@ class SchematicLayerProvider final : public IF_SchematicLayerProvider
     public:
 
         // Constructors / Destructor
-        explicit SchematicLayerProvider(Project& project) throw (Exception);
+        explicit SchematicLayerProvider(Project& project);
         ~SchematicLayerProvider() noexcept;
 
         // Getters

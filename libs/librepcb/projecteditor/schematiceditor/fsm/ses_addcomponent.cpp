@@ -305,7 +305,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
     return PassToParentState;
 }
 
-void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar) throw (Exception)
+void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar)
 {
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) throw LogicError(__FILE__, __LINE__);

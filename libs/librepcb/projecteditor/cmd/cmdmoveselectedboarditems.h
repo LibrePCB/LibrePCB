@@ -64,7 +64,7 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
 
         // Private Member Variables

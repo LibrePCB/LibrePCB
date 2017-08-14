@@ -34,7 +34,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_DebugTools::WSI_DebugTools(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
+WSI_DebugTools::WSI_DebugTools(const QString& xmlTagName, DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
@@ -76,7 +76,7 @@ void WSI_DebugTools::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void WSI_DebugTools::serialize(DomElement& root) const throw (Exception)
+void WSI_DebugTools::serialize(DomElement& root) const
 {
     Q_UNUSED(root);
 }

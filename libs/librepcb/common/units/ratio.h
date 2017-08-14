@@ -116,7 +116,7 @@ class Ratio
          *
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        void setRatioNormalized(const QString& normalized) throw (Exception) {
+        void setRatioNormalized(const QString& normalized) {
             mPpm = normalizedStringToPpm(normalized);
         }
 
@@ -201,7 +201,7 @@ class Ratio
          *
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
-        static Ratio fromNormalized(const QString& normalized) throw (Exception);
+        static Ratio fromNormalized(const QString& normalized);
 
         /**
          * @brief Deserialize object from a string
@@ -212,7 +212,7 @@ class Ratio
          *
          * @throws Exception if the string was invalid
          */
-        static Ratio deserializeFromString(const QString& str) throw (Exception) {
+        static Ratio deserializeFromString(const QString& str) {
             return fromNormalized(str);
         }
 
@@ -272,7 +272,7 @@ class Ratio
          *
          * @todo    don't use double for this purpose!
          */
-        static qint32 normalizedStringToPpm(const QString& normalized) throw (Exception);
+        static qint32 normalizedStringToPpm(const QString& normalized);
 
 
         // Private Member Variables
