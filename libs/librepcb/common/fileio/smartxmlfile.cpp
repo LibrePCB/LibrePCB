@@ -35,7 +35,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
+SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
     SmartFile(filepath, restore, readOnly, create)
 {
 }
@@ -48,13 +48,13 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-std::unique_ptr<DomDocument> SmartXmlFile::parseFileAndBuildDomTree() const throw (Exception)
+std::unique_ptr<DomDocument> SmartXmlFile::parseFileAndBuildDomTree() const
 {
     return std::unique_ptr<DomDocument>(
         new DomDocument(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath));
 }
 
-void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal) throw (Exception)
+void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal)
 {
     const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
     FileUtils::writeFile(filepath, domDocument.toByteArray());
@@ -65,7 +65,7 @@ void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal) throw (
  *  Static Methods
  ****************************************************************************************/
 
-SmartXmlFile* SmartXmlFile::create(const FilePath &filepath) throw (Exception)
+SmartXmlFile* SmartXmlFile::create(const FilePath &filepath)
 {
     return new SmartXmlFile(filepath, false, false, true);
 }

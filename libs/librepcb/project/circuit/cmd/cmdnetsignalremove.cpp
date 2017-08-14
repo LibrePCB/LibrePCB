@@ -49,19 +49,19 @@ CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdNetSignalRemove::performExecute() throw (Exception)
+bool CmdNetSignalRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdNetSignalRemove::performUndo() throw (Exception)
+void CmdNetSignalRemove::performUndo()
 {
     mCircuit.addNetSignal(mNetSignal); // can throw
 }
 
-void CmdNetSignalRemove::performRedo() throw (Exception)
+void CmdNetSignalRemove::performRedo()
 {
     mCircuit.removeNetSignal(mNetSignal); // can throw
 }

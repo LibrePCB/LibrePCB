@@ -70,7 +70,7 @@ CmdPlaceSchematicNetPoint::~CmdPlaceSchematicNetPoint() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdPlaceSchematicNetPoint::performExecute() throw (Exception)
+bool CmdPlaceSchematicNetPoint::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
@@ -98,7 +98,7 @@ bool CmdPlaceSchematicNetPoint::performExecute() throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-NetSignal* CmdPlaceSchematicNetPoint::getOrCreateNewNetSignal() throw (Exception)
+NetSignal* CmdPlaceSchematicNetPoint::getOrCreateNewNetSignal()
 {
     NetSignal* netsignal = mCircuit.getNetSignalByName(mNetSignalName);
     if (netsignal) {
@@ -125,7 +125,7 @@ NetSignal* CmdPlaceSchematicNetPoint::getOrCreateNewNetSignal() throw (Exception
     }
 }
 
-SI_NetPoint* CmdPlaceSchematicNetPoint::createNewNetPoint(NetSignal& netsignal) throw (Exception)
+SI_NetPoint* CmdPlaceSchematicNetPoint::createNewNetPoint(NetSignal& netsignal)
 {
     CmdSchematicNetPointAdd* cmd = new CmdSchematicNetPointAdd(mSchematic, netsignal, mPosition);
     execNewChildCmd(cmd); // can throw

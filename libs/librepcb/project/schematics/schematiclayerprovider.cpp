@@ -34,7 +34,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayerProvider::SchematicLayerProvider(Project& project) throw (Exception):
+SchematicLayerProvider::SchematicLayerProvider(Project& project):
     mProject(project)
 {
     // add all required layers

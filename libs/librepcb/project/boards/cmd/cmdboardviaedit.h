@@ -52,7 +52,7 @@ class CmdBoardViaEdit final : public UndoCommand
         ~CmdBoardViaEdit() noexcept;
 
         // Setters
-        void setNetSignal(NetSignal* netsignal, bool immediate) throw (Exception);
+        void setNetSignal(NetSignal* netsignal, bool immediate);
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setShape(BI_Via::Shape shape, bool immediate) noexcept;
@@ -65,13 +65,13 @@ class CmdBoardViaEdit final : public UndoCommand
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
+        void performUndo() override;
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
+        void performRedo() override;
 
 
         // Private Member Variables

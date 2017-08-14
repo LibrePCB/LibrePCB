@@ -66,7 +66,7 @@ class SmartVersionFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) :
             SmartVersionFile(filepath, restore, readOnly, false, Version()) {}
 
         /**
@@ -107,7 +107,7 @@ class SmartVersionFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        void save(bool toOriginal) throw (Exception);
+        void save(bool toOriginal);
 
 
         // Operator Overloadings
@@ -129,7 +129,7 @@ class SmartVersionFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        static SmartVersionFile* create(const FilePath& filepath, const Version& version) throw (Exception);
+        static SmartVersionFile* create(const FilePath& filepath, const Version& version);
 
 
     protected:
@@ -148,7 +148,7 @@ class SmartVersionFile final : public SmartFile
          * @throw Exception See SmartFile#SmartFile()
          */
         SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
-                         bool create, const Version& newVersion) throw (Exception);
+                         bool create, const Version& newVersion);
 
 
         // General Attributes

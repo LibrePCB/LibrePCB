@@ -74,35 +74,35 @@ Length& Length::scale(qreal factor) noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Length Length::fromMm(qreal millimeters, const Length& gridInterval) throw (RangeError)
+Length Length::fromMm(qreal millimeters, const Length& gridInterval)
 {
     Length l;
     l.setLengthMm(millimeters);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromMm(const QString& millimeters, const Length& gridInterval) throw (Exception)
+Length Length::fromMm(const QString& millimeters, const Length& gridInterval)
 {
     Length l;
     l.setLengthMm(millimeters);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromInch(qreal inches, const Length& gridInterval) throw (RangeError)
+Length Length::fromInch(qreal inches, const Length& gridInterval)
 {
     Length l;
     l.setLengthInch(inches);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromMil(qreal mils, const Length& gridInterval) throw (RangeError)
+Length Length::fromMil(qreal mils, const Length& gridInterval)
 {
     Length l;
     l.setLengthMil(mils);
     return l.mapToGrid(gridInterval);
 }
 
-Length Length::fromPx(qreal pixels, const Length& gridInterval) throw (RangeError)
+Length Length::fromPx(qreal pixels, const Length& gridInterval)
 {
     Length l;
     l.setLengthPx(pixels);
@@ -113,7 +113,7 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval) throw (RangeErro
  *  Private Methods
  ****************************************************************************************/
 
-void Length::setLengthFromFloat(qreal nanometers) throw (RangeError)
+void Length::setLengthFromFloat(qreal nanometers)
 {
     LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
     LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
@@ -137,7 +137,7 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers, const Length& gridInte
         return nanometers;
 }
 
-LengthBase_t Length::mmStringToNm(const QString& millimeters) throw (Exception)
+LengthBase_t Length::mmStringToNm(const QString& millimeters)
 {
     bool ok;
     qreal nm = qRound(QLocale::c().toDouble(millimeters, &ok) * 1e6);

@@ -63,7 +63,7 @@ class CmdCombineAllNetSignalsUnderSchematicNetPoint final : public UndoCommandGr
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
 
         // Attributes from the constructor

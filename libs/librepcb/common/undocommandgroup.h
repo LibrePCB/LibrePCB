@@ -70,7 +70,7 @@ class UndoCommandGroup : public UndoCommand
          *
          * @warning This method must not be called after #undo() was called the first time.
          */
-        void appendChild(UndoCommand* cmd) throw (Exception);
+        void appendChild(UndoCommand* cmd);
 
         // Operator Overloadings
         UndoCommandGroup& operator=(const UndoCommandGroup& rhs) = delete;
@@ -79,20 +79,20 @@ class UndoCommandGroup : public UndoCommand
     protected:
 
         /// @copydoc UndoCommand::performExecute()
-        virtual bool performExecute() throw (Exception) override;
+        virtual bool performExecute() override;
 
         /// @copydoc UndoCommand::performUndo()
-        virtual void performUndo() throw (Exception) override;
+        virtual void performUndo() override;
 
         /// @copydoc UndoCommand::performRedo()
-        virtual void performRedo() throw (Exception) override;
+        virtual void performRedo() override;
 
         /**
          * @brief Helper method for derived classes to execute and add new child commands
          *
          * @param cmd       The command to execute and add (must not be executed already)
          */
-        void execNewChildCmd(UndoCommand* cmd) throw (Exception);
+        void execNewChildCmd(UndoCommand* cmd);
 
 
     private:

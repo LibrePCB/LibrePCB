@@ -124,7 +124,7 @@ Point& Point::mirror(Qt::Orientation orientation, const Point& center) noexcept
 
 // Static Methods
 
-Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval) throw (RangeError)
+Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval)
 {
     Point p;
     p.mX.setLengthMm(millimetersX);
@@ -132,12 +132,12 @@ Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridIn
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromMm(const QPointF& millimeters, const Length& gridInterval) throw (RangeError)
+Point Point::fromMm(const QPointF& millimeters, const Length& gridInterval)
 {
     return fromMm(millimeters.x(), millimeters.y(), gridInterval);
 }
 
-Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval) throw (RangeError)
+Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval)
 {
     Point p;
     p.mX.setLengthInch(inchesX);
@@ -145,12 +145,12 @@ Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval) 
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromInch(const QPointF& inches, const Length& gridInterval) throw (RangeError)
+Point Point::fromInch(const QPointF& inches, const Length& gridInterval)
 {
     return fromInch(inches.x(), inches.y(), gridInterval);
 }
 
-Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval) throw (RangeError)
+Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval)
 {
     Point p;
     p.mX.setLengthMil(milsX);
@@ -158,12 +158,12 @@ Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval) throw
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromMil(const QPointF& mils, const Length& gridInterval) throw (RangeError)
+Point Point::fromMil(const QPointF& mils, const Length& gridInterval)
 {
     return fromMil(mils.x(), mils.y(), gridInterval);
 }
 
-Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval) throw (RangeError)
+Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval)
 {
     Point p;
     p.mX.setLengthPx(pixelsX);
@@ -171,7 +171,7 @@ Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval) th
     return p.mapToGrid(gridInterval);
 }
 
-Point Point::fromPx(const QPointF& pixels, const Length& gridInterval) throw (RangeError)
+Point Point::fromPx(const QPointF& pixels, const Length& gridInterval)
 {
     return fromPx(pixels.x(), pixels.y(), gridInterval);
 }

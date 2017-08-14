@@ -59,7 +59,7 @@ class WSI_Base : public QObject, public SerializableObject
         // Constructors / Destructor
         WSI_Base() = delete;
         WSI_Base(const WSI_Base& other) = delete;
-        explicit WSI_Base(const QString& xmlTagName, DomElement* xmlElement) throw (Exception);
+        explicit WSI_Base(const QString& xmlTagName, DomElement* xmlElement);
         virtual ~WSI_Base() noexcept;
 
         // Getters

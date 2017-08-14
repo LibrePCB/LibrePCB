@@ -69,9 +69,9 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         ComponentInstance() = delete;
         ComponentInstance(const ComponentInstance& other) = delete;
-        explicit ComponentInstance(Circuit& circuit, const DomElement& domElement) throw (Exception);
+        explicit ComponentInstance(Circuit& circuit, const DomElement& domElement);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                   const Uuid& symbVar, const QString& name) throw (Exception);
+                                   const Uuid& symbVar, const QString& name);
         ~ComponentInstance() noexcept;
 
         // Getters: Attributes
@@ -107,7 +107,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
          *
          * @undocmd{#project#CmdComponentInstanceEdit}
          */
-        void setName(const QString& name) throw (Exception);
+        void setName(const QString& name);
 
         /**
          * @brief Set the value of this component instance in the circuit
@@ -122,15 +122,15 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
 
         // General Methods
-        void addToCircuit() throw (Exception);
-        void removeFromCircuit() throw (Exception);
-        void registerSymbol(SI_Symbol& symbol) throw (Exception);
-        void unregisterSymbol(SI_Symbol& symbol) throw (Exception);
-        void registerDevice(BI_Device& device) throw (Exception);
-        void unregisterDevice(BI_Device& device) throw (Exception);
+        void addToCircuit();
+        void removeFromCircuit();
+        void registerSymbol(SI_Symbol& symbol);
+        void unregisterSymbol(SI_Symbol& symbol);
+        void registerDevice(BI_Device& device);
+        void unregisterDevice(BI_Device& device);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Helper Methods
@@ -149,7 +149,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 

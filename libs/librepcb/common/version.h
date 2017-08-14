@@ -206,7 +206,7 @@ class Version final
          *
          * @throws Exception if the string was invalid
          */
-        static Version deserializeFromString(const QString& str) throw (Exception) {
+        static Version deserializeFromString(const QString& str) {
             Version version(str);
             if ((!version.isValid()) && (!str.isEmpty())) {
                 throw RuntimeError(__FILE__, __LINE__,

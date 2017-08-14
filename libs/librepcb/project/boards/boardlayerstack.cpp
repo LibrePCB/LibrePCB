@@ -35,7 +35,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) throw (Exception) :
+BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     foreach (const BoardLayer* layer, other.mLayers) {
@@ -47,7 +47,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) thr
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) throw (Exception):
+BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement):
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     // load all layers
@@ -70,7 +70,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) thr
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board) throw (Exception):
+BoardLayerStack::BoardLayerStack(Board& board):
     QObject(&board), mBoard(board), mLayersChanged(false)
 {
     addAllRequiredLayers();
@@ -89,7 +89,7 @@ BoardLayerStack::~BoardLayerStack() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BoardLayerStack::serialize(DomElement& root) const throw (Exception)
+void BoardLayerStack::serialize(DomElement& root) const
 {
     serializePointerContainer(root, mLayers, "layer");
 }

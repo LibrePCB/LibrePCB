@@ -84,14 +84,14 @@ void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool im
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetPointEdit::performExecute() throw (Exception)
+bool CmdSchematicNetPointEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the netpoint was really modified
 }
 
-void CmdSchematicNetPointEdit::performUndo() throw (Exception)
+void CmdSchematicNetPointEdit::performUndo()
 {
     ScopeGuardList sgl;
     mNetPoint.setNetSignal(*mOldNetSignal); // can throw
@@ -102,7 +102,7 @@ void CmdSchematicNetPointEdit::performUndo() throw (Exception)
     sgl.dismiss();
 }
 
-void CmdSchematicNetPointEdit::performRedo() throw (Exception)
+void CmdSchematicNetPointEdit::performRedo()
 {
     ScopeGuardList sgl;
     mNetPoint.setNetSignal(*mNewNetSignal); // can throw

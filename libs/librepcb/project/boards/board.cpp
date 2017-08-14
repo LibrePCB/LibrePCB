@@ -55,7 +55,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Board::Board(const Board& other, const FilePath& filepath, const QString& name) throw (Exception) :
+Board::Board(const Board& other, const FilePath& filepath, const QString& name) :
     QObject(&other.getProject()), mProject(other.getProject()), mFilePath(filepath),
     mIsAddedToProject(false)
 {
@@ -161,7 +161,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
 }
 
 Board::Board(Project& project, const FilePath& filepath, bool restore,
-             bool readOnly, bool create, const QString& newName) throw (Exception) :
+             bool readOnly, bool create, const QString& newName) :
     QObject(&project), mProject(project), mFilePath(filepath), mIsAddedToProject(false)
 {
     try
@@ -571,7 +571,7 @@ BI_Device* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexc
     return mDeviceInstances.value(uuid, nullptr);
 }
 
-void Board::addDeviceInstance(BI_Device& instance) throw (Exception)
+void Board::addDeviceInstance(BI_Device& instance)
 {
     if ((!mIsAddedToProject) || (&instance.getBoard() != this)) {
         throw LogicError(__FILE__, __LINE__);
@@ -589,7 +589,7 @@ void Board::addDeviceInstance(BI_Device& instance) throw (Exception)
     emit deviceAdded(instance);
 }
 
-void Board::removeDeviceInstance(BI_Device& instance) throw (Exception)
+void Board::removeDeviceInstance(BI_Device& instance)
 {
     if ((!mIsAddedToProject) || (!mDeviceInstances.contains(instance.getComponentInstanceUuid()))) {
         throw LogicError(__FILE__, __LINE__);
@@ -614,7 +614,7 @@ BI_Via* Board::getViaByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Board::addVia(BI_Via& via) throw (Exception)
+void Board::addVia(BI_Via& via)
 {
     if ((!mIsAddedToProject) || (mVias.contains(&via)) || (&via.getBoard() != this)) {
         throw LogicError(__FILE__, __LINE__);
@@ -630,7 +630,7 @@ void Board::addVia(BI_Via& via) throw (Exception)
     mVias.append(&via);
 }
 
-void Board::removeVia(BI_Via& via) throw (Exception)
+void Board::removeVia(BI_Via& via)
 {
     if ((!mIsAddedToProject) || (!mVias.contains(&via))) {
         throw LogicError(__FILE__, __LINE__);
@@ -653,7 +653,7 @@ BI_NetPoint* Board::getNetPointByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Board::addNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void Board::addNetPoint(BI_NetPoint& netpoint)
 {
     if ((!mIsAddedToProject) || (mNetPoints.contains(&netpoint))
         || (&netpoint.getBoard() != this))
@@ -671,7 +671,7 @@ void Board::addNetPoint(BI_NetPoint& netpoint) throw (Exception)
     mNetPoints.append(&netpoint);
 }
 
-void Board::removeNetPoint(BI_NetPoint& netpoint) throw (Exception)
+void Board::removeNetPoint(BI_NetPoint& netpoint)
 {
     if ((!mIsAddedToProject) || (!mNetPoints.contains(&netpoint))) {
         throw LogicError(__FILE__, __LINE__);
@@ -694,7 +694,7 @@ BI_NetLine* Board::getNetLineByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Board::addNetLine(BI_NetLine& netline) throw (Exception)
+void Board::addNetLine(BI_NetLine& netline)
 {
     if ((!mIsAddedToProject) || (mNetLines.contains(&netline))
         || (&netline.getBoard() != this))
@@ -712,7 +712,7 @@ void Board::addNetLine(BI_NetLine& netline) throw (Exception)
     mNetLines.append(&netline);
 }
 
-void Board::removeNetLine(BI_NetLine& netline) throw (Exception)
+void Board::removeNetLine(BI_NetLine& netline)
 {
     if ((!mIsAddedToProject) || (!mNetLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
@@ -726,7 +726,7 @@ void Board::removeNetLine(BI_NetLine& netline) throw (Exception)
  *  Polygon Methods
  ****************************************************************************************/
 
-void Board::addPolygon(BI_Polygon& polygon) throw (Exception)
+void Board::addPolygon(BI_Polygon& polygon)
 {
     if ((!mIsAddedToProject) || (mPolygons.contains(&polygon))
         || (&polygon.getBoard() != this))
@@ -737,7 +737,7 @@ void Board::addPolygon(BI_Polygon& polygon) throw (Exception)
     mPolygons.append(&polygon);
 }
 
-void Board::removePolygon(BI_Polygon& polygon) throw (Exception)
+void Board::removePolygon(BI_Polygon& polygon)
 {
     if ((!mIsAddedToProject) || (!mPolygons.contains(&polygon))) {
         throw LogicError(__FILE__, __LINE__);
@@ -750,7 +750,7 @@ void Board::removePolygon(BI_Polygon& polygon) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void Board::addToProject() throw (Exception)
+void Board::addToProject()
 {
     if (mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
@@ -767,7 +767,7 @@ void Board::addToProject() throw (Exception)
     sgl.dismiss();
 }
 
-void Board::removeFromProject() throw (Exception)
+void Board::removeFromProject()
 {
     if (!mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
@@ -891,7 +891,7 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Board::serialize(DomElement& root) const throw (Exception)
+void Board::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -956,7 +956,7 @@ void Board::updateErcMessages() noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Board* Board::create(Project& project, const FilePath& filepath, const QString& name) throw (Exception)
+Board* Board::create(Project& project, const FilePath& filepath, const QString& name)
 {
     return new Board(project, filepath, false, false, true, name);
 }

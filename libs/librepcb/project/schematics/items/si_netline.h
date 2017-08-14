@@ -53,9 +53,9 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLine() = delete;
         SI_NetLine(const SI_NetLine& other) = delete;
-        SI_NetLine(Schematic& schematic, const DomElement& domElement) throw (Exception);
+        SI_NetLine(Schematic& schematic, const DomElement& domElement);
         SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                   const Length& width) throw (Exception);
+                   const Length& width);
         ~SI_NetLine() noexcept;
 
         // Getters
@@ -70,12 +70,12 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         void setWidth(const Length& width) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
+        void addToSchematic(GraphicsScene& scene) override;
+        void removeFromSchematic(GraphicsScene& scene) override;
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // Inherited from SI_Base
@@ -90,7 +90,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

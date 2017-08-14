@@ -60,13 +60,13 @@ class UndoStackTransaction final
         // Constructors / Destructor
         UndoStackTransaction() = delete;
         UndoStackTransaction(const UndoStackTransaction& other) = delete;
-        UndoStackTransaction(UndoStack& stack, const QString& text) throw (Exception);
+        UndoStackTransaction(UndoStack& stack, const QString& text);
         ~UndoStackTransaction() noexcept;
 
         // General Methods
-        void append(UndoCommand* cmd) throw (Exception);
-        void abort() throw (Exception);
-        void commit() throw (Exception);
+        void append(UndoCommand* cmd);
+        void abort();
+        void commit();
 
         // Operator Overloadings
         UndoStackTransaction& operator=(const UndoStackTransaction& rhs) = delete;
@@ -203,7 +203,7 @@ class UndoStack final : public QObject
          * @note If you try to execute a command with that method while another command is
          *       active (see #isCommandActive()), this method will throw an exception.
          */
-        void execCmd(UndoCommand* cmd, bool forceKeepCmd = false) throw (Exception);
+        void execCmd(UndoCommand* cmd, bool forceKeepCmd = false);
 
         /**
          * @brief Begin building a new command group that consists of multiple commands
@@ -215,7 +215,7 @@ class UndoStack final : public QObject
          *                  command group active (#isCommandGroupActive()) or if an error
          *                  occurs.
          */
-        void beginCmdGroup(const QString& text) throw (Exception);
+        void beginCmdGroup(const QString& text);
 
         /**
          * @brief Append a new command to the currently active command group
@@ -229,7 +229,7 @@ class UndoStack final : public QObject
          *                  active at the moment (#isCommandGroupActive()) or if an error
          *                  occurs.
          */
-        void appendToCmdGroup(UndoCommand* cmd) throw (Exception);
+        void appendToCmdGroup(UndoCommand* cmd);
 
         /**
          * @brief End the currently active command group and keep the changes
@@ -238,7 +238,7 @@ class UndoStack final : public QObject
          *                  active at the moment (#isCommandGroupActive()) or if an error
          *                  occurs.
          */
-        void commitCmdGroup() throw (Exception);
+        void commitCmdGroup();
 
         /**
          * @brief End the currently active command group and revert the changes
@@ -247,7 +247,7 @@ class UndoStack final : public QObject
          *                  active at the moment (#isCommandGroupActive()) or if an error
          *                  occurs.
          */
-        void abortCmdGroup() throw (Exception);
+        void abortCmdGroup();
 
         /**
          * @brief Undo the last command
@@ -259,7 +259,7 @@ class UndoStack final : public QObject
          *                  to restore the state of BEFORE calling this method. But there
          *                  is no guarantee that this will work correctly...
          */
-        void undo() throw (Exception);
+        void undo();
 
         /**
          * @brief Redo the last undoed command
@@ -268,7 +268,7 @@ class UndoStack final : public QObject
          *                  to restore the state of BEFORE calling this method. But there
          *                  is no guarantee that this will work correctly...
          */
-        void redo() throw (Exception);
+        void redo();
 
         /**
          * @brief Clear the whole stack (delete all UndoCommand objects)

@@ -66,37 +66,37 @@ class WorkspaceLibraryDb final : public QObject
         * @throw Exception If the library could not be opened, this constructor throws
         *                  an exception.
         */
-        explicit WorkspaceLibraryDb(Workspace& ws) throw (Exception);
+        explicit WorkspaceLibraryDb(Workspace& ws);
         ~WorkspaceLibraryDb() noexcept;
 
         // Getters: Library Elements by their UUID
-        QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const throw (Exception);
-        QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const throw (Exception);
+        QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
+        QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
+        QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const;
+        QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const;
+        QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const;
+        QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const;
 
         // Getters: Best Match Library Elements by their UUID
-        FilePath getLatestComponentCategory(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestPackageCategory(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestSymbol(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestPackage(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestComponent(const Uuid& uuid) const throw (Exception);
-        FilePath getLatestDevice(const Uuid& uuid) const throw (Exception);
+        FilePath getLatestComponentCategory(const Uuid& uuid) const;
+        FilePath getLatestPackageCategory(const Uuid& uuid) const;
+        FilePath getLatestSymbol(const Uuid& uuid) const;
+        FilePath getLatestPackage(const Uuid& uuid) const;
+        FilePath getLatestComponent(const Uuid& uuid) const;
+        FilePath getLatestDevice(const Uuid& uuid) const;
 
         // Getters: Element Metadata
         template <typename ElementType>
         void getElementTranslations(const FilePath& elemDir, const QStringList& localeOrder,
                                     QString* name = nullptr, QString* desc = nullptr,
-                                    QString* keywords = nullptr) const throw (Exception);
-        void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const throw (Exception);
+                                    QString* keywords = nullptr) const;
+        void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
 
         // Getters: Special
-        QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const throw (Exception);
-        QSet<Uuid> getPackageCategoryChilds(const Uuid& parent) const throw (Exception);
-        QSet<Uuid> getComponentsByCategory(const Uuid& category) const throw (Exception);
-        QSet<Uuid> getDevicesOfComponent(const Uuid& component) const throw (Exception);
+        QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const;
+        QSet<Uuid> getPackageCategoryChilds(const Uuid& parent) const;
+        QSet<Uuid> getComponentsByCategory(const Uuid& category) const;
+        QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
 
         // General Methods
 
@@ -122,14 +122,14 @@ class WorkspaceLibraryDb final : public QObject
         // Private Methods
         void getElementTranslations(const QString& table, const QString& idRow,
                                     const FilePath& elemDir, const QStringList& localeOrder,
-                                    QString* name, QString* desc, QString* keywords) const throw (Exception);
+                                    QString* name, QString* desc, QString* keywords) const;
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
-                                                               const Uuid& uuid) const throw (Exception);
+                                                               const Uuid& uuid) const;
         FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
-        QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception);
+        QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const;
         QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
-                                         const Uuid& categoryUuid) const throw (Exception);
-        void createAllTables() throw (Exception);
+                                         const Uuid& categoryUuid) const;
+        void createAllTables();
 
 
 

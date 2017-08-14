@@ -72,7 +72,7 @@ void DirectoryLock::setDirToLock(const FilePath& dir) noexcept
  *  Getters
  ****************************************************************************************/
 
-DirectoryLock::LockStatus DirectoryLock::getStatus() const throw (Exception)
+DirectoryLock::LockStatus DirectoryLock::getStatus() const
 {
     // check if the directory to lock does exist
     if (!mDirToLock.isExistingDir()) {
@@ -129,7 +129,7 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void DirectoryLock::lock() throw (Exception)
+void DirectoryLock::lock()
 {
     // check if the directory to lock does exist
     if (!mDirToLock.isExistingDir()) {
@@ -157,7 +157,7 @@ void DirectoryLock::lock() throw (Exception)
     mLockedByThisObject = true;
 }
 
-void DirectoryLock::unlock() throw (Exception)
+void DirectoryLock::unlock()
 {
     // remove the lock file
     FileUtils::removeFile(mLockFilePath); // can throw

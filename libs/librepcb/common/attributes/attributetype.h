@@ -73,17 +73,17 @@ class AttributeType
         const QString& getName() const noexcept {return mTypeName;}
         const QString& getNameTr() const noexcept {return mTypeNameTr;}
         const QList<const AttributeUnit*>& getAvailableUnits() const noexcept {return mAvailableUnits;}
-        const AttributeUnit* getUnitFromString(const QString& unit) const throw (Exception);
+        const AttributeUnit* getUnitFromString(const QString& unit) const;
         const AttributeUnit* getDefaultUnit() const noexcept {return mDefaultUnit;}
         bool isUnitAvailable(const AttributeUnit* unit) const noexcept;
-        void throwIfValueInvalid(const QString& value) const throw (Exception);
+        void throwIfValueInvalid(const QString& value) const;
         virtual bool isValueValid(const QString& value) const noexcept = 0;
         virtual QString valueFromTr(const QString& value) const noexcept = 0;
         virtual QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept = 0;
 
         // Static Methods
         static QList<const AttributeType*> getAllTypes() noexcept;
-        static const AttributeType& fromString(const QString& type) throw (Exception);
+        static const AttributeType& fromString(const QString& type);
 
 
     protected:

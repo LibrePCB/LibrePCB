@@ -50,7 +50,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
         // Constructors / Destructor
         explicit ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
                                             bool isRequired, const QString& suffix) noexcept;
-        explicit ComponentSymbolVariantItem(const DomElement& domElement) throw (Exception);
+        explicit ComponentSymbolVariantItem(const DomElement& domElement);
         ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
@@ -68,7 +68,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
         void removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
     private:

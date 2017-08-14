@@ -79,10 +79,10 @@ class BI_FootprintPad final : public BI_Base
         bool isSelectable() const noexcept override;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
-        void registerNetPoint(BI_NetPoint& netpoint) throw (Exception);
-        void unregisterNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
+        void registerNetPoint(BI_NetPoint& netpoint);
+        void unregisterNetPoint(BI_NetPoint& netpoint);
         void updatePosition() noexcept;
 
 

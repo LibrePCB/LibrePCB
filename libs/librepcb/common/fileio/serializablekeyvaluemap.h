@@ -129,7 +129,7 @@ class SerializableKeyValueMap final : public SerializableObject
         }
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const override {
             foreach (const QString& key, mValues.keys()) {
                 DomElement* child = root.appendChild(T::tagname);
                 child->setAttribute(T::keyname, key);

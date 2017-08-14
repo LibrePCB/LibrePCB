@@ -53,7 +53,7 @@ CmdProjectLibraryAddElement<ElementType>::~CmdProjectLibraryAddElement() noexcep
  ****************************************************************************************/
 
 template <typename ElementType>
-bool CmdProjectLibraryAddElement<ElementType>::performExecute() throw (Exception)
+bool CmdProjectLibraryAddElement<ElementType>::performExecute()
 {
     performRedo(); // can throw
 
@@ -61,13 +61,13 @@ bool CmdProjectLibraryAddElement<ElementType>::performExecute() throw (Exception
 }
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::performUndo() throw (Exception)
+void CmdProjectLibraryAddElement<ElementType>::performUndo()
 {
     removeElement(); // can throw
 }
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::performRedo() throw (Exception)
+void CmdProjectLibraryAddElement<ElementType>::performRedo()
 {
     addElement(); // can throw
 }

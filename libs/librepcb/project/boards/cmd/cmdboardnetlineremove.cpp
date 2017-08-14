@@ -49,19 +49,19 @@ CmdBoardNetLineRemove::~CmdBoardNetLineRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetLineRemove::performExecute() throw (Exception)
+bool CmdBoardNetLineRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdBoardNetLineRemove::performUndo() throw (Exception)
+void CmdBoardNetLineRemove::performUndo()
 {
     mBoard.addNetLine(mNetLine); // can throw
 }
 
-void CmdBoardNetLineRemove::performRedo() throw (Exception)
+void CmdBoardNetLineRemove::performRedo()
 {
     mBoard.removeNetLine(mNetLine); // can throw
 }

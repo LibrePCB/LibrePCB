@@ -176,8 +176,8 @@ class NetworkRequestBase : public QObject
 
     public: // Methods
 
-        virtual void prepareRequest() throw (Exception) = 0;
-        virtual void finalizeRequest() throw (Exception) = 0;
+        virtual void prepareRequest() = 0;
+        virtual void finalizeRequest() = 0;
         virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
         virtual void fetchNewData() noexcept = 0;
 

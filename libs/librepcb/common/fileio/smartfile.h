@@ -79,7 +79,7 @@ class SmartFile
          *
          * @throw Exception If the specified file does not exist, an exception will be thrown.
          */
-        SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception);
+        SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
 
         /**
          * @brief The destructor
@@ -135,7 +135,7 @@ class SmartFile
          *
          * @throw Exception If an error occurs, an exception will be thrown
          */
-        void removeFile(bool original) throw (Exception);
+        void removeFile(bool original);
 
 
         // Operator Overloadings
@@ -164,7 +164,7 @@ class SmartFile
          *
          * @throw Exception If an error occurs
          */
-        const FilePath& prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception);
+        const FilePath& prepareSaveAndReturnFilePath(bool toOriginal);
 
         /**
          * @brief Update the member variables #mIsRestored and #mIsCreated after saving

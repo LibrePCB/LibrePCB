@@ -107,8 +107,8 @@ class AttributeListEditorWidget final : public QWidget
         QString setValue(int index, const QString& value) noexcept;
         void setUnit(int index, const AttributeUnit* unit) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        void throwIfKeyEmptyOrExists(const QString& key) const throw (Exception);
-        void throwIfValueInvalid(const AttributeType& type, const QString& value) const throw (Exception);
+        void throwIfKeyEmptyOrExists(const QString& key) const;
+        void throwIfValueInvalid(const AttributeType& type, const QString& value) const;
         static QString cleanKey(const QString& key) noexcept;
 
         // row index <-> attribute index conversion methods

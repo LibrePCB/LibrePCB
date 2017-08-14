@@ -50,8 +50,8 @@ class Device final : public LibraryElement
         Device(const Device& other) = delete;
         Device(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US) throw (Exception);
-        Device(const FilePath& elementDirectory, bool readOnly) throw (Exception);
+               const QString& keywords_en_US);
+        Device(const FilePath& elementDirectory, bool readOnly);
         ~Device() noexcept;
 
         // Getters: Attributes
@@ -81,7 +81,7 @@ class Device final : public LibraryElement
         // Private Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
         bool checkAttributesValidity() const noexcept override;
 
 

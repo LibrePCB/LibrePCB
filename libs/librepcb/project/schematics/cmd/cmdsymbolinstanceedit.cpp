@@ -90,7 +90,7 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSymbolInstanceEdit::performExecute() throw (Exception)
+bool CmdSymbolInstanceEdit::performExecute()
 {
     performRedo(); // can throw
 
@@ -99,13 +99,13 @@ bool CmdSymbolInstanceEdit::performExecute() throw (Exception)
     return false;
 }
 
-void CmdSymbolInstanceEdit::performUndo() throw (Exception)
+void CmdSymbolInstanceEdit::performUndo()
 {
     mSymbol.setPosition(mOldPos);
     mSymbol.setRotation(mOldRotation);
 }
 
-void CmdSymbolInstanceEdit::performRedo() throw (Exception)
+void CmdSymbolInstanceEdit::performRedo()
 {
     mSymbol.setPosition(mNewPos);
     mSymbol.setRotation(mNewRotation);

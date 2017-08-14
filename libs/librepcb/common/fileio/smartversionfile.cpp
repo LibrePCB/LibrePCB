@@ -34,7 +34,7 @@ namespace librepcb {
  ****************************************************************************************/
 
 SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
-                                   bool create, const Version& newVersion) throw (Exception) :
+                                   bool create, const Version& newVersion) :
     SmartFile(filepath, restore, readOnly, create), mVersion()
 {
     if (mIsCreated) {
@@ -61,7 +61,7 @@ SmartVersionFile::~SmartVersionFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SmartVersionFile::save(bool toOriginal) throw (Exception)
+void SmartVersionFile::save(bool toOriginal)
 {
     if (mVersion.isValid()) {
         const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
@@ -77,7 +77,7 @@ void SmartVersionFile::save(bool toOriginal) throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-SmartVersionFile* SmartVersionFile::create(const FilePath& filepath, const Version& version) throw (Exception)
+SmartVersionFile* SmartVersionFile::create(const FilePath& filepath, const Version& version)
 {
     return new SmartVersionFile(filepath, false, false, true, version);
 }

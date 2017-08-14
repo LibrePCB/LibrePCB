@@ -52,7 +52,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Workspace::Workspace(const FilePath& wsPath) throw (Exception) :
+Workspace::Workspace(const FilePath& wsPath) :
     QObject(nullptr),
     mPath(wsPath),
     mProjectsPath(mPath.getPathTo("projects")),
@@ -202,7 +202,7 @@ Version Workspace::getVersionOfLibrary(const Uuid& uuid, bool local, bool remote
     return version;
 }
 
-void Workspace::addLocalLibrary(const QString& libDirName) throw (Exception)
+void Workspace::addLocalLibrary(const QString& libDirName)
 {
     if (!mLocalLibraries.contains(libDirName)) {
         FilePath libDirPath = mLibrariesPath.getPathTo("local").getPathTo(libDirName);
@@ -212,7 +212,7 @@ void Workspace::addLocalLibrary(const QString& libDirName) throw (Exception)
     }
 }
 
-void Workspace::addRemoteLibrary(const QString& libDirName) throw (Exception)
+void Workspace::addRemoteLibrary(const QString& libDirName)
 {
     if (!mRemoteLibraries.contains(libDirName)) {
         // remote libraries are always opened read-only!
@@ -223,7 +223,7 @@ void Workspace::addRemoteLibrary(const QString& libDirName) throw (Exception)
     }
 }
 
-void Workspace::removeLocalLibrary(const QString& libDirName, bool rmDir) throw (Exception)
+void Workspace::removeLocalLibrary(const QString& libDirName, bool rmDir)
 {
     Library* library = mLocalLibraries.value(libDirName).data();
     if (library) {
@@ -234,7 +234,7 @@ void Workspace::removeLocalLibrary(const QString& libDirName, bool rmDir) throw 
     }
 }
 
-void Workspace::removeRemoteLibrary(const QString& libDirName, bool rmDir) throw (Exception)
+void Workspace::removeRemoteLibrary(const QString& libDirName, bool rmDir)
 {
     Library* library = mRemoteLibraries.value(libDirName).data();
     if (library) {
@@ -307,7 +307,7 @@ Version Workspace::getHighestFileFormatVersionOfWorkspace(const FilePath& path) 
     }
 }
 
-void Workspace::createNewWorkspace(const FilePath& path) throw (Exception)
+void Workspace::createNewWorkspace(const FilePath& path)
 {
     FilePath versionFilePath(path.getPathTo(".librepcb-workspace"));
     QScopedPointer<SmartVersionFile> versionFile(

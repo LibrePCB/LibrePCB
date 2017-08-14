@@ -63,7 +63,7 @@ BoardGerberExport::~BoardGerberExport() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BoardGerberExport::exportAllLayers() const throw (Exception)
+void BoardGerberExport::exportAllLayers() const
 {
     exportDrillsPTH();
     exportLayerBoardOutlines();
@@ -79,7 +79,7 @@ void BoardGerberExport::exportAllLayers() const throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-void BoardGerberExport::exportDrillsPTH() const throw (Exception)
+void BoardGerberExport::exportDrillsPTH() const
 {
     ExcellonGenerator gen;
 
@@ -108,7 +108,7 @@ void BoardGerberExport::exportDrillsPTH() const throw (Exception)
     gen.saveToFile(getOutputFilePath("DRILLS-PTH.drl"));
 }
 
-void BoardGerberExport::exportLayerBoardOutlines() const throw (Exception)
+void BoardGerberExport::exportLayerBoardOutlines() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -117,7 +117,7 @@ void BoardGerberExport::exportLayerBoardOutlines() const throw (Exception)
     gen.saveToFile(getOutputFilePath("OUTLINES.gbr"));
 }
 
-void BoardGerberExport::exportLayerTopCopper() const throw (Exception)
+void BoardGerberExport::exportLayerTopCopper() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -126,7 +126,7 @@ void BoardGerberExport::exportLayerTopCopper() const throw (Exception)
     gen.saveToFile(getOutputFilePath("COPPER-TOP.gbr"));
 }
 
-void BoardGerberExport::exportLayerTopSolderMask() const throw (Exception)
+void BoardGerberExport::exportLayerTopSolderMask() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -135,7 +135,7 @@ void BoardGerberExport::exportLayerTopSolderMask() const throw (Exception)
     gen.saveToFile(getOutputFilePath("SOLDERMASK-TOP.gbr"));
 }
 
-void BoardGerberExport::exportLayerTopOverlay() const throw (Exception)
+void BoardGerberExport::exportLayerTopOverlay() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -146,7 +146,7 @@ void BoardGerberExport::exportLayerTopOverlay() const throw (Exception)
     gen.saveToFile(getOutputFilePath("SILKSCREEN-TOP.gbr"));
 }
 
-void BoardGerberExport::exportLayerBottomCopper() const throw (Exception)
+void BoardGerberExport::exportLayerBottomCopper() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -155,7 +155,7 @@ void BoardGerberExport::exportLayerBottomCopper() const throw (Exception)
     gen.saveToFile(getOutputFilePath("COPPER-BOTTOM.gbr"));
 }
 
-void BoardGerberExport::exportLayerBottomSolderMask() const throw (Exception)
+void BoardGerberExport::exportLayerBottomSolderMask() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -164,7 +164,7 @@ void BoardGerberExport::exportLayerBottomSolderMask() const throw (Exception)
     gen.saveToFile(getOutputFilePath("SOLDERMASK-BOTTOM.gbr"));
 }
 
-void BoardGerberExport::exportLayerBottomOverlay() const throw (Exception)
+void BoardGerberExport::exportLayerBottomOverlay() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
@@ -175,7 +175,7 @@ void BoardGerberExport::exportLayerBottomOverlay() const throw (Exception)
     gen.saveToFile(getOutputFilePath("SILKSCREEN-BOTTOM.gbr"));
 }
 
-void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const throw (Exception)
+void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const
 {
     // draw footprints incl. pads
     foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
@@ -210,7 +210,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const throw
     }
 }
 
-void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const throw (Exception)
+void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const
 {
     bool drawCopper = via.isOnLayer(layerId);
     bool drawStopMask = (layerId == BoardLayer::TopStopMask || layerId == BoardLayer::BottomStopMask)
@@ -243,7 +243,7 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, int lay
     }
 }
 
-void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const throw (Exception)
+void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const
 {
     // draw pads
     foreach (const BI_FootprintPad* pad, footprint.getPads()) {
@@ -289,7 +289,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 }
 
-void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const throw (Exception)
+void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const
 {
     bool isOnCopperLayer = pad.isOnLayer(layerId);
     bool isOnSolderMaskTop = pad.isOnLayer(BoardLayer::LayerID::TopCopper) && (layerId == BoardLayer::LayerID::TopStopMask);

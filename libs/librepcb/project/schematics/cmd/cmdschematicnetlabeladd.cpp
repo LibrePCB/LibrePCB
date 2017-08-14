@@ -50,7 +50,7 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelAdd::performExecute() throw (Exception)
+bool CmdSchematicNetLabelAdd::performExecute()
 {
     mNetLabel = new SI_NetLabel(mSchematic, *mNetSignal, mPosition); // can throw
 
@@ -59,12 +59,12 @@ bool CmdSchematicNetLabelAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdSchematicNetLabelAdd::performUndo() throw (Exception)
+void CmdSchematicNetLabelAdd::performUndo()
 {
     mSchematic.removeNetLabel(*mNetLabel); // can throw
 }
 
-void CmdSchematicNetLabelAdd::performRedo() throw (Exception)
+void CmdSchematicNetLabelAdd::performRedo()
 {
     mSchematic.addNetLabel(*mNetLabel); // can throw
 }

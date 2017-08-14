@@ -74,7 +74,7 @@ BI_Device* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdAddDeviceToBoard::performExecute() throw (Exception)
+bool CmdAddDeviceToBoard::performExecute()
 {
     // if there is no such device in the project's library, copy it from the
     // workspace library to the project's library

@@ -73,7 +73,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject
         // Constructors / Destructor
         WorkspaceSettings() = delete;
         WorkspaceSettings(const WorkspaceSettings& other) = delete;
-        explicit WorkspaceSettings(const Workspace& workspace) throw (Exception);
+        explicit WorkspaceSettings(const Workspace& workspace);
         ~WorkspaceSettings() noexcept;
 
 
@@ -90,7 +90,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject
 
         // General Methods
         void restoreDefaults() noexcept;
-        void applyAll() throw (Exception);
+        void applyAll();
         void revertAll() noexcept;
 
         // Operator Overloadings
@@ -112,10 +112,10 @@ class WorkspaceSettings final : public QObject, public SerializableObject
 
         template<typename T>
         void loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                              DomElement* xmlRoot) throw (Exception);
-        void saveToFile() const throw (Exception);
+                              DomElement* xmlRoot);
+        void saveToFile() const;
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
     private: // Data

@@ -78,7 +78,7 @@ class NewProjectWizard final : public QWizard
         void setLocation(const FilePath& dir) noexcept;
 
         // General Methods
-        Project* createProject() const throw (Exception);
+        Project* createProject() const;
 
         // Operator Overloadings
         NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;

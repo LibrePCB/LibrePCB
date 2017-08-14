@@ -130,7 +130,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        void setLengthMm(qreal millimeters) throw (RangeError) {setLengthFromFloat(millimeters * 1e6);}
+        void setLengthMm(qreal millimeters) {setLengthFromFloat(millimeters * 1e6);}
 
         /**
          * @brief Set the length in millimeters, represented in a QString
@@ -145,7 +145,7 @@ class Length
          *
          * @see #toMmString(), #fromMm(const QString&, const Length&)
          */
-        void setLengthMm(const QString& millimeters) throw (Exception) {mNanometers = mmStringToNm(millimeters);}
+        void setLengthMm(const QString& millimeters) {mNanometers = mmStringToNm(millimeters);}
 
         /**
          * @brief Set the length in inches
@@ -159,7 +159,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        void setLengthInch(qreal inches) throw (Exception) {setLengthFromFloat(inches * sNmPerInch);}
+        void setLengthInch(qreal inches) {setLengthFromFloat(inches * sNmPerInch);}
 
         /**
          * @brief Set the length in mils (1/1000 inch)
@@ -173,7 +173,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        void setLengthMil(qreal mils) throw (Exception) {setLengthFromFloat(mils * sNmPerMil);}
+        void setLengthMil(qreal mils) {setLengthFromFloat(mils * sNmPerMil);}
 
         /**
          * @brief Set the length in pixels (from QGraphics* objects)
@@ -189,7 +189,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        void setLengthPx(qreal pixels) throw (Exception) {setLengthFromFloat(pixels * sNmPerPixel);}
+        void setLengthPx(qreal pixels) {setLengthFromFloat(pixels * sNmPerPixel);}
 
 
         // Conversions
@@ -358,7 +358,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        static Length fromMm(qreal millimeters, const Length& gridInterval = Length(0)) throw (RangeError);
+        static Length fromMm(qreal millimeters, const Length& gridInterval = Length(0));
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -383,7 +383,7 @@ class Length
          *
          * @see #setLengthMm(const QString&), #toMmString()
          */
-        static Length fromMm(const QString& millimeters, const Length& gridInterval = Length(0)) throw (Exception);
+        static Length fromMm(const QString& millimeters, const Length& gridInterval = Length(0));
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -400,7 +400,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        static Length fromInch(qreal inches, const Length& gridInterval = Length(0)) throw (RangeError);
+        static Length fromInch(qreal inches, const Length& gridInterval = Length(0));
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -417,7 +417,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        static Length fromMil(qreal mils, const Length& gridInterval = Length(0)) throw (RangeError);
+        static Length fromMil(qreal mils, const Length& gridInterval = Length(0));
 
         /**
          * @brief Get a Length object with a specific length and map it to a specific grid
@@ -436,7 +436,7 @@ class Length
          * @throws RangeError   If the argument is out of range, a RangeError exception
          *                      will be thrown
          */
-        static Length fromPx(qreal pixels, const Length& gridInterval = Length(0)) throw (RangeError);
+        static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
 
         /**
          * @brief Deserialize object from a string
@@ -447,7 +447,7 @@ class Length
          *
          * @throws Exception if the string was invalid
          */
-        static Length deserializeFromString(const QString& str) throw (Exception) {
+        static Length deserializeFromString(const QString& str) {
             return fromMm(str); // can throw
         }
 
@@ -498,7 +498,7 @@ class Length
          * of an integer, we will throw an exception. If we would pass the length as an integer,
          * we couldn't detect such under-/overflows!
          */
-        void setLengthFromFloat(qreal nanometers) throw (RangeError);
+        void setLengthFromFloat(qreal nanometers);
 
 
         // Private Static Functions
@@ -532,7 +532,7 @@ class Length
          * @todo    don't use double for this purpose!
          *          and throw an exception if a range error occurs (under-/overflow)!
          */
-        static LengthBase_t mmStringToNm(const QString& millimeters) throw (Exception);
+        static LengthBase_t mmStringToNm(const QString& millimeters);
 
 
         // Private Member Variables

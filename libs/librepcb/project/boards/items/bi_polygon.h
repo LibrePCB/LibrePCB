@@ -61,10 +61,10 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
         // Constructors / Destructor
         BI_Polygon() = delete;
         BI_Polygon(const BI_Polygon& other) = delete;
-        BI_Polygon(Board& board, const BI_Polygon& other) throw (Exception);
-        BI_Polygon(Board& board, const DomElement& domElement) throw (Exception);
+        BI_Polygon(Board& board, const BI_Polygon& other);
+        BI_Polygon(Board& board, const DomElement& domElement);
         BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
-                   bool isGrabArea, const Point& startPos) throw (Exception);
+                   bool isGrabArea, const Point& startPos);
         ~BI_Polygon() noexcept;
 
         // Getters
@@ -72,11 +72,11 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
         bool isSelectable() const noexcept override;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept override;
@@ -104,7 +104,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
 
 
     private:
-        void init() throw (Exception);
+        void init();
 
 
         // General

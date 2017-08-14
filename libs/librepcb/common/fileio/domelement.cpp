@@ -148,7 +148,7 @@ DomElement* DomElement::appendChild(const QString& name) noexcept
     return child.take();
 }
 
-DomElement* DomElement::getFirstChild(bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getFirstChild(bool throwIfNotFound) const
 {
     if (!mChilds.isEmpty())
         return mChilds.first();
@@ -161,7 +161,7 @@ DomElement* DomElement::getFirstChild(bool throwIfNotFound) const throw (Excepti
     }
 }
 
-DomElement* DomElement::getFirstChild(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getFirstChild(const QString& name, bool throwIfNotFound) const
 {
     foreach (DomElement* child, mChilds)
     {
@@ -178,7 +178,7 @@ DomElement* DomElement::getFirstChild(const QString& name, bool throwIfNotFound)
 }
 
 DomElement* DomElement::getFirstChild(const QString& pathName, bool throwIfPathNotExist,
-                                            bool throwIfChildNotFound) const throw (Exception)
+                                            bool throwIfChildNotFound) const
 {
     int separatorPos = pathName.indexOf("/");
     if (separatorPos > -1)
@@ -198,7 +198,7 @@ DomElement* DomElement::getFirstChild(const QString& pathName, bool throwIfPathN
 }
 
 DomElement* DomElement::getPreviousChild(const DomElement* child, const QString& name,
-                                               bool throwIfNotFound) const throw (Exception)
+                                               bool throwIfNotFound) const
 {
     DomElement* previousChild = const_cast<DomElement*>(child);
     do
@@ -219,7 +219,7 @@ DomElement* DomElement::getPreviousChild(const DomElement* child, const QString&
 }
 
 DomElement* DomElement::getNextChild(const DomElement* child, const QString& name,
-                                           bool throwIfNotFound) const throw (Exception)
+                                           bool throwIfNotFound) const
 {
     DomElement* nextChild = const_cast<DomElement*>(child);
     do
@@ -243,7 +243,7 @@ DomElement* DomElement::getNextChild(const DomElement* child, const QString& nam
  *  Sibling Handling Methods
  ****************************************************************************************/
 
-DomElement* DomElement::getPreviousSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getPreviousSibling(const QString& name, bool throwIfNotFound) const
 {
     if (mParent)
         return mParent->getPreviousChild(this, name, throwIfNotFound);
@@ -256,7 +256,7 @@ DomElement* DomElement::getPreviousSibling(const QString& name, bool throwIfNotF
     }
 }
 
-DomElement* DomElement::getNextSibling(const QString& name, bool throwIfNotFound) const throw (Exception)
+DomElement* DomElement::getNextSibling(const QString& name, bool throwIfNotFound) const
 {
     if (mParent)
         return mParent->getNextChild(this, name, throwIfNotFound);

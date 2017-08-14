@@ -35,7 +35,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentCategory::ComponentCategory(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
+ComponentCategory::ComponentCategory(const FilePath& elementDirectory, bool readOnly) :
     LibraryCategory(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     cleanupAfterLoadingElementFromFile();

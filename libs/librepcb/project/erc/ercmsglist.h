@@ -56,7 +56,7 @@ class ErcMsgList final : public QObject, public SerializableObject
         // Constructors / Destructor
         ErcMsgList() = delete;
         ErcMsgList(const ErcMsgList& other) = delete;
-        explicit ErcMsgList(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
+        explicit ErcMsgList(Project& project, bool restore, bool readOnly, bool create);
         ~ErcMsgList() noexcept;
 
         // Getters
@@ -66,7 +66,7 @@ class ErcMsgList final : public QObject, public SerializableObject
         void add(ErcMsg* ercMsg) noexcept;
         void remove(ErcMsg* ercMsg) noexcept;
         void update(ErcMsg* ercMsg) noexcept;
-        void restoreIgnoreState() throw (Exception);
+        void restoreIgnoreState();
         bool save(bool toOriginal, QStringList& errors) noexcept;
         
         // Operator Overloadings
@@ -83,7 +83,7 @@ class ErcMsgList final : public QObject, public SerializableObject
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // General

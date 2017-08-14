@@ -228,7 +228,7 @@ class DirectoryLock final
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
-        LockStatus getStatus() const throw (Exception);
+        LockStatus getStatus() const;
 
 
         // General Methods
@@ -242,7 +242,7 @@ class DirectoryLock final
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
-        void lock() throw (Exception);
+        void lock();
 
         /**
          * @brief Unlock the specified directory (remove the lock file)
@@ -253,7 +253,7 @@ class DirectoryLock final
          *
          * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
          */
-        void unlock() throw (Exception);
+        void unlock();
 
 
         // Operator Overloadings

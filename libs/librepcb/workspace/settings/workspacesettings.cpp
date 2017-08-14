@@ -38,7 +38,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) throw (Exception) :
+WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
     QObject(nullptr), mXmlFilePath(workspace.getMetadataPath().getPathTo("settings.xml"))
 {
     qDebug("Load workspace settings...");
@@ -90,7 +90,7 @@ void WorkspaceSettings::restoreDefaults() noexcept
     }
 }
 
-void WorkspaceSettings::applyAll() throw (Exception)
+void WorkspaceSettings::applyAll()
 {
     foreach (WSI_Base* item, mItems) {
         item->apply();
@@ -121,14 +121,14 @@ void WorkspaceSettings::showSettingsDialog() noexcept
 
 template<typename T>
 void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                                         DomElement* xmlRoot) throw (Exception)
+                                         DomElement* xmlRoot)
 {
     DomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
     member.reset(new T(xmlTagName, node));
     mItems.append(member.data());
 }
 
-void WorkspaceSettings::saveToFile() const throw (Exception)
+void WorkspaceSettings::saveToFile() const
 {
     DomDocument doc(*serializeToDomElement("workspace_settings"));
 
@@ -136,7 +136,7 @@ void WorkspaceSettings::saveToFile() const throw (Exception)
     file->save(doc, true); // can throw
 }
 
-void WorkspaceSettings::serialize(DomElement& root) const throw (Exception)
+void WorkspaceSettings::serialize(DomElement& root) const
 {
     foreach (WSI_Base* item, mItems) {
         root.appendChild(item->serializeToDomElement(item->getXmlElementTagName()));

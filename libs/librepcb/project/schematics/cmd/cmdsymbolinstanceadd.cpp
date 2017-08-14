@@ -61,7 +61,7 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSymbolInstanceAdd::performExecute() throw (Exception)
+bool CmdSymbolInstanceAdd::performExecute()
 {
     if (!mSymbolInstance) {
         // create new symbol instance
@@ -74,12 +74,12 @@ bool CmdSymbolInstanceAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdSymbolInstanceAdd::performUndo() throw (Exception)
+void CmdSymbolInstanceAdd::performUndo()
 {
     mSchematic.removeSymbol(*mSymbolInstance); // can throw
 }
 
-void CmdSymbolInstanceAdd::performRedo() throw (Exception)
+void CmdSymbolInstanceAdd::performRedo()
 {
     mSchematic.addSymbol(*mSymbolInstance); // can throw
 }

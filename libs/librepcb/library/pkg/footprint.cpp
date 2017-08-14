@@ -36,7 +36,7 @@ namespace library {
  ****************************************************************************************/
 
 Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
-                     const QString& description_en_US) throw (Exception) :
+                     const QString& description_en_US) :
     mUuid(uuid)
 {
     Q_ASSERT(mUuid.isNull() == false);
@@ -44,7 +44,7 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
     mDescriptions.setDefaultValue(description_en_US);
 }
 
-Footprint::Footprint(const DomElement& domElement) throw (Exception)
+Footprint::Footprint(const DomElement& domElement)
 {
     try
     {
@@ -190,7 +190,7 @@ void Footprint::removeHole(Hole& hole) noexcept
  *  Public Methods
  ****************************************************************************************/
 
-void Footprint::serialize(DomElement& root) const throw (Exception)
+void Footprint::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

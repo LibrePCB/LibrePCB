@@ -44,7 +44,7 @@ ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& 
     mDescriptions.setDefaultValue(desc_en_US);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) throw (Exception)
+ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement)
 {
     try
     {
@@ -143,7 +143,7 @@ void ComponentSymbolVariant::removeItem(ComponentSymbolVariantItem& item) noexce
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariant::serialize(DomElement& root) const throw (Exception)
+void ComponentSymbolVariant::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

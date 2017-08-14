@@ -53,7 +53,7 @@ CmdRemoveViaFromBoard::~CmdRemoveViaFromBoard() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveViaFromBoard::performExecute() throw (Exception)
+bool CmdRemoveViaFromBoard::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

@@ -63,13 +63,13 @@ class CmdDetachBoardNetPointFromViaOrPad final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
         // Helper Methods
-        void detachNetPoint() throw (Exception);
-        void removeNetPointWithAllNetlines() throw (Exception);
-        void removeNetLineWithUnusedNetpoints(BI_NetLine& l) throw (Exception);
-        void removeNetpointIfUnused(BI_NetPoint& p) throw (Exception);
+        void detachNetPoint();
+        void removeNetPointWithAllNetlines();
+        void removeNetLineWithUnusedNetpoints(BI_NetLine& l);
+        void removeNetpointIfUnused(BI_NetPoint& p);
 
 
         // Private Member Variables

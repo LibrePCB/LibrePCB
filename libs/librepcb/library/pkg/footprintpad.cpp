@@ -44,7 +44,7 @@ FootprintPad::FootprintPad(Technology_t technology, const Uuid& padUuid,
 {
 }
 
-FootprintPad::FootprintPad(const DomElement& domElement) throw (Exception)
+FootprintPad::FootprintPad(const DomElement& domElement)
 {
     // read attributes
     mTechnology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
@@ -102,7 +102,7 @@ void FootprintPad::setHeight(const Length& height) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void FootprintPad::serialize(DomElement& root) const throw (Exception)
+void FootprintPad::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -132,7 +132,7 @@ bool FootprintPad::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-FootprintPad::Technology_t FootprintPad::stringToTechnology(const QString& technology) throw (Exception)
+FootprintPad::Technology_t FootprintPad::stringToTechnology(const QString& technology)
 {
     if      (technology == QLatin1String("tht")) return Technology_t::THT;
     else if (technology == QLatin1String("smt")) return Technology_t::SMT;
@@ -149,7 +149,7 @@ QString FootprintPad::technologyToString(Technology_t technology) noexcept
     }
 }
 
-FootprintPad* FootprintPad::fromDomElement(const DomElement& domElement) throw (Exception)
+FootprintPad* FootprintPad::fromDomElement(const DomElement& domElement)
 {
     Technology_t technology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
     switch (technology)

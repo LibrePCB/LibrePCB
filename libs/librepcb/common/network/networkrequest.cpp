@@ -45,12 +45,12 @@ NetworkRequest::~NetworkRequest() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void NetworkRequest::prepareRequest() throw (Exception)
+void NetworkRequest::prepareRequest()
 {
     mReceivedData.clear();
 }
 
-void NetworkRequest::finalizeRequest() throw (Exception)
+void NetworkRequest::finalizeRequest()
 {
     if (mReceivedData.size() > 100*1000*1000) {
         throw RuntimeError(__FILE__, __LINE__,

@@ -35,7 +35,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
+WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement),
     mAppLocale(), mAppLocaleTmp(mAppLocale)
 {
@@ -140,7 +140,7 @@ void WSI_AppLocale::updateComboBoxIndex() noexcept
     }
 }
 
-void WSI_AppLocale::serialize(DomElement& root) const throw (Exception)
+void WSI_AppLocale::serialize(DomElement& root) const
 {
     root.setText(mAppLocale);
 }

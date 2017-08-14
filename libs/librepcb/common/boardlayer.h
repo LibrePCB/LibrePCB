@@ -213,8 +213,8 @@ class BoardLayer final : public QObject, public SerializableObject
 
         // Constructors / Destructor
         BoardLayer() = delete;
-        explicit BoardLayer(const BoardLayer& other) throw (Exception);
-        explicit BoardLayer(const DomElement& domElement) throw (Exception);
+        explicit BoardLayer(const BoardLayer& other);
+        explicit BoardLayer(const DomElement& domElement);
         explicit BoardLayer(int id);
         ~BoardLayer();
 
@@ -231,7 +231,7 @@ class BoardLayer final : public QObject, public SerializableObject
 
         // General Methods
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         BoardLayer& operator=(const BoardLayer& rhs) = delete;

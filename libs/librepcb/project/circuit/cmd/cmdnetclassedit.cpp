@@ -59,19 +59,19 @@ void CmdNetClassEdit::setName(const QString& name) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdNetClassEdit::performExecute() throw (Exception)
+bool CmdNetClassEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdNetClassEdit::performUndo() throw (Exception)
+void CmdNetClassEdit::performUndo()
 {
     mCircuit.setNetClassName(mNetClass, mOldName); // can throw
 }
 
-void CmdNetClassEdit::performRedo() throw (Exception)
+void CmdNetClassEdit::performRedo()
 {
     mCircuit.setNetClassName(mNetClass, mNewName); // can throw
 }

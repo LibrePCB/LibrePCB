@@ -434,7 +434,7 @@ int AttributeListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexc
     return row;
 }
 
-void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) const throw (Exception)
+void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) const
 {
     if (key.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -447,7 +447,7 @@ void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) cons
 }
 
 void AttributeListEditorWidget::throwIfValueInvalid(const AttributeType& type,
-                                                    const QString& value) const throw (Exception)
+                                                    const QString& value) const
 {
     if (!type.isValueValid(value)) {
         throw RuntimeError(__FILE__, __LINE__,

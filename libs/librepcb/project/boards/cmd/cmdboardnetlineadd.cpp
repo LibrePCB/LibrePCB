@@ -58,7 +58,7 @@ CmdBoardNetLineAdd::~CmdBoardNetLineAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetLineAdd::performExecute() throw (Exception)
+bool CmdBoardNetLineAdd::performExecute()
 {
     if (!mNetLine) {
         // create new netline
@@ -70,12 +70,12 @@ bool CmdBoardNetLineAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdBoardNetLineAdd::performUndo() throw (Exception)
+void CmdBoardNetLineAdd::performUndo()
 {
     mBoard.removeNetLine(*mNetLine); // can throw
 }
 
-void CmdBoardNetLineAdd::performRedo() throw (Exception)
+void CmdBoardNetLineAdd::performRedo()
 {
     mBoard.addNetLine(*mNetLine); // can throw
 }

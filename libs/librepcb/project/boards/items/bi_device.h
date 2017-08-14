@@ -67,11 +67,11 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         // Constructors / Destructor
         BI_Device() = delete;
         BI_Device(const BI_Device& other) = delete;
-        BI_Device(Board& board, const BI_Device& other) throw (Exception);
-        BI_Device(Board& board, const DomElement& domElement) throw (Exception);
+        BI_Device(Board& board, const BI_Device& other);
+        BI_Device(Board& board, const DomElement& domElement);
         BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
                   const Uuid& footprintUuid, const Point& position, const Angle& rotation,
-                  bool mirror) throw (Exception);
+                  bool mirror);
         ~BI_Device() noexcept;
 
         // Getters
@@ -88,14 +88,14 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
-        void setIsMirrored(bool mirror) throw (Exception);
+        void setIsMirrored(bool mirror);
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Helper Methods
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
@@ -125,8 +125,8 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
     private:
 
         void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                              const Uuid& footprintUuid) throw (Exception);
-        void init() throw (Exception);
+                                              const Uuid& footprintUuid);
+        void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 

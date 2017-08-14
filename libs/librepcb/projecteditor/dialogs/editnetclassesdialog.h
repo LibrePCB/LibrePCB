@@ -64,7 +64,7 @@ class EditNetClassesDialog final : public QDialog
 
         // Constructors / Destructor
         explicit EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack,
-                                      QWidget* parent = 0) throw (Exception);
+                                      QWidget* parent = 0);
         ~EditNetClassesDialog() noexcept;
 
     private slots:

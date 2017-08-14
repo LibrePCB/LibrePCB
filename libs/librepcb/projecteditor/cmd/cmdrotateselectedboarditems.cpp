@@ -57,7 +57,7 @@ CmdRotateSelectedBoardItems::~CmdRotateSelectedBoardItems() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRotateSelectedBoardItems::performExecute() throw (Exception)
+bool CmdRotateSelectedBoardItems::performExecute()
 {
     // get all selected items
     QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, false, true, false,

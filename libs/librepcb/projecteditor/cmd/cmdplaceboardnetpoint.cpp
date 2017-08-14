@@ -66,7 +66,7 @@ CmdPlaceBoardNetPoint::~CmdPlaceBoardNetPoint() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdPlaceBoardNetPoint::performExecute() throw (Exception)
+bool CmdPlaceBoardNetPoint::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
@@ -91,7 +91,7 @@ bool CmdPlaceBoardNetPoint::performExecute() throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPoint() throw (Exception)
+BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPoint()
 {
     // get vias at given position
     QList<BI_Via*> viasUnderCursor = mBoard.getViasAtScenePos(mPosition, nullptr);
@@ -116,7 +116,7 @@ BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPoint() throw (Exception)
     }
 }
 
-BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPointAtPad() throw (Exception)
+BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPointAtPad()
 {
     // get pads at given position
     QList<BI_FootprintPad*> padsUnderCursor = mBoard.getPadsAtScenePos(mPosition, &mLayer, nullptr);

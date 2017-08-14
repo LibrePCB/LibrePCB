@@ -67,7 +67,7 @@ class BES_AddDevice final : public BES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        void startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) throw (Exception);
+        void startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt);
         bool abortCommand(bool showErrMsgBox) noexcept;
         void rotateDevice(const Angle& angle) noexcept;
         void mirrorDevice(Qt::Orientation orientation) noexcept;

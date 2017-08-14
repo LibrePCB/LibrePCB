@@ -83,8 +83,8 @@ class SI_Base : public QObject
         virtual void setSelected(bool selected) noexcept;
 
         // General Methods
-        virtual void addToSchematic(GraphicsScene& scene) throw (Exception) = 0;
-        virtual void removeFromSchematic(GraphicsScene& scene) throw (Exception) = 0;
+        virtual void addToSchematic(GraphicsScene& scene) = 0;
+        virtual void removeFromSchematic(GraphicsScene& scene) = 0;
 
         // Operator Overloadings
         SI_Base& operator=(const SI_Base& rhs) = delete;

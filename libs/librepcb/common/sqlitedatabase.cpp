@@ -33,13 +33,13 @@ namespace librepcb {
  *  Class TransactionScopeGuard
  ****************************************************************************************/
 
-SQLiteDatabase::TransactionScopeGuard::TransactionScopeGuard(SQLiteDatabase& db) throw (Exception) :
+SQLiteDatabase::TransactionScopeGuard::TransactionScopeGuard(SQLiteDatabase& db) :
     mDb(db), mIsCommited(false)
 {
     mDb.beginTransaction(); // can throw
 }
 
-void SQLiteDatabase::TransactionScopeGuard::commit() throw (Exception)
+void SQLiteDatabase::TransactionScopeGuard::commit()
 {
     mDb.commitTransaction(); // can throw
     mIsCommited = true;
@@ -60,7 +60,7 @@ SQLiteDatabase::TransactionScopeGuard::~TransactionScopeGuard() noexcept
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SQLiteDatabase::SQLiteDatabase(const FilePath& filepath) throw (Exception) :
+SQLiteDatabase::SQLiteDatabase(const FilePath& filepath) :
     QObject(nullptr)//, mNestedTransactionCount(0)
 {
     // create database (use random UUID as connection name)
@@ -99,7 +99,7 @@ SQLiteDatabase::~SQLiteDatabase() noexcept
  *  SQL Commands
  ****************************************************************************************/
 
-void SQLiteDatabase::beginTransaction() throw (Exception)
+void SQLiteDatabase::beginTransaction()
 {
     //Q_ASSERT(mNestedTransactionCount >= 0);
     //if (mNestedTransactionCount == 0) {
@@ -111,7 +111,7 @@ void SQLiteDatabase::beginTransaction() throw (Exception)
     //mNestedTransactionCount++;
 }
 
-void SQLiteDatabase::commitTransaction() throw (Exception)
+void SQLiteDatabase::commitTransaction()
 {
     //Q_ASSERT(mNestedTransactionCount >= 0);
     //if (mNestedTransactionCount == 1) {
@@ -126,7 +126,7 @@ void SQLiteDatabase::commitTransaction() throw (Exception)
     //mNestedTransactionCount--;
 }
 
-void SQLiteDatabase::rollbackTransaction() throw (Exception)
+void SQLiteDatabase::rollbackTransaction()
 {
     //Q_ASSERT(mNestedTransactionCount >= 0);
     //if (mNestedTransactionCount == 1) {
@@ -141,7 +141,7 @@ void SQLiteDatabase::rollbackTransaction() throw (Exception)
     //mNestedTransactionCount--;
 }
 
-void SQLiteDatabase::clearTable(const QString& table) throw (Exception)
+void SQLiteDatabase::clearTable(const QString& table)
 {
     exec("DELETE FROM " % table); // can throw
 }
@@ -150,7 +150,7 @@ void SQLiteDatabase::clearTable(const QString& table) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const throw (Exception)
+QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const
 {
     QSqlQuery q(mDb);
     if (!q.prepare(query)) {
@@ -162,7 +162,7 @@ QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const throw (Except
     return q;
 }
 
-int SQLiteDatabase::insert(QSqlQuery& query) throw (Exception)
+int SQLiteDatabase::insert(QSqlQuery& query)
 {
     exec(query); // can throw
 
@@ -176,7 +176,7 @@ int SQLiteDatabase::insert(QSqlQuery& query) throw (Exception)
     }
 }
 
-void SQLiteDatabase::exec(QSqlQuery& query) throw (Exception)
+void SQLiteDatabase::exec(QSqlQuery& query)
 {
     if (!query.exec()) {
         qDebug() << query.lastError().databaseText();
@@ -186,7 +186,7 @@ void SQLiteDatabase::exec(QSqlQuery& query) throw (Exception)
     }
 }
 
-void SQLiteDatabase::exec(const QString& query) throw (Exception)
+void SQLiteDatabase::exec(const QString& query)
 {
     QSqlQuery q = prepareQuery(query);
     exec(q);
@@ -196,7 +196,7 @@ void SQLiteDatabase::exec(const QString& query) throw (Exception)
  *  Private Methods
  ****************************************************************************************/
 
-void SQLiteDatabase::enableSqliteWriteAheadLogging() throw (Exception)
+void SQLiteDatabase::enableSqliteWriteAheadLogging()
 {
     QSqlQuery query("PRAGMA journal_mode=WAL", mDb);
     exec(query); // can throw
@@ -208,7 +208,7 @@ void SQLiteDatabase::enableSqliteWriteAheadLogging() throw (Exception)
     }
 }
 
-QHash<QString, QString> SQLiteDatabase::getSqliteCompileOptions() throw (Exception)
+QHash<QString, QString> SQLiteDatabase::getSqliteCompileOptions()
 {
     QHash<QString, QString> options;
     QSqlQuery query("PRAGMA compile_options", mDb);

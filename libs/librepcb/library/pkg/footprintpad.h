@@ -57,7 +57,7 @@ class FootprintPad : public SerializableObject
         explicit FootprintPad(Technology_t technology, const Uuid& padUuid,
                               const Point& pos, const Angle& rot, const Length& width,
                               const Length& height) noexcept;
-        explicit FootprintPad(const DomElement& domElement) throw (Exception);
+        explicit FootprintPad(const DomElement& domElement);
         virtual ~FootprintPad() noexcept;
 
         // Getters
@@ -82,13 +82,13 @@ class FootprintPad : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const throw (Exception) override;
+        virtual void serialize(DomElement& root) const override;
         virtual bool checkAttributesValidity() const noexcept;
 
         // Static Methods
-        static Technology_t stringToTechnology(const QString& technology) throw (Exception);
+        static Technology_t stringToTechnology(const QString& technology);
         static QString technologyToString(Technology_t technology) noexcept;
-        static FootprintPad* fromDomElement(const DomElement& domElement) throw (Exception);
+        static FootprintPad* fromDomElement(const DomElement& domElement);
 
 
     private:

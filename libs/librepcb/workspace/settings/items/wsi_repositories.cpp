@@ -35,7 +35,7 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Repositories::WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) throw (Exception) :
+WSI_Repositories::WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
@@ -177,7 +177,7 @@ void WSI_Repositories::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_Repositories::serialize(DomElement& root) const throw (Exception)
+void WSI_Repositories::serialize(DomElement& root) const
 {
     serializePointerContainer(root, mList, "repository");
 }

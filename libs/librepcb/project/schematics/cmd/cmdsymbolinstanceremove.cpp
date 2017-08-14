@@ -49,19 +49,19 @@ CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSymbolInstanceRemove::performExecute() throw (Exception)
+bool CmdSymbolInstanceRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdSymbolInstanceRemove::performUndo() throw (Exception)
+void CmdSymbolInstanceRemove::performUndo()
 {
     mSchematic.addSymbol(mSymbol); // can throw
 }
 
-void CmdSymbolInstanceRemove::performRedo() throw (Exception)
+void CmdSymbolInstanceRemove::performRedo()
 {
     mSchematic.removeSymbol(mSymbol); // can throw
 }

@@ -48,7 +48,7 @@ namespace project {
  ****************************************************************************************/
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
-                     bool readOnly, bool create, const QString& newName) throw (Exception):
+                     bool readOnly, bool create, const QString& newName):
     QObject(&project), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
     mIsAddedToProject(false)
 {
@@ -388,7 +388,7 @@ SI_Symbol* Schematic::getSymbolByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
+void Schematic::addSymbol(SI_Symbol& symbol)
 {
     if ((!mIsAddedToProject) || (mSymbols.contains(&symbol))
         || (&symbol.getSchematic() != this))
@@ -406,7 +406,7 @@ void Schematic::addSymbol(SI_Symbol& symbol) throw (Exception)
     mSymbols.append(&symbol);
 }
 
-void Schematic::removeSymbol(SI_Symbol& symbol) throw (Exception)
+void Schematic::removeSymbol(SI_Symbol& symbol)
 {
     if ((!mIsAddedToProject) || (!mSymbols.contains(&symbol))) {
         throw LogicError(__FILE__, __LINE__);
@@ -429,7 +429,7 @@ SI_NetPoint* Schematic::getNetPointByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void Schematic::addNetPoint(SI_NetPoint& netpoint)
 {
     if ((!mIsAddedToProject) || (mNetPoints.contains(&netpoint))
         || (&netpoint.getSchematic() != this))
@@ -447,7 +447,7 @@ void Schematic::addNetPoint(SI_NetPoint& netpoint) throw (Exception)
     mNetPoints.append(&netpoint);
 }
 
-void Schematic::removeNetPoint(SI_NetPoint& netpoint) throw (Exception)
+void Schematic::removeNetPoint(SI_NetPoint& netpoint)
 {
     if ((!mIsAddedToProject) || (!mNetPoints.contains(&netpoint))) {
         throw LogicError(__FILE__, __LINE__);
@@ -470,7 +470,7 @@ SI_NetLine* Schematic::getNetLineByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
+void Schematic::addNetLine(SI_NetLine& netline)
 {
     if ((!mIsAddedToProject) || (mNetLines.contains(&netline))
         || (&netline.getSchematic() != this))
@@ -488,7 +488,7 @@ void Schematic::addNetLine(SI_NetLine& netline) throw (Exception)
     mNetLines.append(&netline);
 }
 
-void Schematic::removeNetLine(SI_NetLine& netline) throw (Exception)
+void Schematic::removeNetLine(SI_NetLine& netline)
 {
     if ((!mIsAddedToProject) || (!mNetLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
@@ -511,7 +511,7 @@ SI_NetLabel* Schematic::getNetLabelByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
+void Schematic::addNetLabel(SI_NetLabel& netlabel)
 {
     if ((!mIsAddedToProject) || (mNetLabels.contains(&netlabel))
         || (&netlabel.getSchematic() != this))
@@ -529,7 +529,7 @@ void Schematic::addNetLabel(SI_NetLabel& netlabel) throw (Exception)
     mNetLabels.append(&netlabel);
 }
 
-void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
+void Schematic::removeNetLabel(SI_NetLabel& netlabel)
 {
     if ((!mIsAddedToProject) || (!mNetLabels.contains(&netlabel))) {
         throw LogicError(__FILE__, __LINE__);
@@ -543,7 +543,7 @@ void Schematic::removeNetLabel(SI_NetLabel& netlabel) throw (Exception)
  *  General Methods
  ****************************************************************************************/
 
-void Schematic::addToProject() throw (Exception)
+void Schematic::addToProject()
 {
     if (mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
@@ -560,7 +560,7 @@ void Schematic::addToProject() throw (Exception)
     sgl.dismiss();
 }
 
-void Schematic::removeFromProject() throw (Exception)
+void Schematic::removeFromProject()
 {
     if (!mIsAddedToProject) {
         throw LogicError(__FILE__, __LINE__);
@@ -701,7 +701,7 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Schematic::serialize(DomElement& root) const throw (Exception)
+void Schematic::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -719,7 +719,7 @@ void Schematic::serialize(DomElement& root) const throw (Exception)
  ****************************************************************************************/
 
 Schematic* Schematic::create(Project& project, const FilePath& filepath,
-                             const QString& name) throw (Exception)
+                             const QString& name)
 {
     return new Schematic(project, filepath, false, false, true, name);
 }

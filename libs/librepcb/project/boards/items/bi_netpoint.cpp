@@ -50,7 +50,7 @@ namespace project {
  ****************************************************************************************/
 
 BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
-                         BI_Via* via) throw (Exception) :
+                         BI_Via* via) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(other.mPosition),
     mLayer(nullptr), mNetSignal(other.mNetSignal), mFootprintPad(pad), mVia(via)
 {
@@ -65,7 +65,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exception) :
+BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) :
     BI_Base(board), mLayer(nullptr), mNetSignal(nullptr), mFootprintPad(nullptr),
     mVia(nullptr)
 {
@@ -122,7 +122,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) throw (Exce
 }
 
 BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                         const Point& position) throw (Exception) :
+                         const Point& position) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(position), mLayer(&layer),
     mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(nullptr)
 {
@@ -130,7 +130,7 @@ BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
 }
 
 BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                         BI_FootprintPad& pad) throw (Exception) :
+                         BI_FootprintPad& pad) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(pad.getPosition()),
     mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(&pad), mVia(nullptr)
 {
@@ -138,14 +138,14 @@ BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
 }
 
 BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
-                         BI_Via& via) throw (Exception) :
+                         BI_Via& via) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(via.getPosition()),
     mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(&via)
 {
     init();
 }
 
-void BI_NetPoint::init() throw (Exception)
+void BI_NetPoint::init()
 {
     // check layer
     if (!mLayer->isCopperLayer()) {
@@ -200,7 +200,7 @@ Length BI_NetPoint::getMaxLineWidth() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void BI_NetPoint::setLayer(BoardLayer& layer) throw (Exception)
+void BI_NetPoint::setLayer(BoardLayer& layer)
 {
     if (&layer != mLayer) {
         if (isUsed() || isAttached() || (!layer.isCopperLayer())) {
@@ -210,7 +210,7 @@ void BI_NetPoint::setLayer(BoardLayer& layer) throw (Exception)
     }
 }
 
-void BI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
+void BI_NetPoint::setNetSignal(NetSignal& netsignal)
 {
     if (&netsignal == mNetSignal) {
         return;
@@ -230,7 +230,7 @@ void BI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
     mNetSignal = &netsignal;
 }
 
-void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad) throw (Exception)
+void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad)
 {
     if (pad == mFootprintPad) {
         return;
@@ -260,7 +260,7 @@ void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad) throw (Exception)
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_NetPoint::setViaToAttach(BI_Via* via) throw (Exception)
+void BI_NetPoint::setViaToAttach(BI_Via* via)
 {
     if (via == mVia) {
         return;
@@ -301,7 +301,7 @@ void BI_NetPoint::setPosition(const Point& position) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_NetPoint::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_NetPoint::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -331,7 +331,7 @@ void BI_NetPoint::addToBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void BI_NetPoint::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_NetPoint::removeFromBoard(GraphicsScene& scene)
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -360,7 +360,7 @@ void BI_NetPoint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void BI_NetPoint::registerNetLine(BI_NetLine& netline) throw (Exception)
+void BI_NetPoint::registerNetLine(BI_NetLine& netline)
 {
     if ((!isAddedToBoard()) || (mRegisteredLines.contains(&netline))
         || (netline.getBoard() != mBoard))
@@ -373,7 +373,7 @@ void BI_NetPoint::registerNetLine(BI_NetLine& netline) throw (Exception)
     mErcMsgDeadNetPoint->setVisible(mRegisteredLines.isEmpty());
 }
 
-void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) throw (Exception)
+void BI_NetPoint::unregisterNetLine(BI_NetLine& netline)
 {
     if ((!isAddedToBoard()) || (!mRegisteredLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
@@ -391,7 +391,7 @@ void BI_NetPoint::updateLines() const noexcept
     }
 }
 
-void BI_NetPoint::serialize(DomElement& root) const throw (Exception)
+void BI_NetPoint::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -50,7 +50,7 @@ UndoCommandGroup::~UndoCommandGroup() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
+void UndoCommandGroup::appendChild(UndoCommand* cmd)
 {
     // make sure "cmd" is deleted when going out of scope (e.g. because of an exception)
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -74,7 +74,7 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) throw (Exception)
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool UndoCommandGroup::performExecute() throw (Exception)
+bool UndoCommandGroup::performExecute()
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
@@ -86,7 +86,7 @@ bool UndoCommandGroup::performExecute() throw (Exception)
     return (mChilds.count() > 0);
 }
 
-void UndoCommandGroup::performUndo() throw (Exception)
+void UndoCommandGroup::performUndo()
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = mChilds.count()-1; i >= 0; --i) { // from top to bottom
@@ -97,7 +97,7 @@ void UndoCommandGroup::performUndo() throw (Exception)
     sgl.dismiss();
 }
 
-void UndoCommandGroup::performRedo() throw (Exception)
+void UndoCommandGroup::performRedo()
 {
     ScopeGuardList sgl(mChilds.count());
     for (int i = 0; i < mChilds.count(); ++i) { // from bottom to top
@@ -112,7 +112,7 @@ void UndoCommandGroup::performRedo() throw (Exception)
  *  Protected Methods
  ****************************************************************************************/
 
-void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) throw (Exception)
+void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd)
 {
     QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
 

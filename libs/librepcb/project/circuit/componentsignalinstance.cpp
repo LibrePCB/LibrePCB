@@ -45,7 +45,7 @@ namespace project {
  ****************************************************************************************/
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                                 const DomElement& domElement) throw (Exception) :
+                                                 const DomElement& domElement) :
     QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
     mComponentSignal(nullptr), mIsAddedToCircuit(false), mNetSignal(nullptr)
 {
@@ -70,14 +70,14 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                                  const library::ComponentSignal& cmpSignal,
-                                                 NetSignal* netsignal) throw (Exception) :
+                                                 NetSignal* netsignal) :
     QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
     mComponentSignal(&cmpSignal), mIsAddedToCircuit(false), mNetSignal(netsignal)
 {
     init();
 }
 
-void ComponentSignalInstance::init() throw (Exception)
+void ComponentSignalInstance::init()
 {
     // create ERC messages
     mErcMsgUnconnectedRequiredSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
@@ -151,7 +151,7 @@ bool ComponentSignalInstance::arePinsOrPadsUsed() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exception)
+void ComponentSignalInstance::setNetSignal(NetSignal* netsignal)
 {
     if (netsignal == mNetSignal) {
         return;
@@ -190,7 +190,7 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) throw (Exceptio
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSignalInstance::addToCircuit() throw (Exception)
+void ComponentSignalInstance::addToCircuit()
 {
     if (mIsAddedToCircuit || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -202,7 +202,7 @@ void ComponentSignalInstance::addToCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void ComponentSignalInstance::removeFromCircuit() throw (Exception)
+void ComponentSignalInstance::removeFromCircuit()
 {
     if (!mIsAddedToCircuit) {
         throw LogicError(__FILE__, __LINE__);
@@ -219,7 +219,7 @@ void ComponentSignalInstance::removeFromCircuit() throw (Exception)
     updateErcMessages();
 }
 
-void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Exception)
+void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin)
 {
     if ((!mIsAddedToCircuit) || (pin.getCircuit() != mCircuit)
         || (mRegisteredSymbolPins.contains(&pin)))
@@ -229,7 +229,7 @@ void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) throw (Except
     mRegisteredSymbolPins.append(&pin);
 }
 
-void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exception)
+void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredSymbolPins.contains(&pin))) {
         throw LogicError(__FILE__, __LINE__);
@@ -237,7 +237,7 @@ void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) throw (Exce
     mRegisteredSymbolPins.removeOne(&pin);
 }
 
-void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) throw (Exception)
+void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad)
 {
     if ((!mIsAddedToCircuit) || (pad.getCircuit() != mCircuit)
         || (mRegisteredFootprintPads.contains(&pad)))
@@ -247,7 +247,7 @@ void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) throw (
     mRegisteredFootprintPads.append(&pad);
 }
 
-void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) throw (Exception)
+void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad)
 {
     if ((!mIsAddedToCircuit) || (!mRegisteredFootprintPads.contains(&pad))) {
         throw LogicError(__FILE__, __LINE__);
@@ -255,7 +255,7 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) throw
     mRegisteredFootprintPads.removeOne(&pad);
 }
 
-void ComponentSignalInstance::serialize(DomElement& root) const throw (Exception)
+void ComponentSignalInstance::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

@@ -42,7 +42,7 @@ SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& positio
     Q_ASSERT(mLength >= 0);
 }
 
-SymbolPin::SymbolPin(const DomElement& domElement) throw (Exception) :
+SymbolPin::SymbolPin(const DomElement& domElement) :
     mUuid(), mPosition(), mLength(), mRotation()
 {
     // read attributes
@@ -90,7 +90,7 @@ void SymbolPin::setRotation(const Angle& rotation) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SymbolPin::serialize(DomElement& root) const throw (Exception)
+void SymbolPin::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

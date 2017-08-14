@@ -35,7 +35,7 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
-                                               DomElement* xmlElement) throw (Exception) :
+                                               DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
@@ -193,7 +193,7 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_LibraryLocaleOrder::serialize(DomElement& root) const throw (Exception)
+void WSI_LibraryLocaleOrder::serialize(DomElement& root) const
 {
     foreach (const QString& locale, mList) {
         root.appendTextChild("locale", locale);

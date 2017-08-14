@@ -64,9 +64,9 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         // Constructors / Destructor
         BI_Footprint() = delete;
         BI_Footprint(const BI_Footprint& other) = delete;
-        BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (Exception);
-        BI_Footprint(BI_Device& device, const DomElement& domElement) throw (Exception);
-        explicit BI_Footprint(BI_Device& device) throw (Exception);
+        BI_Footprint(BI_Device& device, const BI_Footprint& other);
+        BI_Footprint(BI_Device& device, const DomElement& domElement);
+        explicit BI_Footprint(BI_Device& device);
         ~BI_Footprint() noexcept;
 
         // Getters
@@ -80,11 +80,11 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         bool isUsed() const noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) throw (Exception) override;
-        void removeFromBoard(GraphicsScene& scene) throw (Exception) override;
+        void addToBoard(GraphicsScene& scene) override;
+        void removeFromBoard(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
@@ -118,7 +118,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
 
     private:
 
-        void init() throw (Exception);
+        void init();
         void updateGraphicsItemTransform() noexcept;
         bool checkAttributesValidity() const noexcept;
 

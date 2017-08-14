@@ -33,7 +33,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) throw (Exception) :
+SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
     mFilePath(filepath), mTmpFilePath(filepath.toStr() % '~'),
     mOpenedFilePath(filepath), mIsRestored(restore), mIsReadOnly(readOnly),
     mIsCreated(create)
@@ -82,7 +82,7 @@ SmartFile::~SmartFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SmartFile::removeFile(bool original) throw (Exception)
+void SmartFile::removeFile(bool original)
 {
     if (mIsReadOnly) {
         throw LogicError(__FILE__, __LINE__, tr("Cannot remove read-only file!"));
@@ -98,7 +98,7 @@ void SmartFile::removeFile(bool original) throw (Exception)
  *  Protected Methods
  ****************************************************************************************/
 
-const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) throw (Exception)
+const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal)
 {
     if (mIsReadOnly) {
         throw LogicError(__FILE__, __LINE__, tr("Cannot save read-only file!"));

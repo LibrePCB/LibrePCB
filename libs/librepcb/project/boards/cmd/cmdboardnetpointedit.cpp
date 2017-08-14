@@ -102,14 +102,14 @@ void CmdBoardNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool immedi
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetPointEdit::performExecute() throw (Exception)
+bool CmdBoardNetPointEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the netpoint was really modified
 }
 
-void CmdBoardNetPointEdit::performUndo() throw (Exception)
+void CmdBoardNetPointEdit::performUndo()
 {
     ScopeGuardList sgl;
     mNetPoint.setLayer(*mOldLayer); // can throw
@@ -124,7 +124,7 @@ void CmdBoardNetPointEdit::performUndo() throw (Exception)
     sgl.dismiss();
 }
 
-void CmdBoardNetPointEdit::performRedo() throw (Exception)
+void CmdBoardNetPointEdit::performRedo()
 {
     ScopeGuardList sgl;
     mNetPoint.setLayer(*mNewLayer); // can throw

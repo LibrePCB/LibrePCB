@@ -41,7 +41,7 @@ FootprintPadSmt::FootprintPadSmt(const Uuid& padUuid, const Point& pos, const An
 {
 }
 
-FootprintPadSmt::FootprintPadSmt(const DomElement& domElement) throw (Exception) :
+FootprintPadSmt::FootprintPadSmt(const DomElement& domElement) :
     FootprintPad(domElement)
 {
     // read attributes
@@ -104,7 +104,7 @@ void FootprintPadSmt::setBoardSide(BoardSide_t side) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void FootprintPadSmt::serialize(DomElement& root) const throw (Exception)
+void FootprintPadSmt::serialize(DomElement& root) const
 {
     FootprintPad::serialize(root);
     root.setAttribute("side", boardSideToString(mBoardSide));
@@ -114,7 +114,7 @@ void FootprintPadSmt::serialize(DomElement& root) const throw (Exception)
  *  Static Methods
  ****************************************************************************************/
 
-FootprintPadSmt::BoardSide_t FootprintPadSmt::stringToBoardSide(const QString& side) throw (Exception)
+FootprintPadSmt::BoardSide_t FootprintPadSmt::stringToBoardSide(const QString& side)
 {
     if      (side == QLatin1String("top"))      return BoardSide_t::TOP;
     else if (side == QLatin1String("bottom"))   return BoardSide_t::BOTTOM;

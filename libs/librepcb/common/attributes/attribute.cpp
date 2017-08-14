@@ -39,7 +39,7 @@ Attribute::Attribute(const Attribute& other) noexcept :
 {
 }
 
-Attribute::Attribute(const DomElement& domElement) throw (Exception) :
+Attribute::Attribute(const DomElement& domElement) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
     mKey = domElement.getAttribute<QString>("key", true);
@@ -51,7 +51,7 @@ Attribute::Attribute(const DomElement& domElement) throw (Exception) :
 }
 
 Attribute::Attribute(const QString& key, const AttributeType& type, const QString& value,
-                     const AttributeUnit* unit) throw (Exception) :
+                     const AttributeUnit* unit) :
     mKey(key), mType(&type), mValue(value), mUnit(unit)
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -74,7 +74,7 @@ QString Attribute::getValueTr(bool showUnit) const noexcept
  *  Setters
  ****************************************************************************************/
 
-void Attribute::setKey(const QString& key) throw (Exception)
+void Attribute::setKey(const QString& key)
 {
     if (key.trimmed().isEmpty()) {
         qDebug() << key;
@@ -84,7 +84,7 @@ void Attribute::setKey(const QString& key) throw (Exception)
 }
 
 void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value,
-                                 const AttributeUnit* unit) throw (Exception)
+                                 const AttributeUnit* unit)
 {
     if ((!type.isUnitAvailable(unit)) || (!type.isValueValid(value))) {
         throw LogicError(__FILE__, __LINE__, QString("%1,%2,%3")
@@ -99,7 +99,7 @@ void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value
  *  General Methods
  ****************************************************************************************/
 
-void Attribute::serialize(DomElement& root) const throw (Exception)
+void Attribute::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     root.setAttribute("key", mKey);

@@ -33,13 +33,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayer::BoardLayer(const BoardLayer& other) throw (Exception) :
+BoardLayer::BoardLayer(const BoardLayer& other) :
     QObject(0), mId(other.mId), mName(other.mName), mColor(other.mColor),
     mColorHighlighted(other.mColorHighlighted), mIsVisible(other.mIsVisible)
 {
 }
 
-BoardLayer::BoardLayer(const DomElement& domElement) throw (Exception) :
+BoardLayer::BoardLayer(const DomElement& domElement) :
     QObject(0), mId(-1), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
 {
     mId = domElement.getAttribute<uint>("id", true);
@@ -340,7 +340,7 @@ const QColor& BoardLayer::getColor(bool highlighted) const
  *  General Methods
  ****************************************************************************************/
 
-void BoardLayer::serialize(DomElement& root) const throw (Exception)
+void BoardLayer::serialize(DomElement& root) const
 {
     root.setAttribute("id", mId);
     root.setText(mName);

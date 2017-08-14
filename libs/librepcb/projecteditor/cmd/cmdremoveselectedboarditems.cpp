@@ -59,7 +59,7 @@ CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveSelectedBoardItems::performExecute() throw (Exception)
+bool CmdRemoveSelectedBoardItems::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

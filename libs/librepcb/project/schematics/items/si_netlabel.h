@@ -54,8 +54,8 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLabel() = delete;
         SI_NetLabel(const SI_NetLabel& other) = delete;
-        explicit SI_NetLabel(Schematic& schematic, const DomElement& domElement) throw (Exception);
-        explicit SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception);
+        explicit SI_NetLabel(Schematic& schematic, const DomElement& domElement);
+        explicit SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position);
         ~SI_NetLabel() noexcept;
 
         // Getters
@@ -69,11 +69,11 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         void setRotation(const Angle& rotation) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
+        void addToSchematic(GraphicsScene& scene) override;
+        void removeFromSchematic(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}
@@ -92,7 +92,7 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
 
     private:
 
-        void init() throw (Exception);
+        void init();
         bool checkAttributesValidity() const noexcept;
 
 

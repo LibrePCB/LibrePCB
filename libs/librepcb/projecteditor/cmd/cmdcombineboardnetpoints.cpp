@@ -56,7 +56,7 @@ CmdCombineBoardNetPoints::~CmdCombineBoardNetPoints() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdCombineBoardNetPoints::performExecute() throw (Exception)
+bool CmdCombineBoardNetPoints::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

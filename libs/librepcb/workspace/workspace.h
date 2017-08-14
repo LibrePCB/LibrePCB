@@ -81,7 +81,7 @@ class Workspace final : public QObject
          * @throw Exception If the workspace could not be opened, this constructor throws
          *                  an exception.
          */
-        explicit Workspace(const FilePath& wsPath) throw (Exception);
+        explicit Workspace(const FilePath& wsPath);
 
         /**
          * The destructor
@@ -162,7 +162,7 @@ class Workspace final : public QObject
          *
          * @throws Exception on error
          */
-        void addLocalLibrary(const QString& libDirName) throw (Exception);
+        void addLocalLibrary(const QString& libDirName);
 
         /**
          * @brief Add a new remote library
@@ -171,7 +171,7 @@ class Workspace final : public QObject
          *
          * @throws Exception on error
          */
-        void addRemoteLibrary(const QString& libDirName) throw (Exception);
+        void addRemoteLibrary(const QString& libDirName);
 
         /**
          * @brief Remove a local library
@@ -181,7 +181,7 @@ class Workspace final : public QObject
          *
          * @throws Exception on error
          */
-        void removeLocalLibrary(const QString& libDirName, bool rmDir = true) throw (Exception);
+        void removeLocalLibrary(const QString& libDirName, bool rmDir = true);
 
         /**
          * @brief Remove a remote library
@@ -191,7 +191,7 @@ class Workspace final : public QObject
          *
          * @throws Exception on error
          */
-        void removeRemoteLibrary(const QString& libDirName, bool rmDir = true) throw (Exception);
+        void removeRemoteLibrary(const QString& libDirName, bool rmDir = true);
 
 
         /**
@@ -268,7 +268,7 @@ class Workspace final : public QObject
          *
          * @throws Exception on error.
          */
-        static void createNewWorkspace(const FilePath& path) throw (Exception);
+        static void createNewWorkspace(const FilePath& path);
 
         /**
          * @brief Get the most recently used workspace path

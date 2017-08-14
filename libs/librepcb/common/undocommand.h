@@ -90,17 +90,17 @@ class UndoCommand
          * @retval true     If the command has done some changes
          * @retval false    If the command has done nothing (the command can be deleted)
          */
-        virtual bool execute() throw (Exception) final;
+        virtual bool execute() final;
 
         /**
          * @brief Undo the command
          */
-        virtual void undo() throw (Exception) final;
+        virtual void undo() final;
 
         /**
          * @brief Redo the command
          */
-        virtual void redo() throw (Exception) final;
+        virtual void redo() final;
 
         // Operator Overloadings
         UndoCommand& operator=(const UndoCommand& rhs) = delete;
@@ -118,21 +118,21 @@ class UndoCommand
          * @retval true     If the command has done some changes
          * @retval false    If the command has done nothing (the command can be deleted)
          */
-        virtual bool performExecute() throw (Exception) = 0;
+        virtual bool performExecute() = 0;
 
         /**
          * @brief Undo the command
          *
          * @note This method must be implemented in all derived classes.
          */
-        virtual void performUndo() throw (Exception) = 0;
+        virtual void performUndo() = 0;
 
         /**
          * @brief Redo the command
          *
          * @note This method must be implemented in all derived classes.
          */
-        virtual void performRedo() throw (Exception) = 0;
+        virtual void performRedo() = 0;
 
 
     private:

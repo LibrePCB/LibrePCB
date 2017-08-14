@@ -75,7 +75,7 @@ CmdRemoveSelectedSchematicItems::~CmdRemoveSelectedSchematicItems() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveSelectedSchematicItems::performExecute() throw (Exception)
+bool CmdRemoveSelectedSchematicItems::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
@@ -146,7 +146,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() throw (Exception)
     return (getChildCount() > 0);
 }
 
-void CmdRemoveSelectedSchematicItems::detachNetPointFromSymbolPin(SI_NetPoint& netpoint) throw (Exception)
+void CmdRemoveSelectedSchematicItems::detachNetPointFromSymbolPin(SI_NetPoint& netpoint)
 {
     SI_SymbolPin* pin = netpoint.getSymbolPin();
     if (!pin) throw LogicError(__FILE__, __LINE__);
@@ -184,7 +184,7 @@ void CmdRemoveSelectedSchematicItems::detachNetPointFromSymbolPin(SI_NetPoint& n
     }
 }
 
-void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(ComponentSignalInstance& signal) throw (Exception)
+void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(ComponentSignalInstance& signal)
 {
     // disconnect board items
     foreach (BI_FootprintPad* pad, signal.getRegisteredFootprintPads()) {

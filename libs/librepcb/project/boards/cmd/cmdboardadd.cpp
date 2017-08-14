@@ -56,7 +56,7 @@ CmdBoardAdd::~CmdBoardAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardAdd::performExecute() throw (Exception)
+bool CmdBoardAdd::performExecute()
 {
     if (mBoardToCopy) {
         mBoard = mProject.createBoard(*mBoardToCopy, mName); // can throw
@@ -69,12 +69,12 @@ bool CmdBoardAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdBoardAdd::performUndo() throw (Exception)
+void CmdBoardAdd::performUndo()
 {
     mProject.removeBoard(*mBoard); // can throw
 }
 
-void CmdBoardAdd::performRedo() throw (Exception)
+void CmdBoardAdd::performRedo()
 {
     mProject.addBoard(*mBoard, mPageIndex); // can throw
 }

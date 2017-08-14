@@ -57,7 +57,7 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdNetSignalAdd::performExecute() throw (Exception)
+bool CmdNetSignalAdd::performExecute()
 {
     if (mIsAutoName) {
         mName = mCircuit.generateAutoNetSignalName();
@@ -69,12 +69,12 @@ bool CmdNetSignalAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdNetSignalAdd::performUndo() throw (Exception)
+void CmdNetSignalAdd::performUndo()
 {
     mCircuit.removeNetSignal(*mNetSignal); // can throw
 }
 
-void CmdNetSignalAdd::performRedo() throw (Exception)
+void CmdNetSignalAdd::performRedo()
 {
     mCircuit.addNetSignal(*mNetSignal); // can throw
 }

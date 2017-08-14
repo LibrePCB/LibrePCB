@@ -55,8 +55,8 @@ class Library final : public LibraryBaseElement
         Library(const Library& other) = delete;
         Library(const Uuid& uuid, const Version& version, const QString& author,
                 const QString& name_en_US, const QString& description_en_US,
-                const QString& keywords_en_US) throw (Exception);
-        Library(const FilePath& libDir, bool readOnly) throw (Exception);
+                const QString& keywords_en_US);
+        Library(const FilePath& libDir, bool readOnly);
         ~Library() noexcept;
 
         // Getters
@@ -84,9 +84,9 @@ class Library final : public LibraryBaseElement
     private: // Methods
 
         // Private Methods
-        virtual void copyTo(const FilePath& destination, bool removeSource) throw (Exception) override;
+        virtual void copyTo(const FilePath& destination, bool removeSource) override;
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const throw (Exception) override;
+        virtual void serialize(DomElement& root) const override;
         virtual bool checkAttributesValidity() const noexcept override;
 
 

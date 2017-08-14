@@ -151,7 +151,7 @@ class Uuid final
          *
          * @throws Exception if the string was invalid
          */
-        static Uuid deserializeFromString(const QString& str) throw (Exception) {
+        static Uuid deserializeFromString(const QString& str) {
             Uuid uuid(str);
             if (uuid.isNull() && (!str.isEmpty())) {
                 throw RuntimeError(__FILE__, __LINE__,

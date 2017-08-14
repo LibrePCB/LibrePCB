@@ -43,7 +43,7 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack, QWidget* parent) throw (Exception) :
+EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack, QWidget* parent) :
     QDialog(parent), mCircuit(circuit), mUi(new Ui::EditNetClassesDialog),
     mUndoStack(undoStack)
 {

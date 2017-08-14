@@ -68,7 +68,7 @@ ComponentInstance* CmdAddComponentToCircuit::getComponentInstance() const noexce
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdAddComponentToCircuit::performExecute() throw (Exception)
+bool CmdAddComponentToCircuit::performExecute()
 {
     // if there is no such component in the project's library, copy it from the
     // workspace library to the project's library

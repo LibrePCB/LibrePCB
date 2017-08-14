@@ -52,7 +52,7 @@ class MinimalSerializableObjectMock final : public SerializableObject
         MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) = delete;
         ~MinimalSerializableObjectMock() {}
 
-        void serialize(DomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const override {
             root.setText(mValue);
         }
 
@@ -84,7 +84,7 @@ class SerializableObjectMock final : public SerializableObject
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
 
-        void serialize(DomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const override {
             root.setAttribute("uuid", mUuid);
             root.setText(mName);
         }

@@ -44,27 +44,27 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) throw (Exception) :
+BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) :
     BI_Base(device.getBoard()), mDevice(device)
 {
     Q_UNUSED(other);
     init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device, const DomElement& domElement) throw (Exception) :
+BI_Footprint::BI_Footprint(BI_Device& device, const DomElement& domElement) :
     BI_Base(device.getBoard()), mDevice(device)
 {
     Q_UNUSED(domElement);
     init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device) throw (Exception) :
+BI_Footprint::BI_Footprint(BI_Device& device) :
     BI_Base(device.getBoard()), mDevice(device)
 {
     init();
 }
 
-void BI_Footprint::init() throw (Exception)
+void BI_Footprint::init()
 {
     mGraphicsItem.reset(new BGI_Footprint(*this));
     mGraphicsItem->setPos(mDevice.getPosition().toPxQPointF());
@@ -139,7 +139,7 @@ bool BI_Footprint::isUsed() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Footprint::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_Footprint::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -153,7 +153,7 @@ void BI_Footprint::addToBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_Footprint::removeFromBoard(GraphicsScene& scene)
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -167,7 +167,7 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void BI_Footprint::serialize(DomElement& root) const throw (Exception)
+void BI_Footprint::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

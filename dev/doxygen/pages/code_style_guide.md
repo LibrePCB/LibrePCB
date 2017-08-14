@@ -13,10 +13,9 @@ This page describes the code style guide for LibrePCB developers.
 - Use strongly typed enums (`enum class`, C++11) whenever reasonable
 - Use `nullptr` instead of `NULL` or `0`
 - Use keywords like `const`, `constexpr`, `final`, `override`, ... whenever possible
-- Use exception specifier in method declarations:
+- Use noexcept specifier in method declarations that never throw exceptions:
 
-      void foo() noexcept;            // this method never throws exceptions
-      void bar() throw (Exception);   // this method can throw exceptions of type "Exception" (or any subclass of it)
+      void foo() noexcept;    // this method never throws exceptions
 
 - Use Qt's smart pointers `QScopedPointer` and `QSharedPointer` for object ownership (instead of raw pointers)
 

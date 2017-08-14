@@ -44,7 +44,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) throw (Exception) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) :
     SI_Base(schematic), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
@@ -82,21 +82,21 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) thr
     init();
 }
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) throw (Exception) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position) :
     SI_Base(schematic), mUuid(Uuid::createRandom()), mPosition(position),
     mNetSignal(&netsignal), mSymbolPin(nullptr)
 {
     init();
 }
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) throw (Exception) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin) :
     SI_Base(schematic), mUuid(Uuid::createRandom()), mPosition(pin.getPosition()),
     mNetSignal(&netsignal), mSymbolPin(&pin)
 {
     init();
 }
 
-void SI_NetPoint::init() throw (Exception)
+void SI_NetPoint::init()
 {
     // create the graphics item
     mGraphicsItem.reset(new SGI_NetPoint(*this));
@@ -140,7 +140,7 @@ bool SI_NetPoint::isOpenLineEnd() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void SI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
+void SI_NetPoint::setNetSignal(NetSignal& netsignal)
 {
     if (&netsignal == mNetSignal) {
         return;
@@ -160,7 +160,7 @@ void SI_NetPoint::setNetSignal(NetSignal& netsignal) throw (Exception)
     mNetSignal = &netsignal;
 }
 
-void SI_NetPoint::setPinToAttach(SI_SymbolPin* pin) throw (Exception)
+void SI_NetPoint::setPinToAttach(SI_SymbolPin* pin)
 {
     if (pin == mSymbolPin) {
         return;
@@ -203,7 +203,7 @@ void SI_NetPoint::setPosition(const Point& position) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetPoint::addToSchematic(GraphicsScene& scene)
 {
     if (isAddedToSchematic() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -226,7 +226,7 @@ void SI_NetPoint::addToSchematic(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
+void SI_NetPoint::removeFromSchematic(GraphicsScene& scene)
 {
     if ((!isAddedToSchematic()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -248,7 +248,7 @@ void SI_NetPoint::removeFromSchematic(GraphicsScene& scene) throw (Exception)
     sgl.dismiss();
 }
 
-void SI_NetPoint::registerNetLine(SI_NetLine& netline) throw (Exception)
+void SI_NetPoint::registerNetLine(SI_NetLine& netline)
 {
     if ((!isAddedToSchematic()) || (mRegisteredLines.contains(&netline))
         || (netline.getSchematic() != mSchematic))
@@ -261,7 +261,7 @@ void SI_NetPoint::registerNetLine(SI_NetLine& netline) throw (Exception)
     mErcMsgDeadNetPoint->setVisible(mRegisteredLines.isEmpty());
 }
 
-void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) throw (Exception)
+void SI_NetPoint::unregisterNetLine(SI_NetLine& netline)
 {
     if ((!isAddedToSchematic()) || (!mRegisteredLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
@@ -279,7 +279,7 @@ void SI_NetPoint::updateLines() const noexcept
     }
 }
 
-void SI_NetPoint::serialize(DomElement& root) const throw (Exception)
+void SI_NetPoint::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

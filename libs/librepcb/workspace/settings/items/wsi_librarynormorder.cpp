@@ -35,7 +35,7 @@ namespace workspace {
  ****************************************************************************************/
 
 WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
-                                           DomElement* xmlElement) throw (Exception) :
+                                           DomElement* xmlElement) :
     WSI_Base(xmlTagName, xmlElement)
 {
     if (xmlElement) {
@@ -157,7 +157,7 @@ void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
     mListWidget->addItems(mListTmp);
 }
 
-void WSI_LibraryNormOrder::serialize(DomElement& root) const throw (Exception)
+void WSI_LibraryNormOrder::serialize(DomElement& root) const
 {
     foreach (const QString& norm, mList) {
         root.appendTextChild("norm", norm);

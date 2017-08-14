@@ -38,14 +38,14 @@ LibraryElement::LibraryElement(const QString& shortElementName,
                                const QString& longElementName, const Uuid& uuid,
                                const Version& version, const QString& author,
                                const QString& name_en_US, const QString& description_en_US,
-                               const QString& keywords_en_US) throw (Exception) :
+                               const QString& keywords_en_US) :
     LibraryBaseElement(true, shortElementName, longElementName, uuid, version, author,
                        name_en_US, description_en_US, keywords_en_US)
 {
 }
 
 LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& shortElementName,
-                               const QString& longElementName, bool readOnly) throw (Exception) :
+                               const QString& longElementName, bool readOnly) :
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read category UUIDs
@@ -63,7 +63,7 @@ LibraryElement::~LibraryElement() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-void LibraryElement::serialize(DomElement& root) const throw (Exception)
+void LibraryElement::serialize(DomElement& root) const
 {
     LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, mCategories) {

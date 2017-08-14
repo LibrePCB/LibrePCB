@@ -39,7 +39,7 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const DomElement& domElement) throw (Exception)
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const DomElement& domElement)
 {
     // read attributes
     mPinUuid = domElement.getAttribute<Uuid>("pin", true);
@@ -57,7 +57,7 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentPinSignalMapItem::serialize(DomElement& root) const throw (Exception)
+void ComponentPinSignalMapItem::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -80,7 +80,7 @@ bool ComponentPinSignalMapItem::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-ComponentPinSignalMapItem::PinDisplayType_t ComponentPinSignalMapItem::stringToDisplayType(const QString& type) throw (Exception)
+ComponentPinSignalMapItem::PinDisplayType_t ComponentPinSignalMapItem::stringToDisplayType(const QString& type)
 {
     if      (type == QLatin1String("none"))             return PinDisplayType_t::NONE;
     else if (type == QLatin1String("pin_name"))         return PinDisplayType_t::PIN_NAME;

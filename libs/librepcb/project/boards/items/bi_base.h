@@ -87,8 +87,8 @@ class BI_Base : public QObject
         virtual void setSelected(bool selected) noexcept;
 
         // General Methods
-        virtual void addToBoard(GraphicsScene& scene) throw (Exception) = 0;
-        virtual void removeFromBoard(GraphicsScene& scene) throw (Exception) = 0;
+        virtual void addToBoard(GraphicsScene& scene) = 0;
+        virtual void removeFromBoard(GraphicsScene& scene) = 0;
 
         // Operator Overloadings
         BI_Base& operator=(const BI_Base& rhs) = delete;

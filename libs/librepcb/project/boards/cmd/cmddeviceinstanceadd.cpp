@@ -61,7 +61,7 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdDeviceInstanceAdd::performExecute() throw (Exception)
+bool CmdDeviceInstanceAdd::performExecute()
 {
     mDeviceInstance = new BI_Device(mBoard, *mComponentInstance, mDeviceUuid,
                                     mFootprintUuid, mPosition, mRotation, mMirror); // can throw
@@ -71,12 +71,12 @@ bool CmdDeviceInstanceAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdDeviceInstanceAdd::performUndo() throw (Exception)
+void CmdDeviceInstanceAdd::performUndo()
 {
     mBoard.removeDeviceInstance(*mDeviceInstance);
 }
 
-void CmdDeviceInstanceAdd::performRedo() throw (Exception)
+void CmdDeviceInstanceAdd::performRedo()
 {
     mBoard.addDeviceInstance(*mDeviceInstance);
 }

@@ -77,7 +77,7 @@ class Circuit final : public QObject, public SerializableObject
         // Constructors / Destructor
         Circuit() = delete;
         Circuit(const Circuit& other) = delete;
-        Circuit(Project& project, bool restore, bool readOnly, bool create) throw (Exception);
+        Circuit(Project& project, bool restore, bool readOnly, bool create);
         ~Circuit() noexcept;
 
         // Getters
@@ -87,18 +87,18 @@ class Circuit final : public QObject, public SerializableObject
         const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
         NetClass* getNetClassByName(const QString& name) const noexcept;
-        void addNetClass(NetClass& netclass) throw (Exception);
-        void removeNetClass(NetClass& netclass) throw (Exception);
-        void setNetClassName(NetClass& netclass, const QString& newName) throw (Exception);
+        void addNetClass(NetClass& netclass);
+        void removeNetClass(NetClass& netclass);
+        void setNetClassName(NetClass& netclass, const QString& newName);
 
         // NetSignal Methods
         QString generateAutoNetSignalName() const noexcept;
         const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
-        void addNetSignal(NetSignal& netsignal) throw (Exception);
-        void removeNetSignal(NetSignal& netsignal) throw (Exception);
-        void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName) throw (Exception);
+        void addNetSignal(NetSignal& netsignal);
+        void removeNetSignal(NetSignal& netsignal);
+        void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName);
         void setHighlightedNetSignal(NetSignal* signal) noexcept;
 
         // ComponentInstance Methods
@@ -106,9 +106,9 @@ class Circuit final : public QObject, public SerializableObject
         const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
-        void addComponentInstance(ComponentInstance& cmp) throw (Exception);
-        void removeComponentInstance(ComponentInstance& cmp) throw (Exception);
-        void setComponentInstanceName(ComponentInstance& cmp, const QString& newName) throw (Exception);
+        void addComponentInstance(ComponentInstance& cmp);
+        void removeComponentInstance(ComponentInstance& cmp);
+        void setComponentInstanceName(ComponentInstance& cmp, const QString& newName);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;
@@ -131,7 +131,7 @@ class Circuit final : public QObject, public SerializableObject
 
     private:
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // General

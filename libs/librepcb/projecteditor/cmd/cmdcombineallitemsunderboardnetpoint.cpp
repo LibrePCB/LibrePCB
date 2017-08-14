@@ -63,7 +63,7 @@ CmdCombineAllItemsUnderBoardNetPoint::~CmdCombineAllItemsUnderBoardNetPoint() no
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdCombineAllItemsUnderBoardNetPoint::performExecute() throw (Exception)
+bool CmdCombineAllItemsUnderBoardNetPoint::performExecute()
 {
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});

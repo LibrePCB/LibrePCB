@@ -81,10 +81,10 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         bool isUsed() const noexcept {return mRegisteredNetPoint ? true : false;}
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) throw (Exception) override;
-        void removeFromSchematic(GraphicsScene& scene) throw (Exception) override;
-        void registerNetPoint(SI_NetPoint& netpoint) throw (Exception);
-        void unregisterNetPoint(SI_NetPoint& netpoint) throw (Exception);
+        void addToSchematic(GraphicsScene& scene) override;
+        void removeFromSchematic(GraphicsScene& scene) override;
+        void registerNetPoint(SI_NetPoint& netpoint);
+        void unregisterNetPoint(SI_NetPoint& netpoint);
         void updatePosition() noexcept;
 
         // Inherited from SI_Base

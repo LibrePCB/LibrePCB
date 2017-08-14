@@ -42,14 +42,14 @@ namespace project {
  ****************************************************************************************/
 
 BI_NetLine::BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& startPoint,
-                       BI_NetPoint& endPoint) throw (Exception) :
+                       BI_NetPoint& endPoint) :
     BI_Base(board), mPosition(other.mPosition), mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(other.mWidth)
 {
     init();
 }
 
-BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Exception) :
+BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) :
     BI_Base(board), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
@@ -76,14 +76,14 @@ BI_NetLine::BI_NetLine(Board& board, const DomElement& domElement) throw (Except
 }
 
 BI_NetLine::BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
-                       const Length& width) throw (Exception) :
+                       const Length& width) :
     BI_Base(board), mPosition(), mUuid(Uuid::createRandom()), mStartPoint(&startPoint),
     mEndPoint(&endPoint), mWidth(width)
 {
     init();
 }
 
-void BI_NetLine::init() throw (Exception)
+void BI_NetLine::init()
 {
     if(mWidth < 0) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -167,7 +167,7 @@ void BI_NetLine::setWidth(const Length& width) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_NetLine::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_NetLine::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard()
         || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())
@@ -184,7 +184,7 @@ void BI_NetLine::addToBoard(GraphicsScene& scene) throw (Exception)
     sg.dismiss();
 }
 
-void BI_NetLine::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_NetLine::removeFromBoard(GraphicsScene& scene)
 {
     if ((!isAddedToBoard())
         || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())
@@ -206,7 +206,7 @@ void BI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_NetLine::serialize(DomElement& root) const throw (Exception)
+void BI_NetLine::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

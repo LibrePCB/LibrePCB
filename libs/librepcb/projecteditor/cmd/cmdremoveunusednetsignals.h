@@ -58,9 +58,9 @@ class CmdRemoveUnusedNetSignals final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
-        bool buildAndExecuteChildCommands() throw (Exception);
+        bool buildAndExecuteChildCommands();
 
 
         // Private Member Variables

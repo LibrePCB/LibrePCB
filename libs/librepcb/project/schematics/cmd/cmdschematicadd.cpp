@@ -49,7 +49,7 @@ CmdSchematicAdd::~CmdSchematicAdd() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicAdd::performExecute() throw (Exception)
+bool CmdSchematicAdd::performExecute()
 {
     mSchematic = mProject.createSchematic(mName); // can throw
 
@@ -58,12 +58,12 @@ bool CmdSchematicAdd::performExecute() throw (Exception)
     return true;
 }
 
-void CmdSchematicAdd::performUndo() throw (Exception)
+void CmdSchematicAdd::performUndo()
 {
     mProject.removeSchematic(*mSchematic); // can throw
 }
 
-void CmdSchematicAdd::performRedo() throw (Exception)
+void CmdSchematicAdd::performRedo()
 {
     mProject.addSchematic(*mSchematic, mPageIndex); // can throw
 }

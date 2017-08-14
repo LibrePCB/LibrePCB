@@ -73,7 +73,7 @@ void NewProjectWizard::setLocation(const FilePath& dir) noexcept
  *  General Methods
  ****************************************************************************************/
 
-Project* NewProjectWizard::createProject() const throw (Exception)
+Project* NewProjectWizard::createProject() const
 {
     // create project and set some metadata
     FilePath projectFilePath = mPageMetadata->getFullFilePath();

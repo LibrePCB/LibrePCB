@@ -76,7 +76,7 @@ class ProjectEditor final : public QObject
         /**
          * @brief The constructor
          */
-        ProjectEditor(workspace::Workspace& workspace, Project& project) throw (Exception);
+        ProjectEditor(workspace::Workspace& workspace, Project& project);
 
         /**
          * @brief The destructor

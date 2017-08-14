@@ -114,7 +114,7 @@ void WorkspaceLibraryScanner::run() noexcept
     }
 }
 
-void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db) throw (Exception)
+void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db)
 {
     // internal
     db.clearTable("internal");
@@ -150,7 +150,7 @@ void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db) throw (Exceptio
 
 template <typename ElementType>
 int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn) throw (Exception)
+    const QString& table, const QString& idColumn)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {
@@ -188,7 +188,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
 
 template <typename ElementType>
 int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn) throw (Exception)
+    const QString& table, const QString& idColumn)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {
@@ -234,7 +234,7 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<Fil
 }
 
 int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-    const QString& table, const QString& idColumn) throw (Exception)
+    const QString& table, const QString& idColumn)
 {
     int count = 0;
     foreach (const FilePath& filepath, dirs) {

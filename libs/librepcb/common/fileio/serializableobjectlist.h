@@ -130,7 +130,7 @@ class SerializableObjectList : public SerializableObject
             for (const T& obj : elements) { append(std::make_shared<T>(obj)); } // copy element
             if (observer) registerObserver(observer);
         }
-        explicit SerializableObjectList(const DomElement& domElement, IF_Observer* observer = nullptr) throw (Exception) {
+        explicit SerializableObjectList(const DomElement& domElement, IF_Observer* observer = nullptr) {
             loadFromDomElement(domElement); // can throw
             if (observer) registerObserver(observer);
         }
@@ -189,22 +189,22 @@ class SerializableObjectList : public SerializableObject
         std::shared_ptr<const T> first() const noexcept {return mObjects.first();}
         std::shared_ptr<T>& last() noexcept {return mObjects.last();}
         std::shared_ptr<const T> last() const noexcept {return mObjects.last();}
-        std::shared_ptr<T> get(const Uuid& key) throw (Exception) {
+        std::shared_ptr<T> get(const Uuid& key) {
             std::shared_ptr<T> ptr = find(key);
             if (!ptr) throwKeyNotFoundException(key);
             return ptr;
         }
-        std::shared_ptr<const T> get(const Uuid& key) const throw (Exception) {
+        std::shared_ptr<const T> get(const Uuid& key) const {
             std::shared_ptr<const T> ptr = find(key);
             if (!ptr) throwKeyNotFoundException(key);
             return ptr;
         }
-        std::shared_ptr<T> get(const QString& name) throw (Exception) {
+        std::shared_ptr<T> get(const QString& name) {
             std::shared_ptr<T> ptr = find(name);
             if (!ptr) throwNameNotFoundException(name);
             return ptr;
         }
-        std::shared_ptr<const T> get(const QString& name) const throw (Exception) {
+        std::shared_ptr<const T> get(const QString& name) const {
             std::shared_ptr<const T> ptr = find(name);
             if (!ptr) throwNameNotFoundException(name);
             return ptr;
@@ -219,7 +219,7 @@ class SerializableObjectList : public SerializableObject
         iterator end() noexcept {return mObjects.end();}
 
         // General Methods
-        int loadFromDomElement(const DomElement& domElement) throw (Exception) {
+        int loadFromDomElement(const DomElement& domElement) {
             clear();
             for (DomElement* node = domElement.getFirstChild(P::tagname, false);
                  node; node = node->getNextSibling(P::tagname))
@@ -281,7 +281,7 @@ class SerializableObjectList : public SerializableObject
             for (int i = count() - 1; i >= 0; --i) { remove(i); }
         }
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override {
+        void serialize(DomElement& root) const override {
             serializePointerContainer(root, mObjects, P::tagname); // can throw
         }
 
@@ -356,12 +356,12 @@ class SerializableObjectList : public SerializableObject
                 observer->listObjectRemoved(*this, index, obj);
             }
         }
-        void throwKeyNotFoundException(const Uuid& key) const throw (Exception) {
+        void throwKeyNotFoundException(const Uuid& key) const {
             throw RuntimeError(__FILE__, __LINE__, QString(tr("There is "
                 "no element of type \"%1\" with the UUID \"%2\" in the list."))
                 .arg(P::tagname).arg(key.toStr()));
         }
-        void throwNameNotFoundException(const QString& name) const throw (Exception) {
+        void throwNameNotFoundException(const QString& name) const {
             throw RuntimeError(__FILE__, __LINE__, QString(tr("There is "
                 "no element of type \"%1\" with the name \"%2\" in the list."))
                 .arg(P::tagname).arg(name));

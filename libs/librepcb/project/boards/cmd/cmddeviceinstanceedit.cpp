@@ -91,7 +91,7 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center, bool
     }
 }
 
-void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) throw (Exception)
+void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate)
 {
     Q_ASSERT(!wasEverExecuted());
     if (immediate) {
@@ -101,7 +101,7 @@ void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) throw (Ex
 }
 
 void CmdDeviceInstanceEdit::mirror(const Point& center, Qt::Orientation orientation,
-                                   bool immediate) throw (Exception)
+                                   bool immediate)
 {
     Q_ASSERT(!wasEverExecuted());
     bool mirror = !mNewMirrored;
@@ -137,21 +137,21 @@ void CmdDeviceInstanceEdit::mirror(const Point& center, Qt::Orientation orientat
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdDeviceInstanceEdit::performExecute() throw (Exception)
+bool CmdDeviceInstanceEdit::performExecute()
 {
     performRedo(); // can throw
 
     return true; // TODO: determine if the device was really modified
 }
 
-void CmdDeviceInstanceEdit::performUndo() throw (Exception)
+void CmdDeviceInstanceEdit::performUndo()
 {
     mDevice.setIsMirrored(mOldMirrored); // can throw
     mDevice.setPosition(mOldPos);
     mDevice.setRotation(mOldRotation);
 }
 
-void CmdDeviceInstanceEdit::performRedo() throw (Exception)
+void CmdDeviceInstanceEdit::performRedo()
 {
     mDevice.setIsMirrored(mNewMirrored); // can throw
     mDevice.setPosition(mNewPos);

@@ -98,8 +98,8 @@ class Board final : public QObject, public IF_AttributeProvider,
         // Constructors / Destructor
         Board() = delete;
         Board(const Board& other) = delete;
-        Board(const Board& other, const FilePath& filepath, const QString& name) throw (Exception);
-        Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) throw (Exception) :
+        Board(const Board& other, const FilePath& filepath, const QString& name);
+        Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) :
             Board(project, filepath, restore, readOnly, false, QString()) {}
         ~Board() noexcept;
 
@@ -144,34 +144,34 @@ class Board final : public QObject, public IF_AttributeProvider,
         // DeviceInstance Methods
         const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {return mDeviceInstances;}
         BI_Device* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
-        void addDeviceInstance(BI_Device& instance) throw (Exception);
-        void removeDeviceInstance(BI_Device& instance) throw (Exception);
+        void addDeviceInstance(BI_Device& instance);
+        void removeDeviceInstance(BI_Device& instance);
 
         // Via Methods
         const QList<BI_Via*>& getVias() const noexcept {return mVias;}
         BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
-        void addVia(BI_Via& via) throw (Exception);
-        void removeVia(BI_Via& via) throw (Exception);
+        void addVia(BI_Via& via);
+        void removeVia(BI_Via& via);
 
         // NetPoint Methods
         BI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-        void addNetPoint(BI_NetPoint& netpoint) throw (Exception);
-        void removeNetPoint(BI_NetPoint& netpoint) throw (Exception);
+        void addNetPoint(BI_NetPoint& netpoint);
+        void removeNetPoint(BI_NetPoint& netpoint);
 
         // NetLine Methods
         const QList<BI_NetLine*>& getNetLines() const noexcept {return mNetLines;}
         BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
-        void addNetLine(BI_NetLine& netline) throw (Exception);
-        void removeNetLine(BI_NetLine& netline) throw (Exception);
+        void addNetLine(BI_NetLine& netline);
+        void removeNetLine(BI_NetLine& netline);
 
         // Polygon Methods
         const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
-        void addPolygon(BI_Polygon& polygon) throw (Exception);
-        void removePolygon(BI_Polygon& polygon) throw (Exception);
+        void addPolygon(BI_Polygon& polygon);
+        void removePolygon(BI_Polygon& polygon);
 
         // General Methods
-        void addToProject() throw (Exception);
-        void removeFromProject() throw (Exception);
+        void addToProject();
+        void removeFromProject();
         bool save(bool toOriginal, QStringList& errors) noexcept;
         void showInView(GraphicsView& view) noexcept;
         void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
@@ -190,7 +190,7 @@ class Board final : public QObject, public IF_AttributeProvider,
 
         // Static Methods
         static Board* create(Project& project, const FilePath& filepath,
-                             const QString& name) throw (Exception);
+                             const QString& name);
 
 
     signals:
@@ -205,13 +205,13 @@ class Board final : public QObject, public IF_AttributeProvider,
     private:
 
         Board(Project& project, const FilePath& filepath, bool restore,
-              bool readOnly, bool create, const QString& newName) throw (Exception);
+              bool readOnly, bool create, const QString& newName);
         void updateIcon() noexcept;
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
 
         // General

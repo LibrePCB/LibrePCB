@@ -53,9 +53,9 @@ class BoardLayerStack final : public QObject, public SerializableObject,
         // Constructors / Destructor
         BoardLayerStack() = delete;
         BoardLayerStack(const BoardLayerStack& other) = delete;
-        BoardLayerStack(Board& board, const BoardLayerStack& other) throw (Exception);
-        BoardLayerStack(Board& board, const DomElement& domElement) throw (Exception);
-        explicit BoardLayerStack(Board& board) throw (Exception);
+        BoardLayerStack(Board& board, const BoardLayerStack& other);
+        BoardLayerStack(Board& board, const DomElement& domElement);
+        explicit BoardLayerStack(Board& board);
         ~BoardLayerStack() noexcept;
 
         // Getters
@@ -70,7 +70,7 @@ class BoardLayerStack final : public QObject, public SerializableObject,
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const throw (Exception) override;
+        void serialize(DomElement& root) const override;
 
         // Operator Overloadings
         BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;

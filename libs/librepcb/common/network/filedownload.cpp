@@ -66,7 +66,7 @@ void FileDownload::setZipExtractionDirectory(const FilePath& dir) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void FileDownload::prepareRequest() throw (Exception)
+void FileDownload::prepareRequest()
 {
     // check destination filepath
     if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
@@ -93,7 +93,7 @@ void FileDownload::prepareRequest() throw (Exception)
     }
 }
 
-void FileDownload::finalizeRequest() throw (Exception)
+void FileDownload::finalizeRequest()
 {
     // check destination filepath again
     if (mDestination.isExistingFile() || mDestination.isExistingDir()) {

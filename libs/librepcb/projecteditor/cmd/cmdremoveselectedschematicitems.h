@@ -59,10 +59,10 @@ class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
-        void detachNetPointFromSymbolPin(SI_NetPoint& netpoint) throw (Exception);
-        void disconnectComponentSignalInstance(ComponentSignalInstance& signal) throw (Exception);
+        void detachNetPointFromSymbolPin(SI_NetPoint& netpoint);
+        void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
 
 
         // Attributes from the constructor

@@ -61,7 +61,7 @@ class ProjectLibrary final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectLibrary(Project& project, bool restore, bool readOnly) throw (Exception);
+        explicit ProjectLibrary(Project& project, bool restore, bool readOnly);
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
@@ -79,14 +79,14 @@ class ProjectLibrary final : public QObject
 
 
         // Add/Remove Methods
-        void addSymbol(library::Symbol& s) throw (Exception);
-        void addPackage(library::Package& p) throw (Exception);
-        void addComponent(library::Component& c) throw (Exception);
-        void addDevice(library::Device& d) throw (Exception);
-        void removeSymbol(library::Symbol& s) throw (Exception);
-        void removePackage(library::Package& p) throw (Exception);
-        void removeComponent(library::Component& c) throw (Exception);
-        void removeDevice(library::Device& d) throw (Exception);
+        void addSymbol(library::Symbol& s);
+        void addPackage(library::Package& p);
+        void addComponent(library::Component& c);
+        void addDevice(library::Device& d);
+        void removeSymbol(library::Symbol& s);
+        void removePackage(library::Package& p);
+        void removeComponent(library::Component& c);
+        void removeDevice(library::Device& d);
 
 
         // General Methods
@@ -103,17 +103,17 @@ class ProjectLibrary final : public QObject
         // Private Methods
         template <typename ElementType>
         void loadElements(const FilePath& directory, const QString& type,
-                          QHash<Uuid, ElementType*>& elementList) throw (Exception);
+                          QHash<Uuid, ElementType*>& elementList);
         template <typename ElementType>
         void addElement(ElementType& element,
                         QHash<Uuid, ElementType*>& elementList,
                         QList<ElementType*>& addedElementsList,
-                        QList<ElementType*>& removedElementsList) throw (Exception);
+                        QList<ElementType*>& removedElementsList);
         template <typename ElementType>
         void removeElement(ElementType& element,
                            QHash<Uuid, ElementType*>& elementList,
                            QList<ElementType*>& addedElementsList,
-                           QList<ElementType*>& removedElementsList) throw (Exception);
+                           QList<ElementType*>& removedElementsList);
         template <typename ElementType>
         bool saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
                           QHash<Uuid, ElementType*>& elementList,

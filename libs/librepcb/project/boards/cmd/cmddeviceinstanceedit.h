@@ -55,8 +55,8 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate) throw (Exception);
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) throw (Exception);
+        void setMirrored(bool mirrored, bool immediate);
+        void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
 
 
     private:
@@ -64,13 +64,13 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         // Private Methods
 
         /// @copydoc UndoCommand::performExecute()
-        bool performExecute() throw (Exception) override;
+        bool performExecute() override;
 
         /// @copydoc UndoCommand::performUndo()
-        void performUndo() throw (Exception) override;
+        void performUndo() override;
 
         /// @copydoc UndoCommand::performRedo()
-        void performRedo() throw (Exception) override;
+        void performRedo() override;
 
 
         // Private Member Variables

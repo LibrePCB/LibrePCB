@@ -55,9 +55,9 @@ class SQLiteDatabase final : public QObject
             public:
                 TransactionScopeGuard() = delete;
                 TransactionScopeGuard(const TransactionScopeGuard& other) = delete;
-                TransactionScopeGuard(SQLiteDatabase& db) throw (Exception);
+                TransactionScopeGuard(SQLiteDatabase& db);
                 ~TransactionScopeGuard() noexcept;
-                void commit() throw (Exception);
+                void commit();
                 TransactionScopeGuard& operator=(const TransactionScopeGuard& rhs) = delete;
             private:
                 SQLiteDatabase& mDb;
@@ -68,22 +68,22 @@ class SQLiteDatabase final : public QObject
         // Constructors / Destructor
         SQLiteDatabase() = delete;
         SQLiteDatabase(const SQLiteDatabase& other) = delete;
-        SQLiteDatabase(const FilePath& filepath) throw (Exception);
+        SQLiteDatabase(const FilePath& filepath);
         ~SQLiteDatabase() noexcept;
 
 
         // SQL Commands
-        void beginTransaction() throw (Exception);
-        void commitTransaction() throw (Exception);
-        void rollbackTransaction() throw (Exception);
-        void clearTable(const QString& table) throw (Exception);
+        void beginTransaction();
+        void commitTransaction();
+        void rollbackTransaction();
+        void clearTable(const QString& table);
 
 
         // General Methods
-        QSqlQuery prepareQuery(const QString& query) const throw (Exception);
-        int insert(QSqlQuery& query) throw (Exception);
-        void exec(QSqlQuery& query) throw (Exception);
-        void exec(const QString& query) throw (Exception);
+        QSqlQuery prepareQuery(const QString& query) const;
+        int insert(QSqlQuery& query);
+        void exec(QSqlQuery& query);
+        void exec(const QString& query);
 
 
         // Operator Overloadings
@@ -101,7 +101,7 @@ class SQLiteDatabase final : public QObject
          *
          * @see http://www.sqlite.org/wal.html
          */
-        void enableSqliteWriteAheadLogging() throw (Exception);
+        void enableSqliteWriteAheadLogging();
 
         /**
          * @brief Get compile options of the SQLite driver library
@@ -110,7 +110,7 @@ class SQLiteDatabase final : public QObject
          *
          * @see https://sqlite.org/pragma.html#pragma_compile_options
          */
-        QHash<QString, QString> getSqliteCompileOptions() throw (Exception);
+        QHash<QString, QString> getSqliteCompileOptions();
 
 
     private: // Data

@@ -36,7 +36,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, bool create) throw (Exception) :
+ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
     mXmlFilepath(project.getPath().getPathTo("core/settings.xml")), mXmlFile(nullptr)
 {
@@ -127,7 +127,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ProjectSettings::serialize(DomElement& root) const throw (Exception)
+void ProjectSettings::serialize(DomElement& root) const
 {
     DomElement* locale_order = root.appendChild("locale_order");
     foreach (const QString& locale, mLocaleOrder)

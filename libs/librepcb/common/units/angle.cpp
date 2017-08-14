@@ -86,7 +86,7 @@ Angle Angle::fromDeg(qreal degrees) noexcept
     return angle;
 }
 
-Angle Angle::fromDeg(const QString& degrees) throw (Exception)
+Angle Angle::fromDeg(const QString& degrees)
 {
     Angle angle;
     angle.setAngleDeg(degrees);
@@ -102,7 +102,7 @@ Angle Angle::fromRad(qreal radians) noexcept
 
 // Private Static Methods
 
-qint32 Angle::degStringToMicrodeg(const QString& degrees) throw (Exception)
+qint32 Angle::degStringToMicrodeg(const QString& degrees)
 {
     bool ok;
     qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);

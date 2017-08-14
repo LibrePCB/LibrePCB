@@ -42,7 +42,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Device::BI_Device(Board& board, const BI_Device& other) throw (Exception) :
+BI_Device::BI_Device(Board& board, const BI_Device& other) :
     BI_Base(board), mCompInstance(other.mCompInstance), mLibDevice(other.mLibDevice),
     mLibPackage(other.mLibPackage), mLibFootprint(other.mLibFootprint),
     mPosition(other.mPosition), mRotation(other.mRotation), mIsMirrored(other.mIsMirrored)
@@ -52,7 +52,7 @@ BI_Device::BI_Device(Board& board, const BI_Device& other) throw (Exception) :
     init();
 }
 
-BI_Device::BI_Device(Board& board, const DomElement& domElement) throw (Exception) :
+BI_Device::BI_Device(Board& board, const DomElement& domElement) :
     BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibPackage(nullptr),
     mLibFootprint(nullptr)
 {
@@ -83,7 +83,7 @@ BI_Device::BI_Device(Board& board, const DomElement& domElement) throw (Exceptio
 }
 
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
-        const Uuid& footprintUuid, const Point& position, const Angle& rotation, bool mirror) throw (Exception) :
+        const Uuid& footprintUuid, const Point& position, const Angle& rotation, bool mirror) :
     BI_Base(board), mCompInstance(&compInstance), mLibDevice(nullptr), mLibPackage(nullptr),
     mLibFootprint(nullptr), mPosition(position), mRotation(rotation), mIsMirrored(mirror)
 {
@@ -96,7 +96,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& 
 }
 
 void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                                 const Uuid& footprintUuid) throw (Exception)
+                                                 const Uuid& footprintUuid)
 {
     // get device from library
     mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
@@ -132,7 +132,7 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
     }
 }
 
-void BI_Device::init() throw (Exception)
+void BI_Device::init()
 {
     // check pad-signal-map
     foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap()) {
@@ -188,7 +188,7 @@ void BI_Device::setRotation(const Angle& rot) noexcept
     }
 }
 
-void BI_Device::setIsMirrored(bool mirror) throw (Exception)
+void BI_Device::setIsMirrored(bool mirror)
 {
     if (mirror != mIsMirrored) {
         if (isUsed()) {
@@ -199,7 +199,7 @@ void BI_Device::setIsMirrored(bool mirror) throw (Exception)
     }
 }
 
-void BI_Device::addToBoard(GraphicsScene& scene) throw (Exception)
+void BI_Device::addToBoard(GraphicsScene& scene)
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -212,7 +212,7 @@ void BI_Device::addToBoard(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-void BI_Device::removeFromBoard(GraphicsScene& scene) throw (Exception)
+void BI_Device::removeFromBoard(GraphicsScene& scene)
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
@@ -225,7 +225,7 @@ void BI_Device::removeFromBoard(GraphicsScene& scene) throw (Exception)
     updateErcMessages();
 }
 
-void BI_Device::serialize(DomElement& root) const throw (Exception)
+void BI_Device::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 

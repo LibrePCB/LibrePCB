@@ -142,7 +142,7 @@ const QString& SystemInfo::getHostname() noexcept
     return sHostname;
 }
 
-bool SystemInfo::isProcessRunning(qint64 pid) throw (Exception)
+bool SystemInfo::isProcessRunning(qint64 pid)
 {
 #if defined(Q_OS_UNIX) // Mac OS X / Linux / UNIX
     // From: http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
@@ -185,7 +185,7 @@ bool SystemInfo::isProcessRunning(qint64 pid) throw (Exception)
 #endif
 }
 
-QString SystemInfo::getProcessNameByPid(qint64 pid) throw (Exception)
+QString SystemInfo::getProcessNameByPid(qint64 pid)
 {
     QString processName;
 #if defined(Q_OS_OSX) // Mac OS X
