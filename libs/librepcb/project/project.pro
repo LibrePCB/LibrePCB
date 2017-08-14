@@ -26,6 +26,7 @@ SOURCES += \
     boards/boardlayerstack.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/cmd/cmdboarddesignrulesmodify.cpp \
+    boards/cmd/cmdboardlayerstackedit.cpp \
     boards/cmd/cmdboardnetlineadd.cpp \
     boards/cmd/cmdboardnetlineremove.cpp \
     boards/cmd/cmdboardnetpointadd.cpp \
@@ -109,6 +110,7 @@ HEADERS += \
     boards/boardlayerstack.h \
     boards/cmd/cmdboardadd.h \
     boards/cmd/cmdboarddesignrulesmodify.h \
+    boards/cmd/cmdboardlayerstackedit.h \
     boards/cmd/cmdboardnetlineadd.h \
     boards/cmd/cmdboardnetlineremove.h \
     boards/cmd/cmdboardnetpointadd.h \

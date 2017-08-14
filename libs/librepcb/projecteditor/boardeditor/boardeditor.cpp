@@ -45,6 +45,7 @@
 #include "../projecteditor.h"
 #include "boardlayersdock.h"
 #include "fabricationoutputdialog.h"
+#include "boardlayerstacksetupdialog.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -400,6 +401,20 @@ void BoardEditor::on_actionProjectProperties_triggered()
 {
     ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
+}
+
+void BoardEditor::on_actionLayerStackSetup_triggered()
+{
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    try {
+        BoardLayerStackSetupDialog dialog(board->getLayerStack(),
+                                          mProjectEditor.getUndoStack(), this);
+        dialog.exec();
+    } catch (Exception& e) {
+        QMessageBox::warning(this, tr("Error"), e.getMsg());
+    }
 }
 
 void BoardEditor::on_actionModifyDesignRules_triggered()

@@ -60,6 +60,7 @@ class BoardLayerStack final : public QObject, public SerializableObject,
 
         // Getters
         Board& getBoard() const noexcept {return mBoard;}
+        int getInnerLayerCount() const noexcept {return mInnerLayerCount;}
 
         /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
         QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}
@@ -73,6 +74,9 @@ class BoardLayerStack final : public QObject, public SerializableObject,
             }
             return nullptr;
         }
+
+        // Setters
+        void setInnerLayerCount(int count) noexcept;
 
         // General Methods
 
@@ -98,6 +102,9 @@ class BoardLayerStack final : public QObject, public SerializableObject,
         Board& mBoard; ///< A reference to the Board object (from the ctor)
         QList<GraphicsLayer*> mLayers;
         bool mLayersChanged;
+
+        // Settings
+        int mInnerLayerCount;
 };
 
 /*****************************************************************************************

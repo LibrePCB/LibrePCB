@@ -35,7 +35,8 @@ namespace project {
  ****************************************************************************************/
 
 BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
-    QObject(&board), mBoard(board), mLayersChanged(false)
+    QObject(&board), mBoard(board), mLayersChanged(false),
+    mInnerLayerCount(other.mInnerLayerCount)
 {
     foreach (const GraphicsLayer* layer, other.mLayers) {
         addLayer(new GraphicsLayer(*layer));
@@ -46,20 +47,24 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement):
-    QObject(&board), mBoard(board), mLayersChanged(false)
+BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) :
+    QObject(&board), mBoard(board), mLayersChanged(false), mInnerLayerCount(-1)
 {
     addAllLayers();
+
+    setInnerLayerCount(domElement.getAttribute<uint>("inner", true));
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board):
-    QObject(&board), mBoard(board), mLayersChanged(false)
+BoardLayerStack::BoardLayerStack(Board& board) :
+    QObject(&board), mBoard(board), mLayersChanged(false), mInnerLayerCount(-1)
 {
     addAllLayers();
+
+    setInnerLayerCount(0);
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
@@ -72,11 +77,28 @@ BoardLayerStack::~BoardLayerStack() noexcept
 }
 
 /*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void BoardLayerStack::setInnerLayerCount(int count) noexcept
+{
+    if ((count >= 0) && (count != mInnerLayerCount)) {
+        mInnerLayerCount = count;
+        for (GraphicsLayer* layer : mLayers) {
+            if (layer->isInnerLayer() && layer->isCopperLayer()) {
+                layer->setEnabled(layer->getInnerLayerNumber() <= mInnerLayerCount);
+            }
+        }
+    }
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
 void BoardLayerStack::serialize(DomElement& root) const
 {
+    root.setAttribute("inner", mInnerLayerCount);
 }
 
 /*****************************************************************************************
