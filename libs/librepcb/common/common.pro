@@ -110,6 +110,7 @@ SOURCES += \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
     widgets/centeredcheckbox.cpp \
+    widgets/graphicslayercombobox.cpp \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
 
@@ -207,6 +208,7 @@ HEADERS += \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
     widgets/centeredcheckbox.h \
+    widgets/graphicslayercombobox.h \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
 
