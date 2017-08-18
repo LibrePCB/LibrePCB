@@ -102,6 +102,7 @@ SOURCES += \
     units/ratio.cpp \
     utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
+    utils/toolbarproxy.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
@@ -200,6 +201,7 @@ HEADERS += \
     units/ratio.h \
     utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
+    utils/toolbarproxy.h \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
