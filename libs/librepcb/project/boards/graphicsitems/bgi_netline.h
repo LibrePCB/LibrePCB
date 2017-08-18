@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -73,11 +73,11 @@ class BGI_NetLine final : public BGI_Base
         BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
         // Attributes
         BI_NetLine& mNetLine;
-        BoardLayer* mLayer;
+        GraphicsLayer* mLayer;
 
         // Cached Attributes
         QLineF mLineF;

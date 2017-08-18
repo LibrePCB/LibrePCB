@@ -27,7 +27,6 @@
 #include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
-#include <librepcb/common/boardlayer.h>
 #include "../project.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
@@ -486,7 +485,7 @@ QList<BI_Via*> Board::getViasAtScenePos(const Point& pos, const NetSignal* netsi
     return list;
 }
 
-QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                   const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetPoint*> list;
@@ -502,7 +501,7 @@ QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const BoardL
     return list;
 }
 
-QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                 const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetLine*> list;
@@ -518,7 +517,7 @@ QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const BoardLay
     return list;
 }
 
-QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                  const NetSignal* netsignal) const noexcept
 {
     QList<BI_FootprintPad*> list;
@@ -527,7 +526,7 @@ QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLa
         foreach (BI_FootprintPad* pad, device->getFootprint().getPads())
         {
             if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(pos.toPxQPointF())
-                && ((!layer) || (pad->isOnLayer(layer->getId())))
+                && ((!layer) || (pad->isOnLayer(layer->getName())))
                 && ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal)))
             {
                 list.append(pad);

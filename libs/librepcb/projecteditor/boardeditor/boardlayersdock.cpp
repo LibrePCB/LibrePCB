@@ -26,7 +26,6 @@
 #include "ui_boardlayersdock.h"
 #include <librepcb/project/boards/board.h>
 #include "boardeditor.h"
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 
 /*****************************************************************************************
@@ -78,29 +77,29 @@ void BoardLayersDock::setActiveBoard(Board* board)
 void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem *item)
 {
     if (!mActiveBoard) return;
-    int layerId = item->data(Qt::UserRole).toInt();
-    BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
+    QString layerName = item->data(Qt::UserRole).toString();
+    GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName);
     if (!layer) return;
     layer->setVisible(item->checkState() == Qt::Checked);
 }
 
 void BoardLayersDock::on_btnTop_clicked()
 {
-    QList<int> layers = getCommonLayers();
+    QList<QString> layers = getCommonLayers();
     layers.append(getTopLayers());
     setVisibleLayers(layers);
 }
 
 void BoardLayersDock::on_btnBottom_clicked()
 {
-    QList<int> layers = getCommonLayers();
+    QList<QString> layers = getCommonLayers();
     layers.append(getBottomLayers());
     setVisibleLayers(layers);
 }
 
 void BoardLayersDock::on_btnTopBottom_clicked()
 {
-    QList<int> layers = getCommonLayers();
+    QList<QString> layers = getCommonLayers();
     layers.append(getTopLayers());
     layers.append(getBottomLayers());
     setVisibleLayers(layers);
@@ -108,13 +107,13 @@ void BoardLayersDock::on_btnTopBottom_clicked()
 
 void BoardLayersDock::on_btnAll_clicked()
 {
-    QList<int> layers = mActiveBoard->getLayerStack().getAllBoardLayerIds();
+    QList<QString> layers = getAllLayers();
     setVisibleLayers(layers);
 }
 
 void BoardLayersDock::on_btnNone_clicked()
 {
-    QList<int> layers;
+    QList<QString> layers;
     setVisibleLayers(layers);
 }
 
@@ -129,87 +128,95 @@ void BoardLayersDock::updateListWidget() noexcept
         return;
     }
 
-    QList<int> layerIds = mActiveBoard->getLayerStack().getAllBoardLayerIds();
+    QList<QString> layerNames = getAllLayers();
     mUi->listWidget->setUpdatesEnabled(false);
-    if (mUi->listWidget->count() == layerIds.count()) {
-        for (int i = 0; i < layerIds.count(); i++) {
-            int layerId = layerIds.at(i);
-            BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
-            Q_ASSERT(layer); if (!layer) continue;
-
-            QListWidgetItem* item = mUi->listWidget->item(i);
-            Q_ASSERT(item); if (!item) continue;
-            item->setData(Qt::UserRole, layerId);
-            item->setCheckState(layer->isVisible() ? Qt::Checked : Qt::Unchecked);
-        }
-    } else {
+    mUi->listWidget->blockSignals(true);
+    bool simpleUpdate = (mUi->listWidget->count() == layerNames.count());
+    if (!simpleUpdate) {
         mUi->listWidget->clear();
-        foreach (int layerId, layerIds) {
-            BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
-            Q_ASSERT(layer); if (!layer) continue;
-
-            QListWidgetItem* item = new QListWidgetItem(layer->getName());
-            item->setData(Qt::UserRole, layerId);
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            item->setCheckState(layer->isVisible() ? Qt::Checked : Qt::Unchecked);
+    }
+    for (int i = 0; i < layerNames.count(); i++) {
+        QString layerName = layerNames.at(i);
+        GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName); Q_ASSERT(layer);
+        QListWidgetItem* item = nullptr;
+        if (simpleUpdate) {
+            item = mUi->listWidget->item(i); Q_ASSERT(item);
+        } else {
+            item = new QListWidgetItem(layer->getNameTr());
+        }
+        item->setData(Qt::UserRole, layerName);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(layer->getVisible() ? Qt::Checked : Qt::Unchecked);
+        QColor color = layer->getColor(false);
+        color.setAlphaF(color.alphaF() * 0.3);
+        item->setBackgroundColor(color);
+        // still add, but hide disabled layers because of the condition above:
+        // "mUi->listWidget->count() == layerNames.count()"
+        item->setHidden(!layer->isEnabled());
+        if (!simpleUpdate) {
             mUi->listWidget->addItem(item);
         }
     }
+    mUi->listWidget->blockSignals(false);
     mUi->listWidget->setUpdatesEnabled(true);
 }
 
-void BoardLayersDock::setVisibleLayers(const QList<int>& layers) noexcept
+void BoardLayersDock::setVisibleLayers(const QList<QString>& layers) noexcept
 {
     if (!mActiveBoard) return;
-    foreach (int layerId, mActiveBoard->getLayerStack().getAllBoardLayerIds()) {
-        BoardLayer* layer = mActiveBoard->getLayerStack().getBoardLayer(layerId);
-        Q_ASSERT(layer); if (!layer) continue;
-        layer->setVisible(layers.contains(layerId));
+    foreach (auto& layer, mActiveBoard->getLayerStack().getAllLayers()) {
+        layer->setVisible(layers.contains(layer->getName()));
     }
 }
 
-QList<int> BoardLayersDock::getCommonLayers() const noexcept
+QList<QString> BoardLayersDock::getCommonLayers() const noexcept
 {
-    QList<int> layers;
-    layers.append(BoardLayer::LayerID::Grid);
-    layers.append(BoardLayer::LayerID::Unrouted);
-    layers.append(BoardLayer::LayerID::BoardOutlines);
-    layers.append(BoardLayer::LayerID::Drills);
-    layers.append(BoardLayer::LayerID::Vias);
-    layers.append(BoardLayer::LayerID::ViaRestrict);
-    layers.append(BoardLayer::LayerID::ThtPads);
+    QList<QString> layers;
+    //layers.append(GraphicsLayer::sBoardBackground));
+    //layers.append(GraphicsLayer::sBoardErcAirWires));
+    layers.append(GraphicsLayer::sBoardOutlines);
+    layers.append(GraphicsLayer::sBoardDrillsNpth);
+    layers.append(GraphicsLayer::sBoardViasTht);
+    layers.append(GraphicsLayer::sBoardPadsTht);
     return layers;
 }
 
-QList<int> BoardLayersDock::getTopLayers() const noexcept
+QList<QString> BoardLayersDock::getTopLayers() const noexcept
 {
-    QList<int> layers;
-    layers.append(BoardLayer::LayerID::TopDeviceOutlines);
-    layers.append(BoardLayer::LayerID::TopDeviceOriginCrosses);
-    layers.append(BoardLayer::LayerID::TopDeviceGrabAreas);
-    layers.append(BoardLayer::LayerID::TopTestPoints);
-    //layers.append(BoardLayer::LayerID::TopOverlayNames);
-    //layers.append(BoardLayer::LayerID::TopOverlayValues);
-    layers.append(BoardLayer::LayerID::TopOverlay);
-    layers.append(BoardLayer::LayerID::TopDeviceKeepout);
-    layers.append(BoardLayer::LayerID::TopCopperRestrict);
-    layers.append(BoardLayer::LayerID::TopCopper);
+    QList<QString> layers;
+    layers.append(GraphicsLayer::sTopPlacement);
+    layers.append(GraphicsLayer::sTopReferences);
+    layers.append(GraphicsLayer::sTopGrabAreas);
+    //layers.append(GraphicsLayer::sTopTestPoints);
+    layers.append(GraphicsLayer::sTopNames);
+    layers.append(GraphicsLayer::sTopValues);
+    //layers.append(GraphicsLayer::sTopCourtyard);
+    layers.append(GraphicsLayer::sTopDocumentation);
+    layers.append(GraphicsLayer::sTopCopper);
     return layers;
 }
 
-QList<int> BoardLayersDock::getBottomLayers() const noexcept
+QList<QString> BoardLayersDock::getBottomLayers() const noexcept
 {
-    QList<int> layers;
-    layers.append(BoardLayer::LayerID::BottomDeviceOutlines);
-    layers.append(BoardLayer::LayerID::BottomDeviceOriginCrosses);
-    layers.append(BoardLayer::LayerID::BottomDeviceGrabAreas);
-    layers.append(BoardLayer::LayerID::BottomTestPoints);
-    //layers.append(BoardLayer::LayerID::BottomOverlayNames);
-    //layers.append(BoardLayer::LayerID::BottomOverlayValues);
-    layers.append(BoardLayer::LayerID::BottomOverlay);
-    layers.append(BoardLayer::LayerID::BottomDeviceKeepout);
-    layers.append(BoardLayer::LayerID::BottomCopperRestrict);
-    layers.append(BoardLayer::LayerID::BottomCopper);
+    QList<QString> layers;
+    layers.append(GraphicsLayer::sBotPlacement);
+    layers.append(GraphicsLayer::sBotReferences);
+    layers.append(GraphicsLayer::sBotGrabAreas);
+    //layers.append(GraphicsLayer::sBotTestPoints);
+    layers.append(GraphicsLayer::sBotNames);
+    layers.append(GraphicsLayer::sBotValues);
+    //layers.append(GraphicsLayer::sBotCourtyard);
+    layers.append(GraphicsLayer::sBotDocumentation);
+    layers.append(GraphicsLayer::sBotCopper);
+    return layers;
+}
+
+QList<QString> BoardLayersDock::getAllLayers() const noexcept
+{
+    QList<QString> layers;
+    foreach (auto& layer, mActiveBoard->getLayerStack().getAllLayers()) {
+        layers.append(layer->getName());
+    }
     return layers;
 }
 

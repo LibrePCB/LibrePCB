@@ -24,7 +24,6 @@
 #include "cmdflipselectedboarditems.h"
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
@@ -131,7 +130,7 @@ bool CmdFlipSelectedBoardItems::performExecute()
                 cmd->setViaToAttach(nullptr);
                 execNewChildCmd(cmd); // can throw
             }
-            BoardLayer* mirroredLayer = mBoard.getLayerStack().getBoardLayer(netpoint->getLayer().getMirroredLayerId());
+            BoardLayer* mirroredLayer = mBoard.getLayerStack().getLayer(netpoint->getLayer().getMirroredLayerId());
             if (!mirroredLayer) throw LogicError(__FILE__, __LINE__);
             CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
             cmd->setLayer(*mirroredLayer);

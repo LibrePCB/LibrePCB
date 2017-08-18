@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -70,11 +70,11 @@ class SGI_NetLine final : public SGI_Base
         SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
         // Attributes
         SI_NetLine& mNetLine;
-        SchematicLayer* mLayer;
+        GraphicsLayer* mLayer;
 
         // Cached Attributes
         QLineF mLineF;

@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -69,12 +69,12 @@ class SGI_NetPoint final : public SGI_Base
         SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 
         // General Attributes
         SI_NetPoint& mNetPoint;
-        SchematicLayer* mLayer;
+        GraphicsLayer* mLayer;
 
         // Cached Attributes
         bool mIsVisibleJunction;

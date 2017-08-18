@@ -42,7 +42,7 @@ class GridProperties;
 class GraphicsView;
 class GraphicsScene;
 class SmartXmlFile;
-class BoardLayer;
+class GraphicsLayer;
 class BoardDesignRules;
 
 namespace project {
@@ -125,11 +125,11 @@ class Board final : public QObject, public IF_AttributeProvider,
                                          bool attachedLinesFromFootprints) const noexcept;
         QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
         QList<BI_Via*> getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept;
-        QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                    const NetSignal* netsignal) const noexcept;
-        QList<BI_NetLine*> getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_NetLine*> getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                  const NetSignal* netsignal) const noexcept;
-        QList<BI_FootprintPad*> getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_FootprintPad*> getPadsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                   const NetSignal* netsignal) const noexcept;
         QList<BI_Base*> getAllItems() const noexcept;
 

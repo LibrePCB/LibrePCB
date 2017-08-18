@@ -33,7 +33,7 @@
 namespace librepcb {
 
 class Text;
-class BoardLayer;
+class GraphicsLayer;
 
 namespace library {
 class Footprint;
@@ -81,7 +81,7 @@ class BGI_Footprint final : public BGI_Base
         BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(QString name) const noexcept;
 
 
         // Types

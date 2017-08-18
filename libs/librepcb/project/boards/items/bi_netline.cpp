@@ -123,7 +123,7 @@ BI_NetLine::~BI_NetLine() noexcept
  *  Getters
  ****************************************************************************************/
 
-BoardLayer& BI_NetLine::getLayer() const noexcept
+GraphicsLayer& BI_NetLine::getLayer() const noexcept
 {
     Q_ASSERT(&mStartPoint->getLayer() == &mEndPoint->getLayer());
     return mStartPoint->getLayer();

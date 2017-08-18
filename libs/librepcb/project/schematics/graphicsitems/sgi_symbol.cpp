@@ -26,9 +26,9 @@
 #include "sgi_symbol.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/componentinstance.h"
-#include <librepcb/common/schematiclayer.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/cmp/component.h>
 
@@ -150,7 +150,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 {
     Q_UNUSED(widget);
 
-    const SchematicLayer* layer = 0;
+    const GraphicsLayer* layer = 0;
     const bool selected = mSymbol.isSelected();
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
@@ -162,16 +162,16 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         Q_ASSERT(polygon); if (!polygon) continue;
 
         // set colors
-        layer = getSchematicLayer(polygon->getLayerId());
+        layer = getLayer(polygon->getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
         if (polygon->isFilled())
-            layer = getSchematicLayer(polygon->getLayerId());
+            layer = getLayer(polygon->getLayerName());
         else if (polygon->isGrabArea())
-            layer = getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+            layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
@@ -188,16 +188,16 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         Q_ASSERT(ellipse); if (!ellipse) continue;
 
         // set colors
-        layer = getSchematicLayer(ellipse->getLayerId());
+        layer = getLayer(ellipse->getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
         if (ellipse->isFilled())
-            layer = getSchematicLayer(ellipse->getLayerId());
+            layer = getLayer(ellipse->getLayerName());
         else if (ellipse->isGrabArea())
-            layer = getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+            layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
@@ -216,7 +216,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         Q_ASSERT(text); if (!text) continue;
 
         // get layer
-        layer = getSchematicLayer(text->getLayerId());
+        layer = getLayer(text->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -244,7 +244,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-        layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+        layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects); Q_ASSERT(layer);
         if (layer->isVisible())
         {
             // draw text bounding rect
@@ -259,7 +259,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = getSchematicLayer(SchematicLayer::OriginCrosses); Q_ASSERT(layer);
+        layer = getLayer(GraphicsLayer::sSchematicReferences); Q_ASSERT(layer);
         if (layer->isVisible())
         {
             qreal width = Length(700000).toPx();
@@ -270,7 +270,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
 
 #ifdef QT_DEBUG
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_ComponentSymbolsCount); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugComponentSymbolsCounts); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // show symbols count of the component
@@ -282,7 +282,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextDontClip,
                           QString("[%1/%2]").arg(count).arg(maxCount));
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -297,9 +297,9 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_Symbol::getSchematicLayer(int id) const noexcept
+GraphicsLayer* SGI_Symbol::getLayer(const QString& name) const noexcept
 {
-    return mSymbol.getSchematic().getProject().getSchematicLayer(id);
+    return mSymbol.getSchematic().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

@@ -35,8 +35,8 @@
 namespace librepcb {
 
 class Text;
-class BoardLayer;
-class IF_BoardLayerProvider;
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 
 namespace library {
 
@@ -60,7 +60,7 @@ class FootprintPreviewGraphicsItem final : public GraphicsItem, public IF_Attrib
     public:
 
         // Constructors / Destructor
-        explicit FootprintPreviewGraphicsItem(const IF_BoardLayerProvider& layerProvider,
+        explicit FootprintPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
             const QStringList& localeOrder, const Footprint& footprint,
             const Package* package = nullptr, /*const Device* device = nullptr,*/
             const Component* component = nullptr,
@@ -110,7 +110,7 @@ class FootprintPreviewGraphicsItem final : public GraphicsItem, public IF_Attrib
 
 
         // General Attributes
-        const IF_BoardLayerProvider& mLayerProvider;
+        const IF_GraphicsLayerProvider& mLayerProvider;
         const Footprint& mFootprint;
         const Package* mPackage;
         //const Device* mDevice;

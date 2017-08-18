@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -73,14 +73,14 @@ class BGI_Via final : public BGI_Base
         BGI_Via& operator=(const BGI_Via& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 
         // General Attributes
         BI_Via& mVia;
-        BoardLayer* mViaLayer;
-        BoardLayer* mTopStopMaskLayer;
-        BoardLayer* mBottomStopMaskLayer;
+        GraphicsLayer* mViaLayer;
+        GraphicsLayer* mTopStopMaskLayer;
+        GraphicsLayer* mBottomStopMaskLayer;
 
         // Cached Attributes
         bool mDrawStopMask;

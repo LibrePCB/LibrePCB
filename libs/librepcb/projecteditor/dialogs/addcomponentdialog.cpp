@@ -27,6 +27,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/project/project.h>
+#include <librepcb/project/schematics/schematiclayerprovider.h>
 #include <librepcb/project/library/projectlibrary.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
@@ -243,7 +244,7 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
             if (!symbolFp.isValid()) continue; // TODO: show warning
             const library::Symbol* symbol = new library::Symbol(symbolFp, true); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
-                mProject, localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item->getUuid());
+                mProject.getLayers(), localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item->getUuid());
             //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
             Point pos = Point::fromPx(0, mPreviewScene->itemsBoundingRect().bottom()

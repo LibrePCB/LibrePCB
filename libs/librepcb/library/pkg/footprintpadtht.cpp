@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpadtht.h"
 
 /*****************************************************************************************
@@ -60,14 +60,14 @@ FootprintPadTht::~FootprintPadTht() noexcept
  *  Getters
  ****************************************************************************************/
 
-int FootprintPadTht::getLayerId() const noexcept
+QString FootprintPadTht::getLayerName() const noexcept
 {
-    return BoardLayer::LayerID::ThtPads;
+    return GraphicsLayer::sBoardPadsTht;
 }
 
-bool FootprintPadTht::isOnLayer(int id) const noexcept
+bool FootprintPadTht::isOnLayer(const QString& layerName) const noexcept
 {
-    return BoardLayer::isCopperLayer(id);
+    return GraphicsLayer::isCopperLayer(layerName);
 }
 
 const QPainterPath& FootprintPadTht::toQPainterPathPx() const noexcept

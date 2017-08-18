@@ -28,7 +28,6 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/library/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
@@ -96,23 +95,23 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     }
 
     // set layers
-    mPadLayer = getBoardLayer(mLibPad.getLayerId());
+    mPadLayer = getLayer(mLibPad.getLayerName());
     if (mLibPad.getTechnology() == library::FootprintPad::Technology_t::SMT) {
         const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&mLibPad); Q_ASSERT(smt);
         if (smt->getBoardSide() == library::FootprintPadSmt::BoardSide_t::BOTTOM) {
             mTopStopMaskLayer = nullptr;
-            mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+            mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
             mTopCreamMaskLayer = nullptr;
-            mBottomCreamMaskLayer = getBoardLayer(BoardLayer::BottomPaste);
+            mBottomCreamMaskLayer = getLayer(GraphicsLayer::sBotSolderPaste);
         } else {
-            mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
+            mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
             mBottomStopMaskLayer = nullptr;
-            mTopCreamMaskLayer = getBoardLayer(BoardLayer::TopPaste);
+            mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
             mBottomCreamMaskLayer = nullptr;
         }
     } else {
-        mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
-        mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+        mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
+        mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
         mTopCreamMaskLayer = nullptr;
         mBottomCreamMaskLayer = nullptr;
     }
@@ -187,7 +186,7 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     }
 
 #ifdef QT_DEBUG
-    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             // draw bounding rect
@@ -203,10 +202,10 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_FootprintPad::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept
 {
-    if (mPad.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mPad.getFootprint().getDeviceInstance().getBoard().getLayerStack().getBoardLayer(id);
+    if (mPad.getIsMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
+    return mPad.getFootprint().getDeviceInstance().getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

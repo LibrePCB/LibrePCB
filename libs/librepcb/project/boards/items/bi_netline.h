@@ -34,7 +34,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -70,7 +70,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         BI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         BI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
         NetSignal& getNetSignal() const noexcept;
-        BoardLayer& getLayer() const noexcept;
+        GraphicsLayer& getLayer() const noexcept;
         bool isAttached() const noexcept;
         bool isAttachedToFootprint() const noexcept;
         bool isAttachedToVia() const noexcept;

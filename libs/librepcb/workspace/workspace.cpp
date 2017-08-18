@@ -35,7 +35,6 @@
 #include "recentprojectsmodel.h"
 #include "favoriteprojectsmodel.h"
 #include "settings/workspacesettings.h"
-#include <librepcb/common/schematiclayer.h>
 #include <librepcb/library/library.h>
 
 /*****************************************************************************************

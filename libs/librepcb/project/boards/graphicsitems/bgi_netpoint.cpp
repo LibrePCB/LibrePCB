@@ -29,7 +29,6 @@
 #include "../../project.h"
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/boardlayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -69,7 +68,7 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept
     prepareGeometryChange();
 
     // set Z value
-    setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getId()));
+    setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
 
     qreal radius = mNetPoint.getMaxLineWidth().toPx() / 2;
     mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
@@ -89,7 +88,7 @@ void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
 
 #ifdef QT_DEBUG
-    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -107,9 +106,9 @@ void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_NetPoint::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept
 {
-    return mNetPoint.getBoard().getLayerStack().getBoardLayer(id);
+    return mNetPoint.getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

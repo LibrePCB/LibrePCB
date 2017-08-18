@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -69,7 +69,7 @@ class SGI_NetLabel final : public SGI_Base
         SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 
         // Attributes

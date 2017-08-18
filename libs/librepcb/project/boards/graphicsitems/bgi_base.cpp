@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bgi_base.h"
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "../board.h"
 
 /*****************************************************************************************
@@ -49,14 +49,17 @@ BGI_Base::~BGI_Base() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-qreal BGI_Base::getZValueOfCopperLayer(int layerId) noexcept
+qreal BGI_Base::getZValueOfCopperLayer(const QString& name) noexcept
 {
-    if (BoardLayer::isCopperLayer(layerId)) {
+    if (GraphicsLayer::isTopLayer(name)) {
+        return Board::ItemZValue::ZValue_CopperTop;
+    } else if (GraphicsLayer::isBottomLayer(name)) {
+        return Board::ItemZValue::ZValue_CopperBottom;
+    } else if (GraphicsLayer::isCopperLayer(name)) {
         // 0.0 => TOP
         // 1.0 => BOTTOM
-        qreal valueNormalized = qreal(layerId - BoardLayer::LayerID::TopCopper) /
-                                qreal(BoardLayer::LayerID::BottomCopper - BoardLayer::LayerID::TopCopper);
-        return (Board::ItemZValue::ZValue_CopperTop - valueNormalized);
+        qreal delta = QString(name).remove("in").remove("_cu").toDouble() / 100.0;
+        return (Board::ItemZValue::ZValue_CopperTop - delta);
     } else {
         return Board::ItemZValue::ZValue_Default;
     }

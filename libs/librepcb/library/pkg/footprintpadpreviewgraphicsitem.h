@@ -32,8 +32,8 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
-class IF_BoardLayerProvider;
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 
 namespace library {
 
@@ -55,7 +55,7 @@ class FootprintPadPreviewGraphicsItem final : public GraphicsItem
     public:
 
         // Constructors / Destructor
-        explicit FootprintPadPreviewGraphicsItem(const IF_BoardLayerProvider& layerProvider,
+        explicit FootprintPadPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
                                                  const FootprintPad& fptPad,
                                                  const PackagePad* pkgPad = nullptr) noexcept;
         ~FootprintPadPreviewGraphicsItem() noexcept;
@@ -83,7 +83,7 @@ class FootprintPadPreviewGraphicsItem final : public GraphicsItem
         // General Attributes
         const FootprintPad& mFootprintPad;
         const PackagePad* mPackagePad;
-        BoardLayer* mLayer;
+        GraphicsLayer* mLayer;
         bool mDrawBoundingRect;
 
         // Cached Attributes

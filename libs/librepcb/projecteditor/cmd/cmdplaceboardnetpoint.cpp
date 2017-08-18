@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "cmdplaceboardnetpoint.h"
 #include <librepcb/common/scopeguard.h>
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/circuit/netsignal.h>
@@ -51,7 +51,7 @@ namespace editor {
  ****************************************************************************************/
 
 CmdPlaceBoardNetPoint::CmdPlaceBoardNetPoint(Board& board, const Point& pos,
-                                             BoardLayer& layer) noexcept :
+                                             GraphicsLayer& layer) noexcept :
     UndoCommandGroup(tr("Place Board Netpoint")),
     mCircuit(board.getProject().getCircuit()), mBoard(board), mPosition(pos),
     mLayer(layer), mNetPoint(nullptr)
@@ -99,7 +99,7 @@ BI_NetPoint* CmdPlaceBoardNetPoint::createNewNetPoint()
         return createNewNetPointAtPad();
     } else if (viasUnderCursor.count() == 1) {
         BI_Via* via = viasUnderCursor.first();
-        BI_NetPoint* netpoint = via->getNetPointOfLayer(mLayer.getId());
+        BI_NetPoint* netpoint = via->getNetPointOfLayer(mLayer.getName());
         if (netpoint) {
             return netpoint;
         } else {

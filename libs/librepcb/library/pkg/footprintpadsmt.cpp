@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpadsmt.h"
 
 /*****************************************************************************************
@@ -58,19 +58,19 @@ FootprintPadSmt::~FootprintPadSmt() noexcept
  *  Getters
  ****************************************************************************************/
 
-int FootprintPadSmt::getLayerId() const noexcept
+QString FootprintPadSmt::getLayerName() const noexcept
 {
     switch (mBoardSide)
     {
-        case BoardSide_t::TOP:      return BoardLayer::LayerID::TopCopper;
-        case BoardSide_t::BOTTOM:   return BoardLayer::LayerID::BottomCopper;
-        default: Q_ASSERT(false);   return -1;
+        case BoardSide_t::TOP:      return GraphicsLayer::sTopCopper;
+        case BoardSide_t::BOTTOM:   return GraphicsLayer::sBotCopper;
+        default: Q_ASSERT(false);   return "";
     }
 }
 
-bool FootprintPadSmt::isOnLayer(int id) const noexcept
+bool FootprintPadSmt::isOnLayer(const QString& layerName) const noexcept
 {
-    return (id == getLayerId());
+    return (layerName == getLayerName());
 }
 
 const QPainterPath& FootprintPadSmt::toQPainterPathPx() const noexcept

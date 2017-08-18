@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/if_schematiclayerprovider.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -43,37 +43,44 @@ class Project;
  * @brief The SchematicLayerProvider class provides and manages all available schematic
  *        layers which are used in the #project#SchematicEditor class
  */
-class SchematicLayerProvider final : public IF_SchematicLayerProvider
+class SchematicLayerProvider final : public IF_GraphicsLayerProvider
 {
     public:
 
         // Constructors / Destructor
+        SchematicLayerProvider() = delete;
+        SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
         explicit SchematicLayerProvider(Project& project);
         ~SchematicLayerProvider() noexcept;
 
         // Getters
         Project& getProject() const noexcept {return mProject;}
 
-        /**
-         * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
-         */
-        SchematicLayer* getSchematicLayer(int id) const noexcept {return mLayers.value(id, nullptr);}
+        /// @copydoc IF_GraphicsLayerProvider#getLayer()
+        GraphicsLayer* getLayer(const QString& name) const noexcept override {
+            foreach (GraphicsLayer* layer, mLayers) {
+                if (layer->getName() == name) {
+                    return layer;
+                }
+            }
+            return nullptr;
+        }
 
+        QList<GraphicsLayer*> getAllLayers() const noexcept override {
+            return mLayers;
+        }
 
-    private:
-
-        // make some methods inaccessible...
-        SchematicLayerProvider() = delete;
-        SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
+        // Operator Overloadings
         SchematicLayerProvider& operator=(const SchematicLayerProvider& rhs) = delete;
 
-        // Private Methods
-        void addLayer(int id) noexcept;
+
+    private: // Methods
+        void addLayer(const QString& name) noexcept;
 
 
-        // General
+    private: // Data
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        QMap<int, SchematicLayer*> mLayers;
+        QList<GraphicsLayer*> mLayers;
 };
 
 /*****************************************************************************************

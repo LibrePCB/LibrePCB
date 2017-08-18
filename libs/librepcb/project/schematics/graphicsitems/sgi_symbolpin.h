@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
+class GraphicsLayer;
 
 namespace library {
 class SymbolPin;
@@ -77,7 +77,7 @@ class SGI_SymbolPin final : public SGI_Base
         SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 
         // General Attributes

@@ -47,14 +47,14 @@ class Ellipse final : public SerializableObject
 
         // Constructors / Destructor
         Ellipse(const Ellipse& other) noexcept;
-        Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
-                const Point& center, const Length& radiusX, const Length& radiusY,
-                const Angle& rotation) noexcept;
+        Ellipse(const QString& layerName, const Length& lineWidth, bool fill,
+                bool isGrabArea, const Point& center, const Length& radiusX,
+                const Length& radiusY, const Angle& rotation) noexcept;
         explicit Ellipse(const DomElement& domElement);
         ~Ellipse() noexcept;
 
         // Getters
-        int getLayerId() const noexcept {return mLayerId;}
+        const QString& getLayerName() const noexcept {return mLayerName;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
@@ -64,7 +64,7 @@ class Ellipse final : public SerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
 
         // Setters
-        void setLayerId(int id) noexcept;
+        void setLayerName(const QString& layerName) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
@@ -96,7 +96,7 @@ class Ellipse final : public SerializableObject
 
 
         // Polygon Attributes
-        int mLayerId;
+        QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;

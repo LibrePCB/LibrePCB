@@ -27,7 +27,6 @@
 #include "../items/bi_polygon.h"
 #include "../board.h"
 #include "../../project.h"
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/common/geometry/polygon.h>
 #include "../boardlayerstack.h"
 
@@ -70,7 +69,7 @@ void BGI_Polygon::updateCacheAndRepaint() noexcept
 
     setZValue(Board::ZValue_Default);
 
-    mLayer = getBoardLayer(mPolygon.getLayerId());
+    mLayer = getLayer(mPolygon.getLayerName());
 
     // set shape and bounding rect
     mShape = mPolygon.toQPainterPathPx();
@@ -102,8 +101,8 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 
 #ifdef QT_DEBUG
     // draw bounding rect
-    const BoardLayer* layer = mBiPolygon.getBoard().getLayerStack().getBoardLayer(
-        BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
+    const GraphicsLayer* layer = mBiPolygon.getBoard().getLayerStack().getLayer(
+        GraphicsLayer::sDebugGraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             painter->setPen(QPen(layer->getColor(selected), 0));
@@ -118,10 +117,10 @@ void BGI_Polygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_Polygon::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_Polygon::getLayer(QString name) const noexcept
 {
-    if (mBiPolygon.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mBiPolygon.getBoard().getLayerStack().getBoardLayer(id);
+    if (mBiPolygon.getIsMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
+    return mBiPolygon.getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

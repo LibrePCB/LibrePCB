@@ -26,9 +26,9 @@
 #include "sgi_netlabel.h"
 #include "../items/si_netlabel.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/schematiclayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -106,7 +106,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
     bool highlight = mNetLabel.isSelected() || mNetLabel.getNetSignal().isHighlighted();
 
-    SchematicLayer* layer = getSchematicLayer(SchematicLayer::OriginCrosses); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sSchematicReferences); Q_ASSERT(layer);
     if ((layer->isVisible()) && (lod > 2) && (!deviceIsPrinter))
     {
         // draw origin cross
@@ -114,7 +114,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
         painter->drawLines(sOriginCrossLines);
     }
 
-    layer = getSchematicLayer(SchematicLayer::NetLabels); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sSchematicNetLabels); Q_ASSERT(layer);
     if ((layer->isVisible()) && ((deviceIsPrinter) || (lod > 1)))
     {
         // draw text
@@ -139,7 +139,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -147,7 +147,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw text bounding rect
@@ -162,9 +162,9 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetLabel::getSchematicLayer(int id) const noexcept
+GraphicsLayer* SGI_NetLabel::getLayer(const QString& name) const noexcept
 {
-    return mNetLabel.getSchematic().getProject().getSchematicLayer(id);
+    return mNetLabel.getSchematic().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

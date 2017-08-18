@@ -26,8 +26,7 @@
 #include "footprintpadpreviewgraphicsitem.h"
 #include "packagepad.h"
 #include "footprintpad.h"
-#include <librepcb/common/boardlayer.h>
-#include <librepcb/common/if_boardlayerprovider.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -39,15 +38,14 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(
-        const IF_BoardLayerProvider& layerProvider, const FootprintPad& fptPad,
+FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
         const PackagePad* pkgPad) noexcept :
     GraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
 {
     if (mPackagePad)
         setToolTip(mPackagePad->getName());
 
-    mLayer = layerProvider.getBoardLayer(mFootprintPad.getLayerId());
+    mLayer = layerProvider.getLayer(mFootprintPad.getLayerName());
     Q_ASSERT(mLayer);
 
     updateCacheAndRepaint();

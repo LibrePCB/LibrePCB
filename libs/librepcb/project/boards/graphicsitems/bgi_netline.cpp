@@ -30,7 +30,6 @@
 #include "../boardlayerstack.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/boardlayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -70,7 +69,7 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept
     prepareGeometryChange();
 
     // set Z value
-    setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getId()));
+    setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
 
     mLayer = &mNetLine.getLayer();
     Q_ASSERT(mLayer);
@@ -111,7 +110,7 @@ void BGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     }
 
 #ifdef QT_DEBUG
-    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -126,9 +125,9 @@ void BGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_NetLine::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_NetLine::getLayer(const QString& name) const noexcept
 {
-    return mNetLine.getBoard().getLayerStack().getBoardLayer(id);
+    return mNetLine.getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

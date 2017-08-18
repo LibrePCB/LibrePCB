@@ -72,10 +72,10 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         Point p4(xValues.values().last(), yValues.values().first());
 
         // create the new polygon
-        int layerId = lines.first()->getLayerId();
+        QString layerName = lines.first()->getLayerName();
         Length lineWidth = lines.first()->getLineWidth();
 
-        Polygon* rect = new Polygon(layerId, lineWidth, fillArea, isGrabArea, p1);
+        Polygon* rect = new Polygon(layerName, lineWidth, fillArea, isGrabArea, p1);
         rect->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
         rect->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
         rect->appendSegment(*new PolygonSegment(p4, Angle::deg0()));

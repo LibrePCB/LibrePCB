@@ -31,6 +31,8 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class GraphicsLayer;
+
 namespace project {
 
 class Project;
@@ -85,10 +87,11 @@ class BoardLayersDock final : public QDockWidget
 
         // Private Methods
         void updateListWidget() noexcept;
-        void setVisibleLayers(const QList<int>& layers) noexcept;
-        QList<int> getCommonLayers() const noexcept;
-        QList<int> getTopLayers() const noexcept;
-        QList<int> getBottomLayers() const noexcept;
+        void setVisibleLayers(const QList<QString>& layers) noexcept;
+        QList<QString> getCommonLayers() const noexcept;
+        QList<QString> getTopLayers() const noexcept;
+        QList<QString> getBottomLayers() const noexcept;
+        QList<QString> getAllLayers() const noexcept;
 
 
         // General

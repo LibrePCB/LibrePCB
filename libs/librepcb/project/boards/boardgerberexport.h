@@ -81,20 +81,20 @@ class BoardGerberExport final : public QObject
         void exportLayerBoardOutlines() const;
         void exportLayerTopCopper() const;
         void exportLayerTopSolderMask() const;
-        void exportLayerTopOverlay() const;
+        void exportLayerTopSilkscreen() const;
         void exportLayerBottomCopper() const;
         void exportLayerBottomSolderMask() const;
-        void exportLayerBottomOverlay() const;
+        void exportLayerBottomSilkscreen() const;
 
-        void drawLayer(GerberGenerator& gen, int layerId) const;
-        void drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const;
-        void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const;
-        void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const;
+        void drawLayer(GerberGenerator& gen, const QString& layerName) const;
+        void drawVia(GerberGenerator& gen, const BI_Via& via, const QString& layerName) const;
+        void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, const QString& layerName) const;
+        void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, const QString& layerName) const;
 
         FilePath getOutputFilePath(const QString& suffix) const noexcept;
 
         // Static Methods
-        static Length calcWidthOfLayer(const Length& width, int layerId) noexcept;
+        static Length calcWidthOfLayer(const Length& width, const QString& name) noexcept;
 
 
         // Private Member Variables

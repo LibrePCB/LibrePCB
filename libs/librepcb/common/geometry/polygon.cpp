@@ -80,7 +80,7 @@ void PolygonSegment::serialize(DomElement& root) const
  ****************************************************************************************/
 
 Polygon::Polygon(const Polygon& other) noexcept :
-    mLayerId(other.mLayerId), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
+    mLayerName(other.mLayerName), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
     mIsGrabArea(other.mIsGrabArea), mStartPos(other.mStartPos)
 {
     foreach (const PolygonSegment* segment, other.mSegments) {
@@ -88,19 +88,18 @@ Polygon::Polygon(const Polygon& other) noexcept :
     }
 }
 
-Polygon::Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+Polygon::Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                  const Point& startPos) noexcept :
-    mLayerId(layerId), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
+    mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
     mStartPos(startPos)
 {
-    Q_ASSERT(layerId >= 0);
     Q_ASSERT(lineWidth >= 0);
 }
 
 Polygon::Polygon(const DomElement& domElement)
 {
     // load general attributes
-    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mLayerName = domElement.getAttribute<QString>("layer", true);
     mLineWidth = domElement.getAttribute<Length>("width", true);
     mIsFilled = domElement.getAttribute<bool>("fill", true);
     mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
@@ -205,10 +204,9 @@ const QPainterPath& Polygon::toQPainterPathPx() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void Polygon::setLayerId(int id) noexcept
+void Polygon::setLayerName(const QString& layerName) noexcept
 {
-    Q_ASSERT(id >= 0);
-    mLayerId = id;
+    mLayerName = layerName;
 }
 
 void Polygon::setLineWidth(const Length& width) noexcept
@@ -306,7 +304,7 @@ void Polygon::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerId);
+    root.setAttribute("layer", mLayerName);
     root.setAttribute("width", mLineWidth);
     root.setAttribute("fill", mIsFilled);
     root.setAttribute("grab_area", mIsGrabArea);
@@ -319,31 +317,31 @@ void Polygon::serialize(DomElement& root) const
  *  Static Methods
  ****************************************************************************************/
 
-Polygon* Polygon::createLine(int layerId, const Length& lineWidth, bool fill,
+Polygon* Polygon::createLine(const QString& layerName, const Length& lineWidth, bool fill,
                                      bool isGrabArea, const Point& p1, const Point& p2) noexcept
 {
-    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
     p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
     return p;
 }
 
-Polygon* Polygon::createCurve(int layerId, const Length& lineWidth, bool fill,
+Polygon* Polygon::createCurve(const QString& layerName, const Length& lineWidth, bool fill,
                               bool isGrabArea, const Point& p1, const Point& p2,
                               const Angle& angle) noexcept
 {
-    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
     p->appendSegment(*new PolygonSegment(p2, angle));
     return p;
 }
 
-Polygon* Polygon::createRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+Polygon* Polygon::createRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                              const Point& pos, const Length& width, const Length& height) noexcept
 {
     Point p1 = Point(pos.getX(),            pos.getY());
     Point p2 = Point(pos.getX() + width,    pos.getY());
     Point p3 = Point(pos.getX() + width,    pos.getY() + height);
     Point p4 = Point(pos.getX(),            pos.getY() + height);
-    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
     p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
     p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
     p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
@@ -351,7 +349,7 @@ Polygon* Polygon::createRect(int layerId, const Length& lineWidth, bool fill, bo
     return p;
 }
 
-Polygon* Polygon::createCenteredRect(int layerId, const Length& lineWidth, bool fill,
+Polygon* Polygon::createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill,
                                      bool isGrabArea, const Point& center,
                                      const Length& width, const Length& height) noexcept
 {
@@ -359,7 +357,7 @@ Polygon* Polygon::createCenteredRect(int layerId, const Length& lineWidth, bool 
     Point p2 = Point(center.getX() + width/2, center.getY() + height/2);
     Point p3 = Point(center.getX() + width/2, center.getY() - height/2);
     Point p4 = Point(center.getX() - width/2, center.getY() - height/2);
-    Polygon* p = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
     p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
     p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
     p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
@@ -373,7 +371,6 @@ Polygon* Polygon::createCenteredRect(int layerId, const Length& lineWidth, bool 
 
 bool Polygon::checkAttributesValidity() const noexcept
 {
-    if (mLayerId <= 0)          return false;
     if (mLineWidth < 0)         return false;
     return true;
 }

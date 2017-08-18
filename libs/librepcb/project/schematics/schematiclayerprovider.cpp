@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/schematiclayer.h>
 #include "schematiclayerprovider.h"
 
 /*****************************************************************************************
@@ -38,39 +37,43 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project):
     mProject(project)
 {
     // add all required layers
-    addLayer(SchematicLayer::LayerID::Grid);
-    addLayer(SchematicLayer::LayerID::OriginCrosses);
-    addLayer(SchematicLayer::LayerID::SymbolOutlines);
-    addLayer(SchematicLayer::LayerID::SymbolGrabAreas);
-    addLayer(SchematicLayer::LayerID::SymbolPinCircles);
-    addLayer(SchematicLayer::LayerID::SymbolPinNames);
-    addLayer(SchematicLayer::LayerID::ComponentNames);
-    addLayer(SchematicLayer::LayerID::ComponentValues);
-    addLayer(SchematicLayer::LayerID::NetLabels);
-    addLayer(SchematicLayer::LayerID::Nets);
-    addLayer(SchematicLayer::LayerID::Busses);
+    addLayer(GraphicsLayer::sSchematicReferences);
+    addLayer(GraphicsLayer::sSchematicSheetFrames);
+    addLayer(GraphicsLayer::sSymbolOutlines);
+    addLayer(GraphicsLayer::sSymbolGrabAreas);
+    addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+    addLayer(GraphicsLayer::sSymbolPinCirclesReq);
+    addLayer(GraphicsLayer::sSymbolPinNames);
+    addLayer(GraphicsLayer::sSymbolPinNumbers);
+    addLayer(GraphicsLayer::sSymbolNames);
+    addLayer(GraphicsLayer::sSymbolValues);
+    addLayer(GraphicsLayer::sSchematicNetLines);
+    addLayer(GraphicsLayer::sSchematicNetLabels);
+    addLayer(GraphicsLayer::sSchematicDocumentation);
+    addLayer(GraphicsLayer::sSchematicComments);
+    addLayer(GraphicsLayer::sSchematicGuide);
 #ifdef QT_DEBUG
-    addLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect);
-    addLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect);
-    addLayer(SchematicLayer::LayerID::DEBUG_SymbolPinNetSignalNames);
-    addLayer(SchematicLayer::LayerID::DEBUG_NetLinesNetSignalNames);
-    addLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints);
-    addLayer(SchematicLayer::LayerID::DEBUG_ComponentSymbolsCount);
+    addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+    addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
+    addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
+    addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
+    addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
+    addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
 #endif
 }
 
 SchematicLayerProvider::~SchematicLayerProvider() noexcept
 {
-    qDeleteAll(mLayers);        mLayers.clear();
+    qDeleteAll(mLayers); mLayers.clear();
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void SchematicLayerProvider::addLayer(int id) noexcept
+void SchematicLayerProvider::addLayer(const QString& name) noexcept
 {
-    mLayers.insert(id, new SchematicLayer(id));
+    mLayers.append(new GraphicsLayer(name));
 }
 
 /*****************************************************************************************

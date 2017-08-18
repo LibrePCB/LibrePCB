@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -57,7 +57,7 @@ class CmdBoardNetPointEdit final : public UndoCommand
         ~CmdBoardNetPointEdit() noexcept;
 
         // Setters
-        void setLayer(BoardLayer& layer) noexcept;
+        void setLayer(GraphicsLayer& layer) noexcept;
         void setNetSignal(NetSignal& netsignal) noexcept;
         void setPadToAttach(BI_FootprintPad* pad) noexcept;
         void setViaToAttach(BI_Via* via) noexcept;
@@ -85,8 +85,8 @@ class CmdBoardNetPointEdit final : public UndoCommand
         BI_NetPoint& mNetPoint;
 
         // General Attributes
-        BoardLayer* mOldLayer;
-        BoardLayer* mNewLayer;
+        GraphicsLayer* mOldLayer;
+        GraphicsLayer* mNewLayer;
         NetSignal* mOldNetSignal;
         NetSignal* mNewNetSignal;
         BI_FootprintPad* mOldFootprintPad;

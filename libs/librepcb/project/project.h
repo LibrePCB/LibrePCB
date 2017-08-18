@@ -26,8 +26,6 @@
 #include <QtCore>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/if_attributeprovider.h>
-#include <librepcb/common/if_schematiclayerprovider.h>
-#include <librepcb/common/if_boardlayerprovider.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
@@ -78,8 +76,7 @@ class Board;
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject, public IF_AttributeProvider,
-                      public IF_SchematicLayerProvider, public SerializableObject
+class Project final : public QObject, public IF_AttributeProvider, public SerializableObject
 {
         Q_OBJECT
 
@@ -255,10 +252,8 @@ class Project final : public QObject, public IF_AttributeProvider,
 
         // Schematic Methods
 
-        /**
-         * @copydoc IF_SchematicLayerProvider#getSchematicLayer()
-         */
-        SchematicLayer* getSchematicLayer(int id) const noexcept override;
+        SchematicLayerProvider& getLayers() noexcept {return *mSchematicLayerProvider;}
+        const SchematicLayerProvider& getLayers() const noexcept {return *mSchematicLayerProvider;}
 
         /**
          * @brief Get the page index of a specific schematic

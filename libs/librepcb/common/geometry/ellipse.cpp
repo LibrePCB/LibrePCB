@@ -33,19 +33,18 @@ namespace librepcb {
  ****************************************************************************************/
 
 Ellipse::Ellipse(const Ellipse& other) noexcept :
-    mLayerId(other.mLayerId), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
+    mLayerName(other.mLayerName), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
     mIsGrabArea(other.mIsGrabArea), mCenter(other.mCenter), mRadiusX(other.mRadiusX),
     mRadiusY(other.mRadiusY), mRotation(other.mRotation)
 {
 }
 
-Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
+Ellipse::Ellipse(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                  const Point& center, const Length& radiusX, const Length& radiusY,
                  const Angle& rotation) noexcept :
-    mLayerId(layerId), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
+    mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
     mCenter(center), mRadiusX(radiusX), mRadiusY(radiusY), mRotation(rotation)
 {
-    Q_ASSERT(layerId >= 0);
     Q_ASSERT(lineWidth >= 0);
     Q_ASSERT(radiusX > 0);
     Q_ASSERT(radiusY > 0);
@@ -53,7 +52,7 @@ Ellipse::Ellipse(int layerId, const Length& lineWidth, bool fill, bool isGrabAre
 
 Ellipse::Ellipse(const DomElement& domElement)
 {
-    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mLayerName = domElement.getAttribute<QString>("layer", true);
     mLineWidth = domElement.getAttribute<Length>("width", true);
     mIsFilled = domElement.getAttribute<bool>("fill", true);
     mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
@@ -74,10 +73,9 @@ Ellipse::~Ellipse() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Ellipse::setLayerId(int id) noexcept
+void Ellipse::setLayerName(const QString& layerName) noexcept
 {
-    Q_ASSERT(id >= 0);
-    mLayerId = id;
+    mLayerName = layerName;
 }
 
 void Ellipse::setLineWidth(const Length& width) noexcept
@@ -153,7 +151,7 @@ void Ellipse::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerId);
+    root.setAttribute("layer", mLayerName);
     root.setAttribute("width", mLineWidth);
     root.setAttribute("fill", mIsFilled);
     root.setAttribute("grab_area", mIsGrabArea);
@@ -170,7 +168,6 @@ void Ellipse::serialize(DomElement& root) const
 
 bool Ellipse::checkAttributesValidity() const noexcept
 {
-    if (mLayerId <= 0)          return false;
     if (mLineWidth < 0)         return false;
     if (mRadiusX <= 0)          return false;
     if (mRadiusY <= 0)          return false;

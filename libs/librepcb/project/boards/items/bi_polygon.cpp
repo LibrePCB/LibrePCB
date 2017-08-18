@@ -52,11 +52,11 @@ BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) :
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, int layerId, const Length& lineWidth, bool fill,
+BI_Polygon::BI_Polygon(Board& board, const QString& layerName, const Length& lineWidth, bool fill,
                        bool isGrabArea, const Point& startPos) :
     BI_Base(board)
 {
-    mPolygon.reset(new Polygon(layerId, lineWidth, fill, isGrabArea, startPos));
+    mPolygon.reset(new Polygon(layerName, lineWidth, fill, isGrabArea, startPos));
     init();
 }
 

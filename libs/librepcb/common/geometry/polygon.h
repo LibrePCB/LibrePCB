@@ -95,13 +95,13 @@ class Polygon final : public SerializableObject
 
         // Constructors / Destructor
         Polygon(const Polygon& other) noexcept;
-        Polygon(int layerId, const Length& lineWidth, bool fill, bool isGrabArea,
-                const Point& startPos) noexcept;
+        Polygon(const QString& layerName, const Length& lineWidth, bool fill,
+                bool isGrabArea, const Point& startPos) noexcept;
         explicit Polygon(const DomElement& domElement);
         ~Polygon() noexcept;
 
         // Getters
-        int getLayerId() const noexcept {return mLayerId;}
+        const QString& getLayerName() const noexcept {return mLayerName;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
@@ -116,7 +116,7 @@ class Polygon final : public SerializableObject
         const QPainterPath& toQPainterPathPx() const noexcept;
 
         // Setters
-        void setLayerId(int id) noexcept;
+        void setLayerName(const QString& layerName) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
@@ -137,10 +137,10 @@ class Polygon final : public SerializableObject
         void serialize(DomElement& root) const override;
 
         // Static Methods
-        static Polygon* createLine(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
-        static Polygon* createCurve(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
-        static Polygon* createRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
-        static Polygon* createCenteredRect(int layerId, const Length& lineWidth, bool fill, bool isGrabArea, const Point& center, const Length& width, const Length& height) noexcept;
+        static Polygon* createLine(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept;
+        static Polygon* createCurve(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
+        static Polygon* createRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
+        static Polygon* createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea, const Point& center, const Length& width, const Length& height) noexcept;
 
 
     private:
@@ -154,7 +154,7 @@ class Polygon final : public SerializableObject
 
 
         // Polygon Attributes
-        int mLayerId;
+        QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
