@@ -153,15 +153,15 @@ TEST_P(NetworkRequestTest, testDownload)
  ****************************************************************************************/
 
 INSTANTIATE_TEST_CASE_P(NetworkRequestTest, NetworkRequestTest, ::testing::Values(
-    NetworkRequestTestData({QUrl("https://api.librepcb.org/api/v1/libraries"),
+    NetworkRequestTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/common/api/v1/libraries"),
                             QByteArray("application/json"),
                             QByteArray("{"),
                             true}),
-    //NetworkRequestTestData({QUrl("https://api.librepcb.org/api/v1/libraries"),
+    //NetworkRequestTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/common/api/v1/libraries"),
     //                        QByteArray("text/html"),
     //                        QByteArray("<"),
     //                        true}),
-    NetworkRequestTestData({QUrl("https://api.librepcb.org/some-invalid-url"),
+    NetworkRequestTestData({QUrl::fromLocalFile("/some-invalid-url"),
                             QByteArray("text/html"),
                             QByteArray(""),
                             false})
