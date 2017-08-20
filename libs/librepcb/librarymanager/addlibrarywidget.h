@@ -102,6 +102,7 @@ class AddLibraryWidget final : public QWidget
         workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::AddLibraryWidget> mUi;
         QScopedPointer<LibraryDownload> mManualLibraryDownload;
+        QList<QMetaObject::Connection> mLibraryDownloadConnections;
 };
 
 

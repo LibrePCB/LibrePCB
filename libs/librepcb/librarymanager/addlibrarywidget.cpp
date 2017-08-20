@@ -109,10 +109,12 @@ void AddLibraryWidget::currentTabChanged(int index) noexcept
         clearRepositoryLibraryList();
         QList<const Repository*> repos = mWorkspace.getSettings().getRepositories().getRepositories();
         foreach (const Repository* repo, repos) { Q_ASSERT(repo);
-            connect(repo, &Repository::libraryListReceived,
-                    this, &AddLibraryWidget::repositoryLibraryListReceived);
-            connect(repo, &Repository::errorWhileFetchingLibraryList,
-                    this, &AddLibraryWidget::errorWhileFetchingLibraryList);
+            mLibraryDownloadConnections.append(
+                        connect(repo, &Repository::libraryListReceived,
+                                this, &AddLibraryWidget::repositoryLibraryListReceived));
+            mLibraryDownloadConnections.append(
+                        connect(repo, &Repository::errorWhileFetchingLibraryList,
+                                this, &AddLibraryWidget::errorWhileFetchingLibraryList));
             repo->requestLibraryList();
         }
     }
@@ -354,10 +356,8 @@ void AddLibraryWidget::errorWhileFetchingLibraryList(const QString& errorMsg) no
 
 void AddLibraryWidget::clearRepositoryLibraryList() noexcept
 {
-    QList<const Repository*> repos = mWorkspace.getSettings().getRepositories().getRepositories();
-    foreach (const Repository* repo, repos) { Q_ASSERT(repo);
-        disconnect(repo, &Repository::libraryListReceived,
-                   this, &AddLibraryWidget::repositoryLibraryListReceived);
+    foreach (const QMetaObject::Connection& connection, mLibraryDownloadConnections) {
+        disconnect(connection);
     }
     for (int i = mUi->lstRepoLibs->count()-1; i >= 0; i--) {
         QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
