@@ -13,6 +13,9 @@ GENERATED_DIR = ../generated
 # Use common project definitions
 include(../common.pri)
 
+# Set preprocessor defines
+DEFINES += TEST_DATA_DIR=\\\"$${PWD}/data\\\"
+
 QT += core widgets network printsupport xml opengl sql concurrent
 
 CONFIG += console
