@@ -10,3 +10,6 @@
 [submodule "libs/googletest"]
 	path = libs/googletest
 	url = https://github.com/LibrePCB/googletest.git
+[submodule "tests/data"]
+	path = tests/data
+	url = https://github.com/LibrePCB/librepcb-test-data.git
