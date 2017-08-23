@@ -24,8 +24,10 @@ SOURCES += \
     boards/board.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
+    boards/boardusersettings.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/cmd/cmdboarddesignrulesmodify.cpp \
+    boards/cmd/cmdboardlayerstackedit.cpp \
     boards/cmd/cmdboardnetlineadd.cpp \
     boards/cmd/cmdboardnetlineremove.cpp \
     boards/cmd/cmdboardnetpointadd.cpp \
@@ -107,8 +109,10 @@ HEADERS += \
     boards/board.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
+    boards/boardusersettings.h \
     boards/cmd/cmdboardadd.h \
     boards/cmd/cmdboarddesignrulesmodify.h \
+    boards/cmd/cmdboardlayerstackedit.h \
     boards/cmd/cmdboardnetlineadd.h \
     boards/cmd/cmdboardnetlineremove.h \
     boards/cmd/cmdboardnetpointadd.h \

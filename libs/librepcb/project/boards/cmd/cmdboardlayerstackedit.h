@@ -17,69 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_NETLINE_H
-#define LIBREPCB_PROJECT_SGI_NETLINE_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H
+#define LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "sgi_base.h"
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace project {
 
-class SI_NetLine;
+class BoardLayerStack;
 
 /*****************************************************************************************
- *  Class SGI_NetLine
+ *  Class CmdBoardLayerStackEdit
  ****************************************************************************************/
 
 /**
- * @brief The SGI_NetLine class
+ * @brief The CmdBoardLayerStackEdit class
  */
-class SGI_NetLine final : public SGI_Base
+class CmdBoardLayerStackEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit SGI_NetLine(SI_NetLine& netline) noexcept;
-        ~SGI_NetLine() noexcept;
+        CmdBoardLayerStackEdit() = delete;
+        CmdBoardLayerStackEdit(const CmdBoardLayerStackEdit& other) = delete;
+        CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept;
+        ~CmdBoardLayerStackEdit() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
-
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+        // Setters
+        void setInnerLayerCount(int count) noexcept;
 
 
     private:
 
-        // make some methods inaccessible...
-        SGI_NetLine() = delete;
-        SGI_NetLine(const SGI_NetLine& other) = delete;
-        SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
-
         // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-        // Attributes
-        SI_NetLine& mNetLine;
-        GraphicsLayer* mLayer;
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
 
-        // Cached Attributes
-        QLineF mLineF;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
+
+        // Attributes from the constructor
+        BoardLayerStack& mLayerStack;
+
+        // General Attributes
+        int mOldInnerLayerCount;
+        int mNewInnerLayerCount;
 };
 
 /*****************************************************************************************
@@ -89,4 +84,4 @@ class SGI_NetLine final : public SGI_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_NETLINE_H
+#endif // LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H

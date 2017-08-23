@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/boardlayer.h>
 #include "boardlayerstack.h"
 #include "board.h"
 
@@ -36,10 +35,11 @@ namespace project {
  ****************************************************************************************/
 
 BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
-    QObject(&board), mBoard(board), mLayersChanged(false)
+    QObject(&board), mBoard(board), mLayersChanged(false),
+    mInnerLayerCount(other.mInnerLayerCount)
 {
-    foreach (const BoardLayer* layer, other.mLayers) {
-        addLayer(*new BoardLayer(*layer));
+    foreach (const GraphicsLayer* layer, other.mLayers) {
+        addLayer(new GraphicsLayer(*layer));
     }
 
     connect(&mBoard, &Board::attributesChanged,
@@ -47,33 +47,24 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement):
-    QObject(&board), mBoard(board), mLayersChanged(false)
+BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) :
+    QObject(&board), mBoard(board), mLayersChanged(false), mInnerLayerCount(-1)
 {
-    // load all layers
-    foreach (const DomElement* node, domElement.getChilds()) {
-        QScopedPointer<BoardLayer> layer(new BoardLayer(*node));
-        if (!mLayers.contains(layer->getId())) {
-            addLayer(*layer.take());
-        } else {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("Layer ID \"%1\" is defined multiple times in \"%2\"."))
-                .arg(layer->getId()).arg(domElement.getDocFilePath().toNative()));
-        }
-    }
+    addAllLayers();
 
-    // load also all layers which are missing in the XML file
-    addAllRequiredLayers();
+    setInnerLayerCount(domElement.getAttribute<uint>("inner", true));
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board):
-    QObject(&board), mBoard(board), mLayersChanged(false)
+BoardLayerStack::BoardLayerStack(Board& board) :
+    QObject(&board), mBoard(board), mLayersChanged(false), mInnerLayerCount(-1)
 {
-    addAllRequiredLayers();
+    addAllLayers();
+
+    setInnerLayerCount(0);
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
@@ -82,7 +73,23 @@ BoardLayerStack::BoardLayerStack(Board& board):
 
 BoardLayerStack::~BoardLayerStack() noexcept
 {
-    qDeleteAll(mLayers);        mLayers.clear();
+    qDeleteAll(mLayers); mLayers.clear();
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void BoardLayerStack::setInnerLayerCount(int count) noexcept
+{
+    if ((count >= 0) && (count != mInnerLayerCount)) {
+        mInnerLayerCount = count;
+        for (GraphicsLayer* layer : mLayers) {
+            if (layer->isInnerLayer() && layer->isCopperLayer()) {
+                layer->setEnabled(layer->getInnerLayerNumber() <= mInnerLayerCount);
+            }
+        }
+    }
 }
 
 /*****************************************************************************************
@@ -91,7 +98,7 @@ BoardLayerStack::~BoardLayerStack() noexcept
 
 void BoardLayerStack::serialize(DomElement& root) const
 {
-    serializePointerContainer(root, mLayers, "layer");
+    root.setAttribute("inner", mInnerLayerCount);
 }
 
 /*****************************************************************************************
@@ -115,66 +122,72 @@ void BoardLayerStack::boardAttributesChanged() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void BoardLayerStack::addAllRequiredLayers() noexcept
+void BoardLayerStack::addAllLayers() noexcept
 {
-    addLayer(BoardLayer::LayerID::Grid);
-    addLayer(BoardLayer::LayerID::Unrouted);
+    // asymmetric board layers
+    addLayer(GraphicsLayer::sBoardSheetFrames);
+    addLayer(GraphicsLayer::sBoardOutlines);
+    addLayer(GraphicsLayer::sBoardMillingPth);
+    addLayer(GraphicsLayer::sBoardDrillsNpth);
+    addLayer(GraphicsLayer::sBoardViasTht);
+    addLayer(GraphicsLayer::sBoardPadsTht);
 
-    addLayer(BoardLayer::LayerID::BoardOutlines);
-    addLayer(BoardLayer::LayerID::Drills);
-    addLayer(BoardLayer::LayerID::Vias);
-    addLayer(BoardLayer::LayerID::ViaRestrict);
-    addLayer(BoardLayer::LayerID::ThtPads);
+    // copper layers
+    addLayer(GraphicsLayer::sTopCopper);
+    for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
+        addLayer(GraphicsLayer::getInnerLayerName(i));
+    }
+    addLayer(GraphicsLayer::sBotCopper);
 
-    addLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
-    addLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
-    addLayer(BoardLayer::LayerID::TopDeviceOutlines);
-    addLayer(BoardLayer::LayerID::TopTestPoints);
-    addLayer(BoardLayer::LayerID::TopGlue);
-    addLayer(BoardLayer::LayerID::TopPaste);
-    addLayer(BoardLayer::LayerID::TopOverlayNames);
-    addLayer(BoardLayer::LayerID::TopOverlayValues);
-    addLayer(BoardLayer::LayerID::TopOverlay);
-    addLayer(BoardLayer::LayerID::TopStopMask);
-    addLayer(BoardLayer::LayerID::TopDeviceKeepout);
-    addLayer(BoardLayer::LayerID::TopCopperRestrict);
-    addLayer(BoardLayer::LayerID::TopCopper);
-    addLayer(BoardLayer::LayerID::BottomCopper);
+    // symmetric board layers
+    addLayer(GraphicsLayer::sTopReferences);
+    addLayer(GraphicsLayer::sBotReferences);
+    addLayer(GraphicsLayer::sTopGrabAreas);
+    addLayer(GraphicsLayer::sBotGrabAreas);
+    addLayer(GraphicsLayer::sTopPlacement);
+    addLayer(GraphicsLayer::sBotPlacement);
+    addLayer(GraphicsLayer::sTopDocumentation);
+    addLayer(GraphicsLayer::sBotDocumentation);
+    addLayer(GraphicsLayer::sTopNames);
+    addLayer(GraphicsLayer::sBotNames);
+    addLayer(GraphicsLayer::sTopValues);
+    addLayer(GraphicsLayer::sBotValues);
+    addLayer(GraphicsLayer::sTopCourtyard);
+    addLayer(GraphicsLayer::sBotCourtyard);
+    addLayer(GraphicsLayer::sTopStopMask);
+    addLayer(GraphicsLayer::sBotStopMask);
+    addLayer(GraphicsLayer::sTopSolderPaste);
+    addLayer(GraphicsLayer::sBotSolderPaste);
+    addLayer(GraphicsLayer::sTopGlue);
+    addLayer(GraphicsLayer::sBotGlue);
 
-    addLayer(BoardLayer::LayerID::BottomCopperRestrict);
-    addLayer(BoardLayer::LayerID::BottomDeviceKeepout);
-    addLayer(BoardLayer::LayerID::BottomStopMask);
-    addLayer(BoardLayer::LayerID::BottomOverlay);
-    addLayer(BoardLayer::LayerID::BottomOverlayValues);
-    addLayer(BoardLayer::LayerID::BottomOverlayNames);
-    addLayer(BoardLayer::LayerID::BottomPaste);
-    addLayer(BoardLayer::LayerID::BottomGlue);
-    addLayer(BoardLayer::LayerID::BottomTestPoints);
-    addLayer(BoardLayer::LayerID::BottomDeviceGrabAreas);
-    addLayer(BoardLayer::LayerID::BottomDeviceOriginCrosses);
-    addLayer(BoardLayer::LayerID::BottomDeviceOutlines);
+    // other asymmetric board layers
+    addLayer(GraphicsLayer::sBoardMeasures);
+    addLayer(GraphicsLayer::sBoardAlignment);
+    addLayer(GraphicsLayer::sBoardDocumentation);
+    addLayer(GraphicsLayer::sBoardComments);
+    addLayer(GraphicsLayer::sBoardcGuide);
 
 #ifdef QT_DEBUG
-    addLayer(BoardLayer::DEBUG_GraphicsItemsBoundingRects);
-    addLayer(BoardLayer::DEBUG_GraphicsItemsTextsBoundingRects);
+    // debug layers
+    addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+    addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
 #endif
 }
 
-void BoardLayerStack::addLayer(int id) noexcept
+void BoardLayerStack::addLayer(const QString& name) noexcept
 {
-    if (!mLayers.contains(id)) {
-        BoardLayer* layer = new BoardLayer(id);
-        Q_ASSERT(layer);
-        addLayer(*layer);
+    if (!getLayer(name)) {
+        addLayer(new GraphicsLayer(name));
     }
 }
 
-void BoardLayerStack::addLayer(BoardLayer& layer) noexcept
+void BoardLayerStack::addLayer(GraphicsLayer* layer) noexcept
 {
-    connect(&layer, &BoardLayer::attributesChanged,
+    connect(layer, &GraphicsLayer::attributesChanged,
             this, &BoardLayerStack::layerAttributesChanged,
             Qt::QueuedConnection);
-    mLayers.insert(layer.getId(), &layer);
+    mLayers.append(layer);
 }
 
 /*****************************************************************************************

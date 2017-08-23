@@ -25,8 +25,7 @@
 #include <QPrinter>
 #include "footprintpreviewgraphicsitem.h"
 #include "footprint.h"
-#include <librepcb/common/boardlayer.h>
-#include <librepcb/common/if_boardlayerprovider.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpadpreviewgraphicsitem.h"
 #include "package.h"
 #include <librepcb/common/geometry/text.h>
@@ -42,7 +41,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(const IF_BoardLayerProvider& layerProvider, const QStringList& localeOrder,
+FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const QStringList& localeOrder,
         const Footprint& footprint, const Package* package, /*const Device* device,*/
         const Component* component, const IF_AttributeProvider* attrProvider) noexcept :
     GraphicsItem(), mLayerProvider(layerProvider), mFootprint(footprint),
@@ -198,7 +197,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
 
     QPen pen;
-    const BoardLayer* layer = 0;
+    const GraphicsLayer* layer = 0;
     const bool selected = option->state.testFlag(QStyle::State_Selected);
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
@@ -209,7 +208,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         Q_ASSERT(polygon); if (!polygon) continue;
 
         // set colors
-        layer = mLayerProvider.getBoardLayer(polygon->getLayerId());
+        layer = mLayerProvider.getLayer(polygon->getLayerName());
         if (layer)
         {
             pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -218,9 +217,9 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         else
             painter->setPen(Qt::NoPen);
         if (polygon->isFilled())
-            layer = mLayerProvider.getBoardLayer(polygon->getLayerId());
+            layer = mLayerProvider.getLayer(polygon->getLayerName());
         else if (polygon->isGrabArea())
-            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+            layer = mLayerProvider.getLayer(GraphicsLayer::sTopGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -236,7 +235,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         Q_ASSERT(ellipse); if (!ellipse) continue;
 
         // set colors
-        layer = mLayerProvider.getBoardLayer(ellipse->getLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(ellipse->getLayerName()); if (!layer) continue;
         if (layer)
         {
             pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -245,9 +244,9 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         else
             painter->setPen(Qt::NoPen);
         if (ellipse->isFilled())
-            layer = mLayerProvider.getBoardLayer(ellipse->getLayerId());
+            layer = mLayerProvider.getLayer(ellipse->getLayerName());
         else if (ellipse->isGrabArea())
-            layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+            layer = mLayerProvider.getLayer(GraphicsLayer::sTopGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -265,7 +264,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         Q_ASSERT(text); if (!text) continue;
 
         // get layer
-        layer = mLayerProvider.getBoardLayer(text->getLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(text->getLayerName()); if (!layer) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(text);
@@ -286,7 +285,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = mLayerProvider.getBoardLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
+        layer = mLayerProvider.getLayer(GraphicsLayer::sTopReferences);
         if (layer)
         {
             qreal width = Length(700000).toPx();

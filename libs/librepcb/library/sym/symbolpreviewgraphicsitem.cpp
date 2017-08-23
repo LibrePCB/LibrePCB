@@ -25,8 +25,7 @@
 #include <QPrinter>
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
-#include <librepcb/common/schematiclayer.h>
-#include <librepcb/common/if_schematiclayerprovider.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../cmp/component.h"
 #include <librepcb/common/geometry/text.h>
@@ -41,7 +40,7 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
                                                      const Component* cmp,
@@ -208,7 +207,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     Q_UNUSED(widget);
 
     QPen pen;
-    const SchematicLayer* layer = 0;
+    const GraphicsLayer* layer = 0;
     const bool selected = option->state.testFlag(QStyle::State_Selected);
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
@@ -219,7 +218,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         Q_ASSERT(polygon); if (!polygon) continue;
 
         // set colors
-        layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
+        layer = mLayerProvider.getLayer(polygon->getLayerName());
         if (layer)
         {
             pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -228,9 +227,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         else
             painter->setPen(Qt::NoPen);
         if (polygon->isFilled())
-            layer = mLayerProvider.getSchematicLayer(polygon->getLayerId());
+            layer = mLayerProvider.getLayer(polygon->getLayerName());
         else if (polygon->isGrabArea())
-            layer = mLayerProvider.getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+            layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -246,7 +245,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         Q_ASSERT(ellipse); if (!ellipse) continue;
 
         // set colors
-        layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(ellipse->getLayerName()); if (!layer) continue;
         if (layer)
         {
             pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -255,9 +254,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         else
             painter->setPen(Qt::NoPen);
         if (ellipse->isFilled())
-            layer = mLayerProvider.getSchematicLayer(ellipse->getLayerId());
+            layer = mLayerProvider.getLayer(ellipse->getLayerName());
         else if (ellipse->isGrabArea())
-            layer = mLayerProvider.getSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
+            layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
@@ -275,7 +274,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         Q_ASSERT(text); if (!text) continue;
 
         // get layer
-        layer = mLayerProvider.getSchematicLayer(text->getLayerId()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(text->getLayerName()); if (!layer) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(text);
@@ -296,7 +295,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw origin cross
     if (!deviceIsPrinter)
     {
-        layer = mLayerProvider.getSchematicLayer(SchematicLayer::OriginCrosses);
+        layer = mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences);
         if (layer)
         {
             qreal width = Length(700000).toPx();

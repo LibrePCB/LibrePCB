@@ -52,7 +52,7 @@ class BGI_Base : public GraphicsItem
 
     protected:
 
-        static qreal getZValueOfCopperLayer(int layerId) noexcept;
+        static qreal getZValueOfCopperLayer(const QString& name) noexcept;
 
 
     private:

@@ -17,69 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_NETLINE_H
-#define LIBREPCB_PROJECT_SGI_NETLINE_H
+#ifndef LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
+#define LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "sgi_base.h"
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class SmartXmlFile;
+class GraphicsLayerStackAppearanceSettings;
 
 namespace project {
 
-class SI_NetLine;
+class Board;
 
 /*****************************************************************************************
- *  Class SGI_NetLine
+ *  Class BoardUserSettings
  ****************************************************************************************/
 
 /**
- * @brief The SGI_NetLine class
+ * @brief The BoardUserSettings class
  */
-class SGI_NetLine final : public SGI_Base
+class BoardUserSettings final : public QObject, public SerializableObject
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        explicit SGI_NetLine(SI_NetLine& netline) noexcept;
-        ~SGI_NetLine() noexcept;
+        BoardUserSettings() = delete;
+        BoardUserSettings(const BoardUserSettings& other) = delete;
+        BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
+        explicit BoardUserSettings(Board& board, bool restore, bool readOnly, bool create);
+        ~BoardUserSettings() noexcept;
 
         // General Methods
-        void updateCacheAndRepaint() noexcept;
+        bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+        // Operator Overloadings
+        BoardUserSettings& operator=(const BoardUserSettings& rhs) = delete;
 
 
-    private:
+    private: // Methods
 
-        // make some methods inaccessible...
-        SGI_NetLine() = delete;
-        SGI_NetLine(const SGI_NetLine& other) = delete;
-        SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const override;
 
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-        // Attributes
-        SI_NetLine& mNetLine;
-        GraphicsLayer* mLayer;
+        // General
+        Board& mBoard;
 
-        // Cached Attributes
-        QLineF mLineF;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+        // File "user/boards/<BOARDFILENAME>.xml"
+        FilePath mXmlFilepath;
+        QScopedPointer<SmartXmlFile> mXmlFile;
+
+        QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
 };
 
 /*****************************************************************************************
@@ -89,4 +89,4 @@ class SGI_NetLine final : public SGI_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_NETLINE_H
+#endif // LIBREPCB_PROJECT_BOARDUSERSETTINGS_H

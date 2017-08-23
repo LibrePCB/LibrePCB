@@ -33,8 +33,8 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
-class IF_SchematicLayerProvider;
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 
 namespace library {
 
@@ -59,7 +59,7 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         using PinDisplayType_t = ComponentPinSignalMapItem::PinDisplayType_t;
 
         // Constructors / Destructor
-        explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+        explicit SymbolPinPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
             const SymbolPin& pin, const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
@@ -87,9 +87,9 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         const SymbolPin& mPin;
         const ComponentSignal* mComponentSignal;
         PinDisplayType_t mDisplayType;
-        SchematicLayer* mCircleLayer;
-        SchematicLayer* mLineLayer;
-        SchematicLayer* mTextLayer;
+        GraphicsLayer* mCircleLayer;
+        GraphicsLayer* mLineLayer;
+        GraphicsLayer* mTextLayer;
         QFont mFont;
         qreal mRadiusPx;
         bool mDrawBoundingRect;

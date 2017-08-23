@@ -28,7 +28,6 @@
 #include "../board.h"
 #include "../../project.h"
 #include <librepcb/library/pkg/footprint.h>
-#include <librepcb/common/boardlayer.h>
 #include "../items/bi_device.h"
 #include "../boardlayerstack.h"
 
@@ -62,7 +61,7 @@ BGI_Footprint::~BGI_Footprint() noexcept
 
 bool BGI_Footprint::isSelectable() const noexcept
 {
-    BoardLayer* layer = getBoardLayer(BoardLayer::TopDeviceOriginCrosses);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sTopReferences);
     return layer && layer->isVisible();
 }
 
@@ -72,7 +71,7 @@ bool BGI_Footprint::isSelectable() const noexcept
 
 void BGI_Footprint::updateCacheAndRepaint() noexcept
 {
-    BoardLayer* layer = nullptr;
+    GraphicsLayer* layer = nullptr;
     prepareGeometryChange();
 
     mBoundingRect = QRectF();
@@ -85,7 +84,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         setZValue(Board::ZValue_FootprintsTop);
 
     // cross rect
-    layer = getBoardLayer(BoardLayer::LayerID::TopDeviceOriginCrosses);
+    layer = getLayer(GraphicsLayer::sTopReferences);
     if (layer) {
         if (layer->isVisible()) {
             qreal width = Length(700000).toPx();
@@ -99,7 +98,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
     for (int i = 0; i < mLibFootprint.getPolygonCount(); i++) {
         const Polygon* polygon = mLibFootprint.getPolygon(i);
         Q_ASSERT(polygon); if (!polygon) continue;
-        layer = getBoardLayer(polygon->getLayerId());
+        layer = getLayer(polygon->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -107,7 +106,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         qreal w = polygon->getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (!polygon->isGrabArea()) continue;
-        layer = getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+        layer = getLayer(GraphicsLayer::sTopGrabAreas);
         if (!layer) continue;
         if (!layer->isVisible()) continue;
         mShape = mShape.united(polygonPath);
@@ -118,7 +117,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
     for (int i = 0; i < mLibFootprint.getTextCount(); i++) {
         const Text* text = mLibFootprint.getText(i);
         Q_ASSERT(text); if (!text) continue;
-        layer = getBoardLayer(text->getLayerId());
+        layer = getLayer(text->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -183,7 +182,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 {
     Q_UNUSED(widget);
 
-    const BoardLayer* layer = 0;
+    const GraphicsLayer* layer = 0;
     const bool selected = mFootprint.isSelected();
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
@@ -194,7 +193,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         Q_ASSERT(polygon); if (!polygon) continue;
 
         // get layer
-        layer = getBoardLayer(polygon->getLayerId());
+        layer = getLayer(polygon->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -207,7 +206,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         // set brush
         if (!polygon->isFilled()) {
             if (polygon->isGrabArea())
-                layer = getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+                layer = getLayer(GraphicsLayer::sTopGrabAreas);
             else
                 layer = nullptr;
         }
@@ -230,7 +229,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         Q_ASSERT(ellipse); if (!ellipse) continue;
 
         // get layer
-        layer = getBoardLayer(ellipse->getLayerId());
+        layer = getLayer(ellipse->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -243,7 +242,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         // set brush
         if (!ellipse->isFilled()) {
             if (ellipse->isGrabArea())
-                layer = getBoardLayer(BoardLayer::LayerID::TopDeviceGrabAreas);
+                layer = getLayer(GraphicsLayer::sTopGrabAreas);
             else
                 layer = nullptr;
         }
@@ -268,7 +267,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         Q_ASSERT(text); if (!text) continue;
 
         // get layer
-        layer = getBoardLayer(text->getLayerId());
+        layer = getLayer(text->getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -296,7 +295,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             painter->fillRect(props.textRect, QBrush(layer->getColor(selected), Qt::Dense5Pattern));
         }
 #ifdef QT_DEBUG
-        layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRects);
+        layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
         if (layer) {
             if (layer->isVisible()) {
                 // draw text bounding rect
@@ -315,7 +314,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         Q_ASSERT(hole); if (!hole) continue;
 
         // get layer
-        layer = getBoardLayer(BoardLayer::LayerID::Drills);
+        layer = getLayer(GraphicsLayer::sBoardDrillsNpth);
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -329,7 +328,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw origin cross
-    layer = getBoardLayer(BoardLayer::TopDeviceOriginCrosses);
+    layer = getLayer(GraphicsLayer::sTopReferences);
     if (layer) {
         if ((!deviceIsPrinter) && layer->isVisible()) {
             qreal width = Length(700000).toPx();
@@ -341,7 +340,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
 #ifdef QT_DEBUG
     // draw bounding rect
-    layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
     if (layer) {
         if (layer->isVisible()) {
             painter->setPen(QPen(layer->getColor(selected), 0));
@@ -356,10 +355,10 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_Footprint::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_Footprint::getLayer(QString name) const noexcept
 {
-    if (mFootprint.getIsMirrored()) id = BoardLayer::getMirroredLayerId(id);
-    return mFootprint.getDeviceInstance().getBoard().getLayerStack().getBoardLayer(id);
+    if (mFootprint.getIsMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
+    return mFootprint.getDeviceInstance().getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

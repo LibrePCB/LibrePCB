@@ -21,64 +21,85 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "schematiclayerprovider.h"
+#include <QtWidgets>
+#include "boardlayerstacksetupdialog.h"
+#include "ui_boardlayerstacksetupdialog.h"
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/project/boards/cmd/cmdboardlayerstackedit.h>
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayerProvider::SchematicLayerProvider(Project& project):
-    mProject(project)
+BoardLayerStackSetupDialog::BoardLayerStackSetupDialog(BoardLayerStack& layerStack,
+        UndoStack& undoStack, QWidget *parent) noexcept :
+    QDialog(parent), mLayerStack(layerStack), mUndoStack(undoStack),
+    mUi(new Ui::BoardLayerStackSetupDialog)
 {
-    // add all required layers
-    addLayer(GraphicsLayer::sSchematicReferences);
-    addLayer(GraphicsLayer::sSchematicSheetFrames);
-    addLayer(GraphicsLayer::sSymbolOutlines);
-    addLayer(GraphicsLayer::sSymbolGrabAreas);
-    addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-    addLayer(GraphicsLayer::sSymbolPinCirclesReq);
-    addLayer(GraphicsLayer::sSymbolPinNames);
-    addLayer(GraphicsLayer::sSymbolPinNumbers);
-    addLayer(GraphicsLayer::sSymbolNames);
-    addLayer(GraphicsLayer::sSymbolValues);
-    addLayer(GraphicsLayer::sSchematicNetLines);
-    addLayer(GraphicsLayer::sSchematicNetLabels);
-    addLayer(GraphicsLayer::sSchematicDocumentation);
-    addLayer(GraphicsLayer::sSchematicComments);
-    addLayer(GraphicsLayer::sSchematicGuide);
-#ifdef QT_DEBUG
-    addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-    addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-    addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
-    addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
-    addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-    addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
-#endif
+    mUi->setupUi(this);
+
+    mUi->spbxNbrOfInnerCopperLayers->setMinimum(0);
+    mUi->spbxNbrOfInnerCopperLayers->setMaximum(GraphicsLayer::getInnerLayerCount());
+    mUi->spbxNbrOfInnerCopperLayers->setValue(mLayerStack.getInnerLayerCount());
 }
 
-SchematicLayerProvider::~SchematicLayerProvider() noexcept
+BoardLayerStackSetupDialog::~BoardLayerStackSetupDialog() noexcept
 {
-    qDeleteAll(mLayers); mLayers.clear();
+    mUi.reset();
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void SchematicLayerProvider::addLayer(const QString& name) noexcept
+void BoardLayerStackSetupDialog::keyPressEvent(QKeyEvent* e)
 {
-    mLayers.append(new GraphicsLayer(name));
+    switch (e->key())
+    {
+        case Qt::Key_Return:
+            accept();
+            break;
+        case Qt::Key_Escape:
+            reject();
+            break;
+        default:
+            QDialog::keyPressEvent(e);
+            break;
+    }
+}
+
+void BoardLayerStackSetupDialog::accept()
+{
+    if (applyChanges()) {
+        QDialog::accept();
+    }
+}
+
+bool BoardLayerStackSetupDialog::applyChanges() noexcept
+{
+    try {
+        QScopedPointer<CmdBoardLayerStackEdit> cmd(new CmdBoardLayerStackEdit(mLayerStack));
+        cmd->setInnerLayerCount(mUi->spbxNbrOfInnerCopperLayers->value());
+        mUndoStack.execCmd(cmd.take());
+        return true;
+    } catch (Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+        return false;
+    }
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb

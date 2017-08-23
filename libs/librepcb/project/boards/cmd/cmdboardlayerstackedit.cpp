@@ -17,81 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_IF_BOARDLAYERPROVIDER_H
-#define LIBREPCB_IF_BOARDLAYERPROVIDER_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "cmdboardlayerstackedit.h"
+#include "../boardlayerstack.h"
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-
-class BoardLayer;
+namespace project {
 
 /*****************************************************************************************
- *  Interface IF_BoardLayerProvider
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The IF_BoardLayerProvider class defines an interface for classes which
- *        provide board layers
- *
- * @author ubruhin
- * @date 2015-06-06
- */
-class IF_BoardLayerProvider
+CmdBoardLayerStackEdit::CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept :
+    UndoCommand(tr("Modify board layer stack")), mLayerStack(layerStack),
+    mOldInnerLayerCount(mLayerStack.getInnerLayerCount()), mNewInnerLayerCount(mOldInnerLayerCount)
 {
-    public:
+}
 
-        // Constructors / Destructor
+CmdBoardLayerStackEdit::~CmdBoardLayerStackEdit() noexcept
+{
+}
 
-        /**
-         * @brief Default Constructor
-         */
-        IF_BoardLayerProvider() {}
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
 
-        /**
-         * @brief Destructor
-         */
-        virtual ~IF_BoardLayerProvider() {}
+void CmdBoardLayerStackEdit::setInnerLayerCount(int count) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewInnerLayerCount = count;
+}
 
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
 
-        // Getters
+bool CmdBoardLayerStackEdit::performExecute()
+{
+    performRedo(); // can throw
 
-        /**
-         * @brief Get all available board layer IDs
-         *
-         * @return A QList with all board layer IDs
-         */
-        virtual QList<int> getAllBoardLayerIds() const noexcept = 0;
+    if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
+    return false;
+}
 
-        /**
-         * @brief Get the board layer with a specific ID
-         *
-         * @param id                The ID of the requested board layer
-         *
-         * @retval BoardLayer*      Pointer to the board layer with the specified ID
-         * @retval nullptr          If no layer with the specified ID is available
-         */
-        virtual BoardLayer* getBoardLayer(int id) const noexcept = 0;
+void CmdBoardLayerStackEdit::performUndo()
+{
+    mLayerStack.setInnerLayerCount(mOldInnerLayerCount);
+}
 
-
-    private:
-
-        // make some methods inaccessible...
-        IF_BoardLayerProvider(const IF_BoardLayerProvider& other) = delete;
-        IF_BoardLayerProvider& operator=(const IF_BoardLayerProvider& rhs) = delete;
-};
+void CmdBoardLayerStackEdit::performRedo()
+{
+    mLayerStack.setInnerLayerCount(mNewInnerLayerCount);
+}
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
-
-#endif // LIBREPCB_IF_BOARDLAYERPROVIDER_H
 

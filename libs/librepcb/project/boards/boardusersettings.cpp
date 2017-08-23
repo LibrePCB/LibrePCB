@@ -21,14 +21,13 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
-#include "bgi_netpoint.h"
-#include "../items/bi_netpoint.h"
-#include "../board.h"
-#include "../../project.h"
-#include "../boardlayerstack.h"
-#include "../../circuit/netsignal.h"
+#include "boardusersettings.h"
+#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/utils/graphicslayerstackappearancesettings.h>
+#include "board.h"
+#include "boardlayerstack.h"
+#include "../project.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -40,75 +39,62 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept :
-    BGI_Base(), mNetPoint(netpoint)
+BoardUserSettings::BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept :
+    BoardUserSettings(board, false, false, true)
 {
-    updateCacheAndRepaint();
+    *mLayerSettings = *other.mLayerSettings;
 }
 
-BGI_NetPoint::~BGI_NetPoint() noexcept
+BoardUserSettings::BoardUserSettings(Board& board, bool restore, bool readOnly, bool create) :
+    QObject(&board), mBoard(board)
 {
+    QString relpath = QString("user/boards/%1").arg(mBoard.getFilePath().getFilename());
+    mXmlFilepath = mBoard.getProject().getPath().getPathTo(relpath);
+
+    if (create || (!mXmlFilepath.isExistingFile())) {
+        mXmlFile.reset(SmartXmlFile::create(mXmlFilepath));
+
+        mLayerSettings.reset(new GraphicsLayerStackAppearanceSettings(mBoard.getLayerStack()));
+    } else {
+        mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
+        std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
+        const DomElement& root = doc->getRoot();
+
+        mLayerSettings.reset(new GraphicsLayerStackAppearanceSettings(
+            mBoard.getLayerStack(), *root.getFirstChild("layers", true)));
+    }
 }
 
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool BGI_NetPoint::isSelectable() const noexcept
+BoardUserSettings::~BoardUserSettings() noexcept
 {
-    return mNetPoint.getLayer().isVisible();
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void BGI_NetPoint::updateCacheAndRepaint() noexcept
+bool BoardUserSettings::save(bool toOriginal, QStringList& errors) noexcept
 {
-    prepareGeometryChange();
+    bool success = true;
 
-    // set Z value
-    setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
-
-    qreal radius = mNetPoint.getMaxLineWidth().toPx() / 2;
-    mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
-
-    update();
-}
-
-/*****************************************************************************************
- *  Inherited from QGraphicsItem
- ****************************************************************************************/
-
-void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
-
-#ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(boundingRect());
+    try {
+        DomDocument doc(*serializeToDomElement("board_user_settings"));
+        mXmlFile->save(doc, toOriginal);
+    } catch (Exception& e) {
+        success = false;
+        errors.append(e.getMsg());
     }
-#else
-    Q_UNUSED(highlight);
-    Q_UNUSED(painter);
-#endif
+
+    return success;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept
+void BoardUserSettings::serialize(DomElement& root) const
 {
-    return mNetPoint.getBoard().getLayerStack().getLayer(name);
+    root.appendChild(mLayerSettings->serializeToDomElement("layers"));
 }
 
 /*****************************************************************************************

@@ -30,7 +30,6 @@
 #include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/systeminfo.h>
-#include <librepcb/common/schematiclayer.h>
 #include "project.h"
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
@@ -305,11 +304,6 @@ void Project::setAttributes(const AttributeList& newAttributes) noexcept
 /*****************************************************************************************
  *  Schematic Methods
  ****************************************************************************************/
-
-SchematicLayer* Project::getSchematicLayer(int id) const noexcept
-{
-    return mSchematicLayerProvider->getSchematicLayer(id);
-}
 
 int Project::getSchematicIndex(const Schematic& schematic) const noexcept
 {

@@ -24,7 +24,7 @@
 #include "boardgerberexport.h"
 #include <librepcb/common/cam/gerbergenerator.h>
 #include <librepcb/common/cam/excellongenerator.h>
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/geometry/hole.h>
 #include <librepcb/library/pkg/footprint.h>
@@ -69,10 +69,10 @@ void BoardGerberExport::exportAllLayers() const
     exportLayerBoardOutlines();
     exportLayerTopCopper();
     exportLayerTopSolderMask();
-    exportLayerTopOverlay();
+    exportLayerTopSilkscreen();
     exportLayerBottomCopper();
     exportLayerBottomSolderMask();
-    exportLayerBottomOverlay();
+    exportLayerBottomSilkscreen();
 }
 
 /*****************************************************************************************
@@ -112,7 +112,7 @@ void BoardGerberExport::exportLayerBoardOutlines() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::BoardOutlines);
+    drawLayer(gen, GraphicsLayer::sBoardOutlines);
     gen.generate();
     gen.saveToFile(getOutputFilePath("OUTLINES.gbr"));
 }
@@ -121,7 +121,7 @@ void BoardGerberExport::exportLayerTopCopper() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::TopCopper);
+    drawLayer(gen, GraphicsLayer::sTopCopper);
     gen.generate();
     gen.saveToFile(getOutputFilePath("COPPER-TOP.gbr"));
 }
@@ -130,18 +130,19 @@ void BoardGerberExport::exportLayerTopSolderMask() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::TopStopMask);
+    drawLayer(gen, GraphicsLayer::sTopStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SOLDERMASK-TOP.gbr"));
 }
 
-void BoardGerberExport::exportLayerTopOverlay() const
+void BoardGerberExport::exportLayerTopSilkscreen() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::TopOverlay);
+    drawLayer(gen, GraphicsLayer::sTopPlacement);
+    drawLayer(gen, GraphicsLayer::sTopNames);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
-    drawLayer(gen, BoardLayer::TopStopMask);
+    drawLayer(gen, GraphicsLayer::sTopStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SILKSCREEN-TOP.gbr"));
 }
@@ -150,7 +151,7 @@ void BoardGerberExport::exportLayerBottomCopper() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::BottomCopper);
+    drawLayer(gen, GraphicsLayer::sBotCopper);
     gen.generate();
     gen.saveToFile(getOutputFilePath("COPPER-BOTTOM.gbr"));
 }
@@ -159,40 +160,41 @@ void BoardGerberExport::exportLayerBottomSolderMask() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::BottomStopMask);
+    drawLayer(gen, GraphicsLayer::sBotStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SOLDERMASK-BOTTOM.gbr"));
 }
 
-void BoardGerberExport::exportLayerBottomOverlay() const
+void BoardGerberExport::exportLayerBottomSilkscreen() const
 {
     GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getVersion());
-    drawLayer(gen, BoardLayer::BottomOverlay);
+    drawLayer(gen, GraphicsLayer::sBotPlacement);
+    drawLayer(gen, GraphicsLayer::sBotNames);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
-    drawLayer(gen, BoardLayer::BottomStopMask);
+    drawLayer(gen, GraphicsLayer::sBotStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SILKSCREEN-BOTTOM.gbr"));
 }
 
-void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const
+void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName) const
 {
     // draw footprints incl. pads
     foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
         Q_ASSERT(device);
-        drawFootprint(gen, device->getFootprint(), layerId);
+        drawFootprint(gen, device->getFootprint(), layerName);
     }
 
     // draw vias
     foreach (const BI_Via* via, mBoard.getVias()) {
         Q_ASSERT(via);
-        drawVia(gen, *via, layerId);
+        drawVia(gen, *via, layerName);
     }
 
     // draw traces
     foreach (const BI_NetLine* netline, mBoard.getNetLines()) {
         Q_ASSERT(netline);
-        if (netline->getLayer().getId() == layerId) {
+        if (netline->getLayer().getName() == layerName) {
             gen.drawLine(netline->getStartPoint().getPosition(),
                          netline->getEndPoint().getPosition(),
                          netline->getWidth());
@@ -202,18 +204,18 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, int layerId) const
     // draw polygons
     foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
         Q_ASSERT(polygon);
-        if (layerId == polygon->getPolygon().getLayerId()) {
+        if (layerName == polygon->getPolygon().getLayerName()) {
             Polygon p(polygon->getPolygon());
-            p.setLineWidth(calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerId));
+            p.setLineWidth(calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName));
             gen.drawPolygonOutline(p);
         }
     }
 }
 
-void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, int layerId) const
+void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, const QString& layerName) const
 {
-    bool drawCopper = via.isOnLayer(layerId);
-    bool drawStopMask = (layerId == BoardLayer::TopStopMask || layerId == BoardLayer::BottomStopMask)
+    bool drawCopper = via.isOnLayer(layerName);
+    bool drawStopMask = (layerName == GraphicsLayer::sTopStopMask || layerName == GraphicsLayer::sBotStopMask)
                         && mBoard.getDesignRules().doesViaRequireStopMask(via.getDrillDiameter());
     if (drawCopper || drawStopMask) {
         Length outerDiameter = via.getSize();
@@ -243,18 +245,18 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, int lay
     }
 }
 
-void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, int layerId) const
+void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, const QString& layerName) const
 {
     // draw pads
     foreach (const BI_FootprintPad* pad, footprint.getPads()) {
-        drawFootprintPad(gen, *pad, layerId);
+        drawFootprintPad(gen, *pad, layerName);
     }
 
     // draw polygons
     for (int i = 0; i < footprint.getLibFootprint().getPolygonCount(); ++i) {
         const Polygon* polygon = footprint.getLibFootprint().getPolygon(i); Q_ASSERT(polygon);
-        int layer = footprint.getIsMirrored() ? BoardLayer::getMirroredLayerId(layerId) : layerId;
-        if (layer == polygon->getLayerId()) {
+        QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
+        if (layer == polygon->getLayerName()) {
             Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
             Polygon p = polygon->rotated(rot).translate(footprint.getPosition());
             p.setLineWidth(calcWidthOfLayer(p.getLineWidth(), layer));
@@ -268,8 +270,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     // draw ellipses
     for (int i = 0; i < footprint.getLibFootprint().getEllipseCount(); ++i) {
         const Ellipse* ellipse = footprint.getLibFootprint().getEllipse(i); Q_ASSERT(ellipse);
-        int layer = footprint.getIsMirrored() ? BoardLayer::getMirroredLayerId(layerId) : layerId;
-        if (layer == ellipse->getLayerId()) {
+        QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
+        if (layer == ellipse->getLayerName()) {
             Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
             Ellipse e = ellipse->rotated(rot).translate(footprint.getPosition());
             e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
@@ -289,11 +291,11 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 }
 
-void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, int layerId) const
+void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, const QString& layerName) const
 {
-    bool isOnCopperLayer = pad.isOnLayer(layerId);
-    bool isOnSolderMaskTop = pad.isOnLayer(BoardLayer::LayerID::TopCopper) && (layerId == BoardLayer::LayerID::TopStopMask);
-    bool isOnSolderMaskBottom = pad.isOnLayer(BoardLayer::LayerID::BottomCopper) && (layerId == BoardLayer::LayerID::BottomStopMask);
+    bool isOnCopperLayer = pad.isOnLayer(layerName);
+    bool isOnSolderMaskTop = pad.isOnLayer(GraphicsLayer::sTopCopper) && (layerName == GraphicsLayer::sTopStopMask);
+    bool isOnSolderMaskBottom = pad.isOnLayer(GraphicsLayer::sBotCopper) && (layerName == GraphicsLayer::sBotStopMask);
     if (!isOnCopperLayer && !isOnSolderMaskTop && !isOnSolderMaskBottom) {
         return;
     }
@@ -363,9 +365,9 @@ FilePath BoardGerberExport::getOutputFilePath(const QString& suffix) const noexc
  *  Static Methods
  ****************************************************************************************/
 
-Length BoardGerberExport::calcWidthOfLayer(const Length& width, int layerId) noexcept
+Length BoardGerberExport::calcWidthOfLayer(const Length& width, const QString& name) noexcept
 {
-    if ((layerId == BoardLayer::LayerID::BoardOutlines) && (width < Length(1000))) {
+    if ((name == GraphicsLayer::sBoardOutlines) && (width < Length(1000))) {
         return Length(1000); // outlines should have a minimum width of 1um
     } else {
         return width;

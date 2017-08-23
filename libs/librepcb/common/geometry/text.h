@@ -47,14 +47,14 @@ class Text final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Text(int layerId, const QString& text, const Point& pos,
+        explicit Text(const QString& layerName, const QString& text, const Point& pos,
                       const Angle& rotation, const Length& height,
                       const Alignment& align) noexcept;
         explicit Text(const DomElement& domElement);
         ~Text() noexcept;
 
         // Getters
-        int getLayerId() const noexcept {return mLayerId;}
+        const QString& getLayerName() const noexcept {return mLayerName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const Length& getHeight() const noexcept {return mHeight;}
@@ -62,7 +62,7 @@ class Text final : public SerializableObject
         const QString& getText() const noexcept {return mText;}
 
         // Setters
-        void setLayerId(int id) noexcept;
+        void setLayerName(const QString& layerName) noexcept;
         void setText(const QString& text) noexcept;
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rotation) noexcept;
@@ -87,7 +87,7 @@ class Text final : public SerializableObject
 
 
         // Text Attributes
-        int mLayerId;
+        QString mLayerName;
         QString mText;
         Point mPosition;
         Angle mRotation;

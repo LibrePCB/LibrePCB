@@ -44,7 +44,6 @@
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/common/boardlayer.h>
 #include "../../cmd/cmdplaceboardnetpoint.h"
 #include "../../cmd/cmdcombineboardnetpoints.h"
 #include "../../cmd/cmdcombineallitemsunderboardnetpoint.h"
@@ -64,7 +63,7 @@ BES_DrawTrace::BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
                              GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     BES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mSubState(SubState_Idle), mCurrentWireMode(WireMode_HV),
-    mCurrentLayerId(BoardLayer::LayerID::TopCopper), mCurrentWidth(500000),
+    mCurrentLayerName(GraphicsLayer::sTopCopper), mCurrentWidth(500000),
     mFixedNetPoint(nullptr), mPositioningNetLine1(nullptr), mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr), mPositioningNetPoint2(nullptr),
     // command toolbar actions / widgets:
@@ -139,14 +138,13 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept
     mLayerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     mLayerComboBox->setInsertPolicy(QComboBox::NoInsert);
     if (mEditor.getActiveBoard()) {
-        foreach (int id, mEditor.getActiveBoard()->getLayerStack().getAllBoardLayerIds()) {
-            const BoardLayer* layer = mEditor.getActiveBoard()->getLayerStack().getBoardLayer(id);
-            if (!layer->isCopperLayer()) continue;
-            mLayerComboBox->addItem(layer->getName(), layer->getId());
+        foreach (const auto& layer, mEditor.getActiveBoard()->getLayerStack().getAllLayers()) {
+            if (layer->isCopperLayer() && layer->isEnabled()) {
+                mLayerComboBox->addItem(layer->getName(), layer->getName());
+            }
         }
     }
-    mLayerComboBox->model()->sort(0);
-    mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(mCurrentLayerId));
+    mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(mCurrentLayerName));
     mEditorUi.commandToolbar->addWidget(mLayerComboBox);
     connect(mLayerComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &BES_DrawTrace::layerComboBoxIndexChanged);
@@ -348,7 +346,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
         if (fixedPoint) {
             mFixedNetPoint = fixedPoint;
         } else {
-            BoardLayer* layer = board.getLayerStack().getBoardLayer(mCurrentLayerId);
+            GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
             if (!layer) {
                 throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("No layer selected.")));
@@ -359,10 +357,10 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
         }
         Q_ASSERT(mFixedNetPoint);
         NetSignal* netsignal = &mFixedNetPoint->getNetSignal();
-        BoardLayer* layer = &mFixedNetPoint->getLayer();
+        GraphicsLayer* layer = &mFixedNetPoint->getLayer();
 
         // update the command toolbar
-        mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getId()));
+        mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getName()));
 
         // add second netpoint
         CmdBoardNetPointAdd* cmdNetPointAdd2 = new CmdBoardNetPointAdd(
@@ -502,7 +500,7 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept
 
 void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept
 {
-    mCurrentLayerId = mLayerComboBox->itemData(index).toInt();
+    mCurrentLayerName = mLayerComboBox->itemData(index).toString();
     // TODO: add a via to change the layer of the current netline?
 }
 

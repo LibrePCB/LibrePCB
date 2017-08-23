@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace library {
 class FootprintPad;
@@ -81,7 +81,7 @@ class BGI_FootprintPad final : public BGI_Base
         BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(QString name) const noexcept;
 
 
         // General Attributes
@@ -89,11 +89,11 @@ class BGI_FootprintPad final : public BGI_Base
         const library::FootprintPad& mLibPad;
 
         // Cached Attributes
-        BoardLayer* mPadLayer;
-        BoardLayer* mTopStopMaskLayer;
-        BoardLayer* mBottomStopMaskLayer;
-        BoardLayer* mTopCreamMaskLayer;
-        BoardLayer* mBottomCreamMaskLayer;
+        GraphicsLayer* mPadLayer;
+        GraphicsLayer* mTopStopMaskLayer;
+        GraphicsLayer* mBottomStopMaskLayer;
+        GraphicsLayer* mTopCreamMaskLayer;
+        GraphicsLayer* mBottomCreamMaskLayer;
         Length mStopMaskClearance;
         Length mCreamMaskClearance;
         QRectF mBoundingRect;

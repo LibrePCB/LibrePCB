@@ -17,67 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
-#define LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
+#ifndef LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#define LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class SchematicLayer;
+class IF_GraphicsLayerProvider;
 
 /*****************************************************************************************
- *  Interface IF_SchematicLayerProvider
+ *  Class GraphicsLayerStackAppearanceSettings
  ****************************************************************************************/
 
 /**
- * @brief The IF_SchematicLayerProvider class defines an interface for classes which
- *        provide schematic layers
+ * @brief The GraphicsLayerStackAppearanceSettings class
  *
  * @author ubruhin
- * @date 2015-05-31
+ * @date 2017-07-31
  */
-class IF_SchematicLayerProvider
+class GraphicsLayerStackAppearanceSettings final : public SerializableObject
 {
+        Q_DECLARE_TR_FUNCTIONS(GraphicsLayerStackAppearanceSettings)
+
     public:
 
         // Constructors / Destructor
+        GraphicsLayerStackAppearanceSettings() noexcept = delete;
+        GraphicsLayerStackAppearanceSettings(const GraphicsLayerStackAppearanceSettings& other) = delete;
+        explicit GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers) noexcept;
+        GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
+                                             const GraphicsLayerStackAppearanceSettings& other) noexcept;
+        GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
+                                             const DomElement& domElement);
+        ~GraphicsLayerStackAppearanceSettings() noexcept;
 
-        /**
-         * @brief Default Constructor
-         */
-        IF_SchematicLayerProvider() {}
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(DomElement& root) const override;
 
-        /**
-         * @brief Destructor
-         */
-        virtual ~IF_SchematicLayerProvider() {}
-
-
-        // Getters
-
-        /**
-         * @brief Get the schematic layer with a specific ID
-         *
-         * @param id                The ID of the requested schematic layer
-         *
-         * @retval SchematicLayer*  Pointer to the schematic layer with the specified ID
-         * @retval nullptr          If no layer with the specified ID is available
-         */
-        virtual SchematicLayer* getSchematicLayer(int id) const noexcept = 0;
+        // Operator Overloadings
+        GraphicsLayerStackAppearanceSettings& operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept;
 
 
-    private:
-
-        // make some methods inaccessible...
-        IF_SchematicLayerProvider(const IF_SchematicLayerProvider& other) = delete;
-        IF_SchematicLayerProvider& operator=(const IF_SchematicLayerProvider& rhs) = delete;
+    private: // Data
+        IF_GraphicsLayerProvider& mLayers;
 };
 
 /*****************************************************************************************
@@ -86,5 +76,4 @@ class IF_SchematicLayerProvider
 
 } // namespace librepcb
 
-#endif // LIBREPCB_IF_SCHEMATICLAYERPROVIDER_H
-
+#endif // LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H

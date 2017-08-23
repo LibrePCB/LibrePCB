@@ -42,7 +42,7 @@ class GridProperties;
 class GraphicsView;
 class GraphicsScene;
 class SmartXmlFile;
-class BoardLayer;
+class GraphicsLayer;
 class BoardDesignRules;
 
 namespace project {
@@ -57,6 +57,7 @@ class BI_NetPoint;
 class BI_NetLine;
 class BI_Polygon;
 class BoardLayerStack;
+class BoardUserSettings;
 
 /*****************************************************************************************
  *  Class Board
@@ -125,11 +126,11 @@ class Board final : public QObject, public IF_AttributeProvider,
                                          bool attachedLinesFromFootprints) const noexcept;
         QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
         QList<BI_Via*> getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept;
-        QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                    const NetSignal* netsignal) const noexcept;
-        QList<BI_NetLine*> getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_NetLine*> getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                  const NetSignal* netsignal) const noexcept;
-        QList<BI_FootprintPad*> getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+        QList<BI_FootprintPad*> getPadsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                   const NetSignal* netsignal) const noexcept;
         QList<BI_Base*> getAllItems() const noexcept;
 
@@ -224,6 +225,7 @@ class Board final : public QObject, public IF_AttributeProvider,
         QScopedPointer<BoardLayerStack> mLayerStack;
         QScopedPointer<GridProperties> mGridProperties;
         QScopedPointer<BoardDesignRules> mDesignRules;
+        QScopedPointer<BoardUserSettings> mUserSettings;
         QRectF mViewRect;
 
         // Attributes

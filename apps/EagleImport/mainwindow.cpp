@@ -10,8 +10,7 @@
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/library/dev/device.h>
 #include <librepcb/library/cmp/component.h>
-#include <librepcb/common/boardlayer.h>
-#include <librepcb/common/schematiclayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "polygonsimplifier.h"
 
 namespace librepcb {
@@ -107,42 +106,42 @@ QString MainWindow::createDescription(const FilePath& filepath, const QString& n
             .arg(filepath.getFilename(), name);
 }
 
-int MainWindow::convertSchematicLayerId(int eagleLayerId)
+QString MainWindow::convertSchematicLayer(int eagleLayerId)
 {
     switch (eagleLayerId)
     {
-        case 93: return SchematicLayer::LayerID::SymbolPinNames;
-        case 94: return SchematicLayer::LayerID::SymbolOutlines;
-        case 95: return SchematicLayer::LayerID::ComponentNames;
-        case 96: return SchematicLayer::LayerID::ComponentValues;
-        case 99: return SchematicLayer::LayerID::OriginCrosses; // ???
+        case 93: return GraphicsLayer::sSymbolPinNames;
+        case 94: return GraphicsLayer::sSymbolOutlines;
+        case 95: return GraphicsLayer::sSymbolNames;
+        case 96: return GraphicsLayer::sSymbolValues;
+        case 99: return GraphicsLayer::sSchematicReferences; // ???
         default: throw Exception(__FILE__, __LINE__, QString("Invalid schematic layer: %1").arg(eagleLayerId));
     }
 }
 
-int MainWindow::convertBoardLayerId(int eagleLayerId)
+QString MainWindow::convertBoardLayer(int eagleLayerId)
 {
     switch (eagleLayerId)
     {
-        case 1:  return BoardLayer::LayerID::TopCopper;
-        case 16: return BoardLayer::LayerID::BottomCopper;
-        case 20: return BoardLayer::LayerID::BoardOutlines;
-        case 21: return BoardLayer::LayerID::TopOverlay;
-        case 22: return BoardLayer::LayerID::BottomDeviceOutlines;
-        case 25: return BoardLayer::LayerID::TopOverlayNames;
-        case 27: return BoardLayer::LayerID::TopOverlayValues;
-        case 29: return BoardLayer::LayerID::TopStopMask;
-        case 31: return BoardLayer::LayerID::TopPaste;
-        case 35: return BoardLayer::LayerID::TopGlue;
-        case 39: return BoardLayer::LayerID::TopDeviceKeepout;
-        case 41: return BoardLayer::LayerID::TopCopperRestrict;
-        case 42: return BoardLayer::LayerID::BottomCopperRestrict;
-        case 43: return BoardLayer::LayerID::ViaRestrict;
-        case 46: return BoardLayer::LayerID::BoardOutlines; // milling
-        case 48: return BoardLayer::LayerID::TopDeviceOutlines; // document
-        case 49: return BoardLayer::LayerID::TopDeviceOriginCrosses; // reference
-        case 51: return BoardLayer::LayerID::TopDeviceOutlines;
-        case 52: return BoardLayer::LayerID::BottomDeviceOutlines;
+        case 1:  return GraphicsLayer::sTopCopper;
+        case 16: return GraphicsLayer::sBotCopper;
+        case 20: return GraphicsLayer::sBoardOutlines;
+        case 21: return GraphicsLayer::sTopPlacement;
+        case 22: return GraphicsLayer::sBotPlacement;
+        case 25: return GraphicsLayer::sTopNames;
+        case 27: return GraphicsLayer::sTopValues;
+        case 29: return GraphicsLayer::sTopStopMask;
+        case 31: return GraphicsLayer::sTopSolderPaste;
+        case 35: return GraphicsLayer::sTopGlue;
+        case 39: return GraphicsLayer::sTopCourtyard;
+        //case 41: return Layer::sTopCopperRestrict;
+        //case 42: return Layer::sBotCopperRestrict;
+        //case 43: return Layer::sViaRestrict;
+        case 46: return GraphicsLayer::sBoardMillingPth;
+        case 48: return GraphicsLayer::sBoardDocumentation;
+        case 49: return GraphicsLayer::sBoardDocumentation; // reference
+        case 51: return GraphicsLayer::sTopDocumentation;
+        case 52: return GraphicsLayer::sBotDocumentation;
         default: throw Exception(__FILE__, __LINE__, QString("Invalid board layer: %1").arg(eagleLayerId));
     }
 }
@@ -248,7 +247,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
         foreach (DomElement* child, node->getChilds()) {
             if (child->getName() == "wire")
             {
-                int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
                 bool fill = false;
                 bool isGrabArea = true;
                 Length lineWidth = child->getAttribute<Length>("width", true);
@@ -259,13 +258,13 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     startpos = Point(-startpos.getX(), -startpos.getY());
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
-                Polygon* polygon = Polygon::createCurve(layerId, lineWidth, fill, isGrabArea,
+                Polygon* polygon = Polygon::createCurve(layerName, lineWidth, fill, isGrabArea,
                                                         startpos, endpos, angle);
                 symbol->addPolygon(*polygon);
             }
             else if (child->getName() == "rectangle")
             {
-                int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
                 bool fill = true;
                 bool isGrabArea = true;
                 Length lineWidth(0);
@@ -274,7 +273,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Point p2(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true));
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
-                Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
                 polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
                 polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
                 polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
@@ -283,12 +282,12 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "polygon")
             {
-                int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
                 bool fill = false;
                 bool isGrabArea = true;
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
-                Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
+                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0));
                 foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
@@ -301,19 +300,19 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             }
             else if (child->getName() == "circle")
             {
-                int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
                 Length radius(child->getAttribute<Length>("radius", true));
                 Point center(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 Length lineWidth = child->getAttribute<Length>("width", true);
                 bool fill = (lineWidth == 0);
                 bool isGrabArea = true;
-                Ellipse* ellipse = new Ellipse(layerId, lineWidth, fill, isGrabArea,
+                Ellipse* ellipse = new Ellipse(layerName, lineWidth, fill, isGrabArea,
                                                center, radius, radius, Angle::deg0());
                 symbol->addEllipse(*ellipse);
             }
             else if (child->getName() == "text")
             {
-                int layerId = convertSchematicLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
                 QString textStr = child->getText<QString>(true);
                 Length height = child->getAttribute<Length>("size", true)*2;
                 if (textStr == ">NAME") {
@@ -332,7 +331,7 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
                 Alignment align(HAlign::left(), VAlign::bottom());
-                Text* text = new Text(layerId, textStr, pos, rot, height, align);
+                Text* text = new Text(layerName, textStr, pos, rot, height, align);
                 symbol->addText(*text);
             }
             else if (child->getName() == "pin")
@@ -414,7 +413,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "wire")
             {
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 bool fill = false;
                 bool isGrabArea = true;
                 Length lineWidth = child->getAttribute<Length>("width", true);
@@ -425,13 +424,13 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     startpos = Point(-startpos.getX(), -startpos.getY());
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
-                Polygon* polygon = Polygon::createCurve(layerId, lineWidth, fill, isGrabArea,
+                Polygon* polygon = Polygon::createCurve(layerName, lineWidth, fill, isGrabArea,
                                                         startpos, endpos, angle);
                 footprint->addPolygon(*polygon);
             }
             else if (child->getName() == "rectangle")
             {
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 bool fill = true;
                 bool isGrabArea = true;
                 Length lineWidth(0);
@@ -440,7 +439,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Point p2(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true));
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
-                Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, p1);
+                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
                 polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
                 polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
                 polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
@@ -449,12 +448,12 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "polygon")
             {
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 bool fill = false;
                 bool isGrabArea = true;
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
-                Polygon* polygon = new Polygon(layerId, lineWidth, fill, isGrabArea, Point(0, 0));
+                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0));
                 foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
@@ -467,19 +466,19 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             }
             else if (child->getName() == "circle")
             {
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 Length radius(child->getAttribute<Length>("radius", true));
                 Point center(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 Length lineWidth = child->getAttribute<Length>("width", true);
                 bool fill = (lineWidth == 0);
                 bool isGrabArea = true;
-                Ellipse* ellipse = new Ellipse(layerId, lineWidth, fill, isGrabArea,
+                Ellipse* ellipse = new Ellipse(layerName, lineWidth, fill, isGrabArea,
                                                center, radius, radius, Angle::deg0());
                 footprint->addEllipse(*ellipse);
             }
             else if (child->getName() == "text")
             {
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 QString textStr = child->getText<QString>(true);
                 Length height = child->getAttribute<Length>("size", true)*2;
                 if (textStr == ">NAME") {
@@ -498,7 +497,7 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
                 Alignment align(HAlign::left(), VAlign::bottom());
-                Text* text = new Text(layerId, textStr, pos, rot, height, align);
+                Text* text = new Text(layerName, textStr, pos, rot, height, align);
                 footprint->addText(*text);
             }
             else if (child->getName() == "pad")
@@ -548,13 +547,14 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 PackagePad* pkgPad = new PackagePad(padUuid, name);
                 package->addPad(*pkgPad);
                 // add footprint pad
-                int layerId = convertBoardLayerId(child->getAttribute<uint>("layer", true));
+                QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
                 FootprintPadSmt::BoardSide_t side;
-                switch (layerId)
-                {
-                    case BoardLayer::TopCopper:     side = FootprintPadSmt::BoardSide_t::TOP; break;
-                    case BoardLayer::BottomCopper:  side = FootprintPadSmt::BoardSide_t::BOTTOM; break;
-                    default: throw Exception(__FILE__, __LINE__, QString("Invalid pad layer: %1").arg(layerId));
+                if (layerName == GraphicsLayer::sTopCopper) {
+                    side = FootprintPadSmt::BoardSide_t::TOP;
+                } else if (layerName == GraphicsLayer::sBotCopper) {
+                    side = FootprintPadSmt::BoardSide_t::BOTTOM;
+                } else {
+                    throw Exception(__FILE__, __LINE__, QString("Invalid pad layer: %1").arg(layerName));
                 }
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 int angleDeg = 0;

@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -54,7 +54,7 @@ class CmdPlaceBoardNetPoint final : public UndoCommandGroup
     public:
 
         // Constructors / Destructor
-        CmdPlaceBoardNetPoint(Board& board, const Point& pos, BoardLayer& layer) noexcept;
+        CmdPlaceBoardNetPoint(Board& board, const Point& pos, GraphicsLayer& layer) noexcept;
         ~CmdPlaceBoardNetPoint() noexcept;
 
         BI_NetPoint* getNetPoint() const noexcept {return mNetPoint;}
@@ -75,7 +75,7 @@ class CmdPlaceBoardNetPoint final : public UndoCommandGroup
         Circuit& mCircuit;
         Board& mBoard;
         Point mPosition;
-        BoardLayer& mLayer;
+        GraphicsLayer& mLayer;
 
         // Member Variables
         BI_NetPoint* mNetPoint;

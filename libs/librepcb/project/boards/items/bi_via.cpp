@@ -30,7 +30,6 @@
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
@@ -113,9 +112,9 @@ BI_Via::~BI_Via() noexcept
  *  Getters
  ****************************************************************************************/
 
-bool BI_Via::isOnLayer(int layerId) const noexcept
+bool BI_Via::isOnLayer(const QString& layerName) const noexcept
 {
-    return BoardLayer::isCopperLayer(layerId);
+    return GraphicsLayer::isCopperLayer(layerName);
 }
 
 QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const noexcept
@@ -250,22 +249,22 @@ void BI_Via::removeFromBoard(GraphicsScene& scene)
 
 void BI_Via::registerNetPoint(BI_NetPoint& netpoint)
 {
-    if ((!isAddedToBoard()) || (mRegisteredNetPoints.contains(netpoint.getLayer().getId()))
+    if ((!isAddedToBoard()) || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
         || (netpoint.getBoard() != mBoard) || (&netpoint.getNetSignal() != mNetSignal))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.insert(netpoint.getLayer().getId(), &netpoint);
+    mRegisteredNetPoints.insert(netpoint.getLayer().getName(), &netpoint);
     netpoint.updateLines();
     mGraphicsItem->updateCacheAndRepaint();
 }
 
 void BI_Via::unregisterNetPoint(BI_NetPoint& netpoint)
 {
-    if ((!isAddedToBoard()) || (getNetPointOfLayer(netpoint.getLayer().getId()) != &netpoint)) {
+    if ((!isAddedToBoard()) || (getNetPointOfLayer(netpoint.getLayer().getName()) != &netpoint)) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.remove(netpoint.getLayer().getId());
+    mRegisteredNetPoints.remove(netpoint.getLayer().getName());
     netpoint.updateLines();
     mGraphicsItem->updateCacheAndRepaint();
 }

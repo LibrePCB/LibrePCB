@@ -27,9 +27,9 @@
 #include "../items/si_netline.h"
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/schematiclayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -46,7 +46,7 @@ SGI_NetLine::SGI_NetLine(SI_NetLine& netline) noexcept :
 {
     setZValue(Schematic::ZValue_NetLines);
 
-    mLayer = getSchematicLayer(SchematicLayer::Nets);
+    mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
     Q_ASSERT(mLayer);
 
     updateCacheAndRepaint();
@@ -99,7 +99,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     }
 
 #ifdef QT_DEBUG
-    SchematicLayer* layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_NetLinesNetSignalNames); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugNetLinesNetSignalNames); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw net signal name
@@ -112,7 +112,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignal().getName());
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -127,9 +127,9 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetLine::getSchematicLayer(int id) const noexcept
+GraphicsLayer* SGI_NetLine::getLayer(const QString& name) const noexcept
 {
-    return mNetLine.getSchematic().getProject().getSchematicLayer(id);
+    return mNetLine.getSchematic().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

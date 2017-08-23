@@ -27,11 +27,11 @@
 #include "../items/si_symbolpin.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
-#include <librepcb/common/schematiclayer.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/cmp/component.h>
 #include "../../settings/projectsettings.h"
@@ -124,7 +124,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     bool highlight = mPin.isSelected() || (netsignal && netsignal->isHighlighted());
 
     // draw line
-    SchematicLayer* layer = getSchematicLayer(SchematicLayer::SymbolOutlines); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sSymbolOutlines); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         painter->setPen(QPen(layer->getColor(highlight), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
@@ -132,16 +132,20 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw circle
-    layer = getSchematicLayer(SchematicLayer::SymbolPinCircles); Q_ASSERT(layer);
+    if (mPin.isRequired()) {
+        layer = getLayer(GraphicsLayer::sSymbolPinCirclesReq);
+    } else {
+        layer = getLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+    } Q_ASSERT(layer);
     if ((layer->isVisible()) && (!deviceIsPrinter) && (!netsignal))
     {
-        painter->setPen(QPen(layer->getColor(mPin.isRequired()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }
 
     // draw text or filled rect
-    layer = getSchematicLayer(SchematicLayer::SymbolPinNames); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sSymbolPinNames); Q_ASSERT(layer);
     if ((layer->isVisible()) && (!mStaticText.text().isEmpty()))
     {
         if ((deviceIsPrinter) || (lod > 1))
@@ -164,7 +168,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
 #ifdef QT_DEBUG
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_SymbolPinNetSignalNames); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames); Q_ASSERT(layer);
     if ((layer->isVisible()) && (netsignal))
     {
         // draw net signal name
@@ -180,7 +184,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
         painter->restore();
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -188,7 +192,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(mBoundingRect);
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsTextsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw text bounding rect
@@ -203,9 +207,9 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_SymbolPin::getSchematicLayer(int id) const noexcept
+GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept
 {
-    return mPin.getSymbol().getSchematic().getProject().getSchematicLayer(id);
+    return mPin.getSymbol().getSchematic().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

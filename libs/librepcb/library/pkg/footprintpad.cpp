@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/boardlayer.h>
 #include "footprintpad.h"
 #include "footprintpadsmt.h"
 #include "footprintpadtht.h"

@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -55,11 +55,11 @@ class CmdBoardNetPointAdd final : public UndoCommand
 
         // Constructors / Destructor
         explicit CmdBoardNetPointAdd(BI_NetPoint& netpoint) noexcept;
-        CmdBoardNetPointAdd(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                             const Point& position) noexcept;
-        CmdBoardNetPointAdd(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                             BI_FootprintPad& pad) noexcept;
-        CmdBoardNetPointAdd(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                             BI_Via& via) noexcept;
         ~CmdBoardNetPointAdd() noexcept;
 
@@ -84,7 +84,7 @@ class CmdBoardNetPointAdd final : public UndoCommand
         // Private Member Variables
 
         Board& mBoard;
-        BoardLayer* mLayer;
+        GraphicsLayer* mLayer;
         NetSignal* mNetSignal;
         Point mPosition;
         BI_FootprintPad* mFootprintPad;

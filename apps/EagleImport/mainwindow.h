@@ -53,8 +53,8 @@ class MainWindow : public QMainWindow
                                        const QString& cat, const QString& key1,
                                        const QString& key2 = QString());
         QString createDescription(const librepcb::FilePath& filepath, const QString& name);
-        int convertSchematicLayerId(int eagleLayerId);
-        int convertBoardLayerId(int eagleLayerId);
+        QString convertSchematicLayer(int eagleLayerId);
+        QString convertBoardLayer(int eagleLayerId);
         void convertAllFiles(ConvertFileType_t type);
         void convertFile(ConvertFileType_t type, QSettings& outputSettings,
                          const librepcb::FilePath& filepath);

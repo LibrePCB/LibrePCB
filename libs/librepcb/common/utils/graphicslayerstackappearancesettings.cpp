@@ -21,99 +21,77 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
-#include "bgi_netpoint.h"
-#include "../items/bi_netpoint.h"
-#include "../board.h"
-#include "../../project.h"
-#include "../boardlayerstack.h"
-#include "../../circuit/netsignal.h"
+#include "graphicslayerstackappearancesettings.h"
+#include "../graphics/graphicslayer.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept :
-    BGI_Base(), mNetPoint(netpoint)
-{
-    updateCacheAndRepaint();
-}
-
-BGI_NetPoint::~BGI_NetPoint() noexcept
+GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
+        IF_GraphicsLayerProvider& layers) noexcept :
+    mLayers(layers)
 {
 }
 
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool BGI_NetPoint::isSelectable() const noexcept
+GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
+        IF_GraphicsLayerProvider& layers, const GraphicsLayerStackAppearanceSettings& other) noexcept :
+    mLayers(layers)
 {
-    return mNetPoint.getLayer().isVisible();
+    *this = other;
+}
+
+GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
+        IF_GraphicsLayerProvider& layers, const DomElement& domElement) :
+    mLayers(layers)
+{
+    for (const DomElement* child : domElement.getChilds()) { Q_ASSERT(child);
+        QString name = child->getAttribute<QString>("name", true);
+        if (GraphicsLayer* layer = mLayers.getLayer(name)) {
+            layer->setColor(child->getAttribute<QColor>("color", true));
+            layer->setColorHighlighted(child->getAttribute<QColor>("color_hl", true));
+            layer->setVisible(child->getAttribute<bool>("visible", true));
+        }
+    }
+}
+
+GraphicsLayerStackAppearanceSettings::~GraphicsLayerStackAppearanceSettings() noexcept
+{
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
-void BGI_NetPoint::updateCacheAndRepaint() noexcept
+void GraphicsLayerStackAppearanceSettings::serialize(DomElement& root) const
 {
-    prepareGeometryChange();
-
-    // set Z value
-    setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
-
-    qreal radius = mNetPoint.getMaxLineWidth().toPx() / 2;
-    mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
-
-    update();
-}
-
-/*****************************************************************************************
- *  Inherited from QGraphicsItem
- ****************************************************************************************/
-
-void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
-
-#ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(boundingRect());
+    for (const GraphicsLayer* layer : mLayers.getAllLayers()) { Q_ASSERT(layer);
+        DomElement* child = root.appendChild("layer");
+        child->setAttribute("name",     layer->getName());
+        child->setAttribute("color",    layer->getColor(false));
+        child->setAttribute("color_hl", layer->getColor(true));
+        child->setAttribute("visible",  layer->getVisible());
     }
-#else
-    Q_UNUSED(highlight);
-    Q_UNUSED(painter);
-#endif
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Operator Overloadings
  ****************************************************************************************/
 
-GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept
+GraphicsLayerStackAppearanceSettings& GraphicsLayerStackAppearanceSettings::operator=(
+        const GraphicsLayerStackAppearanceSettings& rhs) noexcept
 {
-    return mNetPoint.getBoard().getLayerStack().getLayer(name);
+    Q_UNUSED(rhs); // actually there is nothing to copy here...
+    return *this;
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb

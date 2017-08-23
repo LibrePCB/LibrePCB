@@ -37,7 +37,7 @@ class QGraphicsItem;
 
 namespace librepcb {
 
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -69,17 +69,17 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
                     BI_Via* via);
         BI_NetPoint(Board& board, const DomElement& domElement);
-        BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                     const Point& position);
-        BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                     BI_FootprintPad& pad);
-        BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                     BI_Via& via);
         ~BI_NetPoint() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        BoardLayer& getLayer() const noexcept {return *mLayer;}
+        GraphicsLayer& getLayer() const noexcept {return *mLayer;}
         bool isAttachedToPad() const noexcept {return (mFootprintPad ? true : false);}
         bool isAttachedToVia() const noexcept {return (mVia ? true : false);}
         bool isAttached() const noexcept {return (isAttachedToPad() || isAttachedToVia());}
@@ -93,7 +93,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
 
         // Setters
 
-        void setLayer(BoardLayer& layer);
+        void setLayer(GraphicsLayer& layer);
         void setNetSignal(NetSignal& netsignal);
         void setPadToAttach(BI_FootprintPad* pad);
         void setViaToAttach(BI_Via* via);
@@ -137,7 +137,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         // Attributes
         Uuid mUuid;
         Point mPosition;
-        BoardLayer* mLayer;
+        GraphicsLayer* mLayer;
         NetSignal* mNetSignal;
         BI_FootprintPad* mFootprintPad; ///< only needed if the netpoint is attached to a pad
         BI_Via* mVia;                   ///< only needed if the netpoint is attached to a via

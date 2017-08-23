@@ -32,19 +32,18 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Text::Text(int layerId, const QString& text, const Point& pos, const Angle& rotation,
+Text::Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
            const Length& height, const Alignment& align) noexcept :
-    mLayerId(layerId), mText(text), mPosition(pos), mRotation(rotation), mHeight(height),
+    mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation), mHeight(height),
     mAlign(align)
 {
-    Q_ASSERT(layerId >= 0);
     Q_ASSERT(!text.isEmpty());
     Q_ASSERT(height > 0);
 }
 
 Text::Text(const DomElement& domElement)
 {
-    mLayerId = domElement.getAttribute<uint>("layer", true); // use "uint" to automatically check for >= 0
+    mLayerName = domElement.getAttribute<QString>("layer", true);
     mText = domElement.getText<QString>(true); // empty string --> exception
 
     // load geometry attributes
@@ -73,10 +72,9 @@ Text::~Text() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Text::setLayerId(int id) noexcept
+void Text::setLayerName(const QString& layerName) noexcept
 {
-    Q_ASSERT(id >= 0);
-    mLayerId = id;
+    mLayerName = layerName;
 }
 
 void Text::setText(const QString& text) noexcept
@@ -114,7 +112,7 @@ void Text::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerId);
+    root.setAttribute("layer", mLayerName);
     root.setAttribute("x", mPosition.getX());
     root.setAttribute("y", mPosition.getY());
     root.setAttribute("rotation", mRotation);

@@ -37,7 +37,7 @@
 #include <librepcb/library/cmp/component.h>
 #include "bi_netpoint.h"
 #include "../../circuit/componentsignalinstance.h"
-#include <librepcb/common/boardlayer.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "../../circuit/netsignal.h"
 #include <librepcb/library/pkg/package.h>
 
@@ -101,20 +101,20 @@ QString BI_FootprintPad::getDisplayText() const noexcept
     }
 }
 
-int BI_FootprintPad::getLayerId() const noexcept
+QString BI_FootprintPad::getLayerName() const noexcept
 {
     if (getIsMirrored())
-        return BoardLayer::getMirroredLayerId(mFootprintPad->getLayerId());
+        return GraphicsLayer::getMirroredLayerName(mFootprintPad->getLayerName());
     else
-        return mFootprintPad->getLayerId();
+        return mFootprintPad->getLayerName();
 }
 
-bool BI_FootprintPad::isOnLayer(int layerId) const noexcept
+bool BI_FootprintPad::isOnLayer(const QString& layerName) const noexcept
 {
     if (getIsMirrored()) {
-        return mFootprintPad->isOnLayer(BoardLayer::getMirroredLayerId(layerId));
+        return mFootprintPad->isOnLayer(GraphicsLayer::getMirroredLayerName(layerName));
     } else {
-        return mFootprintPad->isOnLayer(layerId);
+        return mFootprintPad->isOnLayer(layerName);
     }
 }
 
@@ -164,27 +164,27 @@ void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
         || (netpoint.getBoard() != mBoard)
-        || (mRegisteredNetPoints.contains(netpoint.getLayer().getId()))
+        || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
         || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal())
         || (!netpoint.getLayer().isCopperLayer())
         || ((mFootprintPad->getTechnology() == library::FootprintPad::Technology_t::SMT)
-            && (netpoint.getLayer().getId() != getLayerId())))
+            && (netpoint.getLayer().getName() != getLayerName())))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.insert(netpoint.getLayer().getId(), &netpoint);
+    mRegisteredNetPoints.insert(netpoint.getLayer().getName(), &netpoint);
     netpoint.updateLines();
 }
 
 void BI_FootprintPad::unregisterNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
-        || (getNetPointOfLayer(netpoint.getLayer().getId()) != &netpoint)
+        || (getNetPointOfLayer(netpoint.getLayer().getName()) != &netpoint)
         || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.remove(netpoint.getLayer().getId());
+    mRegisteredNetPoints.remove(netpoint.getLayer().getName());
     netpoint.updateLines();
 }
 

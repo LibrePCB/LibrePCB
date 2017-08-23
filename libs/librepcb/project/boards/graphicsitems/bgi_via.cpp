@@ -29,7 +29,6 @@
 #include "../../project.h"
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/common/boarddesignrules.h>
 
 /*****************************************************************************************
@@ -79,9 +78,9 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 
     setToolTip(mVia.getNetSignal() ? mVia.getNetSignal()->getName() : QString());
 
-    mViaLayer = getBoardLayer(BoardLayer::Vias);
-    mTopStopMaskLayer = getBoardLayer(BoardLayer::TopStopMask);
-    mBottomStopMaskLayer = getBoardLayer(BoardLayer::BottomStopMask);
+    mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
+    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
+    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
 
     // determine stop mask clearance
     mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(mVia.getDrillDiameter());
@@ -138,7 +137,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     }
 
 #ifdef QT_DEBUG
-    BoardLayer* layer = getBoardLayer(BoardLayer::LayerID::DEBUG_GraphicsItemsBoundingRects); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible()) {
         // draw bounding rect
         painter->setPen(QPen(layer->getColor(highlight), 0));
@@ -152,9 +151,9 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
  *  Private Methods
  ****************************************************************************************/
 
-BoardLayer* BGI_Via::getBoardLayer(int id) const noexcept
+GraphicsLayer* BGI_Via::getLayer(const QString& name) const noexcept
 {
-    return mVia.getBoard().getLayerStack().getBoardLayer(id);
+    return mVia.getBoard().getLayerStack().getLayer(name);
 }
 
 /*****************************************************************************************

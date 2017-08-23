@@ -27,7 +27,6 @@
 #include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
-#include <librepcb/common/boardlayer.h>
 #include "../project.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
@@ -44,6 +43,7 @@
 #include <librepcb/library/cmp/component.h>
 #include "items/bi_polygon.h"
 #include "boardlayerstack.h"
+#include "boardusersettings.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -78,6 +78,9 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
 
         // copy design rules
         mDesignRules.reset(new BoardDesignRules(*other.mDesignRules));
+
+        // copy user settings
+        mUserSettings.reset(new BoardUserSettings(*this, *other.mUserSettings));
 
         // copy device instances
         QHash<const BI_Device*, BI_Device*> copiedDeviceInstances;
@@ -151,6 +154,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
         qDeleteAll(mNetPoints);         mNetPoints.clear();
         qDeleteAll(mVias);              mVias.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mUserSettings.reset();
         mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
@@ -185,6 +189,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // load default design rules
             mDesignRules.reset(new BoardDesignRules());
+
+            // load default user settings
+            mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
         }
         else
         {
@@ -205,6 +212,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // load design rules
             mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("design_rules", true)));
+
+            // load user settings
+            mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
 
             // Load all device instances
             foreach (const DomElement* node, root.getChilds("device")) {
@@ -277,6 +287,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         qDeleteAll(mNetPoints);         mNetPoints.clear();
         qDeleteAll(mVias);              mVias.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
+        mUserSettings.reset();
         mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
@@ -299,6 +310,7 @@ Board::~Board() noexcept
     qDeleteAll(mVias);              mVias.clear();
     qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
 
+    mUserSettings.reset();
     mDesignRules.reset();
     mGridProperties.reset();
     mLayerStack.reset();
@@ -486,7 +498,7 @@ QList<BI_Via*> Board::getViasAtScenePos(const Point& pos, const NetSignal* netsi
     return list;
 }
 
-QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                   const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetPoint*> list;
@@ -502,7 +514,7 @@ QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const BoardL
     return list;
 }
 
-QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                 const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetLine*> list;
@@ -518,7 +530,7 @@ QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const BoardLay
     return list;
 }
 
-QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLayer* layer,
+QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                                                  const NetSignal* netsignal) const noexcept
 {
     QList<BI_FootprintPad*> list;
@@ -527,7 +539,7 @@ QList<BI_FootprintPad*> Board::getPadsAtScenePos(const Point& pos, const BoardLa
         foreach (BI_FootprintPad* pad, device->getFootprint().getPads())
         {
             if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(pos.toPxQPointF())
-                && ((!layer) || (pad->isOnLayer(layer->getId())))
+                && ((!layer) || (pad->isOnLayer(layer->getName())))
                 && ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal)))
             {
                 list.append(pad);
@@ -805,6 +817,11 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
     {
         success = false;
         errors.append(e.getMsg());
+    }
+
+    // save user settings
+    if (!mUserSettings->save(toOriginal, errors)) {
+        success = false;
     }
 
     return success;

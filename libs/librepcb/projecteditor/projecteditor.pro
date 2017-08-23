@@ -23,6 +23,7 @@ INCLUDEPATH += \
 SOURCES += \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
+    boardeditor/boardlayerstacksetupdialog.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
     boardeditor/fabricationoutputdialog.cpp \
     boardeditor/fsm/bes_adddevice.cpp \
@@ -80,6 +81,7 @@ SOURCES += \
 HEADERS += \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
+    boardeditor/boardlayerstacksetupdialog.h \
     boardeditor/boardviapropertiesdialog.h \
     boardeditor/fabricationoutputdialog.h \
     boardeditor/fsm/bes_adddevice.h \
@@ -137,6 +139,7 @@ HEADERS += \
 FORMS += \
     boardeditor/boardeditor.ui \
     boardeditor/boardlayersdock.ui \
+    boardeditor/boardlayerstacksetupdialog.ui \
     boardeditor/boardviapropertiesdialog.ui \
     boardeditor/fabricationoutputdialog.ui \
     boardeditor/unplacedcomponentsdock.ui \

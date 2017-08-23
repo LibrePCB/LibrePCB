@@ -120,6 +120,7 @@
     <property name="title">
      <string>Board</string>
     </property>
+    <addaction name="actionLayerStackSetup"/>
     <addaction name="actionModifyDesignRules"/>
     <addaction name="separator"/>
     <addaction name="actionNewBoard"/>
@@ -602,6 +603,11 @@
   <action name="actionModifyDesignRules">
    <property name="text">
     <string>Design Rules</string>
+   </property>
+  </action>
+  <action name="actionLayerStackSetup">
+   <property name="text">
+    <string>Layer Stack Setup</string>
    </property>
   </action>
  </widget>

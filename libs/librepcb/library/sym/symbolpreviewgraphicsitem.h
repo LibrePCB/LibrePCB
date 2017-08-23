@@ -35,8 +35,8 @@
 namespace librepcb {
 
 class Text;
-class SchematicLayer;
-class IF_SchematicLayerProvider;
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 
 namespace library {
 
@@ -59,7 +59,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
     public:
 
         // Constructors / Destructor
-        explicit SymbolPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
+        explicit SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
                                            const QStringList& localeOrder,
                                            const Symbol& symbol,
                                            const Component* cmp = nullptr,
@@ -110,7 +110,7 @@ class SymbolPreviewGraphicsItem final : public GraphicsItem, public IF_Attribute
 
 
         // General Attributes
-        const IF_SchematicLayerProvider& mLayerProvider;
+        const IF_GraphicsLayerProvider& mLayerProvider;
         const Symbol& mSymbol;
         const Component* mComponent;
         const ComponentSymbolVariantItem* mSymbVarItem;

@@ -33,7 +33,7 @@
 namespace librepcb {
 
 class Polygon;
-class BoardLayer;
+class GraphicsLayer;
 
 namespace project {
 
@@ -77,14 +77,14 @@ class BGI_Polygon final : public BGI_Base
         BGI_Polygon& operator=(const BGI_Polygon& rhs) = delete;
 
         // Private Methods
-        BoardLayer* getBoardLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(QString name) const noexcept;
 
         // General Attributes
         BI_Polygon& mBiPolygon;
         const Polygon& mPolygon;
 
         // Cached Attributes
-        BoardLayer* mLayer;
+        GraphicsLayer* mLayer;
         QRectF mBoundingRect;
         QPainterPath mShape;
 };

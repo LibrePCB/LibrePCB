@@ -35,7 +35,6 @@
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
 #include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/boardlayer.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/common/scopeguardlist.h>
 
@@ -54,7 +53,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(other.mPosition),
     mLayer(nullptr), mNetSignal(other.mNetSignal), mFootprintPad(pad), mVia(via)
 {
-    mLayer = mBoard.getLayerStack().getBoardLayer(other.getLayer().getId());
+    mLayer = mBoard.getLayerStack().getLayer(other.getLayer().getName());
 
     if (((other.getFootprintPad() == nullptr) != (mFootprintPad == nullptr))
         || ((other.getVia() == nullptr) != (mVia == nullptr)) || (!mLayer))
@@ -72,12 +71,12 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) :
     // read attributes
     mUuid = domElement.getAttribute<Uuid>("uuid", true);
 
-    int layerId = domElement.getAttribute<uint>("layer", true);
-    mLayer = mBoard.getLayerStack().getBoardLayer(layerId);
+    QString layerName = domElement.getAttribute<QString>("layer", true);
+    mLayer = mBoard.getLayerStack().getLayer(layerName);
     if (!mLayer) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid board layer ID: \"%1\""))
-            .arg(layerId));
+            QString(tr("Invalid board layer: \"%1\""))
+            .arg(layerName));
     }
 
     Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
@@ -121,7 +120,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) :
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                          const Point& position) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(position), mLayer(&layer),
     mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(nullptr)
@@ -129,7 +128,7 @@ BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                          BI_FootprintPad& pad) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(pad.getPosition()),
     mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(&pad), mVia(nullptr)
@@ -137,7 +136,7 @@ BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, BoardLayer& layer, NetSignal& netsignal,
+BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
                          BI_Via& via) :
     BI_Base(board), mUuid(Uuid::createRandom()), mPosition(via.getPosition()),
     mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(&via)
@@ -151,14 +150,14 @@ void BI_NetPoint::init()
     if (!mLayer->isCopperLayer()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
-            .arg(mUuid.toStr()).arg(mLayer->getId()));
+            .arg(mUuid.toStr()).arg(mLayer->getName()));
     }
     if (mFootprintPad) {
         if (mFootprintPad->getLibPad().getTechnology() == library::FootprintPad::Technology_t::SMT) {
-            if (mLayer->getId() != mFootprintPad->getLayerId()) {
+            if (mLayer->getName() != mFootprintPad->getLayerName()) {
                 throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
-                    .arg(mUuid.toStr()).arg(mLayer->getId()));
+                    .arg(mUuid.toStr()).arg(mLayer->getName()));
             }
         }
     }
@@ -200,7 +199,7 @@ Length BI_NetPoint::getMaxLineWidth() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void BI_NetPoint::setLayer(BoardLayer& layer)
+void BI_NetPoint::setLayer(GraphicsLayer& layer)
 {
     if (&layer != mLayer) {
         if (isUsed() || isAttached() || (!layer.isCopperLayer())) {
@@ -396,7 +395,7 @@ void BI_NetPoint::serialize(DomElement& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.setAttribute("uuid", mUuid);
-    root.setAttribute("layer", mLayer->getId());
+    root.setAttribute("layer", mLayer->getName());
     root.setAttribute("netsignal", mNetSignal->getUuid());
     if (isAttachedToPad()) {
         root.setAttribute("attached_to", QString("pad"));

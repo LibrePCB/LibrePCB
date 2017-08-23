@@ -75,10 +75,10 @@ class BI_Via final : public BI_Base, public SerializableObject
         const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
         const Length& getSize() const noexcept {return mSize;}
         NetSignal* getNetSignal() const noexcept {return mNetSignal;}
-        const QMap<int, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
-        BI_NetPoint* getNetPointOfLayer(int layerId) const noexcept {return mRegisteredNetPoints.value(layerId, nullptr);}
+        const QMap<QString, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
+        BI_NetPoint* getNetPointOfLayer(const QString& layerName) const noexcept {return mRegisteredNetPoints.value(layerName, nullptr);}
         bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
-        bool isOnLayer(int layerId) const noexcept;
+        bool isOnLayer(const QString& layerName) const noexcept;
         QPainterPath toQPainterPathPx(const Length& clearance, bool hole) const noexcept;
         bool isSelectable() const noexcept override;
 
@@ -133,7 +133,7 @@ class BI_Via final : public BI_Base, public SerializableObject
         NetSignal* mNetSignal;
 
         // Registered Elements
-        QMap<int, BI_NetPoint*> mRegisteredNetPoints;   ///< key: layer ID
+        QMap<QString, BI_NetPoint*> mRegisteredNetPoints;   ///< key: layer name
 };
 
 /*****************************************************************************************

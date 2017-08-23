@@ -33,7 +33,7 @@
 namespace librepcb {
 
 class Text;
-class SchematicLayer;
+class GraphicsLayer;
 
 namespace library {
 class Symbol;
@@ -79,7 +79,7 @@ class SGI_Symbol final : public SGI_Base
         SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
         // Private Methods
-        SchematicLayer* getSchematicLayer(int id) const noexcept;
+        GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 
         // Types

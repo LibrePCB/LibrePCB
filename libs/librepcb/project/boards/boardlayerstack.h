@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/if_boardlayerprovider.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
 
@@ -44,7 +44,7 @@ class Board;
  * @brief The BoardLayerStack class provides and manages all available layers of a board
  */
 class BoardLayerStack final : public QObject, public SerializableObject,
-                              public IF_BoardLayerProvider
+                              public IF_GraphicsLayerProvider
 {
         Q_OBJECT
 
@@ -60,12 +60,23 @@ class BoardLayerStack final : public QObject, public SerializableObject,
 
         // Getters
         Board& getBoard() const noexcept {return mBoard;}
+        int getInnerLayerCount() const noexcept {return mInnerLayerCount;}
 
         /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
-        QList<int> getAllBoardLayerIds() const noexcept override {return mLayers.keys();}
+        QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}
 
-        /// @copydoc IF_BoardLayerProvider#getBoardLayer()
-        BoardLayer* getBoardLayer(int id) const noexcept override {return mLayers.value(id, nullptr);}
+        /// @copydoc IF_BoardLayerProvider#getLayer()
+        GraphicsLayer* getLayer(const QString& name) const noexcept override {
+            foreach (GraphicsLayer* layer, mLayers) {
+                if (layer->getName() == name) {
+                    return layer;
+                }
+            }
+            return nullptr;
+        }
+
+        // Setters
+        void setInnerLayerCount(int count) noexcept;
 
         // General Methods
 
@@ -77,22 +88,23 @@ class BoardLayerStack final : public QObject, public SerializableObject,
 
 
     private slots:
-
         void layerAttributesChanged() noexcept;
         void boardAttributesChanged() noexcept;
 
 
     private:
-
-        void addAllRequiredLayers() noexcept;
-        void addLayer(int id) noexcept;
-        void addLayer(BoardLayer& layer) noexcept;
+        void addAllLayers() noexcept;
+        void addLayer(const QString& name) noexcept;
+        void addLayer(GraphicsLayer* layer) noexcept;
 
 
         // General
         Board& mBoard; ///< A reference to the Board object (from the ctor)
-        QMap<int, BoardLayer*> mLayers;
+        QList<GraphicsLayer*> mLayers;
         bool mLayersChanged;
+
+        // Settings
+        int mInnerLayerCount;
 };
 
 /*****************************************************************************************

@@ -67,8 +67,8 @@ class FootprintPad : public SerializableObject
         const Angle& getRotation() const noexcept {return mRotation;}
         const Length& getWidth() const noexcept {return mWidth;}
         const Length& getHeight() const noexcept {return mHeight;}
-        virtual int getLayerId() const noexcept = 0;
-        virtual bool isOnLayer(int id) const noexcept = 0;
+        virtual QString getLayerName() const noexcept = 0;
+        virtual bool isOnLayer(const QString& layerName) const noexcept = 0;
         QRectF getBoundingRectPx() const noexcept;
         virtual const QPainterPath& toQPainterPathPx() const noexcept = 0;
         virtual QPainterPath toMaskQPainterPathPx(const Length& clearance) const noexcept = 0;

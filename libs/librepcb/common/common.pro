@@ -39,7 +39,6 @@ SOURCES += \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
     boarddesignrules.cpp \
-    boardlayer.cpp \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
     cam/gerbergenerator.cpp \
@@ -61,6 +60,7 @@ SOURCES += \
     geometry/polygon.cpp \
     geometry/text.cpp \
     graphics/graphicsitem.cpp \
+    graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
     gridproperties.cpp \
@@ -70,7 +70,6 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/repository.cpp \
-    schematiclayer.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
     undocommand.cpp \
@@ -81,6 +80,7 @@ SOURCES += \
     units/lengthunit.cpp \
     units/point.cpp \
     units/ratio.cpp \
+    utils/graphicslayerstackappearancesettings.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
@@ -101,7 +101,6 @@ HEADERS += \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \
     boarddesignrules.h \
-    boardlayer.h \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
     cam/gerbergenerator.h \
@@ -129,19 +128,17 @@ HEADERS += \
     geometry/polygon.h \
     geometry/text.h \
     graphics/graphicsitem.h \
+    graphics/graphicslayer.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
     graphics/if_graphicsvieweventhandler.h \
     gridproperties.h \
     if_attributeprovider.h \
-    if_boardlayerprovider.h \
-    if_schematiclayerprovider.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
     network/networkrequest.h \
     network/networkrequestbase.h \
     network/repository.h \
-    schematiclayer.h \
     scopeguard.h \
     scopeguardlist.h \
     sqlitedatabase.h \
@@ -155,6 +152,7 @@ HEADERS += \
     units/lengthunit.h \
     units/point.h \
     units/ratio.h \
+    utils/graphicslayerstackappearancesettings.h \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \

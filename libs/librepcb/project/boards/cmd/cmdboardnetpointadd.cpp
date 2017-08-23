@@ -42,7 +42,7 @@ CmdBoardNetPointAdd::CmdBoardNetPointAdd(BI_NetPoint& netpoint) noexcept :
 {
 }
 
-CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, BoardLayer& layer,
+CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer,
                                          NetSignal& netsignal, const Point& position) noexcept :
     UndoCommand(tr("Add netpoint")),
     mBoard(board), mLayer(&layer), mNetSignal(&netsignal), mPosition(position),
@@ -50,7 +50,7 @@ CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, BoardLayer& layer,
 {
 }
 
-CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, BoardLayer& layer,
+CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer,
                                          NetSignal& netsignal, BI_FootprintPad& pad) noexcept :
     UndoCommand(tr("Add netpoint")),
     mBoard(board), mLayer(&layer), mNetSignal(&netsignal), mPosition(),
@@ -58,7 +58,7 @@ CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, BoardLayer& layer,
 {
 }
 
-CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, BoardLayer& layer,
+CmdBoardNetPointAdd::CmdBoardNetPointAdd(Board& board, GraphicsLayer& layer,
                                          NetSignal& netsignal, BI_Via& via) noexcept :
     UndoCommand(tr("Add netpoint")),
     mBoard(board), mLayer(&layer), mNetSignal(&netsignal), mPosition(),

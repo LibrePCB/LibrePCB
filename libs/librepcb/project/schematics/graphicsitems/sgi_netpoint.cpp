@@ -26,9 +26,9 @@
 #include "sgi_netpoint.h"
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/schematiclayer.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -47,7 +47,7 @@ SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept :
 {
     setZValue(Schematic::ZValue_VisibleNetPoints);
 
-    mLayer = getSchematicLayer(SchematicLayer::Nets);
+    mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
     Q_ASSERT(mLayer);
 
     if (sBoundingRect.isNull())
@@ -100,7 +100,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
 #ifdef QT_DEBUG
-    SchematicLayer* layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_InvisibleNetPoints); Q_ASSERT(layer);
+    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugInvisibleNetPoints); Q_ASSERT(layer);
     if ((layer->isVisible()) && (!mIsVisibleJunction))
     {
         // draw circle
@@ -108,7 +108,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(sBoundingRect);
     }
-    layer = getSchematicLayer(SchematicLayer::LayerID::DEBUG_GraphicsItemsBoundingRect); Q_ASSERT(layer);
+    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())
     {
         // draw bounding rect
@@ -123,9 +123,9 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
  *  Private Methods
  ****************************************************************************************/
 
-SchematicLayer* SGI_NetPoint::getSchematicLayer(int id) const noexcept
+GraphicsLayer* SGI_NetPoint::getLayer(const QString& name) const noexcept
 {
-    return mNetPoint.getSchematic().getProject().getSchematicLayer(id);
+    return mNetPoint.getSchematic().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

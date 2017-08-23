@@ -58,7 +58,7 @@ CmdBoardNetPointEdit::~CmdBoardNetPointEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdBoardNetPointEdit::setLayer(BoardLayer& layer) noexcept
+void CmdBoardNetPointEdit::setLayer(GraphicsLayer& layer) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayer = &layer;
