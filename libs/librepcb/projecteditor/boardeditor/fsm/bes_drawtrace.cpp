@@ -103,10 +103,6 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept
     // clear board selection because selection does not make sense in this state
     if (mEditor.getActiveBoard()) mEditor.getActiveBoard()->clearSelection();
 
-    // Check this state in the "tools" toolbar
-    mEditorUi.actionToolDrawTrace->setCheckable(true);
-    mEditorUi.actionToolDrawTrace->setChecked(true);
-
     // Add wire mode actions to the "command" toolbar
     mWireModeActions.insert(WireMode_HV, mEditorUi.commandToolbar->addAction(
                             QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
@@ -194,10 +190,6 @@ bool BES_DrawTrace::exit(BEE_Base* event) noexcept
     delete mLayerLabel;             mLayerLabel = nullptr;
     qDeleteAll(mWireModeActions);   mWireModeActions.clear();
     qDeleteAll(mActionSeparators);  mActionSeparators.clear();
-
-    // Uncheck this state in the "tools" toolbar
-    mEditorUi.actionToolDrawTrace->setCheckable(false);
-    mEditorUi.actionToolDrawTrace->setChecked(false);
 
     // change the cursor
     mEditorGraphicsView.setCursor(Qt::ArrowCursor);

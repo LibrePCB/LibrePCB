@@ -86,16 +86,12 @@ BES_Base::ProcRetVal BES_Select::process(BEE_Base* event) noexcept
 bool BES_Select::entry(BEE_Base* event) noexcept
 {
     Q_UNUSED(event);
-    mEditorUi.actionToolSelect->setCheckable(true);
-    mEditorUi.actionToolSelect->setChecked(true);
     return true;
 }
 
 bool BES_Select::exit(BEE_Base* event) noexcept
 {
     Q_UNUSED(event);
-    mEditorUi.actionToolSelect->setCheckable(false);
-    mEditorUi.actionToolSelect->setChecked(false);
     return true;
 }
 

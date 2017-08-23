@@ -29,6 +29,7 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
+#include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
@@ -123,17 +124,17 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     // build the whole board editor finite state machine with all its substate objects
     mFsm = new BES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
 
-    // connect the "tools" toolbar with the state machine (the second line of the lambda
-    // functions is a workaround to set the checked attribute of the QActions properly)
-    connect(mUi->actionToolSelect, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartSelect), true);
-                     mUi->actionToolSelect->setChecked(mUi->actionToolSelect->isCheckable());});
-    connect(mUi->actionToolDrawTrace, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawTrace), true);
-                     mUi->actionToolDrawTrace->setChecked(mUi->actionToolDrawTrace->isCheckable());});
-    connect(mUi->actionToolAddVia, &QAction::triggered,
-            [this](){mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);
-                     mUi->actionToolAddVia->setChecked(mUi->actionToolAddVia->isCheckable());});
+    // connect the "tools" toolbar with the state machine
+    mToolsActionGroup.reset(new ExclusiveActionGroup());
+    mToolsActionGroup->addAction(BES_FSM::State::State_Select, mUi->actionToolSelect);
+    mToolsActionGroup->addAction(BES_FSM::State::State_DrawTrace, mUi->actionToolDrawTrace);
+    mToolsActionGroup->addAction(BES_FSM::State::State_AddVia, mUi->actionToolAddVia);
+    mToolsActionGroup->addAction(BES_FSM::State::State_AddDevice, mUi->actionToolAddDevice);
+    mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
+    connect(mFsm, &BES_FSM::stateChanged,
+            mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
+    connect(mToolsActionGroup.data(), &ExclusiveActionGroup::changeRequestTriggered,
+            this, &BoardEditor::toolActionGroupChangeTriggered);
 
     // connect the "command" toolbar with the state machine
     connect(mUi->actionCommandAbort, &QAction::triggered,
@@ -458,6 +459,22 @@ bool BoardEditor::graphicsViewEventHandler(QEvent* event)
 {
     BEE_RedirectedQEvent* e = new BEE_RedirectedQEvent(BEE_Base::GraphicsViewEvent, event);
     return mFsm->processEvent(e, true);
+}
+
+void BoardEditor::toolActionGroupChangeTriggered(const QVariant& newTool) noexcept
+{
+    switch (newTool.toInt()) {
+        case BES_FSM::State::State_Select:
+            mFsm->processEvent(new BEE_Base(BEE_Base::StartSelect), true);
+            break;
+        case BES_FSM::State::State_DrawTrace:
+            mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawTrace), true);
+            break;
+        case BES_FSM::State::State_AddVia:
+            mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);
+            break;
+        default: Q_ASSERT(false); qCritical() << "Unknown tool triggered!"; break;
+    }
 }
 
 /*****************************************************************************************

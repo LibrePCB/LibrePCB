@@ -84,16 +84,12 @@ SES_Base::ProcRetVal SES_Select::process(SEE_Base* event) noexcept
 bool SES_Select::entry(SEE_Base* event) noexcept
 {
     Q_UNUSED(event);
-    mEditorUi.actionToolSelect->setCheckable(true);
-    mEditorUi.actionToolSelect->setChecked(true);
     return true;
 }
 
 bool SES_Select::exit(SEE_Base* event) noexcept
 {
     Q_UNUSED(event);
-    mEditorUi.actionToolSelect->setCheckable(false);
-    mEditorUi.actionToolSelect->setChecked(false);
     return true;
 }
 

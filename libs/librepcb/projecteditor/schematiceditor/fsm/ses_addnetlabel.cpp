@@ -76,12 +76,7 @@ bool SES_AddNetLabel::entry(SEE_Base* event) noexcept
     Q_UNUSED(event);
     Schematic* schematic = mEditor.getActiveSchematic();
     if (!schematic) return false;
-
     if (!addLabel(*schematic)) return false;
-
-    // Check this state in the "tools" toolbar
-    mEditorUi.actionToolAddNetLabel->setCheckable(true);
-    mEditorUi.actionToolAddNetLabel->setChecked(true);
     return true;
 }
 
@@ -102,10 +97,6 @@ bool SES_AddNetLabel::exit(SEE_Base* event) noexcept
             return false;
         }
     }
-
-    // Uncheck this state in the "tools" toolbar
-    mEditorUi.actionToolAddNetLabel->setCheckable(false);
-    mEditorUi.actionToolAddNetLabel->setChecked(false);
     return true;
 }
 

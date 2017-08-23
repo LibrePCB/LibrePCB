@@ -121,10 +121,6 @@ bool BES_AddDevice::entry(BEE_Base* event) noexcept
         return false;
     }
 
-    // Check this state in the "tools" toolbar
-    mEditorUi.actionToolAddDevice->setCheckable(true);
-    mEditorUi.actionToolAddDevice->setChecked(true);
-
     return true;
 }
 
@@ -135,10 +131,6 @@ bool BES_AddDevice::exit(BEE_Base* event) noexcept
     // abort adding the device
     if (!abortCommand(true)) return false;
     Q_ASSERT(mIsUndoCmdActive == false);
-
-    // Uncheck this state in the "tools" toolbar
-    mEditorUi.actionToolAddDevice->setCheckable(false);
-    mEditorUi.actionToolAddDevice->setChecked(false);
     return true;
 }
 

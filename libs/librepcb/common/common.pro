@@ -80,6 +80,7 @@ SOURCES += \
     units/lengthunit.cpp \
     units/point.cpp \
     units/ratio.cpp \
+    utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
@@ -152,6 +153,7 @@ HEADERS += \
     units/lengthunit.h \
     units/point.h \
     units/ratio.h \
+    utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
     utils/undostackactiongroup.h \
     uuid.h \

@@ -55,15 +55,20 @@ BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mSubStates.insert(State_AddDevice, new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
-    if (mSubStates[State_Select]->entry(nullptr))
+    if (mSubStates[State_Select]->entry(nullptr)) {
         mCurrentState = State_Select;
+        emit stateChanged(mCurrentState);
+    }
 }
 
 BES_FSM::~BES_FSM() noexcept
 {
     // exit the current substate
-    if (mCurrentState != State_NoState)
+    if (mCurrentState != State_NoState) {
         mSubStates[mCurrentState]->exit(nullptr);
+        mCurrentState = State_NoState;
+        emit stateChanged(mCurrentState);
+    }
     // delete all substates
     qDeleteAll(mSubStates);     mSubStates.clear();
 }
@@ -118,15 +123,18 @@ BES_Base::ProcRetVal BES_FSM::process(BEE_Base* event) noexcept
             {
                 mPreviousState = mCurrentState;
                 mCurrentState = State_NoState;
+                emit stateChanged(mCurrentState);
             }
         }
         if ((mCurrentState == State_NoState) && (nextState != State_NoState))
         {
             // entry the next state
-            if (mSubStates[nextState]->entry(event))
+            if (mSubStates[nextState]->entry(event)) {
                 mCurrentState = nextState;
-            else // use the select state as fallback
+                emit stateChanged(mCurrentState);
+            } else { // use the select state as fallback
                 processEvent(new BEE_Base(BEE_Base::StartSelect), true);
+            }
         }
     }
 

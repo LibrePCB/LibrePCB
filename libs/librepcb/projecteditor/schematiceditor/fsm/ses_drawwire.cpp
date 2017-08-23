@@ -107,10 +107,6 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
     // clear schematic selection because selection does not make sense in this state
     if (mEditor.getActiveSchematic()) mEditor.getActiveSchematic()->clearSelection();
 
-    // Check this state in the "tools" toolbar
-    mEditorUi.actionToolDrawWire->setCheckable(true);
-    mEditorUi.actionToolDrawWire->setChecked(true);
-
     // Add wire mode actions to the "command" toolbar
     mWireModeActions.insert(WireMode_HV, mEditorUi.commandToolbar->addAction(
                             QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
@@ -220,10 +216,6 @@ bool SES_DrawWire::exit(SEE_Base* event) noexcept
     delete mNetClassLabel;          mNetClassLabel = nullptr;
     qDeleteAll(mWireModeActions);   mWireModeActions.clear();
     qDeleteAll(mActionSeparators);  mActionSeparators.clear();
-
-    // Uncheck this state in the "tools" toolbar
-    mEditorUi.actionToolDrawWire->setCheckable(false);
-    mEditorUi.actionToolDrawWire->setChecked(false);
 
     // change the cursor
     mEditorGraphicsView.setCursor(Qt::ArrowCursor);

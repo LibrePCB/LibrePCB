@@ -17,79 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_FSM_H
-#define LIBREPCB_PROJECT_SES_FSM_H
+#ifndef LIBREPCB_EXCLUSIVEACTIONGROUP_H
+#define LIBREPCB_EXCLUSIVEACTIONGROUP_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "ses_base.h"
+#include <QtWidgets>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace project {
-namespace editor {
 
 /*****************************************************************************************
- *  Class SES_FSM
+ *  Class ExclusiveActionGroup
  ****************************************************************************************/
 
 /**
- * @brief The SES_FSM (Schematic Editor Finite State Machine) class
+ * @brief The ExclusiveActionGroup class groups multiple QAction's together
+ *
+ * This class is basically the same as QActionGroup (http://doc.qt.io/qt-5/qactiongroup.html).
+ * But there is one important difference: When the user clicks on a QAction, that action
+ * won't be checked instantly. Instead, this class only emits the signal
+ * #changeRequestTriggered(). Whether the triggered action actually gets checked or the
+ * request is rejected can be decided from outside this class (typically by the state
+ * machine of an editor window). To change the selected action, #setCurrentAction() needs
+ * to be called.
+ *
+ * @author ubruhin
+ * @date 2016-11-29
  */
-class SES_FSM final : public SES_Base
+class ExclusiveActionGroup final : public QObject
 {
         Q_OBJECT
 
     public:
 
-        /// FSM States
-        enum State {
-            State_NoState,      ///< no state active
-            State_Select,       ///< @see #project#SES_Select
-            State_DrawWire,     ///< @see #project#SES_DrawWire
-            State_AddNetLabel,  ///< @see #project#SES_AddNetLabel
-            State_AddComponent  ///< @see #project#SES_AddComponent
-        };
-
         // Constructors / Destructor
-        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
-        ~SES_FSM() noexcept;
-
-        // Getters
-        State getCurrentState() const noexcept {return mCurrentState;}
+        ExclusiveActionGroup() noexcept;
+        ExclusiveActionGroup(const ExclusiveActionGroup& other) = delete;
+        ~ExclusiveActionGroup() noexcept;
 
         // General Methods
-        bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
+        void reset() noexcept;
+        void setEnabled(bool enabled) noexcept;
+        void addAction(const QVariant& key, QAction* action) noexcept;
+        void setActionEnabled(const QVariant& key, bool enabled) noexcept;
+        void setCurrentAction(const QVariant& key) noexcept;
+        const QVariant& getCurrentAction() const noexcept {return mCurrentAction;}
+
+        // Operator Overloadings
+        ExclusiveActionGroup& operator=(const ExclusiveActionGroup& rhs) = delete;
 
 
     signals:
-        void stateChanged(State newState);
+        void changeRequestTriggered(const QVariant& key);
 
 
-    private:
-
-        // General Methods
-        ProcRetVal process(SEE_Base* event) noexcept;
-        State processEventFromChild(SEE_Base* event) noexcept; ///< returns the next state
+    private: // Methods
+        void actionTriggered() noexcept;
 
 
-        // Attributes
-        State mCurrentState;
-        State mPreviousState;
-        QHash<State, SES_Base*> mSubStates;
+    private: // Data
+        QVariant mCurrentAction;
+        QMap<QVariant, QAction*> mActions;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_FSM_H
+#endif // LIBREPCB_EXCLUSIVEACTIONGROUP_H
