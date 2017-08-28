@@ -49,11 +49,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
         SmartXmlFile file(mXmlFilePath, false, true);
         doc = file.parseFileAndBuildDomTree();
     } else {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         qInfo("Workspace settings file not found, default settings will be used.");
-#else
-        qWarning("Workspace settings file not found, default settings will be used.");
-#endif
     }
 
     // load all settings

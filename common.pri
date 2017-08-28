@@ -32,6 +32,12 @@ lessThan(QT_MAJOR_VERSION, 5) {
     }
 }
 
+# redirect qInfo to qDebug for Qt < 5.5 because qInfo was not yet available
+# https://doc.qt.io/qt-5/qtglobal.html#qInfo
+lessThan(QT_MINOR_VERSION, 5) {
+    DEFINES += qInfo=qDebug
+}
+
 # c++11 is obligatory!
 CONFIG += c++11
 

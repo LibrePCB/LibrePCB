@@ -125,20 +125,15 @@ static void setApplicationMetadata() noexcept
 
 static void writeLogHeader() noexcept
 {
-    // @TODO: After removing support for Qt versions below 5.5, we could use qInfo() here.
-
     // write application name and version to log
-    QString msg = QString("LibrePCB %1 (%2)").arg(qApp->getAppVersion().toPrettyStr(3),
-                                                  qApp->getGitVersion());
-    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+    qInfo() << QString("LibrePCB %1 (%2)").arg(qApp->getAppVersion().toPrettyStr(3),
+                                               qApp->getGitVersion());
 
     // write Qt version to log
-    msg = QString("Qt version: %1 (compiled against %2)").arg(qVersion(), QT_VERSION_STR);
-    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+    qInfo() << QString("Qt version: %1 (compiled against %2)").arg(qVersion(), QT_VERSION_STR);
 
     // write resources directory path to log
-    msg = QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
-    Debug::instance()->print(Debug::DebugLevel_t::Info, msg, __FILE__, __LINE__);
+    qInfo() << QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
 
     // warn if runtime resource files are not found
     if (!qApp->getResourcesFilePath(".librepcb-resources").isExistingFile()) {
