@@ -147,6 +147,10 @@ Workspace::Workspace(const FilePath& wsPath) :
 
     // load library database
     mLibraryDb.reset(new WorkspaceLibraryDb(*this)); // can throw
+    connect(this, &Workspace::libraryAdded,
+            mLibraryDb.data(), &WorkspaceLibraryDb::startLibraryRescan);
+    connect(this, &Workspace::libraryRemoved,
+            mLibraryDb.data(), &WorkspaceLibraryDb::startLibraryRescan);
 
     // load project models
     mRecentProjectsModel.reset(new RecentProjectsModel(*this));
