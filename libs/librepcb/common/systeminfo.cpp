@@ -120,10 +120,11 @@ const QString& SystemInfo::getFullUsername() noexcept
 #else
 #error "Unknown operating system!"
 #endif
-    }
 
-    if (sFullUsername.isEmpty()) {
-        qWarning() << "The system's full username is empty or could not be determined!";
+        if (sFullUsername.isEmpty()) {
+            qWarning() << "The system's full username is empty or could not be determined!";
+            sFullUsername = getUsername(); // fall back to username
+        }
     }
 
     return sFullUsername;
