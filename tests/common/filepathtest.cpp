@@ -169,17 +169,8 @@ TEST(FilePathTest, testCleanFileName)
  *  Test Data
  ****************************************************************************************/
 
-INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
-
+INSTANTIATE_TEST_CASE_P(FilePathTestCommon, FilePathTest, ::testing::Values(
     // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
-#ifdef Q_OS_WIN
-    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             }), // Win path to a dir
-    FilePathTestData({true , "C:\\foo\\bar\\"        , "C:/bar"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "../foo/bar"      }), // Win path to a dir + backslash
-    FilePathTestData({true , "C:\\foo\\bar.txt"      , "C:/bar"         , "C:/foo/bar.txt"  , "C:\\foo\\bar.txt"    , "../foo/bar.txt"  }), // Win path to a file
-    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo\\bar"    , "C:/foo/bar"      , "C:\\foo\\bar"        , ""                }), // Win path with path==base
-    FilePathTestData({true , "C:\\\\foo\\..\\bar\\"  , "C:\\"           , "C:/bar"          , "C:\\bar"             , "bar"             }), // Win path with .. and double backslashes
-    FilePathTestData({true , "C:\\"                  , "C:\\foo"        , "C:"              , "C:"                  , ".."              }), // Win drive root path
-#endif
     FilePathTestData({true , "/foo/bar"              , "/foo"           , "/foo/bar"        , "\\foo\\bar"          , "bar"             }), // UNIX path to a dir
     FilePathTestData({true , "/foo/bar/"             , "/bar"           , "/foo/bar"        , "\\foo\\bar"          , "../foo/bar"      }), // UNIX path to a dir + slash
     FilePathTestData({true , "/foo/bar.txt"          , "/bar"           , "/foo/bar.txt"    , "\\foo\\bar.txt"      , "../foo/bar.txt"  }), // UNIX path to a file
@@ -189,14 +180,26 @@ INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
     FilePathTestData({true , "/"                     , "/foo"           , "/"               , "\\"                  , ".."              }), // UNIX root path
 
     // invalid paths {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
-#ifdef Q_OS_WIN
-    FilePathTestData({false, "foo\\bar"              , ""               , ""                , ""                    , ""                }), // rel. Win path to a dir
-    FilePathTestData({false, "foo\\bar.txt"          , ""               , ""                , ""                    , ""                }), // rel. Win path to a file
-#endif
     FilePathTestData({false, "foo/bar"               , ""               , ""                , ""                    , ""                }), // rel. UNIX path to a dir
     FilePathTestData({false, "foo/bar.txt"           , ""               , ""                , ""                    , ""                }), // rel. UNIX path to a file
     FilePathTestData({false, ""                      , ""               , ""                , ""                    , ""                })  // empty path
 ));
+
+#ifdef Q_OS_WIN
+INSTANTIATE_TEST_CASE_P(FilePathTestWindows, FilePathTest, ::testing::Values(
+    // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             }), // Win path to a dir
+    FilePathTestData({true , "C:\\foo\\bar\\"        , "C:/bar"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "../foo/bar"      }), // Win path to a dir + backslash
+    FilePathTestData({true , "C:\\foo\\bar.txt"      , "C:/bar"         , "C:/foo/bar.txt"  , "C:\\foo\\bar.txt"    , "../foo/bar.txt"  }), // Win path to a file
+    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo\\bar"    , "C:/foo/bar"      , "C:\\foo\\bar"        , ""                }), // Win path with path==base
+    FilePathTestData({true , "C:\\\\foo\\..\\bar\\"  , "C:\\"           , "C:/bar"          , "C:\\bar"             , "bar"             }), // Win path with .. and double backslashes
+    FilePathTestData({true , "C:\\"                  , "C:\\foo"        , "C:"              , "C:"                  , ".."              }), // Win drive root path
+
+    // invalid paths {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    FilePathTestData({false, "foo\\bar"              , ""               , ""                , ""                    , ""                }), // rel. Win path to a dir
+    FilePathTestData({false, "foo\\bar.txt"          , ""               , ""                , ""                    , ""                })  // rel. Win path to a file
+));
+#endif
 
 /*****************************************************************************************
  *  End of File
