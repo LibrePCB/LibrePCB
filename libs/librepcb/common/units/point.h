@@ -402,4 +402,6 @@ QDebug operator<<(QDebug stream, const Point& point);
 
 } // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::Point)
+
 #endif // LIBREPCB_POINT_H
