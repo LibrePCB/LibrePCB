@@ -55,10 +55,9 @@ Workspace::Workspace(const FilePath& wsPath) :
     QObject(nullptr),
     mPath(wsPath),
     mProjectsPath(mPath.getPathTo("projects")),
-    mVersionPath(mPath.getPathTo("v" % qApp->getFileFormatVersion().toStr())),
-    mMetadataPath(mVersionPath.getPathTo("metadata")),
-    mLibrariesPath(mVersionPath.getPathTo("libraries")),
-    mLock(mVersionPath)
+    mMetadataPath(mPath.getPathTo("v" % qApp->getFileFormatVersion().toStr())),
+    mLibrariesPath(mMetadataPath.getPathTo("libraries")),
+    mLock(mMetadataPath)
 {
     // check if the workspace is valid
     if (!isValidWorkspacePath(mPath)) {

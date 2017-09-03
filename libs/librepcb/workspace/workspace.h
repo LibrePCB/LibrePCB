@@ -104,11 +104,6 @@ class Workspace final : public QObject
         /**
          * @brief Get the filepath to the version directory (v#) in the workspace
          */
-        const FilePath& getVersionPath() const {return mVersionPath;}
-
-        /**
-         * @brief Get the filepath to the "v#/metadata" directory in the workspace
-         */
         const FilePath& getMetadataPath() const {return mMetadataPath;}
 
         /**
@@ -312,8 +307,7 @@ class Workspace final : public QObject
 
         FilePath mPath; ///< a FilePath object which represents the workspace directory
         FilePath mProjectsPath; ///< the directory "projects"
-        FilePath mVersionPath; ///< the subdirectory of the current file format version
-        FilePath mMetadataPath; ///< the directory "v#/metadata"
+        FilePath mMetadataPath; ///< the subdirectory of the current file format version
         FilePath mLibrariesPath; ///< the directory "v#/libraries"
         DirectoryLock mLock; ///< to lock the version directory (#mVersionPath)
         QScopedPointer<WorkspaceSettings> mWorkspaceSettings; ///< the WorkspaceSettings object
