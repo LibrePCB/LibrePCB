@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "application.h"
 #include "exceptions.h"
+#include "units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -38,6 +39,7 @@ Application::Application(int& argc, char** argv) noexcept :
 {
     // register meta types
     qRegisterMetaType<FilePath>();
+    qRegisterMetaType<Point>();
 
     // set application version
     mAppVersion = Version(APP_VERSION);

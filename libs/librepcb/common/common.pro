@@ -88,6 +88,7 @@ SOURCES += \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
+    widgets/statusbar.cpp \
 
 HEADERS += \
     alignment.h \
@@ -161,6 +162,7 @@ HEADERS += \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
+    widgets/statusbar.h \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \

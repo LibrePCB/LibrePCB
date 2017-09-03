@@ -118,7 +118,7 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="librepcb::StatusBar" name="statusbar"/>
   <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
     <string>File</string>
@@ -631,6 +631,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::StatusBar</class>
+   <extends>QStatusBar</extends>
+   <header location="global">librepcb/common/widgets/statusbar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../img/images.qrc"/>
  </resources>

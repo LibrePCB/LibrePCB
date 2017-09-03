@@ -452,7 +452,7 @@ QListView::item
    <addaction name="menuExtras"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="librepcb::StatusBar" name="statusBar"/>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
@@ -551,6 +551,13 @@ QListView::item
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::StatusBar</class>
+   <extends>QStatusBar</extends>
+   <header location="global">librepcb/common/widgets/statusbar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../img/images.qrc"/>
  </resources>

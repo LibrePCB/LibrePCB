@@ -26,6 +26,7 @@
 #include "ui_boardeditor.h"
 #include <librepcb/project/project.h>
 #include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
@@ -157,6 +158,18 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_FlipVertical), true);});
     connect(mUi->actionRemove, &QAction::triggered,
             [this](){mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Remove), true);});
+
+    // setup status bar
+    mUi->statusbar->setFields(StatusBar::AbsolutePosition | StatusBar::ProgressBar);
+    mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
+    connect(&mProjectEditor.getWorkspace().getLibraryDb(), &workspace::WorkspaceLibraryDb::scanStarted,
+            mUi->statusbar, &StatusBar::showProgressBar, Qt::QueuedConnection);
+    connect(&mProjectEditor.getWorkspace().getLibraryDb(), &workspace::WorkspaceLibraryDb::scanSucceeded,
+            mUi->statusbar, &StatusBar::hideProgressBar, Qt::QueuedConnection);
+    connect(&mProjectEditor.getWorkspace().getLibraryDb(), &workspace::WorkspaceLibraryDb::scanProgressUpdate,
+            mUi->statusbar, &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
+    connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
+            mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
 
     // Restore Window Geometry
     QSettings clientSettings;
