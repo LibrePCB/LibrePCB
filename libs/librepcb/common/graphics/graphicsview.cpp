@@ -225,6 +225,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event)
                 verticalScrollBar()->setValue(verticalScrollBar()->value() - diff.y());
                 mPanningActive = false;
             }
+            emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
             // no break here!
         }
         case QEvent::GraphicsSceneMouseDoubleClick:

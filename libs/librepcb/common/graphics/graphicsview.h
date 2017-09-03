@@ -81,6 +81,15 @@ class GraphicsView final : public QGraphicsView
         void zoomAll() noexcept;
 
 
+    signals:
+        /**
+         * @brief Cursor scene position changed signal
+         *
+         * @param pos   The new cursor position (*not* mapped to grid!)
+         */
+        void cursorScenePositionChanged(const Point& pos);
+
+
     private slots:
 
         // Private Slots
