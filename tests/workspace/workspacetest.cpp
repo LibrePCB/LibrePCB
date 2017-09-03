@@ -43,7 +43,6 @@ class WorkspaceTest : public ::testing::Test
         FilePath mWsDir;
         FilePath mVersionFile;
         FilePath mProjectsPath;
-        FilePath mVersionPath;
         FilePath mMetadataPath;
         FilePath mLibrariesPath;
 
@@ -52,9 +51,8 @@ class WorkspaceTest : public ::testing::Test
             mWsDir = FilePath::getRandomTempPath().getPathTo("test workspace dir");
             mVersionFile = mWsDir.getPathTo(".librepcb-workspace");
             mProjectsPath = mWsDir.getPathTo("projects");
-            mVersionPath = mWsDir.getPathTo("v" % qApp->getFileFormatVersion().toStr());
-            mMetadataPath = mVersionPath.getPathTo("metadata");
-            mLibrariesPath = mVersionPath.getPathTo("libraries");
+            mMetadataPath = mWsDir.getPathTo("v" % qApp->getFileFormatVersion().toStr());
+            mLibrariesPath = mMetadataPath.getPathTo("libraries");
         }
 
         virtual ~WorkspaceTest() {
@@ -80,7 +78,6 @@ TEST_F(WorkspaceTest, testCreateOpenClose)
         Workspace ws(mWsDir);
         EXPECT_EQ(mWsDir, ws.getPath());
         EXPECT_EQ(mProjectsPath, ws.getProjectsPath());
-        EXPECT_EQ(mVersionPath, ws.getVersionPath());
         EXPECT_EQ(mMetadataPath, ws.getMetadataPath());
         EXPECT_EQ(mLibrariesPath, ws.getLibrariesPath());
     }

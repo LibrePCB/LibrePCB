@@ -15,7 +15,6 @@ Basically, a workspace contains following entries:
         ├── .librepcb-workspace
         ├── projects/
         └── v<VERSION>/
-            ├── metadata/
             └── libraries/
                 ├── local/
                 └── remote/
@@ -38,14 +37,10 @@ Each project is represented by a directory, see its
 
 ## v<VERSION>/ {#doc_workspace_version_dir}
 
-For each major application version, a separate directory is created to store workspace metadata and
-libraries. These directories are called for example `v0.1`, `v1` or `v2`. A specific application
-version will only access the metadata/libraries of its corresponding directory, all other `v*`
-directories will be ignored.
-
-## v<VERSION>/metadata/ {#doc_workspace_metadata_dir}
-
-All workspace settings and other workspace related stuff is stored in this directory.
+For each major application version, a separate directory is created to store workspace metadata
+(e.g. settings) and libraries. These directories are called for example `v0.1`, `v1` or `v2`. A
+specific application version will only access the metadata/libraries of its corresponding directory,
+all other `v*` directories will be ignored.
 
 ## v<VERSION>/libraries/ {#doc_workspace_libraries_dir}
 
@@ -80,7 +75,7 @@ This is an example how a workspace could look like:
         │   ├── Project_B/
         │   └── Project_C/
         ├── v0.1/
-        │   ├── metadata/
+        │   ├── settings.xml
         │   └── libraries/
         │       ├── local/
         │       │   ├── Library_A.lplib/
@@ -91,7 +86,7 @@ This is an example how a workspace could look like:
         │           ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
         │           └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
         ├── v1/
-        │   ├── metadata/
+        │   ├── settings.xml
         │   └── libraries/
         │       ├── local/
         │       │   ├── Library_A.lplib/
@@ -102,7 +97,7 @@ This is an example how a workspace could look like:
         │           ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
         │           └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
         └── v2/
-            ├── metadata/
+            ├── settings.xml
             └── libraries/
                 ├── local/
                 │   ├── Library_A.lplib/
@@ -138,7 +133,7 @@ For better performance of the workspace library (searching in the filesystem can
 time to time this database is filled/updated with metadata of all libraries and their elements.
 Searching for elements is then done with `SELECT` statements in the database, which is very fast.
 
-The database is stored in the [`metadata`](#doc_workspace_metadata_dir) directory of the workspace.
+The database is stored in the [`version`](#doc_workspace_version_dir) directory of the workspace.
 
 
 [UUID]: https://en.wikipedia.org/wiki/Universally_unique_identifier "Universally Unique Identifier"

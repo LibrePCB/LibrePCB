@@ -53,7 +53,7 @@ class WorkspaceSettingsDialog;
 /**
  * @brief The WorkspaceSettings class manages all workspace related settings
  *
- * The ".metadata/settings.xml" file in a workspace is used to store workspace related
+ * The "settings.xml" file in a workspace is used to store workspace related
  * settings. This class is an interface to these settings. A WorkspaceSettings object is
  * created in the constructor of the Workspace object.
  *
@@ -121,7 +121,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject
     private: // Data
 
         // General Attributes
-        FilePath mXmlFilePath; ///< path to the ".metadata/settings.xml" file
+        FilePath mXmlFilePath; ///< path to the "settings.xml" file
         QScopedPointer<WorkspaceSettingsDialog> mDialog; ///< the settings dialog
 
         // Settings Items
