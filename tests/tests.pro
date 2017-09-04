@@ -21,6 +21,11 @@ QT += core widgets network printsupport xml opengl sql concurrent
 CONFIG += console
 CONFIG -= app_bundle
 
+# ignore warnings produced by macros from gtest
+# TODO: fix these warnings because actually the code is not valid!
+QMAKE_CXXFLAGS += -Wno-gnu-zero-variadic-macro-arguments
+QMAKE_CXXFLAGS_DEBUG += -Wno-gnu-zero-variadic-macro-arguments
+
 LIBS += \
     -L$${DESTDIR} \
     -lgoogletest \

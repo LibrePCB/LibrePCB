@@ -52,7 +52,7 @@ class StatusBar final : public QStatusBar
             AbsolutePosition    = 1<<0,
             ProgressBar         = 1<<1,
         };
-        Q_DECLARE_FLAGS(Fields, Field);
+        Q_DECLARE_FLAGS(Fields, Field)
 
         // Constructors / Destructor
         explicit StatusBar(QWidget* parent = nullptr) noexcept;
