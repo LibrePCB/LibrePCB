@@ -39,9 +39,9 @@ namespace manager {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryListWidgetItem::LibraryListWidgetItem(const workspace::Workspace& ws,
+LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
                                              QSharedPointer<Library> lib) noexcept :
-    QWidget(nullptr), mUi(new Ui::LibraryListWidgetItem), mLib(lib)
+    QWidget(nullptr), mUi(new Ui::LibraryListWidgetItem), mWorkspace(ws), mLib(lib)
 {
     mUi->setupUi(this);
 
@@ -91,6 +91,20 @@ QString LibraryListWidgetItem::getName() const noexcept
 bool LibraryListWidgetItem::isRemoteLibrary() const noexcept
 {
     return mLib ? mLib->isOpenedReadOnly() : false;
+}
+
+/*****************************************************************************************
+ *  Inherited from QWidget
+ ****************************************************************************************/
+
+void LibraryListWidgetItem::mouseDoubleClickEvent(QMouseEvent* e) noexcept
+{
+    if (mLib) {
+        emit openLibraryEditorTriggered(mLib);
+        e->accept();
+    } else {
+        QWidget::mouseDoubleClickEvent(e);
+    }
 }
 
 /*****************************************************************************************

@@ -1,0 +1,154 @@
+/*
+ * LibrePCB - Professional EDA for everyone!
+ * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
+ * http://librepcb.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*****************************************************************************************
+ *  Includes
+ ****************************************************************************************/
+#include <QtCore>
+#include "cmdmoveselectedsymbolitems.h"
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdtextedit.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/polygongraphicsitem.h>
+#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+
+/*****************************************************************************************
+ *  Namespace
+ ****************************************************************************************/
+namespace librepcb {
+namespace library {
+namespace editor {
+
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
+                                                       const Point& startPos) noexcept :
+    UndoCommandGroup(tr("Move Symbol Elements")),
+    mContext(context), mStartPos(startPos), mDeltaPos(0, 0)
+{
+    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = context.symbolGraphicsItem.getSelectedPins();
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
+        mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
+    }
+
+    QList<QSharedPointer<EllipseGraphicsItem>> ellipses = context.symbolGraphicsItem.getSelectedEllipses();
+    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
+        mEllipseEditCmds.append(new CmdEllipseEdit(ellipse->getEllipse()));
+    }
+
+    QList<QSharedPointer<PolygonGraphicsItem>> polygons = context.symbolGraphicsItem.getSelectedPolygons();
+    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
+        mPolygonEditCmds.append(new CmdPolygonMove(polygon->getPolygon()));
+    }
+
+    QList<QSharedPointer<TextGraphicsItem>> texts = context.symbolGraphicsItem.getSelectedTexts();
+    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
+        mTextEditCmds.append(new CmdTextEdit(text->getText()));
+    }
+}
+
+CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept
+{
+    deleteAllCommands();
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
+{
+    Point delta = pos - mStartPos;
+    delta.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+
+    if (delta != mDeltaPos) {
+        // move selected elements
+        foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
+        foreach (CmdEllipseEdit* cmd, mEllipseEditCmds) {
+            cmd->setDeltaToStartCenter(delta, true);
+        }
+        foreach (CmdPolygonMove* cmd, mPolygonEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
+        foreach (CmdTextEdit* cmd, mTextEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
+        mDeltaPos = delta;
+    }
+}
+
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
+
+bool CmdMoveSelectedSymbolItems::performExecute()
+{
+    if (mDeltaPos.isOrigin()) {
+        // no movement required --> discard all move commands
+        deleteAllCommands();
+        return false;
+    }
+
+    // move all child commands to parent class
+    while (mPinEditCmds.count() > 0) {
+        appendChild(mPinEditCmds.takeLast());
+    }
+    while (mEllipseEditCmds.count() > 0) {
+        appendChild(mEllipseEditCmds.takeLast());
+    }
+    while (mPolygonEditCmds.count() > 0) {
+        appendChild(mPolygonEditCmds.takeLast());
+    }
+    while (mTextEditCmds.count() > 0) {
+        appendChild(mTextEditCmds.takeLast());
+    }
+
+    // execute all child commands
+    return UndoCommandGroup::performExecute(); // can throw
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept
+{
+    qDeleteAll(mPinEditCmds);           mPinEditCmds.clear();
+    qDeleteAll(mEllipseEditCmds);       mEllipseEditCmds.clear();
+    qDeleteAll(mPolygonEditCmds);       mPolygonEditCmds.clear();
+    qDeleteAll(mTextEditCmds);          mTextEditCmds.clear();
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
+} // namespace editor
+} // namespace library
+} // namespace librepcb

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::library::editor::NewElementWizardPage_ComponentSignals</class>
+ <widget class="QWizardPage" name="librepcb::library::editor::NewElementWizardPage_ComponentSignals">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>361</width>
+    <height>210</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Component Signals</string>
+  </property>
+  <property name="title">
+   <string>Component Signals</string>
+  </property>
+  <property name="subTitle">
+   <string>Define all electrical signals of the component (often equals to its symbol pins).</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="librepcb::library::editor::ComponentSignalListEditorWidget" name="signalListEditorWidget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::library::editor::ComponentSignalListEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/libraryeditor/cmp/componentsignallisteditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

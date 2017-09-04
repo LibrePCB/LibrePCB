@@ -24,8 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -38,7 +40,11 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The PackagePad class
+ * @brief The PackagePad class represents one logical pad of a package
+ *
+ * Following information is considered as the "interface" of a pad and must therefore
+ * never be changed:
+ *  - UUID
  */
 class PackagePad final : public SerializableObject
 {
@@ -47,7 +53,9 @@ class PackagePad final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit PackagePad(const Uuid& uuid, const QString& name) noexcept;
+        PackagePad() = delete;
+        PackagePad(const PackagePad& other) noexcept;
+        PackagePad(const Uuid& uuid, const QString& name) noexcept;
         explicit PackagePad(const DomElement& domElement);
         ~PackagePad() noexcept;
 
@@ -63,22 +71,30 @@ class PackagePad final : public SerializableObject
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const PackagePad& rhs) const noexcept;
+        bool operator!=(const PackagePad& rhs) const noexcept {return !(*this == rhs);}
+        PackagePad& operator=(const PackagePad& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        PackagePad() = delete;
-        PackagePad(const PackagePad& other) = delete;
-        PackagePad& operator=(const PackagePad& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Pin Attributes
+    private: // Data
         Uuid mUuid;
         QString mName;
 };
+
+/*****************************************************************************************
+ *  Class PackagePadList
+ ****************************************************************************************/
+
+struct PackagePadListNameProvider {static constexpr const char* tagname = "pad";};
+using PackagePadList = SerializableObjectList<PackagePad, PackagePadListNameProvider>;
+using CmdPackagePadInsert = CmdListElementInsert<PackagePad, PackagePadListNameProvider>;
+using CmdPackagePadRemove = CmdListElementRemove<PackagePad, PackagePadListNameProvider>;
+using CmdPackagePadsSwap = CmdListElementsSwap<PackagePad, PackagePadListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

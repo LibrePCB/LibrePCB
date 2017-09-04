@@ -54,7 +54,7 @@ LibraryManager::LibraryManager(workspace::Workspace& ws, QWidget* parent) noexce
             this, &LibraryManager::currentListItemChanged);
 
     mAddLibraryWidget.reset(new AddLibraryWidget(mWorkspace));
-    mUi->horizontalLayout->addWidget(mAddLibraryWidget.data());
+    mUi->verticalLayout->insertWidget(0, mAddLibraryWidget.data());
     connect(mAddLibraryWidget.data(), &AddLibraryWidget::libraryAdded,
             this, &LibraryManager::libraryAddedSlot);
 
@@ -100,7 +100,10 @@ void LibraryManager::loadLibraryList() noexcept
     libraries.append(mWorkspace.getLocalLibraries().values());
     libraries.append(mWorkspace.getRemoteLibraries().values());
     foreach (const QSharedPointer<library::Library>& lib, libraries) {
-        widgets.append(new LibraryListWidgetItem(mWorkspace, lib));
+        LibraryListWidgetItem* widget = new LibraryListWidgetItem(mWorkspace, lib);
+        connect(widget, &LibraryListWidgetItem::openLibraryEditorTriggered,
+                this, &LibraryManager::openLibraryEditorTriggered);
+        widgets.append(widget);
     }
 
     // sort all list widget items
@@ -131,14 +134,16 @@ void LibraryManager::currentListItemChanged(QListWidgetItem* current, QListWidge
         if (item && (!item->getLibrary().isNull())) {
             QSharedPointer<library::Library> lib = item->getLibrary();
             LibraryInfoWidget* widget = new LibraryInfoWidget(mWorkspace, lib);
+            connect(widget, &LibraryInfoWidget::openLibraryEditorTriggered,
+                    this, &LibraryManager::openLibraryEditorTriggered);
             connect(widget, &LibraryInfoWidget::libraryRemoved,
                     this, &LibraryManager::libraryRemovedSlot);
-            mUi->horizontalLayout->addWidget(widget);
+            mUi->verticalLayout->insertWidget(0, widget);
             mCurrentWidget = widget;
         }
     } else {
         mCurrentWidget = new QWidget();
-        mUi->horizontalLayout->addWidget(mCurrentWidget);
+        mUi->verticalLayout->insertWidget(0, mCurrentWidget);
     }
 
     mAddLibraryWidget->setVisible(mCurrentWidget ? false : true);

@@ -21,9 +21,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpad.h"
-#include "footprintpadsmt.h"
-#include "footprintpadtht.h"
+#include "footprintpadgraphicsitem.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,22 +35,32 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FootprintPad::FootprintPad(Technology_t technology, const Uuid& padUuid,
-                           const Point& pos, const Angle& rot, const Length& width,
-                           const Length& height) noexcept :
-    mTechnology(technology), mUuid(padUuid), mPosition(pos), mRotation(rot),
-    mWidth(width), mHeight(height)
+FootprintPad::FootprintPad(const FootprintPad& other) noexcept :
+    mRegisteredGraphicsItem(nullptr)
+{
+    *this = other; // use assignment operator
+}
+
+FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
+        Shape shape, const Length& width, const Length& height,
+        const Length& drillDiameter, BoardSide side) noexcept :
+    mPackagePadUuid(padUuid), mPosition(pos), mRotation(rot), mShape(shape), mWidth(width),
+    mHeight(height), mDrillDiameter(drillDiameter), mBoardSide(side),
+    mRegisteredGraphicsItem(nullptr)
 {
 }
 
-FootprintPad::FootprintPad(const DomElement& domElement)
+FootprintPad::FootprintPad(const DomElement& domElement) :
+    mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mTechnology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mPackagePadUuid = domElement.getAttribute<Uuid>("package_pad", true);
     mPosition.setX(domElement.getAttribute<Length>("x", true));
     mPosition.setY(domElement.getAttribute<Length>("y", true));
     mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mBoardSide = stringToBoardSide(domElement.getAttribute<QString>("side", true));
+    mShape = stringToShape(domElement.getAttribute<QString>("shape", true));
+    mDrillDiameter = domElement.getAttribute<Length>("drill", true);
     mWidth = domElement.getAttribute<Length>("width", true);
     mHeight = domElement.getAttribute<Length>("height", true);
 
@@ -59,15 +69,115 @@ FootprintPad::FootprintPad(const DomElement& domElement)
 
 FootprintPad::~FootprintPad() noexcept
 {
+    Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
+QString FootprintPad::getLayerName() const noexcept
+{
+    switch (mBoardSide) {
+        case BoardSide::TOP:        return GraphicsLayer::sTopCopper;
+        case BoardSide::BOTTOM:     return GraphicsLayer::sBotCopper;
+        case BoardSide::THT:        return GraphicsLayer::sBoardPadsTht;
+        default: Q_ASSERT(false);   return "";
+    }
+}
+
+bool FootprintPad::isOnLayer(const QString& name) const noexcept
+{
+    if (mBoardSide == BoardSide::THT) {
+        return GraphicsLayer::isCopperLayer(name);
+    } else {
+        return (name == getLayerName());
+    }
+}
+
 QRectF FootprintPad::getBoundingRectPx() const noexcept
 {
     return QRectF(-mWidth.toPx()/2, -mHeight.toPx()/2, mWidth.toPx(), mHeight.toPx());
+}
+
+const QPainterPath& FootprintPad::toQPainterPathPx() const noexcept
+{
+    if (mPainterPathPx.isEmpty()) {
+        mPainterPathPx.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
+        QRectF rect = getBoundingRectPx();
+        switch (mShape)
+        {
+            case Shape::ROUND: {
+                qreal radius = qMin(mWidth.toPx(), mHeight.toPx())/2;
+                mPainterPathPx.addRoundedRect(rect, radius, radius);
+                break;
+            }
+            case Shape::RECT: {
+                mPainterPathPx.addRect(rect);
+                break;
+            }
+            case Shape::OCTAGON: {
+                qreal rx = mWidth.toPx()/2;
+                qreal ry = mHeight.toPx()/2;
+                qreal a = qMin(rx, ry) * (2 - qSqrt(2));
+                QPolygonF octagon;
+                octagon.append(QPointF(rx, ry-a));
+                octagon.append(QPointF(rx-a, ry));
+                octagon.append(QPointF(a-rx, ry));
+                octagon.append(QPointF(-rx, ry-a));
+                octagon.append(QPointF(-rx, a-ry));
+                octagon.append(QPointF(a-rx, -ry));
+                octagon.append(QPointF(rx-a, -ry));
+                octagon.append(QPointF(rx, a-ry));
+                mPainterPathPx.addPolygon(octagon);
+                break;
+            }
+            default: Q_ASSERT(false); break;
+        }
+        // remove hole if THT
+        if (mBoardSide == BoardSide::THT) {
+            mPainterPathPx.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
+        }
+    }
+    return mPainterPathPx;
+}
+
+QPainterPath FootprintPad::toMaskQPainterPathPx(const Length& clearance) const noexcept
+{
+    QPainterPath p;
+    qreal w = qMax(mWidth + clearance*2, Length(0)).toPx();
+    qreal h = qMax(mHeight + clearance*2, Length(0)).toPx();
+    QRectF rect(-w/2, -h/2, w, h);
+    switch (mShape)
+    {
+        case Shape::ROUND: {
+            qreal radius = qMin(w, h)/2;
+            p.addRoundedRect(rect, radius, radius);
+            break;
+        }
+        case Shape::RECT: {
+            p.addRect(rect);
+            break;
+        }
+        case Shape::OCTAGON: {
+            qreal rx = w/2;
+            qreal ry = h/2;
+            qreal a = qMin(rx, ry) * (2 - qSqrt(2));
+            QPolygonF octagon;
+            octagon.append(QPointF(rx, ry-a));
+            octagon.append(QPointF(rx-a, ry));
+            octagon.append(QPointF(a-rx, ry));
+            octagon.append(QPointF(-rx, ry-a));
+            octagon.append(QPointF(-rx, a-ry));
+            octagon.append(QPointF(a-rx, -ry));
+            octagon.append(QPointF(rx-a, -ry));
+            octagon.append(QPointF(rx, a-ry));
+            p.addPolygon(octagon);
+            break;
+        }
+        default: Q_ASSERT(false); break;
+    }
+    return p;
 }
 
 /*****************************************************************************************
@@ -76,42 +186,116 @@ QRectF FootprintPad::getBoundingRectPx() const noexcept
 void FootprintPad::setPosition(const Point& pos) noexcept
 {
     mPosition = pos;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
+}
+
+void FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept
+{
+    mPackagePadUuid = pad;
 }
 
 void FootprintPad::setRotation(const Angle& rot) noexcept
 {
     mRotation = rot;
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
+}
+
+void FootprintPad::setShape(Shape shape) noexcept
+{
+    mShape = shape;
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setWidth(const Length& width) noexcept
 {
-    Q_ASSERT(width > 0);
     mWidth = width;
     mPainterPathPx = QPainterPath(); // invalidate painter path
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setHeight(const Length& height) noexcept
 {
-    Q_ASSERT(height > 0);
     mHeight = height;
     mPainterPathPx = QPainterPath(); // invalidate painter path
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+}
+
+void FootprintPad::setDrillDiameter(const Length& diameter) noexcept
+{
+    mDrillDiameter = diameter;
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+}
+
+void FootprintPad::setBoardSide(BoardSide side) noexcept
+{
+    mBoardSide = side;
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLayerName(getLayerName());
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
+void FootprintPad::registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept
+{
+    Q_ASSERT(!mRegisteredGraphicsItem);
+    mRegisteredGraphicsItem = &item;
+}
+
+void FootprintPad::unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept
+{
+    Q_ASSERT(mRegisteredGraphicsItem == &item);
+    mRegisteredGraphicsItem = nullptr;
+}
+
 void FootprintPad::serialize(DomElement& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("technology", technologyToString(mTechnology));
+    root.setAttribute("package_pad", mPackagePadUuid);
     root.setAttribute("x", mPosition.getX());
     root.setAttribute("y", mPosition.getY());
     root.setAttribute("rotation", mRotation);
+    root.setAttribute("shape", shapeToString(mShape));
     root.setAttribute("width", mWidth);
     root.setAttribute("height", mHeight);
+    root.setAttribute("drill", mDrillDiameter);
+    root.setAttribute("side", boardSideToString(mBoardSide));
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept
+{
+    if (mPackagePadUuid != rhs.mPackagePadUuid) return false;
+    if (mPosition != rhs.mPosition) return false;
+    if (mRotation != rhs.mRotation) return false;
+    if (mShape != rhs.mShape) return false;
+    if (mWidth != rhs.mWidth) return false;
+    if (mHeight != rhs.mHeight) return false;
+    if (mDrillDiameter != rhs.mDrillDiameter) return false;
+    if (mBoardSide != rhs.mBoardSide) return false;
+    return true;
+}
+
+FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept
+{
+    mPackagePadUuid = rhs.mPackagePadUuid;
+    mPosition = rhs.mPosition;
+    mRotation = rhs.mRotation;
+    mShape = rhs.mShape;
+    mWidth = rhs.mWidth;
+    mHeight = rhs.mHeight;
+    mDrillDiameter = rhs.mDrillDiameter;
+    mBoardSide = rhs.mBoardSide;
+    mPainterPathPx = rhs.mPainterPathPx;
+    return *this;
 }
 
 /*****************************************************************************************
@@ -120,10 +304,10 @@ void FootprintPad::serialize(DomElement& root) const
 
 bool FootprintPad::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                             return false;
-    if (technologyToString(mTechnology).isEmpty())  return false;
+    if (mPackagePadUuid.isNull())                             return false;
     if (mWidth <= 0)                                return false;
     if (mHeight <= 0)                               return false;
+    if (mDrillDiameter < 0)                         return false;
     return true;
 }
 
@@ -131,31 +315,41 @@ bool FootprintPad::checkAttributesValidity() const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-FootprintPad::Technology_t FootprintPad::stringToTechnology(const QString& technology)
+FootprintPad::Shape FootprintPad::stringToShape(const QString& shape)
 {
-    if      (technology == QLatin1String("tht")) return Technology_t::THT;
-    else if (technology == QLatin1String("smt")) return Technology_t::SMT;
-    else throw RuntimeError(__FILE__, __LINE__, technology);
+    if      (shape == QLatin1String("round"))   return Shape::ROUND;
+    else if (shape == QLatin1String("rect"))    return Shape::RECT;
+    else if (shape == QLatin1String("octagon")) return Shape::OCTAGON;
+    else throw RuntimeError(__FILE__, __LINE__, shape);
 }
 
-QString FootprintPad::technologyToString(Technology_t technology) noexcept
+QString FootprintPad::shapeToString(Shape shape) noexcept
 {
-    switch (technology)
+    switch (shape)
     {
-        case Technology_t::THT: return QString("tht");
-        case Technology_t::SMT: return QString("smt");
+        case Shape::ROUND:    return QString("round");
+        case Shape::RECT:     return QString("rect");
+        case Shape::OCTAGON:  return QString("octagon");
         default: Q_ASSERT(false); return QString();
     }
 }
 
-FootprintPad* FootprintPad::fromDomElement(const DomElement& domElement)
+FootprintPad::BoardSide FootprintPad::stringToBoardSide(const QString& side)
 {
-    Technology_t technology = stringToTechnology(domElement.getAttribute<QString>("technology", true));
-    switch (technology)
+    if      (side == QLatin1String("top"))      return BoardSide::TOP;
+    else if (side == QLatin1String("bottom"))   return BoardSide::BOTTOM;
+    else if (side == QLatin1String("tht"))      return BoardSide::THT;
+    else throw RuntimeError(__FILE__, __LINE__, side);
+}
+
+QString FootprintPad::boardSideToString(BoardSide side) noexcept
+{
+    switch (side)
     {
-        case Technology_t::THT: return new FootprintPadTht(domElement);
-        case Technology_t::SMT: return new FootprintPadSmt(domElement);
-        default: Q_ASSERT(false); throw LogicError(__FILE__, __LINE__);
+        case BoardSide::TOP:    return QString("top");
+        case BoardSide::BOTTOM: return QString("bottom");
+        case BoardSide::THT:    return QString("tht");
+        default: Q_ASSERT(false); return QString();
     }
 }
 

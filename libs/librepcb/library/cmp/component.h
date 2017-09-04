@@ -51,7 +51,19 @@ using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapCon
  ****************************************************************************************/
 
 /**
- * @brief The Component class
+ * @brief The Component class represents a "generic" device in the library
+ *
+ * Following information is considered as the "interface" of a component and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Property "is schematic only"
+ *  - All signal UUIDs (and their meaning)
+ *  - Symbol variants (adding new variants is allowed, but removing not)
+ *    - UUID
+ *    - Symbol items (neither adding nor removing items is allowed)
+ *      - UUID
+ *      - Symbol UUID
+ *      - Pin-signal-mapping
  */
 class Component final : public LibraryElement
 {
@@ -73,42 +85,34 @@ class Component final : public LibraryElement
         void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
 
         // Attribute Methods
-        const AttributeList& getAttributes() const noexcept {return *mAttributes;}
-        void setAttributes(const AttributeList& attributes) noexcept {*mAttributes = attributes;}
+        AttributeList& getAttributes() noexcept {return mAttributes;}
+        const AttributeList& getAttributes() const noexcept {return mAttributes;}
 
         // Default Value Methods
         const QString& getDefaultValue() const noexcept {return mDefaultValue;}
         void setDefaultValue(const QString& value) noexcept {mDefaultValue = value;}
 
         // Prefix Methods
+        NormDependentPrefixMap& getPrefixes() noexcept {return mPrefixes;}
         const NormDependentPrefixMap& getPrefixes() const noexcept {return mPrefixes;}
-        void addPrefix(const QString& norm, const QString& prefix) noexcept;
 
         // Signal Methods
-        const QList<ComponentSignal*>& getSignals() noexcept {return mSignals;}
-        int getSignalCount() const noexcept {return mSignals.count();}
-        ComponentSignal* getSignal(int index) noexcept {return mSignals.value(index);}
-        const ComponentSignal* getSignal(int index) const noexcept {return mSignals.value(index);}
-        ComponentSignal* getSignalByUuid(const Uuid& uuid) noexcept;
-        const ComponentSignal* getSignalByUuid(const Uuid& uuid) const noexcept;
-        ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) noexcept;
-        const ComponentSignal* getSignalOfPin(const Uuid& symbVar, const Uuid& item, const Uuid& pin) const noexcept;
-        void addSignal(ComponentSignal& signal) noexcept;
-        void removeSignal(ComponentSignal& signal) noexcept;
+        ComponentSignalList& getSignals() noexcept {return mSignals;}
+        const ComponentSignalList& getSignals() const noexcept {return mSignals;}
 
         // Symbol Variant Methods
-        const QList<ComponentSymbolVariant*>& getSymbolVariants() noexcept {return mSymbolVariants;}
-        int getSymbolVariantCount() const noexcept {return mSymbolVariants.count();}
-        ComponentSymbolVariant* getSymbolVariant(int index) noexcept {return mSymbolVariants.value(index);}
-        const ComponentSymbolVariant* getSymbolVariant(int index) const noexcept {return mSymbolVariants.value(index);}
-        ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) noexcept;
-        const ComponentSymbolVariant* getSymbolVariantByUuid(const Uuid& uuid) const noexcept;
-        void addSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
-        void removeSymbolVariant(ComponentSymbolVariant& symbolVariant) noexcept;
+        ComponentSymbolVariantList& getSymbolVariants() noexcept {return mSymbolVariants;}
+        const ComponentSymbolVariantList& getSymbolVariants() const noexcept {return mSymbolVariants;}
 
-        // Symbol Variant Item Methods
-        ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) noexcept;
-        const ComponentSymbolVariantItem* getSymbVarItem(const Uuid& symbVar, const Uuid& item) const noexcept;
+        // Convenience Methods
+        std::shared_ptr<ComponentSignal> getSignalOfPin(const Uuid& symbVar, const Uuid& item,
+                                                        const Uuid& pin);
+        std::shared_ptr<const ComponentSignal> getSignalOfPin(const Uuid& symbVar, const Uuid& item,
+                                                              const Uuid& pin) const;
+        std::shared_ptr<ComponentSymbolVariantItem> getSymbVarItem(const Uuid& symbVar,
+                                                                   const Uuid& item);
+        std::shared_ptr<const ComponentSymbolVariantItem> getSymbVarItem(const Uuid& symbVar,
+                                                                         const Uuid& item) const;
 
         // Operator Overloadings
         Component& operator=(const Component& rhs) = delete;
@@ -118,22 +122,20 @@ class Component final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("component");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Conponent Attributes
+    private: // Data
         bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
         QString mDefaultValue;
         NormDependentPrefixMap mPrefixes;
-        QScopedPointer<AttributeList> mAttributes; ///< all attributes in a specific order
-        QList<ComponentSignal*> mSignals; ///< empty if the component has no signals
-        QList<ComponentSymbolVariant*> mSymbolVariants; ///< minimum one entry
+        AttributeList mAttributes; ///< all attributes in a specific order
+        ComponentSignalList mSignals;
+        ComponentSymbolVariantList mSymbolVariants;
 };
 
 /*****************************************************************************************

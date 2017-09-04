@@ -166,7 +166,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd)
         }
         Q_ASSERT(mCurrentIndex == mCommands.count());
 
-        // add command to the command stack and emit signals
+        // add command to the command stack
         mCommands.append(cmdScopeGuard.take()); // move ownership of "cmd" to "mCommands"
         mCurrentIndex++;
 
@@ -176,6 +176,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd)
         emit canUndoChanged(true);
         emit canRedoChanged(false);
         emit cleanChanged(false);
+        emit stateModified();
     } else {
         // the command has done nothing, so we will just discard it
         cmd->undo(); // only to be sure the command has executed nothing...
@@ -212,6 +213,9 @@ void UndoStack::appendToCmdGroup(UndoCommand* cmd)
     // append new command as a child of active command group
     // note: this will also execute the new command!
     mActiveCommandGroup->appendChild(cmdScopeGuard.take()); // can throw
+
+    // emit signals
+    emit stateModified();
 }
 
 void UndoStack::commitCmdGroup()
@@ -263,6 +267,7 @@ void UndoStack::abortCmdGroup()
     emit canRedoChanged(false);
     emit cleanChanged(isClean());
     emit commandGroupAborted(); // this is important!
+    emit stateModified();
 }
 
 void UndoStack::undo()
@@ -285,6 +290,7 @@ void UndoStack::undo()
     emit canUndoChanged(canUndo());
     emit canRedoChanged(canRedo());
     emit cleanChanged(isClean());
+    emit stateModified();
 }
 
 void UndoStack::redo()
@@ -307,6 +313,7 @@ void UndoStack::redo()
     emit canUndoChanged(canUndo());
     emit canRedoChanged(canRedo());
     emit cleanChanged(isClean());
+    emit stateModified();
 }
 
 void UndoStack::clear() noexcept

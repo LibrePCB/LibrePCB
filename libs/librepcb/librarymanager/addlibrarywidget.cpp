@@ -187,6 +187,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
         QScopedPointer<Library> lib(new Library(Uuid::createRandom(), version, author,
                                                 name, desc, QString("")));
         lib->setUrl(url);
+        lib->setIconFilePath(qApp->getResourcesDir().getPathTo("library/default_image.png"));
         lib->saveTo(directory); // can throw
 
         // copy license file

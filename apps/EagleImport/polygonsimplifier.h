@@ -56,9 +56,9 @@ class PolygonSimplifier
 
         // Private Methods
         bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<librepcb::Polygon*>& lines, librepcb::Point& p,
+        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
                        librepcb::Length* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<librepcb::Polygon*>& lines, librepcb::Point& p,
+        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
                        librepcb::Length* width, librepcb::Polygon** line) noexcept;
 
 

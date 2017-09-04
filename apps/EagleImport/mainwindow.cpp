@@ -258,9 +258,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     startpos = Point(-startpos.getX(), -startpos.getY());
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
-                Polygon* polygon = Polygon::createCurve(layerName, lineWidth, fill, isGrabArea,
-                                                        startpos, endpos, angle);
-                symbol->addPolygon(*polygon);
+                symbol->getPolygons().append(std::shared_ptr<Polygon>(Polygon::createCurve(
+                    layerName, lineWidth, fill, isGrabArea, startpos, endpos, angle)));
             }
             else if (child->getName() == "rectangle")
             {
@@ -273,12 +272,12 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Point p2(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true));
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
-                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-                polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
-                symbol->addPolygon(*polygon);
+                std::shared_ptr<Polygon> polygon(new Polygon(layerName, lineWidth, fill, isGrabArea, p1));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
+                symbol->getPolygons().append(polygon);
             }
             else if (child->getName() == "polygon")
             {
@@ -287,16 +286,16 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 bool isGrabArea = true;
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
-                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0));
+                std::shared_ptr<Polygon> polygon(new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0)));
                 foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
-                        polygon->appendSegment(*new PolygonSegment(p, Angle::deg0()));
+                        polygon->getSegments().append(std::make_shared<PolygonSegment>(p, Angle::deg0()));
                 }
                 polygon->close();
-                symbol->addPolygon(*polygon);
+                symbol->getPolygons().append(polygon);
             }
             else if (child->getName() == "circle")
             {
@@ -306,9 +305,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 Length lineWidth = child->getAttribute<Length>("width", true);
                 bool fill = (lineWidth == 0);
                 bool isGrabArea = true;
-                Ellipse* ellipse = new Ellipse(layerName, lineWidth, fill, isGrabArea,
-                                               center, radius, radius, Angle::deg0());
-                symbol->addEllipse(*ellipse);
+                symbol->getEllipses().append(std::make_shared<Ellipse>(layerName,
+                    lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
             }
             else if (child->getName() == "text")
             {
@@ -331,8 +329,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
                 Alignment align(HAlign::left(), VAlign::bottom());
-                Text* text = new Text(layerName, textStr, pos, rot, height, align);
-                symbol->addText(*text);
+                symbol->getTexts().append(std::make_shared<Text>(
+                    layerName, textStr, pos, rot, height, align));
             }
             else if (child->getName() == "pin")
             {
@@ -359,8 +357,8 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                     angleDeg += 180;
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
-                SymbolPin* pin = new SymbolPin(pinUuid, name, pos, len, rot);
-                symbol->addPin(*pin);
+                symbol->getPins().append(std::make_shared<SymbolPin>(pinUuid, name,
+                                                                     pos, len, rot));
             }
             else
             {
@@ -399,12 +397,11 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
 
         // create footprint
         Uuid fptUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_footprints", name);
-        Footprint* footprint = new Footprint(fptUuid, "default", "");
+        Footprint footprint(fptUuid, "default", "");
 
         // create package
         Uuid pkgUuid = getOrCreateUuid(outputSettings, filepath, "packages_to_packages", name);
         Package* package = new Package(pkgUuid, Version("0.1"), "LibrePCB", name, desc, "");
-        package->addFootprint(*footprint);
 
         foreach (DomElement* child, node->getChilds()) {
             if (child->getName() == "description")
@@ -424,9 +421,8 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     startpos = Point(-startpos.getX(), -startpos.getY());
                     endpos = Point(-endpos.getX(), -endpos.getY());
                 }
-                Polygon* polygon = Polygon::createCurve(layerName, lineWidth, fill, isGrabArea,
-                                                        startpos, endpos, angle);
-                footprint->addPolygon(*polygon);
+                footprint.getPolygons().append(std::shared_ptr<Polygon>(Polygon::createCurve(
+                    layerName, lineWidth, fill, isGrabArea, startpos, endpos, angle)));
             }
             else if (child->getName() == "rectangle")
             {
@@ -439,12 +435,12 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Point p2(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y1", true));
                 Point p3(child->getAttribute<Length>("x2", true), child->getAttribute<Length>("y2", true));
                 Point p4(child->getAttribute<Length>("x1", true), child->getAttribute<Length>("y2", true));
-                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-                polygon->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-                polygon->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
-                footprint->addPolygon(*polygon);
+                std::shared_ptr<Polygon> polygon(new Polygon(layerName, lineWidth, fill, isGrabArea, p1));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+                polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
+                footprint.getPolygons().append(polygon);
             }
             else if (child->getName() == "polygon")
             {
@@ -453,16 +449,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 bool isGrabArea = true;
                 Length lineWidth(0);
                 if (child->hasAttribute("width")) lineWidth = child->getAttribute<Length>("width", true);
-                Polygon* polygon = new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0));
+                std::shared_ptr<Polygon> polygon(new Polygon(layerName, lineWidth, fill, isGrabArea, Point(0, 0)));
                 foreach (DomElement* vertex, child->getChilds()) {
                     Point p(vertex->getAttribute<Length>("x", true), vertex->getAttribute<Length>("y", true));
                     if (vertex == child->getFirstChild())
                         polygon->setStartPos(p);
                     else
-                        polygon->appendSegment(*new PolygonSegment(p, Angle::deg0()));
+                        polygon->getSegments().append(std::make_shared<PolygonSegment>(p, Angle::deg0()));
                 }
                 polygon->close();
-                footprint->addPolygon(*polygon);
+                footprint.getPolygons().append(polygon);
             }
             else if (child->getName() == "circle")
             {
@@ -472,9 +468,9 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Length lineWidth = child->getAttribute<Length>("width", true);
                 bool fill = (lineWidth == 0);
                 bool isGrabArea = true;
-                Ellipse* ellipse = new Ellipse(layerName, lineWidth, fill, isGrabArea,
-                                               center, radius, radius, Angle::deg0());
-                footprint->addEllipse(*ellipse);
+                std::shared_ptr<Ellipse> ellipse(new Ellipse(layerName, lineWidth, fill, isGrabArea,
+                                                 center, radius, radius, Angle::deg0()));
+                footprint.getEllipses().append(ellipse);
             }
             else if (child->getName() == "text")
             {
@@ -497,16 +493,15 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
                 Alignment align(HAlign::left(), VAlign::bottom());
-                Text* text = new Text(layerName, textStr, pos, rot, height, align);
-                footprint->addText(*text);
+                std::shared_ptr<Text> text(new Text(layerName, textStr, pos, rot, height, align));
+                footprint.getTexts().append(text);
             }
             else if (child->getName() == "pad")
             {
                 Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute<QString>("name", true));
                 QString name = child->getAttribute<QString>("name", true);
                 // add package pad
-                PackagePad* pkgPad = new PackagePad(padUuid, name);
-                package->addPad(*pkgPad);
+                package->getPads().append(std::make_shared<PackagePad>(padUuid, name));
                 // add footprint pad
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 Length drillDiameter = child->getAttribute<Length>("drill", true);
@@ -514,16 +509,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 if (child->hasAttribute("diameter")) padDiameter = child->getAttribute<Length>("diameter", true);
                 Length width = padDiameter;
                 Length height = padDiameter;
-                FootprintPadTht::Shape_t shape;
+                FootprintPad::Shape shape;
                 QString shapeStr = child->hasAttribute("shape") ? child->getAttribute<QString>("shape", true) : "round";
                 if (shapeStr == "square") {
-                    shape = FootprintPadTht::Shape_t::RECT;
+                    shape = FootprintPad::Shape::RECT;
                 } else if (shapeStr == "octagon") {
-                    shape = FootprintPadTht::Shape_t::OCTAGON;
+                    shape = FootprintPad::Shape::OCTAGON;
                 } else if (shapeStr == "round") {
-                    shape = FootprintPadTht::Shape_t::ROUND;
+                    shape = FootprintPad::Shape::ROUND;
                 } else if (shapeStr == "long") {
-                    shape = FootprintPadTht::Shape_t::ROUND;
+                    shape = FootprintPad::Shape::ROUND;
                     width = padDiameter * 2;
                 } else {
                     throw Exception(__FILE__, __LINE__, "Invalid shape: " % shapeStr % " :: " % filepath.toStr());
@@ -535,24 +530,24 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                     angleDeg += 180;
                 }
                 Angle rot = Angle::fromDeg(angleDeg);
-                FootprintPad* fptPad = new FootprintPadTht(padUuid, pos, rot, width,
-                                                           height, shape, drillDiameter);
-                footprint->addPad(*fptPad);
+                std::shared_ptr<FootprintPad> fptPad(new FootprintPad(
+                    padUuid, pos, rot, shape, width, height, drillDiameter,
+                    FootprintPad::BoardSide::THT));
+                footprint.getPads().append(fptPad);
             }
             else if (child->getName() == "smd")
             {
                 Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), child->getAttribute<QString>("name", true));
                 QString name = child->getAttribute<QString>("name", true);
                 // add package pad
-                PackagePad* pkgPad = new PackagePad(padUuid, name);
-                package->addPad(*pkgPad);
+                package->getPads().append(std::make_shared<PackagePad>(padUuid, name));
                 // add footprint pad
                 QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
-                FootprintPadSmt::BoardSide_t side;
+                FootprintPad::BoardSide side;
                 if (layerName == GraphicsLayer::sTopCopper) {
-                    side = FootprintPadSmt::BoardSide_t::TOP;
+                    side = FootprintPad::BoardSide::TOP;
                 } else if (layerName == GraphicsLayer::sBotCopper) {
-                    side = FootprintPadSmt::BoardSide_t::BOTTOM;
+                    side = FootprintPad::BoardSide::BOTTOM;
                 } else {
                     throw Exception(__FILE__, __LINE__, QString("Invalid pad layer: %1").arg(layerName));
                 }
@@ -566,16 +561,16 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 Angle rot = Angle::fromDeg(angleDeg);
                 Length width = child->getAttribute<Length>("dx", true);
                 Length height = child->getAttribute<Length>("dy", true);
-                FootprintPad* fptPad = new FootprintPadSmt(padUuid, pos, rot, width,
-                                                           height, side);
-                footprint->addPad(*fptPad);
+                std::shared_ptr<FootprintPad> fptPad(new FootprintPad(
+                    padUuid, pos, rot, FootprintPad::Shape::RECT, width, height,
+                    Length(0), side));
+                footprint.getPads().append(fptPad);
             }
             else if (child->getName() == "hole")
             {
                 Point pos(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
                 Length diameter(child->getAttribute<Length>("drill", true));
-                Hole* hole = new Hole(pos, diameter);
-                footprint->addHole(*hole);
+                footprint.getHoles().append(std::make_shared<Hole>(pos, diameter));
             }
             else
             {
@@ -585,8 +580,11 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
         }
 
         // convert line rects to polygon rects
-        PolygonSimplifier<Footprint> polygonSimplifier(*footprint);
+        PolygonSimplifier<Footprint> polygonSimplifier(footprint);
         polygonSimplifier.convertLineRectsToPolygonRects(false, true);
+
+        // add footprint to package
+        package->getFootprints().append(std::make_shared<Footprint>(footprint));
 
         // save package to file
         package->saveIntoParentDirectory(FilePath(QString("%1/pkg").arg(ui->output->text())));
@@ -620,12 +618,12 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
         Component* component = new Component(uuid, Version("0.1"), "LibrePCB", name, desc, "");
 
         // properties
-        component->addPrefix("", node->hasAttribute("prefix") ? node->getAttribute<QString>("prefix", false) : "");
+        component->getPrefixes().insert("", node->hasAttribute("prefix") ? node->getAttribute<QString>("prefix", false) : "");
 
         // symbol variant
         Uuid symbVarUuid = getOrCreateUuid(outputSettings, filepath, "component_symbolvariants", uuid.toStr());
-        ComponentSymbolVariant* symbvar = new ComponentSymbolVariant(symbVarUuid, "", "default", "");
-        component->addSymbolVariant(*symbvar);
+        std::shared_ptr<ComponentSymbolVariant> symbvar(new ComponentSymbolVariant(symbVarUuid, "", "default", ""));
+        component->getSymbolVariants().append(symbvar);
 
         // signals
         DomElement* device = node->getFirstChild("devices/device", true, true);
@@ -638,11 +636,10 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
             if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
             Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
 
-            if (!component->getSignalByUuid(signalUuid))
+            if (!component->getSignals().contains(signalUuid))
             {
                 // create signal
-                ComponentSignal* signal = new ComponentSignal(signalUuid, pinName);
-                component->addSignal(*signal);
+                component->getSignals().append(std::make_shared<ComponentSignal>(signalUuid, pinName));
             }
         }
 
@@ -654,7 +651,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
 
             // create symbol variant item
             Uuid symbVarItemUuid = getOrCreateUuid(outputSettings, filepath, "symbolgates_to_symbvaritems", uuid.toStr(), gateName);
-            ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName);
+            std::shared_ptr<ComponentSymbolVariantItem> item(new ComponentSymbolVariantItem(symbVarItemUuid, symbolUuid, true, (gateName == "G$1") ? "" : gateName));
 
             // connect pins
             for (DomElement* connect = device->getFirstChild("connects/connect", false, false);
@@ -667,13 +664,13 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
                     Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
-                    ComponentPinSignalMapItem* map = new ComponentPinSignalMapItem(pinUuid,
-                        signalUuid, ComponentPinSignalMapItem::PinDisplayType_t::COMPONENT_SIGNAL);
-                    item->addPinSignalMapItem(*map);
+                    item->getPinSignalMap().append(
+                        std::make_shared<ComponentPinSignalMapItem>(pinUuid,
+                            signalUuid, CmpSigPinDisplayType::componentSignal()));
                 }
             }
 
-            symbvar->addItem(*item);
+            symbvar->getSymbolItems().append(item);
         }
 
         // create devices
@@ -709,7 +706,8 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                 {
                     Uuid padUuid = getOrCreateUuid(outputSettings, filepath, "package_pads", fptUuid.toStr(), padName);
                     Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
-                    device->addPadSignalMapping(padUuid, signalUuid);
+                    device->getPadSignalMap().append(
+                        std::make_shared<DevicePadSignalMapItem>(padUuid, signalUuid));
                 }
             }
 

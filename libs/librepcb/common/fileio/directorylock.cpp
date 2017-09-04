@@ -48,12 +48,10 @@ DirectoryLock::DirectoryLock(const FilePath& dir) noexcept :
 
 DirectoryLock::~DirectoryLock() noexcept
 {
-    if (mLockedByThisObject) {
-        try {
-            unlock(); // can throw
-        } catch (const Exception& e) {
-            qCritical() << "Could not remove lock file:" << e.getMsg();
-        }
+    try {
+        unlockIfLocked(); // can throw
+    } catch (const Exception& e) {
+        qCritical() << "Could not remove lock file:" << e.getMsg();
     }
 }
 
@@ -128,6 +126,37 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void DirectoryLock::tryLock(bool* wasStale)
+{
+    LockStatus status = getStatus(); // can throw
+    if (wasStale) {
+        *wasStale = (status == LockStatus::StaleLock);
+    }
+    switch (status)
+    {
+        case LockStatus::Unlocked:
+        case LockStatus::StaleLock:
+            lock(); // can throw
+            break;
+        case LockStatus::Locked:
+            throw RuntimeError(__FILE__, __LINE__, QString(tr("The directory is locked, "
+                "check if it is already opened elsewhere: %1")).arg(mDirToLock.toNative()));
+        default:
+            Q_ASSERT(false);
+            throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+bool DirectoryLock::unlockIfLocked()
+{
+    if (mLockedByThisObject) {
+        unlock(); // can throw
+        return true;
+    } else {
+        return false;
+    }
+}
 
 void DirectoryLock::lock()
 {

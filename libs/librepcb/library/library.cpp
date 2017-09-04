@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "library.h"
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
 #include "cat/componentcategory.h"
@@ -66,13 +67,12 @@ Library::Library(const FilePath& libDir, bool readOnly) :
 
     // read dependency UUIDs
     foreach (const DomElement* node, root.getChilds("dependency")) {
-        mDependencies.append(node->getText<Uuid>(true));
+        mDependencies.insert(node->getText<Uuid>(true));
     }
 
     // load image if available
-    FilePath iconFilePath = libDir.getPathTo("library.png");
-    if (iconFilePath.isExistingFile()) {
-        mIcon = QPixmap(iconFilePath.toStr());
+    if (getIconFilePath().isExistingFile()) {
+        mIcon = QPixmap(getIconFilePath().toStr());
     }
 
     cleanupAfterLoadingElementFromFile();
@@ -82,6 +82,50 @@ Library::~Library() noexcept
 {
 }
 
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+template <typename ElementType>
+FilePath Library::getElementsDirectory() const noexcept
+{
+    return mDirectory.getPathTo(ElementType::getShortElementName());
+}
+
+// explicit template instantiations
+template FilePath Library::getElementsDirectory<ComponentCategory>() const noexcept;
+template FilePath Library::getElementsDirectory<PackageCategory>() const noexcept;
+template FilePath Library::getElementsDirectory<Symbol>() const noexcept;
+template FilePath Library::getElementsDirectory<Package>() const noexcept;
+template FilePath Library::getElementsDirectory<Component>() const noexcept;
+template FilePath Library::getElementsDirectory<Device>() const noexcept;
+
+FilePath Library::getIconFilePath() const noexcept
+{
+    return mDirectory.getPathTo("library.png");
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void Library::setIconFilePath(const FilePath& png) noexcept
+{
+    if (png == getIconFilePath()) {
+        return;
+    }
+
+    if (getIconFilePath().isExistingFile()) {
+        QFile(getIconFilePath().toStr()).remove();
+    }
+
+    if (png.isExistingFile()) {
+        QFile::copy(png.toStr(), getIconFilePath().toStr());
+        mIcon = QPixmap(getIconFilePath().toStr());
+    } else {
+        mIcon = QPixmap();
+    }
+}
 
 /*****************************************************************************************
  *  General Methods
@@ -90,7 +134,7 @@ Library::~Library() noexcept
 void Library::addDependency(const Uuid& uuid) noexcept
 {
     if ((!uuid.isNull()) && (!mDependencies.contains(uuid))) {
-        mDependencies.append(uuid);
+        mDependencies.insert(uuid);
     } else {
         qWarning() << "Invalid or duplicate library dependency:" << uuid.toStr();
     }
@@ -99,7 +143,7 @@ void Library::addDependency(const Uuid& uuid) noexcept
 void Library::removeDependency(const Uuid& uuid) noexcept
 {
     if ((!uuid.isNull()) && (mDependencies.contains(uuid))) {
-        mDependencies.removeAll(uuid);
+        mDependencies.remove(uuid);
     } else {
         qWarning() << "Invalid library dependency:" << uuid.toStr();
     }
@@ -109,7 +153,7 @@ template <typename ElementType>
 QList<FilePath> Library::searchForElements() const noexcept
 {
     QList<FilePath> list;
-    FilePath subDirFilePath = mDirectory.getPathTo(ElementType::getShortElementName());
+    FilePath subDirFilePath = getElementsDirectory<ElementType>();
     QDir subDir(subDirFilePath.toStr());
     foreach (const QString& dirname, subDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         FilePath elementFilePath = subDirFilePath.getPathTo(dirname);
@@ -151,7 +195,7 @@ void Library::serialize(DomElement& root) const
 {
     LibraryBaseElement::serialize(root);
     root.appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));
-    foreach (const Uuid& uuid, mDependencies) {
+    foreach (const Uuid& uuid, Toolbox::sortedQSet(mDependencies)) {
         root.appendTextChild("dependency", uuid);
     }
 }

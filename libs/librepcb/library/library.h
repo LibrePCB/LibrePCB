@@ -60,12 +60,17 @@ class Library final : public LibraryBaseElement
         ~Library() noexcept;
 
         // Getters
+        template <typename ElementType>
+        FilePath getElementsDirectory() const noexcept;
         const QUrl& getUrl() const noexcept {return mUrl;}
-        const QList<Uuid>& getDependencies() const noexcept {return mDependencies;}
+        const QSet<Uuid>& getDependencies() const noexcept {return mDependencies;}
+        FilePath getIconFilePath() const noexcept;
         const QPixmap& getIcon() const noexcept {return mIcon;}
 
         // Setters
         void setUrl(const QUrl& url) noexcept {mUrl = url;}
+        void setDependencies(const QSet<Uuid>& deps) noexcept {mDependencies = deps;}
+        void setIconFilePath(const FilePath& png) noexcept;
 
         // General Methods
         void addDependency(const Uuid& uuid) noexcept;
@@ -91,9 +96,8 @@ class Library final : public LibraryBaseElement
 
 
     private: // Data
-
         QUrl mUrl;
-        QList<Uuid> mDependencies;
+        QSet<Uuid> mDependencies;
         QPixmap mIcon;
 };
 

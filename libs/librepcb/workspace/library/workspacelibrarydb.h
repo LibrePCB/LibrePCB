@@ -85,6 +85,10 @@ class WorkspaceLibraryDb final : public QObject
         FilePath getLatestComponent(const Uuid& uuid) const;
         FilePath getLatestDevice(const Uuid& uuid) const;
 
+        // Getters: Library elements of a specified library
+        template <typename ElementType>
+        QList<FilePath> getLibraryElements(const FilePath& lib) const;
+
         // Getters: Element Metadata
         template <typename ElementType>
         void getElementTranslations(const FilePath& elemDir, const QStringList& localeOrder,
@@ -95,7 +99,12 @@ class WorkspaceLibraryDb final : public QObject
         // Getters: Special
         QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const;
         QSet<Uuid> getPackageCategoryChilds(const Uuid& parent) const;
+        QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
+        QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
+        QSet<Uuid> getSymbolsByCategory(const Uuid& category) const;
+        QSet<Uuid> getPackagesByCategory(const Uuid& category) const;
         QSet<Uuid> getComponentsByCategory(const Uuid& category) const;
+        QSet<Uuid> getDevicesByCategory(const Uuid& category) const;
         QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
 
         // General Methods
@@ -127,16 +136,24 @@ class WorkspaceLibraryDb final : public QObject
                                                                const Uuid& uuid) const;
         FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
         QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const;
+        QList<Uuid> getCategoryParents(const QString& tablename, Uuid category) const;
+        Uuid getCategoryParent(const QString& tablename, const Uuid& category) const;
         QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
                                          const Uuid& categoryUuid) const;
+        int getLibraryId(const FilePath& lib) const;
+        QList<FilePath> getLibraryElements(const FilePath& lib, const QString& tablename) const;
         void createAllTables();
-
+        void setDbVersion(int version);
+        int getDbVersion() const noexcept;
 
 
         // Attributes
         Workspace& mWorkspace;
         QScopedPointer<SQLiteDatabase> mDb; ///< the SQLite database "library_cache.sqlite"
         QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
+
+        // Constants
+        static const int sCurrentDbVersion = 1;
 };
 
 /*****************************************************************************************

@@ -35,6 +35,12 @@ namespace librepcb {
 class FilePath;
 
 namespace library {
+class Library;
+
+namespace editor {
+class LibraryEditor;
+}
+
 namespace manager {
 class LibraryManager;
 }
@@ -189,11 +195,25 @@ class ControlPanel final : public QMainWindow
         project::editor::ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
 
 
+        // Library Management
+        void openLibraryEditor(QSharedPointer<library::Library> lib) noexcept;
+        void libraryEditorDestroyed() noexcept;
+
+        /**
+         * @brief Close all open library editors
+         *
+         * @param askForSave    If true, the user will be asked to save all modified libraries
+         *
+         * @retval  true if all library editors successfully closed, false otherwise
+         */
+        bool closeAllLibraryEditors(bool askForSave) noexcept;
+
         // Attributes
         workspace::Workspace& mWorkspace;
         QScopedPointer<Ui::ControlPanel> mUi;
         QScopedPointer<library::manager::LibraryManager> mLibraryManager;
         QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
+        QHash<library::Library*, library::editor::LibraryEditor*> mOpenLibraryEditors;
 };
 
 /*****************************************************************************************

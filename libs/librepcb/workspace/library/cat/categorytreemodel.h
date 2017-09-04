@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "categorytreeitem.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,7 +33,6 @@ namespace librepcb {
 namespace workspace {
 
 class WorkspaceLibraryDb;
-class CategoryTreeItem;
 
 /*****************************************************************************************
  *  Class CategoryTreeModel
@@ -41,15 +41,19 @@ class CategoryTreeItem;
 /**
  * @brief The CategoryTreeModel class
  */
+template <typename ElementType>
 class CategoryTreeModel final : public QAbstractItemModel
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
+        CategoryTreeModel() = delete;
+        CategoryTreeModel(const CategoryTreeModel& other) = delete;
         explicit CategoryTreeModel(const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept;
         ~CategoryTreeModel() noexcept;
+
+        // Getters
+        CategoryTreeItem<ElementType>* getItem(const QModelIndex& index) const;
 
         // Inherited Methods
         virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
@@ -59,21 +63,18 @@ class CategoryTreeModel final : public QAbstractItemModel
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
         virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
+        // Operator Overloadings
+        CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
+
 
     private:
 
-        // make some methods inaccessible...
-        CategoryTreeModel(const CategoryTreeModel& other);
-        CategoryTreeModel& operator=(const CategoryTreeModel& rhs);
-
-
-        // Private Methods
-        CategoryTreeItem* getItem(const QModelIndex& index) const;
-
-
         // Attributes
-        CategoryTreeItem* mRootItem;
+        QScopedPointer<CategoryTreeItem<ElementType>> mRootItem;
 };
+
+typedef CategoryTreeModel<library::ComponentCategory> ComponentCategoryTreeModel;
+typedef CategoryTreeModel<library::PackageCategory> PackageCategoryTreeModel;
 
 /*****************************************************************************************
  *  End of File

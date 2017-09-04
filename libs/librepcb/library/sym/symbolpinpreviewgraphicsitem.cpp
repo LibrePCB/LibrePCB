@@ -39,8 +39,8 @@ namespace library {
  ****************************************************************************************/
 
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
-        const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept :
-    GraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
+        const ComponentSignal* compSignal, const CmpSigPinDisplayType& displayType) noexcept :
+    QGraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
     mDrawBoundingRect(false)
 {
     setToolTip(mPin.getName());
@@ -98,17 +98,17 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mBoundingRect = mBoundingRect.united(lineRect).normalized();
 
     // text
-    switch (mDisplayType)
-    {
-        case PinDisplayType_t::NONE:
-            mStaticText.setText(""); break;
-        case PinDisplayType_t::PIN_NAME:
-            mStaticText.setText(mPin.getName()); break;
-        case PinDisplayType_t::COMPONENT_SIGNAL:
-            mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : ""); break;
-        case PinDisplayType_t::NET_SIGNAL:
-            mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : ""); break;
-        default: Q_ASSERT(false);
+    if (mDisplayType == CmpSigPinDisplayType::none()) {
+        mStaticText.setText("");
+    } else if (mDisplayType == CmpSigPinDisplayType::pinName()) {
+        mStaticText.setText(mPin.getName());
+    } else  if (mDisplayType == CmpSigPinDisplayType::componentSignal()) {
+        mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : "");
+    } else if (mDisplayType == CmpSigPinDisplayType::netSignal()) {
+        mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : "");
+    } else {
+        Q_ASSERT(false);
+        mStaticText.setText("???");
     }
     qreal x = mPin.getLength().toPx() + 4;
     mStaticText.prepare(QTransform(), mFont);

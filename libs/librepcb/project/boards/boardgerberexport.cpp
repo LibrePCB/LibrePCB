@@ -28,8 +28,7 @@
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/geometry/hole.h>
 #include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintpadsmt.h>
-#include <librepcb/library/pkg/footprintpadtht.h>
+#include <librepcb/library/pkg/footprintpad.h>
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
@@ -86,15 +85,13 @@ void BoardGerberExport::exportDrillsPTH() const
     // footprint holes and pads
     foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
         const BI_Footprint& footprint = device->getFootprint();
-        for (int i = 0; i < footprint.getLibFootprint().getHoleCount(); ++i) {
-            const Hole* hole = footprint.getLibFootprint().getHole(i); Q_ASSERT(hole);
-            gen.drill(footprint.mapToScene(hole->getPosition()), hole->getDiameter());
+        for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
+            gen.drill(footprint.mapToScene(hole.getPosition()), hole.getDiameter());
         }
         foreach (const BI_FootprintPad* pad, footprint.getPads()) {
             const library::FootprintPad& libPad = pad->getLibPad();
-            if (libPad.getTechnology() == library::FootprintPad::Technology_t::THT) {
-                const library::FootprintPadTht* tht = dynamic_cast<const library::FootprintPadTht*>(&libPad); Q_ASSERT(tht);
-                gen.drill(pad->getPosition(), tht->getDrillDiameter());
+            if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
+                gen.drill(pad->getPosition(), libPad.getDrillDiameter());
             }
         }
     }
@@ -253,12 +250,11 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 
     // draw polygons
-    for (int i = 0; i < footprint.getLibFootprint().getPolygonCount(); ++i) {
-        const Polygon* polygon = footprint.getLibFootprint().getPolygon(i); Q_ASSERT(polygon);
+    for (const Polygon& polygon : footprint.getLibFootprint().getPolygons()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
-        if (layer == polygon->getLayerName()) {
+        if (layer == polygon.getLayerName()) {
             Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
-            Polygon p = polygon->rotated(rot).translate(footprint.getPosition());
+            Polygon p = polygon.rotated(rot).translate(footprint.getPosition());
             p.setLineWidth(calcWidthOfLayer(p.getLineWidth(), layer));
             gen.drawPolygonOutline(p);
             if (p.isFilled()) {
@@ -268,12 +264,11 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 
     // draw ellipses
-    for (int i = 0; i < footprint.getLibFootprint().getEllipseCount(); ++i) {
-        const Ellipse* ellipse = footprint.getLibFootprint().getEllipse(i); Q_ASSERT(ellipse);
+    for (const Ellipse& ellipse : footprint.getLibFootprint().getEllipses()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
-        if (layer == ellipse->getLayerName()) {
+        if (layer == ellipse.getLayerName()) {
             Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
-            Ellipse e = ellipse->rotated(rot).translate(footprint.getPosition());
+            Ellipse e = ellipse.rotated(rot).translate(footprint.getPosition());
             e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
             gen.drawEllipseOutline(e);
             if (e.isFilled()) {
@@ -285,9 +280,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     // TODO: draw texts
 
     // draw holes
-    for (int i = 0; i < footprint.getLibFootprint().getHoleCount(); ++i) {
-        const Hole* hole = footprint.getLibFootprint().getHole(i); Q_ASSERT(hole);
-        gen.flashCircle(footprint.mapToScene(hole->getPosition()), hole->getDiameter(), Length(0));
+    for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
+        gen.flashCircle(footprint.mapToScene(hole.getPosition()), hole.getDiameter(), Length(0));
     }
 }
 
@@ -311,41 +305,26 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
         height += clearance*2;
     }
 
-    switch (libPad.getTechnology())
+    switch (libPad.getShape())
     {
-        case library::FootprintPad::Technology_t::SMT: {
-            //const library::FootprintPadSmt* smt = dynamic_cast<const library::FootprintPadSmt*>(&libPad); Q_ASSERT(smt);
+        case library::FootprintPad::Shape::ROUND: {
+            if (width == height) {
+                gen.flashCircle(pad.getPosition(), width, Length(0));
+            } else {
+                gen.flashObround(pad.getPosition(), width, height, rot, Length(0));
+            }
+            break;
+        }
+        case library::FootprintPad::Shape::RECT: {
             gen.flashRect(pad.getPosition(), width, height, rot, Length(0));
             break;
         }
-        case library::FootprintPad::Technology_t::THT: {
-            const library::FootprintPadTht* tht = dynamic_cast<const library::FootprintPadTht*>(&libPad); Q_ASSERT(tht);
-            switch (tht->getShape())
-            {
-                case library::FootprintPadTht::Shape_t::ROUND: {
-                    if (width == height) {
-                        gen.flashCircle(pad.getPosition(), width, Length(0));
-                    } else {
-                        gen.flashObround(pad.getPosition(), width, height, rot, Length(0));
-                    }
-                    break;
-                }
-                case library::FootprintPadTht::Shape_t::RECT: {
-                    gen.flashRect(pad.getPosition(), width, height, rot, Length(0));
-                    break;
-                }
-                case library::FootprintPadTht::Shape_t::OCTAGON: {
-                    if (width != height) {
-                        throw LogicError(__FILE__, __LINE__,
-                            tr("Sorry, non-square octagons are not yet supported."));
-                    }
-                    gen.flashRegularPolygon(pad.getPosition(), width, 8, rot, Length(0));
-                    break;
-                }
-                default: {
-                    throw LogicError(__FILE__, __LINE__);
-                }
+        case library::FootprintPad::Shape::OCTAGON: {
+            if (width != height) {
+                throw LogicError(__FILE__, __LINE__,
+                    tr("Sorry, non-square octagons are not yet supported."));
             }
+            gen.flashRegularPolygon(pad.getPosition(), width, 8, rot, Length(0));
             break;
         }
         default: {

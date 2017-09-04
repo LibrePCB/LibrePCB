@@ -36,40 +36,62 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept :
+template <typename ElementType>
+CategoryTreeModel<ElementType>::CategoryTreeModel(const WorkspaceLibraryDb& library,
+                                                  const QStringList& localeOrder) noexcept :
     QAbstractItemModel(nullptr)
 {
-    mRootItem = new CategoryTreeItem(library, localeOrder, nullptr, Uuid());
+    mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder, nullptr, Uuid()));
 }
 
-CategoryTreeModel::~CategoryTreeModel() noexcept
+template <typename ElementType>
+CategoryTreeModel<ElementType>::~CategoryTreeModel() noexcept
 {
-    delete mRootItem;       mRootItem = nullptr;
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+template <typename ElementType>
+CategoryTreeItem<ElementType>* CategoryTreeModel<ElementType>::getItem(const QModelIndex& index) const
+{
+    if (index.isValid())
+    {
+        CategoryTreeItem<ElementType>* item = static_cast<CategoryTreeItem<ElementType>*>(
+                                                  index.internalPointer());
+        if (item)
+            return item;
+    }
+    return mRootItem.data();
 }
 
 /*****************************************************************************************
  *  Inherited Methods
  ****************************************************************************************/
 
-int CategoryTreeModel::columnCount(const QModelIndex& parent) const
+template <typename ElementType>
+int CategoryTreeModel<ElementType>::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return mRootItem->getColumnCount();
 }
 
-int CategoryTreeModel::rowCount(const QModelIndex& parent) const
+template <typename ElementType>
+int CategoryTreeModel<ElementType>::rowCount(const QModelIndex& parent) const
 {
-    CategoryTreeItem* parentItem = getItem(parent);
+    CategoryTreeItem<ElementType>* parentItem = getItem(parent);
     return parentItem->getChildCount();
 }
 
-QModelIndex CategoryTreeModel::index(int row, int column, const QModelIndex& parent) const
+template <typename ElementType>
+QModelIndex CategoryTreeModel<ElementType>::index(int row, int column, const QModelIndex& parent) const
 {
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
 
-    CategoryTreeItem* parentItem = getItem(parent);
-    CategoryTreeItem* childItem = parentItem->getChild(row);
+    CategoryTreeItem<ElementType>* parentItem = getItem(parent);
+    CategoryTreeItem<ElementType>* childItem = parentItem->getChild(row);
 
     if (childItem)
         return createIndex(row, column, childItem);
@@ -77,21 +99,23 @@ QModelIndex CategoryTreeModel::index(int row, int column, const QModelIndex& par
         return QModelIndex();
 }
 
-QModelIndex CategoryTreeModel::parent(const QModelIndex& index) const
+template <typename ElementType>
+QModelIndex CategoryTreeModel<ElementType>::parent(const QModelIndex& index) const
 {
     if (!index.isValid())
         return QModelIndex();
 
-    CategoryTreeItem* childItem = getItem(index);
-    CategoryTreeItem* parentItem = childItem->getParent();
+    CategoryTreeItem<ElementType>* childItem = getItem(index);
+    CategoryTreeItem<ElementType>* parentItem = childItem->getParent();
 
-    if (parentItem == mRootItem)
+    if (parentItem == mRootItem.data())
         return QModelIndex();
 
     return createIndex(parentItem->getChildNumber(), 0, parentItem);
 }
 
-QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+template <typename ElementType>
+QVariant CategoryTreeModel<ElementType>::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal))
     {
@@ -104,26 +128,18 @@ QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-QVariant CategoryTreeModel::data(const QModelIndex& index, int role) const
+template <typename ElementType>
+QVariant CategoryTreeModel<ElementType>::data(const QModelIndex& index, int role) const
 {
-    CategoryTreeItem* item = getItem(index);
+    CategoryTreeItem<ElementType>* item = getItem(index);
     return item->data(role);
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Explicit template instantiations
  ****************************************************************************************/
-
-CategoryTreeItem* CategoryTreeModel::getItem(const QModelIndex& index) const
-{
-    if (index.isValid())
-    {
-        CategoryTreeItem* item = static_cast<CategoryTreeItem*>(index.internalPointer());
-        if (item)
-            return item;
-    }
-    return mRootItem;
-}
+template class CategoryTreeModel<library::ComponentCategory>;
+template class CategoryTreeModel<library::PackageCategory>;
 
 /*****************************************************************************************
  *  End of File

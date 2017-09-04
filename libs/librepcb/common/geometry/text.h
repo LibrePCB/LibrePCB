@@ -24,7 +24,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../fileio/serializableobject.h"
+#include "../fileio/serializableobjectlist.h"
+#include "../fileio/cmd/cmdlistelementinsert.h"
+#include "../fileio/cmd/cmdlistelementremove.h"
+#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../units/all_length_units.h"
 #include "../alignment.h"
 
@@ -32,6 +35,33 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+/*****************************************************************************************
+ *  Interface IF_TextObserver
+ ****************************************************************************************/
+
+/**
+ * @brief The IF_TextObserver class
+ *
+ * @author ubruhin
+ * @date 2017-01-02
+ */
+class IF_TextObserver
+{
+    public:
+        virtual void textLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void textTextChanged(const QString& newText) noexcept = 0;
+        virtual void textPositionChanged(const Point& newPos) noexcept = 0;
+        virtual void textRotationChanged(const Angle& newRot) noexcept = 0;
+        virtual void textHeightChanged(const Length& newHeight) noexcept = 0;
+        virtual void textAlignChanged(const Alignment& newAlign) noexcept = 0;
+
+    protected:
+        IF_TextObserver() noexcept {}
+        explicit IF_TextObserver(const IF_TextObserver& other) = delete;
+        virtual ~IF_TextObserver() noexcept {}
+        IF_TextObserver& operator=(const IF_TextObserver& rhs) = delete;
+};
 
 /*****************************************************************************************
  *  Class Text
@@ -47,9 +77,10 @@ class Text final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Text(const QString& layerName, const QString& text, const Point& pos,
-                      const Angle& rotation, const Length& height,
-                      const Alignment& align) noexcept;
+        Text() = delete;
+        Text(const Text& other) noexcept;
+        Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
+             const Length& height, const Alignment& align) noexcept;
         explicit Text(const DomElement& domElement);
         ~Text() noexcept;
 
@@ -62,7 +93,7 @@ class Text final : public SerializableObject
         const QString& getText() const noexcept {return mText;}
 
         // Setters
-        void setLayerName(const QString& layerName) noexcept;
+        void setLayerName(const QString& name) noexcept;
         void setText(const QString& text) noexcept;
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rotation) noexcept;
@@ -70,30 +101,43 @@ class Text final : public SerializableObject
         void setAlign(const Alignment& align) noexcept;
 
         // General Methods
+        void registerObserver(IF_TextObserver& object) const noexcept;
+        void unregisterObserver(IF_TextObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
+        // Operator Overloadings
+        bool operator==(const Text& rhs) const noexcept;
+        bool operator!=(const Text& rhs) const noexcept {return !(*this == rhs);}
+        Text& operator=(const Text& rhs) noexcept;
 
-    private:
 
-        // make some methods inaccessible...
-        Text() = delete;
-        Text(const Text& other) = delete;
-        Text& operator=(const Text& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Text Attributes
+    private: // Data
         QString mLayerName;
         QString mText;
         Point mPosition;
         Angle mRotation;
         Length mHeight;
         Alignment mAlign;
+
+        // Misc
+        mutable QSet<IF_TextObserver*> mObservers; ///< A list of all observer objects
 };
+
+/*****************************************************************************************
+ *  Class TextList
+ ****************************************************************************************/
+
+struct TextListNameProvider {static constexpr const char* tagname = "text";};
+using TextList = SerializableObjectList<Text, TextListNameProvider>;
+using CmdTextInsert = CmdListElementInsert<Text, TextListNameProvider>;
+using CmdTextRemove = CmdListElementRemove<Text, TextListNameProvider>;
+using CmdTextsSwap = CmdListElementsSwap<Text, TextListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

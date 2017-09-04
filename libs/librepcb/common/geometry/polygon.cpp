@@ -68,6 +68,34 @@ Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
     }
 }
 
+void PolygonSegment::setEndPos(const Point& pos) noexcept
+{
+    if (pos == mEndPos) return;
+    mEndPos = pos;
+    foreach (IF_PolygonSegmentObserver* object, mObservers) {
+        object->polygonSegmentEndPosChanged(*this, mEndPos);
+    }
+}
+
+void PolygonSegment::setAngle(const Angle& angle) noexcept
+{
+    if (angle == mAngle) return;
+    mAngle = angle;
+    foreach (IF_PolygonSegmentObserver* object, mObservers) {
+        object->polygonSegmentAngleChanged(*this, mAngle);
+    }
+}
+
+void PolygonSegment::registerObserver(IF_PolygonSegmentObserver& object) const noexcept
+{
+    mObservers.insert(&object);
+}
+
+void PolygonSegment::unregisterObserver(IF_PolygonSegmentObserver& object) const noexcept
+{
+    mObservers.remove(&object);
+}
+
 void PolygonSegment::serialize(DomElement& root) const
 {
     root.setAttribute("end_x", mEndPos.getX());
@@ -75,48 +103,54 @@ void PolygonSegment::serialize(DomElement& root) const
     root.setAttribute("angle", mAngle);
 }
 
+bool PolygonSegment::operator==(const PolygonSegment& rhs) const noexcept
+{
+    if (mEndPos != rhs.mEndPos)         return false;
+    if (mAngle != rhs.mAngle)           return false;
+    return true;
+}
+
+PolygonSegment& PolygonSegment::operator=(const PolygonSegment& rhs) noexcept
+{
+    mEndPos = rhs.mEndPos;
+    mAngle = rhs.mAngle;
+    return *this;
+}
+
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
 Polygon::Polygon(const Polygon& other) noexcept :
-    mLayerName(other.mLayerName), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
-    mIsGrabArea(other.mIsGrabArea), mStartPos(other.mStartPos)
+    mSegments(this)
 {
-    foreach (const PolygonSegment* segment, other.mSegments) {
-        mSegments.append(new PolygonSegment(*segment));
-    }
+    *this = other; // use assignment operator
 }
 
 Polygon::Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                  const Point& startPos) noexcept :
     mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
-    mStartPos(startPos)
+    mStartPos(startPos), mSegments(this)
 {
-    Q_ASSERT(lineWidth >= 0);
 }
 
-Polygon::Polygon(const DomElement& domElement)
+Polygon::Polygon(const DomElement& domElement) :
+    mSegments(this)
 {
-    // load general attributes
     mLayerName = domElement.getAttribute<QString>("layer", true);
     mLineWidth = domElement.getAttribute<Length>("width", true);
     mIsFilled = domElement.getAttribute<bool>("fill", true);
     mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
     mStartPos.setX(domElement.getAttribute<Length>("start_x", true));
     mStartPos.setY(domElement.getAttribute<Length>("start_y", true));
-
-    // load all segments
-    foreach (const DomElement* node, domElement.getChilds()) {
-        mSegments.append(new PolygonSegment(*node));
-    }
+    mSegments.loadFromDomElement(domElement);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Polygon::~Polygon() noexcept
 {
-    qDeleteAll(mSegments);      mSegments.clear();
+    mSegments.unregisterObserver(this);
 }
 
 /*****************************************************************************************
@@ -137,9 +171,7 @@ Point Polygon::getStartPointOfSegment(int index) const noexcept
     if (index == 0) {
         return mStartPos;
     } else if (index > 0 && index < mSegments.count()) {
-        const PolygonSegment* segmentBefore = mSegments.at(index-1);
-        Q_ASSERT(segmentBefore);
-        return segmentBefore->getEndPos();
+        return mSegments[index-1]->getEndPos();
     } else {
         qCritical() << "Invalid polygon segment index:" << index;
         return Point();
@@ -149,52 +181,54 @@ Point Polygon::getStartPointOfSegment(int index) const noexcept
 Point Polygon::calcCenterOfArcSegment(int index) const noexcept
 {
     if (index >= 0 && index < mSegments.count()) {
-        const PolygonSegment* segment = mSegments.at(index);
-        Q_ASSERT(segment);
-        return segment->calcArcCenter(getStartPointOfSegment(index));
+        return mSegments[index]->calcArcCenter(getStartPointOfSegment(index));
     } else {
         qCritical() << "Invalid polygon segment index:" << index;
         return Point();
     }
 }
 
+Point Polygon::calcCenter() const noexcept
+{
+    Point center = mStartPos;
+    for (const PolygonSegment& segment : mSegments) {
+        center += segment.getEndPos();
+    }
+    return center / (mSegments.count() + 1);
+}
+
 const QPainterPath& Polygon::toQPainterPathPx() const noexcept
 {
-    if (mPainterPathPx.isEmpty())
-    {
+    if (mPainterPathPx.isEmpty()) {
         mPainterPathPx.setFillRule(Qt::WindingFill);
         Point lastPos = mStartPos;
         mPainterPathPx.moveTo(lastPos.toPxQPointF());
-        foreach (const PolygonSegment* segment, mSegments)
-        {
-            if (segment->getAngle() == 0)
-            {
-                mPainterPathPx.lineTo(segment->getEndPos().toPxQPointF());
-            }
-            else
-            {
+        for (const PolygonSegment& segment : mSegments) {
+            if (segment.getAngle() == 0) {
+                mPainterPathPx.lineTo(segment.getEndPos().toPxQPointF());
+            } else {
                 // TODO: this is very provisional and may contain bugs...
                 // all lengths in pixels
                 qreal x1 = lastPos.toPxQPointF().x();
                 qreal y1 = lastPos.toPxQPointF().y();
-                qreal x2 = segment->getEndPos().toPxQPointF().x();
-                qreal y2 = segment->getEndPos().toPxQPointF().y();
+                qreal x2 = segment.getEndPos().toPxQPointF().x();
+                qreal y2 = segment.getEndPos().toPxQPointF().y();
                 qreal x3 = (x1+x2)/qreal(2);
                 qreal y3 = (y1+y2)/qreal(2);
                 qreal dx = x2-x1;
                 qreal dy = y2-y1;
                 qreal q = qSqrt(dx*dx + dy*dy);
-                qreal r = qAbs(q / (qreal(2) * qSin(segment->getAngle().toRad()/qreal(2))));
-                qreal rh = r * qCos(segment->getAngle().mappedTo180deg().toRad()/qreal(2));
+                qreal r = qAbs(q / (qreal(2) * qSin(segment.getAngle().toRad()/qreal(2))));
+                qreal rh = r * qCos(segment.getAngle().mappedTo180deg().toRad()/qreal(2));
                 qreal hx = -dy * rh / q;
                 qreal hy = dx * rh / q;
-                qreal cx = x3 + hx * (segment->getAngle().mappedTo180deg() > 0 ? -1 : 1);
-                qreal cy = y3 + hy * (segment->getAngle().mappedTo180deg() > 0 ? -1 : 1);
+                qreal cx = x3 + hx * (segment.getAngle().mappedTo180deg() > 0 ? -1 : 1);
+                qreal cy = y3 + hy * (segment.getAngle().mappedTo180deg() > 0 ? -1 : 1);
                 QRectF rect(cx-r, cy-r, 2*r, 2*r);
                 qreal startAngleDeg = -qRadiansToDegrees(qAtan2(y1-cy, x1-cx));
-                mPainterPathPx.arcTo(rect, startAngleDeg, segment->getAngle().toDeg());
+                mPainterPathPx.arcTo(rect, startAngleDeg, segment.getAngle().toDeg());
             }
-            lastPos = segment->getEndPos();
+            lastPos = segment.getEndPos();
         }
     }
     return mPainterPathPx;
@@ -204,31 +238,50 @@ const QPainterPath& Polygon::toQPainterPathPx() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void Polygon::setLayerName(const QString& layerName) noexcept
+void Polygon::setLayerName(const QString& name) noexcept
 {
-    mLayerName = layerName;
+    if (name == mLayerName) return;
+    mLayerName = name;
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonLayerNameChanged(mLayerName);
+    }
 }
 
 void Polygon::setLineWidth(const Length& width) noexcept
 {
-    Q_ASSERT(width >= 0);
+    if (width == mLineWidth) return;
     mLineWidth = width;
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonLineWidthChanged(mLineWidth);
+    }
 }
 
 void Polygon::setIsFilled(bool isFilled) noexcept
 {
+    if (isFilled == mIsFilled) return;
     mIsFilled = isFilled;
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonIsFilledChanged(mIsFilled);
+    }
 }
 
 void Polygon::setIsGrabArea(bool isGrabArea) noexcept
 {
+    if (isGrabArea == mIsGrabArea) return;
     mIsGrabArea = isGrabArea;
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonIsGrabAreaChanged(mIsGrabArea);
+    }
 }
 
 void Polygon::setStartPos(const Point& pos) noexcept
 {
+    if (pos == mStartPos) return;
     mStartPos = pos;
     mPainterPathPx = QPainterPath(); // invalidate painter path
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonStartPosChanged(mStartPos);
+    }
 }
 
 /*****************************************************************************************
@@ -237,9 +290,9 @@ void Polygon::setStartPos(const Point& pos) noexcept
 
 Polygon& Polygon::translate(const Point& offset) noexcept
 {
-    mStartPos += offset;
-    foreach (PolygonSegment* segment, mSegments) {
-        segment->setEndPos(segment->getEndPos() + offset);
+    setStartPos(mStartPos + offset);
+    for (PolygonSegment& segment : mSegments) {
+        segment.setEndPos(segment.getEndPos() + offset);
     }
     return *this;
 }
@@ -251,9 +304,9 @@ Polygon Polygon::translated(const Point& offset) const noexcept
 
 Polygon& Polygon::rotate(const Angle& angle, const Point& center) noexcept
 {
-    mStartPos.rotate(angle, center);
-    foreach (PolygonSegment* segment, mSegments) {
-        segment->setEndPos(segment->getEndPos().rotated(angle, center));
+    setStartPos(mStartPos.rotated(angle, center));
+    for (PolygonSegment& segment : mSegments) {
+        segment.setEndPos(segment.getEndPos().rotated(angle, center));
     }
     return *this;
 }
@@ -268,36 +321,24 @@ Polygon Polygon::rotated(const Angle& angle, const Point& center) const noexcept
  *  General Methods
  ****************************************************************************************/
 
-PolygonSegment* Polygon::close() noexcept
+bool Polygon::close() noexcept
 {
-    if (mSegments.count() > 0) {
-        Point start = mStartPos;
-        Point end = mSegments.last()->getEndPos();
-        if (end != start) {
-            PolygonSegment* s = new PolygonSegment(start, Angle::deg0());
-            appendSegment(*s);
-            return s;
-        }
+    if ((mSegments.count() > 0) && (mSegments.last()->getEndPos() != mStartPos)) {
+        mSegments.append(std::make_shared<PolygonSegment>(mStartPos, Angle::deg0()));
+        return true;
+    } else {
+        return false;
     }
-    return nullptr;
 }
 
-void Polygon::appendSegment(PolygonSegment& segment) noexcept
+void Polygon::registerObserver(IF_PolygonObserver& object) const noexcept
 {
-    Q_ASSERT(!mSegments.contains(&segment));
-    mSegments.append(&segment);
-    mPainterPathPx = QPainterPath(); // invalidate painter path
+    mObservers.insert(&object);
 }
 
-void Polygon::removeSegment(PolygonSegment& segment)
+void Polygon::unregisterObserver(IF_PolygonObserver& object) const noexcept
 {
-    Q_ASSERT(mSegments.contains(&segment));
-    if (mSegments.count() <= 1) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The last segment of a polygon cannot be removed."));
-    }
-    mSegments.removeAll(&segment);
-    mPainterPathPx = QPainterPath(); // invalidate painter path
+    mObservers.remove(&object);
 }
 
 void Polygon::serialize(DomElement& root) const
@@ -310,7 +351,34 @@ void Polygon::serialize(DomElement& root) const
     root.setAttribute("grab_area", mIsGrabArea);
     root.setAttribute("start_x", mStartPos.getX());
     root.setAttribute("start_y", mStartPos.getY());
-    serializePointerContainer(root, mSegments, "segment");
+    serializeObjectContainer(root, mSegments, "segment");
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool Polygon::operator==(const Polygon& rhs) const noexcept
+{
+    if (mLayerName != rhs.mLayerName)           return false;
+    if (mLineWidth != rhs.mLineWidth)       return false;
+    if (mIsFilled != rhs.mIsFilled)         return false;
+    if (mIsGrabArea != rhs.mIsGrabArea)     return false;
+    if (mStartPos != rhs.mStartPos)         return false;
+    if (mSegments != rhs.mSegments)         return false;
+    return true;
+}
+
+Polygon& Polygon::operator=(const Polygon& rhs) noexcept
+{
+    mLayerName = rhs.mLayerName;
+    mLineWidth = rhs.mLineWidth;
+    mIsFilled = rhs.mIsFilled;
+    mIsGrabArea = rhs.mIsGrabArea;
+    mStartPos = rhs.mStartPos;
+    mSegments = rhs.mSegments;
+    mPainterPathPx = rhs.mPainterPathPx;
+    return *this;
 }
 
 /*****************************************************************************************
@@ -318,10 +386,10 @@ void Polygon::serialize(DomElement& root) const
  ****************************************************************************************/
 
 Polygon* Polygon::createLine(const QString& layerName, const Length& lineWidth, bool fill,
-                                     bool isGrabArea, const Point& p1, const Point& p2) noexcept
+                             bool isGrabArea, const Point& p1, const Point& p2) noexcept
 {
     Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
     return p;
 }
 
@@ -330,7 +398,7 @@ Polygon* Polygon::createCurve(const QString& layerName, const Length& lineWidth,
                               const Angle& angle) noexcept
 {
     Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-    p->appendSegment(*new PolygonSegment(p2, angle));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p2, angle));
     return p;
 }
 
@@ -342,10 +410,10 @@ Polygon* Polygon::createRect(const QString& layerName, const Length& lineWidth, 
     Point p3 = Point(pos.getX() + width,    pos.getY() + height);
     Point p4 = Point(pos.getX(),            pos.getY() + height);
     Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
     return p;
 }
 
@@ -358,10 +426,10 @@ Polygon* Polygon::createCenteredRect(const QString& layerName, const Length& lin
     Point p3 = Point(center.getX() + width/2, center.getY() - height/2);
     Point p4 = Point(center.getX() - width/2, center.getY() - height/2);
     Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
-    p->appendSegment(*new PolygonSegment(p2, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p3, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p4, Angle::deg0()));
-    p->appendSegment(*new PolygonSegment(p1, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
+    p->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
     return p;
 }
 
@@ -369,8 +437,49 @@ Polygon* Polygon::createCenteredRect(const QString& layerName, const Length& lin
  *  Private Methods
  ****************************************************************************************/
 
+void Polygon::listObjectAdded(const PolygonSegmentList& list, int newIndex,
+                              const std::shared_ptr<PolygonSegment>& ptr) noexcept
+{
+    Q_ASSERT(&list == &mSegments);
+    ptr->registerObserver(*this);
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonSegmentAdded(newIndex);
+    }
+}
+
+void Polygon::listObjectRemoved(const PolygonSegmentList& list, int oldIndex,
+                                const std::shared_ptr<PolygonSegment>& ptr) noexcept
+{
+    Q_ASSERT(&list == &mSegments);
+    ptr->unregisterObserver(*this);
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonSegmentRemoved(oldIndex);
+    }
+}
+
+void Polygon::polygonSegmentEndPosChanged(const PolygonSegment& segment, const Point& newEndPos) noexcept
+{
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    int index = mSegments.indexOf(&segment); Q_ASSERT(index >= 0);
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonSegmentEndPosChanged(index, newEndPos);
+    }
+}
+
+void Polygon::polygonSegmentAngleChanged(const PolygonSegment& segment, const Angle& newAngle) noexcept
+{
+    mPainterPathPx = QPainterPath(); // invalidate painter path
+    int index = mSegments.indexOf(&segment); Q_ASSERT(index >= 0);
+    foreach (IF_PolygonObserver* object, mObservers) {
+        object->polygonSegmentAngleChanged(index, newAngle);
+    }
+}
+
 bool Polygon::checkAttributesValidity() const noexcept
 {
+    if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
     return true;
 }

@@ -44,7 +44,11 @@ SOURCES += \
     cam/gerbergenerator.cpp \
     debug.cpp \
     dialogs/boarddesignrulesdialog.cpp \
+    dialogs/ellipsepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
+    dialogs/holepropertiesdialog.cpp \
+    dialogs/polygonpropertiesdialog.cpp \
+    dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
     fileio/domdocument.cpp \
@@ -55,14 +59,28 @@ SOURCES += \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
     fileio/smartxmlfile.cpp \
+    geometry/cmd/cmdellipseedit.cpp \
+    geometry/cmd/cmdholeedit.cpp \
+    geometry/cmd/cmdpolygonedit.cpp \
+    geometry/cmd/cmdpolygonmove.cpp \
+    geometry/cmd/cmdpolygonsegmentedit.cpp \
+    geometry/cmd/cmdtextedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/polygon.cpp \
     geometry/text.cpp \
-    graphics/graphicsitem.cpp \
+    graphics/ellipsegraphicsitem.cpp \
     graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
+    graphics/holegraphicsitem.cpp \
+    graphics/linegraphicsitem.cpp \
+    graphics/origincrossgraphicsitem.cpp \
+    graphics/polygongraphicsitem.cpp \
+    graphics/primitiveellipsegraphicsitem.cpp \
+    graphics/primitivepathgraphicsitem.cpp \
+    graphics/primitivetextgraphicsitem.cpp \
+    graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
     if_attributeprovider.cpp \
     network/filedownload.cpp \
@@ -70,8 +88,10 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/repository.cpp \
+    signalrole.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
+    toolbox.cpp \
     undocommand.cpp \
     undocommandgroup.cpp \
     undostack.cpp \
@@ -82,12 +102,17 @@ SOURCES += \
     units/ratio.cpp \
     utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
+    utils/toolbarproxy.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
     version.cpp \
+    widgets/alignmentselector.cpp \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
+    widgets/centeredcheckbox.cpp \
+    widgets/graphicslayercombobox.cpp \
+    widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
 
 HEADERS += \
@@ -108,7 +133,11 @@ HEADERS += \
     cam/gerbergenerator.h \
     debug.h \
     dialogs/boarddesignrulesdialog.h \
+    dialogs/ellipsepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
+    dialogs/holepropertiesdialog.h \
+    dialogs/polygonpropertiesdialog.h \
+    dialogs/textpropertiesdialog.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
@@ -125,15 +154,29 @@ HEADERS += \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
     fileio/smartxmlfile.h \
+    geometry/cmd/cmdellipseedit.h \
+    geometry/cmd/cmdholeedit.h \
+    geometry/cmd/cmdpolygonedit.h \
+    geometry/cmd/cmdpolygonmove.h \
+    geometry/cmd/cmdpolygonsegmentedit.h \
+    geometry/cmd/cmdtextedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/polygon.h \
     geometry/text.h \
-    graphics/graphicsitem.h \
+    graphics/ellipsegraphicsitem.h \
     graphics/graphicslayer.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
+    graphics/holegraphicsitem.h \
     graphics/if_graphicsvieweventhandler.h \
+    graphics/linegraphicsitem.h \
+    graphics/origincrossgraphicsitem.h \
+    graphics/polygongraphicsitem.h \
+    graphics/primitiveellipsegraphicsitem.h \
+    graphics/primitivepathgraphicsitem.h \
+    graphics/primitivetextgraphicsitem.h \
+    graphics/textgraphicsitem.h \
     gridproperties.h \
     if_attributeprovider.h \
     network/filedownload.h \
@@ -143,8 +186,10 @@ HEADERS += \
     network/repository.h \
     scopeguard.h \
     scopeguardlist.h \
+    signalrole.h \
     sqlitedatabase.h \
     systeminfo.h \
+    toolbox.h \
     undocommand.h \
     undocommandgroup.h \
     undostack.h \
@@ -156,15 +201,25 @@ HEADERS += \
     units/ratio.h \
     utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
+    utils/toolbarproxy.h \
     utils/undostackactiongroup.h \
     uuid.h \
     version.h \
+    widgets/alignmentselector.h \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
+    widgets/centeredcheckbox.h \
+    widgets/graphicslayercombobox.h \
+    widgets/signalrolecombobox.h \
     widgets/statusbar.h \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
+    dialogs/ellipsepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \
+    dialogs/holepropertiesdialog.ui \
+    dialogs/polygonpropertiesdialog.ui \
+    dialogs/textpropertiesdialog.ui \
+    widgets/alignmentselector.ui \
 

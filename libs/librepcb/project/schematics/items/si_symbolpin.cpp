@@ -54,17 +54,8 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     mRegisteredNetPoint(nullptr)
 {
     // read attributes
-    mSymbolPin = mSymbol.getLibSymbol().getPinByUuid(pinUuid);
-    if (!mSymbolPin) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid symbol pin UUID: \"%1\"")).arg(pinUuid.toStr()));
-    }
-    mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMapItemOfPin(pinUuid);
-    if (!mPinSignalMapItem) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Pin \"%1\" not found in pin-signal-map of symbol instance \"%2\"."))
-            .arg(pinUuid.toStr(), symbol.getUuid().toStr()));
-    }
+    mSymbolPin = mSymbol.getLibSymbol().getPins().get(pinUuid).get(); // can throw
+    mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMap().get(pinUuid).get(); // can throw
     Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
     mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
 
@@ -97,24 +88,21 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
     QString text;
-    using PinDisplayType_t = library::ComponentPinSignalMapItem::PinDisplayType_t;
-    switch (mPinSignalMapItem->getDisplayType())
-    {
-        case PinDisplayType_t::PIN_NAME:
-            text = mSymbolPin->getName(); break;
-        case PinDisplayType_t::COMPONENT_SIGNAL:
-            if (mComponentSignalInstance) {
-                text = mComponentSignalInstance->getCompSignal().getName();
+    library::CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
+    if (displayType == library::CmpSigPinDisplayType::pinName()) {
+        text = mSymbolPin->getName();
+    } else  if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
+        if (mComponentSignalInstance) {
+            text = mComponentSignalInstance->getCompSignal().getName();
+        }
+    } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
+        if (mComponentSignalInstance) {
+            if (mComponentSignalInstance->getNetSignal()) {
+                text = mComponentSignalInstance->getNetSignal()->getName();
             }
-            break;
-        case PinDisplayType_t::NET_SIGNAL:
-            if (mComponentSignalInstance) {
-                if (mComponentSignalInstance->getNetSignal()) {
-                    text = mComponentSignalInstance->getNetSignal()->getName();
-                }
-            }
-            break;
-        default: break;
+        }
+    } else if (displayType != library::CmpSigPinDisplayType::none()) {
+        Q_ASSERT(false);
     }
     if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
         text = mComponentSignalInstance->getCompSignal().getName();

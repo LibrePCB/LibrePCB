@@ -153,12 +153,10 @@ void BI_NetPoint::init()
             .arg(mUuid.toStr()).arg(mLayer->getName()));
     }
     if (mFootprintPad) {
-        if (mFootprintPad->getLibPad().getTechnology() == library::FootprintPad::Technology_t::SMT) {
-            if (mLayer->getName() != mFootprintPad->getLayerName()) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
-                    .arg(mUuid.toStr()).arg(mLayer->getName()));
-            }
+        if (!mFootprintPad->isOnLayer(mLayer->getName())) {
+            throw RuntimeError(__FILE__, __LINE__,
+                QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
+                .arg(mUuid.toStr()).arg(mLayer->getName()));
         }
     }
 

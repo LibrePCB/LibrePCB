@@ -36,14 +36,24 @@
 namespace librepcb {
 namespace library {
 
+class SymbolGraphicsItem;
+
 /*****************************************************************************************
  *  Class Symbol
  ****************************************************************************************/
 
 /**
- * @brief The Symbol class
+ * @brief The Symbol class represents the part of a component which is added to schematics
+ *
+ * Following information is considered as the "interface" of a symbol and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Pins (neither adding nor removing pins is allowed)
+ *    - UUID
  */
-class Symbol final : public LibraryElement
+class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
+                     private PolygonList::IF_Observer, private EllipseList::IF_Observer,
+                     private TextList::IF_Observer
 {
         Q_OBJECT
 
@@ -52,43 +62,25 @@ class Symbol final : public LibraryElement
         // Constructors / Destructor
         Symbol() = delete;
         Symbol(const Symbol& other) = delete;
-        explicit Symbol(const Uuid& uuid, const Version& version, const QString& author,
-                        const QString& name_en_US, const QString& description_en_US,
-                        const QString& keywords_en_US);
+        Symbol(const Uuid& uuid, const Version& version, const QString& author,
+               const QString& name_en_US, const QString& description_en_US,
+               const QString& keywords_en_US);
         explicit Symbol(const FilePath& elementDirectory, bool readOnly);
         ~Symbol() noexcept;
 
-        // SymbolPin Methods
-        const QMap<Uuid, SymbolPin*>& getPins() noexcept {return mPins;}
-        QList<Uuid> getPinUuids() const noexcept {return mPins.keys();}
-        SymbolPin* getPinByUuid(const Uuid& uuid) noexcept {return mPins.value(uuid);}
-        const SymbolPin* getPinByUuid(const Uuid& uuid) const noexcept {return mPins.value(uuid);}
-        void addPin(SymbolPin& pin) noexcept;
-        void removePin(SymbolPin& pin) noexcept;
+        // Getters: Geometry
+        SymbolPinList& getPins() noexcept {return mPins;}
+        const SymbolPinList& getPins() const noexcept {return mPins;}
+        PolygonList& getPolygons() noexcept {return mPolygons;}
+        const PolygonList& getPolygons() const noexcept {return mPolygons;}
+        EllipseList& getEllipses() noexcept {return mEllipses;}
+        const EllipseList& getEllipses() const noexcept {return mEllipses;}
+        TextList& getTexts() noexcept {return mTexts;}
+        const TextList& getTexts() const noexcept {return mTexts;}
 
-        // Polygon Methods
-        const QList<Polygon*>& getPolygons() noexcept {return mPolygons;}
-        int getPolygonCount() const noexcept {return mPolygons.count();}
-        Polygon* getPolygon(int index) noexcept {return mPolygons.value(index);}
-        const Polygon* getPolygon(int index) const noexcept {return mPolygons.value(index);}
-        void addPolygon(Polygon& polygon) noexcept;
-        void removePolygon(Polygon& polygon) noexcept;
-
-        // Ellipse Methods
-        const QList<Ellipse*>& getEllipses() noexcept {return mEllipses;}
-        int getEllipseCount() const noexcept {return mEllipses.count();}
-        Ellipse* getEllipse(int index) noexcept {return mEllipses.value(index);}
-        const Ellipse* getEllipse(int index) const noexcept {return mEllipses.value(index);}
-        void addEllipse(Ellipse& ellipse) noexcept;
-        void removeEllipse(Ellipse& ellipse) noexcept;
-
-        // Text Methods
-        const QList<Text*>& getTexts() noexcept {return mTexts;}
-        int getTextCount() const noexcept {return mTexts.count();}
-        Text* getText(int index) noexcept {return mTexts.value(index);}
-        const Text* getText(int index) const noexcept {return mTexts.value(index);}
-        void addText(Text& text) noexcept;
-        void removeText(Text& text) noexcept;
+        // General Methods
+        void registerGraphicsItem(SymbolGraphicsItem& item) noexcept;
+        void unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept;
 
         // Operator Overloadings
         Symbol& operator=(const Symbol& rhs) = delete;
@@ -98,19 +90,35 @@ class Symbol final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("symbol");}
 
 
-    private:
-
-        // Private Methods
-
+    private: // Methods
+        void listObjectAdded(const SymbolPinList& list, int newIndex,
+                             const std::shared_ptr<SymbolPin>& ptr) noexcept override;
+        void listObjectAdded(const PolygonList& list, int newIndex,
+                             const std::shared_ptr<Polygon>& ptr) noexcept override;
+        void listObjectAdded(const EllipseList& list, int newIndex,
+                             const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectAdded(const TextList& list, int newIndex,
+                             const std::shared_ptr<Text>& ptr) noexcept override;
+        void listObjectRemoved(const SymbolPinList& list, int oldIndex,
+                               const std::shared_ptr<SymbolPin>& ptr) noexcept override;
+        void listObjectRemoved(const PolygonList& list, int oldIndex,
+                               const std::shared_ptr<Polygon>& ptr) noexcept override;
+        void listObjectRemoved(const EllipseList& list, int oldIndex,
+                               const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectRemoved(const TextList& list, int oldIndex,
+                               const std::shared_ptr<Text>& ptr) noexcept override;
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
+        bool checkAttributesValidity() const noexcept override;
 
 
-        // Symbol Attributes
-        QMap<Uuid, SymbolPin*> mPins;
-        QList<Polygon*> mPolygons;
-        QList<Ellipse*> mEllipses;
-        QList<Text*> mTexts;
+    private: // Data
+        SymbolPinList mPins;
+        PolygonList mPolygons;
+        EllipseList mEllipses;
+        TextList mTexts;
+
+        SymbolGraphicsItem* mRegisteredGraphicsItem;
 };
 
 /*****************************************************************************************

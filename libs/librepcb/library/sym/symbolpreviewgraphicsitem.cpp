@@ -46,35 +46,35 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
                                                      const Component* cmp,
                                                      const Uuid& symbVarUuid,
                                                      const Uuid& symbVarItemUuid) noexcept :
-    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
+    QGraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
-    if (mComponent)
-        mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid);
-
     mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
     mFont.setStyleHint(QFont::SansSerif);
     mFont.setFamily("Nimbus Sans L");
 
-    updateCacheAndRepaint();
+    try {
+        if (mComponent) {
+            mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid).get(); // can throw
+        }
 
-    foreach (const Uuid& pinUuid, symbol.getPinUuids())
-    {
-        const SymbolPin* pin = symbol.getPinByUuid(pinUuid);
-        Q_ASSERT(pin); if (!pin) continue;
+        updateCacheAndRepaint();
 
-        const ComponentSignal* signal = nullptr;
-        const ComponentPinSignalMapItem* mapItem = nullptr;
-        ComponentPinSignalMapItem::PinDisplayType_t displayType =
-                ComponentPinSignalMapItem::PinDisplayType_t::PIN_NAME;
-        if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
-        if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMapItemOfPin(pin->getUuid());
-        if (mapItem) displayType = mapItem->getDisplayType();
-        SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, *pin, signal, displayType);
-        item->setPos(pin->getPosition().toPxQPointF());
-        item->setRotation(-pin->getRotation().toDeg());
-        item->setZValue(2);
-        item->setParentItem(this);
+        for (const SymbolPin& pin : symbol.getPins()) {
+            const ComponentSignal* signal = nullptr;
+            const ComponentPinSignalMapItem* mapItem = nullptr;
+            CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
+            if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin.getUuid()).get(); // can throw
+            if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMap().find(pin.getUuid()).get(); // can throw
+            if (mapItem) displayType = mapItem->getDisplayType();
+            SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, pin, signal, displayType);
+            item->setPos(pin.getPosition().toPxQPointF());
+            item->setRotation(-pin.getRotation().toDeg());
+            item->setZValue(2);
+            item->setParentItem(this);
+        }
+    } catch (const Exception& e) {
+        qCritical() << "Error while loading symbol preview";
     }
 }
 
@@ -114,73 +114,65 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mSymbol.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
-        QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getLineWidth().toPx() / 2;
+    for (const Polygon& polygon : mSymbol.getPolygons()) {
+        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-        if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
+        if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
     }
 
     // texts
     mCachedTextProperties.clear();
-    for (int i = 0; i < mSymbol.getTextCount(); i++)
-    {
-        const Text* text = mSymbol.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mSymbol.getTexts()) {
         // create static text properties
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text->getText();
+        props.text = text.getText();
         replaceVariablesWithAttributes(props.text, false);
 
         // calculate font metrics
-        mFont.setPointSizeF(text->getHeight().toPx());
+        mFont.setPointSizeF(text.getHeight().toPx());
         QFontMetricsF metrics(mFont);
-        props.fontSize = text->getHeight().toPx()*0.8*text->getHeight().toPx()/metrics.height();
+        props.fontSize = text.getHeight().toPx()*0.8*text.getHeight().toPx()/metrics.height();
         mFont.setPointSizeF(props.fontSize);
         metrics = QFontMetricsF(mFont);
-        props.textRect = metrics.boundingRect(QRectF(), text->getAlign().toQtAlign() |
+        props.textRect = metrics.boundingRect(QRectF(), text.getAlign().toQtAlign() |
                                               Qt::TextDontClip, props.text);
 
         // check rotation
-        Angle absAngle = text->getRotation() + Angle::fromDeg(rotation());
+        Angle absAngle = text.getRotation() + Angle::fromDeg(rotation());
         absAngle.mapTo180deg();
         props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
         qreal dx, dy;
-        if (text->getAlign().getV() == VAlign::top())
-            dy = text->getPosition().toPxQPointF().y()-props.textRect.top();
-        else if (text->getAlign().getV() == VAlign::bottom())
-            dy = text->getPosition().toPxQPointF().y()-props.textRect.bottom();
+        if (text.getAlign().getV() == VAlign::top())
+            dy = text.getPosition().toPxQPointF().y()-props.textRect.top();
+        else if (text.getAlign().getV() == VAlign::bottom())
+            dy = text.getPosition().toPxQPointF().y()-props.textRect.bottom();
         else
-            dy = text->getPosition().toPxQPointF().y()-(props.textRect.top()+props.textRect.bottom())/2;
-        if (text->getAlign().getH() == HAlign::left())
-            dx = text->getPosition().toPxQPointF().x()-props.textRect.left();
-        else if (text->getAlign().getH() == HAlign::right())
-            dx = text->getPosition().toPxQPointF().x()-props.textRect.right();
+            dy = text.getPosition().toPxQPointF().y()-(props.textRect.top()+props.textRect.bottom())/2;
+        if (text.getAlign().getH() == HAlign::left())
+            dx = text.getPosition().toPxQPointF().x()-props.textRect.left();
+        else if (text.getAlign().getH() == HAlign::right())
+            dx = text.getPosition().toPxQPointF().x()-props.textRect.right();
         else
-            dx = text->getPosition().toPxQPointF().x()-(props.textRect.left()+props.textRect.right())/2;
+            dx = text.getPosition().toPxQPointF().x()-(props.textRect.left()+props.textRect.right())/2;
 
         // text alignment
         if (props.rotate180)
         {
             props.align = 0;
-            if (text->getAlign().getV() == VAlign::top()) props.align |= Qt::AlignBottom;
-            if (text->getAlign().getV() == VAlign::center()) props.align |= Qt::AlignVCenter;
-            if (text->getAlign().getV() == VAlign::bottom()) props.align |= Qt::AlignTop;
-            if (text->getAlign().getH() == HAlign::left()) props.align |= Qt::AlignRight;
-            if (text->getAlign().getH() == HAlign::center()) props.align |= Qt::AlignHCenter;
-            if (text->getAlign().getH() == HAlign::right()) props.align |= Qt::AlignLeft;
+            if (text.getAlign().getV() == VAlign::top()) props.align |= Qt::AlignBottom;
+            if (text.getAlign().getV() == VAlign::center()) props.align |= Qt::AlignVCenter;
+            if (text.getAlign().getV() == VAlign::bottom()) props.align |= Qt::AlignTop;
+            if (text.getAlign().getH() == HAlign::left()) props.align |= Qt::AlignRight;
+            if (text.getAlign().getH() == HAlign::center()) props.align |= Qt::AlignHCenter;
+            if (text.getAlign().getH() == HAlign::right()) props.align |= Qt::AlignLeft;
         }
         else
-            props.align = text->getAlign().toQtAlign();
+            props.align = text.getAlign().toQtAlign();
 
         // calculate text bounding rect
         props.textRect = props.textRect.translated(dx, dy).normalized();
@@ -192,7 +184,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         }
 
         // save properties
-        mCachedTextProperties.insert(text, props);
+        mCachedTextProperties.insert(&text, props);
     }
 
     update();
@@ -212,79 +204,66 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
     // draw all polygons
-    for (int i = 0; i < mSymbol.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mSymbol.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
+    for (const Polygon& polygon : mSymbol.getPolygons()) {
         // set colors
-        layer = mLayerProvider.getLayer(polygon->getLayerName());
-        if (layer)
-        {
-            pen = QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        layer = mLayerProvider.getLayer(polygon.getLayerName());
+        if (layer) {
+            pen = QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
-        }
-        else
+        } else {
             painter->setPen(Qt::NoPen);
-        if (polygon->isFilled())
-            layer = mLayerProvider.getLayer(polygon->getLayerName());
-        else if (polygon->isGrabArea())
+        }
+        if (polygon.isFilled())
+            layer = mLayerProvider.getLayer(polygon.getLayerName());
+        else if (polygon.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
-        painter->drawPath(polygon->toQPainterPathPx());
+        painter->drawPath(polygon.toQPainterPathPx());
     }
 
     // draw all ellipses
-    for (int i = 0; i < mSymbol.getEllipseCount(); i++)
-    {
-        const Ellipse* ellipse = mSymbol.getEllipse(i);
-        Q_ASSERT(ellipse); if (!ellipse) continue;
-
+    for (const Ellipse& ellipse : mSymbol.getEllipses()) {
         // set colors
-        layer = mLayerProvider.getLayer(ellipse->getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(ellipse.getLayerName()); if (!layer) continue;
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
-        if (ellipse->isFilled())
-            layer = mLayerProvider.getLayer(ellipse->getLayerName());
-        else if (ellipse->isGrabArea())
+        if (ellipse.isFilled())
+            layer = mLayerProvider.getLayer(ellipse.getLayerName());
+        else if (ellipse.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
-        painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
-                             ellipse->getRadiusY().toPx());
+        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
+                             ellipse.getRadiusY().toPx());
         // TODO: rotation
     }
 
     // draw all texts
-    for (int i = 0; i < mSymbol.getTextCount(); i++)
-    {
-        const Text* text = mSymbol.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mSymbol.getTexts()) {
         // get layer
-        layer = mLayerProvider.getLayer(text->getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(text.getLayerName()); if (!layer) continue;
 
         // get cached text properties
-        const CachedTextProperties_t& props = mCachedTextProperties.value(text);
+        const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
         mFont.setPointSizeF(props.fontSize);
 
         // draw text
         painter->save();
-        painter->translate(text->getPosition().toPxQPointF());
-        painter->rotate(-text->getRotation().toDeg());
-        painter->translate(-text->getPosition().toPxQPointF());
+        painter->translate(text.getPosition().toPxQPointF());
+        painter->rotate(-text.getRotation().toDeg());
+        painter->translate(-text.getPosition().toPxQPointF());
         if (props.rotate180) painter->rotate(180);
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setFont(mFont);

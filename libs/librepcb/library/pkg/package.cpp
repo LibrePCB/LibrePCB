@@ -45,82 +45,15 @@ Package::Package(const Uuid& uuid, const Version& version, const QString& author
 Package::Package(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
-    try
-    {
-        const DomElement& root = mLoadingXmlFileDocument->getRoot();
+    const DomElement& root = mLoadingXmlFileDocument->getRoot();
+    mPads.loadFromDomElement(root);
+    mFootprints.loadFromDomElement(root);
 
-        // Load all pads
-        foreach (const DomElement* node, root.getChilds("pad")) {
-            PackagePad* pad = new PackagePad(*node);
-            if (getPadByUuid(pad->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                    .arg(pad->getUuid().toStr(), root.getDocFilePath().toNative()));
-            }
-            mPads.insert(pad->getUuid(), pad);
-        }
-
-        // Load all footprints
-        foreach (const DomElement* node, root.getChilds("footprint")) {
-            Footprint* footprint = new Footprint(*node);
-            if (getFootprintByUuid(footprint->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The footprint \"%1\" exists multiple times in \"%2\"."))
-                    .arg(footprint->getUuid().toStr(), root.getDocFilePath().toNative()));
-            }
-            mFootprints.insert(footprint->getUuid(), footprint);
-        }
-
-        cleanupAfterLoadingElementFromFile();
-    }
-    catch (Exception& e)
-    {
-        qDeleteAll(mFootprints);    mFootprints.clear();
-        qDeleteAll(mPads);          mPads.clear();
-        throw;
-    }
+    cleanupAfterLoadingElementFromFile();
 }
 
 Package::~Package() noexcept
 {
-    qDeleteAll(mFootprints);    mFootprints.clear();
-    qDeleteAll(mPads);          mPads.clear();
-}
-
-/*****************************************************************************************
- *  PackagePad Methods
- ****************************************************************************************/
-
-void Package::addPad(PackagePad& pad) noexcept
-{
-    Q_ASSERT(!mPads.contains(pad.getUuid()));
-    // TODO: check if name is valid
-    mPads.insert(pad.getUuid(), &pad);
-}
-
-void Package::removePad(PackagePad& pad) noexcept
-{
-    Q_ASSERT(mPads.contains(pad.getUuid()));
-    Q_ASSERT(mPads.value(pad.getUuid()) == &pad);
-    mPads.remove(pad.getUuid());
-}
-
-/*****************************************************************************************
- *  Footprint Methods
- ****************************************************************************************/
-
-void Package::addFootprint(Footprint& footprint) noexcept
-{
-    Q_ASSERT(!mFootprints.contains(footprint.getUuid()));
-    // TODO: check if name is valid
-    mFootprints.insert(footprint.getUuid(), &footprint);
-}
-
-void Package::removeFootprint(Footprint& footprint) noexcept
-{
-    Q_ASSERT(mFootprints.contains(footprint.getUuid()));
-    Q_ASSERT(mFootprints.value(footprint.getUuid()) == &footprint);
-    mFootprints.remove(footprint.getUuid());
 }
 
 /*****************************************************************************************
@@ -130,14 +63,13 @@ void Package::removeFootprint(Footprint& footprint) noexcept
 void Package::serialize(DomElement& root) const
 {
     LibraryElement::serialize(root);
-    serializePointerContainer(root, mPads, "pad");
-    serializePointerContainer(root, mFootprints, "footprint");
+    mPads.serialize(root);
+    mFootprints.serialize(root);
 }
 
 bool Package::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())             return false;
-    if (mFootprints.isEmpty())                                  return false;
     return true;
 }
 

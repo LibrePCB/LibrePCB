@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>150</width>
-    <height>416</height>
+    <width>315</width>
+    <height>447</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -299,10 +299,17 @@
        </property>
       </widget>
      </item>
-     <item row="14" column="0" colspan="2">
+     <item row="15" column="0" colspan="2">
       <widget class="QPushButton" name="btnRemove">
        <property name="text">
         <string>Remove this Library</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="0" colspan="2">
+      <widget class="QPushButton" name="btnOpenLibraryEditor">
+       <property name="text">
+        <string>Open Library Editor</string>
        </property>
       </widget>
      </item>

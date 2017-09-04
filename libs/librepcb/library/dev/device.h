@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../libraryelement.h"
+#include "devicepadsignalmap.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -37,7 +38,14 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Device class
+ * @brief The Device class represents an instance of a component (a "real" component)
+ *
+ * Following information is considered as the "interface" of a device and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Component UUID
+ *  - Package UUID
+ *  - Pad-signal-mapping
  */
 class Device final : public LibraryElement
 {
@@ -54,19 +62,15 @@ class Device final : public LibraryElement
         Device(const FilePath& elementDirectory, bool readOnly);
         ~Device() noexcept;
 
-        // Getters: Attributes
+        // Getters
         const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
         const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        DevicePadSignalMap& getPadSignalMap() noexcept {return mPadSignalMap;}
+        const DevicePadSignalMap& getPadSignalMap() const noexcept {return mPadSignalMap;}
 
-        // Setters: Attributes
-        void setComponentUuid(const Uuid& uuid) noexcept {mComponentUuid = uuid;}
-        void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
-
-        // Pad-Signal-Map Methods
-        const QMap<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
-        Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
-        void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
-        void removePadSignalMapping(const Uuid& pad) noexcept;
+        // Setters
+        void setComponentUuid(const Uuid& uuid) noexcept;
+        void setPackageUuid(const Uuid& uuid) noexcept;
 
         // Operator Overloadings
         Device& operator=(const Device& rhs) = delete;
@@ -76,19 +80,22 @@ class Device final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("device");}
 
 
-    private:
+    signals:
+        void componentUuidChanged(const Uuid& uuid);
+        void packageUuidChanged(const Uuid& uuid);
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
+    private: // Data
         Uuid mComponentUuid;
         Uuid mPackageUuid;
-        QMap<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
+        DevicePadSignalMap mPadSignalMap;
 };
 
 /*****************************************************************************************

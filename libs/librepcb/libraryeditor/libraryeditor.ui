@@ -6,29 +6,596 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>572</width>
-    <height>473</height>
+    <width>611</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Library Editor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout"/>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="lblRemoteLibraryWarning">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+	background-color: rgb(255, 255, 127);
+	color: rgb(170, 0, 0);
+};</string>
+      </property>
+      <property name="text">
+       <string>WARNING: This is a remote library, so all modifications will be lost after updating the library the next time! You should use a local library to manage your own library elements.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>5</number>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>572</width>
-     <height>27</height>
+     <width>611</width>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionRemoveElement"/>
+    <addaction name="separator"/>
+    <addaction name="actionUpdateLibraryDb"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionRotateCcw"/>
+    <addaction name="actionRotateCw"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionRemove"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionToolSelect"/>
+    <addaction name="actionDrawLine"/>
+    <addaction name="actionDrawRect"/>
+    <addaction name="actionDrawPolygon"/>
+    <addaction name="actionDrawEllipse"/>
+    <addaction name="actionAddText"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddSymbolPin"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddThtPad"/>
+    <addaction name="actionAddSmtPad"/>
+    <addaction name="actionAddHole"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
+    <addaction name="actionZoomAll"/>
+    <addaction name="separator"/>
+    <addaction name="actionGridProperties"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="librepcb::StatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="fileToolbar">
+   <property name="windowTitle">
+    <string>File</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionSave"/>
+   <addaction name="separator"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+  </widget>
+  <widget class="QToolBar" name="editToolbar">
+   <property name="windowTitle">
+    <string>Edit</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRotateCcw"/>
+   <addaction name="actionRotateCw"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionRemove"/>
+  </widget>
+  <widget class="QToolBar" name="viewToolbar">
+   <property name="windowTitle">
+    <string>View</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionZoomAll"/>
+   <addaction name="actionGridProperties"/>
+  </widget>
+  <widget class="QToolBar" name="commandToolbar">
+   <property name="windowTitle">
+    <string>Command</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionAbortCommand"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QToolBar" name="toolsToolbar">
+   <property name="windowTitle">
+    <string>Tools</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionToolSelect"/>
+   <addaction name="actionDrawLine"/>
+   <addaction name="actionDrawRect"/>
+   <addaction name="actionDrawPolygon"/>
+   <addaction name="actionDrawEllipse"/>
+   <addaction name="actionAddName"/>
+   <addaction name="actionAddValue"/>
+   <addaction name="actionAddText"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddSymbolPin"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddThtPad"/>
+   <addaction name="actionAddSmtPad"/>
+   <addaction name="actionAddHole"/>
+  </widget>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close Library Editor</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionAbortCommand">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Abort Command</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionZoomAll">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom All</string>
+   </property>
+  </action>
+  <action name="actionRotateCcw">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Counterclockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionRotateCw">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Clockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+R</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionToolSelect">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="actionAddSymbolPin">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_symbol_pin.png</normaloff>:/img/actions/add_symbol_pin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Symbol Pin</string>
+   </property>
+   <property name="shortcut">
+    <string>I</string>
+   </property>
+  </action>
+  <action name="actionAddThtPad">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_tht_pad.png</normaloff>:/img/actions/add_tht_pad.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add THT Pad</string>
+   </property>
+   <property name="shortcut">
+    <string>H</string>
+   </property>
+  </action>
+  <action name="actionAddSmtPad">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_smt_pad.png</normaloff>:/img/actions/add_smt_pad.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add SMT Pad</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
+   </property>
+  </action>
+  <action name="actionDrawLine">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_line.png</normaloff>:/img/actions/draw_line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Line</string>
+   </property>
+  </action>
+  <action name="actionAddText">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_text.png</normaloff>:/img/actions/add_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Text</string>
+   </property>
+   <property name="shortcut">
+    <string>T</string>
+   </property>
+  </action>
+  <action name="actionDrawPolygon">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Polygon</string>
+   </property>
+   <property name="shortcut">
+    <string>P</string>
+   </property>
+  </action>
+  <action name="actionDrawEllipse">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Circle/Ellipse</string>
+   </property>
+   <property name="shortcut">
+    <string>E</string>
+   </property>
+  </action>
+  <action name="actionAddHole">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_hole.png</normaloff>:/img/actions/add_hole.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Hole (NPTH)</string>
+   </property>
+   <property name="shortcut">
+    <string>O</string>
+   </property>
+  </action>
+  <action name="actionGridProperties">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid</string>
+   </property>
+  </action>
+  <action name="actionDrawRect">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_rectangle.png</normaloff>:/img/actions/draw_rectangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Rectangle</string>
+   </property>
+  </action>
+  <action name="actionUpdateLibraryDb">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Library Database</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionRemoveElement">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Element</string>
+   </property>
+  </action>
+  <action name="actionAddName">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_name.png</normaloff>:/img/actions/add_name.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Name</string>
+   </property>
+  </action>
+  <action name="actionAddValue">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_value.png</normaloff>:/img/actions/add_value.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Value</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::StatusBar</class>
+   <extends>QStatusBar</extends>
+   <header location="global">librepcb/common/widgets/statusbar.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../img/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

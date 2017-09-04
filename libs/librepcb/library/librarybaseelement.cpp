@@ -104,7 +104,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     // read attributes
     mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
     mVersion = root.getFirstChild("version", true)->getText<Version>(true);
-    mAuthor = root.getFirstChild("author", true)->getText<QString>(true);
+    mAuthor = root.getFirstChild("author", true)->getText<QString>(false);
     mCreated = root.getFirstChild("created", true)->getText<QDateTime>(true);
     mLastModified = root.getFirstChild("last_modified", true)->getText<QDateTime>(true);
     mIsDeprecated = root.getFirstChild("deprecated", true)->getText<bool>(true);

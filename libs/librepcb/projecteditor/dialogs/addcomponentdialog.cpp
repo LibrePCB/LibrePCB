@@ -65,7 +65,7 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->graphicsView->setOriginCrossVisible(false);
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    mCategoryTreeModel = new workspace::CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder);
+    mCategoryTreeModel = new workspace::ComponentCategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder);
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddComponentDialog::treeCategories_currentItemChanged);
@@ -148,7 +148,7 @@ void AddComponentDialog::on_listComponents_currentItemChanged(QListWidgetItem *c
 void AddComponentDialog::on_cbxSymbVar_currentIndexChanged(int index)
 {
     if ((mSelectedComponent) && (index >= 0))
-        setSelectedSymbVar(mSelectedComponent->getSymbolVariantByUuid(Uuid(mUi->cbxSymbVar->itemData(index).toString())));
+        setSelectedSymbVar(mSelectedComponent->getSymbolVariants().find(Uuid(mUi->cbxSymbVar->itemData(index).toString())).get());
     else
         setSelectedSymbVar(nullptr);
 }
@@ -207,14 +207,11 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
         mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
-        for (int i = 0; i < cmp->getSymbolVariantCount(); i++) {
-            const library::ComponentSymbolVariant* symbVar = cmp->getSymbolVariant(i);
-            Q_ASSERT(symbVar); if (!symbVar) continue;
-
-            mUi->cbxSymbVar->addItem(symbVar->getNames().value(localeOrder),
-                                     symbVar->getUuid().toStr());
+        for (const library::ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
+            QString text = symbVar.getNames().value(localeOrder);
+            mUi->cbxSymbVar->addItem(text, symbVar.getUuid().toStr());
         }
-        mUi->cbxSymbVar->setCurrentIndex(0);
+        mUi->cbxSymbVar->setCurrentIndex(cmp->getSymbolVariants().count() > 0 ? 0 : -1);
     }
 }
 
@@ -236,21 +233,15 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
         mUi->lblSymbVarNorm->setText(symbVar->getNorm());
         mUi->lblSymbVarDescription->setText(symbVar->getDescriptions().value(localeOrder));
 
-        for (int i = 0; i < symbVar->getItemCount(); i++) {
-            const library::ComponentSymbolVariantItem* item = symbVar->getItem(i);
-            Q_ASSERT(item); if (!item) continue;
-
-            FilePath symbolFp = mWorkspace.getLibraryDb().getLatestSymbol(item->getSymbolUuid());
+        for (const library::ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
+            FilePath symbolFp = mWorkspace.getLibraryDb().getLatestSymbol(item.getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning
             const library::Symbol* symbol = new library::Symbol(symbolFp, true); // TODO: fix memory leak...
             library::SymbolPreviewGraphicsItem* graphicsItem = new library::SymbolPreviewGraphicsItem(
-                mProject.getLayers(), localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item->getUuid());
-            //graphicsItem->setDrawBoundingRect(mProject.getWorkspace().getSettings().getDebugTools()->getShowGraphicsItemsBoundingRect());
+                mProject.getLayers(), localeOrder, *symbol, mSelectedComponent, symbVar->getUuid(), item.getUuid());
+            graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
+            graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
             mPreviewSymbolGraphicsItems.append(graphicsItem);
-            Point pos = Point::fromPx(0, mPreviewScene->itemsBoundingRect().bottom()
-                                      + graphicsItem->boundingRect().height(),
-                                      mUi->graphicsView->getGridProperties().getInterval());
-            graphicsItem->setPos(pos.toPxQPointF());
             mPreviewScene->addItem(*graphicsItem);
             mUi->graphicsView->zoomAll();
         }

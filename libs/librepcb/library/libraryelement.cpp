@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "libraryelement.h"
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/fileio/domdocument.h>
 
 /*****************************************************************************************
@@ -51,7 +52,7 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
     // read category UUIDs
     DomElement& root = mLoadingXmlFileDocument->getRoot();
     foreach (const DomElement* node, root.getChilds("category")) {
-        mCategories.append(node->getText<Uuid>(true));
+        mCategories.insert(node->getText<Uuid>(true));
     }
 }
 
@@ -66,7 +67,7 @@ LibraryElement::~LibraryElement() noexcept
 void LibraryElement::serialize(DomElement& root) const
 {
     LibraryBaseElement::serialize(root);
-    foreach (const Uuid& uuid, mCategories) {
+    foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
         root.appendTextChild("category", uuid);
     }
 }

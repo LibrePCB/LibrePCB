@@ -34,6 +34,10 @@ namespace librepcb {
 
 class SQLiteDatabase;
 
+namespace library {
+class Library;
+}
+
 namespace workspace {
 
 class Workspace;
@@ -84,14 +88,15 @@ class WorkspaceLibraryScanner final : public QThread
 
         void run() noexcept override;
         void clearAllTables(SQLiteDatabase& db);
+        int addLibraryToDb(SQLiteDatabase& db, const QSharedPointer<library::Library>& lib);
         template <typename ElementType>
         int addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                              const QString& table, const QString& idColumn);
+                              const QString& table, const QString& idColumn, int libId);
         template <typename ElementType>
         int addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                            const QString& table, const QString& idColumn);
+                            const QString& table, const QString& idColumn, int libId);
         int addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                           const QString& table, const QString& idColumn);
+                           const QString& table, const QString& idColumn, int libId);
 
 
     private: // Data

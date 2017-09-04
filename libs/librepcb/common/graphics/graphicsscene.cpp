@@ -24,7 +24,6 @@
 #include <QtWidgets>
 #include "graphicsscene.h"
 #include "../units/point.h"
-#include "graphicsitem.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -60,12 +59,12 @@ GraphicsScene::~GraphicsScene() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GraphicsScene::addItem(GraphicsItem& item) noexcept
+void GraphicsScene::addItem(QGraphicsItem& item) noexcept
 {
     QGraphicsScene::addItem(&item);
 }
 
-void GraphicsScene::removeItem(GraphicsItem& item) noexcept
+void GraphicsScene::removeItem(QGraphicsItem& item) noexcept
 {
     QGraphicsScene::removeItem(&item);
 }

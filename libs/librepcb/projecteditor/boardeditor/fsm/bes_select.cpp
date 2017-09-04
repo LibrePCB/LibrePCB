@@ -245,7 +245,6 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
 
             // get all available alternative devices and footprints
             QSet<Uuid> devicesList = mWorkspace.getLibraryDb().getDevicesOfComponent(cmpInst.getLibComponent().getUuid());
-            QList<Uuid> footprintsList = devInst.getLibPackage().getFootprintUuids();
 
             // build the context menu
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
@@ -271,17 +270,17 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 }
             }
             QMenu* aChangeFootprintMenu = menu.addMenu(tr("Change Footprint"));
-            aChangeFootprintMenu->setEnabled(footprintsList.count() > 0);
-            foreach (const Uuid& footprintUuid, footprintsList) {
-                const library::Footprint* footprint = devInst.getLibPackage().getFootprintByUuid(footprintUuid); Q_ASSERT(footprint);
-                QAction* a = aChangeFootprintMenu->addAction(footprint->getNames().value(localeOrder));
-                a->setData(footprintUuid.toStr());
-                if (footprintUuid == devInst.getFootprint().getLibFootprint().getUuid()) {
+
+            for (const library::Footprint& footprint : devInst.getLibPackage().getFootprints()) {
+                QAction* a = aChangeFootprintMenu->addAction(footprint.getNames().value(localeOrder));
+                a->setData(footprint.getUuid().toStr());
+                if (footprint.getUuid() == devInst.getFootprint().getLibFootprint().getUuid()) {
                     a->setCheckable(true);
                     a->setChecked(true);
                     a->setEnabled(false);
                 }
             }
+            aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
@@ -310,7 +309,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                     Uuid uuid(action->data().toString());
                     Uuid deviceUuid = devInst.getLibDevice().getUuid();
                     Uuid footprintUuid = Uuid(); // TODO
-                    if (footprintsList.contains(uuid)) {
+                    if (devInst.getLibPackage().getFootprints().contains(uuid)) {
                         // change footprint
                         footprintUuid = uuid;
                     } else {

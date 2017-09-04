@@ -76,54 +76,46 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
     mShape.addRect(crossRect);
 
     // polygons
-    for (int i = 0; i < mLibSymbol.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mLibSymbol.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
-        QPainterPath polygonPath = polygon->toQPainterPathPx();
-        qreal w = polygon->getLineWidth().toPx() / 2;
+    for (const Polygon& polygon : mLibSymbol.getPolygons()) {
+        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-        if (polygon->isGrabArea()) mShape = mShape.united(polygonPath);
+        if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
     }
 
     // texts
     mCachedTextProperties.clear();
-    for (int i = 0; i < mLibSymbol.getTextCount(); i++)
-    {
-        const Text* text = mLibSymbol.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mLibSymbol.getTexts()) {
         // create static text properties
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text->getText();
+        props.text = text.getText();
         mSymbol.replaceVariablesWithAttributes(props.text, true);
 
         // calculate font metrics
-        props.fontPixelSize = qCeil(text->getHeight().toPx());
+        props.fontPixelSize = qCeil(text.getHeight().toPx());
         mFont.setPixelSize(props.fontPixelSize);
         QFontMetricsF metrics(mFont);
-        props.scaleFactor = text->getHeight().toPx() / metrics.height();
-        props.textRect = metrics.boundingRect(QRectF(), text->getAlign().toQtAlign() |
+        props.scaleFactor = text.getHeight().toPx() / metrics.height();
+        props.textRect = metrics.boundingRect(QRectF(), text.getAlign().toQtAlign() |
                                               Qt::TextDontClip, props.text);
         QRectF scaledTextRect = QRectF(props.textRect.topLeft() * props.scaleFactor,
                                        props.textRect.bottomRight() * props.scaleFactor);
 
         // check rotation
-        Angle absAngle = text->getRotation() + mSymbol.getRotation();
+        Angle absAngle = text.getRotation() + mSymbol.getRotation();
         absAngle.mapTo180deg();
         props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 
         // calculate text position
-        scaledTextRect.translate(text->getPosition().toPxQPointF());
+        scaledTextRect.translate(text.getPosition().toPxQPointF());
 
         // text alignment
         if (props.rotate180)
-            props.flags = text->getAlign().mirrored().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().mirrored().toQtAlign() | Qt::TextWordWrap;
         else
-            props.flags = text->getAlign().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().toQtAlign() | Qt::TextWordWrap;
 
         // calculate text bounding rect
         mBoundingRect = mBoundingRect.united(scaledTextRect);
@@ -136,7 +128,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
         }
 
         // save properties
-        mCachedTextProperties.insert(text, props);
+        mCachedTextProperties.insert(&text, props);
     }
 
     update();
@@ -156,21 +148,17 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // draw all polygons
-    for (int i = 0; i < mLibSymbol.getPolygonCount(); i++)
-    {
-        const Polygon* polygon = mLibSymbol.getPolygon(i);
-        Q_ASSERT(polygon); if (!polygon) continue;
-
+    for (const Polygon& polygon : mLibSymbol.getPolygons()) {
         // set colors
-        layer = getLayer(polygon->getLayerName());
+        layer = getLayer(polygon.getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
-            painter->setPen(QPen(layer->getColor(selected), polygon->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setPen(QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
-        if (polygon->isFilled())
-            layer = getLayer(polygon->getLayerName());
-        else if (polygon->isGrabArea())
+        if (polygon.isFilled())
+            layer = getLayer(polygon.getLayerName());
+        else if (polygon.isGrabArea())
             layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
@@ -178,25 +166,21 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
-        painter->drawPath(polygon->toQPainterPathPx());
+        painter->drawPath(polygon.toQPainterPathPx());
     }
 
     // draw all ellipses
-    for (int i = 0; i < mLibSymbol.getEllipseCount(); i++)
-    {
-        const Ellipse* ellipse = mLibSymbol.getEllipse(i);
-        Q_ASSERT(ellipse); if (!ellipse) continue;
-
+    for (const Ellipse& ellipse : mLibSymbol.getEllipses()) {
         // set colors
-        layer = getLayer(ellipse->getLayerName());
+        layer = getLayer(ellipse.getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
-            painter->setPen(QPen(layer->getColor(selected), ellipse->getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setPen(QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
-        if (ellipse->isFilled())
-            layer = getLayer(ellipse->getLayerName());
-        else if (ellipse->isGrabArea())
+        if (ellipse.isFilled())
+            layer = getLayer(ellipse.getLayerName());
+        else if (ellipse.isGrabArea())
             layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
@@ -204,34 +188,30 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw ellipse
-        painter->drawEllipse(ellipse->getCenter().toPxQPointF(), ellipse->getRadiusX().toPx(),
-                             ellipse->getRadiusY().toPx());
+        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
+                             ellipse.getRadiusY().toPx());
         // TODO: rotation
     }
 
     // draw all texts
-    for (int i = 0; i < mLibSymbol.getTextCount(); i++)
-    {
-        const Text* text = mLibSymbol.getText(i);
-        Q_ASSERT(text); if (!text) continue;
-
+    for (const Text& text : mLibSymbol.getTexts()) {
         // get layer
-        layer = getLayer(text->getLayerName());
+        layer = getLayer(text.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
         // get cached text properties
-        const CachedTextProperties_t& props = mCachedTextProperties.value(text);
+        const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
         mFont.setPixelSize(props.fontPixelSize);
 
         // draw text or rect
         painter->save();
-        painter->translate(text->getPosition().toPxQPointF());
-        painter->rotate(-text->getRotation().toDeg());
-        painter->translate(-text->getPosition().toPxQPointF());
+        painter->translate(text.getPosition().toPxQPointF());
+        painter->rotate(-text.getRotation().toDeg());
+        painter->translate(-text.getPosition().toPxQPointF());
         painter->scale(props.scaleFactor, props.scaleFactor);
         if (props.rotate180) painter->rotate(180);
-        if ((deviceIsPrinter) || (lod * text->getHeight().toPx() > 8))
+        if ((deviceIsPrinter) || (lod * text.getHeight().toPx() > 8))
         {
             // draw text
             painter->setPen(QPen(layer->getColor(selected), 0));
@@ -275,7 +255,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     {
         // show symbols count of the component
         int count = mSymbol.getComponentInstance().getPlacedSymbolsCount();
-        int maxCount = mSymbol.getComponentInstance().getSymbolVariant().getItemCount();
+        int maxCount = mSymbol.getComponentInstance().getSymbolVariant().getSymbolItems().count();
         mFont.setPixelSize(Length(1000000).toPx());
         painter->setFont(mFont);
         painter->setPen(QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));

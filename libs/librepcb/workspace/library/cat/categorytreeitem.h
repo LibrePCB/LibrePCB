@@ -47,41 +47,53 @@ class WorkspaceLibraryDb;
 /**
  * @brief The CategoryTreeItem class
  */
+template <typename ElementType>
 class CategoryTreeItem final
 {
     public:
 
         // Constructors / Destructor
+        CategoryTreeItem() = delete;
+        CategoryTreeItem(const CategoryTreeItem& other) = delete;
         CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
                          CategoryTreeItem* parent, const Uuid& uuid) noexcept;
         ~CategoryTreeItem() noexcept;
 
         // Getters
-        const Uuid& getUuid()                  const noexcept {return mUuid;}
+        const Uuid& getUuid()                   const noexcept {return mUuid;}
         unsigned int getDepth()                 const noexcept {return mDepth;}
         int getColumnCount()                    const noexcept {return 1;}
         CategoryTreeItem* getParent()           const noexcept {return mParent;}
-        CategoryTreeItem* getChild(int index)   const noexcept {return mChilds.value(index);}
-        int getChildCount()                     const noexcept{return mChilds.count();}
+        CategoryTreeItem* getChild(int index)   const noexcept {return mChilds.value(index).data();}
+        int getChildCount()                     const noexcept {return mChilds.count();}
         int getChildNumber()                    const noexcept;
-        QVariant data(int role) const noexcept;
+        QVariant data(int role)                 const noexcept;
+
+        // Operator Overloadings
+        CategoryTreeItem& operator=(const CategoryTreeItem& rhs) = delete;
+
 
     private:
 
-        // make some methods inaccessible...
-        CategoryTreeItem();
-        CategoryTreeItem(const CategoryTreeItem& other);
-        CategoryTreeItem& operator=(const CategoryTreeItem& rhs);
+        // Types
+        using ChildType = QSharedPointer<CategoryTreeItem<ElementType>>;
+
+        // Methods
+        FilePath getLatestCategory(const WorkspaceLibraryDb& lib) const;
+        QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
 
         // Attributes
         QStringList mLocaleOrder;
         CategoryTreeItem* mParent;
         Uuid mUuid;
-        library::ComponentCategory* mCategory;
+        QScopedPointer<ElementType> mCategory;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
         QString mExceptionMessage;
-        QList<CategoryTreeItem*> mChilds;
+        QList<ChildType> mChilds;
 };
+
+typedef CategoryTreeItem<library::ComponentCategory> ComponentCategoryTreeItem;
+typedef CategoryTreeItem<library::PackageCategory> PackageCategoryTreeItem;
 
 /*****************************************************************************************
  *  End of File

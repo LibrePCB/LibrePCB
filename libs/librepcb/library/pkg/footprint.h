@@ -24,14 +24,16 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/ellipse.h>
 #include <librepcb/common/geometry/text.h>
 #include <librepcb/common/geometry/hole.h>
-#include "footprintpadsmt.h"
-#include "footprintpadtht.h"
+#include "footprintpad.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,69 +41,59 @@
 namespace librepcb {
 namespace library {
 
+class FootprintGraphicsItem;
+
 /*****************************************************************************************
  *  Class Footprint
  ****************************************************************************************/
 
 /**
- * @brief The Footprint class
+ * @brief The Footprint class represents one footprint variant of a package
+ *
+ * Following information is considered as the "interface" of a footprint and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Footprint pads (neither adding nor removing pads is allowed)
+ *    - UUID
  */
-class Footprint final : public SerializableObject
+class Footprint final : public SerializableObject, private FootprintPadList::IF_Observer,
+                        private PolygonList::IF_Observer, private EllipseList::IF_Observer,
+                        private TextList::IF_Observer, private HoleList::IF_Observer
 {
         Q_DECLARE_TR_FUNCTIONS(Footprint)
 
     public:
 
         // Constructors / Destructor
-        explicit Footprint(const Uuid& uuid, const QString& name_en_US,
-                           const QString& description_en_US);
+        Footprint() = delete;
+        Footprint(const Footprint& other) noexcept;
+        Footprint(const Uuid& uuid, const QString& name_en_US,
+                  const QString& description_en_US);
         explicit Footprint(const DomElement& domElement);
         ~Footprint() noexcept;
 
-        // Getters: Attributes
+        // Getters: General
         const Uuid& getUuid() const noexcept {return mUuid;}
+        LocalizedNameMap& getNames() noexcept {return mNames;}
         const LocalizedNameMap& getNames() const noexcept {return mNames;}
+        LocalizedDescriptionMap& getDescriptions() noexcept {return mDescriptions;}
         const LocalizedDescriptionMap& getDescriptions() const noexcept {return mDescriptions;}
 
-        // FootprintPad Methods
-        const QMap<Uuid, FootprintPad*>& getPads() noexcept {return mPads;}
-        QList<Uuid> getPadUuids() const noexcept {return mPads.keys();}
-        FootprintPad* getPadByUuid(const Uuid& uuid) noexcept {return mPads.value(uuid);}
-        const FootprintPad* getPadByUuid(const Uuid& uuid) const noexcept {return mPads.value(uuid);}
-        void addPad(FootprintPad& pad) noexcept;
-        void removePad(FootprintPad& pad) noexcept;
+        // Getters: Geometry
+        const FootprintPadList& getPads() const noexcept {return mPads;}
+        FootprintPadList& getPads() noexcept {return mPads;}
+        const PolygonList& getPolygons() const noexcept {return mPolygons;}
+        PolygonList& getPolygons() noexcept {return mPolygons;}
+        const EllipseList& getEllipses() const noexcept {return mEllipses;}
+        EllipseList& getEllipses() noexcept {return mEllipses;}
+        const TextList& getTexts() const noexcept {return mTexts;}
+        TextList& getTexts() noexcept {return mTexts;}
+        const HoleList& getHoles() const noexcept {return mHoles;}
+        HoleList& getHoles() noexcept {return mHoles;}
 
-        // Polygon Methods
-        const QList<Polygon*>& getPolygons() noexcept {return mPolygons;}
-        int getPolygonCount() const noexcept {return mPolygons.count();}
-        Polygon* getPolygon(int index) noexcept {return mPolygons.value(index);}
-        const Polygon* getPolygon(int index) const noexcept {return mPolygons.value(index);}
-        void addPolygon(Polygon& polygon) noexcept;
-        void removePolygon(Polygon& polygon) noexcept;
-
-        // Ellipse Methods
-        const QList<Ellipse*>& getEllipses() noexcept {return mEllipses;}
-        int getEllipseCount() const noexcept {return mEllipses.count();}
-        Ellipse* getEllipse(int index) noexcept {return mEllipses.value(index);}
-        const Ellipse* getEllipse(int index) const noexcept {return mEllipses.value(index);}
-        void addEllipse(Ellipse& ellipse) noexcept;
-        void removeEllipse(Ellipse& ellipse) noexcept;
-
-        // Text Methods
-        const QList<Text*>& getTexts() noexcept {return mTexts;}
-        int getTextCount() const noexcept {return mTexts.count();}
-        Text* getText(int index) noexcept {return mTexts.value(index);}
-        const Text* getText(int index) const noexcept {return mTexts.value(index);}
-        void addText(Text& text) noexcept;
-        void removeText(Text& text) noexcept;
-
-        // Hole Methods
-        const QList<Hole*>& getHoles() noexcept {return mHoles;}
-        int getHoleCount() const noexcept {return mHoles.count();}
-        Hole* getHole(int index) noexcept {return mHoles.value(index);}
-        const Hole* getHole(int index) const noexcept {return mHoles.value(index);}
-        void addHole(Hole& hole) noexcept;
-        void removeHole(Hole& hole) noexcept;
+        // General Methods
+        void registerGraphicsItem(FootprintGraphicsItem& item) noexcept;
+        void unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept;
 
 
         // General Methods
@@ -109,29 +101,57 @@ class Footprint final : public SerializableObject
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        Footprint() = delete;
-        Footprint(const Footprint& other) = delete;
-        Footprint& operator=(const Footprint& rhs) = delete;
+        // Operator Overloadings
+        bool operator==(const Footprint& rhs) const noexcept;
+        bool operator!=(const Footprint& rhs) const noexcept {return !(*this == rhs);}
+        Footprint& operator=(const Footprint& rhs) noexcept;
 
 
-        // Private Methods
-        bool checkAttributesValidity() const noexcept;
+    private: // Methods
+        void listObjectAdded(const FootprintPadList& list, int newIndex,
+                             const std::shared_ptr<FootprintPad>& ptr) noexcept override;
+        void listObjectAdded(const PolygonList& list, int newIndex,
+                             const std::shared_ptr<Polygon>& ptr) noexcept override;
+        void listObjectAdded(const EllipseList& list, int newIndex,
+                             const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectAdded(const TextList& list, int newIndex,
+                             const std::shared_ptr<Text>& ptr) noexcept override;
+        void listObjectAdded(const HoleList& list, int newIndex,
+                             const std::shared_ptr<Hole>& ptr) noexcept override;
+        void listObjectRemoved(const FootprintPadList& list, int oldIndex,
+                               const std::shared_ptr<FootprintPad>& ptr) noexcept override;
+        void listObjectRemoved(const PolygonList& list, int oldIndex,
+                               const std::shared_ptr<Polygon>& ptr) noexcept override;
+        void listObjectRemoved(const EllipseList& list, int oldIndex,
+                               const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectRemoved(const TextList& list, int oldIndex,
+                               const std::shared_ptr<Text>& ptr) noexcept override;
+        void listObjectRemoved(const HoleList& list, int oldIndex,
+                               const std::shared_ptr<Hole>& ptr) noexcept override;
 
 
-        // Footprint Attributes
+    private: // Data
         Uuid mUuid;
         LocalizedNameMap mNames;
         LocalizedDescriptionMap mDescriptions;
-        QMap<Uuid, FootprintPad*> mPads;
-        QList<Polygon*> mPolygons;
-        QList<Ellipse*> mEllipses;
-        QList<Text*> mTexts;
-        QList<Hole*> mHoles;
+        FootprintPadList mPads;
+        PolygonList mPolygons;
+        EllipseList mEllipses;
+        TextList mTexts;
+        HoleList mHoles;
+
+        FootprintGraphicsItem* mRegisteredGraphicsItem;
 };
+
+/*****************************************************************************************
+ *  Class FootprintList
+ ****************************************************************************************/
+
+struct FootprintListNameProvider {static constexpr const char* tagname = "footprint";};
+using FootprintList = SerializableObjectList<Footprint, FootprintListNameProvider>;
+using CmdFootprintInsert = CmdListElementInsert<Footprint, FootprintListNameProvider>;
+using CmdFootprintRemove = CmdListElementRemove<Footprint, FootprintListNameProvider>;
+using CmdFootprintsSwap= CmdListElementsSwap<Footprint, FootprintListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

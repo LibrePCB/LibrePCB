@@ -1,257 +1,211 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="74cm" height="33cm" viewBox="-31 -41 1466 646" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <g>
-    <rect style="fill: #ffffff" x="360" y="120" width="76.55" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="360" y="120" width="76.55" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="398.275" y="139">Symbol</text>
+<svg width="76cm" height="29cm" viewBox="339 -21 1503 566" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g id="Background">
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="1580,302.236 1580,300 1580,300 1580,380 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="1588,302.236 1580,286.236 1572,302.236 "/>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="1020,122.236 1020,120 1020,120 1020,500 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="1028,122.236 1020,106.236 1012,122.236 "/>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="760" y="140" width="128.65" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="824.325" y="156">&lt;&lt;QMainWindow&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="824.325" y="175">LibraryEditor</text>
+    </g>
+    <text xml:space="preserve" font-size="22.5778" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="900" y="0">
+      <tspan x="900" y="0">Namespace librepcb::library::editor</tspan>
+    </text>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="60" width="172.35" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1106.18" y="76">&lt;&lt;QWidget&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1106.18" y="95">EditorWidgetBase</text>
+    </g>
+    <g>
+      <rect style="fill: #ffb1b1; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1320" y="320" width="168.1" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1404.05" y="336">&lt;&lt;QObject&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1404.05" y="355">SymbolEditorFsm</text>
+    </g>
+    <g>
+      <rect style="fill: #ffbdbd; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="560" y="220" width="206.3" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="663.15" y="236">&lt;&lt;QObject&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="663.15" y="255">ExclusiveActionGroup</text>
+    </g>
+    <g>
+      <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="340" y="160" width="159.95" height="28"/>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="419.975" y="179">Ui::LibraryEditor</text>
+    </g>
+    <g>
+      <rect style="fill: #ffbdbd; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="360" y="260" width="94.7" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="407.35" y="276">&lt;&lt;QObject&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="407.35" y="295">QAction</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="419.975,213.172 419.975,231 407.35,231 407.35,260 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="419.975,188 424.775,202 419.975,216 415.175,202 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="413.663" y="227.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="430.975" y="200">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="411.35" y="256">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="824.325,209.172 824.325,242 766.3,242 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="824.325,184 829.125,198 824.325,212 819.525,198 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="795.312" y="238.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="835.325" y="196">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="770.3" y="238.8">1</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="454.7,260 507.35,260 507.35,242 560,242 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="509.35" y="247.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="458.7" y="256.8">0..*</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="556" y="238.8">0..1</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="733.82,162 622.976,162 622.976,174 500.96,174 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="758.992,162 744.992,166.8 730.992,162 744.992,157.2 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="624.976" y="164.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="726.992" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="504.96" y="170.8">1</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,222 1020,222 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="188.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="218.8">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="1240.72,342 1274.27,342 1274.27,342 1318.99,342 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="1215.55,342 1229.55,337.2 1243.55,342 1229.55,346.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1274.27" y="338.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1247.55" y="338.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1314.99" y="338.8">0..1</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="200" width="314" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1177" y="216">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1177" y="235">ComponentCategoryEditorWidget</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="260" width="286.2" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1163.1" y="276">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1163.1" y="295">PackageCategoryEditorWidget</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="320" width="195.55" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1117.78" y="336">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1117.78" y="355">SymbolEditorWidget</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="380" width="204.35" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1122.17" y="396">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1122.17" y="415">PackageEditorWidget</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="440" width="232.15" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1136.08" y="456">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1136.08" y="475">ComponentEditorWidget</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="500" width="189.45" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1114.72" y="516">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1114.72" y="535">DeviceEditorWidget</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,282 1020,282 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="218.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="278.8">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,342 1020,342 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="248.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="338.8">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,402 1020,402 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="278.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="398.8">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,462 1020,462 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="308.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="458.8">0..*</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,522 1020,522 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="963.325" y="338.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="518.8">0..*</text>
+    </g>
+    <g>
+      <rect style="fill: #ffb1b1; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1580" y="240" width="179.45" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1669.72" y="256">&lt;&lt;QObject&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1669.72" y="275">SymbolEditorState</text>
+    </g>
+    <g>
+      <rect style="fill: #ffb1b1; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1580" y="320" width="243.3" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1701.65" y="336">&lt;&lt;SymbolEditorState&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1701.65" y="355">SymbolEditorState_Select</text>
+    </g>
+    <g>
+      <rect style="fill: #ffb1b1; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1580" y="380" width="260.9" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1710.45" y="396">&lt;&lt;SymbolEditorState&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1710.45" y="415">SymbolEditorState_AddPins</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="1513.27,342 1541.05,342 1541.05,342 1580,342 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="1488.1,342 1502.1,337.2 1516.1,342 1502.1,346.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1541.05" y="338.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1520.1" y="338.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1576" y="338.8">1</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="1513.27,342 1541.05,342 1541.05,402 1580,402 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="1488.1,342 1502.1,337.2 1516.1,342 1502.1,346.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1543.05" y="368.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1520.1" y="338.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1576" y="398.8">1</text>
+    </g>
+    <g>
+      <rect style="fill: #92ff92; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="140" width="223.15" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1131.58" y="156">&lt;&lt;EditorWidgetBase&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1131.58" y="175">LibraryOverviewWidget</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="913.822,162 961.325,162 961.325,162 1020,162 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="888.65,162 902.65,157.2 916.65,162 902.65,166.8 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="961.325" y="158.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="920.65" y="158.8">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1016" y="158.8">1</text>
+    </g>
+    <g>
+      <rect style="fill: #ffbdbd; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="560" y="300" width="219.3" height="44"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="669.65" y="316">&lt;&lt;QObject&gt;&gt;</text>
+      <text xml:space="preserve" font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="669.65" y="335">UndoStackActionGroup</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="824.325,209.172 824.325,322 779.3,322 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="824.325,184 829.125,198 824.325,212 819.525,198 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="801.812" y="318.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="835.325" y="196">1</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="783.3" y="318.8">1</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="454.7,304 507.35,304 507.35,322 560,322 "/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="509.35" y="309.8"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="458.7" y="300.8">2</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="556" y="318.8">0..1</text>
+    </g>
   </g>
-  <g>
-    <rect style="fill: #ffffff" x="1020" y="120" width="85.35" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1020" y="120" width="85.35" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1062.67" y="139">Package</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="880" y="120" width="113.5" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="880" y="120" width="113.5" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="936.75" y="139">SpiceModel</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="680" y="120" width="93.85" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="680" y="120" width="93.85" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="726.925" y="139">Footprint</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="800" y="120" width="64.7" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="120" width="64.7" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="832.35" y="139">Model</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1120" y="120" width="182.3" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1120" y="120" width="182.3" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1211.15" y="139">GenericComponent</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1320" y="120" width="113.15" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1320" y="120" width="113.15" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1376.58" y="139">Component</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="380" width="149.1" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="380" width="149.1" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="494.55" y="396">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="494.55" y="415">SymbolPolygon</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="200" width="171.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="200" width="171.7" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="505.85" y="216">&lt;&lt;QGraphicsLineItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="505.85" y="235">SymbolLine</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="260" width="171.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="260" width="171.7" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="505.85" y="276">&lt;&lt;QGraphicsRectItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="505.85" y="295">SymbolRect</text>
-  </g>
-  <g>
-    <rect style="fill: #92ff92" x="360" y="20" width="128.65" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="360" y="20" width="128.65" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="424.325" y="36">&lt;&lt;QMainWindow&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="424.325" y="55">LibraryEditor</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="-30" y="120" width="195" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="-30" y="120" width="195" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="67.5" y="139">ComponentCategory</text>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="180" y="120" width="167.2" height="28"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="120" width="167.2" height="28"/>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="263.6" y="139">PackageCategory</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="320" width="194.8" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="320" width="194.8" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="517.4" y="336">&lt;&lt;QGraphicsEllipseItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="517.4" y="355">SymbolEllipse</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="500" width="217.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="500" width="217.9" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="528.95" y="516">&lt;&lt;QGraphicsSimpleTextItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="528.95" y="535">SymbolText</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="420" y="560" width="140.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="560" width="140.9" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="490.45" y="576">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="490.45" y="595">SymbolPin</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,222 420,222 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="219"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="219"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,282 420,282 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="279"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="279"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,342 420,342 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="339"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="339"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,402 420,402 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="399"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="399"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,522 420,522 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="519"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="519"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,173.172 398.275,582 420,582 "/>
-    <polygon style="fill: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="398.275,148 403.075,162 398.275,176 393.475,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="409.137" y="579"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="409.275" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="416" y="579"/>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="380" width="166.4" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="380" width="166.4" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="843.2" y="396">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="843.2" y="415">FootprintPolygon</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="200" width="171.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="200" width="171.7" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="845.85" y="216">&lt;&lt;QGraphicsLineItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="845.85" y="235">FootprintLine</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="260" width="171.7" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="260" width="171.7" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="845.85" y="276">&lt;&lt;QGraphicsRectItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="845.85" y="295">FootprintRect</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="320" width="194.8" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="320" width="194.8" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="857.4" y="336">&lt;&lt;QGraphicsEllipseItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="857.4" y="355">FootprintEllipse</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="500" width="217.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="500" width="217.9" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="868.95" y="516">&lt;&lt;QGraphicsSimpleTextItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="868.95" y="535">FootprintText</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="760" y="560" width="140.9" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="760" y="560" width="140.9" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="830.45" y="576">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830.45" y="595">FootprintPad</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,222 760,222 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="219"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="219"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,282 760,282 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="279"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="279"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,342 760,342 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="339"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="339"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,402 760,402 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="399"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="399"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,522 760,522 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="519"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="519"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,173.172 726.925,582 760,582 "/>
-    <polygon style="fill: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="726.925,148 731.725,162 726.925,176 722.125,162 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="743.462" y="579"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="737.925" y="160"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="756" y="579"/>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="520" y="440" width="190.2" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="520" y="440" width="190.2" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="615.1" y="456">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="615.1" y="475">SymbolPolygonItem</text>
-  </g>
-  <g>
-    <rect style="fill: #ffcdcd" x="880" y="440" width="207.5" height="44"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="880" y="440" width="207.5" height="44"/>
-    <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="983.75" y="456">&lt;&lt;QGraphicsItem&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="983.75" y="475">FootprintPolygonItem</text>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="494.55,450.177 494.55,462 520,462 "/>
-    <polygon style="fill: #000000" points="494.55,425.006 499.35,439.006 494.55,453.006 489.75,439.006 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="494.55,425.006 499.35,439.006 494.55,453.006 489.75,439.006 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="507.275" y="459"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="505.55" y="437.006"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="516" y="459"/>
-  </g>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="843.2,449.172 843.2,462 880,462 "/>
-    <polygon style="fill: #000000" points="843.2,424 848,438 843.2,452 838.4,438 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="843.2,424 848,438 843.2,452 838.4,438 "/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="861.6" y="459"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="854.2" y="436"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="876" y="459"/>
-  </g>
-  <text xml:space="preserve" font-size="160" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="180" y="380">
-    <tspan x="180" y="380">not up to date!</tspan>
-  </text>
-  <text xml:space="preserve" font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="560" y="-20">
-    <tspan x="560" y="-20">Namespace: library_editor</tspan>
-  </text>
 </svg>

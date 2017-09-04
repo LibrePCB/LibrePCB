@@ -32,6 +32,8 @@
 #include <librepcb/workspace/projecttreeitem.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/librarymanager/librarymanager.h>
+#include <librepcb/library/library.h>
+#include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/projecteditor/projecteditor.h>
 #include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcb/common/application.h>
@@ -99,6 +101,8 @@ ControlPanel::ControlPanel(Workspace& workspace) :
             qApp, &QApplication::aboutQt);
     connect(mUi->actionWorkspace_Settings, &QAction::triggered,
             &mWorkspace.getSettings(), &WorkspaceSettings::showSettingsDialog);
+    connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
+            this, &ControlPanel::openLibraryEditor);
 
     mUi->projectTreeView->setModel(&mWorkspace.getProjectTreeModel());
     mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
@@ -121,6 +125,7 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 ControlPanel::~ControlPanel()
 {
     closeAllProjects(false);
+    closeAllLibraryEditors(false);
     mLibraryManager.reset();
     mUi.reset();
 }
@@ -128,10 +133,15 @@ ControlPanel::~ControlPanel()
 void ControlPanel::closeEvent(QCloseEvent *event)
 {
     // close all projects, unsaved projects will ask for saving
-    if (!closeAllProjects(true))
-    {
+    if (!closeAllProjects(true)) {
         event->ignore();
         return; // do NOT close the application, there are still open projects!
+    }
+
+    // close all library editors, unsaved libraries will ask for saving
+    if (!closeAllLibraryEditors(true)) {
+        event->ignore();
+        return; // do NOT close the application, there are still open library editors!
     }
 
     saveSettings();
@@ -316,6 +326,54 @@ ProjectEditor* ControlPanel::getOpenProject(const FilePath& filepath) const noex
         return mOpenProjectEditors.value(filepath.toUnique().toStr());
     else
         return nullptr;
+}
+
+/*****************************************************************************************
+ *  Library Management
+ ****************************************************************************************/
+
+void ControlPanel::openLibraryEditor(QSharedPointer<library::Library> lib) noexcept
+{
+    using library::editor::LibraryEditor;
+    LibraryEditor* editor = mOpenLibraryEditors.value(lib.data());
+    if (!editor) {
+        try {
+            editor = new LibraryEditor(mWorkspace, lib);
+            connect(editor, &LibraryEditor::destroyed,
+                    this, &ControlPanel::libraryEditorDestroyed);
+            mOpenLibraryEditors.insert(lib.data(), editor);
+        } catch (const Exception& e) {
+            QMessageBox::critical(this, tr("Error"), e.getMsg());
+        }
+    }
+    editor->show();
+    editor->raise();
+    editor->activateWindow();
+}
+
+void ControlPanel::libraryEditorDestroyed() noexcept
+{
+    using library::editor::LibraryEditor;
+    // Note: Actually we should dynamic_cast the QObject* to LibraryEditor*, but as this
+    // slot is called in the destructor of QObject (base class of LibraryEditor), the
+    // dynamic_cast does no longer work at this point, so a static_cast is used instead ;)
+    LibraryEditor* editor = static_cast<LibraryEditor*>(QObject::sender()); Q_ASSERT(editor);
+    library::Library* library = mOpenLibraryEditors.key(editor); Q_ASSERT(library);
+    mOpenLibraryEditors.remove(library);
+}
+
+bool ControlPanel::closeAllLibraryEditors(bool askForSave) noexcept
+{
+    using library::editor::LibraryEditor;
+    bool success = true;
+    foreach (LibraryEditor* editor, mOpenLibraryEditors) {
+        if (editor->closeAndDestroy(askForSave)) {
+            delete editor; // this calls the slot "libraryEditorDestroyed()"
+        } else {
+            success = false;
+        }
+    }
+    return success;
 }
 
 /*****************************************************************************************

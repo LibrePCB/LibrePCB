@@ -123,19 +123,14 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
             .arg(packageUuid.toStr()));
     }
     // get footprint from package
-    mLibFootprint = mLibPackage->getFootprintByUuid(footprintUuid);
-    if (!mLibFootprint) {
-        qDebug() << mCompInstance->getUuid();
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The package \"%1\" does not have a footprint with the UUID \"%2\"."))
-            .arg(packageUuid.toStr()).arg(footprintUuid.toStr()));
-    }
+    mLibFootprint = mLibPackage->getFootprints().get(footprintUuid).get(); // can throw
 }
 
 void BI_Device::init()
 {
     // check pad-signal-map
-    foreach (const Uuid& signalUuid, mLibDevice->getPadSignalMap()) {
+    for (const library::DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
+        Uuid signalUuid = item.getSignalUuid();
         if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid))) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))

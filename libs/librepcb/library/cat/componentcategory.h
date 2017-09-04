@@ -48,6 +48,9 @@ class ComponentCategory final : public LibraryCategory
         // Constructors / Destructor
         ComponentCategory() = delete;
         ComponentCategory(const ComponentCategory& other) = delete;
+        ComponentCategory(const Uuid& uuid, const Version& version, const QString& author,
+                          const QString& name_en_US, const QString& description_en_US,
+                          const QString& keywords_en_US);
         ComponentCategory(const FilePath& elementDirectory, bool readOnly);
         ~ComponentCategory() noexcept;
 

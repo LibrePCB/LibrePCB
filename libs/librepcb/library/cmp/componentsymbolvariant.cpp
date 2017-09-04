@@ -34,50 +34,39 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+ComponentSymbolVariant::ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept :
+    QObject(nullptr), mSymbolItems(this)
+{
+    *this = other; // use assignment operator
+}
+
 ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                                                const QString& name_en_US,
                                                const QString& desc_en_US) noexcept :
-    mUuid(uuid), mNorm(norm)
+    QObject(nullptr), mUuid(uuid), mNorm(norm), mSymbolItems(this)
 {
     Q_ASSERT(!mUuid.isNull());
     mNames.setDefaultValue(name_en_US);
     mDescriptions.setDefaultValue(desc_en_US);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement)
+ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) :
+    QObject(nullptr), mSymbolItems(this)
 {
-    try
-    {
-        // read attributes
-        mUuid = domElement.getAttribute<Uuid>("uuid", true);
-        mNorm = domElement.getAttribute<QString>("norm", false);
-        mNames.loadFromDomElement(domElement);
-        mDescriptions.loadFromDomElement(domElement);
+    // read attributes
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mNorm = domElement.getAttribute<QString>("norm", false);
+    mNames.loadFromDomElement(domElement);
+    mDescriptions.loadFromDomElement(domElement);
 
-        // Load all symbol variant items
-        foreach (const DomElement* node, domElement.getChilds("symbol_item")) {
-            ComponentSymbolVariantItem* item = new ComponentSymbolVariantItem(*node);
-            if (getItemByUuid(item->getUuid()))
-            {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The symbol variant item \"%1\" exists multiple times in \"%2\"."))
-                    .arg(item->getUuid().toStr(), domElement.getDocFilePath().toNative()));
-            }
-            mSymbolItems.append(item);
-        }
+    // Load all symbol variant items
+    mSymbolItems.loadFromDomElement(domElement);
 
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    }
-    catch (Exception& e)
-    {
-        qDeleteAll(mSymbolItems);       mSymbolItems.clear();
-        throw;
-    }
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
 {
-    qDeleteAll(mSymbolItems);       mSymbolItems.clear();
 }
 
 /*****************************************************************************************
@@ -87,56 +76,35 @@ ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
 void ComponentSymbolVariant::setNorm(const QString& norm) noexcept
 {
     mNorm = norm;
+    emit edited();
 }
 
 void ComponentSymbolVariant::setName(const QString& locale, const QString& name) noexcept
 {
+    if (mNames.contains(locale) && mNames.value(locale) == name) return;
     mNames.insert(locale, name);
+    emit edited();
 }
 
 void ComponentSymbolVariant::setDescription(const QString& locale, const QString& desc) noexcept
 {
+    if (mDescriptions.contains(locale) && mDescriptions.value(locale) == desc) return;
     mDescriptions.insert(locale, desc);
+    emit edited();
 }
 
-/*****************************************************************************************
- *  Symbol Item Methods
- ****************************************************************************************/
-
-ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) noexcept
+void ComponentSymbolVariant::setNames(const LocalizedNameMap& names) noexcept
 {
-    const ComponentSymbolVariant* const_this = this;
-    return const_cast<ComponentSymbolVariantItem*>(const_this->getItemByUuid(uuid));
+    if (names == mNames) return;
+    mNames = names;
+    emit edited();
 }
 
-const ComponentSymbolVariantItem* ComponentSymbolVariant::getItemByUuid(const Uuid& uuid) const noexcept
+void ComponentSymbolVariant::setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept
 {
-    foreach (const ComponentSymbolVariantItem* item, mSymbolItems) {
-        if (item->getUuid() == uuid)
-            return item;
-    }
-    return nullptr;
-}
-
-QSet<Uuid> ComponentSymbolVariant::getAllItemSymbolUuids() const noexcept
-{
-    QSet<Uuid> set;
-    foreach (const ComponentSymbolVariantItem* item, mSymbolItems) {
-        set.insert(item->getSymbolUuid());
-    }
-    return set;
-}
-
-void ComponentSymbolVariant::addItem(ComponentSymbolVariantItem& item) noexcept
-{
-    Q_ASSERT(!mSymbolItems.contains(&item));
-    mSymbolItems.append(&item);
-}
-
-void ComponentSymbolVariant::removeItem(ComponentSymbolVariantItem& item) noexcept
-{
-    Q_ASSERT(mSymbolItems.contains(&item));
-    mSymbolItems.removeAll(&item);
+    if (descriptions == mDescriptions) return;
+    mDescriptions = descriptions;
+    emit edited();
 }
 
 /*****************************************************************************************
@@ -151,18 +119,67 @@ void ComponentSymbolVariant::serialize(DomElement& root) const
     root.setAttribute("norm", mNorm);
     mNames.serialize(root);
     mDescriptions.serialize(root);
-    serializePointerContainer(root, mSymbolItems, "symbol_item");
+    mSymbolItems.serialize(root);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool ComponentSymbolVariant::operator==(const ComponentSymbolVariant& rhs) const noexcept
+{
+    if (mUuid != rhs.mUuid)                                 return false;
+    if (mNorm != rhs.mNorm)                                 return false;
+    if (mNames != rhs.mNames)                               return false;
+    if (mDescriptions != rhs.mDescriptions)                 return false;
+    if (mSymbolItems != rhs.mSymbolItems)                   return false;
+    return true;
+}
+
+ComponentSymbolVariant& ComponentSymbolVariant::operator=(const ComponentSymbolVariant& rhs) noexcept
+{
+    if (mUuid != rhs.mUuid) {
+        mUuid = rhs.mUuid;
+        emit edited();
+    }
+    setNorm(rhs.mNorm);
+    setNames(rhs.mNames);
+    setDescriptions(rhs.mDescriptions);
+    if (mSymbolItems != rhs.mSymbolItems) {
+        mSymbolItems = rhs.mSymbolItems;
+        emit edited();
+    }
+    return *this;
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
+void ComponentSymbolVariant::listObjectAdded(const ComponentSymbolVariantItemList& list,
+    int newIndex, const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept
+{
+    Q_UNUSED(list);
+    Q_UNUSED(newIndex);
+    Q_UNUSED(ptr);
+    Q_ASSERT(&list == &mSymbolItems);
+    emit edited();
+}
+
+void ComponentSymbolVariant::listObjectRemoved(const ComponentSymbolVariantItemList& list,
+    int oldIndex, const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept
+{
+    Q_UNUSED(list);
+    Q_UNUSED(oldIndex);
+    Q_UNUSED(ptr);
+    Q_ASSERT(&list == &mSymbolItems);
+    emit edited();
+}
+
 bool ComponentSymbolVariant::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                     return false;
     if (mNames.getDefaultValue().isEmpty()) return false;
-    if (mSymbolItems.isEmpty())             return false;
     return true;
 }
 

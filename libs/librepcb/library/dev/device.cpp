@@ -48,20 +48,9 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) :
     DomElement& root = mLoadingXmlFileDocument->getRoot();
 
     // load attributes
-    mComponentUuid = root.getFirstChild("component", true)->getText<Uuid>(true);
-    mPackageUuid = root.getFirstChild("package", true)->getText<Uuid>(true);
-
-    // load pad signal map
-    foreach (const DomElement* node, root.getChilds("pad_signal_map")) {
-        Uuid pad = node->getAttribute<Uuid>("pad", true);
-        Uuid signal = node->getText<Uuid>(false);
-        if (mPadSignalMap.contains(pad)) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The pad \"%1\" exists multiple times in \"%2\"."))
-                .arg(pad.toStr(), root.getDocFilePath().toNative()));
-        }
-        mPadSignalMap.insert(pad, signal);
-    }
+    mComponentUuid = root.getFirstChild("component", true, true)->getText<Uuid>(true);
+    mPackageUuid = root.getFirstChild("package", true, true)->getText<Uuid>(true);
+    mPadSignalMap.loadFromDomElement(root);
 
     cleanupAfterLoadingElementFromFile();
 }
@@ -71,19 +60,21 @@ Device::~Device() noexcept
 }
 
 /*****************************************************************************************
- *  Pad-Signal-Map Methods
+ *  Setters
  ****************************************************************************************/
 
-void Device::addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept
+void Device::setComponentUuid(const Uuid& uuid) noexcept
 {
-    Q_ASSERT(!mPadSignalMap.contains(pad));
-    mPadSignalMap.insert(pad, signal);
+    if (uuid == mComponentUuid) return;
+    mComponentUuid = uuid;
+    emit componentUuidChanged(mComponentUuid);
 }
 
-void Device::removePadSignalMapping(const Uuid& pad) noexcept
+void Device::setPackageUuid(const Uuid& uuid) noexcept
 {
-    Q_ASSERT(mPadSignalMap.contains(pad));
-    mPadSignalMap.remove(pad);
+    if (uuid == mPackageUuid) return;
+    mPackageUuid = uuid;
+    emit packageUuidChanged(mPackageUuid);
 }
 
 /*****************************************************************************************
@@ -95,11 +86,7 @@ void Device::serialize(DomElement& root) const
     LibraryElement::serialize(root);
     root.appendTextChild("component", mComponentUuid);
     root.appendTextChild("package", mPackageUuid);
-    foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
-        DomElement* child = root.appendChild("pad_signal_map");
-        child->setAttribute("pad", padUuid);
-        child->setText(mPadSignalMap.value(padUuid));
-    }
+    mPadSignalMap.serialize(root);
 }
 
 bool Device::checkAttributesValidity() const noexcept
@@ -107,9 +94,6 @@ bool Device::checkAttributesValidity() const noexcept
     if (!LibraryElement::checkAttributesValidity())             return false;
     if (mComponentUuid.isNull())                                return false;
     if (mPackageUuid.isNull())                                  return false;
-    foreach (const Uuid& padUuid, mPadSignalMap.keys()) {
-        if (padUuid.isNull())                                   return false;
-    }
     return true;
 }
 

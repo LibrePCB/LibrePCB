@@ -24,9 +24,11 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,12 +36,18 @@
 namespace librepcb {
 namespace library {
 
+class SymbolPinGraphicsItem;
+
 /*****************************************************************************************
  *  Class SymbolPin
  ****************************************************************************************/
 
 /**
- * @brief The SymbolPin class
+ * @brief The SymbolPin class represents one pin of a symbol
+ *
+ * Following information is considered as the "interface" of a pin and must therefore
+ * never be changed:
+ *  - UUID
  */
 class SymbolPin final : public SerializableObject
 {
@@ -48,8 +56,10 @@ class SymbolPin final : public SerializableObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                           const Length& length, const Angle& rotation) noexcept;
+        SymbolPin() = delete;
+        SymbolPin(const SymbolPin& other) noexcept;
+        SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+                  const Length& length, const Angle& rotation) noexcept;
         explicit SymbolPin(const DomElement& domElement);
         ~SymbolPin() noexcept;
 
@@ -67,28 +77,41 @@ class SymbolPin final : public SerializableObject
         void setName(const QString& name) noexcept;
 
         // General Methods
+        void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
+        void unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
-    private:
+        // Operator Overloadings
+        bool operator==(const SymbolPin& rhs) const noexcept;
+        bool operator!=(const SymbolPin& rhs) const noexcept {return !(*this == rhs);}
+        SymbolPin& operator=(const SymbolPin& rhs) noexcept;
 
-        // make some methods inaccessible...
-        SymbolPin() = delete;
-        SymbolPin(const SymbolPin& other) = delete;
-        SymbolPin& operator=(const SymbolPin& rhs) = delete;
 
-        // Private Methods
+    private: // Methods
         bool checkAttributesValidity() const noexcept;
 
 
-        // Pin Attributes
+    private: // Data
         Uuid mUuid;
         QString mName;
         Point mPosition;
         Length mLength;
         Angle mRotation;
+
+        SymbolPinGraphicsItem* mRegisteredGraphicsItem;
 };
+
+/*****************************************************************************************
+ *  Class SymbolPinList
+ ****************************************************************************************/
+
+struct SymbolPinListNameProvider {static constexpr const char* tagname = "pin";};
+using SymbolPinList = SerializableObjectList<SymbolPin, SymbolPinListNameProvider>;
+using CmdSymbolPinInsert = CmdListElementInsert<SymbolPin, SymbolPinListNameProvider>;
+using CmdSymbolPinRemove = CmdListElementRemove<SymbolPin, SymbolPinListNameProvider>;
+using CmdSymbolPinsSwap = CmdListElementsSwap<SymbolPin, SymbolPinListNameProvider>;
 
 /*****************************************************************************************
  *  End of File

@@ -24,7 +24,7 @@
 #include "componentsymbolvariantitem.h"
 #include "component.h"
 #include "componentsymbolvariant.h"
-#include "componentpinsignalmapitem.h"
+#include "componentpinsignalmap.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,10 +36,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept
+{
+    *this = other; // use assignment operator
+}
+
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
-                                                       const Uuid& symbolUuid,
-                                                       bool isRequired,
-                                                       const QString& suffix) noexcept :
+        const Uuid& symbolUuid, bool isRequired, const QString& suffix) noexcept :
     mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
 {
     Q_ASSERT(mUuid.isNull() == false);
@@ -47,55 +50,23 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement)
 {
-    try
-    {
-        // read attributes
-        mUuid = domElement.getAttribute<Uuid>("uuid", true);
-        mSymbolUuid = domElement.getAttribute<Uuid>("symbol", true);
-        mIsRequired = domElement.getAttribute<bool>("required", true);
-        mSuffix = domElement.getAttribute<QString>("suffix", false);
+    // read attributes
+    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mSymbolUuid = domElement.getAttribute<Uuid>("symbol", true);
+    mSymbolPos.setX(domElement.getAttribute<Length>("x", true));
+    mSymbolPos.setY(domElement.getAttribute<Length>("y", true));
+    mSymbolRot = domElement.getAttribute<Angle>("rotation", true);
+    mIsRequired = domElement.getAttribute<bool>("required", true);
+    mSuffix = domElement.getAttribute<QString>("suffix", false);
 
-        // read pin signal map
-        foreach (const DomElement* node, domElement.getChilds("pin_signal_map")) {
-            ComponentPinSignalMapItem* item = new ComponentPinSignalMapItem(*node);
-            if (mPinSignalMap.contains(item->getPinUuid()))
-            {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The pin \"%1\" is assigned to multiple signals in \"%2\"."))
-                    .arg(item->getPinUuid().toStr(), domElement.getDocFilePath().toNative()));
-            }
-            mPinSignalMap.insert(item->getPinUuid(), item);
-        }
+    // read pin signal map
+    mPinSignalMap.loadFromDomElement(domElement);
 
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    }
-    catch (Exception& e)
-    {
-        qDeleteAll(mPinSignalMap);      mPinSignalMap.clear();
-        throw;
-    }
+    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
 {
-    qDeleteAll(mPinSignalMap);      mPinSignalMap.clear();
-}
-
-/*****************************************************************************************
- *  Pin-Signal-Map Methods
- ****************************************************************************************/
-
-void ComponentSymbolVariantItem::addPinSignalMapItem(ComponentPinSignalMapItem& item) noexcept
-{
-    Q_ASSERT(!mPinSignalMap.contains(item.getPinUuid()));
-    mPinSignalMap.insert(item.getPinUuid(), &item);
-}
-
-void ComponentSymbolVariantItem::removePinSignalMapItem(ComponentPinSignalMapItem& item) noexcept
-{
-    Q_ASSERT(mPinSignalMap.contains(item.getPinUuid()));
-    Q_ASSERT(mPinSignalMap.value(item.getPinUuid()) == &item);
-    mPinSignalMap.remove(item.getPinUuid());
 }
 
 /*****************************************************************************************
@@ -108,9 +79,38 @@ void ComponentSymbolVariantItem::serialize(DomElement& root) const
 
     root.setAttribute("uuid", mUuid);
     root.setAttribute("symbol", mSymbolUuid);
+    root.setAttribute("x", mSymbolPos.getX());
+    root.setAttribute("y", mSymbolPos.getY());
+    root.setAttribute("rotation", mSymbolRot);
     root.setAttribute("required", mIsRequired);
     root.setAttribute("suffix", mSuffix);
-    serializePointerContainer(root, mPinSignalMap, "pin_signal_map");
+    mPinSignalMap.serialize(root);
+}
+
+/*****************************************************************************************
+ *  Operator Overloadings
+ ****************************************************************************************/
+
+bool ComponentSymbolVariantItem::operator==(const ComponentSymbolVariantItem& rhs) const noexcept
+{
+    if (mUuid != rhs.mUuid)                                     return false;
+    if (mSymbolUuid != rhs.mSymbolUuid)                         return false;
+    if (mIsRequired != rhs.mIsRequired)                         return false;
+    if (mSuffix != rhs.mSuffix)                                 return false;
+    if (mPinSignalMap != rhs.mPinSignalMap)                     return false;
+    return true;
+}
+
+ComponentSymbolVariantItem& ComponentSymbolVariantItem::operator=(const ComponentSymbolVariantItem& rhs) noexcept
+{
+    mUuid = rhs.mUuid;
+    mSymbolUuid = rhs.mSymbolUuid;
+    mSymbolPos = rhs.mSymbolPos;
+    mSymbolRot = rhs.mSymbolRot;
+    mIsRequired = rhs.mIsRequired;
+    mSuffix = rhs.mSuffix;
+    mPinSignalMap = rhs.mPinSignalMap;
+    return *this;
 }
 
 /*****************************************************************************************

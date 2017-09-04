@@ -32,7 +32,6 @@
 namespace librepcb {
 
 class Point;
-class GraphicsItem;
 
 /*****************************************************************************************
  *  Class GraphicsScene
@@ -52,8 +51,8 @@ class GraphicsScene final : public QGraphicsScene
         ~GraphicsScene() noexcept;
 
         // General Methods
-        void addItem(GraphicsItem& item) noexcept;
-        void removeItem(GraphicsItem& item) noexcept;
+        void addItem(QGraphicsItem& item) noexcept;
+        void removeItem(QGraphicsItem& item) noexcept;
         void setSelectionRect(const Point& p1, const Point& p2) noexcept;
 
 

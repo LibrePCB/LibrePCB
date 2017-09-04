@@ -86,6 +86,7 @@ TEST_F(DirectoryLockTest, testDefaultConstructor)
     EXPECT_FALSE(lock.getDirToLock().isValid());
     EXPECT_FALSE(lock.getLockFilepath().isValid());
     EXPECT_THROW(lock.getStatus(), Exception);
+    EXPECT_THROW(lock.tryLock(), Exception);
     EXPECT_THROW(lock.lock(), Exception);
     EXPECT_THROW(lock.unlock(), Exception);
 }
@@ -96,6 +97,8 @@ TEST_F(DirectoryLockTest, testConstructorWithExistingDir)
     EXPECT_EQ(mTempDir, lock.getDirToLock());
     EXPECT_EQ(mTempLockFilePath, lock.getLockFilepath());
     EXPECT_NO_THROW(lock.getStatus());
+    EXPECT_NO_THROW(lock.tryLock());
+    EXPECT_NO_THROW(lock.unlockIfLocked());
     EXPECT_NO_THROW(lock.lock());
     EXPECT_NO_THROW(lock.unlock());
 }
@@ -108,6 +111,7 @@ TEST_F(DirectoryLockTest, testConstructorWithNonExistingDir)
     EXPECT_EQ(dir, lock.getDirToLock());
     EXPECT_EQ(dir.getPathTo(".lock"), lock.getLockFilepath());
     EXPECT_THROW(lock.getStatus(), Exception);
+    EXPECT_THROW(lock.tryLock(), Exception);
     EXPECT_THROW(lock.lock(), Exception);
     EXPECT_THROW(lock.unlock(), Exception);
 }
@@ -123,6 +127,7 @@ TEST_F(DirectoryLockTest, testConstructorWithExistingFile)
     EXPECT_EQ(file, lock.getDirToLock());
     EXPECT_EQ(file.getPathTo(".lock"), lock.getLockFilepath());
     EXPECT_THROW(lock.getStatus(), Exception);
+    EXPECT_THROW(lock.tryLock(), Exception);
     EXPECT_THROW(lock.lock(), Exception);
     EXPECT_THROW(lock.unlock(), Exception);
 }
@@ -225,6 +230,50 @@ TEST_F(DirectoryLockTest, testMultipleStatusLockUnlock)
     EXPECT_FALSE(mTempLockFilePath.isExistingFile());
 }
 
+TEST_F(DirectoryLockTest, testTryLockWithoutArgument)
+{
+    DirectoryLock lock(mTempDir);
+    lock.tryLock();
+    EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+}
+
+TEST_F(DirectoryLockTest, testTryLockUnlockedDir)
+{
+    bool wasStale = true;
+    DirectoryLock lock(mTempDir);
+    lock.tryLock(&wasStale);
+    EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+    EXPECT_FALSE(wasStale);
+}
+
+TEST_F(DirectoryLockTest, testTryLockLockedDir)
+{
+    bool wasStale = true;
+    DirectoryLock lock1(mTempDir);
+    DirectoryLock lock2(mTempDir);
+    lock1.tryLock(&wasStale);
+    EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock1.getStatus());
+    EXPECT_THROW(lock2.tryLock(), Exception);
+    EXPECT_FALSE(wasStale);
+}
+
+TEST_F(DirectoryLockTest, testUnlockIfLockedOnUnlockedDir)
+{
+    DirectoryLock lock(mTempDir);
+    EXPECT_EQ(DirectoryLock::LockStatus::Unlocked, lock.getStatus());
+    EXPECT_FALSE(lock.unlockIfLocked());
+    EXPECT_EQ(DirectoryLock::LockStatus::Unlocked, lock.getStatus());
+}
+
+TEST_F(DirectoryLockTest, testUnlockIfLockedOnLockedDir)
+{
+    DirectoryLock lock(mTempDir);
+    lock.lock();
+    EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+    EXPECT_TRUE(lock.unlockIfLocked());
+    EXPECT_EQ(DirectoryLock::LockStatus::Unlocked, lock.getStatus());
+}
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)) // QProcess::processId() requires Qt>=5.3
 TEST_F(DirectoryLockTest, testStaleLock)
 {
@@ -248,6 +297,11 @@ TEST_F(DirectoryLockTest, testStaleLock)
 
     // check status
     EXPECT_EQ(DirectoryLock::LockStatus::StaleLock, lock.getStatus());
+
+    // try to get the lock
+    bool wasStale = false;
+    lock.tryLock(&wasStale);
+    ASSERT_TRUE(wasStale);
 }
 #endif
 

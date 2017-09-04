@@ -78,10 +78,12 @@ class LibraryInfoWidget final : public QWidget
     signals:
 
         void libraryRemoved(const FilePath& libDir);
+        void openLibraryEditorTriggered(QSharedPointer<Library> lib);
 
 
     private: // Methods
 
+        void btnOpenLibraryEditorClicked() noexcept;
         void btnRemoveLibraryClicked() noexcept;
         bool isRemoteLibrary() const noexcept;
 

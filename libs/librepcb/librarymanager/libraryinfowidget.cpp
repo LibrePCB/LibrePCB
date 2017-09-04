@@ -44,6 +44,8 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     mWorkspace(ws), mLib(lib)
 {
     mUi->setupUi(this);
+    connect(mUi->btnOpenLibraryEditor, &QPushButton::clicked,
+            this, &LibraryInfoWidget::btnOpenLibraryEditorClicked);
     connect(mUi->btnRemove, &QPushButton::clicked,
             this, &LibraryInfoWidget::btnRemoveLibraryClicked);
 
@@ -98,6 +100,11 @@ LibraryInfoWidget::~LibraryInfoWidget() noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept
+{
+    emit openLibraryEditorTriggered(mLib);
+}
 
 void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept
 {

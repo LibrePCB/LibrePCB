@@ -69,6 +69,12 @@ void LibraryCategory::serialize(DomElement& root) const
     root.appendTextChild("parent", mParentUuid);
 }
 
+bool LibraryCategory::checkAttributesValidity() const noexcept
+{
+    if (mParentUuid == mUuid)   {return false;}
+    return true;
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

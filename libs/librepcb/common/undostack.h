@@ -280,7 +280,6 @@ class UndoStack final : public QObject
 
 
     signals:
-
         void undoTextChanged(const QString& text);
         void redoTextChanged(const QString& text);
         void canUndoChanged(bool canUndo);
@@ -288,6 +287,7 @@ class UndoStack final : public QObject
         void cleanChanged(bool clean);
         void commandGroupEnded();
         void commandGroupAborted();
+        void stateModified();
 
 
     private:
