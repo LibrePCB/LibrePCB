@@ -30,6 +30,7 @@ SOURCES += \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
+    attributes/attributeprovider.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -82,7 +83,6 @@ SOURCES += \
     graphics/primitivetextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
-    if_attributeprovider.cpp \
     network/filedownload.cpp \
     network/networkaccessmanager.cpp \
     network/networkrequest.cpp \
@@ -119,6 +119,7 @@ HEADERS += \
     alignment.h \
     application.h \
     attributes/attribute.h \
+    attributes/attributeprovider.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
@@ -178,7 +179,6 @@ HEADERS += \
     graphics/primitivetextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
-    if_attributeprovider.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
     network/networkrequest.h \

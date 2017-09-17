@@ -51,7 +51,7 @@ namespace project {
  ****************************************************************************************/
 
 Project::Project(const FilePath& filepath, bool create, bool readOnly) :
-    QObject(nullptr), IF_AttributeProvider(), mPath(filepath.getParentDir()),
+    QObject(nullptr), AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mLock(filepath.getParentDir()), mIsRestored(false),
     mIsReadOnly(readOnly)
 {

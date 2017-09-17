@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/attributes/attribute.h>
@@ -59,7 +59,7 @@ class ErcMsg;
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance : public QObject, public IF_AttributeProvider,
+class ComponentInstance : public QObject, public AttributeProvider,
                           public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
@@ -144,7 +144,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 

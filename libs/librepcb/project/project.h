@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
@@ -76,7 +76,7 @@ class Board;
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject, public IF_AttributeProvider, public SerializableObject
+class Project final : public QObject, public AttributeProvider, public SerializableObject
 {
         Q_OBJECT
 
@@ -454,7 +454,7 @@ class Project final : public QObject, public IF_AttributeProvider, public Serial
         // Helper Methods
 
         /**
-         * @copydoc IF_AttributeProvider#getAttributeValue()
+         * @copydoc AttributeProvider::getAttributeValue()
          */
         bool getAttributeValue(const QString& attrNS, const QString& attrKey,
                                bool passToParents, QString& value) const noexcept override;
@@ -475,7 +475,7 @@ class Project final : public QObject, public IF_AttributeProvider, public Serial
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
         /**

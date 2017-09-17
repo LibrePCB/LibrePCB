@@ -49,7 +49,7 @@ namespace project {
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName):
-    QObject(&project), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
+    QObject(&project), AttributeProvider(), mProject(project), mFilePath(filepath),
     mIsAddedToProject(false)
 {
     try

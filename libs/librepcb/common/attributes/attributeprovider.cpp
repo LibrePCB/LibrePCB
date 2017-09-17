@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "if_attributeprovider.h"
+#include "attributeprovider.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -29,10 +29,10 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class IF_AttributeProvider
+ *  Class AttributeProvider
  ****************************************************************************************/
 
-int IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
+int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
 {
     int count = 0;
     int startPos = 0;
@@ -46,7 +46,7 @@ int IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool 
         {
             // avoid endless recursion
             QString complete = rawText.mid(startPos, length);
-            varValue.replace(complete, QCoreApplication::translate("IF_AttributeProvider",
+            varValue.replace(complete, QCoreApplication::translate("AttributeProvider",
                                                                    "[RECURSION REMOVED]"));
             rawText.replace(startPos, length, varValue);
         }
@@ -57,7 +57,7 @@ int IF_AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool 
     return count;
 }
 
-bool IF_AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
+bool AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
                                                 int& length, QString& varNS, QString& varName) noexcept
 {
     pos = text.indexOf("${", startPos);         // index of '$'

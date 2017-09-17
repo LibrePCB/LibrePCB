@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
@@ -72,7 +72,7 @@ class SI_NetLabel;
  *  - ellipse:          TODO
  *  - text:             TODO
  */
-class Schematic final : public QObject, public IF_AttributeProvider,
+class Schematic final : public QObject, public AttributeProvider,
                         public SerializableObject
 {
         Q_OBJECT
@@ -184,7 +184,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 

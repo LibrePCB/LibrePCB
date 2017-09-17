@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "si_base.h"
 #include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************
@@ -56,7 +56,7 @@ class SI_SymbolPin;
  * @date 2014-08-23
  */
 class SI_Symbol final : public SI_Base, public SerializableObject,
-                        public IF_AttributeProvider
+                        public AttributeProvider
 {
         Q_OBJECT
 
@@ -115,7 +115,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 

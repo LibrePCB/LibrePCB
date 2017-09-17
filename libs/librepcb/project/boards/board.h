@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
@@ -66,7 +66,7 @@ class BoardUserSettings;
 /**
  * @brief The Board class represents a PCB of a project and is always part of a circuit
  */
-class Board final : public QObject, public IF_AttributeProvider,
+class Board final : public QObject, public AttributeProvider,
                     public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
@@ -196,7 +196,7 @@ class Board final : public QObject, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
         void deviceAdded(BI_Device& comp);

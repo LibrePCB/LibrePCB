@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_IF_ATTRIBUTEPROVIDER_H
-#define LIBREPCB_IF_ATTRIBUTEPROVIDER_H
+#ifndef LIBREPCB_ATTRIBUTEPROVIDER_H
+#define LIBREPCB_ATTRIBUTEPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
@@ -31,11 +31,11 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Interface IF_AttributeProvider
+ *  Interface AttributeProvider
  ****************************************************************************************/
 
 /**
- * @brief The IF_AttributeProvider class defines an interface for classes which provides
+ * @brief The AttributeProvider class defines an interface for classes which provides
  *        some attributes which can be used as variables in texts (like "${NS::KEY}")
  *
  * For example library symbols can contain text elements which contains variables, for
@@ -46,7 +46,7 @@ namespace librepcb {
  * The main goal of this interface is to provide the method #replaceVariablesWithAttributes()
  * which will replace all variables in a text with their values. To get the values from
  * attributes, the pure virtual method #getAttributeValue() have to be implemented in all
- * classes which inherit from #IF_AttributeProvider.
+ * classes which inherit from librepcb::AttributeProvider.
  *
  * To resolve a variable like "${CMP::NAME}", the class #project#ComponentInstance must
  * inherit from this interface class. The method #getAttributeValue() must be implemented
@@ -56,7 +56,7 @@ namespace librepcb {
  * @author ubruhin
  * @date 2015-01-10
  */
-class IF_AttributeProvider
+class AttributeProvider
 {
     public:
 
@@ -65,12 +65,12 @@ class IF_AttributeProvider
         /**
          * @brief Default Constructor
          */
-        IF_AttributeProvider() {}
+        AttributeProvider() {}
 
         /**
          * @brief Destructor
          */
-        virtual ~IF_AttributeProvider() {}
+        virtual ~AttributeProvider() {}
 
 
         // General Methods
@@ -124,8 +124,8 @@ class IF_AttributeProvider
     private:
 
         // make some methods inaccessible...
-        IF_AttributeProvider(const IF_AttributeProvider& other);
-        IF_AttributeProvider& operator=(const IF_AttributeProvider& rhs);
+        AttributeProvider(const AttributeProvider& other);
+        AttributeProvider& operator=(const AttributeProvider& rhs);
 
 
         // Private Methods
@@ -153,10 +153,15 @@ class IF_AttributeProvider
                                          int& length, QString& varNS, QString& varName) noexcept;
 };
 
+// Make sure that the AttributeProvider class does not contain any data (except the vptr).
+// Otherwise it could introduce issues when using multiple inheritance.
+static_assert(sizeof(AttributeProvider) == sizeof(void*),
+              "AttributeProvider must not contain any data!");
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
 } // namespace librepcb
 
-#endif // LIBREPCB_IF_ATTRIBUTEPROVIDER_H
+#endif // LIBREPCB_ATTRIBUTEPROVIDER_H

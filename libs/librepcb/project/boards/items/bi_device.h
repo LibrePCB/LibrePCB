@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/bgi_footprint.h"
@@ -56,7 +56,7 @@ class BI_Footprint;
 /**
  * @brief The BI_Device class
  */
-class BI_Device final : public BI_Base, public IF_AttributeProvider,
+class BI_Device final : public BI_Base, public AttributeProvider,
                         public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
@@ -114,7 +114,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
         void moved(const Point& newPos);

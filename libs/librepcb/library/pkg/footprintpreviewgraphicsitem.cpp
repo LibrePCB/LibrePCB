@@ -43,7 +43,7 @@ namespace library {
 
 FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const QStringList& localeOrder,
         const Footprint& footprint, const Package* package, /*const Device* device,*/
-        const Component* component, const IF_AttributeProvider* attrProvider) noexcept :
+        const Component* component, const AttributeProvider* attrProvider) noexcept :
     QGraphicsItem(), mLayerProvider(layerProvider), mFootprint(footprint),
     mPackage(package), /*mDevice(device),*/ mComponent(component),
     mAttributeProvider(attrProvider), mDrawBoundingRect(false), mLocaleOrder(localeOrder)

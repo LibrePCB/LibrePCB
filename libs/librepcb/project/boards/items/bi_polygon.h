@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -52,7 +52,7 @@ class BGI_Polygon;
  * @date 2016-01-12
  */
 class BI_Polygon final : public BI_Base, public SerializableObject,
-                         public IF_AttributeProvider
+                         public AttributeProvider
 {
         Q_OBJECT
 
@@ -99,7 +99,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 
