@@ -311,13 +311,11 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
             else if (child->getName() == "text")
             {
                 QString layerName = convertSchematicLayer(child->getAttribute<uint>("layer", true));
-                QString textStr = child->getText<QString>(true);
+                QString textStr = child->getText<QString>(true).replace('>', '#');
                 Length height = child->getAttribute<Length>("size", true)*2;
-                if (textStr == ">NAME") {
-                    textStr = "${NAME}";
+                if (textStr == "#NAME") {
                     height = Length::fromMm(3.175);
-                } else if (textStr == ">VALUE") {
-                    textStr = "${VALUE}";
+                } else if (textStr == "#VALUE") {
                     height = Length::fromMm(2.5);
                 }
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
@@ -475,13 +473,11 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
             else if (child->getName() == "text")
             {
                 QString layerName = convertBoardLayer(child->getAttribute<uint>("layer", true));
-                QString textStr = child->getText<QString>(true);
+                QString textStr = child->getText<QString>(true).replace('>', '#');
                 Length height = child->getAttribute<Length>("size", true)*2;
-                if (textStr == ">NAME") {
-                    textStr = "${NAME}";
+                if (textStr == "#NAME") {
                     height = Length::fromMm(2.5);
-                } else if (textStr == ">VALUE") {
-                    textStr = "${VALUE}";
+                } else if (textStr == "#VALUE") {
                     height = Length::fromMm(2.0);
                 }
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));

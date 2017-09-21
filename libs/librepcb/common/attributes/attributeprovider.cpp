@@ -59,12 +59,23 @@ int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool pas
 bool AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
                                                 int& length, QString& varName) noexcept
 {
-    pos = text.indexOf("${", startPos);         // index of '$'
+    pos = text.indexOf("#", startPos);          // index of '#'
     if (pos < 0) return false;
-    length = text.indexOf("}", pos) - pos + 1;  // length inclusive '${' and '}'
-    if (length < 3) return false;
-    varName = text.mid(pos+2, length-3);
+    length = getLengthOfKey(text, pos + 1) + 1; // length inclusive '#'
+    if (length < 2) return false;
+    varName = text.mid(pos+1, length-1);
     return true;
+}
+
+int AttributeProvider::getLengthOfKey(const QString& text, int startPos) noexcept
+{
+    QString allowedChars("_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+    for (int i = startPos; i < text.length(); ++i) {
+        if (!allowedChars.contains(text.at(i))) {
+            return i - startPos;
+        }
+    }
+    return text.length() - startPos;
 }
 
 /*****************************************************************************************

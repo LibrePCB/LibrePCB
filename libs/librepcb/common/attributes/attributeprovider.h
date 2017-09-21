@@ -36,10 +36,10 @@ namespace librepcb {
 
 /**
  * @brief The AttributeProvider class defines an interface for classes which provides
- *        some attributes which can be used as variables in texts (like "${NAME}")
+ *        some attributes which can be used as variables in texts (like "#NAME")
  *
  * For example library symbols can contain text elements which contains variables, for
- * example the most importants texts "${NAME}" and "${VALUE}". All these variables will be
+ * example the most importants texts "#NAME" and "#VALUE". All these variables will be
  * parsed and replaced with their values when such a text is displayed in a schematic of a
  * project.
  *
@@ -48,10 +48,10 @@ namespace librepcb {
  * attributes, the pure virtual method #getAttributeValue() have to be implemented in all
  * classes which inherit from librepcb::AttributeProvider.
  *
- * To resolve a variable like "${NAME}", the class #project#ComponentInstance must
+ * To resolve a variable like "#NAME", the class librepcb::project::ComponentInstance must
  * inherit from this interface class. The method #getAttributeValue() must be implemented
  * and should return the name of the component instance (like "U123") when the attribute
- * "${NAME}" was requested.
+ * "#NAME" was requested.
  *
  * @author ubruhin
  * @date 2015-01-10
@@ -81,7 +81,7 @@ class AttributeProvider
          * This method fetches all attribute values with #getAttributeValue() for all
          * variables found in the given text and replaces them in the text.
          *
-         * @param rawText           A text which can contain variables ("${KEY}"). The
+         * @param rawText           A text which can contain variables ("#KEY"). The
          *                          variables will be replaced directly in this QString.
          * @param passToParents     If true, the method #getAttributeValue() may also
          *                          call the same method of a "parent attribute provider"
@@ -94,9 +94,9 @@ class AttributeProvider
         int replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept;
 
         /**
-         * @brief Get the value of an attribute which can be used in texts (like "${NAME}")
+         * @brief Get the value of an attribute which can be used in texts (like "#NAME")
          *
-         * @param attrKey           The attribute name (e.g. "FOOBAR" in "${FOOBAR}").
+         * @param attrKey           The attribute name (e.g. "FOOBAR" in "#FOOBAR").
          * @param passToParents     See #replaceVariablesWithAttributes()
          * @param value             The value of the specified attribute will be written
          *                          into this variable, but only if the attribute was
@@ -130,22 +130,24 @@ class AttributeProvider
         // Private Methods
 
         /**
-         * @brief Search the next variable ("${KEY}") in a given text
+         * @brief Search the next variable ("#KEY") in a given text
          *
          * @param text      A text which can contain variables
          * @param startPos  The search start index (use 0 to search in the whole text)
          * @param pos       The index of the next variable in the specified text (index of
-         *                  the "$" character, or -1 if no variable found) will be written
+         *                  the "#" character, or -1 if no variable found) will be written
          *                  into this variable.
-         * @param length    If a variable is found, the length (incl. "${" and "}") will
+         * @param length    If a variable is found, the length (incl. "#") will
          *                  be written into this variable.
-         * @param varName   The variable name (text between "{" and "}"), e.g. "FOOBAR"
+         * @param varName   The variable name (text after "#"), e.g. "FOOBAR"
          *                  for the example above.
          *
          * @return          true if a variable is found, false if not
          */
         static bool searchVariableInText(const QString& text, int startPos, int& pos,
                                          int& length, QString& varName) noexcept;
+
+        static int getLengthOfKey(const QString& text, int startPos) noexcept;
 };
 
 // Make sure that the AttributeProvider class does not contain any data (except the vptr).
