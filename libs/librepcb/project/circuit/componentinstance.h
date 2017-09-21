@@ -135,8 +135,7 @@ class ComponentInstance : public QObject, public AttributeProvider,
 
 
         // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
         // Operator Overloadings
         ComponentInstance& operator=(const ComponentInstance& rhs) = delete;

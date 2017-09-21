@@ -874,11 +874,9 @@ void Board::clearSelection() const noexcept
  *  Helper Methods
  ****************************************************************************************/
 
-bool Board::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                              bool passToParents, QString& value) const noexcept
+bool Board::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
     // TODO
-    Q_UNUSED(attrNS);
     Q_UNUSED(attrKey);
     Q_UNUSED(passToParents);
     Q_UNUSED(value);

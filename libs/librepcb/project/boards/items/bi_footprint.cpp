@@ -190,12 +190,11 @@ Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept
     }
 }
 
-bool BI_Footprint::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                     bool passToParents, QString& value) const noexcept
+bool BI_Footprint::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
     // no local attributes available
     if (passToParents)
-        return mDevice.getAttributeValue(attrNS, attrKey, true, value);
+        return mDevice.getAttributeValue(attrKey, true, value);
     else
         return false;
 }

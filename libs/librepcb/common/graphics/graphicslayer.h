@@ -67,8 +67,8 @@ class GraphicsLayer : public QObject
         // symbol layers
         static constexpr const char* sSymbolOutlines          = "sym_outlines";           ///< dark red lines of symbols
         static constexpr const char* sSymbolGrabAreas         = "sym_grab_areas";         ///< optional yellow area of symbols
-        static constexpr const char* sSymbolNames             = "sym_names";              ///< text ${SYM::NAME}
-        static constexpr const char* sSymbolValues            = "sym_values";             ///< text ${CMP::VALUE}
+        static constexpr const char* sSymbolNames             = "sym_names";              ///< text ${NAME}
+        static constexpr const char* sSymbolValues            = "sym_values";             ///< text ${VALUE}
         static constexpr const char* sSymbolPinCirclesOpt     = "sym_pin_circles_opt";    ///< green circle of unconnected pins
         static constexpr const char* sSymbolPinCirclesReq     = "sym_pin_circles_req";    ///< red circle of unconnected pins
         static constexpr const char* sSymbolPinNames          = "sym_pin_names";          ///< name of the connected component signal

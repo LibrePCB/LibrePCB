@@ -93,8 +93,7 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public Attribut
 
 
         // private methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept;
 
 
         // Types

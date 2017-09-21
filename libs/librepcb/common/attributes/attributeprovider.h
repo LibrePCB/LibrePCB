@@ -36,22 +36,22 @@ namespace librepcb {
 
 /**
  * @brief The AttributeProvider class defines an interface for classes which provides
- *        some attributes which can be used as variables in texts (like "${NS::KEY}")
+ *        some attributes which can be used as variables in texts (like "${NAME}")
  *
  * For example library symbols can contain text elements which contains variables, for
- * example the most importants texts "${SYM::NAME}" and "${CMP::VALUE}". All these
- * variables will be parsed and replaced with their values when such a text is displayed
- * in a schematic of a project.
+ * example the most importants texts "${NAME}" and "${VALUE}". All these variables will be
+ * parsed and replaced with their values when such a text is displayed in a schematic of a
+ * project.
  *
  * The main goal of this interface is to provide the method #replaceVariablesWithAttributes()
  * which will replace all variables in a text with their values. To get the values from
  * attributes, the pure virtual method #getAttributeValue() have to be implemented in all
  * classes which inherit from librepcb::AttributeProvider.
  *
- * To resolve a variable like "${CMP::NAME}", the class #project#ComponentInstance must
+ * To resolve a variable like "${NAME}", the class #project#ComponentInstance must
  * inherit from this interface class. The method #getAttributeValue() must be implemented
  * and should return the name of the component instance (like "U123") when the attribute
- * "${CMP::NAME}" was requested.
+ * "${NAME}" was requested.
  *
  * @author ubruhin
  * @date 2015-01-10
@@ -81,7 +81,7 @@ class AttributeProvider
          * This method fetches all attribute values with #getAttributeValue() for all
          * variables found in the given text and replaces them in the text.
          *
-         * @param rawText           A text which can contain variables ("${NS::KEY}"). The
+         * @param rawText           A text which can contain variables ("${KEY}"). The
          *                          variables will be replaced directly in this QString.
          * @param passToParents     If true, the method #getAttributeValue() may also
          *                          call the same method of a "parent attribute provider"
@@ -94,10 +94,9 @@ class AttributeProvider
         int replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept;
 
         /**
-         * @brief Get the value of an attribute which can be used in texts (like "${CMP::NAME}")
+         * @brief Get the value of an attribute which can be used in texts (like "${NAME}")
          *
-         * @param attrNS            The attribute namespace (e.g. "HELLO" in "${HELLO::WORLD}").
-         * @param attrKey           The attribute name (e.g. "WORLD" in "${HELLO::WORLD}").
+         * @param attrKey           The attribute name (e.g. "FOOBAR" in "${FOOBAR}").
          * @param passToParents     See #replaceVariablesWithAttributes()
          * @param value             The value of the specified attribute will be written
          *                          into this variable, but only if the attribute was
@@ -105,8 +104,8 @@ class AttributeProvider
          *
          * @return true if the attribute was found, false if not
          */
-        virtual bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                       bool passToParents, QString& value) const noexcept = 0;
+        virtual bool getAttributeValue(const QString& attrKey, bool passToParents,
+                                       QString& value) const noexcept = 0;
 
 
     signals:
@@ -131,7 +130,7 @@ class AttributeProvider
         // Private Methods
 
         /**
-         * @brief Search the next variable ("${NS::KEY}") in a given text
+         * @brief Search the next variable ("${KEY}") in a given text
          *
          * @param text      A text which can contain variables
          * @param startPos  The search start index (use 0 to search in the whole text)
@@ -140,17 +139,13 @@ class AttributeProvider
          *                  into this variable.
          * @param length    If a variable is found, the length (incl. "${" and "}") will
          *                  be written into this variable.
-         * @param varNS     The variable namespace (text between "${" and "::"), for
-         *                  example "HELLO" if the text was "12${HELLO::WORLD}34".
-         *                  If no namespace is used (e.g. "12${WORLD}34"), this variable
-         *                  will be empty.
-         * @param varName   The variable name (text between "::" and "}"), e.g. "WORLD"
+         * @param varName   The variable name (text between "{" and "}"), e.g. "FOOBAR"
          *                  for the example above.
          *
          * @return          true if a variable is found, false if not
          */
         static bool searchVariableInText(const QString& text, int startPos, int& pos,
-                                         int& length, QString& varNS, QString& varName) noexcept;
+                                         int& length, QString& varName) noexcept;
 };
 
 // Make sure that the AttributeProvider class does not contain any data (except the vptr).

@@ -95,8 +95,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::Symbol;}

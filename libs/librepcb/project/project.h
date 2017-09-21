@@ -456,8 +456,7 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         /**
          * @copydoc AttributeProvider::getAttributeValue()
          */
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
 
         // Operator Overloadings

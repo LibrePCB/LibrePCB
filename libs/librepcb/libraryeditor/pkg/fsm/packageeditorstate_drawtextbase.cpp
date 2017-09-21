@@ -80,9 +80,9 @@ bool PackageEditorState_DrawTextBase::entry() noexcept
         mContext.commandToolBar.addLabel(tr("Text:"), 10);
         std::unique_ptr<QComboBox> textComboBox(new QComboBox());
         textComboBox->setEditable(true);
-        textComboBox->addItem("${CMP::NAME}");
-        textComboBox->addItem("${CMP::VALUE}");
-        textComboBox->addItem("${PRJ::NAME}");
+        textComboBox->addItem("${NAME}");
+        textComboBox->addItem("${VALUE}");
+        textComboBox->addItem("${PROJECT}");
         textComboBox->setCurrentIndex(textComboBox->findText(mLastText));
         connect(textComboBox.get(), &QComboBox::currentTextChanged,
                 this, &PackageEditorState_DrawTextBase::textComboBoxValueChanged);
@@ -234,12 +234,12 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept
         case Mode::NAME:
             mLastLayerName = GraphicsLayer::sTopNames;
             mLastHeight = Length(2500000);
-            mLastText = "${CMP::NAME}";
+            mLastText = "${NAME}";
             break;
         case Mode::VALUE:
             mLastLayerName = GraphicsLayer::sTopValues;
             mLastHeight = Length(2000000);
-            mLastText = "${CMP::VALUE}";
+            mLastText = "${VALUE}";
             break;
         default:
             mLastLayerName = GraphicsLayer::sTopPlacement;

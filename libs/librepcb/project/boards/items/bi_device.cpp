@@ -239,20 +239,18 @@ void BI_Device::serialize(DomElement& root) const
  *  Helper Methods
  ****************************************************************************************/
 
-bool BI_Device::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                        bool passToParents, QString& value) const noexcept
+bool BI_Device::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
     // no local attributes available
 
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && passToParents) {
-        if (mCompInstance->getAttributeValue(attrNS, attrKey, false, value))
+    if (passToParents) {
+        if (mCompInstance->getAttributeValue(attrKey, false, value))
             return true;
+        else
+            return mBoard.getAttributeValue(attrKey, true, value);
     }
 
-    if ((attrNS != QLatin1String("CMP")) && (passToParents))
-        return mBoard.getAttributeValue(attrNS, attrKey, true, value);
-    else
-        return false;
+    return false;
 }
 
 /*****************************************************************************************

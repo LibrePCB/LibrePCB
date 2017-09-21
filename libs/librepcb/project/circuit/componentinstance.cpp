@@ -345,20 +345,17 @@ void ComponentInstance::serialize(DomElement& root) const
  *  Helper Methods
  ****************************************************************************************/
 
-bool ComponentInstance::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                        bool passToParents, QString& value) const noexcept
+bool ComponentInstance::getAttributeValue(const QString& attrKey, bool passToParents,
+                                          QString& value) const noexcept
 {
-    if ((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mName, true;
-        else if (attrKey == QLatin1String("VALUE"))
-            return value = mValue, true;
-        else if (mAttributes->contains(attrKey))
-            return value = mAttributes->find(attrKey)->getValueTr(true), true;
-    }
-
-    if ((attrNS != QLatin1String("CMP")) && (passToParents))
-        return mCircuit.getProject().getAttributeValue(attrNS, attrKey, passToParents, value);
+    if (attrKey == QLatin1String("NAME"))
+        return value = mName, true;
+    else if (attrKey == QLatin1String("VALUE"))
+        return value = mValue, true;
+    else if (mAttributes->contains(attrKey))
+        return value = mAttributes->find(attrKey)->getValueTr(true), true;
+    else if (passToParents)
+        return mCircuit.getProject().getAttributeValue(attrKey, passToParents, value);
     else
         return false;
 }

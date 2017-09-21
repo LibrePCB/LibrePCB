@@ -314,10 +314,10 @@ bool MainWindow::convertSymbol(QSettings& outputSettings, const FilePath& filepa
                 QString textStr = child->getText<QString>(true);
                 Length height = child->getAttribute<Length>("size", true)*2;
                 if (textStr == ">NAME") {
-                    textStr = "${SYM::NAME}";
+                    textStr = "${NAME}";
                     height = Length::fromMm(3.175);
                 } else if (textStr == ">VALUE") {
-                    textStr = "${CMP::VALUE}";
+                    textStr = "${VALUE}";
                     height = Length::fromMm(2.5);
                 }
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));
@@ -478,10 +478,10 @@ bool MainWindow::convertPackage(QSettings& outputSettings, const FilePath& filep
                 QString textStr = child->getText<QString>(true);
                 Length height = child->getAttribute<Length>("size", true)*2;
                 if (textStr == ">NAME") {
-                    textStr = "${CMP::NAME}";
+                    textStr = "${NAME}";
                     height = Length::fromMm(2.5);
                 } else if (textStr == ">VALUE") {
-                    textStr = "${CMP::VALUE}";
+                    textStr = "${VALUE}";
                     height = Length::fromMm(2.0);
                 }
                 Point pos = Point(child->getAttribute<Length>("x", true), child->getAttribute<Length>("y", true));

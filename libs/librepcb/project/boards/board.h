@@ -181,8 +181,7 @@ class Board final : public QObject, public AttributeProvider,
         void clearSelection() const noexcept;
 
         // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
         // Operator Overloadings
         Board& operator=(const Board& rhs) = delete;

@@ -93,8 +93,7 @@ class SymbolPreviewGraphicsItem final : public QGraphicsItem, public AttributePr
 
 
         // private methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
 
         // Types

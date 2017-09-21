@@ -37,12 +37,11 @@ int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool pas
     int count = 0;
     int startPos = 0;
     int length = 0;
-    QString varNS;
     QString varName;
     QString varValue;
-    while (searchVariableInText(rawText, startPos, startPos, length, varNS, varName))
+    while (searchVariableInText(rawText, startPos, startPos, length, varName))
     {
-        if (getAttributeValue(varNS, varName, passToParents, varValue))
+        if (getAttributeValue(varName, passToParents, varValue))
         {
             // avoid endless recursion
             QString complete = rawText.mid(startPos, length);
@@ -58,25 +57,13 @@ int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool pas
 }
 
 bool AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
-                                                int& length, QString& varNS, QString& varName) noexcept
+                                                int& length, QString& varName) noexcept
 {
     pos = text.indexOf("${", startPos);         // index of '$'
     if (pos < 0) return false;
     length = text.indexOf("}", pos) - pos + 1;  // length inclusive '${' and '}'
     if (length < 3) return false;
-    int namespaceLength = text.indexOf("::", pos+2) - pos - 2; // count of chars between '${' and '::'
-    if ((namespaceLength < 0) || (namespaceLength > length-3))
-    {
-        // no namespace defined
-        varNS.clear();
-        varName = text.mid(pos+2, length-3);
-    }
-    else
-    {
-        // namespace defined
-        varNS = text.mid(pos+2, namespaceLength);
-        varName = text.mid(pos+4+namespaceLength, length-5-namespaceLength);
-    }
+    varName = text.mid(pos+2, length-3);
     return true;
 }
 

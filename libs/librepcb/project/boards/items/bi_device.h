@@ -98,8 +98,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void serialize(DomElement& root) const override;
 
         // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}

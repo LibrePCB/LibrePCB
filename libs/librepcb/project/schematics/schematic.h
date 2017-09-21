@@ -169,8 +169,7 @@ class Schematic final : public QObject, public AttributeProvider,
         void renderToQPainter(QPainter& painter) const noexcept;
 
         // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
 
         // Operator Overloadings
         Schematic& operator=(const Schematic& rhs) = delete;

@@ -653,27 +653,16 @@ void Schematic::renderToQPainter(QPainter& painter) const noexcept
  *  Helper Methods
  ****************************************************************************************/
 
-bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                  bool passToParents, QString& value) const noexcept
+bool Schematic::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
-    if ((attrNS == QLatin1String("PAGE")) || (attrNS.isEmpty()))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mName, true;
-        else if (attrKey == QLatin1String("AUTHOR"))
-            return value = mProject.getAuthor(), true;
-        else if (attrKey == QLatin1String("CREATED"))
-            return value = mProject.getCreated().toString(Qt::SystemLocaleShortDate), true;
-        else if (attrKey == QLatin1String("LAST_MODIFIED"))
-            return value = mProject.getLastModified().toString(Qt::SystemLocaleShortDate), true;
-        else if (attrKey == QLatin1String("NBR"))
-            return value = QString::number(mProject.getSchematicIndex(*this) + 1), true;
-        else if (attrKey == QLatin1String("CNT"))
-            return value = QString::number(mProject.getSchematics().count()), true;
-    }
-
-    if ((attrNS != QLatin1String("PAGE")) && (passToParents))
-        return mProject.getAttributeValue(attrNS, attrKey, passToParents, value);
+    if (attrKey == QLatin1String("SHEET"))
+        return value = mName, true;
+    else if (attrKey == QLatin1String("PAGE"))
+        return value = QString::number(mProject.getSchematicIndex(*this) + 1), true;
+    else if (attrKey == QLatin1String("PAGES"))
+        return value = QString::number(mProject.getSchematics().count()), true;
+    else if (passToParents)
+        return mProject.getAttributeValue(attrKey, passToParents, value);
     else
         return false;
 }

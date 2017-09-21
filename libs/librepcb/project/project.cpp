@@ -550,26 +550,22 @@ void Project::save(bool toOriginal)
  *  Helper Methods
  ****************************************************************************************/
 
-bool Project::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                bool passToParents, QString& value) const noexcept
+bool Project::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
     Q_UNUSED(passToParents);
 
-    if ((attrNS == QLatin1String("PRJ")) || (attrNS.isEmpty()))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mName, true;
-        else if (attrKey == QLatin1String("AUTHOR"))
-            return value = mAuthor, true;
-        else if (attrKey == QLatin1String("CREATED"))
-            return value = mCreated.toString(Qt::SystemLocaleShortDate), true;
-        else if (attrKey == QLatin1String("LAST_MODIFIED"))
-            return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
-        else if (mAttributes->contains(attrKey))
-            return value = mAttributes->find(attrKey)->getValueTr(true), true;
-    }
-
-    return false;
+    if (attrKey == QLatin1String("PROJECT"))
+        return value = mName, true;
+    else if (attrKey == QLatin1String("AUTHOR"))
+        return value = mAuthor, true;
+    else if (attrKey == QLatin1String("CREATED"))
+        return value = mCreated.toString(Qt::SystemLocaleShortDate), true;
+    else if (attrKey == QLatin1String("MODIFIED"))
+        return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
+    else if (mAttributes->contains(attrKey))
+        return value = mAttributes->find(attrKey)->getValueTr(true), true;
+    else
+        return false;
 }
 
 /*****************************************************************************************

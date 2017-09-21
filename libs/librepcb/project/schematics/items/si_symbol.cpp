@@ -206,18 +206,14 @@ Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
     return (mPosition + relativePos).rotated(mRotation, mPosition);
 }
 
-bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                       bool passToParents, QString& value) const noexcept
+bool SI_Symbol::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
 {
-    if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty())) {
-        if (attrKey == QLatin1String("NAME"))
-            return value = getName(), true;
-    }
-
-    if ((attrNS != QLatin1String("SYM")) && (passToParents)) {
-        if (mComponentInstance->getAttributeValue(attrNS, attrKey, false, value))
+    if (attrKey == QLatin1String("NAME")) {
+        return value = getName(), true;
+    } else if (passToParents) {
+        if (mComponentInstance->getAttributeValue(attrKey, false, value))
             return true;
-        if (mSchematic.getAttributeValue(attrNS, attrKey, true, value))
+        if (mSchematic.getAttributeValue(attrKey, true, value))
             return true;
     }
 

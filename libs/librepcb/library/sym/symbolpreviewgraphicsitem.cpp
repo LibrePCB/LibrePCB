@@ -300,19 +300,14 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
  *  Private Method
  ****************************************************************************************/
 
-bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                                  bool passToParents, QString& value) const noexcept
+bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrKey, bool passToParents,
+                                                  QString& value) const noexcept
 {
     Q_UNUSED(passToParents);
 
-    if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
-    {
-        if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix(), true;
-    }
-
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
-    {
+    if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem)) {
+        return value = mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix(), true;
+    } else if (mComponent) {
         if (attrKey == QLatin1String("NAME"))
             return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
         if (attrKey == QLatin1String("VALUE"))
@@ -323,13 +318,7 @@ bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const Q
         }
     }
 
-    if ((attrNS == QLatin1String("PAGE")) || (attrNS.isEmpty()))
-    {
-        value = attrKey;
-        return true;
-    }
-
-    value = attrNS % "::" % attrKey;
+    value = attrKey;
     return true;
 }
 
