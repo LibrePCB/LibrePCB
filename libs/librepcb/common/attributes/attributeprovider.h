@@ -43,10 +43,16 @@ namespace librepcb {
  * parsed and replaced with their values when such a text is displayed in a schematic of a
  * project.
  *
+ * Please read the documentation about the @ref doc_attributes_system to get an idea how
+ * the @ref doc_attributes_system works in detail.
+ *
  * To get the values from the attributes of an object, their class must inherit from
  * #AttributeProvider and override at least one of the methods #getUserDefinedAttributeValue(),
  * #getBuiltInAttributeValue() and #getAttributeProviderParents(), depending on what kind
  * of attributes it provides.
+ *
+ * @see librepcb::AttributeSubstitutor
+ * @see @ref doc_attributes_system
  *
  * @author ubruhin
  * @date 2015-01-10
@@ -60,24 +66,6 @@ class AttributeProvider
         AttributeProvider(const AttributeProvider& other) = delete;
         AttributeProvider& operator=(const AttributeProvider& rhs) = delete;
         virtual ~AttributeProvider() noexcept {}
-
-        /**
-         * @brief Replace all variables in a text with their attribute values
-         *
-         * This method fetches all attribute values with #getAttributeValue() for all
-         * variables found in the given text and replaces them in the text.
-         *
-         * @param rawText           A text which can contain variables ("#KEY"). The
-         *                          variables will be replaced directly in this QString.
-         * @param passToParents     If true, the method #getAttributeValue() may also
-         *                          call the same method of a "parent attribute provider"
-         *                          class to fetch the requested attribute value (for
-         *                          example #project#Project is a "parent" class of
-         *                          #project#ComponentInstance).
-         *
-         * @return The count of replaced variables in the text
-         */
-        int replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept;
 
         /**
          * @brief Get the value of an attribute which can be used in texts (like "#NAME")
@@ -135,27 +123,6 @@ class AttributeProvider
 
 
     private:
-
-        /**
-         * @brief Search the next variable ("#KEY") in a given text
-         *
-         * @param text      A text which can contain variables
-         * @param startPos  The search start index (use 0 to search in the whole text)
-         * @param pos       The index of the next variable in the specified text (index of
-         *                  the "#" character, or -1 if no variable found) will be written
-         *                  into this variable.
-         * @param length    If a variable is found, the length (incl. "#") will
-         *                  be written into this variable.
-         * @param varName   The variable name (text after "#"), e.g. "FOOBAR"
-         *                  for the example above.
-         *
-         * @return          true if a variable is found, false if not
-         */
-        static bool searchVariableInText(const QString& text, int startPos, int& pos,
-                                         int& length, QString& varName) noexcept;
-
-        static int getLengthOfKey(const QString& text, int startPos) noexcept;
-
         QString getAttributeValue(const QString& key,
                                   QVector<const AttributeProvider*>& backtrace) const noexcept;
 };

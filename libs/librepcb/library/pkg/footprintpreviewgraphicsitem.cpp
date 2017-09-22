@@ -25,6 +25,7 @@
 #include <QPrinter>
 #include "footprintpreviewgraphicsitem.h"
 #include "footprint.h"
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpadpreviewgraphicsitem.h"
 #include "package.h"
@@ -115,8 +116,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text.getText();
-        replaceVariablesWithAttributes(props.text, false);
+        props.text = AttributeSubstitutor::substitute(text.getText(), this);
 
         // calculate font metrics
         mFont.setPointSizeF(text.getHeight().toPx());

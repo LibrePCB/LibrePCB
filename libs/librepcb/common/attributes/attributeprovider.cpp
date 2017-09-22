@@ -32,30 +32,6 @@ namespace librepcb {
  *  Public Methods
  ****************************************************************************************/
 
-int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
-{
-    Q_UNUSED(passToParents);
-    int count = 0;
-    int startPos = 0;
-    int length = 0;
-    QString varName;
-    QString varValue;
-    QSet<QString> keys;
-    while (searchVariableInText(rawText, startPos, startPos, length, varName))
-    {
-        if (!keys.contains(varName)) {
-            varValue = getAttributeValue(varName);
-            rawText.replace(startPos, length, varValue);
-        }
-        else {
-            rawText.remove(startPos, length);
-        }
-        keys.insert(varName);
-        count++;
-    }
-    return count;
-}
-
 QString AttributeProvider::getAttributeValue(const QString& key) const noexcept
 {
    QVector<const AttributeProvider*> backtrace; // for endless loop detection
@@ -65,28 +41,6 @@ QString AttributeProvider::getAttributeValue(const QString& key) const noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
-
-bool AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
-                                                int& length, QString& varName) noexcept
-{
-    pos = text.indexOf("#", startPos);          // index of '#'
-    if (pos < 0) return false;
-    length = getLengthOfKey(text, pos + 1) + 1; // length inclusive '#'
-    if (length < 2) return false;
-    varName = text.mid(pos+1, length-1);
-    return true;
-}
-
-int AttributeProvider::getLengthOfKey(const QString& text, int startPos) noexcept
-{
-    QString allowedChars("_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-    for (int i = startPos; i < text.length(); ++i) {
-        if (!allowedChars.contains(text.at(i))) {
-            return i - startPos;
-        }
-    }
-    return text.length() - startPos;
-}
 
 QString AttributeProvider::getAttributeValue(const QString& key,
                                              QVector<const AttributeProvider*>& backtrace) const noexcept

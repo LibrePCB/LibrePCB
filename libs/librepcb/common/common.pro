@@ -31,6 +31,7 @@ SOURCES += \
     application.cpp \
     attributes/attribute.cpp \
     attributes/attributeprovider.cpp \
+    attributes/attributesubstitutor.cpp \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
@@ -120,6 +121,7 @@ HEADERS += \
     application.h \
     attributes/attribute.h \
     attributes/attributeprovider.h \
+    attributes/attributesubstitutor.h \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \

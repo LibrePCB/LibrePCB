@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "componentinstance.h"
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "circuit.h"
 #include "../project.h"
@@ -141,11 +141,11 @@ ComponentInstance::~ComponentInstance() noexcept
 
 QString ComponentInstance::getValue(bool replaceAttributes) const noexcept
 {
-    QString value = mValue;
     if (replaceAttributes) {
-        replaceVariablesWithAttributes(value, false);
+        return AttributeSubstitutor::substitute(mValue, this);
+    } else {
+        return mValue;
     }
-    return value;
 }
 
 int ComponentInstance::getUnplacedSymbolsCount() const noexcept

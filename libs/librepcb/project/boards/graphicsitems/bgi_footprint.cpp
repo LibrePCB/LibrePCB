@@ -30,6 +30,7 @@
 #include <librepcb/library/pkg/footprint.h>
 #include "../items/bi_device.h"
 #include "../boardlayerstack.h"
+#include <librepcb/common/attributes/attributesubstitutor.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -121,8 +122,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text.getText();
-        mFootprint.replaceVariablesWithAttributes(props.text, true);
+        props.text = AttributeSubstitutor::substitute(text.getText(), &mFootprint);
 
         // calculate font metrics
         props.fontPixelSize = qCeil(text.getHeight().toPx());
