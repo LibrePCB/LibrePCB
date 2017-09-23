@@ -255,7 +255,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         if (props.rotate180) painter->rotate(180);
         painter->setPen(QPen(layer->getColor(selected), 0));
         painter->setFont(mFont);
-        painter->drawText(props.textRect, props.align | Qt::TextWordWrap, props.text);
+        painter->drawText(props.textRect, props.align, props.text);
         painter->restore();
     }
 

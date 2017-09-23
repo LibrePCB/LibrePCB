@@ -144,9 +144,9 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
 
         // text alignment
         if (props.rotate180)
-            props.flags = text.getAlign().mirrored().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().mirrored().toQtAlign();
         else
-            props.flags = text.getAlign().toQtAlign() | Qt::TextWordWrap;
+            props.flags = text.getAlign().toQtAlign();
 
         // calculate text bounding rect
         mBoundingRect = mBoundingRect.united(scaledTextRect);
