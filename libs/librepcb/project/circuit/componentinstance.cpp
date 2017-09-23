@@ -281,6 +281,17 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol)
         throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Symbol item UUID already exists in circuit: \"%1\".")).arg(itemUuid.toStr()));
     }
+    if (!mRegisteredSymbols.isEmpty()) {
+        if (symbol.getSchematic() != mRegisteredSymbols.values().first()->getSchematic()) {
+            // Actually it would be possible to place the symbols of a component on
+            // different schematics. But maybe some time this will no longer be possible
+            // due to the concept of hierarchical sheets, sub-circuits or something like
+            // that. To make the later project upgrade process (as simple as) possible, we
+            // introduce this restriction already from now on.
+            throw RuntimeError(__FILE__, __LINE__,
+                tr("All symbols of a component must be placed in the same schematic."));
+        }
+    }
     mRegisteredSymbols.insert(itemUuid, &symbol);
     updateErcMessages();
 }
