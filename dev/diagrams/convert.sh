@@ -17,6 +17,7 @@ done
 
 # update images in doxygen documentation
 inkscape -z -f svg/architecture_overview.svg -w 1000 -e ../doxygen/images/architecture_overview.png
+inkscape -z -f svg/attributes_system.svg -w 1200 -e ../doxygen/images/attributes_system.png
 inkscape -z -f svg/library_structure.svg -w 1200 -e ../doxygen/images/library_structure.png
 inkscape -z -f svg/library_structure_overview.svg -w 800 -e ../doxygen/images/library_structure_overview.png
 inkscape -z -f svg/library_structure_examples.svg -w 1800 -e ../doxygen/images/library_structure_examples.png
