@@ -97,8 +97,11 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}
@@ -128,6 +131,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
+        const QStringList& getLocaleOrder() const noexcept;
 
 
         // General

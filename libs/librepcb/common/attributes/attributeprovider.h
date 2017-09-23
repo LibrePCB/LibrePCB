@@ -43,15 +43,10 @@ namespace librepcb {
  * parsed and replaced with their values when such a text is displayed in a schematic of a
  * project.
  *
- * The main goal of this interface is to provide the method #replaceVariablesWithAttributes()
- * which will replace all variables in a text with their values. To get the values from
- * attributes, the pure virtual method #getAttributeValue() have to be implemented in all
- * classes which inherit from librepcb::AttributeProvider.
- *
- * To resolve a variable like "#NAME", the class librepcb::project::ComponentInstance must
- * inherit from this interface class. The method #getAttributeValue() must be implemented
- * and should return the name of the component instance (like "U123") when the attribute
- * "#NAME" was requested.
+ * To get the values from the attributes of an object, their class must inherit from
+ * #AttributeProvider and override at least one of the methods #getUserDefinedAttributeValue(),
+ * #getBuiltInAttributeValue() and #getAttributeProviderParents(), depending on what kind
+ * of attributes it provides.
  *
  * @author ubruhin
  * @date 2015-01-10
@@ -60,20 +55,11 @@ class AttributeProvider
 {
     public:
 
-        // Constructors / Destructor
-
-        /**
-         * @brief Default Constructor
-         */
-        AttributeProvider() {}
-
-        /**
-         * @brief Destructor
-         */
-        virtual ~AttributeProvider() {}
-
-
-        // General Methods
+        // Constructors / Destructor / Operator Overloadings
+        AttributeProvider() noexcept {}
+        AttributeProvider(const AttributeProvider& other) = delete;
+        AttributeProvider& operator=(const AttributeProvider& rhs) = delete;
+        virtual ~AttributeProvider() noexcept {}
 
         /**
          * @brief Replace all variables in a text with their attribute values
@@ -96,16 +82,44 @@ class AttributeProvider
         /**
          * @brief Get the value of an attribute which can be used in texts (like "#NAME")
          *
-         * @param attrKey           The attribute name (e.g. "FOOBAR" in "#FOOBAR").
-         * @param passToParents     See #replaceVariablesWithAttributes()
-         * @param value             The value of the specified attribute will be written
-         *                          into this variable, but only if the attribute was
-         *                          found, otherwise the variable won't be modified.
+         * @param key   The attribute key name (e.g. "NAME" in "#NAME").
          *
-         * @return true if the attribute was found, false if not
+         * @return The value of the specified attribute (empty if attribute not found)
          */
-        virtual bool getAttributeValue(const QString& attrKey, bool passToParents,
-                                       QString& value) const noexcept = 0;
+        QString getAttributeValue(const QString& key) const noexcept;
+
+        /**
+         * @brief Get the value of a user defined attribute (if available)
+         *
+         * @param key   The attribute name (e.g. "NAME" for "#NAME")
+         *
+         * @return The value of the attribute (empty string if not found)
+         */
+        virtual QString getUserDefinedAttributeValue(const QString& key) const noexcept {
+            Q_UNUSED(key);
+            return QString();
+        }
+
+        /**
+         * @brief Get the value of a built-in attribute (if available)
+         *
+         * @param key   The attribute name (e.g. "NAME" for "#NAME")
+         *
+         * @return The value of the attribute (empty string if not found)
+         */
+        virtual QString getBuiltInAttributeValue(const QString& key) const noexcept {
+            Q_UNUSED(key);
+            return QString();
+        }
+
+        /**
+         * @brief Get all parent attribute providers (fallback if attribute not found)
+         *
+         * @return All parent attribute provider objects (empty and nullptr are allowed)
+         */
+        virtual QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept {
+            return QVector<const AttributeProvider*>();
+        }
 
 
     signals:
@@ -121,13 +135,6 @@ class AttributeProvider
 
 
     private:
-
-        // make some methods inaccessible...
-        AttributeProvider(const AttributeProvider& other);
-        AttributeProvider& operator=(const AttributeProvider& rhs);
-
-
-        // Private Methods
 
         /**
          * @brief Search the next variable ("#KEY") in a given text
@@ -148,6 +155,9 @@ class AttributeProvider
                                          int& length, QString& varName) noexcept;
 
         static int getLengthOfKey(const QString& text, int startPos) noexcept;
+
+        QString getAttributeValue(const QString& key,
+                                  QVector<const AttributeProvider*>& backtrace) const noexcept;
 };
 
 // Make sure that the AttributeProvider class does not contain any data (except the vptr).

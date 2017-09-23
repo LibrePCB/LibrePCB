@@ -27,6 +27,7 @@
 #include "circuit.h"
 #include "../project.h"
 #include "../library/projectlibrary.h"
+#include "../settings/projectsettings.h"
 #include "componentsignalinstance.h"
 #include <librepcb/library/cmp/component.h>
 #include "../erc/ercmsg.h"
@@ -317,6 +318,7 @@ void ComponentInstance::registerDevice(BI_Device& device)
     }
     mRegisteredDevices.append(&device);
     updateErcMessages();
+    emit attributesChanged(); // parent attribute provider may have changed!
 }
 
 void ComponentInstance::unregisterDevice(BI_Device& device)
@@ -326,6 +328,7 @@ void ComponentInstance::unregisterDevice(BI_Device& device)
     }
     mRegisteredDevices.removeOne(&device);
     updateErcMessages();
+    emit attributesChanged(); // parent attribute provider may have changed!
 }
 
 void ComponentInstance::serialize(DomElement& root) const
@@ -342,22 +345,37 @@ void ComponentInstance::serialize(DomElement& root) const
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool ComponentInstance::getAttributeValue(const QString& attrKey, bool passToParents,
-                                          QString& value) const noexcept
+QString ComponentInstance::getUserDefinedAttributeValue(const QString& key) const noexcept
 {
-    if (attrKey == QLatin1String("NAME"))
-        return value = mName, true;
-    else if (attrKey == QLatin1String("VALUE"))
-        return value = mValue, true;
-    else if (mAttributes->contains(attrKey))
-        return value = mAttributes->find(attrKey)->getValueTr(true), true;
-    else if (passToParents)
-        return mCircuit.getProject().getAttributeValue(attrKey, passToParents, value);
-    else
-        return false;
+    if (std::shared_ptr<Attribute> attr = mAttributes->find(key)) {
+        return attr->getValueTr(true);
+    }  else {
+        return QString();
+    }
+}
+
+QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const noexcept
+{
+    if (key == QLatin1String("NAME")) {
+        return mName;
+    } else if (key == QLatin1String("VALUE")) {
+        return mValue;
+    } else if (key == QLatin1String("COMPONENT")) {
+        return mLibComponent->getNames().value(getLocaleOrder());
+    } else {
+        return QString();
+    }
+}
+
+QVector<const AttributeProvider*> ComponentInstance::getAttributeProviderParents() const noexcept
+{
+    // TODO: add support for multiple boards!
+    const BI_Device* dev = (mRegisteredDevices.count() == 1) ? mRegisteredDevices.first()
+                                                             : nullptr;
+    return QVector<const AttributeProvider*>{&mCircuit.getProject(), dev};
 }
 
 /*****************************************************************************************
@@ -385,6 +403,11 @@ void ComponentInstance::updateErcMessages() noexcept
         .arg(mName).arg(optional));
     mErcMsgUnplacedRequiredSymbols->setVisible((mIsAddedToCircuit) && (required > 0));
     mErcMsgUnplacedOptionalSymbols->setVisible((mIsAddedToCircuit) && (optional > 0));
+}
+
+const QStringList& ComponentInstance::getLocaleOrder() const noexcept
+{
+    return mCircuit.getProject().getSettings().getLocaleOrder();
 }
 
 /*****************************************************************************************

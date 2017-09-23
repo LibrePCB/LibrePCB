@@ -547,25 +547,49 @@ void Project::save(bool toOriginal)
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool Project::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
+QString Project::getUserDefinedAttributeValue(const QString& key) const noexcept
 {
-    Q_UNUSED(passToParents);
+    if (std::shared_ptr<Attribute> attr = mAttributes->find(key)) {
+        return attr->getValueTr(true);
+    }  else {
+        return QString();
+    }
+}
 
-    if (attrKey == QLatin1String("PROJECT"))
-        return value = mName, true;
-    else if (attrKey == QLatin1String("AUTHOR"))
-        return value = mAuthor, true;
-    else if (attrKey == QLatin1String("CREATED"))
-        return value = mCreated.toString(Qt::SystemLocaleShortDate), true;
-    else if (attrKey == QLatin1String("MODIFIED"))
-        return value = mLastModified.toString(Qt::SystemLocaleShortDate), true;
-    else if (mAttributes->contains(attrKey))
-        return value = mAttributes->find(attrKey)->getValueTr(true), true;
-    else
-        return false;
+QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
+{
+    if (key == QLatin1String("PROJECT")) {
+        return mName;
+    } else if (key == QLatin1String("PROJECT_DIRPATH")) {
+        return mPath.toNative();
+    } else if (key == QLatin1String("PROJECT_BASENAME")) {
+        return mFilepath.getBasename();
+    } else if (key == QLatin1String("PROJECT_FILENAME")) {
+        return mFilepath.getFilename();
+    } else if (key == QLatin1String("PROJECT_FILEPATH")) {
+        return mFilepath.toNative();
+    } else if (key == QLatin1String("CREATED_DATE")) {
+        return mCreated.date().toString(Qt::ISODate);
+    } else if (key == QLatin1String("CREATED_TIME")) {
+        return mCreated.time().toString(Qt::ISODate);
+    } else if (key == QLatin1String("MODIFIED_DATE")) {
+        return mLastModified.date().toString(Qt::ISODate);
+    } else if (key == QLatin1String("MODIFIED_TIME")) {
+        return mLastModified.time().toString(Qt::ISODate);
+    } else if (key == QLatin1String("AUTHOR")) {
+        return mAuthor;
+    } else if (key == QLatin1String("VERSION")) {
+        return mVersion;
+    } else if (key == QLatin1String("PAGES")) {
+        return QString::number(mSchematics.count());
+    } else if (key == QLatin1String("PAGE_X_OF_Y")) {
+        return "Page #PAGE of #PAGES"; // do not translate this, must be the same for every user!
+    } else {
+        return QString();
+    }
 }
 
 /*****************************************************************************************

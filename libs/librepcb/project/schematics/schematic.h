@@ -168,8 +168,11 @@ class Schematic final : public QObject, public AttributeProvider,
         void clearSelection() const noexcept;
         void renderToQPainter(QPainter& painter) const noexcept;
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         Schematic& operator=(const Schematic& rhs) = delete;

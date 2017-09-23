@@ -285,33 +285,19 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
 }
 
 /*****************************************************************************************
- *  Private Method
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool FootprintPreviewGraphicsItem::getAttributeValue(const QString& attrKey,
-                                                     bool passToParents, QString& value) const noexcept
+QString FootprintPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    Q_UNUSED(passToParents);
-
     if (mAttributeProvider) {
-        if (mAttributeProvider->getAttributeValue(attrKey, passToParents, value))
-            return true;
+        QString value = mAttributeProvider->getAttributeValue(key);
+        if (!value.isEmpty()) return value;
     }
-
-    if (mComponent)
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
-        if (attrKey == QLatin1String("VALUE"))
-            return value = "VALUE", true;
-        if (mComponent->getAttributes().contains(attrKey)) {
-            value = attrKey;
-            return true;
-        }
+    if (mComponent && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?";
     }
-
-    value = attrKey;
-    return true;
+    return "##" % key;
 }
 
 /*****************************************************************************************

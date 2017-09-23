@@ -297,29 +297,18 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 }
 
 /*****************************************************************************************
- *  Private Method
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrKey, bool passToParents,
-                                                  QString& value) const noexcept
+QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    Q_UNUSED(passToParents);
-
-    if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem)) {
-        return value = mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix(), true;
-    } else if (mComponent) {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
-        if (attrKey == QLatin1String("VALUE"))
-            return value = "VALUE", true;
-        if (mComponent->getAttributes().contains(attrKey)) {
-            value = attrKey;
-            return true;
-        }
+    if (mComponent && mSymbVarItem && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix();
+    } else if (mComponent && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?";
+    } else {
+        return "##" % key;
     }
-
-    value = attrKey;
-    return true;
 }
 
 /*****************************************************************************************

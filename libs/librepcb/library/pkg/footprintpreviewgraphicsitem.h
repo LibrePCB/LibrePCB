@@ -92,8 +92,9 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public Attribut
         FootprintPreviewGraphicsItem& operator=(const FootprintPreviewGraphicsItem& rhs) = delete;
 
 
-        // private methods
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 
         // Types

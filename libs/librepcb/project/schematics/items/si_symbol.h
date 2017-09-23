@@ -95,7 +95,12 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::Symbol;}

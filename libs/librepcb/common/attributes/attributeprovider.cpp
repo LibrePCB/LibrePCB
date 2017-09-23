@@ -29,32 +29,42 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class AttributeProvider
+ *  Public Methods
  ****************************************************************************************/
 
 int AttributeProvider::replaceVariablesWithAttributes(QString& rawText, bool passToParents) const noexcept
 {
+    Q_UNUSED(passToParents);
     int count = 0;
     int startPos = 0;
     int length = 0;
     QString varName;
     QString varValue;
+    QSet<QString> keys;
     while (searchVariableInText(rawText, startPos, startPos, length, varName))
     {
-        if (getAttributeValue(varName, passToParents, varValue))
-        {
-            // avoid endless recursion
-            QString complete = rawText.mid(startPos, length);
-            varValue.replace(complete, QCoreApplication::translate("AttributeProvider",
-                                                                   "[RECURSION REMOVED]"));
+        if (!keys.contains(varName)) {
+            varValue = getAttributeValue(varName);
             rawText.replace(startPos, length, varValue);
         }
-        else
+        else {
             rawText.remove(startPos, length);
+        }
+        keys.insert(varName);
         count++;
     }
     return count;
 }
+
+QString AttributeProvider::getAttributeValue(const QString& key) const noexcept
+{
+   QVector<const AttributeProvider*> backtrace; // for endless loop detection
+   return getAttributeValue(key, backtrace);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
 
 bool AttributeProvider::searchVariableInText(const QString& text, int startPos, int& pos,
                                                 int& length, QString& varName) noexcept
@@ -76,6 +86,30 @@ int AttributeProvider::getLengthOfKey(const QString& text, int startPos) noexcep
         }
     }
     return text.length() - startPos;
+}
+
+QString AttributeProvider::getAttributeValue(const QString& key,
+                                             QVector<const AttributeProvider*>& backtrace) const noexcept
+{
+    // priority 1: user defined attributes of this object
+    QString value = getUserDefinedAttributeValue(key);
+    if (!value.isEmpty()) return value;
+
+    // priority 2: built-in attributes of this object
+    value = getBuiltInAttributeValue(key);
+    if (!value.isEmpty()) return value;
+
+    // priority 3: attributes from all parent objects in specific order
+    backtrace.append(this);
+    foreach (const AttributeProvider* parent, getAttributeProviderParents()) {
+        if (parent && (!backtrace.contains(parent))) { // break possible endless loop
+            value = parent->getAttributeValue(key, backtrace);
+            if (!value.isEmpty()) return value;
+        }
+    }
+
+    // attribute not set...
+    return QString();
 }
 
 /*****************************************************************************************

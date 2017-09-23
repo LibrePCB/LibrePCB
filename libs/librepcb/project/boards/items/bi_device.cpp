@@ -25,6 +25,7 @@
 #include "../board.h"
 #include "../../project.h"
 #include "../../library/projectlibrary.h"
+#include "../../settings/projectsettings.h"
 #include <librepcb/library/elements.h>
 #include "../../erc/ercmsg.h"
 #include "../../circuit/circuit.h"
@@ -236,21 +237,25 @@ void BI_Device::serialize(DomElement& root) const
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool BI_Device::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
+QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    // no local attributes available
-
-    if (passToParents) {
-        if (mCompInstance->getAttributeValue(attrKey, false, value))
-            return true;
-        else
-            return mBoard.getAttributeValue(attrKey, true, value);
+    if (key == QLatin1String("DEVICE")) {
+        return mLibDevice->getNames().value(getLocaleOrder());
+    } else if (key == QLatin1String("PACKAGE")) {
+        return mLibPackage->getNames().value(getLocaleOrder());
+    } else if (key == QLatin1String("FOOTPRINT")) {
+        return mLibFootprint->getNames().value(getLocaleOrder());
+    } else {
+        return QString();
     }
+}
 
-    return false;
+QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const noexcept
+{
+    return QVector<const AttributeProvider*>{&mBoard, mCompInstance};
 }
 
 /*****************************************************************************************
@@ -287,6 +292,11 @@ bool BI_Device::checkAttributesValidity() const noexcept
 
 void BI_Device::updateErcMessages() noexcept
 {
+}
+
+const QStringList& BI_Device::getLocaleOrder() const noexcept
+{
+    return getProject().getSettings().getLocaleOrder();
 }
 
 /*****************************************************************************************

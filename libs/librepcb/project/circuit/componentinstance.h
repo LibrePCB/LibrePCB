@@ -134,8 +134,13 @@ class ComponentInstance : public QObject, public AttributeProvider,
         void serialize(DomElement& root) const override;
 
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
@@ -152,6 +157,7 @@ class ComponentInstance : public QObject, public AttributeProvider,
         void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
+        const QStringList& getLocaleOrder() const noexcept;
 
 
         // General

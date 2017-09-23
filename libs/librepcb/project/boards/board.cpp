@@ -871,16 +871,21 @@ void Board::clearSelection() const noexcept
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool Board::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
+QString Board::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    // TODO
-    Q_UNUSED(attrKey);
-    Q_UNUSED(passToParents);
-    Q_UNUSED(value);
-    return false;
+    if (key == QLatin1String("BOARD")) {
+        return mName;
+    } else {
+        return QString();
+    }
+}
+
+QVector<const AttributeProvider*> Board::getAttributeProviderParents() const noexcept
+{
+    return QVector<const AttributeProvider*>{&mProject};
 }
 
 /*****************************************************************************************

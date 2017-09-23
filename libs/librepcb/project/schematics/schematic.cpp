@@ -650,21 +650,23 @@ void Schematic::renderToQPainter(QPainter& painter) const noexcept
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool Schematic::getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept
+QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    if (attrKey == QLatin1String("SHEET"))
-        return value = mName, true;
-    else if (attrKey == QLatin1String("PAGE"))
-        return value = QString::number(mProject.getSchematicIndex(*this) + 1), true;
-    else if (attrKey == QLatin1String("PAGES"))
-        return value = QString::number(mProject.getSchematics().count()), true;
-    else if (passToParents)
-        return mProject.getAttributeValue(attrKey, passToParents, value);
-    else
-        return false;
+    if (key == QLatin1String("SHEET")) {
+        return mName;
+    } else if (key == QLatin1String("PAGE")) {
+        return QString::number(mProject.getSchematicIndex(*this) + 1);
+    } else {
+        return QString();
+    }
+}
+
+QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const noexcept
+{
+    return QVector<const AttributeProvider*>{&mProject};
 }
 
 /*****************************************************************************************

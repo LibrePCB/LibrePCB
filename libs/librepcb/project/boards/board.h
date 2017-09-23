@@ -180,8 +180,11 @@ class Board final : public QObject, public AttributeProvider,
         void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
         void clearSelection() const noexcept;
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         Board& operator=(const Board& rhs) = delete;

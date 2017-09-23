@@ -451,12 +451,11 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         void save(bool toOriginal);
 
 
-        // Helper Methods
-
-        /**
-         * @copydoc AttributeProvider::getAttributeValue()
-         */
-        bool getAttributeValue(const QString& attrKey, bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 
         // Operator Overloadings
