@@ -159,6 +159,12 @@ QList<FilePath> Library::searchForElements() const noexcept
         FilePath elementFilePath = subDirFilePath.getPathTo(dirname);
         if (isValidElementDirectory<ElementType>(elementFilePath)) {
             list.append(elementFilePath);
+        } else if (elementFilePath.isEmptyDir()) {
+            qInfo() << "Empty library element directory will be removed:" << elementFilePath.toNative();
+            // TODO: This is actually a race condition, because the directory may be
+            // created just a moment ago in the main thread, and is thus still empty.
+            // Even if not very critical, this should be made thread-safe some time ;)
+            QDir(elementFilePath.toStr()).removeRecursively();
         } else {
             qWarning() << "Directory is not a valid library element:" << elementFilePath.toNative();
         }

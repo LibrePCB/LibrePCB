@@ -215,10 +215,15 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         FilePath subdirPath(directory.getPathTo(dirname));
 
         // check if directory is a valid library element
-        /*if (!LibraryBaseElement::isDirectoryLibraryElement(subdirPath)) {
-            qWarning() << "Found an invalid directory in the library:" << subdirPath.toNative();
+        if (!LibraryBaseElement::isValidElementDirectory<ElementType>(subdirPath)) {
+            if (subdirPath.isEmptyDir()) {
+                qInfo() << "Empty library element directory will be removed:" << subdirPath.toNative();
+                QDir(subdirPath.toStr()).removeRecursively();
+            } else {
+                qWarning() << "Found an invalid directory in the library:" << subdirPath.toNative();
+            }
             continue;
-        }*/
+        }
 
         // load the library element --> an exception will be thrown on error
         ElementType* element = new ElementType(subdirPath, false);
