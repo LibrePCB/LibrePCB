@@ -46,7 +46,8 @@ namespace project {
 BI_Device::BI_Device(Board& board, const BI_Device& other) :
     BI_Base(board), mCompInstance(other.mCompInstance), mLibDevice(other.mLibDevice),
     mLibPackage(other.mLibPackage), mLibFootprint(other.mLibFootprint),
-    mPosition(other.mPosition), mRotation(other.mRotation), mIsMirrored(other.mIsMirrored)
+    mPosition(other.mPosition), mRotation(other.mRotation), mIsMirrored(other.mIsMirrored),
+    mAttributes(other.mAttributes)
 {
     mFootprint.reset(new BI_Footprint(*this, *other.mFootprint));
 
@@ -55,7 +56,7 @@ BI_Device::BI_Device(Board& board, const BI_Device& other) :
 
 BI_Device::BI_Device(Board& board, const DomElement& domElement) :
     BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibPackage(nullptr),
-    mLibFootprint(nullptr)
+    mLibFootprint(nullptr), mAttributes()
 {
     // get component instance
     Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
@@ -76,6 +77,9 @@ BI_Device::BI_Device(Board& board, const DomElement& domElement) :
     mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
     mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror", true);
 
+    // load attributes
+    mAttributes.loadFromDomElement(domElement); // can throw
+
     // load footprint
     mFootprint.reset(new BI_Footprint(*this));
     //mFootprint.reset(new BI_Footprint(*this, *domElement.getFirstChild("footprint", true)));
@@ -89,6 +93,9 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& 
     mLibFootprint(nullptr), mPosition(position), mRotation(rotation), mIsMirrored(mirror)
 {
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
+
+    // add attributes
+    mAttributes = mLibDevice->getAttributes();
 
     // create footprint
     mFootprint.reset(new BI_Footprint(*this));
@@ -234,11 +241,21 @@ void BI_Device::serialize(DomElement& root) const
     position->setAttribute("y", mPosition.getY());
     position->setAttribute("rotation", mRotation);
     position->setAttribute("mirror", mIsMirrored);
+    mAttributes.serialize(root);
 }
 
 /*****************************************************************************************
  *  Inherited from AttributeProvider
  ****************************************************************************************/
+
+QString BI_Device::getUserDefinedAttributeValue(const QString& key) const noexcept
+{
+    if (std::shared_ptr<const Attribute> attr = mAttributes.find(key)) {
+        return attr->getValueTr(true);
+    }  else {
+        return QString();
+    }
+}
 
 QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept
 {

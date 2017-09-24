@@ -26,6 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/uuid.h>
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/attributes/attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
@@ -98,6 +99,8 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void serialize(DomElement& root) const override;
 
         // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
         /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
         QString getBuiltInAttributeValue(const QString& key) const noexcept override;
         /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
@@ -111,7 +114,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void setSelected(bool selected) noexcept override;
 
         // Operator Overloadings
-        BI_Device& operator=(const BI_Device& rhs);
+        BI_Device& operator=(const BI_Device& rhs) = delete;
 
 
     signals:
@@ -145,6 +148,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         Point mPosition;
         Angle mRotation;
         bool mIsMirrored;
+        AttributeList mAttributes; ///< not yet used, but already specified in file format
 };
 
 /*****************************************************************************************
