@@ -25,6 +25,7 @@
 #include <QPrinter>
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include "symbolpinpreviewgraphicsitem.h"
 #include "../cmp/component.h"
@@ -128,8 +129,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text.getText();
-        replaceVariablesWithAttributes(props.text, false);
+        props.text = AttributeSubstitutor::substitute(text.getText(), this);
 
         // calculate font metrics
         mFont.setPointSizeF(text.getHeight().toPx());
@@ -297,40 +297,18 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 }
 
 /*****************************************************************************************
- *  Private Method
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool SymbolPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                                  bool passToParents, QString& value) const noexcept
+QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    Q_UNUSED(passToParents);
-
-    if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty()))
-    {
-        if ((attrKey == QLatin1String("NAME")) && (mComponent) && (mSymbVarItem))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix(), true;
+    if (mComponent && mSymbVarItem && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix();
+    } else if (mComponent && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?";
+    } else {
+        return "##" % key;
     }
-
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
-        if (attrKey == QLatin1String("VALUE"))
-            return value = "VALUE", true;
-        if (mComponent->getAttributes().contains(attrKey)) {
-            value = attrKey;
-            return true;
-        }
-    }
-
-    if ((attrNS == QLatin1String("PAGE")) || (attrNS.isEmpty()))
-    {
-        value = attrKey;
-        return true;
-    }
-
-    value = attrNS % "::" % attrKey;
-    return true;
 }
 
 /*****************************************************************************************

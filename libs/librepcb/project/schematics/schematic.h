@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
@@ -72,7 +72,7 @@ class SI_NetLabel;
  *  - ellipse:          TODO
  *  - text:             TODO
  */
-class Schematic final : public QObject, public IF_AttributeProvider,
+class Schematic final : public QObject, public AttributeProvider,
                         public SerializableObject
 {
         Q_OBJECT
@@ -168,9 +168,11 @@ class Schematic final : public QObject, public IF_AttributeProvider,
         void clearSelection() const noexcept;
         void renderToQPainter(QPainter& painter) const noexcept;
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         Schematic& operator=(const Schematic& rhs) = delete;
@@ -184,7 +186,7 @@ class Schematic final : public QObject, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 

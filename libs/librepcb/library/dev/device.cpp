@@ -50,6 +50,7 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) :
     // load attributes
     mComponentUuid = root.getFirstChild("component", true, true)->getText<Uuid>(true);
     mPackageUuid = root.getFirstChild("package", true, true)->getText<Uuid>(true);
+    mAttributes.loadFromDomElement(root); // can throw
     mPadSignalMap.loadFromDomElement(root);
 
     cleanupAfterLoadingElementFromFile();
@@ -86,6 +87,7 @@ void Device::serialize(DomElement& root) const
     LibraryElement::serialize(root);
     root.appendTextChild("component", mComponentUuid);
     root.appendTextChild("package", mPackageUuid);
+    mAttributes.serialize(root);
     mPadSignalMap.serialize(root);
 }
 

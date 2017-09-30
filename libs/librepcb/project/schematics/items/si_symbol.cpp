@@ -206,22 +206,22 @@ Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
     return (mPosition + relativePos).rotated(mRotation, mPosition);
 }
 
-bool SI_Symbol::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                       bool passToParents, QString& value) const noexcept
+/*****************************************************************************************
+ *  Inherited from AttributeProvider
+ ****************************************************************************************/
+
+QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    if ((attrNS == QLatin1String("SYM")) || (attrNS.isEmpty())) {
-        if (attrKey == QLatin1String("NAME"))
-            return value = getName(), true;
+    if (key == QLatin1String("NAME")) {
+        return getName();
+    } else {
+        return QString();
     }
+}
 
-    if ((attrNS != QLatin1String("SYM")) && (passToParents)) {
-        if (mComponentInstance->getAttributeValue(attrNS, attrKey, false, value))
-            return true;
-        if (mSchematic.getAttributeValue(attrNS, attrKey, true, value))
-            return true;
-    }
-
-    return false;
+QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const noexcept
+{
+    return QVector<const AttributeProvider*>{&mSchematic, mComponentInstance};
 }
 
 /*****************************************************************************************

@@ -53,6 +53,7 @@ PRE_TARGETDEPS += \
 
 SOURCES += \
     common/applicationtest.cpp \
+    common/attributes/attributesubstitutortest.cpp \
     common/directorylocktest.cpp \
     common/filedownloadtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
@@ -70,6 +71,7 @@ SOURCES += \
     workspace/workspacetest.cpp \
 
 HEADERS += \
+    common/attributes/attributeproviderdummy.h \
     common/fileio/serializableobjectmock.h \
     common/networkrequestbasesignalreceiver.h \
 

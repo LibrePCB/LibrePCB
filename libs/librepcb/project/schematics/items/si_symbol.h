@@ -26,7 +26,7 @@
 #include <QtCore>
 #include "si_base.h"
 #include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../graphicsitems/sgi_symbol.h"
 
 /*****************************************************************************************
@@ -56,7 +56,7 @@ class SI_SymbolPin;
  * @date 2014-08-23
  */
 class SI_Symbol final : public SI_Base, public SerializableObject,
-                        public IF_AttributeProvider
+                        public AttributeProvider
 {
         Q_OBJECT
 
@@ -95,8 +95,12 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::Symbol;}
@@ -115,7 +119,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 

@@ -26,7 +26,8 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attribute.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include "../graphicsitems/bgi_footprint.h"
@@ -56,7 +57,7 @@ class BI_Footprint;
 /**
  * @brief The BI_Device class
  */
-class BI_Device final : public BI_Base, public IF_AttributeProvider,
+class BI_Device final : public BI_Base, public AttributeProvider,
                         public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
@@ -97,9 +98,13 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(DomElement& root) const override;
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}
@@ -109,12 +114,12 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void setSelected(bool selected) noexcept override;
 
         // Operator Overloadings
-        BI_Device& operator=(const BI_Device& rhs);
+        BI_Device& operator=(const BI_Device& rhs) = delete;
 
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
         void moved(const Point& newPos);
@@ -129,6 +134,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
+        const QStringList& getLocaleOrder() const noexcept;
 
 
         // General
@@ -142,6 +148,7 @@ class BI_Device final : public BI_Base, public IF_AttributeProvider,
         Point mPosition;
         Angle mRotation;
         bool mIsMirrored;
+        AttributeList mAttributes; ///< not yet used, but already specified in file format
 };
 
 /*****************************************************************************************

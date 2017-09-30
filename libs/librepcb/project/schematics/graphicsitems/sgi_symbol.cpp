@@ -29,6 +29,7 @@
 #include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/componentinstance.h"
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/cmp/component.h>
 
@@ -90,8 +91,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text.getText();
-        mSymbol.replaceVariablesWithAttributes(props.text, true);
+        props.text = AttributeSubstitutor::substitute(text.getText(), &mSymbol);
 
         // calculate font metrics
         props.fontPixelSize = qCeil(text.getHeight().toPx());

@@ -21,7 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "componentsignalinstance.h"
 #include "componentinstance.h"
@@ -115,9 +115,8 @@ bool ComponentSignalInstance::isNetSignalNameForced() const noexcept
 
 QString ComponentSignalInstance::getForcedNetSignalName() const noexcept
 {
-    QString name = mComponentSignal->getForcedNetName();
-    mComponentInstance.replaceVariablesWithAttributes(name, false);
-    return name;
+    return AttributeSubstitutor::substitute(mComponentSignal->getForcedNetName(),
+                                            &mComponentInstance);
 }
 
 int ComponentSignalInstance::getRegisteredElementsCount() const noexcept

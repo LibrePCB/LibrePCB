@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -54,7 +54,7 @@ class Footprint;
  * @author ubruhin
  * @date 2015-04-21
  */
-class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_AttributeProvider
+class FootprintPreviewGraphicsItem final : public QGraphicsItem, public AttributeProvider
 {
     public:
 
@@ -63,7 +63,7 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_Attri
             const QStringList& localeOrder, const Footprint& footprint,
             const Package* package = nullptr, /*const Device* device = nullptr,*/
             const Component* component = nullptr,
-            const IF_AttributeProvider* attrProvider = nullptr) noexcept;
+            const AttributeProvider* attrProvider = nullptr) noexcept;
         ~FootprintPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -80,7 +80,7 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_Attri
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() {}
 
 
@@ -92,9 +92,9 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_Attri
         FootprintPreviewGraphicsItem& operator=(const FootprintPreviewGraphicsItem& rhs) = delete;
 
 
-        // private methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 
         // Types
@@ -114,7 +114,7 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public IF_Attri
         const Package* mPackage;
         //const Device* mDevice;
         const Component* mComponent;
-        const IF_AttributeProvider* mAttributeProvider;
+        const AttributeProvider* mAttributeProvider;
         QFont mFont;
         bool mDrawBoundingRect;
         QStringList mLocaleOrder;

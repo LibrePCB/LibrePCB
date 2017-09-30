@@ -101,16 +101,6 @@ void BI_Polygon::serialize(DomElement& root) const
     mPolygon->serialize(root);
 }
 
-bool BI_Polygon::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                     bool passToParents, QString& value) const noexcept
-{
-    // no local attributes available
-    if (passToParents)
-        return mBoard.getAttributeValue(attrNS, attrKey, true, value);
-    else
-        return false;
-}
-
 /*****************************************************************************************
  *  Inherited from BI_Base
  ****************************************************************************************/

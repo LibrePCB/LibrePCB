@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -53,7 +53,7 @@ class ComponentSymbolVariantItem;
  * @author ubruhin
  * @date 2015-04-21
  */
-class SymbolPreviewGraphicsItem final : public QGraphicsItem, public IF_AttributeProvider
+class SymbolPreviewGraphicsItem final : public QGraphicsItem, public AttributeProvider
 {
     public:
 
@@ -80,7 +80,7 @@ class SymbolPreviewGraphicsItem final : public QGraphicsItem, public IF_Attribut
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() {}
 
 
@@ -92,9 +92,9 @@ class SymbolPreviewGraphicsItem final : public QGraphicsItem, public IF_Attribut
         SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) = delete;
 
 
-        // private methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 
         // Types

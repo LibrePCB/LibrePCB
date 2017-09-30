@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/if_attributeprovider.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/attributes/attribute.h>
@@ -59,7 +59,7 @@ class ErcMsg;
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance : public QObject, public IF_AttributeProvider,
+class ComponentInstance : public QObject, public AttributeProvider,
                           public IF_ErcMsgProvider, public SerializableObject
 {
         Q_OBJECT
@@ -134,9 +134,13 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void serialize(DomElement& root) const override;
 
 
-        // Helper Methods
-        bool getAttributeValue(const QString& attrNS, const QString& attrKey,
-                               bool passToParents, QString& value) const noexcept override;
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
@@ -144,7 +148,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
 
     signals:
 
-        /// @copydoc IF_AttributeProvider#attributesChanged()
+        /// @copydoc AttributeProvider::attributesChanged()
         void attributesChanged() override;
 
 
@@ -153,6 +157,7 @@ class ComponentInstance : public QObject, public IF_AttributeProvider,
         void init();
         bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
+        const QStringList& getLocaleOrder() const noexcept;
 
 
         // General

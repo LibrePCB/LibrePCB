@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/attributes/attribute.h>
 #include "../libraryelement.h"
 #include "devicepadsignalmap.h"
 
@@ -65,6 +66,7 @@ class Device final : public LibraryElement
         // Getters
         const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
         const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
+        const AttributeList& getAttributes() const noexcept {return mAttributes;}
         DevicePadSignalMap& getPadSignalMap() noexcept {return mPadSignalMap;}
         const DevicePadSignalMap& getPadSignalMap() const noexcept {return mPadSignalMap;}
 
@@ -95,6 +97,7 @@ class Device final : public LibraryElement
     private: // Data
         Uuid mComponentUuid;
         Uuid mPackageUuid;
+        AttributeList mAttributes; ///< not yet used, but already specified in file format
         DevicePadSignalMap mPadSignalMap;
 };
 

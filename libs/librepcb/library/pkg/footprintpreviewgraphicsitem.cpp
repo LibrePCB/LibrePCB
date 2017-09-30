@@ -25,6 +25,7 @@
 #include <QPrinter>
 #include "footprintpreviewgraphicsitem.h"
 #include "footprint.h"
+#include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include "footprintpadpreviewgraphicsitem.h"
 #include "package.h"
@@ -43,7 +44,7 @@ namespace library {
 
 FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const QStringList& localeOrder,
         const Footprint& footprint, const Package* package, /*const Device* device,*/
-        const Component* component, const IF_AttributeProvider* attrProvider) noexcept :
+        const Component* component, const AttributeProvider* attrProvider) noexcept :
     QGraphicsItem(), mLayerProvider(layerProvider), mFootprint(footprint),
     mPackage(package), /*mDevice(device),*/ mComponent(component),
     mAttributeProvider(attrProvider), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
@@ -115,8 +116,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         CachedTextProperties_t props;
 
         // get the text to display
-        props.text = text.getText();
-        replaceVariablesWithAttributes(props.text, false);
+        props.text = AttributeSubstitutor::substitute(text.getText(), this);
 
         // calculate font metrics
         mFont.setPointSizeF(text.getHeight().toPx());
@@ -285,33 +285,19 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
 }
 
 /*****************************************************************************************
- *  Private Method
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool FootprintPreviewGraphicsItem::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                                  bool passToParents, QString& value) const noexcept
+QString FootprintPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    Q_UNUSED(passToParents);
-
     if (mAttributeProvider) {
-        if (mAttributeProvider->getAttributeValue(attrNS, attrKey, passToParents, value))
-            return true;
+        QString value = mAttributeProvider->getAttributeValue(key);
+        if (!value.isEmpty()) return value;
     }
-
-    if (((attrNS == QLatin1String("CMP")) || (attrNS.isEmpty())) && (mComponent))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mComponent->getPrefixes().getDefaultValue() % "?", true;
-        if (attrKey == QLatin1String("VALUE"))
-            return value = "VALUE", true;
-        if (mComponent->getAttributes().contains(attrKey)) {
-            value = attrKey;
-            return true;
-        }
+    if (mComponent && (key == QLatin1String("NAME"))) {
+        return mComponent->getPrefixes().getDefaultValue() % "?";
     }
-
-    value = attrNS % "::" % attrKey;
-    return true;
+    return "##" % key;
 }
 
 /*****************************************************************************************

@@ -49,7 +49,7 @@ namespace project {
 
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName):
-    QObject(&project), IF_AttributeProvider(), mProject(project), mFilePath(filepath),
+    QObject(&project), AttributeProvider(), mProject(project), mFilePath(filepath),
     mIsAddedToProject(false)
 {
     try
@@ -650,32 +650,23 @@ void Schematic::renderToQPainter(QPainter& painter) const noexcept
 }
 
 /*****************************************************************************************
- *  Helper Methods
+ *  Inherited from AttributeProvider
  ****************************************************************************************/
 
-bool Schematic::getAttributeValue(const QString& attrNS, const QString& attrKey,
-                                  bool passToParents, QString& value) const noexcept
+QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept
 {
-    if ((attrNS == QLatin1String("PAGE")) || (attrNS.isEmpty()))
-    {
-        if (attrKey == QLatin1String("NAME"))
-            return value = mName, true;
-        else if (attrKey == QLatin1String("AUTHOR"))
-            return value = mProject.getAuthor(), true;
-        else if (attrKey == QLatin1String("CREATED"))
-            return value = mProject.getCreated().toString(Qt::SystemLocaleShortDate), true;
-        else if (attrKey == QLatin1String("LAST_MODIFIED"))
-            return value = mProject.getLastModified().toString(Qt::SystemLocaleShortDate), true;
-        else if (attrKey == QLatin1String("NBR"))
-            return value = QString::number(mProject.getSchematicIndex(*this) + 1), true;
-        else if (attrKey == QLatin1String("CNT"))
-            return value = QString::number(mProject.getSchematics().count()), true;
+    if (key == QLatin1String("SHEET")) {
+        return mName;
+    } else if (key == QLatin1String("PAGE")) {
+        return QString::number(mProject.getSchematicIndex(*this) + 1);
+    } else {
+        return QString();
     }
+}
 
-    if ((attrNS != QLatin1String("PAGE")) && (passToParents))
-        return mProject.getAttributeValue(attrNS, attrKey, passToParents, value);
-    else
-        return false;
+QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const noexcept
+{
+    return QVector<const AttributeProvider*>{&mProject};
 }
 
 /*****************************************************************************************
