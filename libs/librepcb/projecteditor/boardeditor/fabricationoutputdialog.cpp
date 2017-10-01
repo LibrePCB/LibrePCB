@@ -24,6 +24,7 @@
 #include "fabricationoutputdialog.h"
 #include "ui_fabricationoutputdialog.h"
 #include <librepcb/project/project.h>
+#include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardgerberexport.h>
 
@@ -44,7 +45,7 @@ FabricationOutputDialog::FabricationOutputDialog(Board& board, QWidget *parent) 
 {
     mUi->setupUi(this);
 
-    QString version = FilePath::cleanFileName(mProject.getVersion(),
+    QString version = FilePath::cleanFileName(mProject.getMetadata().getVersion(),
                       FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString outputDir = QString("output/%1/gerber").arg(version);
     FilePath gerberDir = mProject.getPath().getPathTo(outputDir);

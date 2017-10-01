@@ -35,7 +35,7 @@ class UndoStack;
 
 namespace project {
 
-class Project;
+class ProjectMetadata;
 
 namespace editor {
 
@@ -59,7 +59,8 @@ class ProjectPropertiesEditorDialog final : public QDialog
         // Constructors / Destructor
         ProjectPropertiesEditorDialog() = delete;
         ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) = delete;
-        ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack, QWidget* parent) noexcept;
+        ProjectPropertiesEditorDialog(ProjectMetadata& metadata, UndoStack& undoStack,
+                                      QWidget* parent) noexcept;
         ~ProjectPropertiesEditorDialog() noexcept;
 
 
@@ -74,7 +75,7 @@ class ProjectPropertiesEditorDialog final : public QDialog
 
 
     private: // Data
-        Project& mProject;
+        ProjectMetadata& mMetadata;
         UndoStack& mUndoStack;
         QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
 };

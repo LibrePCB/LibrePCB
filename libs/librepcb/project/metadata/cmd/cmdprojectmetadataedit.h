@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
-#define LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
+#ifndef LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H
+#define LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,22 +33,22 @@
 namespace librepcb {
 namespace project {
 
-class Project;
+class ProjectMetadata;
 
 /*****************************************************************************************
- *  Class CmdProjectSetMetadata
+ *  Class CmdProjectMetadataEdit
  ****************************************************************************************/
 
 /**
- * @brief The CmdProjectSetMetadata class
+ * @brief The CmdProjectMetadataEdit class
  */
-class CmdProjectSetMetadata final : public UndoCommand
+class CmdProjectMetadataEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdProjectSetMetadata(Project& project) noexcept;
-        ~CmdProjectSetMetadata() noexcept;
+        explicit CmdProjectMetadataEdit(ProjectMetadata& metadata) noexcept;
+        ~CmdProjectMetadataEdit() noexcept;
 
         // Setters
         void setName(const QString& newName) noexcept;
@@ -74,7 +74,7 @@ class CmdProjectSetMetadata final : public UndoCommand
         // Private Member Variables
 
         // General
-        Project& mProject;
+        ProjectMetadata& mMetadata;
 
         // Misc
         QString mOldName;
@@ -94,4 +94,4 @@ class CmdProjectSetMetadata final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTSETMETADATA_H
+#endif // LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H

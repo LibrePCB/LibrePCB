@@ -24,9 +24,9 @@
 #include <QtWidgets>
 #include "projectpropertieseditordialog.h"
 #include "ui_projectpropertieseditordialog.h"
-#include <librepcb/project/project.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/project/cmd/cmdprojectsetmetadata.h>
+#include <librepcb/project/metadata/projectmetadata.h>
+#include <librepcb/project/metadata/cmd/cmdprojectmetadataedit.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -39,19 +39,19 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(Project& project,
+ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(ProjectMetadata& metadata,
         UndoStack& undoStack, QWidget* parent) noexcept :
-    QDialog(parent), mProject(project), mUndoStack(undoStack),
+    QDialog(parent), mMetadata(metadata), mUndoStack(undoStack),
     mUi(new Ui::ProjectPropertiesEditorDialog)
 {
     mUi->setupUi(this);
 
-    mUi->edtName->setText(mProject.getName());
-    mUi->edtAuthor->setText(mProject.getAuthor());
-    mUi->edtVersion->setText(mProject.getVersion());
-    mUi->lblCreatedDateTime->setText(mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
-    mUi->lblLastModifiedDateTime->setText(mProject.getLastModified().toString(Qt::DefaultLocaleLongDate));
-    mUi->attributeListEditorWidget->setAttributeList(mProject.getAttributes());
+    mUi->edtName->setText(mMetadata.getName());
+    mUi->edtAuthor->setText(mMetadata.getAuthor());
+    mUi->edtVersion->setText(mMetadata.getVersion());
+    mUi->lblCreatedDateTime->setText(mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
+    mUi->lblLastModifiedDateTime->setText(mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
+    mUi->attributeListEditorWidget->setAttributeList(mMetadata.getAttributes());
 }
 
 ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept
@@ -88,7 +88,7 @@ void ProjectPropertiesEditorDialog::accept()
 bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 {
     try {
-        CmdProjectSetMetadata* cmd = new CmdProjectSetMetadata(mProject);
+        CmdProjectMetadataEdit* cmd = new CmdProjectMetadataEdit(mMetadata);
         cmd->setName(mUi->edtName->text().trimmed());
         cmd->setAuthor(mUi->edtAuthor->text().trimmed());
         cmd->setVersion(mUi->edtVersion->text().trimmed());

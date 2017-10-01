@@ -69,11 +69,12 @@ SOURCES += \
     circuit/componentsignalinstance.cpp \
     circuit/netclass.cpp \
     circuit/netsignal.cpp \
-    cmd/cmdprojectsetmetadata.cpp \
     erc/ercmsg.cpp \
     erc/ercmsglist.cpp \
     library/cmd/cmdprojectlibraryaddelement.cpp \
     library/projectlibrary.cpp \
+    metadata/cmd/cmdprojectmetadataedit.cpp \
+    metadata/projectmetadata.cpp \
     project.cpp \
     schematics/cmd/cmdschematicadd.cpp \
     schematics/cmd/cmdschematicnetlabeladd.cpp \
@@ -154,12 +155,13 @@ HEADERS += \
     circuit/componentsignalinstance.h \
     circuit/netclass.h \
     circuit/netsignal.h \
-    cmd/cmdprojectsetmetadata.h \
     erc/ercmsg.h \
     erc/ercmsglist.h \
     erc/if_ercmsgprovider.h \
     library/cmd/cmdprojectlibraryaddelement.h \
     library/projectlibrary.h \
+    metadata/cmd/cmdprojectmetadataedit.h \
+    metadata/projectmetadata.h \
     project.h \
     schematics/cmd/cmdschematicadd.h \
     schematics/cmd/cmdschematicnetlabeladd.h \
