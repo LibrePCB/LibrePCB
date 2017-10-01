@@ -169,11 +169,11 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
         }
 
-        // try to create/open the XML project file
+        // try to create/open the project file
         if (create) {
-            mXmlFile.reset(SmartXmlFile::create(mFilepath));
+            mProjectFile.reset(SmartTextFile::create(mFilepath));
         } else {
-            mXmlFile.reset(new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly));
+            mProjectFile.reset(new SmartTextFile(mFilepath, mIsRestored, mIsReadOnly));
         }
 
         // Create all needed objects
@@ -568,10 +568,6 @@ Version Project::getProjectFileFormatVersion(const FilePath& dir)
  *  Private Methods
  ****************************************************************************************/
 
-void Project::serialize(DomElement& root) const
-{
-}
-
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -594,13 +590,10 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     // Save *.lpp project file
-    try
-    {
-        DomDocument doc(*serializeToDomElement("project"));
-        mXmlFile->save(doc, toOriginal);
-    }
-    catch (Exception& e)
-    {
+    try {
+        mProjectFile->setContent("LIBREPCB-PROJECT");
+        mProjectFile->save(toOriginal);
+    } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
     }

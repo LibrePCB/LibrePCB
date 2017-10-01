@@ -24,7 +24,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
@@ -77,7 +76,7 @@ class Board;
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject, public AttributeProvider, public SerializableObject
+class Project final : public QObject, public AttributeProvider
 {
         Q_OBJECT
 
@@ -443,11 +442,6 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         explicit Project(const FilePath& filepath, bool create, bool readOnly);
 
         /**
-         * @copydoc librepcb::SerializableObject::serialize()
-         */
-        void serialize(DomElement& root) const override;
-
-        /**
          * @brief Save the project to the harddisc (to temporary or original files)
          *
          * @param toOriginal    True: save to original files; False: save to temporary files
@@ -472,7 +466,7 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.lpp project file
         QScopedPointer<SmartVersionFile> mVersionFile; ///< the ".librepcb-project" file
-        QScopedPointer<SmartXmlFile> mXmlFile; ///< the *.lpp project file
+        QScopedPointer<SmartTextFile> mProjectFile; ///< the *.lpp project file
         DirectoryLock mLock; ///< Lock for the whole project directory (see @ref doc_project_lock)
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
