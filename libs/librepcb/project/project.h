@@ -477,6 +477,10 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
+        // schematic and board list files
+        QScopedPointer<SmartXmlFile> mSchematicsXmlFile; ///< core/schematics.xml
+        QScopedPointer<SmartXmlFile> mBoardsXmlFile; ///< core/boards.xml
+
         // General
         QScopedPointer<ProjectMetadata> mProjectMetadata; ///< e.g. project name, author, ...
         QScopedPointer<ProjectSettings> mProjectSettings; ///< all project specific settings

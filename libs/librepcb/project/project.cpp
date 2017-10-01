@@ -170,14 +170,10 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         }
 
         // try to create/open the XML project file
-        std::unique_ptr<DomDocument> doc;
-        DomElement* root = nullptr;
         if (create) {
             mXmlFile.reset(SmartXmlFile::create(mFilepath));
         } else {
             mXmlFile.reset(new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly));
-            doc = mXmlFile->parseFileAndBuildDomTree();
-            root = &doc->getRoot();
         }
 
         // Create all needed objects
@@ -192,18 +188,30 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         // Load all schematic layers
         mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
-        if (!create) {
-            // Load all schematics
-            foreach (const DomElement* node, root->getChilds("schematic")) {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
+        // Load all schematics
+        FilePath schematicsXmlFp = mPath.getPathTo("core/schematics.xml");
+        if (create) {
+            mSchematicsXmlFile.reset(SmartXmlFile::create(schematicsXmlFp));
+        } else {
+            mSchematicsXmlFile.reset(new SmartXmlFile(schematicsXmlFp, mIsRestored, mIsReadOnly));
+            std::unique_ptr<DomDocument> schDoc = mSchematicsXmlFile->parseFileAndBuildDomTree();
+            foreach (const DomElement* node, schDoc->getRoot().getChilds("schematic")) {
+                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
             }
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
+        }
 
-            // Load all boards
-            foreach (const DomElement* node, root->getChilds("board")) {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
+        // Load all boards
+        FilePath boardsXmlFp = mPath.getPathTo("core/boards.xml");
+        if (create) {
+            mBoardsXmlFile.reset(SmartXmlFile::create(boardsXmlFp));
+        } else {
+            mBoardsXmlFile.reset(new SmartXmlFile(boardsXmlFp, mIsRestored, mIsReadOnly));
+            std::unique_ptr<DomDocument> brdDoc = mBoardsXmlFile->parseFileAndBuildDomTree();
+            foreach (const DomElement* node, brdDoc->getRoot().getChilds("board")) {
+                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
             }
@@ -562,15 +570,6 @@ Version Project::getProjectFileFormatVersion(const FilePath& dir)
 
 void Project::serialize(DomElement& root) const
 {
-    // schematics
-    FilePath schematicsPath(mPath.getPathTo("schematics"));
-    foreach (Schematic* schematic, mSchematics)
-        root.appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
-
-    // boards
-    FilePath boardsPath(mPath.getPathTo("boards"));
-    foreach (Board* board, mBoards)
-        root.appendTextChild("board", board->getFilePath().toRelative(boardsPath));
 }
 
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
@@ -602,6 +601,30 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
     catch (Exception& e)
     {
+        success = false;
+        errors.append(e.getMsg());
+    }
+
+    // Save core/schematics.xml
+    try {
+        QScopedPointer<DomElement> root(new DomElement("schematics"));
+        foreach (Schematic* schematic, mSchematics) {
+            root->appendTextChild("schematic", schematic->getFilePath().toRelative(mPath));
+        }
+        mSchematicsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+    } catch (const Exception& e) {
+        success = false;
+        errors.append(e.getMsg());
+    }
+
+    // Save core/boards.xml
+    try {
+        QScopedPointer<DomElement> root(new DomElement("boards"));
+        foreach (Board* board, mBoards) {
+            root->appendTextChild("board", board->getFilePath().toRelative(mPath));
+        }
+        mBoardsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+    } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
     }
