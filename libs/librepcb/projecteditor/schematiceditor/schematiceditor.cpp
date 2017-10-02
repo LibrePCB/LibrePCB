@@ -25,6 +25,7 @@
 #include "schematiceditor.h"
 #include "ui_schematiceditor.h"
 #include <librepcb/project/project.h>
+#include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -305,9 +306,9 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 {
     try
     {
-        QString projectName = FilePath::cleanFileName(mProject.getName(),
+        QString projectName = FilePath::cleanFileName(mProject.getMetadata().getName(),
                               FilePath::ReplaceSpaces | FilePath::KeepCase);
-        QString projectVersion = FilePath::cleanFileName(mProject.getVersion(),
+        QString projectVersion = FilePath::cleanFileName(mProject.getMetadata().getVersion(),
                                  FilePath::ReplaceSpaces | FilePath::KeepCase);
         QString relativePath = QString("output/%1/%2_Schematics.pdf")
                                .arg(projectVersion, projectName);
@@ -376,7 +377,8 @@ void SchematicEditor::on_actionAddComp_vcc_triggered()
 
 void SchematicEditor::on_actionProjectProperties_triggered()
 {
-    ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
+    ProjectPropertiesEditorDialog dialog(mProject.getMetadata(),
+                                         mProjectEditor.getUndoStack(), this);
     dialog.exec();
 }
 

@@ -29,6 +29,7 @@
 #include <librepcb/common/geometry/hole.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintpad.h>
+#include "../metadata/projectmetadata.h"
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
@@ -107,8 +108,8 @@ void BoardGerberExport::exportDrillsPTH() const
 
 void BoardGerberExport::exportLayerBoardOutlines() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBoardOutlines);
     gen.generate();
     gen.saveToFile(getOutputFilePath("OUTLINES.gbr"));
@@ -116,8 +117,8 @@ void BoardGerberExport::exportLayerBoardOutlines() const
 
 void BoardGerberExport::exportLayerTopCopper() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopCopper);
     gen.generate();
     gen.saveToFile(getOutputFilePath("COPPER-TOP.gbr"));
@@ -125,8 +126,8 @@ void BoardGerberExport::exportLayerTopCopper() const
 
 void BoardGerberExport::exportLayerTopSolderMask() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SOLDERMASK-TOP.gbr"));
@@ -134,8 +135,8 @@ void BoardGerberExport::exportLayerTopSolderMask() const
 
 void BoardGerberExport::exportLayerTopSilkscreen() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopPlacement);
     drawLayer(gen, GraphicsLayer::sTopNames);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
@@ -146,8 +147,8 @@ void BoardGerberExport::exportLayerTopSilkscreen() const
 
 void BoardGerberExport::exportLayerBottomCopper() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotCopper);
     gen.generate();
     gen.saveToFile(getOutputFilePath("COPPER-BOTTOM.gbr"));
@@ -155,8 +156,8 @@ void BoardGerberExport::exportLayerBottomCopper() const
 
 void BoardGerberExport::exportLayerBottomSolderMask() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotStopMask);
     gen.generate();
     gen.saveToFile(getOutputFilePath("SOLDERMASK-BOTTOM.gbr"));
@@ -164,8 +165,8 @@ void BoardGerberExport::exportLayerBottomSolderMask() const
 
 void BoardGerberExport::exportLayerBottomSilkscreen() const
 {
-    GerberGenerator gen(mProject.getName() % " - " % mBoard.getName(),
-                        mBoard.getUuid(), mProject.getVersion());
+    GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
+                        mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotPlacement);
     drawLayer(gen, GraphicsLayer::sBotNames);
     gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
@@ -335,7 +336,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
 
 FilePath BoardGerberExport::getOutputFilePath(const QString& suffix) const noexcept
 {
-    QString projectName = FilePath::cleanFileName(mProject.getName(),
+    QString projectName = FilePath::cleanFileName(mProject.getMetadata().getName(),
                           FilePath::ReplaceSpaces | FilePath::KeepCase);
     return mOutputDirectory.getPathTo(projectName % "_" % suffix);
 }

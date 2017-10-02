@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/common/systeminfo.h>
 #include <librepcb/project/project.h>
+#include <librepcb/project/metadata/projectmetadata.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -67,13 +68,13 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_EQ(mProjectDir, project->getPath());
     EXPECT_FALSE(project->isReadOnly());
     EXPECT_FALSE(project->isRestored());
-    EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getName());
-    EXPECT_EQ(SystemInfo::getFullUsername(), project->getAuthor());
-    EXPECT_EQ(QString("v1"), project->getVersion());
+    EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getMetadata().getName());
+    EXPECT_EQ(SystemInfo::getFullUsername(), project->getMetadata().getAuthor());
+    EXPECT_EQ(QString("v1"), project->getMetadata().getVersion());
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-                project->getCreated().toMSecsSinceEpoch(), 5000);
+                project->getMetadata().getCreated().toMSecsSinceEpoch(), 5000);
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-                project->getLastModified().toMSecsSinceEpoch(), 5000);
+                project->getMetadata().getLastModified().toMSecsSinceEpoch(), 5000);
     EXPECT_EQ(0, project->getSchematics().count());
     EXPECT_EQ(0, project->getBoards().count());
 
@@ -95,13 +96,13 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_EQ(mProjectDir, project->getPath());
     EXPECT_FALSE(project->isReadOnly());
     EXPECT_FALSE(project->isRestored());
-    EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getName());
-    EXPECT_EQ(SystemInfo::getFullUsername(), project->getAuthor());
-    EXPECT_EQ(QString("v1"), project->getVersion());
+    EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getMetadata().getName());
+    EXPECT_EQ(SystemInfo::getFullUsername(), project->getMetadata().getAuthor());
+    EXPECT_EQ(QString("v1"), project->getMetadata().getVersion());
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-                project->getCreated().toMSecsSinceEpoch(), 5000);
+                project->getMetadata().getCreated().toMSecsSinceEpoch(), 5000);
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-                project->getLastModified().toMSecsSinceEpoch(), 5000);
+                project->getMetadata().getLastModified().toMSecsSinceEpoch(), 5000);
     EXPECT_EQ(0, project->getSchematics().count());
     EXPECT_EQ(0, project->getBoards().count());
 }
@@ -132,16 +133,16 @@ TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave)
 {
     // create new project
     QScopedPointer<Project> project(Project::create(mProjectFile));
-    qint64 datetimeAfterCreating = project->getLastModified().toMSecsSinceEpoch();
+    qint64 datetimeAfterCreating = project->getMetadata().getLastModified().toMSecsSinceEpoch();
 
     // check if datetime has not changed
     QThread::msleep(1000);
-    EXPECT_EQ(datetimeAfterCreating, project->getLastModified().toMSecsSinceEpoch());
+    EXPECT_EQ(datetimeAfterCreating, project->getMetadata().getLastModified().toMSecsSinceEpoch());
 
     // save project and verify that datetime has changed
     QThread::msleep(1000);
     project->save(true);
-    qint64 datetimeAfterSaving = project->getLastModified().toMSecsSinceEpoch();
+    qint64 datetimeAfterSaving = project->getMetadata().getLastModified().toMSecsSinceEpoch();
     EXPECT_NEAR(QDateTime::currentMSecsSinceEpoch(), datetimeAfterSaving, 1000); // +/- 1s
     EXPECT_NE(datetimeAfterCreating, datetimeAfterSaving);
 }
@@ -155,14 +156,14 @@ TEST_F(ProjectTest, testSettersGetters)
     QString name = "test name 1234";
     QString author = "test author 1234";
     QString version = "test version 1234";
-    project->setName(name);
-    project->setAuthor(author);
-    project->setVersion(version);
+    project->getMetadata().setName(name);
+    project->getMetadata().setAuthor(author);
+    project->getMetadata().setVersion(version);
 
     // get properties
-    EXPECT_EQ(name, project->getName());
-    EXPECT_EQ(author, project->getAuthor());
-    EXPECT_EQ(version, project->getVersion());
+    EXPECT_EQ(name, project->getMetadata().getName());
+    EXPECT_EQ(author, project->getMetadata().getAuthor());
+    EXPECT_EQ(version, project->getMetadata().getVersion());
 
     // save project
     project->save(true);
@@ -172,9 +173,9 @@ TEST_F(ProjectTest, testSettersGetters)
     project.reset(new Project(mProjectFile, true));
 
     // get properties
-    EXPECT_EQ(name, project->getName());
-    EXPECT_EQ(author, project->getAuthor());
-    EXPECT_EQ(version, project->getVersion());
+    EXPECT_EQ(name, project->getMetadata().getName());
+    EXPECT_EQ(author, project->getMetadata().getAuthor());
+    EXPECT_EQ(version, project->getMetadata().getVersion());
 }
 
 /*****************************************************************************************

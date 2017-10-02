@@ -24,7 +24,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
@@ -45,6 +44,7 @@ class SmartVersionFile;
 
 namespace project {
 
+class ProjectMetadata;
 class ProjectSettings;
 class ProjectLibrary;
 class Circuit;
@@ -76,7 +76,7 @@ class Board;
  * @author ubruhin
  * @date 2014-06-24
  */
-class Project final : public QObject, public AttributeProvider, public SerializableObject
+class Project final : public QObject, public AttributeProvider
 {
         Q_OBJECT
 
@@ -134,6 +134,13 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         bool isRestored() const noexcept {return mIsRestored;}
 
         /**
+         * @brief Get the ProjectMetadata object which contains all project metadata
+         *
+         * @return A reference to the ProjectMetadata object
+         */
+        ProjectMetadata& getMetadata() const noexcept {return *mProjectMetadata;}
+
+        /**
          * @brief Get the ProjectSettings object which contains all project settings
          *
          * @return A reference to the ProjectSettings object
@@ -161,93 +168,6 @@ class Project final : public QObject, public AttributeProvider, public Serializa
          * @return A reference to the Circuit object
          */
         Circuit& getCircuit() const noexcept {return *mCircuit;}
-
-
-        // Getters: Attributes
-
-        /**
-         * @brief Get the name of the project
-         *
-         * @return The name of the project
-         */
-        const QString& getName() const noexcept {return mName;}
-
-        /**
-         * @brief Get the author of the project
-         *
-         * @return The author of the project
-         */
-        const QString& getAuthor() const noexcept {return mAuthor;}
-
-        /**
-         * @brief Get the version of the project
-         *
-         * @return The version of the project (arbitrary string)
-         */
-        const QString& getVersion() const noexcept {return mVersion;}
-
-        /**
-         * @brief Get the date and time when the project was created
-         *
-         * @return The local date and time of creation
-         */
-        const QDateTime& getCreated() const noexcept {return mCreated;}
-
-        /**
-         * @brief Get the date and time when the project was last modified
-         *
-         * @return The local date and time of last modification
-         *
-         * @todo    Dynamically determine the datetime of the last modification from
-         *          version control system, file attributes or something like that.
-         */
-        const QDateTime& getLastModified() const noexcept {return mLastModified;}
-
-        /**
-         * @brief Get the list of attributes
-         *
-         * @return All attributes in a specific order
-         */
-        const AttributeList& getAttributes() const noexcept {return *mAttributes;}
-
-
-        // Setters: Attributes
-
-        /**
-         * @brief Set the name of the project
-         *
-         * @param newName           The new name (should not be empty!)
-         *
-         * @undocmd{project#CmdProjectSetMetadata}
-         */
-        void setName(const QString& newName) noexcept;
-
-        /**
-         * @brief Set the author of the project
-         *
-         * @param newAuthor         The new author
-         *
-         * @undocmd{project#CmdProjectSetMetadata}
-         */
-        void setAuthor(const QString& newAuthor) noexcept;
-
-        /**
-         * @brief Set the version of the project
-         *
-         * @param newVersion        The new version (can be an arbitrary string)
-         *
-         * @undocmd{project#CmdProjectSetMetadata}
-         */
-        void setVersion(const QString& newVersion) noexcept;
-
-        /**
-         * @brief Set all project attributes
-         *
-         * @param newAttributes     The new list of attributes
-         *
-         * @undocmd{librepcb::project::CmdProjectSetMetadata}
-         */
-        void setAttributes(const AttributeList& newAttributes) noexcept;
 
 
         // Schematic Methods
@@ -521,13 +441,6 @@ class Project final : public QObject, public AttributeProvider, public Serializa
          */
         explicit Project(const FilePath& filepath, bool create, bool readOnly);
 
-        bool checkAttributesValidity() const noexcept;
-
-        /**
-         * @copydoc librepcb::SerializableObject::serialize()
-         */
-        void serialize(DomElement& root) const override;
-
         /**
          * @brief Save the project to the harddisc (to temporary or original files)
          *
@@ -553,19 +466,17 @@ class Project final : public QObject, public AttributeProvider, public Serializa
         FilePath mPath; ///< the path to the project directory
         FilePath mFilepath; ///< the filepath of the *.lpp project file
         QScopedPointer<SmartVersionFile> mVersionFile; ///< the ".librepcb-project" file
-        QScopedPointer<SmartXmlFile> mXmlFile; ///< the *.lpp project file
+        QScopedPointer<SmartTextFile> mProjectFile; ///< the *.lpp project file
         DirectoryLock mLock; ///< Lock for the whole project directory (see @ref doc_project_lock)
         bool mIsRestored; ///< the constructor will set this to true if the project was restored
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
-        // Attributes
-        QString mName;              ///< the name of the project
-        QString mAuthor;            ///< the author of the project
-        QString mVersion;           ///< the version of the project (arbitrary string)
-        QDateTime mCreated;         ///< the datetime of the project creation
-        QDateTime mLastModified;    ///< the datetime of the last project modification
+        // schematic and board list files
+        QScopedPointer<SmartXmlFile> mSchematicsXmlFile; ///< core/schematics.xml
+        QScopedPointer<SmartXmlFile> mBoardsXmlFile; ///< core/boards.xml
 
         // General
+        QScopedPointer<ProjectMetadata> mProjectMetadata; ///< e.g. project name, author, ...
         QScopedPointer<ProjectSettings> mProjectSettings; ///< all project specific settings
         QScopedPointer<ProjectLibrary> mProjectLibrary; ///< the library which contains all elements needed in this project
         QScopedPointer<ErcMsgList> mErcMsgList; ///< A list which contains all electrical rule check (ERC) messages

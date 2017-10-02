@@ -29,12 +29,12 @@
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/systeminfo.h>
 #include "project.h"
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
 #include "schematics/schematic.h"
 #include "erc/ercmsglist.h"
+#include "metadata/projectmetadata.h"
 #include "settings/projectsettings.h"
 #include "boards/board.h"
 #include <librepcb/common/application.h>
@@ -169,34 +169,17 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
         }
 
-        // try to create/open the XML project file
-        std::unique_ptr<DomDocument> doc;
-        DomElement* root = nullptr;
+        // try to create/open the project file
         if (create) {
-            mXmlFile.reset(SmartXmlFile::create(mFilepath));
+            mProjectFile.reset(SmartTextFile::create(mFilepath));
         } else {
-            mXmlFile.reset(new SmartXmlFile(mFilepath, mIsRestored, mIsReadOnly));
-            doc = mXmlFile->parseFileAndBuildDomTree();
-            root = &doc->getRoot();
-        }
-
-        // load project attributes
-        mLastModified = QDateTime::currentDateTime();
-        if (create) {
-            mName = mFilepath.getCompleteBasename();
-            mAuthor = SystemInfo::getFullUsername();
-            mVersion = "v1";
-            mCreated = QDateTime::currentDateTime();
-            mAttributes.reset(new AttributeList());
-        } else {
-            mName = root->getFirstChild("name", true)->getText<QString>(false);
-            mAuthor = root->getFirstChild("author", true)->getText<QString>(false);
-            mVersion = root->getFirstChild("version", true)->getText<QString>(false);
-            mCreated = root->getFirstChild("created", true)->getText<QDateTime>(true);
-            mAttributes.reset(new AttributeList(*root)); // can throw
+            mProjectFile.reset(new SmartTextFile(mFilepath, mIsRestored, mIsReadOnly));
         }
 
         // Create all needed objects
+        mProjectMetadata.reset(new ProjectMetadata(*this, mIsRestored, mIsReadOnly, create));
+        connect(mProjectMetadata.data(), &ProjectMetadata::attributesChanged,
+                this, &Project::attributesChanged);
         mProjectSettings.reset(new ProjectSettings(*this, mIsRestored, mIsReadOnly, create));
         mProjectLibrary.reset(new ProjectLibrary(*this, mIsRestored, mIsReadOnly));
         mErcMsgList.reset(new ErcMsgList(*this, mIsRestored, mIsReadOnly, create));
@@ -205,18 +188,30 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         // Load all schematic layers
         mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
-        if (!create) {
-            // Load all schematics
-            foreach (const DomElement* node, root->getChilds("schematic")) {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("schematics"), node->getText<QString>(true));
+        // Load all schematics
+        FilePath schematicsXmlFp = mPath.getPathTo("core/schematics.xml");
+        if (create) {
+            mSchematicsXmlFile.reset(SmartXmlFile::create(schematicsXmlFp));
+        } else {
+            mSchematicsXmlFile.reset(new SmartXmlFile(schematicsXmlFp, mIsRestored, mIsReadOnly));
+            std::unique_ptr<DomDocument> schDoc = mSchematicsXmlFile->parseFileAndBuildDomTree();
+            foreach (const DomElement* node, schDoc->getRoot().getChilds("schematic")) {
+                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
             }
             qDebug() << mSchematics.count() << "schematics successfully loaded!";
+        }
 
-            // Load all boards
-            foreach (const DomElement* node, root->getChilds("board")) {
-                FilePath fp = FilePath::fromRelative(mPath.getPathTo("boards"), node->getText<QString>(true));
+        // Load all boards
+        FilePath boardsXmlFp = mPath.getPathTo("core/boards.xml");
+        if (create) {
+            mBoardsXmlFile.reset(SmartXmlFile::create(boardsXmlFp));
+        } else {
+            mBoardsXmlFile.reset(new SmartXmlFile(boardsXmlFp, mIsRestored, mIsReadOnly));
+            std::unique_ptr<DomDocument> brdDoc = mBoardsXmlFile->parseFileAndBuildDomTree();
+            foreach (const DomElement* node, brdDoc->getRoot().getChilds("board")) {
+                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
             }
@@ -227,8 +222,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         // loaded, so the ERC list now contains all the correct ERC messages.
         // So we can now restore the ignore state of each ERC message from the XML file.
         mErcMsgList->restoreIgnoreState(); // can throw
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
         if (create) save(true); // write all files to harddisc
     }
@@ -263,42 +256,6 @@ Project::~Project() noexcept
     qDeleteAll(mRemovedSchematics); mRemovedSchematics.clear();
 
     qDebug() << "closed project:" << mFilepath.toNative();
-}
-
-/*****************************************************************************************
- *  Setters: Attributes
- ****************************************************************************************/
-
-void Project::setName(const QString& newName) noexcept
-{
-    if (newName != mName) {
-        mName = newName;
-        emit attributesChanged();
-    }
-}
-
-void Project::setAuthor(const QString& newAuthor) noexcept
-{
-    if (newAuthor != mAuthor) {
-        mAuthor = newAuthor;
-        emit attributesChanged();
-    }
-}
-
-void Project::setVersion(const QString& newVersion) noexcept
-{
-    if (newVersion != mVersion) {
-        mVersion = newVersion;
-        emit attributesChanged();
-    }
-}
-
-void Project::setAttributes(const AttributeList& newAttributes) noexcept
-{
-    if (newAttributes != *mAttributes) {
-        *mAttributes = newAttributes;
-        emit attributesChanged();
-    }
 }
 
 /*****************************************************************************************
@@ -552,7 +509,7 @@ void Project::save(bool toOriginal)
 
 QString Project::getUserDefinedAttributeValue(const QString& key) const noexcept
 {
-    if (std::shared_ptr<Attribute> attr = mAttributes->find(key)) {
+    if (const auto& attr = mProjectMetadata->getAttributes().find(key)) {
         return attr->getValueTr(true);
     }  else {
         return QString();
@@ -562,7 +519,7 @@ QString Project::getUserDefinedAttributeValue(const QString& key) const noexcept
 QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("PROJECT")) {
-        return mName;
+        return mProjectMetadata->getName();
     } else if (key == QLatin1String("PROJECT_DIRPATH")) {
         return mPath.toNative();
     } else if (key == QLatin1String("PROJECT_BASENAME")) {
@@ -572,17 +529,17 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
     } else if (key == QLatin1String("PROJECT_FILEPATH")) {
         return mFilepath.toNative();
     } else if (key == QLatin1String("CREATED_DATE")) {
-        return mCreated.date().toString(Qt::ISODate);
+        return mProjectMetadata->getCreated().date().toString(Qt::ISODate);
     } else if (key == QLatin1String("CREATED_TIME")) {
-        return mCreated.time().toString(Qt::ISODate);
+        return mProjectMetadata->getCreated().time().toString(Qt::ISODate);
     } else if (key == QLatin1String("MODIFIED_DATE")) {
-        return mLastModified.date().toString(Qt::ISODate);
+        return mProjectMetadata->getLastModified().date().toString(Qt::ISODate);
     } else if (key == QLatin1String("MODIFIED_TIME")) {
-        return mLastModified.time().toString(Qt::ISODate);
+        return mProjectMetadata->getLastModified().time().toString(Qt::ISODate);
     } else if (key == QLatin1String("AUTHOR")) {
-        return mAuthor;
+        return mProjectMetadata->getAuthor();
     } else if (key == QLatin1String("VERSION")) {
-        return mVersion;
+        return mProjectMetadata->getVersion();
     } else if (key == QLatin1String("PAGES")) {
         return QString::number(mSchematics.count());
     } else if (key == QLatin1String("PAGE_X_OF_Y")) {
@@ -611,36 +568,6 @@ Version Project::getProjectFileFormatVersion(const FilePath& dir)
  *  Private Methods
  ****************************************************************************************/
 
-bool Project::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
-}
-
-void Project::serialize(DomElement& root) const
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    // metadata
-    root.appendTextChild("name", mName);
-    root.appendTextChild("author", mAuthor);
-    root.appendTextChild("version", mVersion);
-    root.appendTextChild("created", mCreated);
-
-    // attributes
-    mAttributes->serialize(root);
-
-    // schematics
-    FilePath schematicsPath(mPath.getPathTo("schematics"));
-    foreach (Schematic* schematic, mSchematics)
-        root.appendTextChild("schematic", schematic->getFilePath().toRelative(schematicsPath));
-
-    // boards
-    FilePath boardsPath(mPath.getPathTo("boards"));
-    foreach (Board* board, mBoards)
-        root.appendTextChild("board", board->getFilePath().toRelative(boardsPath));
-}
-
 bool Project::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
@@ -663,16 +590,41 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     }
 
     // Save *.lpp project file
-    try
-    {
-        DomDocument doc(*serializeToDomElement("project"));
-        mXmlFile->save(doc, toOriginal);
-    }
-    catch (Exception& e)
-    {
+    try {
+        mProjectFile->setContent("LIBREPCB-PROJECT");
+        mProjectFile->save(toOriginal);
+    } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
     }
+
+    // Save core/schematics.xml
+    try {
+        QScopedPointer<DomElement> root(new DomElement("schematics"));
+        foreach (Schematic* schematic, mSchematics) {
+            root->appendTextChild("schematic", schematic->getFilePath().toRelative(mPath));
+        }
+        mSchematicsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+    } catch (const Exception& e) {
+        success = false;
+        errors.append(e.getMsg());
+    }
+
+    // Save core/boards.xml
+    try {
+        QScopedPointer<DomElement> root(new DomElement("boards"));
+        foreach (Board* board, mBoards) {
+            root->appendTextChild("board", board->getFilePath().toRelative(mPath));
+        }
+        mBoardsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+    } catch (const Exception& e) {
+        success = false;
+        errors.append(e.getMsg());
+    }
+
+    // Save metadata
+    if (!mProjectMetadata->save(toOriginal, errors))
+        success = false;
 
     // Save circuit
     if (!mCircuit->save(toOriginal, errors))
@@ -722,8 +674,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         mIsRestored = false;
 
     // update the "last modified datetime" attribute of the project
-    mLastModified = QDateTime::currentDateTime();
-    emit attributesChanged();
+    mProjectMetadata->updateLastModified();
 
     return success;
 }

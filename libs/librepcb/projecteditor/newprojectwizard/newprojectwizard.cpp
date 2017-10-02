@@ -28,6 +28,7 @@
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/smarttextfile.h>
 #include <librepcb/project/project.h>
+#include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/settings/projectsettings.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -78,8 +79,8 @@ Project* NewProjectWizard::createProject() const
     // create project and set some metadata
     FilePath projectFilePath = mPageMetadata->getFullFilePath();
     QScopedPointer<Project> project(Project::create(projectFilePath));
-    project->setName(mPageMetadata->getProjectName());
-    project->setAuthor(mPageMetadata->getProjectAuthor());
+    project->getMetadata().setName(mPageMetadata->getProjectName());
+    project->getMetadata().setAuthor(mPageMetadata->getProjectAuthor());
 
     // set project settings (copy from workspace settings)
     ProjectSettings& settings = project->getSettings();

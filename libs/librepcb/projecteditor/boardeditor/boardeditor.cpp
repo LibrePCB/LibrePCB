@@ -413,7 +413,8 @@ void BoardEditor::on_actionGenerateFabricationData_triggered()
 
 void BoardEditor::on_actionProjectProperties_triggered()
 {
-    ProjectPropertiesEditorDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
+    ProjectPropertiesEditorDialog dialog(mProject.getMetadata(),
+                                         mProjectEditor.getUndoStack(), this);
     dialog.exec();
 }
 
