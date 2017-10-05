@@ -144,6 +144,8 @@ void BoardLayerStack::addAllLayers() noexcept
     addLayer(GraphicsLayer::sBotReferences);
     addLayer(GraphicsLayer::sTopGrabAreas);
     addLayer(GraphicsLayer::sBotGrabAreas);
+    addLayer(GraphicsLayer::sTopHiddenGrabAreas, true);
+    addLayer(GraphicsLayer::sBotHiddenGrabAreas, true);
     addLayer(GraphicsLayer::sTopPlacement);
     addLayer(GraphicsLayer::sBotPlacement);
     addLayer(GraphicsLayer::sTopDocumentation);
@@ -175,10 +177,12 @@ void BoardLayerStack::addAllLayers() noexcept
 #endif
 }
 
-void BoardLayerStack::addLayer(const QString& name) noexcept
+void BoardLayerStack::addLayer(const QString& name, bool disable) noexcept
 {
     if (!getLayer(name)) {
-        addLayer(new GraphicsLayer(name));
+        QScopedPointer<GraphicsLayer> layer(new GraphicsLayer(name));
+        if (disable) layer->setEnabled(false);
+        addLayer(layer.take());
     }
 }
 

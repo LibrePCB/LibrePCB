@@ -94,7 +94,7 @@ class BoardLayerStack final : public QObject, public SerializableObject,
 
     private:
         void addAllLayers() noexcept;
-        void addLayer(const QString& name) noexcept;
+        void addLayer(const QString& name, bool disable = false) noexcept;
         void addLayer(GraphicsLayer* layer) noexcept;
 
 

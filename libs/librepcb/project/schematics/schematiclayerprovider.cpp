@@ -41,6 +41,7 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project):
     addLayer(GraphicsLayer::sSchematicSheetFrames);
     addLayer(GraphicsLayer::sSymbolOutlines);
     addLayer(GraphicsLayer::sSymbolGrabAreas);
+    addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
     addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
     addLayer(GraphicsLayer::sSymbolPinCirclesReq);
     addLayer(GraphicsLayer::sSymbolPinNames);
