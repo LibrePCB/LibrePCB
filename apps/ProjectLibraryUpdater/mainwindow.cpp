@@ -84,8 +84,9 @@ void MainWindow::on_pushButton_2_clicked()
         {
             // open the project xml file
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
-            SmartXmlFile projectFile(projectFilepath, false, true);
-            std::unique_ptr<DomDocument> projectDoc = projectFile.parseFileAndBuildDomTree();
+            FilePath coreDirPath = projectFilepath.getParentDir().getPathTo("core");
+            SmartXmlFile boardsFile(coreDirPath.getPathTo("boards.xml"), false, true);
+            std::unique_ptr<DomDocument> boardsDoc = boardsFile.parseFileAndBuildDomTree();
 
             // remove the whole library directory
             FilePath libDir = projectFilepath.getParentDir().getPathTo("library");
@@ -127,8 +128,8 @@ void MainWindow::on_pushButton_2_clicked()
             }
 
             // devices & packages
-            foreach (DomElement* node, projectDoc->getRoot().getChilds("board")) {
-                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo("boards/" % node->getText<QString>(true));
+            foreach (DomElement* node, boardsDoc->getRoot().getChilds("board")) {
+                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo(node->getText<QString>(true));
                 SmartXmlFile boardFile(boardFilePath, false, true);
                 std::unique_ptr<DomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
                 foreach (DomElement* node, boardDoc->getRoot().getChilds("device")) {
