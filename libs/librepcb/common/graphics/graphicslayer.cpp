@@ -179,6 +179,7 @@ const QStringList& GraphicsLayer::getSchematicGeometryElementLayerNames() noexce
 {
     static QStringList names = {
         sSymbolOutlines,
+        sSymbolHiddenGrabAreas,
         sSymbolNames,
         sSymbolValues,
         sSchematicSheetFrames,
@@ -201,6 +202,7 @@ const QStringList& GraphicsLayer::getBoardGeometryElementLayerNames() noexcept
         sBoardComments,
         sBoardcGuide,
         sTopPlacement,
+        sTopHiddenGrabAreas,
         sTopDocumentation,
         sTopNames,
         sTopValues,
@@ -210,6 +212,7 @@ const QStringList& GraphicsLayer::getBoardGeometryElementLayerNames() noexcept
         sTopSolderPaste,
         sTopStopMask,
         sBotPlacement,
+        sBotHiddenGrabAreas,
         sBotDocumentation,
         sBotNames,
         sBotValues,
@@ -239,6 +242,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         // symbol
         h.insert(sSymbolOutlines,           {tr("Outlines"),                    Qt::darkRed,                Qt::red,                    true});
         h.insert(sSymbolGrabAreas,          {tr("Grab Areas"),                  QColor(255, 255, 0, 30),    QColor(255, 255, 0, 50),    true});
+        h.insert(sSymbolHiddenGrabAreas,    {tr("Hidden Grab Areas"),           QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50),      false});
         h.insert(sSymbolNames,              {tr("Names"),                       QColor(32, 32, 32, 255),    Qt::darkGray,               true});
         h.insert(sSymbolValues,             {tr("Values"),                      QColor(80, 80, 80, 255),    Qt::gray,                   true});
         h.insert(sSymbolPinCirclesOpt,      {tr("Optional Pins"),               QColor(0, 255, 0, 255),     QColor(0, 255, 0, 127),     true});
@@ -264,6 +268,8 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sBotDocumentation,         {tr("Bot Documentation"),           QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
         h.insert(sTopGrabAreas,             {tr("Top Grab Areas"),              QColor(255, 255, 255, 20),  QColor(255, 255, 255, 50),  false});
         h.insert(sBotGrabAreas,             {tr("Bot Grab Areas"),              QColor(255, 255, 255, 20),  QColor(255, 255, 255, 50),  false});
+        h.insert(sTopHiddenGrabAreas,       {tr("Top Hidden Grab Areas"),       QColor(255, 255, 255, 40),  QColor(255, 255, 255, 70),  false});
+        h.insert(sBotHiddenGrabAreas,       {tr("Bot Hidden Grab Areas"),       QColor(255, 255, 255, 40),  QColor(255, 255, 255, 70),  false});
         h.insert(sTopReferences,            {tr("Top References"),              QColor(255, 255, 255, 50),  QColor(255, 255, 255, 80),  true});
         h.insert(sBotReferences,            {tr("Bot References"),              QColor(255, 255, 255, 50),  QColor(255, 255, 255, 80),  true});
         h.insert(sTopNames,                 {tr("Top Names"),                   QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
