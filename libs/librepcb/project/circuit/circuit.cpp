@@ -196,7 +196,7 @@ QString Circuit::generateAutoNetSignalName() const noexcept
     QString name;
     int i = 1;
     do {
-        name = QString("N#%1").arg(i++);
+        name = QString("N%1").arg(i++);
     } while (getNetSignalByName(name));
     return name;
 }
