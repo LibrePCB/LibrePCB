@@ -6,7 +6,7 @@ If you are a contributor and your name is not listed here, feel free to add
 yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
 ## Main Authors
-- U. Bruhin ([@ubruhin](https://github.com/))
+- U. Bruhin ([@ubruhin](https://github.com/ubruhin))
 
 ## Contributors
 - Raphael Nestler ([@rnestler](https://github.com/rnestler))
