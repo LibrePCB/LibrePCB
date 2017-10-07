@@ -81,7 +81,6 @@
     <addaction name="actionRemove"/>
     <addaction name="separator"/>
     <addaction name="actionEditNetClasses"/>
-    <addaction name="actionDesignRules"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -410,11 +409,6 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
-   </property>
-  </action>
-  <action name="actionDesignRules">
-   <property name="text">
-    <string>Design Rules</string>
    </property>
   </action>
   <action name="actionGrid">
