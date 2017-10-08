@@ -134,6 +134,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addLayer(GraphicsLayer::sSchematicSheetFrames);
     addLayer(GraphicsLayer::sSymbolOutlines);
     addLayer(GraphicsLayer::sSymbolGrabAreas);
+    addLayer(GraphicsLayer::sSymbolHiddenGrabAreas, true); // force it to be visible!
     addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
     addLayer(GraphicsLayer::sSymbolPinCirclesReq);
     addLayer(GraphicsLayer::sSymbolPinNames);
@@ -167,6 +168,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addLayer(GraphicsLayer::sBotReferences);
     addLayer(GraphicsLayer::sTopGrabAreas);
     addLayer(GraphicsLayer::sBotGrabAreas);
+    addLayer(GraphicsLayer::sTopHiddenGrabAreas, true); // force it to be visible!
+    addLayer(GraphicsLayer::sBotHiddenGrabAreas, true); // force it to be visible!
     addLayer(GraphicsLayer::sTopPlacement);
     addLayer(GraphicsLayer::sBotPlacement);
     addLayer(GraphicsLayer::sTopDocumentation);
@@ -522,9 +525,11 @@ void LibraryEditor::closeEvent(QCloseEvent* event) noexcept
     }
 }
 
-void LibraryEditor::addLayer(const QString& name) noexcept
+void LibraryEditor::addLayer(const QString& name, bool forceVisible) noexcept
 {
-    mLayers.append(new GraphicsLayer(name));
+    QScopedPointer<GraphicsLayer> layer(new GraphicsLayer(name));
+    if (forceVisible) layer->setVisible(true);
+    mLayers.append(layer.take());
 }
 
 /*****************************************************************************************

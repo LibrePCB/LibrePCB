@@ -67,6 +67,7 @@ class GraphicsLayer : public QObject
         // symbol layers
         static constexpr const char* sSymbolOutlines          = "sym_outlines";           ///< dark red lines of symbols
         static constexpr const char* sSymbolGrabAreas         = "sym_grab_areas";         ///< optional yellow area of symbols
+        static constexpr const char* sSymbolHiddenGrabAreas   = "sym_hidden_grab_areas";  ///< hidden grab areas of symbols
         static constexpr const char* sSymbolNames             = "sym_names";              ///< text #NAME
         static constexpr const char* sSymbolValues            = "sym_values";             ///< text #VALUE
         static constexpr const char* sSymbolPinCirclesOpt     = "sym_pin_circles_opt";    ///< green circle of unconnected pins
@@ -97,6 +98,8 @@ class GraphicsLayer : public QObject
         static constexpr const char* sBotDocumentation        = "bot_documentation";      ///< like placement layers, but not for silk screen
         static constexpr const char* sTopGrabAreas            = "top_grab_areas";         ///< area where devices can be dragged
         static constexpr const char* sBotGrabAreas            = "bot_grab_areas";         ///< area where devices can be dragged
+        static constexpr const char* sTopHiddenGrabAreas      = "top_hidden_grab_areas";  ///< hidden area where devices can be dragged
+        static constexpr const char* sBotHiddenGrabAreas      = "bot_hidden_grab_areas";  ///< hidden area where devices can be dragged
         static constexpr const char* sTopReferences           = "top_references";         ///< origin crosses of devices
         static constexpr const char* sBotReferences           = "bot_references";         ///< origin crosses of devices
         static constexpr const char* sTopNames                = "top_names";              ///< text, may be used for silk screen

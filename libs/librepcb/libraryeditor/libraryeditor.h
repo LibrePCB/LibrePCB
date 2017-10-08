@@ -154,7 +154,7 @@ class LibraryEditor final : public QMainWindow, public IF_GraphicsLayerProvider
         void setActiveEditorWidget(EditorWidgetBase* widget);
         void updateTabTitles() noexcept;
         void closeEvent(QCloseEvent* event) noexcept override;
-        void addLayer(const QString& name) noexcept;
+        void addLayer(const QString& name, bool forceVisible = false) noexcept;
 
 
     private: // Data
