@@ -1,0 +1,14 @@
+# Git Bugtraq Configuration for LibrePCB
+# See https://github.com/mstrap/bugtraq
+
+[bugtraq "github-pullrequests"]
+  url = "https://github.com/LibrePCB/LibrePCB/pull/%BUGID%"
+  logfilterregex = "[Pp]ull [Rr]equest #\\d+"
+  loglinkregex = "#\\d+"
+  logregex = "\\d+"
+
+[bugtraq "github-issues"]
+  url = "https://github.com/LibrePCB/LibrePCB/issues/%BUGID%"
+  logfilterregex = "(?<![Pp]ull [Rr]equest) #\\d+"
+  loglinkregex = "#\\d+"
+  logregex = "\\d+"
