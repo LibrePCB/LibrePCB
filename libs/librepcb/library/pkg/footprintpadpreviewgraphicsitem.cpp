@@ -90,7 +90,7 @@ void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptio
     painter->drawPath(mShape);
 
     // draw text
-    if ((!deviceIsPrinter) && (lod > 3)) {
+    if (mPackagePad && (!deviceIsPrinter) && (lod > 3)) {
         QColor color = mLayer->getColor(selected).lighter(150);
         color.setAlpha(255);
         painter->setPen(color);
