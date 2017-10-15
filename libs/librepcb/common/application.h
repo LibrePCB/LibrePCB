@@ -39,7 +39,7 @@ namespace librepcb {
 #if defined(qApp)
 #undef qApp
 #endif
-#define qApp (static_cast<Application *>(QCoreApplication::instance()))
+#define qApp (Application::instance())
 
 /*****************************************************************************************
  *  Class Application
@@ -76,6 +76,9 @@ class Application final : public QApplication
 
         // Operator Overloadings
         Application& operator=(const Application& rhs) = delete;
+
+        // Static Methods
+        static Application* instance() noexcept;
 
 
     private: // Data

@@ -100,6 +100,17 @@ bool Application::notify(QObject* receiver, QEvent* e)
 }
 
 /*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+Application* Application::instance() noexcept
+{
+    Application* app = dynamic_cast<Application*>(QCoreApplication::instance());
+    Q_ASSERT(app);
+    return app;
+}
+
+/*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
