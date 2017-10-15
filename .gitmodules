@@ -13,3 +13,6 @@
 [submodule "tests/data"]
 	path = tests/data
 	url = https://github.com/LibrePCB/librepcb-test-data.git
+[submodule "libs/parseagle"]
+	path = libs/parseagle
+	url = https://github.com/LibrePCB/parseagle.git
