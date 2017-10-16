@@ -5,6 +5,7 @@ SUBDIRS = \
     library \
     project \
     workspace \
+    eagleimport \
     libraryeditor \
     projecteditor \
     librarymanager
@@ -12,6 +13,7 @@ SUBDIRS = \
 library.depends = common
 project.depends = library
 workspace.depends = project
-libraryeditor.depends = workspace
-projecteditor.depends = workspace
+eagleimport.depends = workspace
+libraryeditor.depends = eagleimport
+projecteditor.depends = eagleimport
 librarymanager.depends = libraryeditor

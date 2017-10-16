@@ -23,7 +23,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QApplication>
+#include <librepcb/common/application.h>
 #include "mainwindow.h"
 
 using namespace librepcb;
@@ -34,10 +34,11 @@ using namespace librepcb;
 
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
+    Application app(argc, argv);
 
-    QCoreApplication::setOrganizationName("LibrePCB");
-    QCoreApplication::setApplicationName("EagleImport");
+    Application::setOrganizationName("LibrePCB");
+    Application::setOrganizationDomain("librepcb.org");
+    Application::setApplicationName("EagleImport");
 
     MainWindow w;
     w.show();

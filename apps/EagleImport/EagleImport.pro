@@ -13,27 +13,30 @@ GENERATED_DIR = ../../generated
 # Use common project definitions
 include(../../common.pri)
 
-# Path to UUID_List.ini
-isEmpty(UUID_LIST_FILEPATH):UUID_LIST_FILEPATH = $$absolute_path("UUID_List.ini")
-DEFINES += UUID_LIST_FILEPATH=\\\"$${UUID_LIST_FILEPATH}\\\"
-
 QT += core widgets xml network
 
 LIBS += \
     -L$${DESTDIR} \
+    -llibrepcbeagleimport \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
-    -llibrepcbcommon       # Another order could end up in "undefined reference" errors!
+    -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
+    -lparseagle
 
 INCLUDEPATH += \
-    ../../libs
+    ../../libs \
+    ../../libs/parseagle
 
 DEPENDPATH += \
+    ../../libs/librepcb/eagleimport \
     ../../libs/librepcb/library \
-    ../../libs/librepcb/common
+    ../../libs/librepcb/common \
+    ../../libs/parseagle
 
 PRE_TARGETDEPS += \
+    $${DESTDIR}/liblibrepcbeagleimport.a \
     $${DESTDIR}/liblibrepcblibrary.a \
-    $${DESTDIR}/liblibrepcbcommon.a
+    $${DESTDIR}/liblibrepcbcommon.a \
+    $${DESTDIR}/libparseagle.a
 
 SOURCES += \
     main.cpp \
