@@ -117,6 +117,17 @@ VAlign VAlign::deserializeFromString(const QString& align)
  *  Class VAlign
  ****************************************************************************************/
 
+Alignment::Alignment(const SExpression& node)
+{
+    try {
+        mH = node.getChildByIndex(0).getValue<HAlign>(true);
+        mV = node.getChildByIndex(1).getValue<VAlign>(true);
+    } catch (const Exception& e) {
+        throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
+                             QString(), e.getMsg());
+    }
+}
+
 Alignment& Alignment::mirror() noexcept
 {
     mH.mirror();
@@ -134,6 +145,12 @@ Alignment& Alignment::mirrorV() noexcept
 {
     mV.mirror();
     return *this;
+}
+
+void Alignment::serialize(SExpression& root) const
+{
+    root.appendToken(mH);
+    root.appendToken(mV);
 }
 
 /*****************************************************************************************

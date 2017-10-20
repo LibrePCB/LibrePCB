@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "exceptions.h"
+#include "fileio/serializableobject.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -115,7 +115,7 @@ class VAlign final
  * @author ubruhin
  * @date 2015-02-27
  */
-class Alignment final
+class Alignment final : public SerializableObject
 {
         Q_DECLARE_TR_FUNCTIONS(Alignment)
 
@@ -124,6 +124,7 @@ class Alignment final
         Alignment() noexcept : mH(HAlign::left()), mV(VAlign::bottom()) {}
         Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
         explicit Alignment(const HAlign& h, const VAlign& v) noexcept : mH(h), mV(v) {}
+        explicit Alignment(const SExpression& node);
         const HAlign getH() const noexcept {return mH;}
         const VAlign getV() const noexcept {return mV;}
         void setH(const HAlign& h) noexcept {mH = h;}
@@ -135,6 +136,10 @@ class Alignment final
         Alignment mirrored() const noexcept {return Alignment(*this).mirror();}
         Alignment mirroredH() const noexcept {return Alignment(*this).mirrorH();}
         Alignment mirroredV() const noexcept {return Alignment(*this).mirrorV();}
+
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(SExpression& root) const override;
+
         Alignment& operator=(const Alignment& rhs) noexcept {mH = rhs.mH; mV = rhs.mV; return *this;}
         bool operator==(const Alignment& rhs) const noexcept {return mH == rhs.mH && mV == rhs.mV;}
         bool operator!=(const Alignment& rhs) const noexcept {return mH != rhs.mH || mV != rhs.mV;}
