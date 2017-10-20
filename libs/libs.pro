@@ -5,6 +5,7 @@ SUBDIRS = \
     googletest \
     librepcb \
     parseagle \
-    quazip
+    quazip \
+    sexpresso
 
-librepcb.depends = parseagle hoedown quazip
+librepcb.depends = parseagle hoedown quazip sexpresso

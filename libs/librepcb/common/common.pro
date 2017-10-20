@@ -24,7 +24,8 @@ QT += core widgets xml opengl network sql
 CONFIG += staticlib
 
 INCLUDEPATH += \
-    ../../quazip
+    ../../quazip \
+    ../../sexpresso \
 
 SOURCES += \
     alignment.cpp \

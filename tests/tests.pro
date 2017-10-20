@@ -29,6 +29,7 @@ LIBS += \
     -llibrepcbproject \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
+    -lsexpresso \
     -lparseagle -lquazip -lz
 
 INCLUDEPATH += \
@@ -46,6 +47,7 @@ DEPENDPATH += \
     ../libs/librepcb/common \
     ../libs/parseagle \
     ../libs/quazip \
+    ../libs/sexpresso \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
@@ -55,6 +57,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a \
     $${DESTDIR}/libquazip.a \
+    $${DESTDIR}/libsexpresso.a \
 
 SOURCES += \
     common/applicationtest.cpp \
