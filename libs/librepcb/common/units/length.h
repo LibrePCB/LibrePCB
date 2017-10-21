@@ -229,7 +229,7 @@ class Length
          *
          * @see #setLengthMm(const QString&), #fromMm(const QString&, const Length&)
          */
-        QString toMmString() const noexcept {return QLocale::c().toString(toMm(), 'f', 6);}
+        QString toMmString() const noexcept;
 
         /**
          * @brief Get the length in inches

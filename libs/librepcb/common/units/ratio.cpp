@@ -32,6 +32,15 @@ namespace librepcb {
  *  Class Ratio
  ****************************************************************************************/
 
+QString Ratio::toNormalizedString() const noexcept
+{
+    QString str = QLocale::c().toString(toNormalized(), 'f', 6);
+    for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
+        str.chop(1);
+    }
+    return str;
+}
+
 // Static Methods
 
 Ratio Ratio::fromPercent(qreal percent) noexcept

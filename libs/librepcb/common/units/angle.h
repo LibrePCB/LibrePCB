@@ -180,7 +180,7 @@ class Angle
          *
          * @todo don't use double for this purpose!
          */
-        QString toDegString() const noexcept {return QLocale::c().toString(toDeg(), 'f', 6);}
+        QString toDegString() const noexcept;
 
         /**
          * @brief Get the angle in radians

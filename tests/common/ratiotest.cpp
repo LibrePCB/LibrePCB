@@ -210,9 +210,9 @@ TEST(RatioTest, testOperatorBool)
 
 INSTANTIATE_TEST_CASE_P(RatioTest, RatioTest, ::testing::Values(
     //              {            ratio,        ppm,     percent,  normalized,        string}
-    RatioTestData_t({Ratio(         0),          0,         0.0,         0.0,    "0.000000"}),
-    RatioTestData_t({Ratio(    500000),     500000,        50.0,         0.5,    "0.500000"}),
-    RatioTestData_t({Ratio(   1000000),    1000000,       100.0,         1.0,    "1.000000"}),
+    RatioTestData_t({Ratio(         0),          0,         0.0,         0.0,    "0.0"     }),
+    RatioTestData_t({Ratio(    500000),     500000,        50.0,         0.5,    "0.5"     }),
+    RatioTestData_t({Ratio(   1000000),    1000000,       100.0,         1.0,    "1.0"     }),
     RatioTestData_t({Ratio( 123456789),  123456789,  12345.6789,  123.456789,  "123.456789"}),
     RatioTestData_t({Ratio(-987654321), -987654321, -98765.4321, -987.654321, "-987.654321"})
 ));
