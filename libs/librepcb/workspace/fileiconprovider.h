@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTTREEITEM_H
-#define LIBREPCB_PROJECTTREEITEM_H
+#ifndef LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
+#define LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/filepath.h>
+#include <QtWidgets>
+#include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -33,56 +34,23 @@ namespace librepcb {
 namespace workspace {
 
 /*****************************************************************************************
- *  Class ProjectTreeItem
+ *  Class FileIconProvider
  ****************************************************************************************/
 
 /**
- * @brief The ProjectTreeItem class
+ * @brief The FileIconProvider class
  *
  * @author ubruhin
- *
- * @date 2014-06-24
+ * @date 2017-10-22
  */
-class ProjectTreeItem
+class FileIconProvider final : public QFileIconProvider
 {
     public:
+        FileIconProvider() noexcept;
+        ~FileIconProvider() noexcept;
 
-        // Types
-        enum ItemType_t {
-            File,
-            Folder,
-            ProjectFile,
-            ProjectFolder,
-        };
-
-        // Constructors / Destructor
-        ProjectTreeItem(ProjectTreeItem* parent, const FilePath& filepath);
-        ~ProjectTreeItem();
-
-        // Getters
-        ItemType_t getType()                    const {return mType;}
-        const FilePath& getFilePath()           const {return mFilePath;}
-        unsigned int getDepth()                 const {return mDepth;}
-        int getColumnCount()                    const {return 1;}
-        ProjectTreeItem* getParent()            const {return mParent;}
-        ProjectTreeItem* getChild(int index)    const {return mChilds.value(index);}
-        int getChildCount()                     const {return mChilds.count();}
-        int getChildNumber()                    const;
-        QVariant data(int role) const;
-
-    private:
-
-        // make some methods inaccessible...
-        ProjectTreeItem();
-        ProjectTreeItem(const ProjectTreeItem& other);
-        ProjectTreeItem& operator=(const ProjectTreeItem& rhs);
-
-        FilePath mFilePath;
-        ProjectTreeItem* mParent;
-        ItemType_t mType;
-        QMimeType mMimeType;
-        unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
-        QList<ProjectTreeItem*> mChilds;
+        // Inherited Methods
+        virtual QIcon icon(const QFileInfo& info) const noexcept override;
 };
 
 /*****************************************************************************************
@@ -92,4 +60,4 @@ class ProjectTreeItem
 } // namespace workspace
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECTTREEITEM_H
+#endif // LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H

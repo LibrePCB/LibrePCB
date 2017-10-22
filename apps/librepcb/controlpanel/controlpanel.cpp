@@ -29,7 +29,8 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/project/project.h>
 #include <librepcb/workspace/projecttreemodel.h>
-#include <librepcb/workspace/projecttreeitem.h>
+#include <librepcb/workspace/recentprojectsmodel.h>
+#include <librepcb/workspace/favoriteprojectsmodel.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/librarymanager/librarymanager.h>
 #include <librepcb/library/library.h>
@@ -37,6 +38,7 @@
 #include <librepcb/projecteditor/projecteditor.h>
 #include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcb/common/application.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include "../markdown/markdownconverter.h"
 
 /*****************************************************************************************
@@ -104,7 +106,14 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
             this, &ControlPanel::openLibraryEditor);
 
+    // build projects file tree
     mUi->projectTreeView->setModel(&mWorkspace.getProjectTreeModel());
+    mUi->projectTreeView->setRootIndex(mWorkspace.getProjectTreeModel().index(mWorkspace.getProjectsPath().toStr()));
+    for (int i = 1; i < mUi->projectTreeView->header()->count(); ++i) {
+        mUi->projectTreeView->hideColumn(i);
+    }
+
+    // load recent and favorite poject models
     mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
     mUi->favoriteProjectsListView->setModel(&mWorkspace.getFavoriteProjectsModel());
 
@@ -175,16 +184,11 @@ void ControlPanel::saveSettings()
     clientSettings.setValue("splitter_v_state", mUi->splitter_v->saveState());
 
     // projects treeview (expanded items)
-    ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
-    if (model)
-    {
+    if (ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model())) {
         QStringList list;
-        foreach (QModelIndex index, model->getPersistentIndexList())
-        {
-            if (mUi->projectTreeView->isExpanded(index))
-            {
-                list.append(FilePath(index.data(Qt::UserRole).toString())
-                            .toRelative(mWorkspace.getPath()));
+        foreach (QModelIndex index, model->getPersistentIndexList()) {
+            if (mUi->projectTreeView->isExpanded(index)) {
+                list.append(FilePath(model->filePath(index)).toRelative(mWorkspace.getPath()));
             }
         }
         clientSettings.setValue("expanded_projecttreeview_items", QVariant::fromValue(list));
@@ -205,18 +209,12 @@ void ControlPanel::loadSettings()
     mUi->splitter_v->restoreState(clientSettings.value("splitter_v_state").toByteArray());
 
     // projects treeview (expanded items)
-    ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model());
-    if (model)
-    {
+    if (ProjectTreeModel* model = dynamic_cast<ProjectTreeModel*>(mUi->projectTreeView->model())) {
         QStringList list = clientSettings.value("expanded_projecttreeview_items").toStringList();
-        foreach (QString item, list)
-        {
+        foreach (QString item, list) {
             FilePath filepath = FilePath::fromRelative(mWorkspace.getPath(), item);
-            QModelIndexList items = model->match(model->index(0, 0), Qt::UserRole,
-                QVariant::fromValue(filepath.toStr()), 1,
-                Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
-            if (!items.isEmpty())
-                mUi->projectTreeView->setExpanded(items.first(), true);
+            QModelIndex index = model->index(filepath.toStr());
+            mUi->projectTreeView->setExpanded(index, true);
         }
     }
 
@@ -226,8 +224,8 @@ void ControlPanel::loadSettings()
 void ControlPanel::showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept
 {
     if (projectFilePath.isValid()) {
-        FilePath readmeFilePath = projectFilePath.getParentDir().getPathTo("README.md");
-        mUi->textBrowser->setSearchPaths(QStringList(projectFilePath.getParentDir().toStr()));
+        FilePath readmeFilePath = projectFilePath.getPathTo("README.md");
+        mUi->textBrowser->setSearchPaths(QStringList(projectFilePath.toStr()));
         mUi->textBrowser->setHtml(MarkdownConverter::convertMarkdownToHtml(readmeFilePath));
     } else {
         mUi->textBrowser->clear();
@@ -237,6 +235,21 @@ void ControlPanel::showProjectReadmeInBrowser(const FilePath& projectFilePath) n
 /*****************************************************************************************
  *  Project Management
  ****************************************************************************************/
+
+ProjectEditor* ControlPanel::newProject(const FilePath& parentDir) noexcept
+{
+    NewProjectWizard wizard(mWorkspace, this);
+    wizard.setLocation(parentDir);
+    if (wizard.exec() == QWizard::Accepted) {
+        try {
+            QScopedPointer<Project> project(wizard.createProject()); // can throw
+            return openProject(*project.take());
+        } catch (Exception& e) {
+            QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
+        }
+    }
+    return nullptr;
+}
 
 ProjectEditor* ControlPanel::openProject(Project& project) noexcept
 {
@@ -408,16 +421,7 @@ void ControlPanel::on_actionAbout_triggered()
 
 void ControlPanel::on_actionNew_Project_triggered()
 {
-    NewProjectWizard wizard(mWorkspace, this);
-    wizard.setLocation(mWorkspace.getProjectsPath());
-    if (wizard.exec() == QWizard::Accepted) {
-        try {
-            QScopedPointer<Project> project(wizard.createProject()); // can throw
-            openProject(*project.take());
-        } catch (Exception& e) {
-            QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
-        }
-    }
+    newProject(mWorkspace.getProjectsPath());
 }
 
 void ControlPanel::on_actionOpen_Project_triggered()
@@ -462,135 +466,112 @@ void ControlPanel::on_actionSwitch_Workspace_triggered()
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index)
 {
-    ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
-    if (!item) return;
-
-    if ((item->getType() == ProjectTreeItem::ProjectFolder) || (item->getType() == ProjectTreeItem::ProjectFile)) {
-        showProjectReadmeInBrowser(item->getFilePath());
+    FilePath fp(mWorkspace.getProjectTreeModel().filePath(index));
+    if ((fp.getSuffix() == "lpp") || (fp.getFilename() == "README.md")) {
+        showProjectReadmeInBrowser(fp.getParentDir());
     } else {
-        showProjectReadmeInBrowser(FilePath());
+        showProjectReadmeInBrowser(fp);
     }
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index)
 {
-    ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
-
-    if (!item)
-        return;
-
-    switch (item->getType())
-    {
-        case ProjectTreeItem::File:
-            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFilePath().toStr()));
-            break;
-
-        case ProjectTreeItem::Folder:
-        case ProjectTreeItem::ProjectFolder:
-            mUi->projectTreeView->setExpanded(index, !mUi->projectTreeView->isExpanded(index));
-            break;
-
-        case ProjectTreeItem::ProjectFile:
-            openProject(item->getFilePath());
-            break;
-
-        default:
-            break;
+    FilePath fp(mWorkspace.getProjectTreeModel().filePath(index));
+    if (fp.isExistingDir()) {
+        mUi->projectTreeView->setExpanded(index, !mUi->projectTreeView->isExpanded(index));
+    } else if (fp.getSuffix() == "lpp") {
+        openProject(fp);
+    } else {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr()));
     }
 }
 
 void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& pos)
 {
-    // get clicked tree item
+    // get clicked tree item filepath
     QModelIndex index = mUi->projectTreeView->indexAt(pos);
-    if (!index.isValid()) return;
-    ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
-    if (!item) return;
+    FilePath fp = index.isValid()
+                  ? FilePath(mWorkspace.getProjectTreeModel().filePath(index))
+                  : mWorkspace.getProjectsPath();
+    bool isProjectFile = Project::isProjectFile(fp);
+    bool isProjectDir = Project::isProjectDirectory(fp);
+    bool isInProjectDir = Project::isFilePathInsideProjectDirectory(fp);
+
 
     // build context menu with actions
     QMenu menu;
-    QMap<unsigned int, QAction*> actions;
-    if (item->getType() == ProjectTreeItem::ProjectFile)
-    {
-        if (!getOpenProject(item->getFilePath()))
-        {
-            // this project is not open
-            actions.insert(1, menu.addAction(tr("Open Project")));
-            actions.value(1)->setIcon(QIcon(":/img/actions/open.png"));
+    enum Action {OpenProject, CloseProject, AddFavorite, RemoveFavorite, // on projects
+                 NewProject, NewFolder,                                  // on folders
+                 Open, Remove};                                          // on folders+files
+    if (isProjectFile) {
+        if (!getOpenProject(fp)) {
+            menu.addAction(QIcon(":/img/actions/open.png"), tr("Open Project"))->setData(OpenProject);
+            menu.setDefaultAction(menu.actions().last());
+        } else {
+            menu.addAction(QIcon(":/img/actions/close.png"), tr("Close Project"))->setData(CloseProject);
         }
-        else
-        {
-            // this project is open
-            actions.insert(2, menu.addAction(tr("Close Project")));
-            actions.value(2)->setIcon(QIcon(":/img/actions/close.png"));
+        menu.addSeparator();
+        if (mWorkspace.isFavoriteProject(fp)) {
+            menu.addAction(QIcon(":/img/actions/bookmark.png"), tr("Remove from favorites"))->setData(RemoveFavorite);
+        } else {
+            menu.addAction(QIcon(":/img/actions/bookmark_gray.png"), tr("Add to favorites"))->setData(AddFavorite);
         }
-        if (mWorkspace.isFavoriteProject(item->getFilePath()))
-        {
-            // this is a favorite project
-            actions.insert(3, menu.addAction(tr("Remove from favorites")));
-            actions.value(3)->setIcon(QIcon(":/img/actions/bookmark.png"));
-        }
-        else
-        {
-            // this is not a favorite project
-            actions.insert(4, menu.addAction(tr("Add to favorites")));
-            actions.value(4)->setIcon(QIcon(":/img/actions/bookmark_gray.png"));
-        }
-        actions.insert(100, menu.addSeparator());
+    } else {
+        menu.addAction(QIcon(":/img/actions/open.png"), tr("Open"))->setData(Open);
+        if (fp.isExistingFile()) {menu.setDefaultAction(menu.actions().last());}
     }
-    else
-    {
-        // a folder or a file is selected
-        actions.insert(10, menu.addAction(tr("New Project")));
-        actions.value(10)->setIcon(QIcon(":/img/actions/new.png"));
+    menu.addSeparator();
+    if (fp.isExistingDir() && (!isProjectDir) && (!isInProjectDir)) {
+        menu.addAction(QIcon(":/img/places/project_folder.png"), tr("New Project"))->setData(NewProject);
+        menu.addAction(QIcon(":/img/actions/new_folder.png"), tr("New Folder"))->setData(NewFolder);
     }
-    actions.insert(20, menu.addAction(tr("New Folder")));
-    actions.value(20)->setIcon(QIcon(":/img/actions/new_folder.png"));
-    actions.insert(101, menu.addSeparator());
-    actions.insert(21, menu.addAction(tr("Open Directory")));
-    actions.value(21)->setIcon(QIcon(":/img/places/folder_open.png"));
-    actions.insert(102, menu.addSeparator());
+    if (fp != mWorkspace.getProjectsPath()) {
+        menu.addSeparator();
+        menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"))->setData(Remove);
+    }
 
     // show context menu and execute the clicked action
-    switch (actions.key(menu.exec(QCursor::pos()), 0))
-    {
-        case 1: // open project
-            openProject(item->getFilePath());
+    QAction* action = menu.exec(QCursor::pos());
+    if (!action) return;
+    switch (action->data().toInt()) {
+        case OpenProject: openProject(fp); break;
+        case CloseProject: closeProject(fp, true); break;
+        case AddFavorite: mWorkspace.addFavoriteProject(fp); break;
+        case RemoveFavorite: mWorkspace.removeFavoriteProject(fp); break;
+        case NewProject: newProject(fp); break;
+        case NewFolder: QDir(fp.toStr()).mkdir(QInputDialog::getText(this, tr("New Folder"), tr("Name:"))); break;
+        case Open: QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr())); break;
+        case Remove: {
+            QMessageBox::StandardButton btn = QMessageBox::question(this, tr("Remove"),
+                QString(tr("Are you really sure to remove following file or directory?\n\n"
+                           "%1\n\nWarning: This cannot be undone!")).arg(fp.toNative()));
+            if (btn == QMessageBox::Yes) {
+                try {
+                    if (fp.isExistingDir()) {
+                        FileUtils::removeDirRecursively(fp);
+                    } else {
+                        FileUtils::removeFile(fp);
+                    }
+                } catch (const Exception& e) {
+                    QMessageBox::critical(this, tr("Error"), e.getMsg());
+                }
+            }
             break;
-        case 2: // close project
-            closeProject(item->getFilePath(), true);
-            break;
-        case 3: // remove project from favorites
-            mWorkspace.removeFavoriteProject(item->getFilePath());
-            break;
-        case 4: // add project to favorites
-            mWorkspace.addFavoriteProject(item->getFilePath());
-            break;
-        case 10: // new project
-            break;
-        case 20: // new folder
-            break;
-        case 21: // open project directory
-            QDesktopServices::openUrl(QUrl::fromLocalFile(item->getFilePath().toStr()));
-            break;
-        default:
-            break;
+        }
+        default: qCritical() << "Unknown action triggered"; break;
     }
-
-    // clean up
-    qDeleteAll(actions);
 }
 
 void ControlPanel::on_recentProjectsListView_entered(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    showProjectReadmeInBrowser(filepath);
+    showProjectReadmeInBrowser(filepath.getParentDir());
 }
 
 void ControlPanel::on_favoriteProjectsListView_entered(const QModelIndex &index)
 {
     FilePath filepath(index.data(Qt::UserRole).toString());
-    showProjectReadmeInBrowser(filepath);
+    showProjectReadmeInBrowser(filepath.getParentDir());
 }
 
 void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex &index)

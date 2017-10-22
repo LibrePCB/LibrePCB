@@ -111,9 +111,9 @@ class Workspace final : public QObject
          */
         const FilePath& getLibrariesPath() const {return mLibrariesPath;}
 
-        QAbstractItemModel& getProjectTreeModel() const noexcept;
-        QAbstractItemModel& getRecentProjectsModel() const noexcept;
-        QAbstractItemModel& getFavoriteProjectsModel() const noexcept;
+        ProjectTreeModel& getProjectTreeModel() const noexcept;
+        RecentProjectsModel& getRecentProjectsModel() const noexcept;
+        FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
 
         /**
          * @brief Get the workspace settings

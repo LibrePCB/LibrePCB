@@ -17,51 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTTREEMODEL_H
-#define LIBREPCB_PROJECTTREEMODEL_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
+#include "fileiconprovider.h"
+#include <librepcb/project/project.h>
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-class Workspace;
-
 /*****************************************************************************************
- *  Class ProjectTreeModel
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The ProjectTreeModel class
- *
- * @author ubruhin
- *
- * @date 2014-06-24
- */
-class ProjectTreeModel : public QFileSystemModel
+FileIconProvider::FileIconProvider() noexcept :
+    QFileIconProvider()
 {
-    public:
+}
 
-        // Constructors / Destructor
-        ProjectTreeModel() = delete;
-        ProjectTreeModel(const ProjectTreeModel& other) = delete;
-        explicit ProjectTreeModel(const Workspace& workspace, QObject* parent = nullptr) noexcept;
-        ~ProjectTreeModel() noexcept;
+FileIconProvider::~FileIconProvider() noexcept
+{
+}
 
-        // General methods
-        QModelIndexList getPersistentIndexList() const {return persistentIndexList();}
-        QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+/*****************************************************************************************
+ *  Inherited Methods
+ ****************************************************************************************/
 
-        // Operator Overloadings
-        ProjectTreeModel& operator=(const ProjectTreeModel& rhs) = delete;
-};
+QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept
+{
+    if (info.isFile()) {
+        if (info.suffix() == "lpp") {
+            return QIcon(":/img/app/librepcb.png");
+        } else {
+            return QIcon(":/img/places/file.png");
+        }
+    } else if (info.isDir()) {
+        if (project::Project::isProjectDirectory(FilePath(info.absoluteFilePath()))) {
+            return QIcon(":/img/places/project_folder.png");
+        } else if (info.isDir()) {
+            return QIcon(":/img/places/folder.png");
+        }
+    }
+
+    return QFileIconProvider::icon(info);
+}
 
 /*****************************************************************************************
  *  End of File
@@ -69,5 +72,3 @@ class ProjectTreeModel : public QFileSystemModel
 
 } // namespace workspace
 } // namespace librepcb
-
-#endif // LIBREPCB_PROJECTTREEMODEL_H

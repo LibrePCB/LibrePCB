@@ -23,8 +23,8 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "projecttreemodel.h"
+#include "fileiconprovider.h"
 #include "workspace.h"
-#include "projecttreeitem.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,93 +36,28 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectTreeModel::ProjectTreeModel(const Workspace& workspace) :
-    QAbstractItemModel(0)
+ProjectTreeModel::ProjectTreeModel(const Workspace& workspace, QObject* parent) noexcept :
+    QFileSystemModel(parent)
 {
-    mRootProjectDirectory = new ProjectTreeItem(0, workspace.getProjectsPath());
+    setIconProvider(new FileIconProvider());
+    setRootPath(workspace.getProjectsPath().toStr());
 }
 
-ProjectTreeModel::~ProjectTreeModel()
+ProjectTreeModel::~ProjectTreeModel() noexcept
 {
-    delete mRootProjectDirectory;       mRootProjectDirectory = 0;
 }
 
 /*****************************************************************************************
  *  Inherited Methods
  ****************************************************************************************/
 
-int ProjectTreeModel::columnCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent);
-    return mRootProjectDirectory->getColumnCount();
-}
-
-int ProjectTreeModel::rowCount(const QModelIndex& parent) const
-{
-    ProjectTreeItem* parentItem = getItem(parent);
-    return parentItem->getChildCount();
-}
-
-QModelIndex ProjectTreeModel::index(int row, int column, const QModelIndex& parent) const
-{
-    if (parent.isValid() && parent.column() != 0)
-        return QModelIndex();
-
-    ProjectTreeItem* parentItem = getItem(parent);
-    ProjectTreeItem* childItem = parentItem->getChild(row);
-
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
-}
-
-QModelIndex ProjectTreeModel::parent(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    ProjectTreeItem* childItem = getItem(index);
-    ProjectTreeItem* parentItem = childItem->getParent();
-
-    if (parentItem == mRootProjectDirectory)
-        return QModelIndex();
-
-    return createIndex(parentItem->getChildNumber(), 0, parentItem);
-}
-
 QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal))
-    {
-        switch (section)
-        {
-            case 0:
-                return QString("Workspace Projects");
-        }
+    if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal) && (section == 0)){
+        return QString("Workspace Projects");
+    } else {
+        return QFileSystemModel::headerData(section, orientation, role);
     }
-    return QVariant();
-}
-
-QVariant ProjectTreeModel::data(const QModelIndex& index, int role) const
-{
-    ProjectTreeItem* item = getItem(index);
-    return item->data(role);
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-ProjectTreeItem* ProjectTreeModel::getItem(const QModelIndex& index) const
-{
-    if (index.isValid())
-    {
-        ProjectTreeItem* item = static_cast<ProjectTreeItem*>(index.internalPointer());
-        if (item)
-            return item;
-    }
-    return mRootProjectDirectory;
 }
 
 /*****************************************************************************************

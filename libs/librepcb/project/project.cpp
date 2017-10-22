@@ -73,7 +73,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         FileUtils::makePath(mPath); // can throw
     } else {
         // check if the project does exist
-        if (!isValidProjectDirectory(mPath)) {
+        if (!isProjectDirectory(mPath)) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The directory \"%1\" does not contain a LibrePCB project."))
                 .arg(mPath.toNative()));
@@ -553,7 +553,25 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
  *  Static Methods
  ****************************************************************************************/
 
-bool Project::isValidProjectDirectory(const FilePath& dir) noexcept
+bool Project::isFilePathInsideProjectDirectory(const FilePath& fp) noexcept
+{
+    FilePath parent = fp.getParentDir();
+    if (isProjectDirectory(parent)) {
+        return true;
+    } else if (parent.isValid() && !parent.isRoot()) {
+        return isFilePathInsideProjectDirectory(parent);
+    } else {
+        return false;
+    }
+}
+
+bool Project::isProjectFile(const FilePath& file) noexcept
+{
+    return file.getSuffix() == "lpp" && file.isExistingFile()
+            && isProjectDirectory(file.getParentDir());
+}
+
+bool Project::isProjectDirectory(const FilePath& dir) noexcept
 {
     return dir.getPathTo(".librepcb-project").isExistingFile();
 }

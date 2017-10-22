@@ -165,17 +165,17 @@ Workspace::~Workspace() noexcept
  *  Getters
  ****************************************************************************************/
 
-QAbstractItemModel& Workspace::getProjectTreeModel() const noexcept
+ProjectTreeModel& Workspace::getProjectTreeModel() const noexcept
 {
     return *mProjectTreeModel;
 }
 
-QAbstractItemModel& Workspace::getRecentProjectsModel() const noexcept
+RecentProjectsModel& Workspace::getRecentProjectsModel() const noexcept
 {
     return *mRecentProjectsModel;
 }
 
-QAbstractItemModel& Workspace::getFavoriteProjectsModel() const noexcept
+FavoriteProjectsModel& Workspace::getFavoriteProjectsModel() const noexcept
 {
     return *mFavoriteProjectsModel;
 }

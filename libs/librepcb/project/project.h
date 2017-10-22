@@ -387,7 +387,9 @@ class Project final : public QObject, public AttributeProvider
         static Project* create(const FilePath& filepath)
         {return new Project(filepath, true, false);}
 
-        static bool isValidProjectDirectory(const FilePath& dir) noexcept;
+        static bool isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
+        static bool isProjectFile(const FilePath& file) noexcept;
+        static bool isProjectDirectory(const FilePath& dir) noexcept;
         static Version getProjectFileFormatVersion(const FilePath& dir);
 
 

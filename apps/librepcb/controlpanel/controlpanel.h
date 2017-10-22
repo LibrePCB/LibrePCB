@@ -135,6 +135,8 @@ class ControlPanel final : public QMainWindow
 
         // Project Management
 
+        project::editor::ProjectEditor* newProject(const FilePath& parentDir) noexcept;
+
         /**
          * @brief Open a project with the editor (or bring an already opened editor to front)
          *

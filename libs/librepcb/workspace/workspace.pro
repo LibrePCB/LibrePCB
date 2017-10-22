@@ -22,11 +22,11 @@ INCLUDEPATH += \
 
 SOURCES += \
     favoriteprojectsmodel.cpp \
+    fileiconprovider.cpp \
     library/cat/categorytreeitem.cpp \
     library/cat/categorytreemodel.cpp \
     library/workspacelibrarydb.cpp \
     library/workspacelibraryscanner.cpp \
-    projecttreeitem.cpp \
     projecttreemodel.cpp \
     recentprojectsmodel.cpp \
     settings/items/wsi_appdefaultmeasurementunits.cpp \
@@ -44,11 +44,11 @@ SOURCES += \
 
 HEADERS += \
     favoriteprojectsmodel.h \
+    fileiconprovider.h \
     library/cat/categorytreeitem.h \
     library/cat/categorytreemodel.h \
     library/workspacelibrarydb.h \
     library/workspacelibraryscanner.h \
-    projecttreeitem.h \
     projecttreemodel.h \
     recentprojectsmodel.h \
     settings/items/wsi_appdefaultmeasurementunits.h \
