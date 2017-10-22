@@ -46,7 +46,7 @@ namespace editor {
 
 class NewProjectWizardPage_Metadata;
 class NewProjectWizardPage_Initialization;
-class NewProjectWizardPage_VersionControl;
+//class NewProjectWizardPage_VersionControl;
 
 namespace Ui {
 class NewProjectWizard;
@@ -90,7 +90,7 @@ class NewProjectWizard final : public QWizard
         QScopedPointer<Ui::NewProjectWizard> mUi;
         NewProjectWizardPage_Metadata* mPageMetadata;
         NewProjectWizardPage_Initialization* mPageInitialization;
-        NewProjectWizardPage_VersionControl* mPageVersionControl;
+        //NewProjectWizardPage_VersionControl* mPageVersionControl;
 };
 
 /*****************************************************************************************

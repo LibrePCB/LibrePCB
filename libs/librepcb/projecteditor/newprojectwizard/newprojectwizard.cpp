@@ -34,7 +34,7 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include "newprojectwizardpage_metadata.h"
 #include "newprojectwizardpage_initialization.h"
-#include "newprojectwizardpage_versioncontrol.h"
+//#include "newprojectwizardpage_versioncontrol.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -54,7 +54,7 @@ NewProjectWizard::NewProjectWizard(const workspace::Workspace& ws, QWidget* pare
 
     addPage(mPageMetadata = new NewProjectWizardPage_Metadata(this));
     addPage(mPageInitialization = new NewProjectWizardPage_Initialization(this));
-    addPage(mPageVersionControl = new NewProjectWizardPage_VersionControl(this));
+    //addPage(mPageVersionControl = new NewProjectWizardPage_VersionControl(this));
 }
 
 NewProjectWizard::~NewProjectWizard() noexcept
@@ -130,7 +130,7 @@ Project* NewProjectWizard::createProject() const
     }
 
     // initialize git repository
-    if (mPageVersionControl->getInitGitRepository()) {
+    //if (mPageVersionControl->getInitGitRepository()) {
         // copy .gitignore
         try {
             FilePath source = qApp->getResourcesDir().getPathTo("project/gitignore_template");
@@ -149,7 +149,7 @@ Project* NewProjectWizard::createProject() const
         }
         // TODO: git init
         // TODO: create initial commit
-    }
+    //}
 
     // all done, return the new project
     return project.take();
