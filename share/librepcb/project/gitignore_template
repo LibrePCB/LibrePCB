@@ -1,7 +1,8 @@
-# Note: 
-# This file may be overwritten by LibrePCB when upgrading the project to a newer version.
-# So, if you make any changes in this file, you should review/correct it after an upgrade.
-# If you think that something is missing here, please open a new issue on our issue tracker.
+# Note:
+# This file may be overwritten by LibrePCB when upgrading the project to a newer
+# version. So, if you make any changes in this file, you should review/correct
+# it after an upgrade. If you think that something is missing here, please open
+# a new issue on our issue tracker: https://github.com/LibrePCB/LibrePCB/issues
 
 # LibrePCB files
 user/

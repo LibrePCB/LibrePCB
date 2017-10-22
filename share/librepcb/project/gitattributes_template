@@ -1,7 +1,10 @@
-# Note: 
-# This file may be overwritten by LibrePCB when upgrading the project to a newer version.
-# So, if you make any changes in this file, you should review/correct it after an upgrade.
-# If you think that something is missing here, please open a new issue on our issue tracker.
+# Note:
+# This file may be overwritten by LibrePCB when upgrading the project to a newer
+# version. So, if you make any changes in this file, you should review/correct
+# it after an upgrade. If you think that something is missing here, please open
+# a new issue on our issue tracker: https://github.com/LibrePCB/LibrePCB/issues
 
-# Disable automatic end-of-line conversion for all files (same as "core.autocrlf=false").
+# Disable automatic end-of-line conversion for all files. This is to prevent Git
+# from (silently) modifying files which are read and written by LibrePCB. Do not
+# remove this line (or file) as is could lead into annoying and wrong behavior!
 * -text
