@@ -76,8 +76,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
 
     // Add Dock Widgets
-    mErcMsgDock = new ErcMsgDock(mProject);
-    addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
     mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
     connect(mUnplacedComponentsDock, &UnplacedComponentsDock::addDeviceTriggered,
             [this](ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt)
@@ -85,6 +83,11 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
     mBoardLayersDock = new BoardLayersDock(*this);
     addDockWidget(Qt::RightDockWidgetArea, mBoardLayersDock, Qt::Vertical);
+    tabifyDockWidget(mUnplacedComponentsDock, mBoardLayersDock);
+    mErcMsgDock = new ErcMsgDock(mProject);
+    addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
+    tabifyDockWidget(mBoardLayersDock, mErcMsgDock);
+    mUnplacedComponentsDock->raise();
 
     // add graphics view as central widget
     mGraphicsView = new GraphicsView(nullptr, this);
