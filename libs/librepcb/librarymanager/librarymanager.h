@@ -71,6 +71,9 @@ class LibraryManager final : public QMainWindow
         LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
         ~LibraryManager() noexcept;
 
+        // General Methods
+        void updateRepositoryLibraryList() noexcept;
+
         // Operator Overloadings
         LibraryManager& operator=(const LibraryManager& rhs) = delete;
 

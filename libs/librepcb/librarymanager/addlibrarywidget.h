@@ -69,6 +69,7 @@ class AddLibraryWidget final : public QWidget
         ~AddLibraryWidget() noexcept;
 
         // General Methods
+        void updateRepositoryLibraryList() noexcept;
         void updateInstalledStatusOfRepositoryLibraries() noexcept;
 
         // Operator Overloadings
@@ -81,8 +82,6 @@ class AddLibraryWidget final : public QWidget
 
 
     private: // Methods
-
-        void currentTabChanged(int index) noexcept;
         void localLibraryNameLineEditTextChanged(QString name) noexcept;
         void downloadZipUrlLineEditTextChanged(QString urlStr) noexcept;
         void createLocalLibraryButtonClicked() noexcept;

@@ -448,6 +448,7 @@ void ControlPanel::on_actionOpen_Library_Manager_triggered()
     mLibraryManager->show();
     mLibraryManager->raise();
     mLibraryManager->activateWindow();
+    mLibraryManager->updateRepositoryLibraryList();
 }
 
 void ControlPanel::on_actionClose_all_open_projects_triggered()

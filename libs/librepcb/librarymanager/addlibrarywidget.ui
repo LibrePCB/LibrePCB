@@ -29,11 +29,35 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="movable">
       <bool>true</bool>
      </property>
+     <widget class="QWidget" name="tabDownloadFromRepo">
+      <attribute name="title">
+       <string>Download from repository</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Browse, download and update libraries directly from the Internet!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="lstRepoLibs"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnRepoLibsDownload">
+         <property name="text">
+          <string>Download and install/update all selected libraries</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tabCreateLocal">
       <attribute name="title">
        <string>Create local library</string>
@@ -194,30 +218,6 @@ Note: This is mandatory to publish the library on librepcb.org!</string>
         <widget class="QLineEdit" name="edtLocalUrl">
          <property name="maxLength">
           <number>255</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabDownloadFromRepo">
-      <attribute name="title">
-       <string>Download from repository</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Browse, download and update libraries directly from the Internet!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QListWidget" name="lstRepoLibs"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnRepoLibsDownload">
-         <property name="text">
-          <string>Download and install/update all selected libraries</string>
          </property>
         </widget>
        </item>

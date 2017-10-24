@@ -49,8 +49,6 @@ AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept :
     QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget)
 {
     mUi->setupUi(this);
-    connect(mUi->tabWidget, &QTabWidget::currentChanged,
-            this, &AddLibraryWidget::currentTabChanged);
     connect(mUi->btnDownloadZip, &QPushButton::clicked,
             this, &AddLibraryWidget::downloadZippedLibraryButtonClicked);
     connect(mUi->btnLocalCreate, &QPushButton::clicked,
@@ -88,6 +86,21 @@ AddLibraryWidget::~AddLibraryWidget() noexcept
  *  General Methods
  ****************************************************************************************/
 
+void AddLibraryWidget::updateRepositoryLibraryList() noexcept
+{
+    clearRepositoryLibraryList();
+    QList<const Repository*> repos = mWorkspace.getSettings().getRepositories().getRepositories();
+    foreach (const Repository* repo, repos) { Q_ASSERT(repo);
+        mLibraryDownloadConnections.append(
+                    connect(repo, &Repository::libraryListReceived,
+                            this, &AddLibraryWidget::repositoryLibraryListReceived));
+        mLibraryDownloadConnections.append(
+                    connect(repo, &Repository::errorWhileFetchingLibraryList,
+                            this, &AddLibraryWidget::errorWhileFetchingLibraryList));
+        repo->requestLibraryList();
+    }
+}
+
 void AddLibraryWidget::updateInstalledStatusOfRepositoryLibraries() noexcept
 {
     for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
@@ -101,24 +114,6 @@ void AddLibraryWidget::updateInstalledStatusOfRepositoryLibraries() noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
-
-void AddLibraryWidget::currentTabChanged(int index) noexcept
-{
-    if (mUi->tabWidget->widget(index) == mUi->tabDownloadFromRepo) {
-        // tab "download from repository": request list of libraries
-        clearRepositoryLibraryList();
-        QList<const Repository*> repos = mWorkspace.getSettings().getRepositories().getRepositories();
-        foreach (const Repository* repo, repos) { Q_ASSERT(repo);
-            mLibraryDownloadConnections.append(
-                        connect(repo, &Repository::libraryListReceived,
-                                this, &AddLibraryWidget::repositoryLibraryListReceived));
-            mLibraryDownloadConnections.append(
-                        connect(repo, &Repository::errorWhileFetchingLibraryList,
-                                this, &AddLibraryWidget::errorWhileFetchingLibraryList));
-            repo->requestLibraryList();
-        }
-    }
-}
 
 void AddLibraryWidget::localLibraryNameLineEditTextChanged(QString name) noexcept
 {
