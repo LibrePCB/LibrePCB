@@ -36,6 +36,12 @@
     </property>
     <item>
      <widget class="QLabel" name="lblWarnForNewerAppVersions">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">QLabel {
 	background-color: rgb(255, 255, 127);
@@ -53,12 +59,19 @@
        <bool>true</bool>
       </property>
       <property name="margin">
-       <number>5</number>
+       <number>10</number>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QLabel" name="lblWarnForNoLibraries">
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">QLabel {
 	background-color: rgb(255, 255, 127);
@@ -67,7 +80,7 @@
 };</string>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This workspace does not contain any libraries, which are essential to create and modify projects. You should open the library manager to add some libraries.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This workspace does not contain any libraries, which are essential to create and modify projects. You should open the library manager to add some libraries. &lt;a href=&quot;LibraryManager&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click here to open the library manager&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -76,7 +89,7 @@
        <bool>true</bool>
       </property>
       <property name="margin">
-       <number>5</number>
+       <number>10</number>
       </property>
      </widget>
     </item>

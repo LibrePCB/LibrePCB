@@ -88,6 +88,8 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     // decide if we have to show the warning about missing workspace libraries
     if (mWorkspace.getLocalLibraries().isEmpty() && mWorkspace.getRemoteLibraries().isEmpty()) {
         mUi->lblWarnForNoLibraries->setVisible(true);
+        connect(mUi->lblWarnForNoLibraries, &QLabel::linkActivated,
+                this, &ControlPanel::on_actionOpen_Library_Manager_triggered);
         connect(&mWorkspace, &Workspace::libraryAdded,
                 mUi->lblWarnForNoLibraries, &QLabel::hide);
     } else {
