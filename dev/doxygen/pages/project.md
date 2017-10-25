@@ -50,7 +50,7 @@ detect a crash, the librepcb::DirectoryLock class is used (see @ref doc_project_
 
 1. The project is automatically saved to temporary files periodically (autosave).
    Temporary files are indicated by the '~' at the end of the filename. For example the class
-   librepcb::project::Circuit saves its content to `core/circuit.xml~` instead of `core/circuit.xml`.
+   librepcb::project::Circuit saves its content to `core/circuit.lp~` instead of `core/circuit.lp`.
 2. If the user wants to save the project, all changes will be saved to the temporary files first.
    Only after *ALL* changes to the whole project were saved *SUCCESSFULLY* to these files, the
    changes can be written to the original files. The temporary files will still exist. If saving to

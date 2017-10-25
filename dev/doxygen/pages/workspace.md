@@ -75,7 +75,7 @@ This is an example how a workspace could look like:
         │   ├── Project_B/
         │   └── Project_C/
         ├── v0.1/
-        │   ├── settings.xml
+        │   ├── settings.lp
         │   └── libraries/
         │       ├── local/
         │       │   ├── Library_A.lplib/
@@ -86,7 +86,7 @@ This is an example how a workspace could look like:
         │           ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
         │           └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
         ├── v1/
-        │   ├── settings.xml
+        │   ├── settings.lp
         │   └── libraries/
         │       ├── local/
         │       │   ├── Library_A.lplib/
@@ -97,7 +97,7 @@ This is an example how a workspace could look like:
         │           ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
         │           └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
         └── v2/
-            ├── settings.xml
+            ├── settings.lp
             └── libraries/
                 ├── local/
                 │   ├── Library_A.lplib/

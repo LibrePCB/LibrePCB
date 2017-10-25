@@ -41,7 +41,7 @@ that element"*.
 To make this always working properly, [version file]s actually *do* need to be forward compatible!
 So [version file]s are the only files of LibrePCB which are designed to be forward compatible, while
 all other files are not. This gives us maximum flexibility to change the file format in future (we
-could even switch from XML to another file format some day).
+could even switch from S-Expressions to another file format some day).
 
 
 [version file]: #doc_versioning_file

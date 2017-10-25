@@ -39,30 +39,30 @@ This tree shows the structure of a library directory:
     MyLibrary.lplib/
     ├── .librepcb-lib
     ├── library.png
-    ├── library.xml
+    ├── library.lp
     ├── cmp/
     │   └── 670421c3-850b-4d7c-b511-c0e6b7ac40f9/
-    │       ├── component.xml
+    │       ├── component.lp
     │       └── .librepcb-cmp
     ├── cmpcat/
     │   └── c49eb199-2cf5-45da-a740-7d444045c08a/
-    │       ├── component_category.xml
+    │       ├── component_category.lp
     │       └── .librepcb-cmpcat
     ├── dev/
     │   └── 6c696128-6e7e-401c-92af-57f1e340da52/
-    │       ├── device.xml
+    │       ├── device.lp
     │       └── .librepcb-dev
     ├── pkg/
     │   └── 556c2a2f-8462-4acd-bed1-3218d67c774b/
-    │       ├── package.xml
+    │       ├── package.lp
     │       └── .librepcb-pkg
     ├── pkgcat/
     │   └── b66c9cf9-99b6-434e-af72-867cee1a271c/
-    │       ├── package_category.xml
+    │       ├── package_category.lp
     │       └── .librepcb-pkgcat
     └── sym/
         └── ad26f787-cdc9-47f9-963f-ab5a4767cdb4/
-            ├── symbol.xml
+            ├── symbol.lp
             └── .librepcb-sym
 
 ## .librepcb-lib
@@ -75,7 +75,7 @@ See @ref doc_versioning for more information about LibrePCB's file format versio
 This (optional) picture is displayed on different locations in the graphical user interface (e.g. in
 the library manager). The dimensions of the image should be 256x256 pixels.
 
-## library.xml
+## library.lp
 
 This file contains some metadata about the library itself (e.g. name, author, dependencies).
 
@@ -97,7 +97,7 @@ Each library element inside these directories is represented by a subdirectory w
 corresponds to the element's [UUID]. The element directories contain following files:
 
 - An identification file (e.g. `.librepcb-cmp`) used for @ref doc_versioning.
-- An XML file (e.g. `component.xml`) containing the actual library element (metadata, geometry, ...).
+- An S-Expression file (e.g. `component.lp`) containing the actual library element (metadata, geometry, ...).
 - Depending on the element type, there may be more files (e.g. 3D models for Packages).
 
 
