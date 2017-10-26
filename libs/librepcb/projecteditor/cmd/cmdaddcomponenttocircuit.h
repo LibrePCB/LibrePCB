@@ -61,7 +61,8 @@ class CmdAddComponentToCircuit final : public UndoCommandGroup
 
         // Constructors / Destructor
         CmdAddComponentToCircuit(workspace::Workspace& workspace, Project& project,
-                                 const Uuid& component, const Uuid& symbolVariant) noexcept;
+                                 const Uuid& component, const Uuid& symbolVariant,
+                                 const Uuid& defaultDevice = Uuid()) noexcept;
         ~CmdAddComponentToCircuit() noexcept;
 
         // Getters
@@ -82,6 +83,7 @@ class CmdAddComponentToCircuit final : public UndoCommandGroup
         Project& mProject;
         Uuid mComponentUuid;
         Uuid mSymbVarUuid;
+        Uuid mDefaultDeviceUuid;
 
         // child commands
         CmdComponentInstanceAdd* mCmdAddToCircuit;

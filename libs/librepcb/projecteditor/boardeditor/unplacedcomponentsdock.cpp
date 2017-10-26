@@ -278,7 +278,10 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
             mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
         }
         if (mUi->cbxSelectedDevice->count() > 0) {
-            Uuid deviceUuid = mLastDeviceOfComponent.value(mSelectedComponent->getLibComponent().getUuid());
+            Uuid deviceUuid = mSelectedComponent->getDefaultDeviceUuid();
+            if (deviceUuid.isNull()) {
+                deviceUuid = mLastDeviceOfComponent.value(mSelectedComponent->getLibComponent().getUuid());
+            }
             int index = deviceUuid.isNull() ? 0 : mUi->cbxSelectedDevice->findData(deviceUuid.toStr());
             mUi->cbxSelectedDevice->setCurrentIndex(index);
         }
