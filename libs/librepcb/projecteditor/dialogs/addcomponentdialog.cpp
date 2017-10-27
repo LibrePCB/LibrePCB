@@ -60,6 +60,9 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mSelectedComponent(nullptr), mSelectedSymbVar(nullptr)
 {
     mUi->setupUi(this);
+    mUi->lblCompDescription->hide();
+    mUi->lblSymbVar->hide();
+    mUi->cbxSymbVar->hide();
     connect(mUi->edtSearch, &QLineEdit::textChanged,
             this, &AddComponentDialog::searchEditTextChanged);
 
@@ -72,8 +75,6 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddComponentDialog::treeCategories_currentItemChanged);
-
-    //setSelectedCategory(Uuid());
 }
 
 AddComponentDialog::~AddComponentDialog() noexcept
@@ -220,10 +221,8 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
     if (cmp == mSelectedComponent) return;
 
     mUi->lblCompUuid->setText(QString("00000000-0000-0000-0000-000000000000"));
-    mUi->lblCompName->setText(QString("-"));
-    mUi->lblCompDescription->setText(QString("-"));
-    mUi->gbxComponent->setEnabled(false);
-    mUi->gbxSymbVar->setEnabled(false);
+    mUi->lblCompName->setText(tr("No component selected"));
+    mUi->lblCompDescription->clear();
     setSelectedSymbVar(nullptr);
     delete mSelectedComponent;
     mSelectedComponent = nullptr;
@@ -236,17 +235,20 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
         mUi->lblCompName->setText(cmp->getNames().value(localeOrder));
         mUi->lblCompDescription->setText(cmp->getDescriptions().value(localeOrder));
 
-        mUi->gbxComponent->setEnabled(true);
-        mUi->gbxSymbVar->setEnabled(true);
         mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
         for (const library::ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
             QString text = symbVar.getNames().value(localeOrder);
+            if (!symbVar.getNorm().isEmpty()) {text += " [" + symbVar.getNorm() + "]";}
             mUi->cbxSymbVar->addItem(text, symbVar.getUuid().toStr());
         }
         mUi->cbxSymbVar->setCurrentIndex(cmp->getSymbolVariants().count() > 0 ? 0 : -1);
     }
+
+    mUi->lblSymbVar->setVisible(mUi->cbxSymbVar->count() > 1);
+    mUi->cbxSymbVar->setVisible(mUi->cbxSymbVar->count() > 1);
+    mUi->lblCompDescription->setVisible(!mUi->lblCompDescription->text().isEmpty());
 }
 
 void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar)
@@ -254,19 +256,10 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
     if (symbVar == mSelectedSymbVar) return;
     qDeleteAll(mPreviewSymbolGraphicsItems);
     mPreviewSymbolGraphicsItems.clear();
-    mUi->lblSymbVarUuid->setText(QString("00000000-0000-0000-0000-000000000000"));
-    mUi->lblSymbVarNorm->setText(QString("-"));
-    mUi->lblSymbVarDescription->setText(QString("-"));
     mSelectedSymbVar = symbVar;
 
-    if (mSelectedComponent && symbVar)
-    {
+    if (mSelectedComponent && symbVar) {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-
-        mUi->lblSymbVarUuid->setText(symbVar->getUuid().toStr());
-        mUi->lblSymbVarNorm->setText(symbVar->getNorm());
-        mUi->lblSymbVarDescription->setText(symbVar->getDescriptions().value(localeOrder));
-
         for (const library::ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
             FilePath symbolFp = mWorkspace.getLibraryDb().getLatestSymbol(item.getSymbolUuid());
             if (!symbolFp.isValid()) continue; // TODO: show warning
