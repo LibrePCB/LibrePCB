@@ -58,6 +58,7 @@ SOURCES += \
     fileio/domelement.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
+    fileio/sexpression.cpp \
     fileio/smartfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     fileio/serializablekeyvaluemap.h \
     fileio/serializableobject.h \
     fileio/serializableobjectlist.h \
+    fileio/sexpression.h \
     fileio/smartfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
