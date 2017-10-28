@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartXmlFile;
+class SmartSExprFile;
 class GraphicsLayerStackAppearanceSettings;
 
 namespace project {
@@ -69,15 +69,15 @@ class BoardUserSettings final : public QObject, public SerializableObject
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // General
         Board& mBoard;
 
-        // File "user/boards/<BOARDFILENAME>.xml"
-        FilePath mXmlFilepath;
-        QScopedPointer<SmartXmlFile> mXmlFile;
+        // File "user/boards/<BOARDFILENAME>.lp"
+        FilePath mFilepath;
+        QScopedPointer<SmartSExprFile> mFile;
 
         QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
 };

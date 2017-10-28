@@ -43,21 +43,20 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_Symbol::SI_Symbol(Schematic& schematic, const DomElement& domElement) :
+SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    Uuid gcUuid = domElement.getAttribute<Uuid>("component", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    Uuid gcUuid = node.getValueByPath<Uuid>("component", true);
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("No component with the UUID \"%1\" found in the circuit!"))
             .arg(gcUuid.toStr()));
     }
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
-    Uuid symbVarItemUuid = domElement.getAttribute<Uuid>("symbol", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    Uuid symbVarItemUuid = node.getValueByPath<Uuid>("lib_item", true);
     init(symbVarItemUuid);
 }
 
@@ -184,17 +183,15 @@ void SI_Symbol::removeFromSchematic(GraphicsScene& scene)
     sgl.dismiss();
 }
 
-void SI_Symbol::serialize(DomElement& root) const
+void SI_Symbol::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("component", mComponentInstance->getUuid());
-    root.setAttribute("symbol", mSymbVarItem->getUuid());
-    DomElement* position = root.appendChild("position");
-    position->setAttribute("x", mPosition.getX());
-    position->setAttribute("y", mPosition.getY());
-    position->setAttribute("rotation", mRotation);
+    root.appendToken(mUuid);
+    root.appendTokenChild("component", mComponentInstance->getUuid(), true);
+    root.appendTokenChild("lib_item", mSymbVarItem->getUuid(), true);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************

@@ -64,14 +64,14 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) :
+BI_NetPoint::BI_NetPoint(Board& board, const SExpression& node) :
     BI_Base(board), mLayer(nullptr), mNetSignal(nullptr), mFootprintPad(nullptr),
     mVia(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
 
-    QString layerName = domElement.getAttribute<QString>("layer", true);
+    QString layerName = node.getValueByPath<QString>("layer", true);
     mLayer = mBoard.getLayerStack().getLayer(layerName);
     if (!mLayer) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -79,42 +79,44 @@ BI_NetPoint::BI_NetPoint(Board& board, const DomElement& domElement) :
             .arg(layerName));
     }
 
-    Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
+    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
     mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
 
-    QString attachedTo = domElement.getAttribute<QString>("attached_to", true);
-    if (attachedTo == "via") {
-        Uuid viaUuid = domElement.getAttribute<Uuid>("via", true);
+    const SExpression* viaNode = node.tryGetChildByPath("via");
+    const SExpression* devNode = node.tryGetChildByPath("dev");
+    const SExpression* padNode = node.tryGetChildByPath("pad");
+    const SExpression* posNode = node.tryGetChildByPath("pos");
+
+    if (viaNode && (!devNode) && (!padNode) && (!posNode)) {
+        Uuid viaUuid = viaNode->getValueOfFirstChild<Uuid>(true);
         mVia = mBoard.getViaByUuid(viaUuid);
         if (!mVia) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid via UUID: \"%1\"")).arg(viaUuid.toStr()));
         }
         mPosition = mVia->getPosition();
-    } else if (attachedTo == "pad") {
-        Uuid componentUuid = domElement.getAttribute<Uuid>("component", true);
+    } else if (devNode && padNode && (!viaNode) && (!posNode)) {
+        Uuid componentUuid = devNode->getValueOfFirstChild<Uuid>(true);
         BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(componentUuid);
         if (!device) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid component UUID: \"%1\"")).arg(componentUuid.toStr()));
         }
-        Uuid padUuid = domElement.getAttribute<Uuid>("pad", true);
+        Uuid padUuid = padNode->getValueOfFirstChild<Uuid>(true);
         mFootprintPad = device->getFootprint().getPad(padUuid);
         if (!mFootprintPad) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid footprint pad UUID: \"%1\"")).arg(padUuid.toStr()));
         }
         mPosition = mFootprintPad->getPosition();
-    } else if (attachedTo == "none") {
-        mPosition.setX(domElement.getAttribute<Length>("x", true));
-        mPosition.setY(domElement.getAttribute<Length>("y", true));
+    } else if (posNode && (!viaNode) && (!devNode) && (!padNode)) {
+        mPosition = Point(*posNode);
     } else {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid 'attached_to' attribute: \"%1\"")).arg(attachedTo));
+        throw RuntimeError(__FILE__, __LINE__, tr("Invalid combination of sym/pin/pos nodes."));
     }
 
     init();
@@ -388,24 +390,20 @@ void BI_NetPoint::updateLines() const noexcept
     }
 }
 
-void BI_NetPoint::serialize(DomElement& root) const
+void BI_NetPoint::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("layer", mLayer->getName());
-    root.setAttribute("netsignal", mNetSignal->getUuid());
+    root.appendToken(mUuid);
+    root.appendTokenChild("net", mNetSignal->getUuid(), true);
+    root.appendTokenChild("layer", mLayer->getName(), false);
     if (isAttachedToPad()) {
-        root.setAttribute("attached_to", QString("pad"));
-        root.setAttribute("component", mFootprintPad->getFootprint().getComponentInstanceUuid());
-        root.setAttribute("pad", mFootprintPad->getLibPadUuid());
+        root.appendTokenChild("dev", mFootprintPad->getFootprint().getComponentInstanceUuid(), true);
+        root.appendTokenChild("pad", mFootprintPad->getLibPadUuid(), false);
     } else if (isAttachedToVia()) {
-        root.setAttribute("attached_to", QString("via"));
-        root.setAttribute("via", mVia->getUuid());
+        root.appendTokenChild("via", mVia->getUuid(), true);
     } else {
-        root.setAttribute("attached_to", QString("none"));
-        root.setAttribute("x", mPosition.getX());
-        root.setAttribute("y", mPosition.getY());
+        root.appendChild(mPosition.serializeToDomElement("pos"), true);
     }
 }
 

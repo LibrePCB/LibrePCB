@@ -54,12 +54,12 @@ BI_Device::BI_Device(Board& board, const BI_Device& other) :
     init();
 }
 
-BI_Device::BI_Device(Board& board, const DomElement& domElement) :
+BI_Device::BI_Device(Board& board, const SExpression& node) :
     BI_Base(board), mCompInstance(nullptr), mLibDevice(nullptr), mLibPackage(nullptr),
     mLibFootprint(nullptr), mAttributes()
 {
     // get component instance
-    Uuid compInstUuid = domElement.getAttribute<Uuid>("component", true);
+    Uuid compInstUuid = node.getChildByIndex(0).getValue<Uuid>(true);
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -67,22 +67,21 @@ BI_Device::BI_Device(Board& board, const DomElement& domElement) :
             .arg(compInstUuid.toStr()));
     }
     // get device and footprint uuid
-    Uuid deviceUuid = domElement.getAttribute<Uuid>("device", true);
-    Uuid footprintUuid = domElement.getAttribute<Uuid>("footprint", true);
+    Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device", true);
+    Uuid footprintUuid = node.getValueByPath<Uuid>("lib_footprint", true);
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // get position, rotation and mirrored
-    mPosition.setX(domElement.getFirstChild("position", true)->getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getFirstChild("position", true)->getAttribute<Length>("y", true));
-    mRotation = domElement.getFirstChild("position", true)->getAttribute<Angle>("rotation", true);
-    mIsMirrored = domElement.getFirstChild("position", true)->getAttribute<bool>("mirror", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    mIsMirrored = node.getValueByPath<bool>("mirror", true);
 
     // load attributes
-    mAttributes.loadFromDomElement(domElement); // can throw
+    mAttributes.loadFromDomElement(node); // can throw
 
     // load footprint
     mFootprint.reset(new BI_Footprint(*this));
-    //mFootprint.reset(new BI_Footprint(*this, *domElement.getFirstChild("footprint", true)));
+    //mFootprint.reset(new BI_Footprint(*this, *node.getFirstChild("footprint", true)));
 
     init();
 }
@@ -228,19 +227,16 @@ void BI_Device::removeFromBoard(GraphicsScene& scene)
     updateErcMessages();
 }
 
-void BI_Device::serialize(DomElement& root) const
+void BI_Device::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("component", mCompInstance->getUuid());
-    root.setAttribute("device", mLibDevice->getUuid());
-    root.setAttribute("footprint", mLibFootprint->getUuid());
-    //root.appendChild(mFootprint->serializeToDomElement("footprint"));
-    DomElement* position = root.appendChild("position");
-    position->setAttribute("x", mPosition.getX());
-    position->setAttribute("y", mPosition.getY());
-    position->setAttribute("rotation", mRotation);
-    position->setAttribute("mirror", mIsMirrored);
+    root.appendToken(mCompInstance->getUuid());
+    root.appendTokenChild("lib_device", mLibDevice->getUuid(), true);
+    root.appendTokenChild("lib_footprint", mLibFootprint->getUuid(), true);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
+    root.appendTokenChild("mirror", mIsMirrored, false);
     mAttributes.serialize(root);
 }
 

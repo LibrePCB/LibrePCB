@@ -45,14 +45,14 @@ namespace project {
  ****************************************************************************************/
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                                 const DomElement& domElement) :
+                                                 const SExpression& node) :
     QObject(&cmpInstance), mCircuit(circuit), mComponentInstance(cmpInstance),
     mComponentSignal(nullptr), mIsAddedToCircuit(false), mNetSignal(nullptr)
 {
     // read attributes
-    Uuid compSignalUuid = domElement.getAttribute<Uuid>("comp_signal", true);
+    Uuid compSignalUuid = node.getChildByIndex(0).getValue<Uuid>(true);
     mComponentSignal = mComponentInstance.getLibComponent().getSignals().get(compSignalUuid).get(); // can throw
-    Uuid netsignalUuid = domElement.getAttribute<Uuid>("netsignal", false, Uuid());
+    Uuid netsignalUuid = node.getValueByPath<Uuid>("net", false, Uuid());
     if (!netsignalUuid.isNull()) {
         mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
         if(!mNetSignal) {
@@ -250,12 +250,12 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad)
     mRegisteredFootprintPads.removeOne(&pad);
 }
 
-void ComponentSignalInstance::serialize(DomElement& root) const
+void ComponentSignalInstance::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("comp_signal", mComponentSignal->getUuid());
-    root.setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
+    root.appendToken(mComponentSignal->getUuid());
+    root.appendTokenChild("net", mNetSignal ? mNetSignal->getUuid() : Uuid(), false);
 }
 
 /*****************************************************************************************

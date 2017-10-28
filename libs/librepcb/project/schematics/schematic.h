@@ -40,7 +40,7 @@ namespace librepcb {
 class GridProperties;
 class GraphicsView;
 class GraphicsScene;
-class SmartXmlFile;
+class SmartSExprFile;
 
 namespace project {
 
@@ -198,13 +198,13 @@ class Schematic final : public QObject, public AttributeProvider,
         bool checkAttributesValidity() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        FilePath mFilePath; ///< the filepath of the schematic *.xml file (from the ctor)
-        QScopedPointer<SmartXmlFile> mXmlFile;
+        FilePath mFilePath; ///< the filepath of the schematic *.lp file (from the ctor)
+        QScopedPointer<SmartSExprFile> mFile;
         bool mIsAddedToProject;
 
         QScopedPointer<GraphicsScene> mGraphicsScene;

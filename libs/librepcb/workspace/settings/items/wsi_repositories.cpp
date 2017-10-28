@@ -35,16 +35,14 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Repositories::WSI_Repositories(const QString& xmlTagName, DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement)
+WSI_Repositories::WSI_Repositories(const SExpression& node) :
+    WSI_Base()
 {
-    if (xmlElement) {
-        // load setting
-        foreach (const DomElement* node, xmlElement->getChilds()) {
-            mList.append(new Repository(*node)); // can throw
+    if (const SExpression* child = node.tryGetChildByPath("repositories")) {
+        foreach (const SExpression& repo, child->getChildren()) {
+            mList.append(new Repository(repo)); // can throw
         }
     } else {
-        // load defaults
         mList.append(new Repository(QUrl("https://api.librepcb.org")));
     }
     foreach (const Repository* repository, mList) {
@@ -177,9 +175,10 @@ void WSI_Repositories::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_Repositories::serialize(DomElement& root) const
+void WSI_Repositories::serialize(SExpression& root) const
 {
-    serializePointerContainer(root, mList, "repository");
+    SExpression& child = root.appendList("repositories", true);
+    serializePointerContainer(child, mList, "repository");
 }
 
 /*****************************************************************************************

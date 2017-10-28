@@ -44,30 +44,30 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const DomElement& domElement) :
+ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
     // read general attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getFirstChild("name", true)->getText<QString>(true);
-    mValue = domElement.getFirstChild("value", true)->getText<QString>(false);
-    Uuid cmpUuid = domElement.getAttribute<Uuid>("component", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
+    mValue = node.getValueByPath<QString>("value", false);
+    Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component", true);
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(cmpUuid.toStr()));
     }
-    Uuid symbVarUuid = domElement.getAttribute<Uuid>("symbol_variant", true);
+    Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant", true);
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
 
     // load all component attributes
-    mAttributes.reset(new AttributeList(domElement)); // can throw
+    mAttributes.reset(new AttributeList(node)); // can throw
 
     // load all signal instances
-    foreach (const DomElement* node, domElement.getChilds("signal_map")) {
-        ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, *node);
+    foreach (const SExpression& node, node.getChildren("sig")) {
+        ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The signal with the UUID \"%1\" is defined multiple times."))
@@ -331,17 +331,17 @@ void ComponentInstance::unregisterDevice(BI_Device& device)
     emit attributesChanged(); // parent attribute provider may have changed!
 }
 
-void ComponentInstance::serialize(DomElement& root) const
+void ComponentInstance::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("component", mLibComponent->getUuid());
-    root.setAttribute("symbol_variant", mCompSymbVar->getUuid());
-    root.appendTextChild("name", mName);
-    root.appendTextChild("value", mValue);
+    root.appendToken(mUuid);
+    root.appendTokenChild("lib_component", mLibComponent->getUuid(), true);
+    root.appendTokenChild("lib_variant", mCompSymbVar->getUuid(), true);
+    root.appendStringChild("name", mName, true);
+    root.appendStringChild("value", mValue, false);
     mAttributes->serialize(root);
-    serializePointerContainer(root, mSignals, "signal_map");
+    serializePointerContainer(root, mSignals, "sig");
 }
 
 /*****************************************************************************************

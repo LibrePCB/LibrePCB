@@ -39,20 +39,19 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, const DomElement& domElement) :
+SI_NetLabel::SI_NetLabel(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
     mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
 
     init();
 }
@@ -146,15 +145,14 @@ void SI_NetLabel::removeFromSchematic(GraphicsScene& scene)
     SI_Base::removeFromSchematic(scene, *mGraphicsItem);
 }
 
-void SI_NetLabel::serialize(DomElement& root) const
+void SI_NetLabel::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    root.setAttribute("rotation", mRotation);
-    root.setAttribute("netsignal", mNetSignal->getUuid());
+    root.appendToken(mUuid);
+    root.appendTokenChild("net", mNetSignal->getUuid(), true);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************

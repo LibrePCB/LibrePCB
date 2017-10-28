@@ -50,7 +50,7 @@ class WSI_Appearance final : public WSI_Base
         // Constructors / Destructor
         WSI_Appearance() = delete;
         WSI_Appearance(const WSI_Appearance& other) = delete;
-        WSI_Appearance(const QString& xmlTagName, DomElement* xmlElement);
+        explicit WSI_Appearance(const SExpression& node);
         ~WSI_Appearance() noexcept;
 
         // Getters
@@ -66,7 +66,7 @@ class WSI_Appearance final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         WSI_Appearance& operator=(const WSI_Appearance& rhs) = delete;

@@ -25,8 +25,8 @@
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
 #include "../project.h"
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -40,13 +40,13 @@ namespace project {
 
 ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
-    mXmlFilepath(project.getPath().getPathTo("core/erc.xml")), mXmlFile(nullptr)
+    mFilepath(project.getPath().getPathTo("core/erc.lp")), mFile(nullptr)
 {
-    // try to create/open the XML file "erc.xml"
+    // try to create/open the file "erc.lp"
     if (create) {
-        mXmlFile.reset(SmartXmlFile::create(mXmlFilepath));
+        mFile.reset(SmartSExprFile::create(mFilepath));
     } else {
-        mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
+        mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
     }
 }
 
@@ -87,21 +87,20 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept
 
 void ErcMsgList::restoreIgnoreState()
 {
-    if (mXmlFile->isCreated()) return; // the XML file does not yet exist
+    if (mFile->isCreated()) return; // the file does not yet exist
 
-    std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-    DomElement& root = doc->getRoot();
+    SExpression root = mFile->parseFileAndBuildDomTree();
 
     // reset all ignore attributes
     foreach (ErcMsg* ercMsg, mItems)
         ercMsg->setIgnored(false);
 
     // scan ignored items and set ignore attributes
-    foreach (const DomElement* node, root.getChilds("ignore")) {
+    foreach (const SExpression& node, root.getChildren("ignore")) {
         foreach (ErcMsg* ercMsg, mItems) {
-            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node->getAttribute<QString>("owner_class", false))
-             && (ercMsg->getOwnerKey() == node->getAttribute<QString>("owner_key", false))
-             && (ercMsg->getMsgKey() == node->getAttribute<QString>("msg_key", false)))
+            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node.getValueByPath<QString>("class", false))
+             && (ercMsg->getOwnerKey() == node.getValueByPath<QString>("instance", false))
+             && (ercMsg->getMsgKey() == node.getValueByPath<QString>("message", false)))
             {
                 ercMsg->setIgnored(true);
             }
@@ -113,11 +112,11 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/erc.xml"
+    // Save "core/erc.lp"
     try
     {
-        DomDocument doc(*serializeToDomElement("erc"));
-        mXmlFile->save(doc, toOriginal);
+        SExpression doc(serializeToDomElement("librepcb_erc"));
+        mFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {
@@ -132,14 +131,14 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ErcMsgList::serialize(DomElement& root) const
+void ErcMsgList::serialize(SExpression& root) const
 {
     foreach (ErcMsg* ercMsg, mItems) {
         if (ercMsg->isIgnored()) {
-            DomElement* itemNode = root.appendChild("ignore");
-            itemNode->setAttribute("owner_class", ercMsg->getOwner().getErcMsgOwnerClassName());
-            itemNode->setAttribute("owner_key", ercMsg->getOwnerKey());
-            itemNode->setAttribute("msg_key", ercMsg->getMsgKey());
+            SExpression& itemNode = root.appendList("ignore", true);
+            itemNode.appendStringChild("class", ercMsg->getOwner().getErcMsgOwnerClassName(), true);
+            itemNode.appendStringChild("instance", ercMsg->getOwnerKey(), true);
+            itemNode.appendStringChild("message", ercMsg->getMsgKey(), true);
         }
     }
 }

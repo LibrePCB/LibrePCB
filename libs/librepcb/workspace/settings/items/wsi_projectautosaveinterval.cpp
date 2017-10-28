@@ -34,15 +34,14 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const QString& xmlTagName,
-                                                         DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement),
+WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const SExpression& node) :
+    WSI_Base(),
     mInterval(600), mIntervalTmp(mInterval)
 {
-    if (xmlElement) {
-        // load setting
-        mInterval = xmlElement->getText<uint>(true);
+    if (const SExpression* child = node.tryGetChildByPath("project_autosave_interval")) {
+        mInterval = child->getValueOfFirstChild<uint>(true);
     }
+
     if (mInterval % 60 != 0) {
         mInterval += 60 - (mInterval % 60); // round up to the next full minute
     }
@@ -99,9 +98,9 @@ void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
     mIntervalTmp = value * 60;
 }
 
-void WSI_ProjectAutosaveInterval::serialize(DomElement& root) const
+void WSI_ProjectAutosaveInterval::serialize(SExpression& root) const
 {
-    root.setText(mInterval);
+    root.appendTokenChild("project_autosave_interval", mInterval, true);
 }
 
 /*****************************************************************************************

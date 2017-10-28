@@ -57,7 +57,7 @@ class CmpSigPinDisplayType final
         // Getters
 
         /**
-         * @brief Serialize the display type to a string (e.g. to write it into an XML file)
+         * @brief Serialize the display type to a string (e.g. to write it into a file)
          *
          * @return The generated string
          */
@@ -82,7 +82,7 @@ class CmpSigPinDisplayType final
         /**
          * @brief Deserialize a display type from a string
          *
-         * @param str   The string (e.g. from an XML file)
+         * @param str   The string (e.g. from a file)
          *
          * @return The CmpSigPinDisplayType object of the given string
          *
@@ -105,19 +105,19 @@ class CmpSigPinDisplayType final
 
         /// @brief display the name of the symbol pin
         static const CmpSigPinDisplayType& pinName() noexcept {
-            static CmpSigPinDisplayType type("pin_name", tr("Symbol pin name"));
+            static CmpSigPinDisplayType type("pin", tr("Symbol pin name"));
             return type;
         }
 
         /// @brief display the name of the component signal
         static const CmpSigPinDisplayType& componentSignal() noexcept {
-            static CmpSigPinDisplayType type("component_signal", tr("Component signal name"));
+            static CmpSigPinDisplayType type("signal", tr("Component signal name"));
             return type;
         }
 
         /// @brief display the name of the connected net signal
         static const CmpSigPinDisplayType& netSignal() noexcept {
-            static CmpSigPinDisplayType type("net_signal", tr("Schematic net name"));
+            static CmpSigPinDisplayType type("net", tr("Schematic net name"));
             return type;
         }
 

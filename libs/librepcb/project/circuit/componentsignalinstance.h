@@ -67,7 +67,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ComponentSignalInstance() = delete;
         ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const DomElement& domElement);
+                                         const SExpression& node);
         explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
                                          const library::ComponentSignal& cmpSignal,
                                          NetSignal* netsignal = nullptr);
@@ -110,7 +110,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         void unregisterFootprintPad(BI_FootprintPad& pad);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;

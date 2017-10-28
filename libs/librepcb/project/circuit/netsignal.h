@@ -61,7 +61,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         // Constructors / Destructor
         NetSignal() = delete;
         NetSignal(const NetSignal& other) = delete;
-        explicit NetSignal(Circuit& circuit, const DomElement& domElement);
+        explicit NetSignal(Circuit& circuit, const SExpression& node);
         explicit NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
                            bool autoName);
         ~NetSignal() noexcept;
@@ -103,7 +103,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         void unregisterBoardVia(BI_Via& via);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         NetSignal& operator=(const NetSignal& rhs) = delete;

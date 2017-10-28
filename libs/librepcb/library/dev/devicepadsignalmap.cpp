@@ -44,12 +44,12 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const Uuid& sign
 {
 }
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const DomElement& domElement) :
+DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node) :
     QObject(nullptr)
 {
     // read attributes
-    mPadUuid = domElement.getAttribute<Uuid>("pad", true);
-    mSignalUuid = domElement.getText<Uuid>(false);
+    mPadUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mSignalUuid = node.getValueByPath<Uuid>("sig", false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -73,12 +73,12 @@ void DevicePadSignalMapItem::setSignalUuid(const Uuid& uuid) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void DevicePadSignalMapItem::serialize(DomElement& root) const
+void DevicePadSignalMapItem::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("pad", mPadUuid);
-    root.setText(mSignalUuid);
+    root.appendToken(mPadUuid);
+    root.appendTokenChild("sig", mSignalUuid, false);
 }
 
 /*****************************************************************************************

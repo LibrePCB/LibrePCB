@@ -65,7 +65,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         BI_Footprint() = delete;
         BI_Footprint(const BI_Footprint& other) = delete;
         BI_Footprint(BI_Device& device, const BI_Footprint& other);
-        BI_Footprint(BI_Device& device, const DomElement& domElement);
+        BI_Footprint(BI_Device& device, const SExpression& node);
         explicit BI_Footprint(BI_Device& device);
         ~BI_Footprint() noexcept;
 
@@ -84,7 +84,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         void removeFromBoard(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Helper Methods
         Point mapToScene(const Point& relativePos) const noexcept;

@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include "circuit.h"
 #include "../project.h"
 #include "netclass.h"
@@ -44,43 +44,42 @@ namespace project {
 
 Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
-    mXmlFilepath(project.getPath().getPathTo("core/circuit.xml")), mXmlFile(nullptr)
+    mFilepath(project.getPath().getPathTo("core/circuit.lp")), mFile(nullptr)
 {
     qDebug() << "load circuit...";
     Q_ASSERT(!(create && (restore || readOnly)));
 
     try
     {
-        // try to create/open the XML file "circuit.xml"
+        // try to create/open the file "circuit.lp"
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mXmlFilepath);
+            mFile = SmartSExprFile::create(mFilepath);
             NetClass* netclass = new NetClass(*this, "default");
             addNetClass(*netclass); // add a netclass with name "default"
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            DomElement& root = doc->getRoot();
+            mFile = new SmartSExprFile(mFilepath, restore, readOnly);
+            SExpression root = mFile->parseFileAndBuildDomTree();
 
-            // OK - XML file is open --> now load the whole circuit stuff
+            // OK - file is open --> now load the whole circuit stuff
 
             // Load all netclasses
-            foreach (const DomElement* node, root.getChilds("netclass")) {
-                NetClass* netclass = new NetClass(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netclass")) {
+                NetClass* netclass = new NetClass(*this, node);
                 addNetClass(*netclass);
             }
 
             // Load all netsignals
-            foreach (const DomElement* node, root.getChilds("netsignal")) {
-                NetSignal* netsignal = new NetSignal(*this, *node);
+            foreach (const SExpression& node, root.getChildren("net")) {
+                NetSignal* netsignal = new NetSignal(*this, node);
                 addNetSignal(*netsignal);
             }
 
             // Load all component instances
-            foreach (const DomElement* node, root.getChilds("component")) {
-                ComponentInstance* component = new ComponentInstance(*this, *node);
+            foreach (const SExpression& node, root.getChildren("component")) {
+                ComponentInstance* component = new ComponentInstance(*this, node);
                 addComponentInstance(*component);
             }
         }
@@ -94,7 +93,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) :
             try { removeNetSignal(*netsignal); delete netsignal; } catch (...) {}
         foreach (NetClass* netclass, mNetClasses)
             try { removeNetClass(*netclass); delete netclass; } catch (...) {}
-        delete mXmlFile;            mXmlFile = nullptr;
+        delete mFile;            mFile = nullptr;
         throw;
     }
 
@@ -115,7 +114,7 @@ Circuit::~Circuit() noexcept
     foreach (NetClass* netclass, mNetClasses)
         try { removeNetClass(*netclass); delete netclass; } catch (...) {}
 
-    delete mXmlFile;            mXmlFile = nullptr;
+    delete mFile;            mFile = nullptr;
 }
 
 /*****************************************************************************************
@@ -361,11 +360,11 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/circuit.xml"
+    // Save "core/circuit.lp"
     try
     {
-        DomDocument doc(*serializeToDomElement("circuit"));
-        mXmlFile->save(doc, toOriginal);
+        SExpression doc(serializeToDomElement("librepcb_circuit"));
+        mFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {
@@ -380,11 +379,15 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Circuit::serialize(DomElement& root) const
+void Circuit::serialize(SExpression& root) const
 {
+    root.appendLineBreak();
     serializePointerContainer(root, mNetClasses, "netclass");
-    serializePointerContainer(root, mNetSignals, "netsignal");
+    root.appendLineBreak();
+    serializePointerContainer(root, mNetSignals, "net");
+    root.appendLineBreak();
     serializePointerContainer(root, mComponentInstances,"component");
+    root.appendLineBreak();
 }
 
 /*****************************************************************************************

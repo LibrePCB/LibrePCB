@@ -51,7 +51,7 @@ class WSI_AppLocale final : public WSI_Base
         // Constructors / Destructor
         WSI_AppLocale() = delete;
         WSI_AppLocale(const WSI_AppLocale& other) = delete;
-        WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement);
+        explicit WSI_AppLocale(const SExpression& node);
         ~WSI_AppLocale() noexcept;
 
         // Getters
@@ -67,7 +67,7 @@ class WSI_AppLocale final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         WSI_AppLocale& operator=(const WSI_AppLocale& rhs) = delete;

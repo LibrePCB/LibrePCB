@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/fileio/domelement.h>
 #include "footprint.h"
 #include "package.h"
 #include "footprintgraphicsitem.h"
@@ -53,21 +52,21 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
     mDescriptions.setDefaultValue(description_en_US);
 }
 
-Footprint::Footprint(const DomElement& domElement) :
+Footprint::Footprint(const SExpression& node) :
     mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
     mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mNames.loadFromDomElement(domElement);
-    mDescriptions.loadFromDomElement(domElement);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mNames.loadFromDomElement(node);
+    mDescriptions.loadFromDomElement(node);
 
     // load all elements
-    mPads.loadFromDomElement(domElement);
-    mPolygons.loadFromDomElement(domElement);
-    mEllipses.loadFromDomElement(domElement);
-    mTexts.loadFromDomElement(domElement);
-    mHoles.loadFromDomElement(domElement);
+    mPads.loadFromDomElement(node);
+    mPolygons.loadFromDomElement(node);
+    mEllipses.loadFromDomElement(node);
+    mTexts.loadFromDomElement(node);
+    mHoles.loadFromDomElement(node);
 }
 
 Footprint::~Footprint() noexcept
@@ -91,9 +90,9 @@ void Footprint::unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept
     mRegisteredGraphicsItem = nullptr;
 }
 
-void Footprint::serialize(DomElement& root) const
+void Footprint::serialize(SExpression& root) const
 {
-    root.setAttribute("uuid", mUuid);
+    root.appendToken(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mPads.serialize(root);

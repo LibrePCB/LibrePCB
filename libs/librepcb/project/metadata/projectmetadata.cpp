@@ -23,8 +23,8 @@
 #include <QtCore>
 #include "projectmetadata.h"
 #include <librepcb/common/systeminfo.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include "../project.h"
 
 /*****************************************************************************************
@@ -39,27 +39,26 @@ namespace project {
 
 ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
-    mXmlFilepath(project.getPath().getPathTo("core/metadata.xml"))
+    mFilepath(project.getPath().getPathTo("core/metadata.lp"))
 {
     qDebug() << "load project metadata...";
     Q_ASSERT(!(create && (restore || readOnly)));
 
     if (create) {
-        mXmlFile.reset(SmartXmlFile::create(mXmlFilepath));
+        mFile.reset(SmartSExprFile::create(mFilepath));
 
         mName = mProject.getFilepath().getCompleteBasename();
         mAuthor = SystemInfo::getFullUsername();
         mVersion = "v1";
         mCreated = QDateTime::currentDateTime();
     } else {
-        mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
-        std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-        DomElement& root = doc->getRoot();
+        mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
+        SExpression root = mFile->parseFileAndBuildDomTree();
 
-        mName = root.getFirstChild("name", true)->getText<QString>(false);
-        mAuthor = root.getFirstChild("author", true)->getText<QString>(false);
-        mVersion = root.getFirstChild("version", true)->getText<QString>(false);
-        mCreated = root.getFirstChild("created", true)->getText<QDateTime>(true);
+        mName = root.getValueByPath<QString>("name", false);
+        mAuthor = root.getValueByPath<QString>("author", false);
+        mVersion = root.getValueByPath<QString>("version", false);
+        mCreated = root.getValueByPath<QDateTime>("created", true);
         mAttributes.loadFromDomElement(root); // can throw
     }
 
@@ -125,8 +124,8 @@ bool ProjectMetadata::save(bool toOriginal, QStringList& errors) noexcept
     bool success = true;
 
     try {
-        DomDocument doc(*serializeToDomElement("metadata"));
-        mXmlFile->save(doc, toOriginal);
+        SExpression doc(serializeToDomElement("librepcb_project_metadata"));
+        mFile->save(doc, toOriginal);
     } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
@@ -139,14 +138,14 @@ bool ProjectMetadata::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ProjectMetadata::serialize(DomElement& root) const
+void ProjectMetadata::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendTextChild("name", mName);
-    root.appendTextChild("author", mAuthor);
-    root.appendTextChild("version", mVersion);
-    root.appendTextChild("created", mCreated);
+    root.appendStringChild("name", mName, true);
+    root.appendStringChild("author", mAuthor, true);
+    root.appendStringChild("version", mVersion, true);
+    root.appendTokenChild("created", mCreated, true);
     mAttributes.serialize(root);
 }
 

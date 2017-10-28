@@ -69,7 +69,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         BI_Device() = delete;
         BI_Device(const BI_Device& other) = delete;
         BI_Device(Board& board, const BI_Device& other);
-        BI_Device(Board& board, const DomElement& domElement);
+        BI_Device(Board& board, const SExpression& node);
         BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
                   const Uuid& footprintUuid, const Point& position, const Angle& rotation,
                   bool mirror);
@@ -96,7 +96,7 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void removeFromBoard(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Inherited from AttributeProvider
         /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()

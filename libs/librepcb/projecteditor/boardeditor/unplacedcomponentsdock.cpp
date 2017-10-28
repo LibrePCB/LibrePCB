@@ -262,7 +262,7 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
         QSet<Uuid> devices = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(mSelectedComponent->getLibComponent().getUuid());
         foreach (const Uuid& deviceUuid, devices)
         {
-            // TODO: use library metadata instead of loading the XML files
+            // TODO: use library metadata instead of loading the files
             FilePath devFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(deviceUuid);
             if (!devFp.isValid()) continue;
             const library::Device device(devFp, true);

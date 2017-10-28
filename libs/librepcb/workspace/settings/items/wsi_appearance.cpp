@@ -34,12 +34,11 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_Appearance::WSI_Appearance(const QString& xmlTagName, DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement), mUseOpenGl(false)
+WSI_Appearance::WSI_Appearance(const SExpression& node) :
+    WSI_Base(), mUseOpenGl(false)
 {
-    if (xmlElement) {
-        // load setting
-        mUseOpenGl = xmlElement->getFirstChild("use_opengl", true)->getText<bool>(true);
+    if (const SExpression* child = node.tryGetChildByPath("use_opengl")) {
+        mUseOpenGl = child->getValueOfFirstChild<bool>(true);
     }
 
     // create widgets
@@ -80,9 +79,9 @@ void WSI_Appearance::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void WSI_Appearance::serialize(DomElement& root) const
+void WSI_Appearance::serialize(SExpression& root) const
 {
-    root.appendTextChild("use_opengl", mUseOpenGlCheckBox->isChecked());
+    root.appendTokenChild("use_opengl", mUseOpenGlCheckBox->isChecked(), true);
 }
 
 /*****************************************************************************************

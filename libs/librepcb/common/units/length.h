@@ -137,7 +137,7 @@ class Length
          *
          * @param millimeters   The length in millimeters in a QString with locale "C"
          *
-         * @note This method is useful to read lengths from XML files! The problem with
+         * @note This method is useful to read lengths from files! The problem with
          * decreased precision does NOT exist by using this method!
          *
          * @throw Exception     If the string is not valid or the number is out of range,
@@ -222,7 +222,7 @@ class Length
          *
          * @return The length in millimeters as a QString. The used locale is always "C".
          *
-         * @note This method is useful to store lengths in XML files. The problem with
+         * @note This method is useful to store lengths in files. The problem with
          * decreased precision does NOT exist by using this method!
          *
          * @todo don't use double for this purpose!
@@ -375,7 +375,7 @@ class Length
          *
          * @return A new Length object with a length which is mapped to the specified grid
          *
-         * @note This method is useful to read lengths from XML files! The problem with
+         * @note This method is useful to read lengths from files! The problem with
          * decreased precision does NOT exist by using this method!
          *
          * @throw Exception     If the argument is invalid or out of range, an Exception

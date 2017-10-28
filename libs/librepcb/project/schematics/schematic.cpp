@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "schematic.h"
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/scopeguardlist.h>
 #include "../project.h"
 #include <librepcb/library/sym/symbolpin.h>
@@ -56,10 +56,10 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
     {
         mGraphicsScene.reset(new GraphicsScene());
 
-        // try to open/create the XML schematic file
+        // try to open/create the schematic file
         if (create)
         {
-            mXmlFile.reset(SmartXmlFile::create(mFilePath));
+            mFile.reset(SmartSExprFile::create(mFilePath));
 
             // set attributes
             mUuid = Uuid::createRandom();
@@ -70,21 +70,20 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         }
         else
         {
-            mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            DomElement& root = doc->getRoot();
+            mFile.reset(new SmartSExprFile(mFilePath, restore, readOnly));
+            SExpression root = mFile->parseFileAndBuildDomTree();
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
-            mName = root.getFirstChild("name", true)->getText<QString>(true);
+            mUuid = root.getValueByPath<Uuid>("uuid", true);
+            mName = root.getValueByPath<QString>("name", true);
 
             // Load grid properties
-            mGridProperties.reset(new GridProperties(*root.getFirstChild("grid", true)));
+            mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
 
             // Load all symbols
-            foreach (const DomElement* node, root.getChilds("symbol")) {
-                SI_Symbol* symbol = new SI_Symbol(*this, *node);
+            foreach (const SExpression& node, root.getChildren("symbol")) {
+                SI_Symbol* symbol = new SI_Symbol(*this, node);
                 if (getSymbolByUuid(symbol->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a symbol with the UUID \"%1\"!"))
@@ -94,8 +93,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            foreach (const DomElement* node, root.getChilds("netpoint")) {
-                SI_NetPoint* netpoint = new SI_NetPoint(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netpoint")) {
+                SI_NetPoint* netpoint = new SI_NetPoint(*this, node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netpoint with the UUID \"%1\"!"))
@@ -105,8 +104,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            foreach (const DomElement* node, root.getChilds("netline")) {
-                SI_NetLine* netline = new SI_NetLine(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netline")) {
+                SI_NetLine* netline = new SI_NetLine(*this, node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netline with the UUID \"%1\"!"))
@@ -116,8 +115,8 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlabels
-            foreach (const DomElement* node, root.getChilds("netlabel")) {
-                SI_NetLabel* netlabel = new SI_NetLabel(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netlabel")) {
+                SI_NetLabel* netlabel = new SI_NetLabel(*this, node);
                 if (getNetLabelByUuid(netlabel->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netlabel with the UUID \"%1\"!"))
@@ -140,7 +139,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
         qDeleteAll(mNetPoints);         mNetPoints.clear();
         qDeleteAll(mSymbols);           mSymbols.clear();
         mGridProperties.reset();
-        mXmlFile.reset();
+        mFile.reset();
         mGraphicsScene.reset();
         throw; // ...and rethrow the exception
     }
@@ -157,7 +156,7 @@ Schematic::~Schematic() noexcept
     qDeleteAll(mSymbols);           mSymbols.clear();
 
     mGridProperties.reset();
-    mXmlFile.reset();
+    mFile.reset();
     mGraphicsScene.reset();
 }
 
@@ -580,17 +579,17 @@ bool Schematic::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // save schematic XML file
+    // save schematic file
     try
     {
         if (mIsAddedToProject)
         {
-            DomDocument doc(*serializeToDomElement("schematic"));
-            mXmlFile->save(doc, toOriginal);
+            SExpression doc(serializeToDomElement("librepcb_schematic"));
+            mFile->save(doc, toOriginal);
         }
         else
         {
-            mXmlFile->removeFile(toOriginal);
+            mFile->removeFile(toOriginal);
         }
     }
     catch (Exception& e)
@@ -692,17 +691,22 @@ bool Schematic::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Schematic::serialize(DomElement& root) const
+void Schematic::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendTextChild("uuid", mUuid);
-    root.appendTextChild("name", mName);
-    root.appendChild(mGridProperties->serializeToDomElement("grid"));
+    root.appendTokenChild("uuid", mUuid, true);
+    root.appendStringChild("name", mName, true);
+    root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
+    root.appendLineBreak();
     serializePointerContainer(root, mSymbols, "symbol");
+    root.appendLineBreak();
     serializePointerContainer(root, mNetPoints, "netpoint");
+    root.appendLineBreak();
     serializePointerContainer(root, mNetLines, "netline");
+    root.appendLineBreak();
     serializePointerContainer(root, mNetLabels, "netlabel");
+    root.appendLineBreak();
 }
 
 /*****************************************************************************************

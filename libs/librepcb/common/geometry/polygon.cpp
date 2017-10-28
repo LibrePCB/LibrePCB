@@ -37,11 +37,10 @@ PolygonSegment::PolygonSegment(const PolygonSegment& other) noexcept :
 {
 }
 
-PolygonSegment::PolygonSegment(const DomElement& domElement)
+PolygonSegment::PolygonSegment(const SExpression& node)
 {
-    mEndPos.setX(domElement.getAttribute<Length>("end_x", true));
-    mEndPos.setY(domElement.getAttribute<Length>("end_y", true));
-    mAngle = domElement.getAttribute<Angle>("angle", true);
+    mEndPos = Point(node.getChildByPath("pos"));
+    mAngle = node.getValueByPath<Angle>("angle", true);
 }
 
 Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
@@ -96,11 +95,10 @@ void PolygonSegment::unregisterObserver(IF_PolygonSegmentObserver& object) const
     mObservers.remove(&object);
 }
 
-void PolygonSegment::serialize(DomElement& root) const
+void PolygonSegment::serialize(SExpression& root) const
 {
-    root.setAttribute("end_x", mEndPos.getX());
-    root.setAttribute("end_y", mEndPos.getY());
-    root.setAttribute("angle", mAngle);
+    root.appendChild(mEndPos.serializeToDomElement("pos"), false);
+    root.appendTokenChild("angle", mAngle, false);
 }
 
 bool PolygonSegment::operator==(const PolygonSegment& rhs) const noexcept
@@ -134,16 +132,15 @@ Polygon::Polygon(const QString& layerName, const Length& lineWidth, bool fill, b
 {
 }
 
-Polygon::Polygon(const DomElement& domElement) :
+Polygon::Polygon(const SExpression& node) :
     mSegments(this)
 {
-    mLayerName = domElement.getAttribute<QString>("layer", true);
-    mLineWidth = domElement.getAttribute<Length>("width", true);
-    mIsFilled = domElement.getAttribute<bool>("fill", true);
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
-    mStartPos.setX(domElement.getAttribute<Length>("start_x", true));
-    mStartPos.setY(domElement.getAttribute<Length>("start_y", true));
-    mSegments.loadFromDomElement(domElement);
+    mLayerName = node.getValueByPath<QString>("layer", true);
+    mLineWidth = node.getValueByPath<Length>("width", true);
+    mIsFilled = node.getValueByPath<bool>("fill", true);
+    mIsGrabArea = node.getValueByPath<bool>("grab", true);
+    mStartPos = Point(node.getChildByPath("pos"));
+    mSegments.loadFromDomElement(node);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -341,16 +338,15 @@ void Polygon::unregisterObserver(IF_PolygonObserver& object) const noexcept
     mObservers.remove(&object);
 }
 
-void Polygon::serialize(DomElement& root) const
+void Polygon::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerName);
-    root.setAttribute("width", mLineWidth);
-    root.setAttribute("fill", mIsFilled);
-    root.setAttribute("grab_area", mIsGrabArea);
-    root.setAttribute("start_x", mStartPos.getX());
-    root.setAttribute("start_y", mStartPos.getY());
+    root.appendTokenChild("layer", mLayerName, false);
+    root.appendTokenChild("width", mLineWidth, false);
+    root.appendTokenChild("fill", mIsFilled, true);
+    root.appendTokenChild("grab", mIsGrabArea, false);
+    root.appendChild(mStartPos.serializeToDomElement("pos"), false);
     serializeObjectContainer(root, mSegments, "segment");
 }
 

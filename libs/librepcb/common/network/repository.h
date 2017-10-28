@@ -51,7 +51,7 @@ class Repository final : public QObject, public SerializableObject
         Repository() = delete;
         explicit Repository(const Repository& other) noexcept;
         explicit Repository(const QUrl& url) noexcept;
-        explicit Repository(const DomElement& domElement);
+        explicit Repository(const SExpression& node);
         ~Repository() noexcept;
 
         // Getters
@@ -65,7 +65,7 @@ class Repository final : public QObject, public SerializableObject
         void requestLibraryList() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operators
         Repository& operator=(const Repository& rhs) = delete;

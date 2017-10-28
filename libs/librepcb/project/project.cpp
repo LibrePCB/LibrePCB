@@ -25,9 +25,9 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/fileio/smarttextfile.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/fileio/smartversionfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include "project.h"
 #include "library/projectlibrary.h"
@@ -189,14 +189,14 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
         // Load all schematics
-        FilePath schematicsXmlFp = mPath.getPathTo("core/schematics.xml");
+        FilePath schematicsFilepath = mPath.getPathTo("core/schematics.lp");
         if (create) {
-            mSchematicsXmlFile.reset(SmartXmlFile::create(schematicsXmlFp));
+            mSchematicsFile.reset(SmartSExprFile::create(schematicsFilepath));
         } else {
-            mSchematicsXmlFile.reset(new SmartXmlFile(schematicsXmlFp, mIsRestored, mIsReadOnly));
-            std::unique_ptr<DomDocument> schDoc = mSchematicsXmlFile->parseFileAndBuildDomTree();
-            foreach (const DomElement* node, schDoc->getRoot().getChilds("schematic")) {
-                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
+            mSchematicsFile.reset(new SmartSExprFile(schematicsFilepath, mIsRestored, mIsReadOnly));
+            SExpression schRoot = mSchematicsFile->parseFileAndBuildDomTree();
+            foreach (const SExpression& node, schRoot.getChildren("schematic")) {
+                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
             }
@@ -204,14 +204,14 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         }
 
         // Load all boards
-        FilePath boardsXmlFp = mPath.getPathTo("core/boards.xml");
+        FilePath boardsFilepath = mPath.getPathTo("core/boards.lp");
         if (create) {
-            mBoardsXmlFile.reset(SmartXmlFile::create(boardsXmlFp));
+            mBoardsFile.reset(SmartSExprFile::create(boardsFilepath));
         } else {
-            mBoardsXmlFile.reset(new SmartXmlFile(boardsXmlFp, mIsRestored, mIsReadOnly));
-            std::unique_ptr<DomDocument> brdDoc = mBoardsXmlFile->parseFileAndBuildDomTree();
-            foreach (const DomElement* node, brdDoc->getRoot().getChilds("board")) {
-                FilePath fp = FilePath::fromRelative(mPath, node->getText<QString>(true));
+            mBoardsFile.reset(new SmartSExprFile(boardsFilepath, mIsRestored, mIsReadOnly));
+            SExpression brdRoot = mBoardsFile->parseFileAndBuildDomTree();
+            foreach (const SExpression& node, brdRoot.getChildren("board")) {
+                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
             }
@@ -220,7 +220,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
 
         // at this point, the whole circuit with all schematics and boards is successfully
         // loaded, so the ERC list now contains all the correct ERC messages.
-        // So we can now restore the ignore state of each ERC message from the XML file.
+        // So we can now restore the ignore state of each ERC message from the file.
         mErcMsgList->restoreIgnoreState(); // can throw
 
         if (create) save(true); // write all files to harddisc
@@ -292,7 +292,7 @@ Schematic* Project::createSchematic(const QString& name)
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid schematic name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("schematics/" % basename % ".xml");
+    FilePath filepath = mPath.getPathTo("schematics/" % basename % ".lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The schematic exists already: \"%1\"")).arg(filepath.toNative()));
@@ -410,7 +410,7 @@ Board* Project::createBoard(const QString& name)
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    FilePath filepath = mPath.getPathTo("boards/" % basename % ".lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
@@ -425,7 +425,7 @@ Board* Project::createBoard(const Board& other, const QString& name)
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("boards/" % basename % ".xml");
+    FilePath filepath = mPath.getPathTo("boards/" % basename % ".lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
@@ -616,25 +616,25 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         errors.append(e.getMsg());
     }
 
-    // Save core/schematics.xml
+    // Save core/schematics.lp
     try {
-        QScopedPointer<DomElement> root(new DomElement("schematics"));
+        SExpression root = SExpression::createList("librepcb_schematics");
         foreach (Schematic* schematic, mSchematics) {
-            root->appendTextChild("schematic", schematic->getFilePath().toRelative(mPath));
+            root.appendStringChild("schematic", schematic->getFilePath().toRelative(mPath), true);
         }
-        mSchematicsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+        mSchematicsFile->save(root, toOriginal); // can throw
     } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
     }
 
-    // Save core/boards.xml
+    // Save core/boards.lp
     try {
-        QScopedPointer<DomElement> root(new DomElement("boards"));
+        SExpression root = SExpression::createList("librepcb_boards");
         foreach (Board* board, mBoards) {
-            root->appendTextChild("board", board->getFilePath().toRelative(mPath));
+            root.appendStringChild("board", board->getFilePath().toRelative(mPath), true);
         }
-        mBoardsXmlFile->save(DomDocument(*root.take()), toOriginal); // can throw
+        mBoardsFile->save(root, toOriginal); // can throw
     } catch (const Exception& e) {
         success = false;
         errors.append(e.getMsg());
@@ -648,26 +648,26 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     if (!mCircuit->save(toOriginal, errors))
         success = false;
 
-    // Save all removed schematics (*.xml files)
+    // Save all removed schematics (*.lp files)
     foreach (Schematic* schematic, mRemovedSchematics)
     {
         if (!schematic->save(toOriginal, errors))
             success = false;
     }
-    // Save all added schematics (*.xml files)
+    // Save all added schematics (*.lp files)
     foreach (Schematic* schematic, mSchematics)
     {
         if (!schematic->save(toOriginal, errors))
             success = false;
     }
 
-    // Save all removed boards (*.xml files)
+    // Save all removed boards (*.lp files)
     foreach (Board* board, mRemovedBoards)
     {
         if (!board->save(toOriginal, errors))
             success = false;
     }
-    // Save all added boards (*.xml files)
+    // Save all added boards (*.lp files)
     foreach (Board* board, mBoards)
     {
         if (!board->save(toOriginal, errors))

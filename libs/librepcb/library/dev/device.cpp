@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "device.h"
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -45,13 +45,11 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
 Device::Device(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
-    DomElement& root = mLoadingXmlFileDocument->getRoot();
-
     // load attributes
-    mComponentUuid = root.getFirstChild("component", true, true)->getText<Uuid>(true);
-    mPackageUuid = root.getFirstChild("package", true, true)->getText<Uuid>(true);
-    mAttributes.loadFromDomElement(root); // can throw
-    mPadSignalMap.loadFromDomElement(root);
+    mComponentUuid = mLoadingFileDocument.getValueByPath<Uuid>("component", true);
+    mPackageUuid = mLoadingFileDocument.getValueByPath<Uuid>("package", true);
+    mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
+    mPadSignalMap.loadFromDomElement(mLoadingFileDocument);
 
     cleanupAfterLoadingElementFromFile();
 }
@@ -82,11 +80,11 @@ void Device::setPackageUuid(const Uuid& uuid) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Device::serialize(DomElement& root) const
+void Device::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
-    root.appendTextChild("component", mComponentUuid);
-    root.appendTextChild("package", mPackageUuid);
+    root.appendTokenChild("component", mComponentUuid, true);
+    root.appendTokenChild("package", mPackageUuid, true);
     mAttributes.serialize(root);
     mPadSignalMap.serialize(root);
 }

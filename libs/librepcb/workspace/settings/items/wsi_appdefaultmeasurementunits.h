@@ -52,7 +52,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         // Constructors / Destructor
         WSI_AppDefaultMeasurementUnits() = delete;
         WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other) = delete;
-        WSI_AppDefaultMeasurementUnits(const QString& xmlTagName, DomElement* xmlElement);
+        explicit WSI_AppDefaultMeasurementUnits(const SExpression& node);
         ~WSI_AppDefaultMeasurementUnits() noexcept;
 
         // Getters
@@ -68,7 +68,7 @@ class WSI_AppDefaultMeasurementUnits final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         WSI_AppDefaultMeasurementUnits& operator=(const WSI_AppDefaultMeasurementUnits& rhs) = delete;

@@ -63,7 +63,7 @@ class FootprintPad final : public SerializableObject
         FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
                      Shape shape, const Length& width, const Length& height,
                      const Length& drillDiameter, BoardSide side) noexcept;
-        explicit FootprintPad(const DomElement& domElement);
+        explicit FootprintPad(const SExpression& node);
         ~FootprintPad() noexcept;
 
         // Getters
@@ -97,7 +97,7 @@ class FootprintPad final : public SerializableObject
         void unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const override;
+        virtual void serialize(SExpression& root) const override;
         virtual bool checkAttributesValidity() const noexcept;
 
         // Operator Overloadings

@@ -41,14 +41,14 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) :
+SI_NetLine::SI_NetLine(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
     mWidth()
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mWidth = domElement.getAttribute<Length>("width", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mWidth = node.getValueByPath<Length>("width", true);
 
-    Uuid spUuid = domElement.getAttribute<Uuid>("start_point", true);
+    Uuid spUuid = node.getValueByPath<Uuid>("p1", true);
     mStartPoint = mSchematic.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -56,7 +56,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const DomElement& domElement) :
             .arg(spUuid.toStr()));
     }
 
-    Uuid epUuid = domElement.getAttribute<Uuid>("end_point", true);
+    Uuid epUuid = node.getValueByPath<Uuid>("p2", true);
     mEndPoint = mSchematic.getNetPointByUuid(epUuid);
     if(!mEndPoint) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -170,14 +170,14 @@ void SI_NetLine::updateLine() noexcept
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_NetLine::serialize(DomElement& root) const
+void SI_NetLine::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("start_point", mStartPoint->getUuid());
-    root.setAttribute("end_point", mEndPoint->getUuid());
-    root.setAttribute("width", mWidth);
+    root.appendToken(mUuid);
+    root.appendTokenChild("width", mWidth, false);
+    root.appendTokenChild("p1", mStartPoint->getUuid(), true);
+    root.appendTokenChild("p2", mEndPoint->getUuid(), true);
 }
 
 /*****************************************************************************************

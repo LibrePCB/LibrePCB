@@ -42,13 +42,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const DomElement& domElement) :
+NetSignal::NetSignal(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getAttribute<QString>("name", true);
-    mHasAutoName = domElement.getAttribute<bool>("auto_name", true);
-    Uuid netclassUuid = domElement.getAttribute<Uuid>("netclass", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
+    mHasAutoName = node.getValueByPath<bool>("auto", true);
+    Uuid netclassUuid = node.getValueByPath<Uuid>("netclass", true);
     mNetClass = circuit.getNetClassByUuid(netclassUuid);
     if (!mNetClass) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -259,14 +259,14 @@ void NetSignal::unregisterBoardVia(BI_Via& via)
     updateErcMessages();
 }
 
-void NetSignal::serialize(DomElement& root) const
+void NetSignal::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("name", mName);
-    root.setAttribute("auto_name", mHasAutoName);
-    root.setAttribute("netclass", mNetClass->getUuid());
+    root.appendToken(mUuid);
+    root.appendTokenChild("auto", mHasAutoName, false);
+    root.appendStringChild("name", mName, false);
+    root.appendTokenChild("netclass", mNetClass->getUuid(), true);
 }
 
 /*****************************************************************************************

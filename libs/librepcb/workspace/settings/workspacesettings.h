@@ -53,7 +53,7 @@ class WorkspaceSettingsDialog;
 /**
  * @brief The WorkspaceSettings class manages all workspace related settings
  *
- * The "settings.xml" file in a workspace is used to store workspace related
+ * The "settings.lp" file in a workspace is used to store workspace related
  * settings. This class is an interface to these settings. A WorkspaceSettings object is
  * created in the constructor of the Workspace object.
  *
@@ -111,17 +111,16 @@ class WorkspaceSettings final : public QObject, public SerializableObject
     private: // Methods
 
         template<typename T>
-        void loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                              DomElement* xmlRoot);
+        void loadSettingsItem(QScopedPointer<T>& member, SExpression& root);
         void saveToFile() const;
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
     private: // Data
 
         // General Attributes
-        FilePath mXmlFilePath; ///< path to the "settings.xml" file
+        FilePath mFilePath; ///< path to the "settings.lp" file
         QScopedPointer<WorkspaceSettingsDialog> mDialog; ///< the settings dialog
 
         // Settings Items

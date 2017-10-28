@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "boardusersettings.h"
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/utils/graphicslayerstackappearancesettings.h>
 #include "board.h"
 #include "boardlayerstack.h"
@@ -49,19 +49,18 @@ BoardUserSettings::BoardUserSettings(Board& board, bool restore, bool readOnly, 
     QObject(&board), mBoard(board)
 {
     QString relpath = QString("user/boards/%1").arg(mBoard.getFilePath().getFilename());
-    mXmlFilepath = mBoard.getProject().getPath().getPathTo(relpath);
+    mFilepath = mBoard.getProject().getPath().getPathTo(relpath);
 
-    if (create || (!mXmlFilepath.isExistingFile())) {
-        mXmlFile.reset(SmartXmlFile::create(mXmlFilepath));
+    if (create || (!mFilepath.isExistingFile())) {
+        mFile.reset(SmartSExprFile::create(mFilepath));
 
         mLayerSettings.reset(new GraphicsLayerStackAppearanceSettings(mBoard.getLayerStack()));
     } else {
-        mXmlFile.reset(new SmartXmlFile(mXmlFilepath, restore, readOnly));
-        std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-        const DomElement& root = doc->getRoot();
+        mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
+        SExpression root = mFile->parseFileAndBuildDomTree();
 
         mLayerSettings.reset(new GraphicsLayerStackAppearanceSettings(
-            mBoard.getLayerStack(), *root.getFirstChild("layers", true)));
+            mBoard.getLayerStack(), root));
     }
 }
 
@@ -78,8 +77,8 @@ bool BoardUserSettings::save(bool toOriginal, QStringList& errors) noexcept
     bool success = true;
 
     try {
-        DomDocument doc(*serializeToDomElement("board_user_settings"));
-        mXmlFile->save(doc, toOriginal);
+        SExpression doc(serializeToDomElement("librepcb_board_user_settings"));
+        mFile->save(doc, toOriginal);
     } catch (Exception& e) {
         success = false;
         errors.append(e.getMsg());
@@ -92,9 +91,9 @@ bool BoardUserSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void BoardUserSettings::serialize(DomElement& root) const
+void BoardUserSettings::serialize(SExpression& root) const
 {
-    root.appendChild(mLayerSettings->serializeToDomElement("layers"));
+    mLayerSettings->serialize(root);
 }
 
 /*****************************************************************************************

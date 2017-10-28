@@ -48,19 +48,18 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const DomElement& domElement)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mSymbolUuid = domElement.getAttribute<Uuid>("symbol", true);
-    mSymbolPos.setX(domElement.getAttribute<Length>("x", true));
-    mSymbolPos.setY(domElement.getAttribute<Length>("y", true));
-    mSymbolRot = domElement.getAttribute<Angle>("rotation", true);
-    mIsRequired = domElement.getAttribute<bool>("required", true);
-    mSuffix = domElement.getAttribute<QString>("suffix", false);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mSymbolUuid = node.getValueByPath<Uuid>("symbol", true);
+    mSymbolPos = Point(node.getChildByPath("pos"));
+    mSymbolRot = node.getValueByPath<Angle>("rot", true);
+    mIsRequired = node.getValueByPath<bool>("required", true);
+    mSuffix = node.getValueByPath<QString>("suffix", false);
 
     // read pin signal map
-    mPinSignalMap.loadFromDomElement(domElement);
+    mPinSignalMap.loadFromDomElement(node);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -73,17 +72,16 @@ ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariantItem::serialize(DomElement& root) const
+void ComponentSymbolVariantItem::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("symbol", mSymbolUuid);
-    root.setAttribute("x", mSymbolPos.getX());
-    root.setAttribute("y", mSymbolPos.getY());
-    root.setAttribute("rotation", mSymbolRot);
-    root.setAttribute("required", mIsRequired);
-    root.setAttribute("suffix", mSuffix);
+    root.appendToken(mUuid);
+    root.appendTokenChild("symbol", mSymbolUuid, true);
+    root.appendChild(mSymbolPos.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mSymbolRot, false);
+    root.appendTokenChild("required", mIsRequired, false);
+    root.appendStringChild("suffix", mSuffix, false);
     mPinSignalMap.serialize(root);
 }
 

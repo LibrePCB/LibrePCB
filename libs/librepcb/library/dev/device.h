@@ -90,7 +90,7 @@ class Device final : public LibraryElement
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
         bool checkAttributesValidity() const noexcept override;
 
 

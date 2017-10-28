@@ -70,7 +70,7 @@ class ComponentInstance : public QObject, public AttributeProvider,
         // Constructors / Destructor
         ComponentInstance() = delete;
         ComponentInstance(const ComponentInstance& other) = delete;
-        explicit ComponentInstance(Circuit& circuit, const DomElement& domElement);
+        explicit ComponentInstance(Circuit& circuit, const SExpression& node);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
                                    const Uuid& symbVar, const QString& name);
         ~ComponentInstance() noexcept;
@@ -131,7 +131,7 @@ class ComponentInstance : public QObject, public AttributeProvider,
         void unregisterDevice(BI_Device& device);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // Inherited from AttributeProvider

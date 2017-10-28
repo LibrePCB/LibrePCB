@@ -39,13 +39,13 @@ Attribute::Attribute(const Attribute& other) noexcept :
 {
 }
 
-Attribute::Attribute(const DomElement& domElement) :
+Attribute::Attribute(const SExpression& node) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
-    mKey = domElement.getAttribute<QString>("key", true);
-    mType = &AttributeType::fromString(domElement.getAttribute<QString>("type", true));
-    mUnit = mType->getUnitFromString(domElement.getAttribute<QString>("unit", false));
-    mValue = domElement.getText<QString>(false);
+    mKey = node.getChildByIndex(0).getValue<QString>(true);
+    mType = &AttributeType::fromString(node.getValueByPath<QString>("type", true));
+    mUnit = mType->getUnitFromString(node.getValueByPath<QString>("unit", false));
+    mValue = node.getValueByPath<QString>("value", false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -99,13 +99,13 @@ void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value
  *  General Methods
  ****************************************************************************************/
 
-void Attribute::serialize(DomElement& root) const
+void Attribute::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    root.setAttribute("key", mKey);
-    root.setAttribute("type", mType->getName());
-    root.setAttribute("unit", mUnit ? mUnit->getName() : "");
-    root.setText(mValue);
+    root.appendString(mKey);
+    root.appendTokenChild("type", mType->getName(), false);
+    root.appendTokenChild("unit", mUnit ? mUnit->getName() : "none", false);
+    root.appendStringChild("value", mValue, false);
 }
 
 /*****************************************************************************************

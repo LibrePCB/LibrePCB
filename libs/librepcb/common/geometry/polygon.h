@@ -78,7 +78,7 @@ class PolygonSegment final : public SerializableObject
         PolygonSegment(const PolygonSegment& other) noexcept;
         PolygonSegment(const Point& endPos, const Angle& angle) noexcept :
             mEndPos(endPos), mAngle(angle) {}
-        explicit PolygonSegment(const DomElement& domElement);
+        explicit PolygonSegment(const SExpression& node);
         ~PolygonSegment() noexcept {}
 
         // Getters
@@ -95,7 +95,7 @@ class PolygonSegment final : public SerializableObject
         void unregisterObserver(IF_PolygonSegmentObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const PolygonSegment& rhs) const noexcept;
@@ -170,7 +170,7 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
         Polygon(const Polygon& other) noexcept;
         Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& startPos) noexcept;
-        explicit Polygon(const DomElement& domElement);
+        explicit Polygon(const SExpression& node);
         ~Polygon() noexcept;
 
         // Getters
@@ -206,7 +206,7 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
         void unregisterObserver(IF_PolygonObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Polygon& rhs) const noexcept;

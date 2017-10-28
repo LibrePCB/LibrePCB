@@ -64,7 +64,7 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
         ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept;
         ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                                const QString& name_en_US, const QString& desc_en_US) noexcept;
-        explicit ComponentSymbolVariant(const DomElement& domElement);
+        explicit ComponentSymbolVariant(const SExpression& node);
         ~ComponentSymbolVariant() noexcept;
 
         // Getters: Attributes
@@ -88,7 +88,7 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const ComponentSymbolVariant& rhs) const noexcept;
@@ -120,7 +120,7 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
  *  Class ComponentSymbolVariantList
  ****************************************************************************************/
 
-struct ComponentSymbolVariantListNameProvider {static constexpr const char* tagname = "symbol_variant";};
+struct ComponentSymbolVariantListNameProvider {static constexpr const char* tagname = "variant";};
 using ComponentSymbolVariantList = SerializableObjectList<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
 using CmdComponentSymbolVariantInsert = CmdListElementInsert<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;
 using CmdComponentSymbolVariantRemove = CmdListElementRemove<ComponentSymbolVariant, ComponentSymbolVariantListNameProvider>;

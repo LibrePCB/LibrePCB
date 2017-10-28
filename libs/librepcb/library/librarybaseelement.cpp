@@ -23,8 +23,8 @@
 #include <QtCore>
 #include "librarybaseelement.h"
 #include <librepcb/common/fileio/smartversionfile.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/application.h>
 
@@ -95,31 +95,30 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
             .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toPrettyStr(3)));
     }
 
-    // open main XML file
-    FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
-    SmartXmlFile xmlFile(xmlFilePath, false, true);
-    mLoadingXmlFileDocument = xmlFile.parseFileAndBuildDomTree();
-    const DomElement& root = mLoadingXmlFileDocument->getRoot(mLongElementName);
+    // open main file
+    FilePath sexprFilePath = mDirectory.getPathTo(mLongElementName % ".lp");
+    SmartSExprFile sexprFile(sexprFilePath, false, true);
+    mLoadingFileDocument = sexprFile.parseFileAndBuildDomTree();
 
     // read attributes
-    mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
-    mVersion = root.getFirstChild("version", true)->getText<Version>(true);
-    mAuthor = root.getFirstChild("author", true)->getText<QString>(false);
-    mCreated = root.getFirstChild("created", true)->getText<QDateTime>(true);
-    mLastModified = root.getFirstChild("last_modified", true)->getText<QDateTime>(true);
-    mIsDeprecated = root.getFirstChild("deprecated", true)->getText<bool>(true);
+    mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid", true);
+    mVersion = mLoadingFileDocument.getValueByPath<Version>("version", true);
+    mAuthor = mLoadingFileDocument.getValueByPath<QString>("author", false);
+    mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created", true);
+    mLastModified = mLoadingFileDocument.getValueByPath<QDateTime>("modified", true);
+    mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated", true);
 
     // read names, descriptions and keywords in all available languages
-    mNames.loadFromDomElement(root);
-    mDescriptions.loadFromDomElement(root);
-    mKeywords.loadFromDomElement(root);
+    mNames.loadFromDomElement(mLoadingFileDocument);
+    mDescriptions.loadFromDomElement(mLoadingFileDocument);
+    mKeywords.loadFromDomElement(mLoadingFileDocument);
 
     // check if the UUID equals to the directory basename
     if (mDirectoryNameMustBeUuid && (mUuid != dirUuid)) {
         qDebug() << mUuid << "!=" << dirUuid;
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("UUID mismatch between element directory and XML file: \"%1\""))
-            .arg(xmlFilePath.toNative()));
+            QString(tr("UUID mismatch between element directory and main file: \"%1\""))
+            .arg(sexprFilePath.toNative()));
     }
 }
 
@@ -159,12 +158,11 @@ void LibraryBaseElement::save()
             .arg(mDirectory.toNative()));
     }
 
-    // save xml file
-    FilePath xmlFilePath = mDirectory.getPathTo(mLongElementName % ".xml");
-    QScopedPointer<DomElement> root(serializeToDomElement(mLongElementName));
-    QScopedPointer<DomDocument> doc(new DomDocument(*root.take()));
-    QScopedPointer<SmartXmlFile> xmlFile(SmartXmlFile::create(xmlFilePath));
-    xmlFile->save(*doc, true);
+    // save S-Expressions file
+    FilePath sexprFilePath = mDirectory.getPathTo(mLongElementName % ".lp");
+    SExpression root(serializeToDomElement("librepcb_" % mLongElementName));
+    QScopedPointer<SmartSExprFile> sexprFile(SmartSExprFile::create(sexprFilePath));
+    sexprFile->save(root, true);
 
     // save version number file
     QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
@@ -203,7 +201,7 @@ void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir)
 
 void LibraryBaseElement::cleanupAfterLoadingElementFromFile() noexcept
 {
-    mLoadingXmlFileDocument.reset(); // destroy the whole XML DOM tree
+    mLoadingFileDocument = SExpression(); // destroy the whole DOM tree
 }
 
 void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
@@ -245,19 +243,19 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
     }
 }
 
-void LibraryBaseElement::serialize(DomElement& root) const
+void LibraryBaseElement::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) {
         throw LogicError(__FILE__, __LINE__,
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    root.appendTextChild("uuid", mUuid);
-    root.appendTextChild("version", mVersion);
-    root.appendTextChild("author", mAuthor);
-    root.appendTextChild("created", mCreated);
-    root.appendTextChild("last_modified", mLastModified);
-    root.appendTextChild("deprecated", mIsDeprecated);
+    root.appendTokenChild("uuid", mUuid, true);
+    root.appendStringChild("version", mVersion, true);
+    root.appendStringChild("author", mAuthor, true);
+    root.appendTokenChild("created", mCreated, true);
+    root.appendTokenChild("modified", mLastModified, true);
+    root.appendTokenChild("deprecated", mIsDeprecated, true);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mKeywords.serialize(root);

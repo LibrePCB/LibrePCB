@@ -104,7 +104,7 @@ QString NewProjectWizardPage_Initialization::getBoardFileName() const noexcept
 void NewProjectWizardPage_Initialization::schematicNameChanged(const QString& name) noexcept
 {
     QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (!filename.isEmpty()) filename.append(".xml");
+    if (!filename.isEmpty()) filename.append(".lp");
     mUi->lblSchematicFileName->setText(filename);
     emit completeChanged();
 }
@@ -112,7 +112,7 @@ void NewProjectWizardPage_Initialization::schematicNameChanged(const QString& na
 void NewProjectWizardPage_Initialization::boardNameChanged(const QString& name) noexcept
 {
     QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (!filename.isEmpty()) filename.append(".xml");
+    if (!filename.isEmpty()) filename.append(".lp");
     mUi->lblBoardFileName->setText(filename);
     emit completeChanged();
 }

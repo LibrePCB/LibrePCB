@@ -31,9 +31,6 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class DomElement;
-
 namespace workspace {
 
 /*****************************************************************************************
@@ -57,13 +54,9 @@ class WSI_Base : public QObject, public SerializableObject
     public:
 
         // Constructors / Destructor
-        WSI_Base() = delete;
+        WSI_Base() noexcept;
         WSI_Base(const WSI_Base& other) = delete;
-        explicit WSI_Base(const QString& xmlTagName, DomElement* xmlElement);
         virtual ~WSI_Base() noexcept;
-
-        // Getters
-        const QString& getXmlElementTagName() const noexcept {return mXmlElementTagName;}
 
         // General Methods
         virtual void restoreDefault() noexcept = 0;
@@ -73,12 +66,6 @@ class WSI_Base : public QObject, public SerializableObject
 
         // Operator Overloadings
         WSI_Base& operator=(const WSI_Base& rhs) = delete;
-
-
-    private:
-
-        // General Attributes
-        QString mXmlElementTagName;
 };
 
 /*****************************************************************************************

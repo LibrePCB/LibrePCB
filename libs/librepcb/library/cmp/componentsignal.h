@@ -54,7 +54,7 @@ class ComponentSignal final : public QObject, public SerializableObject
         ComponentSignal() = delete;
         ComponentSignal(const ComponentSignal& other) noexcept;
         ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
-        explicit ComponentSignal(const DomElement& domElement);
+        explicit ComponentSignal(const SExpression& node);
         ~ComponentSignal() noexcept;
 
         // Getters
@@ -78,7 +78,7 @@ class ComponentSignal final : public QObject, public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const ComponentSignal& rhs) const noexcept;

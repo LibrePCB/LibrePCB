@@ -37,11 +37,11 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const DomElement& domElement) :
+NetClass::NetClass(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getAttribute<QString>("name", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -128,12 +128,12 @@ void NetClass::unregisterNetSignal(NetSignal& signal)
     updateErcMessages();
 }
 
-void NetClass::serialize(DomElement& root) const
+void NetClass::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("name", mName);
+    root.appendToken(mUuid);
+    root.appendStringChild("name", mName, false);
 }
 
 /*****************************************************************************************

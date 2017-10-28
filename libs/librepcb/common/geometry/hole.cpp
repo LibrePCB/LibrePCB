@@ -42,11 +42,10 @@ Hole::Hole(const Point& position, const Length& diameter) noexcept :
 {
 }
 
-Hole::Hole(const DomElement& domElement)
+Hole::Hole(const SExpression& node)
 {
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    mDiameter = domElement.getAttribute<Length>("diameter", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mDiameter = node.getValueByPath<Length>("dia", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -92,13 +91,12 @@ void Hole::unregisterObserver(IF_HoleObserver& object) const noexcept
     mObservers.remove(&object);
 }
 
-void Hole::serialize(DomElement& root) const
+void Hole::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    root.setAttribute("diameter", mDiameter);
+    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendTokenChild("dia", mDiameter, false);
 }
 
 /*****************************************************************************************

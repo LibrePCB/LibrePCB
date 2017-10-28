@@ -53,7 +53,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLine() = delete;
         SI_NetLine(const SI_NetLine& other) = delete;
-        SI_NetLine(Schematic& schematic, const DomElement& domElement);
+        SI_NetLine(Schematic& schematic, const SExpression& node);
         SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
                    const Length& width);
         ~SI_NetLine() noexcept;
@@ -75,7 +75,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // Inherited from SI_Base

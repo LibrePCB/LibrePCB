@@ -53,7 +53,7 @@ class Attribute final : public SerializableObject
         // Constructors / Destructor
         Attribute() = delete;
         Attribute(const Attribute& other) noexcept;
-        explicit Attribute(const DomElement& domElement);
+        explicit Attribute(const SExpression& node);
         Attribute(const QString& key, const AttributeType& type, const QString& value,
                   const AttributeUnit* unit);
         ~Attribute() noexcept;
@@ -74,7 +74,7 @@ class Attribute final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Attribute& rhs) const noexcept;

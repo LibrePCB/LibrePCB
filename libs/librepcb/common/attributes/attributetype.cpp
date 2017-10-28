@@ -56,7 +56,7 @@ AttributeType::~AttributeType() noexcept
 
 const AttributeUnit* AttributeType::getUnitFromString(const QString& unit) const
 {
-    if (unit.isEmpty() && mAvailableUnits.isEmpty())
+    if ((unit.isEmpty() || (unit == "none")) && mAvailableUnits.isEmpty())
         return nullptr;
 
     foreach (const AttributeUnit* u, mAvailableUnits)

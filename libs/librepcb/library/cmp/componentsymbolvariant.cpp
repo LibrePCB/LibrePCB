@@ -50,17 +50,17 @@ ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& 
     mDescriptions.setDefaultValue(desc_en_US);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const DomElement& domElement) :
+ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node) :
     QObject(nullptr), mSymbolItems(this)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mNorm = domElement.getAttribute<QString>("norm", false);
-    mNames.loadFromDomElement(domElement);
-    mDescriptions.loadFromDomElement(domElement);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mNorm = node.getValueByPath<QString>("norm", false);
+    mNames.loadFromDomElement(node);
+    mDescriptions.loadFromDomElement(node);
 
     // Load all symbol variant items
-    mSymbolItems.loadFromDomElement(domElement);
+    mSymbolItems.loadFromDomElement(node);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -111,12 +111,12 @@ void ComponentSymbolVariant::setDescriptions(const LocalizedDescriptionMap& desc
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariant::serialize(DomElement& root) const
+void ComponentSymbolVariant::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("norm", mNorm);
+    root.appendToken(mUuid);
+    root.appendStringChild("norm", mNorm, false);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mSymbolItems.serialize(root);

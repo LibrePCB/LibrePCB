@@ -47,17 +47,17 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
     Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSignal::ComponentSignal(const DomElement& domElement) :
+ComponentSignal::ComponentSignal(const SExpression& node) :
     QObject(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getText<QString>(true);
-    mRole = domElement.getAttribute<SignalRole>("role", true);
-    mForcedNetName = domElement.getAttribute<QString>("forced_net_name", false);
-    mIsRequired = domElement.getAttribute<bool>("required", true);
-    mIsNegated = domElement.getAttribute<bool>("negated", true);
-    mIsClock = domElement.getAttribute<bool>("clock", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
+    mRole = node.getValueByPath<SignalRole>("role", true);
+    mForcedNetName = node.getValueByPath<QString>("forced_net", false);
+    mIsRequired = node.getValueByPath<bool>("required", true);
+    mIsNegated = node.getValueByPath<bool>("negated", true);
+    mIsClock = node.getValueByPath<bool>("clock", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -122,17 +122,17 @@ void ComponentSignal::setIsClock(bool clock) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentSignal::serialize(DomElement& root) const
+void ComponentSignal::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("role", mRole);
-    root.setAttribute("forced_net_name", mForcedNetName);
-    root.setAttribute("required", mIsRequired);
-    root.setAttribute("negated", mIsNegated);
-    root.setAttribute("clock", mIsClock);
-    root.setText(mName);
+    root.appendToken(mUuid);
+    root.appendStringChild("name", mName, false);
+    root.appendTokenChild("role", mRole, false);
+    root.appendTokenChild("required", mIsRequired, true);
+    root.appendTokenChild("negated", mIsNegated, false);
+    root.appendTokenChild("clock", mIsClock, false);
+    root.appendStringChild("forced_net", mForcedNetName, false);
 }
 
 /*****************************************************************************************

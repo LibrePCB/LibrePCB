@@ -83,7 +83,7 @@ class Ellipse : public SerializableObject
         Ellipse(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
                 const Point& center, const Length& radiusX, const Length& radiusY,
                 const Angle& rotation) noexcept;
-        explicit Ellipse(const DomElement& domElement);
+        explicit Ellipse(const SExpression& node);
         virtual ~Ellipse() noexcept;
 
         // Getters
@@ -118,7 +118,7 @@ class Ellipse : public SerializableObject
         void unregisterObserver(IF_EllipseObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Ellipse& rhs) const noexcept;
