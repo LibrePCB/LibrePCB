@@ -46,14 +46,14 @@ class MinimalSerializableObjectMock final : public SerializableObject
         MinimalSerializableObjectMock() = delete;
         MinimalSerializableObjectMock(const QString& value) :
             mValue(value) {}
-        MinimalSerializableObjectMock(const DomElement& root) :
-            mValue(root.getText<QString>(false)) {}
+        MinimalSerializableObjectMock(const SExpression& root) :
+            mValue(root.getValueOfFirstChild<QString>(false)) {}
         MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
         MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) = delete;
         ~MinimalSerializableObjectMock() {}
 
-        void serialize(DomElement& root) const override {
-            root.setText(mValue);
+        void serialize(SExpression& root) const override {
+            root.appendStringChild("value", mValue, true);
         }
 
         bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
@@ -77,16 +77,17 @@ class SerializableObjectMock final : public SerializableObject
             mUuid(std::move(other.mUuid)), mName(std::move(other.mName)) {}
         SerializableObjectMock(const Uuid& uuid, const QString& name) :
             mUuid(uuid), mName(name) {}
-        SerializableObjectMock(const DomElement& root) :
-            mUuid(root.getAttribute<Uuid>("uuid", true)), mName(root.getText<QString>(false)) {}
+        SerializableObjectMock(const SExpression& root) :
+            mUuid(root.getValueOfFirstChild<Uuid>(true)),
+            mName(root.getValueByPath<QString>("name", false)) {}
         ~SerializableObjectMock() {}
 
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
 
-        void serialize(DomElement& root) const override {
-            root.setAttribute("uuid", mUuid);
-            root.setText(mName);
+        void serialize(SExpression& root) const override {
+            root.appendString(mUuid);
+            root.appendStringChild("name", mName, true);
         }
 
         bool operator==(const SerializableObjectMock& rhs) const noexcept {

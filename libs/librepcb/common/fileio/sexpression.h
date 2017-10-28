@@ -85,6 +85,9 @@ class SExpression final
         T getValue(bool throwIfEmpty, const T& defaultValue = T()) const
         {
             try {
+                if (!isToken() && !isString()) {
+                    throw RuntimeError(__FILE__, __LINE__, tr("Node is not a token or string."));
+                }
                 return stringToObject<T>(mValue, throwIfEmpty, defaultValue);
             } catch (const Exception& e) {
                 throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue, e.getMsg());
@@ -105,12 +108,7 @@ class SExpression final
                 throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
                                      tr("Node does not have children."));
             }
-            try {
-                return stringToObject<T>(mChildren.at(0).mValue, throwIfEmpty, defaultValue);
-            } catch (const Exception& e) {
-                throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1,
-                                     mChildren.at(0).mValue, e.getMsg());
-            }
+            return mChildren.at(0).getValue<T>(throwIfEmpty, defaultValue);
         }
 
 
@@ -237,7 +235,7 @@ inline QString SExpression::objectToString(const QUrl& obj) noexcept {
 
 template <>
 inline QString SExpression::objectToString(const QDateTime& obj) noexcept {
-    return obj.toString(Qt::ISODate);
+    return obj.toUTC().toString(Qt::ISODate);
 }
 
 // all other types need to have a method "QString serializeToString() const noexcept"
@@ -292,7 +290,7 @@ inline uint SExpression::stringToObject(const QString& str, bool throwIfEmpty, c
 template <>
 inline QDateTime SExpression::stringToObject(const QString& str, bool throwIfEmpty, const QDateTime& defaultValue) {
     QString s = stringToObject<QString>(str, throwIfEmpty);
-    QDateTime obj = QDateTime::fromString(s, Qt::ISODate);
+    QDateTime obj = QDateTime::fromString(s, Qt::ISODate).toLocalTime();
     if (obj.isValid())      { return obj;           }
     else if (s.isEmpty())   { return defaultValue;  }
     else { throw RuntimeError(__FILE__, __LINE__, tr("Not a valid datetime.")); }

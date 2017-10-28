@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_XMLSERIALIZABLEOBJECT_H
-#define LIBREPCB_XMLSERIALIZABLEOBJECT_H
+#ifndef LIBREPCB_SERIALIZABLEOBJECT_H
+#define LIBREPCB_SERIALIZABLEOBJECT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "domelement.h"
+#include "sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -37,7 +37,7 @@ namespace librepcb {
 
 /**
  * @brief The SerializableObject class is the base class for all classes which need to be
- *        serializable/deserializable from/to DOM elements
+ *        serializable/deserializable from/to librepcb::SExpression nodes
  *
  * @author ubruhin
  * @date 2015-02-06
@@ -50,56 +50,57 @@ class SerializableObject
 
 
         /**
-         * @brief Serialize the object to a new DOM element
+         * @brief Serialize the object to a new S-Expression node
          *
-         * This method creates a new DOM element, serializes the whole object into it and
-         * then returns the whole DOM element. See #serialize() for details.
+         * This method creates a new S-Expression node, serializes the whole object into
+         * it and then returns the whole S-Expression node. See #serialize() for details.
          *
-         * @param name          The root name of the returned DOM element
+         * @param name          The root name of the returned S-Expression node
          *
-         * @return The created XML DOM element (the caller takes the ownership!)
+         * @return The created S-Expression node (the caller takes the ownership!)
          *
          * @throw Exception     This method throws an exception if an error occurs.
          *
          * @see #serialize()
          */
-        DomElement* serializeToDomElement(const QString& name) const {
-            QScopedPointer<DomElement> root(new DomElement(name));
-            serialize(*root);
-            return root.take();
+        SExpression serializeToDomElement(const QString& name) const {
+            SExpression root = SExpression::createList(name);
+            serialize(root);
+            return root;
         }
 
         /**
-         * @brief Serialize the object into an existing DOM element
+         * @brief Serialize the object into an existing S-Expression node
          *
          * This method inserts/appends all attributes and childs of the object to an
-         * existing DOM element. The content which already exists in the given DOM element
-         * will not be removed.
+         * existing S-Expression node. The content which already exists in the given
+         * S-Expression node will not be removed.
          *
-         * @note    The generated DOM element has always the format of the application's
-         *          major version (it's not possible to generate DOMs of older versions).
+         * @note    The generated S-Expression node has always the format of the
+         *          application's major version (it's not possible to generate DOMs of
+         *          older versions).
          *
          * @param root          The target DOM root node
          *
          * @throw Exception     This method throws an exception if an error occurs.
          */
-        virtual void serialize(DomElement& root) const = 0;
+        virtual void serialize(SExpression& root) const = 0;
 
         template <typename T>
-        static void serializeObjectContainer(DomElement& root, const T& container,
+        static void serializeObjectContainer(SExpression& root, const T& container,
             const QString& itemName)
         {
             for (const auto& object : container) {
-                root.appendChild(object.serializeToDomElement(itemName)); // can throw
+                root.appendChild(object.serializeToDomElement(itemName), true); // can throw
             }
         }
 
         template <typename T>
-        static void serializePointerContainer(DomElement& root, const T& container,
+        static void serializePointerContainer(SExpression& root, const T& container,
             const QString& itemName)
         {
             for (const auto& pointer : container) {
-                root.appendChild(pointer->serializeToDomElement(itemName)); // can throw
+                root.appendChild(pointer->serializeToDomElement(itemName), true); // can throw
             }
         }
 };
@@ -115,4 +116,4 @@ static_assert(sizeof(SerializableObject) == sizeof(void*),
 
 } // namespace librepcb
 
-#endif // LIBREPCB_XMLSERIALIZABLEOBJECT_H
+#endif // LIBREPCB_SERIALIZABLEOBJECT_H

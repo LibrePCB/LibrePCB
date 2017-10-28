@@ -67,6 +67,7 @@ SExpression::SExpression(sexpresso::Sexp& sexp, const FilePath& filePath) :
         }
     } else if (sexp.isString()) {
         mValue = QString::fromStdString(sexp.getString());
+        mType = Type::String;
     } else {
         throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
                              tr("Unknown node type."));

@@ -21,10 +21,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "smartxmlfile.h"
+#include "smartsexprfile.h"
 #include "fileutils.h"
-#include "domdocument.h"
-#include "domelement.h"
+#include "sexpression.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,12 +34,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartXmlFile::SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
+SmartSExprFile::SmartSExprFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
     SmartFile(filepath, restore, readOnly, create)
 {
 }
 
-SmartXmlFile::~SmartXmlFile() noexcept
+SmartSExprFile::~SmartSExprFile() noexcept
 {
 }
 
@@ -48,16 +47,19 @@ SmartXmlFile::~SmartXmlFile() noexcept
  *  General Methods
  ****************************************************************************************/
 
-std::unique_ptr<DomDocument> SmartXmlFile::parseFileAndBuildDomTree() const
+SExpression SmartSExprFile::parseFileAndBuildDomTree() const
 {
-    return std::unique_ptr<DomDocument>(
-        new DomDocument(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath));
+    return SExpression::parse(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath);
 }
 
-void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal)
+void SmartSExprFile::save(const SExpression& domDocument, bool toOriginal)
 {
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, domDocument.toByteArray());
+    FilePath filepath = prepareSaveAndReturnFilePath(toOriginal); // can throw
+    QString content = domDocument.toString(0); // can throw
+    if (!content.endsWith('\n')) {
+        content.append('\n');
+    }
+    FileUtils::writeFile(filepath, content.toUtf8()); // can throw
     updateMembersAfterSaving(toOriginal);
 }
 
@@ -65,9 +67,9 @@ void SmartXmlFile::save(const DomDocument& domDocument, bool toOriginal)
  *  Static Methods
  ****************************************************************************************/
 
-SmartXmlFile* SmartXmlFile::create(const FilePath &filepath)
+SmartSExprFile* SmartSExprFile::create(const FilePath &filepath)
 {
-    return new SmartXmlFile(filepath, false, false, true);
+    return new SmartSExprFile(filepath, false, false, true);
 }
 
 /*****************************************************************************************
