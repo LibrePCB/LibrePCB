@@ -75,7 +75,7 @@ class Hole final : public SerializableObject
         Hole() = delete;
         Hole(const Hole& other) noexcept;
         Hole(const Point& position, const Length& diameter) noexcept;
-        explicit Hole(const DomElement& domElement);
+        explicit Hole(const SExpression& node);
         ~Hole() noexcept;
 
         // Getters
@@ -91,7 +91,7 @@ class Hole final : public SerializableObject
         void unregisterObserver(IF_HoleObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Hole& rhs) const noexcept;

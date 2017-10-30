@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "symbol.h"
 #include "symbolgraphicsitem.h"
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,11 +50,10 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) :
     mPins(this), mPolygons(this), mEllipses(this), mTexts(this),
     mRegisteredGraphicsItem(nullptr)
 {
-    const DomElement& root = mLoadingXmlFileDocument->getRoot();
-    mPins.loadFromDomElement(root); // can throw
-    mPolygons.loadFromDomElement(root); // can throw
-    mEllipses.loadFromDomElement(root); // can throw
-    mTexts.loadFromDomElement(root); // can throw
+    mPins.loadFromDomElement(mLoadingFileDocument); // can throw
+    mPolygons.loadFromDomElement(mLoadingFileDocument); // can throw
+    mEllipses.loadFromDomElement(mLoadingFileDocument); // can throw
+    mTexts.loadFromDomElement(mLoadingFileDocument); // can throw
 
     cleanupAfterLoadingElementFromFile();
 }
@@ -148,7 +147,7 @@ void Symbol::listObjectRemoved(const TextList& list, int oldIndex,
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeText(*ptr);
 }
 
-void Symbol::serialize(DomElement& root) const
+void Symbol::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
     mPins.serialize(root);

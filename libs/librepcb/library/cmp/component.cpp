@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "component.h"
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -47,15 +47,13 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
     mSchematicOnly(false), mDefaultValue()
 {
-    DomElement& root = mLoadingXmlFileDocument->getRoot();
-
     // Load all properties
-    mSchematicOnly = root.getFirstChild("schematic_only", true, true)->getText<bool>(true);
-    mAttributes.loadFromDomElement(root); // can throw
-    mDefaultValue = root.getFirstChild("default_value", true)->getText<QString>(false);
-    mPrefixes.loadFromDomElement(root);
-    mSignals.loadFromDomElement(root);
-    mSymbolVariants.loadFromDomElement(root);
+    mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only", true);
+    mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
+    mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value", false);
+    mPrefixes.loadFromDomElement(mLoadingFileDocument);
+    mSignals.loadFromDomElement(mLoadingFileDocument);
+    mSymbolVariants.loadFromDomElement(mLoadingFileDocument);
 
     cleanupAfterLoadingElementFromFile();
 }
@@ -100,11 +98,11 @@ std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
  *  Private Methods
  ****************************************************************************************/
 
-void Component::serialize(DomElement& root) const
+void Component::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
-    root.appendTextChild("schematic_only", mSchematicOnly);
-    root.appendTextChild("default_value", mDefaultValue);
+    root.appendTokenChild("schematic_only", mSchematicOnly, true);
+    root.appendStringChild("default_value", mDefaultValue, true);
     mPrefixes.serialize(root);
     mAttributes.serialize(root);
     mSignals.serialize(root);

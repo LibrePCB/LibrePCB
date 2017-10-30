@@ -54,7 +54,7 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLabel() = delete;
         SI_NetLabel(const SI_NetLabel& other) = delete;
-        explicit SI_NetLabel(Schematic& schematic, const DomElement& domElement);
+        explicit SI_NetLabel(Schematic& schematic, const SExpression& node);
         explicit SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position);
         ~SI_NetLabel() noexcept;
 
@@ -73,7 +73,7 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         void removeFromSchematic(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetLabel;}

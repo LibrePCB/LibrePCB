@@ -153,9 +153,7 @@ class Ratio
          *
          * @todo don't use double for this purpose!
          */
-        QString toNormalizedString() const noexcept {
-            return QLocale::c().toString(toNormalized(), 'f', 6);
-        }
+        QString toNormalizedString() const noexcept;
 
         /**
          * @brief Serialize this object into a string

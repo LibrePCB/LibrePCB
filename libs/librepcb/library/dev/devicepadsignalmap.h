@@ -52,7 +52,7 @@ class DevicePadSignalMapItem final : public QObject, public SerializableObject
         DevicePadSignalMapItem() = delete;
         DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
         DevicePadSignalMapItem(const Uuid& pad, const Uuid& signal) noexcept;
-        explicit DevicePadSignalMapItem(const DomElement& domElement);
+        explicit DevicePadSignalMapItem(const SExpression& node);
         ~DevicePadSignalMapItem() noexcept;
 
         // Getters
@@ -64,7 +64,7 @@ class DevicePadSignalMapItem final : public QObject, public SerializableObject
         void setSignalUuid(const Uuid& uuid) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const DevicePadSignalMapItem& rhs) const noexcept;
@@ -89,7 +89,7 @@ class DevicePadSignalMapItem final : public QObject, public SerializableObject
  *  Class DevicePadSignalMap
  ****************************************************************************************/
 
-struct DevicePadSignalMapNameProvider {static constexpr const char* tagname = "pad_signal_map";};
+struct DevicePadSignalMapNameProvider {static constexpr const char* tagname = "pad";};
 using DevicePadSignalMap = SerializableObjectList<DevicePadSignalMapItem, DevicePadSignalMapNameProvider>;
 using CmdDevicePadSignalMapItemInsert = CmdListElementInsert<DevicePadSignalMapItem, DevicePadSignalMapNameProvider>;
 using CmdDevicePadSignalMapItemRemove = CmdListElementRemove<DevicePadSignalMapItem, DevicePadSignalMapNameProvider>;

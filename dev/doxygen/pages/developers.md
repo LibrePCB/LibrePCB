@@ -17,15 +17,16 @@ contribution guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRI
 
 # Internationalization (i18n) {#doc_developers_i18n}
 
-- All files (\*.cpp, \*.h, \*.md, \*.xml, \*.ini,...) must be written in english. Only strings which
+- All files (\*.cpp, \*.h, \*.md, \*.lp, \*.ini,...) must be written in english. Only strings which
   are visible in the GUI should be translatable into other languages.
 - Always use international date/time formats in files:
     - Use the [ISO 8601] format for date/time in all files.
     - Use UTC time in all files, e.g. `2014-12-20T14:42:30Z`.
     - In the GUI, you should normally use the local date/time format.
     - See also https://en.wikipedia.org/wiki/ISO_8601 and http://doc.qt.io/qt-5/qdatetime.html
-- All numbers which are stored in files (e.g. XML or INI) must have a locale-independent format. We
-  always use the point '.' as decimal separator, and no thousands separator. Example: `123456789.987654321`
+- All numbers which are stored in files (e.g. S-Expressions or INI) must have a
+  locale-independent format. We always use the point '.' as decimal separator,
+  and no thousands separator. Example: `123456789.987654321`
 
 
 # Licenses {#doc_developers_licenses}

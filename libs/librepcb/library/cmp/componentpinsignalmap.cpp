@@ -44,13 +44,13 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const DomElement& domElement)
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
 {
     // read attributes
-    mPinUuid = domElement.getAttribute<Uuid>("pin", true);
+    mPinUuid = node.getChildByIndex(0).getValue<Uuid>(true);
     mDisplayType = CmpSigPinDisplayType::fromString(
-                       domElement.getAttribute<QString>("display", true));
-    mSignalUuid = domElement.getText<Uuid>(false);
+                       node.getValueByPath<QString>("disp", true));
+    mSignalUuid = node.getValueByPath<Uuid>("sig", false);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -63,13 +63,13 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ComponentPinSignalMapItem::serialize(DomElement& root) const
+void ComponentPinSignalMapItem::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("pin", mPinUuid);
-    root.setAttribute<QString>("display", mDisplayType.toString());
-    root.setText(mSignalUuid);
+    root.appendToken(mPinUuid);
+    root.appendTokenChild("sig", mSignalUuid, false);
+    root.appendTokenChild("disp", mDisplayType.toString(), false);
 }
 
 /*****************************************************************************************

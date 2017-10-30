@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SMARTXMLFILE_H
-#define LIBREPCB_SMARTXMLFILE_H
+#ifndef LIBREPCB_SMARTSEXPRFILE_H
+#define LIBREPCB_SMARTSEXPRFILE_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,36 +32,36 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class DomDocument;
+class SExpression;
 
 /*****************************************************************************************
- *  Class SmartXmlFile
+ *  Class SmartSExprFile
  ****************************************************************************************/
 
 /**
- * @brief The SmartXmlFile class represents a XML file and provides methods to load/save
- *        XML DOM trees (#DomDocument)
+ * @brief The SmartSExprFile class represents an S-Expressions file and provides methods
+ *        to load/save DOM trees (#DomDocument)
  *
- * With #parseFileAndBuildDomTree() the XML file can be parsed and a DOM tree is created.
- * With #save() the DOM tree can be saved back to the XML file.
+ * With #parseFileAndBuildDomTree() the file can be parsed and a DOM tree is created.
+ * With #save() the DOM tree can be saved back to the S-Expressions file.
  *
  * @note See class #SmartFile for more information.
  *
  * @author ubruhin
  * @date 2014-08-13
  */
-class SmartXmlFile final : public SmartFile
+class SmartSExprFile final : public SmartFile
 {
-        Q_DECLARE_TR_FUNCTIONS(SmartXmlFile)
+        Q_DECLARE_TR_FUNCTIONS(SmartSExprFile)
 
     public:
 
         // Constructors / Destructor
-        SmartXmlFile() = delete;
-        SmartXmlFile(const SmartXmlFile& other) = delete;
+        SmartSExprFile() = delete;
+        SmartSExprFile(const SmartSExprFile& other) = delete;
 
         /**
-         * @brief The constructor to open an existing XML file
+         * @brief The constructor to open an existing S-Expressions file
          *
          * This constructor tries to open an existing file and throws an exception if an
          * error occurs.
@@ -73,27 +73,27 @@ class SmartXmlFile final : public SmartFile
          * @throw Exception If the specified text file could not be opened successful, an
          *                  exception will be thrown.
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly) :
-            SmartXmlFile(filepath, restore, readOnly, false) {}
+        SmartSExprFile(const FilePath& filepath, bool restore, bool readOnly) :
+            SmartSExprFile(filepath, restore, readOnly, false) {}
 
         /**
          * @copydoc SmartFile#~SmartFile()
          */
-        ~SmartXmlFile() noexcept;
+        ~SmartSExprFile() noexcept;
 
 
         // General Methods
 
         /**
-         * @brief Open and parse the XML file and build the whole DOM tree
+         * @brief Open and parse the S-Expressions file and build the whole DOM tree
          *
          * @return  A pointer to the created DOM tree. The caller takes the ownership of
          *          the DOM document.
          */
-        std::unique_ptr<DomDocument> parseFileAndBuildDomTree() const;
+        SExpression parseFileAndBuildDomTree() const;
 
         /**
-         * @brief Write the XML DOM tree to the file system
+         * @brief Write the S-Expressions DOM tree to the file system
          *
          * @param domDocument   The DOM document to save
          * @param toOriginal    Specifies whether the original or the backup file should
@@ -101,17 +101,17 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception If an error occurs
          */
-        void save(const DomDocument& domDocument, bool toOriginal);
+        void save(const SExpression& domDocument, bool toOriginal);
 
 
         // Operator Overloadings
-        SmartXmlFile& operator=(const SmartXmlFile& rhs) = delete;
+        SmartSExprFile& operator=(const SmartSExprFile& rhs) = delete;
 
 
         // Static Methods
 
         /**
-         * @brief Create a new XML file
+         * @brief Create a new S-Expressions file
          *
          * @note    This method will NOT immediately create the file! The file will be
          *          created after calling #save().
@@ -119,17 +119,17 @@ class SmartXmlFile final : public SmartFile
          * @param filepath  The filepath to the file to create (always to the original file,
          *                  not to the backup file with "~" at the end of the filename!)
          *
-         * @return The #SmartXmlFile object of the created file
+         * @return The #SmartSExprFile object of the created file
          *
          * @throw Exception If an error occurs
          */
-        static SmartXmlFile* create(const FilePath &filepath);
+        static SmartSExprFile* create(const FilePath &filepath);
 
 
     private: // Methods
 
         /**
-         * @brief Constructor to create or open a XML file
+         * @brief Constructor to create or open a S-Expressions file
          *
          * @param filepath          See SmartFile#SmartFile()
          * @param restore           See SmartFile#SmartFile()
@@ -138,7 +138,7 @@ class SmartXmlFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartXmlFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
+        SmartSExprFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
 
 };
 
@@ -148,4 +148,4 @@ class SmartXmlFile final : public SmartFile
 
 } // namespace librepcb
 
-#endif // LIBREPCB_SMARTXMLFILE_H
+#endif // LIBREPCB_SMARTSEXPRFILE_H

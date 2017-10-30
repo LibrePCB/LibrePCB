@@ -3,8 +3,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <parseagle/library.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/pkg/footprint.h>

@@ -24,7 +24,8 @@ QT += core widgets xml opengl network sql
 CONFIG += staticlib
 
 INCLUDEPATH += \
-    ../../quazip
+    ../../quazip \
+    ../../sexpresso \
 
 SOURCES += \
     alignment.cpp \
@@ -53,14 +54,13 @@ SOURCES += \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
-    fileio/domdocument.cpp \
-    fileio/domelement.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
+    fileio/sexpression.cpp \
     fileio/smartfile.cpp \
+    fileio/smartsexprfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
-    fileio/smartxmlfile.cpp \
     geometry/cmd/cmdellipseedit.cpp \
     geometry/cmd/cmdholeedit.cpp \
     geometry/cmd/cmdpolygonedit.cpp \
@@ -146,17 +146,16 @@ HEADERS += \
     fileio/cmd/cmdlistelementremove.h \
     fileio/cmd/cmdlistelementsswap.h \
     fileio/directorylock.h \
-    fileio/domdocument.h \
-    fileio/domelement.h \
     fileio/filepath.h \
     fileio/fileutils.h \
     fileio/serializablekeyvaluemap.h \
     fileio/serializableobject.h \
     fileio/serializableobjectlist.h \
+    fileio/sexpression.h \
     fileio/smartfile.h \
+    fileio/smartsexprfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
-    fileio/smartxmlfile.h \
     geometry/cmd/cmdellipseedit.h \
     geometry/cmd/cmdholeedit.h \
     geometry/cmd/cmdpolygonedit.h \

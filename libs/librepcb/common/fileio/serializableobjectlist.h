@@ -59,7 +59,7 @@ namespace librepcb {
  *              - Optional: Comparison operator overloadings
  *              - Optional: A method `Uuid getUuid() const noexcept`
  *              - Optional: A method `QString getName() const noexcept`
- * @tparam P  A class which provides the XML element tag name of the list items. Example:
+ * @tparam P  A class which provides the S-Expression node tag name of the list items. Example:
  *            `struct MyNameProvider {static constexpr const char* tagname = "item";};`
  *
  * @note    Instead of directly storing elements of type `T`, elements are always wrapped
@@ -130,8 +130,8 @@ class SerializableObjectList : public SerializableObject
             for (const T& obj : elements) { append(std::make_shared<T>(obj)); } // copy element
             if (observer) registerObserver(observer);
         }
-        explicit SerializableObjectList(const DomElement& domElement, IF_Observer* observer = nullptr) {
-            loadFromDomElement(domElement); // can throw
+        explicit SerializableObjectList(const SExpression& node, IF_Observer* observer = nullptr) {
+            loadFromDomElement(node); // can throw
             if (observer) registerObserver(observer);
         }
         virtual ~SerializableObjectList() noexcept {}
@@ -219,12 +219,10 @@ class SerializableObjectList : public SerializableObject
         iterator end() noexcept {return mObjects.end();}
 
         // General Methods
-        int loadFromDomElement(const DomElement& domElement) {
+        int loadFromDomElement(const SExpression& node) {
             clear();
-            for (DomElement* node = domElement.getFirstChild(P::tagname, false);
-                 node; node = node->getNextSibling(P::tagname))
-            {
-                append(std::make_shared<T>(*node)); // can throw
+            foreach (const SExpression& node, node.getChildren(P::tagname)) {
+                append(std::make_shared<T>(node)); // can throw
             }
             return count();
         }
@@ -281,7 +279,7 @@ class SerializableObjectList : public SerializableObject
             for (int i = count() - 1; i >= 0; --i) { remove(i); }
         }
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override {
+        void serialize(SExpression& root) const override {
             serializePointerContainer(root, mObjects, P::tagname); // can throw
         }
 

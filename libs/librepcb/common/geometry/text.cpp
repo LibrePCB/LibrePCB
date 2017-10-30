@@ -45,25 +45,21 @@ Text::Text(const QString& layerName, const QString& text, const Point& pos, cons
 {
 }
 
-Text::Text(const DomElement& domElement)
+Text::Text(const SExpression& node)
 {
-    mLayerName = domElement.getAttribute<QString>("layer", true);
-    mText = domElement.getText<QString>(true); // empty string --> exception
+    mText = node.getChildByIndex(0).getValue<QString>(true);
+    mLayerName = node.getValueByPath<QString>("layer", true);
 
     // load geometry attributes
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
-    mHeight = domElement.getAttribute<Length>("height", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    mHeight = node.getValueByPath<Length>("height", true);
     if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The height of a text element in the file \"%1\" is <= 0."))
-            .arg(domElement.getDocFilePath().toNative()));
+        throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
 
     // text alignment
-    mAlign.setH(domElement.getAttribute<HAlign>("align_h", true));
-    mAlign.setV(domElement.getAttribute<VAlign>("align_v", true));
+    mAlign = Alignment(node.getChildByPath("align"));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -144,18 +140,16 @@ void Text::unregisterObserver(IF_TextObserver& object) const noexcept
     mObservers.remove(&object);
 }
 
-void Text::serialize(DomElement& root) const
+void Text::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerName);
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    root.setAttribute("rotation", mRotation);
-    root.setAttribute("height", mHeight);
-    root.setAttribute("align_h", mAlign.getH());
-    root.setAttribute("align_v", mAlign.getV());
-    root.setText(mText);
+    root.appendString(mText);
+    root.appendTokenChild("layer", mLayerName, false);
+    root.appendChild(mAlign.serializeToDomElement("align"), false);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
+    root.appendTokenChild("height", mHeight, false);
 }
 
 /*****************************************************************************************

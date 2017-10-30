@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartXmlFile;
+class SmartSExprFile;
 
 namespace project {
 
@@ -90,16 +90,16 @@ class ProjectSettings final : public QObject, public SerializableObject
         // Private Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
         FilePath mLibraryPath; ///< the "lib" directory of the project
 
-        // File "core/settings.xml"
-        FilePath mXmlFilepath;
-        SmartXmlFile* mXmlFile;
+        // File "core/settings.lp"
+        FilePath mFilepath;
+        SmartSExprFile* mFile;
 
 
         // All Settings

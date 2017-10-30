@@ -24,8 +24,8 @@
 #include <QtWidgets>
 #include "library.h"
 #include <librepcb/common/toolbox.h>
-#include <librepcb/common/fileio/domdocument.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "sym/symbol.h"
@@ -62,12 +62,11 @@ Library::Library(const FilePath& libDir, bool readOnly) :
     }
 
     // read properties
-    DomElement& root = mLoadingXmlFileDocument->getRoot();
-    mUrl = QUrl(root.getFirstChild("url", true)->getText<QString>(false), QUrl::StrictMode);
+    mUrl = mLoadingFileDocument.getValueByPath<QUrl>("url", false);
 
     // read dependency UUIDs
-    foreach (const DomElement* node, root.getChilds("dependency")) {
-        mDependencies.insert(node->getText<Uuid>(true));
+    foreach (const SExpression& node, mLoadingFileDocument.getChildren("dependency")) {
+        mDependencies.insert(node.getValueOfFirstChild<Uuid>(true));
     }
 
     // load image if available
@@ -197,12 +196,12 @@ void Library::copyTo(const FilePath& destination, bool removeSource)
     LibraryBaseElement::copyTo(destination, removeSource);
 }
 
-void Library::serialize(DomElement& root) const
+void Library::serialize(SExpression& root) const
 {
     LibraryBaseElement::serialize(root);
-    root.appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));
+    root.appendStringChild("url", mUrl, true);
     foreach (const Uuid& uuid, Toolbox::sortedQSet(mDependencies)) {
-        root.appendTextChild("dependency", uuid);
+        root.appendTokenChild("dependency", uuid, true);
     }
 }
 

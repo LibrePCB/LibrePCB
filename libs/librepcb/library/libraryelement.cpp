@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "libraryelement.h"
 #include <librepcb/common/toolbox.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,9 +50,8 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read category UUIDs
-    DomElement& root = mLoadingXmlFileDocument->getRoot();
-    foreach (const DomElement* node, root.getChilds("category")) {
-        mCategories.insert(node->getText<Uuid>(true));
+    foreach (const SExpression& node, mLoadingFileDocument.getChildren("category")) {
+        mCategories.insert(node.getValueOfFirstChild<Uuid>(true));
     }
 }
 
@@ -64,11 +63,11 @@ LibraryElement::~LibraryElement() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-void LibraryElement::serialize(DomElement& root) const
+void LibraryElement::serialize(SExpression& root) const
 {
     LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
-        root.appendTextChild("category", uuid);
+        root.appendTokenChild("category", uuid, true);
     }
 }
 

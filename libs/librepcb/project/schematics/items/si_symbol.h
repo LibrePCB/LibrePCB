@@ -65,7 +65,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         // Constructors / Destructor
         SI_Symbol() = delete;
         SI_Symbol(const SI_Symbol& other) = delete;
-        explicit SI_Symbol(Schematic& schematic, const DomElement& domElement);
+        explicit SI_Symbol(Schematic& schematic, const SExpression& node);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
                            const Angle& rotation = Angle());
@@ -90,7 +90,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         void removeFromSchematic(GraphicsScene& scene) override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // Helper Methods

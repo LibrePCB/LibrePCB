@@ -23,8 +23,8 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "board.h"
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include "../project.h"
@@ -64,7 +64,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
         mGraphicsScene.reset(new GraphicsScene());
 
         // copy the other board
-        mXmlFile.reset(SmartXmlFile::create(mFilePath));
+        mFile.reset(SmartSExprFile::create(mFilePath));
 
         // set attributes
         mUuid = Uuid::createRandom();
@@ -158,7 +158,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
         mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
-        mXmlFile.reset();
+        mFile.reset();
         mGraphicsScene.reset();
         throw; // ...and rethrow the exception
     }
@@ -172,10 +172,10 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     {
         mGraphicsScene.reset(new GraphicsScene());
 
-        // try to open/create the XML board file
+        // try to open/create the board file
         if (create)
         {
-            mXmlFile.reset(SmartXmlFile::create(mFilePath));
+            mFile.reset(SmartSExprFile::create(mFilePath));
 
             // set attributes
             mUuid = Uuid::createRandom();
@@ -195,30 +195,29 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         }
         else
         {
-            mXmlFile.reset(new SmartXmlFile(mFilePath, restore, readOnly));
-            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            DomElement& root = doc->getRoot();
+            mFile.reset(new SmartSExprFile(mFilePath, restore, readOnly));
+            SExpression root = mFile->parseFileAndBuildDomTree();
 
             // the board seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getFirstChild("uuid", true)->getText<Uuid>(true);
-            mName = root.getFirstChild("name", true)->getText<QString>(true);
+            mUuid = root.getValueByPath<Uuid>("uuid", true);
+            mName = root.getValueByPath<QString>("name", true);
 
             // Load grid properties
-            mGridProperties.reset(new GridProperties(*root.getFirstChild("grid", true)));
+            mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
 
             // Load layer stack
-            mLayerStack.reset(new BoardLayerStack(*this, *root.getFirstChild("layers", true)));
+            mLayerStack.reset(new BoardLayerStack(*this, root.getChildByPath("layers")));
 
             // load design rules
-            mDesignRules.reset(new BoardDesignRules(*root.getFirstChild("design_rules", true)));
+            mDesignRules.reset(new BoardDesignRules(root.getChildByPath("design_rules")));
 
             // load user settings
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
 
             // Load all device instances
-            foreach (const DomElement* node, root.getChilds("device")) {
-                BI_Device* device = new BI_Device(*this, *node);
+            foreach (const SExpression& node, root.getChildren("device")) {
+                BI_Device* device = new BI_Device(*this, node);
                 if (getDeviceInstanceByComponentUuid(device->getComponentInstanceUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a device of the component instance \"%1\"!"))
@@ -228,8 +227,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all vias
-            foreach (const DomElement* node, root.getChilds("via")) {
-                BI_Via* via = new BI_Via(*this, *node);
+            foreach (const SExpression& node, root.getChildren("via")) {
+                BI_Via* via = new BI_Via(*this, node);
                 if (getViaByUuid(via->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a via with the UUID \"%1\"!"))
@@ -239,8 +238,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netpoints
-            foreach (const DomElement* node, root.getChilds("netpoint")) {
-                BI_NetPoint* netpoint = new BI_NetPoint(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netpoint")) {
+                BI_NetPoint* netpoint = new BI_NetPoint(*this, node);
                 if (getNetPointByUuid(netpoint->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netpoint with the UUID \"%1\"!"))
@@ -250,8 +249,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all netlines
-            foreach (const DomElement* node, root.getChilds("netline")) {
-                BI_NetLine* netline = new BI_NetLine(*this, *node);
+            foreach (const SExpression& node, root.getChildren("netline")) {
+                BI_NetLine* netline = new BI_NetLine(*this, node);
                 if (getNetLineByUuid(netline->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
                         QString(tr("There is already a netline with the UUID \"%1\"!"))
@@ -261,8 +260,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             }
 
             // Load all polygons
-            foreach (const DomElement* node, root.getChilds("polygon")) {
-                BI_Polygon* polygon = new BI_Polygon(*this, *node);
+            foreach (const SExpression& node, root.getChildren("polygon")) {
+                BI_Polygon* polygon = new BI_Polygon(*this, node);
                 mPolygons.append(polygon);
             }
         }
@@ -291,7 +290,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         mDesignRules.reset();
         mGridProperties.reset();
         mLayerStack.reset();
-        mXmlFile.reset();
+        mFile.reset();
         mGraphicsScene.reset();
         throw; // ...and rethrow the exception
     }
@@ -314,7 +313,7 @@ Board::~Board() noexcept
     mDesignRules.reset();
     mGridProperties.reset();
     mLayerStack.reset();
-    mXmlFile.reset();
+    mFile.reset();
     mGraphicsScene.reset();
 }
 
@@ -800,17 +799,17 @@ bool Board::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // save board XML file
+    // save board file
     try
     {
         if (mIsAddedToProject)
         {
-            DomDocument doc(*serializeToDomElement("board"));
-            mXmlFile->save(doc, toOriginal);
+            SExpression doc(serializeToDomElement("librepcb_board"));
+            mFile->save(doc, toOriginal);
         }
         else
         {
-            mXmlFile->removeFile(toOriginal);
+            mFile->removeFile(toOriginal);
         }
     }
     catch (Exception& e)
@@ -911,29 +910,26 @@ bool Board::checkAttributesValidity() const noexcept
     return true;
 }
 
-void Board::serialize(DomElement& root) const
+void Board::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    // metadata
-    root.appendTextChild("uuid", mUuid);
-    root.appendTextChild("name", mName);
-    // grid properties
-    root.appendChild(mGridProperties->serializeToDomElement("grid"));
-    // layer stack
-    root.appendChild(mLayerStack->serializeToDomElement("layers"));
-    // design rules
-    root.appendChild(mDesignRules->serializeToDomElement("design_rules"));
-    // devices
+    root.appendTokenChild("uuid", mUuid, true);
+    root.appendStringChild("name", mName, true);
+    root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
+    root.appendChild(mLayerStack->serializeToDomElement("layers"), true);
+    root.appendChild(mDesignRules->serializeToDomElement("design_rules"), true);
+    root.appendLineBreak();
     serializePointerContainer(root, mDeviceInstances, "device");
-    // vias
+    root.appendLineBreak();
     serializePointerContainer(root, mVias, "via");
-    // netpoints
+    root.appendLineBreak();
     serializePointerContainer(root, mNetPoints, "netpoint");
-    // netlines
+    root.appendLineBreak();
     serializePointerContainer(root, mNetLines, "netline");
-    // polygons
+    root.appendLineBreak();
     serializePointerContainer(root, mPolygons, "polygon");
+    root.appendLineBreak();
 }
 
 void Board::updateErcMessages() noexcept

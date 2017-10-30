@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartXmlFile;
+class SmartSExprFile;
 
 namespace project {
 
@@ -83,15 +83,15 @@ class ErcMsgList final : public QObject, public SerializableObject
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // General
         Project& mProject;
 
-        // File "core/erc.xml"
-        FilePath mXmlFilepath;
-        QScopedPointer<SmartXmlFile> mXmlFile;
+        // File "core/erc.lp"
+        FilePath mFilepath;
+        QScopedPointer<SmartSExprFile> mFile;
 
         // Misc
         QList<ErcMsg*> mItems; ///< contains all visible ERC messages

@@ -73,7 +73,7 @@ TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass)
 {
     MinimalList l1;                         // default ctor
     MinimalList l2(std::move(l1));          // move ctor
-    MinimalList l3(DomElement("list"));  // DomElement ctor
+    MinimalList l3(SExpression::createList("list"));  // SExpression ctor
     l3.append(std::make_shared<MinimalMock>("foo"));
     EXPECT_TRUE(l1.isEmpty());
     EXPECT_EQ(0, l2.count());
@@ -123,10 +123,10 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor)
 
 TEST_F(SerializableObjectListTest, testDomElementConstructor)
 {
-    DomElement e("list");
-    e.appendTextChild<QString>("test", "foo")->setAttribute("uuid", mMocks[0]->mUuid);
-    e.appendTextChild<QString>("test", "bar")->setAttribute("uuid", mMocks[1]->mUuid);
-    e.appendTextChild<QString>("none", "bar")->setAttribute("uuid", mMocks[2]->mUuid);
+    SExpression e = SExpression::createList("list");
+    e.appendStringChild("test", mMocks[0]->mUuid, true).appendStringChild<QString>("name", "foo", true);
+    e.appendStringChild("test", mMocks[1]->mUuid, true).appendStringChild<QString>("name", "bar", true);
+    e.appendStringChild("none", mMocks[2]->mUuid, true).appendStringChild<QString>("name", "bar", true);
     List l(e);
     EXPECT_EQ(2, l.count());
     EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
@@ -285,13 +285,14 @@ TEST_F(SerializableObjectListTest, testClear)
 
 TEST_F(SerializableObjectListTest, testSerialize)
 {
-    DomElement e("list");
+    SExpression e = SExpression::createList("list");
     List l{mMocks[0], mMocks[1], mMocks[2]};
     l.serialize(e);
-    EXPECT_EQ(3, e.getChildCount());
-    EXPECT_EQ("test",           e.getChilds()[0]->getName());
-    EXPECT_EQ(mMocks[1]->mUuid, e.getChilds()[1]->getAttribute<Uuid>("uuid", false));
-    EXPECT_EQ(mMocks[2]->mName, e.getChilds()[2]->getText<QString>(false));
+    e.removeLineBreaks(); // we are not interested in line breaks...
+    EXPECT_EQ(3,                e.getChildren().count());
+    EXPECT_EQ("test",           e.getChildren()[0].getName());
+    EXPECT_EQ(mMocks[1]->mUuid, e.getChildren()[1].getValueOfFirstChild<Uuid>(false));
+    EXPECT_EQ(mMocks[2]->mName, e.getChildren()[2].getValueByPath<QString>("name", false));
 }
 
 TEST_F(SerializableObjectListTest, testOperatorEqual)

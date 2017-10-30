@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="librepcb" _name="LibrePCB" version="2.0" _section="Other">
+
+  <metadata>
+    <property name="mimetypes">application/x-librepcb-file</property>
+    <property name="globs">*.lp</property>
+    <property name="line-comment-start">;</property>
+  </metadata>
+
+  <styles>
+    <style id="comment" _name="Comment" map-to="def:comment"/>
+    <style id="string"  _name="String"  map-to="def:string"/>
+    <style id="element" _name="Element" map-to="def:keyword"/>
+    <style id="token" _name="Token" map-to="def:identifier"/>
+  </styles>
+
+  <definitions>
+    <context id="line-comment" style-ref="comment" end-at-line-end="true" class="comment" class-disabled="no-spell-check">
+      <start>;</start>
+      <include>
+        <context ref="def:in-comment"/>
+      </include>
+    </context>
+
+    <context id="string" style-ref="string" class="string" class-disabled="no-spell-check">
+      <start>"</start>
+      <end>"</end>
+      <include>
+        <context ref="def:escape"/>
+      </include>
+    </context>
+
+    <define-regex id="name">[[:alpha:]_][[:alnum:].:_-]*</define-regex>
+    <context id="element" style-ref="element">
+      <match>\(\b\%{name}\s*</match>
+    </context>
+
+    <context id="endtag" style-ref="element">
+      <match>\)</match>
+    </context>
+
+    <context id="catchall" style-ref="token" extend-parent="false">
+      <match>\S</match>
+    </context>
+
+    <context id="librepcb" class="no-spell-check">
+      <include>
+        <context ref="line-comment"/>
+        <context ref="string"/>
+        <context ref="element"/>
+        <context ref="endtag"/>
+        <context ref="catchall"/>
+      </include>
+    </context>
+
+  </definitions>
+</language>

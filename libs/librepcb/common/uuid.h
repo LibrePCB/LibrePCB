@@ -104,7 +104,7 @@ class Uuid final
          *
          * @return This object as a string
          */
-        QString serializeToString() const noexcept {return toStr();}
+        QString serializeToString() const noexcept {return isNull() ? "null" : toStr();}
 
 
         // Setters
@@ -153,7 +153,7 @@ class Uuid final
          */
         static Uuid deserializeFromString(const QString& str) {
             Uuid uuid(str);
-            if (uuid.isNull() && (!str.isEmpty())) {
+            if (uuid.isNull() && (!str.isEmpty()) && (str != "null")) {
                 throw RuntimeError(__FILE__, __LINE__,
                                    QString(tr("Invalid UUID: \"%1\"")).arg(str));
             }

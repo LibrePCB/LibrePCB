@@ -47,7 +47,7 @@ class WSI_DebugTools final : public WSI_Base
         // Constructors / Destructor
         WSI_DebugTools() = delete;
         WSI_DebugTools(const WSI_DebugTools& other) = delete;
-        WSI_DebugTools(const QString& xmlTagName, DomElement* xmlElement);
+        explicit WSI_DebugTools(const SExpression& node);
         ~WSI_DebugTools() noexcept;
 
         // Getters: Widgets
@@ -59,7 +59,7 @@ class WSI_DebugTools final : public WSI_Base
         void revert() noexcept override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         WSI_DebugTools& operator=(const WSI_DebugTools& rhs) = delete;

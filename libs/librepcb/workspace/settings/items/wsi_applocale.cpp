@@ -35,13 +35,12 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppLocale::WSI_AppLocale(const QString& xmlTagName, DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement),
+WSI_AppLocale::WSI_AppLocale(const SExpression& node) :
+    WSI_Base(),
     mAppLocale(), mAppLocaleTmp(mAppLocale)
 {
-    if (xmlElement) {
-        // load setting
-        mAppLocale = xmlElement->getText<QString>(false);
+    if (const SExpression* child = node.tryGetChildByPath("application_locale")) {
+        mAppLocale = child->getValueOfFirstChild<QString>(false);
         mAppLocaleTmp = mAppLocale;
     }
 
@@ -140,9 +139,9 @@ void WSI_AppLocale::updateComboBoxIndex() noexcept
     }
 }
 
-void WSI_AppLocale::serialize(DomElement& root) const
+void WSI_AppLocale::serialize(SExpression& root) const
 {
-    root.setText(mAppLocale);
+    root.appendStringChild("application_locale", mAppLocale, true);
 }
 
 /*****************************************************************************************

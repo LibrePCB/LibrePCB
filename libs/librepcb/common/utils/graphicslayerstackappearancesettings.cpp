@@ -47,15 +47,15 @@ GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
 }
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-        IF_GraphicsLayerProvider& layers, const DomElement& domElement) :
+        IF_GraphicsLayerProvider& layers, const SExpression& node) :
     mLayers(layers)
 {
-    for (const DomElement* child : domElement.getChilds()) { Q_ASSERT(child);
-        QString name = child->getAttribute<QString>("name", true);
+    for (const SExpression& child : node.getChildren("layer")) {
+        QString name = child.getChildByIndex(0).getValue<QString>(true);
         if (GraphicsLayer* layer = mLayers.getLayer(name)) {
-            layer->setColor(child->getAttribute<QColor>("color", true));
-            layer->setColorHighlighted(child->getAttribute<QColor>("color_hl", true));
-            layer->setVisible(child->getAttribute<bool>("visible", true));
+            layer->setColor(child.getValueByPath<QColor>("color", true));
+            layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl", true));
+            layer->setVisible(child.getValueByPath<bool>("visible", true));
         }
     }
 }
@@ -68,14 +68,14 @@ GraphicsLayerStackAppearanceSettings::~GraphicsLayerStackAppearanceSettings() no
  *  General Methods
  ****************************************************************************************/
 
-void GraphicsLayerStackAppearanceSettings::serialize(DomElement& root) const
+void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const
 {
     for (const GraphicsLayer* layer : mLayers.getAllLayers()) { Q_ASSERT(layer);
-        DomElement* child = root.appendChild("layer");
-        child->setAttribute("name",     layer->getName());
-        child->setAttribute("color",    layer->getColor(false));
-        child->setAttribute("color_hl", layer->getColor(true));
-        child->setAttribute("visible",  layer->getVisible());
+        SExpression& child = root.appendList("layer", true);
+        child.appendToken(layer->getName());
+        child.appendStringChild("color",    layer->getColor(false), false);
+        child.appendStringChild("color_hl", layer->getColor(true), false);
+        child.appendTokenChild("visible",  layer->getVisible(), false);
     }
 }
 

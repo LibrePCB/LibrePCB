@@ -34,14 +34,12 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(const QString& xmlTagName,
-                                                               DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement),
+WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(const SExpression& node) :
+    WSI_Base(),
     mLengthUnit(LengthUnit::millimeters()), mLengthUnitTmp(mLengthUnit)
 {
-    if (xmlElement) {
-        // load default length unit
-        mLengthUnit = xmlElement->getFirstChild("length_unit", true)->getText<LengthUnit>(true);
+    if (const SExpression* child = node.tryGetChildByPath("default_length_unit")) {
+        mLengthUnit = child->getValueOfFirstChild<LengthUnit>(true);
         mLengthUnitTmp = mLengthUnit;
     }
 
@@ -99,9 +97,9 @@ void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept
     mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
 }
 
-void WSI_AppDefaultMeasurementUnits::serialize(DomElement& root) const
+void WSI_AppDefaultMeasurementUnits::serialize(SExpression& root) const
 {
-    root.appendTextChild("length_unit", mLengthUnit);
+    root.appendTokenChild("default_length_unit", mLengthUnit, true);
 }
 
 /*****************************************************************************************

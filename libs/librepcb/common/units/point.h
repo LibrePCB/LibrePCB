@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../fileio/serializableobject.h"
 #include "length.h"
 
 /*****************************************************************************************
@@ -70,7 +71,7 @@ class Angle;
  * @author ubruhin
  * @date 2014-06-21
  */
-class Point
+class Point final : public SerializableObject
 {
     public:
 
@@ -97,6 +98,8 @@ class Point
          * @param y     The Y coordinate as a Length object
          */
         explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
+
+        explicit Point(const SExpression& node);
 
         /**
          * @brief Destructor
@@ -345,6 +348,9 @@ class Point
          * @see Point#mirrored()
          */
         Point& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
+
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(SExpression& root) const override;
 
 
         // Static Functions

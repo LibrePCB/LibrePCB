@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "package.h"
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -45,9 +45,8 @@ Package::Package(const Uuid& uuid, const Version& version, const QString& author
 Package::Package(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
-    const DomElement& root = mLoadingXmlFileDocument->getRoot();
-    mPads.loadFromDomElement(root);
-    mFootprints.loadFromDomElement(root);
+    mPads.loadFromDomElement(mLoadingFileDocument);
+    mFootprints.loadFromDomElement(mLoadingFileDocument);
 
     cleanupAfterLoadingElementFromFile();
 }
@@ -60,7 +59,7 @@ Package::~Package() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void Package::serialize(DomElement& root) const
+void Package::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
     mPads.serialize(root);

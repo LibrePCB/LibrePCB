@@ -81,7 +81,7 @@ class Text final : public SerializableObject
         Text(const Text& other) noexcept;
         Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
              const Length& height, const Alignment& align) noexcept;
-        explicit Text(const DomElement& domElement);
+        explicit Text(const SExpression& node);
         ~Text() noexcept;
 
         // Getters
@@ -105,7 +105,7 @@ class Text final : public SerializableObject
         void unregisterObserver(IF_TextObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Text& rhs) const noexcept;

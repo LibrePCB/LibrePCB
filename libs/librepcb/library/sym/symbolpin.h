@@ -60,7 +60,7 @@ class SymbolPin final : public SerializableObject
         SymbolPin(const SymbolPin& other) noexcept;
         SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
                   const Length& length, const Angle& rotation) noexcept;
-        explicit SymbolPin(const DomElement& domElement);
+        explicit SymbolPin(const SExpression& node);
         ~SymbolPin() noexcept;
 
         // Getters
@@ -81,7 +81,7 @@ class SymbolPin final : public SerializableObject
         void unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const SymbolPin& rhs) const noexcept;

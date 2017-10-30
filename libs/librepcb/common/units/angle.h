@@ -132,7 +132,7 @@ class Angle
         /**
          * @brief Set the angle in degrees, represented in a QString
          *
-         * This method is useful to read angles from XML files.
+         * This method is useful to read angles from files.
          *
          * @param degrees       See fromDeg(const QString&)
          *
@@ -176,11 +176,11 @@ class Angle
          *
          * @return The angle in degrees as a QString
          *
-         * @note This method is useful to store lengths in XML files.
+         * @note This method is useful to store lengths in files.
          *
          * @todo don't use double for this purpose!
          */
-        QString toDegString() const noexcept {return QLocale::c().toString(toDeg(), 'f', 6);}
+        QString toDegString() const noexcept;
 
         /**
          * @brief Get the angle in radians

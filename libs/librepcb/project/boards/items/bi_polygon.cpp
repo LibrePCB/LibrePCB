@@ -45,10 +45,10 @@ BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) :
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const DomElement& domElement) :
+BI_Polygon::BI_Polygon(Board& board, const SExpression& node) :
     BI_Base(board)
 {
-    mPolygon.reset(new Polygon(domElement));
+    mPolygon.reset(new Polygon(node));
     init();
 }
 
@@ -96,7 +96,7 @@ void BI_Polygon::removeFromBoard(GraphicsScene& scene)
     BI_Base::removeFromBoard(scene, *mGraphicsItem);
 }
 
-void BI_Polygon::serialize(DomElement& root) const
+void BI_Polygon::serialize(SExpression& root) const
 {
     mPolygon->serialize(root);
 }

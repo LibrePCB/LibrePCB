@@ -86,9 +86,9 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_FALSE(mProjectDir.isEmptyDir());
     EXPECT_TRUE(mProjectFile.isExistingFile());
     EXPECT_TRUE(mProjectDir.getPathTo(".librepcb-project").isExistingFile());
-    EXPECT_TRUE(mProjectDir.getPathTo("core/circuit.xml").isExistingFile());
-    EXPECT_TRUE(mProjectDir.getPathTo("core/settings.xml").isExistingFile());
-    EXPECT_TRUE(mProjectDir.getPathTo("core/erc.xml").isExistingFile());
+    EXPECT_TRUE(mProjectDir.getPathTo("core/circuit.lp").isExistingFile());
+    EXPECT_TRUE(mProjectDir.getPathTo("core/settings.lp").isExistingFile());
+    EXPECT_TRUE(mProjectDir.getPathTo("core/erc.lp").isExistingFile());
 
     // open project again
     project.reset(new Project(mProjectFile, false));

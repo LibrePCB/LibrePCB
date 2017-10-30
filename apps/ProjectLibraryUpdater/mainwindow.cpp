@@ -3,9 +3,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
-#include <librepcb/common/fileio/domelement.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/dev/device.h>
@@ -82,21 +81,21 @@ void MainWindow::on_pushButton_2_clicked()
 
         for (int i = 0; i < ui->projectfiles->count(); i++)
         {
-            // open the project xml file
+            // open the project file
             FilePath projectFilepath(ui->projectfiles->item(i)->text());
             FilePath coreDirPath = projectFilepath.getParentDir().getPathTo("core");
-            SmartXmlFile boardsFile(coreDirPath.getPathTo("boards.xml"), false, true);
-            std::unique_ptr<DomDocument> boardsDoc = boardsFile.parseFileAndBuildDomTree();
+            SmartSExprFile boardsFile(coreDirPath.getPathTo("boards.lp"), false, true);
+            SExpression boardsRoot = boardsFile.parseFileAndBuildDomTree();
 
             // remove the whole library directory
             FilePath libDir = projectFilepath.getParentDir().getPathTo("library");
             FileUtils::removeDirRecursively(libDir); // can throw
 
             // components & symbols
-            SmartXmlFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.xml"), false, true);
-            std::unique_ptr<DomDocument> circuitDoc = circuitFile.parseFileAndBuildDomTree();
-            foreach (DomElement* node, circuitDoc->getRoot().getChilds("component")) {
-                Uuid compUuid = node->getAttribute<Uuid>("component", true);
+            SmartSExprFile circuitFile(projectFilepath.getParentDir().getPathTo("core/circuit.lp"), false, true);
+            SExpression circuitRoot = circuitFile.parseFileAndBuildDomTree();
+            foreach (const SExpression& node, circuitRoot.getChildren("component")) {
+                Uuid compUuid = node.getValueByPath<Uuid>("lib_component", true);
                 FilePath filepath = workspace.getLibraryDb().getLatestComponent(compUuid);
                 if (!filepath.isExistingDir()) {
                     qDebug() << filepath.toStr();
@@ -128,12 +127,12 @@ void MainWindow::on_pushButton_2_clicked()
             }
 
             // devices & packages
-            foreach (DomElement* node, boardsDoc->getRoot().getChilds("board")) {
-                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo(node->getText<QString>(true));
-                SmartXmlFile boardFile(boardFilePath, false, true);
-                std::unique_ptr<DomDocument> boardDoc = boardFile.parseFileAndBuildDomTree();
-                foreach (DomElement* node, boardDoc->getRoot().getChilds("device")) {
-                    Uuid deviceUuid = node->getAttribute<Uuid>("device", true);
+            foreach (const SExpression& node, boardsRoot.getChildren("board")) {
+                FilePath boardFilePath = projectFilepath.getParentDir().getPathTo(node.getValueOfFirstChild<QString>(true));
+                SmartSExprFile boardFile(boardFilePath, false, true);
+                SExpression boardRoot = boardFile.parseFileAndBuildDomTree();
+                foreach (const SExpression& node, boardRoot.getChildren("device")) {
+                    Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device", true);
                     FilePath filepath = workspace.getLibraryDb().getLatestDevice(deviceUuid);
                     if (!filepath.isExistingDir()) {
                         qDebug() << filepath.toStr();

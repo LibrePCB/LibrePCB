@@ -51,10 +51,10 @@ BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) :
     init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device, const DomElement& domElement) :
+BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node) :
     BI_Base(device.getBoard()), mDevice(device)
 {
-    Q_UNUSED(domElement);
+    Q_UNUSED(node);
     init();
 }
 
@@ -164,14 +164,14 @@ void BI_Footprint::removeFromBoard(GraphicsScene& scene)
     sgl.dismiss();
 }
 
-void BI_Footprint::serialize(DomElement& root) const
+void BI_Footprint::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     Q_UNUSED(root);
-    //root.setAttribute("uuid", mUuid);
-    //root.setAttribute("gen_comp_instance", mComponentInstance->getUuid());
-    //root.setAttribute("symbol_item", mSymbVarItem->getUuid());
+    //root.appendStringChild("uuid", mUuid);
+    //root.appendStringChild("gen_comp_instance", mComponentInstance->getUuid());
+    //root.appendStringChild("symbol_item", mSymbVarItem->getUuid());
 }
 
 /*****************************************************************************************

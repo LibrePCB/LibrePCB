@@ -307,7 +307,7 @@ class RangeError final : public RuntimeError
  * @brief The FileParseError class
  *
  * This exception class is used for errors while parsing files due to invalid file content
- * (for example invalid XML syntax, invalid content of XML attributes and so on).
+ * (for example invalid syntax).
  *
  * @see Exception
  */

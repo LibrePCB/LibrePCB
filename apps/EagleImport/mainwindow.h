@@ -5,7 +5,6 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/domelement.h>
 
 namespace Ui {
 class MainWindow;

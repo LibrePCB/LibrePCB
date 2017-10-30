@@ -60,7 +60,7 @@ class ComponentPinSignalMapItem final : public SerializableObject
         ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
         ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
                                   const CmpSigPinDisplayType& displayType) noexcept;
-        explicit ComponentPinSignalMapItem(const DomElement& domElement);
+        explicit ComponentPinSignalMapItem(const SExpression& node);
         ~ComponentPinSignalMapItem() noexcept;
 
         // Getters
@@ -74,7 +74,7 @@ class ComponentPinSignalMapItem final : public SerializableObject
         void setDisplayType(const CmpSigPinDisplayType& type) noexcept {mDisplayType = type;}
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const ComponentPinSignalMapItem& rhs) const noexcept;
@@ -96,7 +96,7 @@ class ComponentPinSignalMapItem final : public SerializableObject
  *  Class PinSignalMap
  ****************************************************************************************/
 
-struct ComponentPinSignalMapNameProvider {static constexpr const char* tagname = "pin_signal_map";};
+struct ComponentPinSignalMapNameProvider {static constexpr const char* tagname = "pin";};
 using ComponentPinSignalMap = SerializableObjectList<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
 using CmdComponentPinSignalMapItemInsert = CmdListElementInsert<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
 using CmdComponentPinSignalMapItemRemove = CmdListElementRemove<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;

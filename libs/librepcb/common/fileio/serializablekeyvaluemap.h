@@ -38,18 +38,6 @@ namespace librepcb {
 /**
  * @brief The SerializableKeyValueMap class provides an easy way to serialize and
  *        deserialize ordered key value pairs
- *
- * For example if you have DOM nodes with strings in different languages, this class helps
- * you to read these strings. This class will also check if an entry with an empty key
- * (this is used to specify the default value) exists in the DOM node.
- *
- * Example of a valid DOM node:
- * @code
- * <my_parent_node>
- *     <my_subnode my_key="">hello</my_subnode>
- *     <my_subnode my_key="foo">foobar</my_subnode>
- * </my_parent_node>
- * @endcode
  */
 template <typename T>
 class SerializableKeyValueMap final : public SerializableObject
@@ -62,8 +50,8 @@ class SerializableKeyValueMap final : public SerializableObject
         SerializableKeyValueMap() noexcept {}
         SerializableKeyValueMap(const SerializableKeyValueMap<T>& other) noexcept :
             mValues(other.mValues) {}
-        explicit SerializableKeyValueMap(const DomElement& domElement) {
-            loadFromDomElement(domElement); // can throw
+        explicit SerializableKeyValueMap(const SExpression& node) {
+            loadFromDomElement(node); // can throw
         }
         ~SerializableKeyValueMap() noexcept {}
 
@@ -107,33 +95,37 @@ class SerializableKeyValueMap final : public SerializableObject
             mValues.clear();
         }
 
-        void loadFromDomElement(const DomElement& domElement) {
+        void loadFromDomElement(const SExpression& node) {
             mValues.clear();
-            for (const DomElement* child = domElement.getFirstChild(T::tagname, true);
-                 child; child = child->getNextSibling(T::tagname))
-            {
-                QString key = child->getAttribute<QString>(T::keyname, false);
-                QString value = child->getText<QString>(false);
+            foreach (const SExpression& child, node.getChildren(T::tagname)) {
+                QString key, value;
+                if (child.getChildren().count() > 1) {
+                    key = child.getValueByPath<QString>(T::keyname, false);
+                    value = child.getChildByIndex(1).getValue<QString>(false);
+                } else {
+                    key = QString("");
+                    value = child.getChildByIndex(0).getValue<QString>(false);
+                }
                 if (mValues.contains(key)) {
                     throw RuntimeError(__FILE__, __LINE__,
-                        QString(tr("Key \"%1\" defined multiple times in \"%2\"."))
-                        .arg(key, domElement.getDocFilePath().toNative()));
+                        QString(tr("Key \"%1\" defined multiple times.")).arg(key));
                 }
                 mValues.insert(key, value);
             }
             if (!mValues.contains(QString(""))) {
                 throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("The file \"%1\" has no default %2 defined."))
-                    .arg(domElement.getDocFilePath().toNative(), T::tagname));
+                    QString(tr("No default %1 defined.")).arg(T::tagname));
             }
         }
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override {
+        void serialize(SExpression& root) const override {
             foreach (const QString& key, mValues.keys()) {
-                DomElement* child = root.appendChild(T::tagname);
-                child->setAttribute(T::keyname, key);
-                child->setText(mValues.value(key));
+                SExpression& child = root.appendList(T::tagname, true);
+                if (!key.isEmpty()) {
+                    child.appendStringChild(T::keyname, key, false);
+                }
+                child.appendString(mValues.value(key));
             }
         }
 

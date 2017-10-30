@@ -25,7 +25,7 @@
 #include "recentprojectsmodel.h"
 #include "workspace.h"
 #include "settings/workspacesettings.h"
-#include <librepcb/common/fileio/smarttextfile.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -41,18 +41,20 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept :
     QAbstractListModel(nullptr), mWorkspace(workspace)
 {
     try {
-        FilePath filepath = mWorkspace.getMetadataPath().getPathTo("recent_projects.txt");
+        FilePath filepath = mWorkspace.getMetadataPath().getPathTo("recent_projects.lp");
         if (filepath.isExistingFile()) {
-            mFile.reset(new SmartTextFile(filepath, false, false));
-            QStringList lines = QString(mFile->getContent()).split('\n');
-            beginInsertRows(QModelIndex(), 0, lines.count()-1);
-            foreach (const QString& line, lines) {
-                FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), line);
+            mFile.reset(new SmartSExprFile(filepath, false, false));
+            SExpression root = mFile->parseFileAndBuildDomTree();
+            const QList<SExpression>& childs = root.getChildren("project");
+            beginInsertRows(QModelIndex(), 0, childs.count()-1);
+            foreach (const SExpression& child, childs) {
+                QString path = child.getValueOfFirstChild<QString>(true);
+                FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
                 mRecentProjects.append(absPath);
             }
             endInsertRows();
         } else {
-            mFile.reset(SmartTextFile::create(filepath));
+            mFile.reset(SmartSExprFile::create(filepath));
         }
     } catch (Exception& e) {
         qWarning() << "Could not read recent projects file:" << e.getMsg();
@@ -71,13 +73,12 @@ void RecentProjectsModel::save() noexcept
 {
     try {
         // save the new list in the workspace
-        QStringList lines;
+        SExpression root = SExpression::createList("librepcb_recent_projects");
         foreach (const FilePath& filepath, mRecentProjects) {
-            lines.append(filepath.toRelative(mWorkspace.getPath()));
+            root.appendStringChild("project", filepath.toRelative(mWorkspace.getPath()), true);
         }
         if (mFile.isNull()) throw LogicError(__FILE__, __LINE__);
-        mFile->setContent(lines.join('\n').toUtf8());
-        mFile->save(true); // can throw
+        mFile->save(root, true); // can throw
     } catch (Exception& e) {
         qWarning() << "Could not save recent projects file:" << e.getMsg();
     }

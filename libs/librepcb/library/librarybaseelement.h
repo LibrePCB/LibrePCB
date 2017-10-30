@@ -28,6 +28,7 @@
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/version.h>
 #include <librepcb/common/uuid.h>
 
@@ -35,10 +36,6 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class DomDocument;
-class DomElement;
-
 namespace library {
 
 /*****************************************************************************************
@@ -115,7 +112,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
         virtual void copyTo(const FilePath& destination, bool removeSource);
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const override;
+        virtual void serialize(SExpression& root) const override;
         virtual bool checkAttributesValidity() const noexcept;
 
 
@@ -129,7 +126,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         // Members required for loading elements from file
         Version mLoadingElementFileVersion;
-        std::unique_ptr<DomDocument> mLoadingXmlFileDocument;
+        SExpression mLoadingFileDocument;
 
         // General Library Element Attributes
         Uuid mUuid;

@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "projectsettings.h"
-#include <librepcb/common/fileio/smartxmlfile.h>
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/sexpression.h>
 #include "../project.h"
 
 /*****************************************************************************************
@@ -38,7 +38,7 @@ namespace project {
 
 ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
-    mXmlFilepath(project.getPath().getPathTo("core/settings.xml")), mXmlFile(nullptr)
+    mFilepath(project.getPath().getPathTo("core/settings.lp")), mFile(nullptr)
 {
     qDebug() << "load settings...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -48,27 +48,26 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
         // restore all default values
         restoreDefaults();
 
-        // try to create/open the XML file "settings.xml"
+        // try to create/open the file "settings.lp"
         if (create)
         {
-            mXmlFile = SmartXmlFile::create(mXmlFilepath);
+            mFile = SmartSExprFile::create(mFilepath);
         }
         else
         {
-            mXmlFile = new SmartXmlFile(mXmlFilepath, restore, readOnly);
-            std::unique_ptr<DomDocument> doc = mXmlFile->parseFileAndBuildDomTree();
-            DomElement& root = doc->getRoot();
+            mFile = new SmartSExprFile(mFilepath, restore, readOnly);
+            SExpression root = mFile->parseFileAndBuildDomTree();
 
-            // OK - XML file is open --> now load all settings
+            // OK - file is open --> now load all settings
 
             // locale order
-            foreach (const DomElement* node, root.getFirstChild("locale_order", true)->getChilds()) {
-                mLocaleOrder.append(node->getText<QString>(true));
+            foreach (const SExpression& node, root.getChildByPath("library_locale_order").getChildren()) {
+                mLocaleOrder.append(node.getValueOfFirstChild<QString>(true));
             }
 
             // norm order
-            foreach (const DomElement* node, root.getFirstChild("norm_order", true)->getChilds()) {
-                mNormOrder.append(node->getText<QString>(true));
+            foreach (const SExpression& node, root.getChildByPath("library_norm_order").getChildren()) {
+                mNormOrder.append(node.getValueOfFirstChild<QString>(true));
             }
         }
 
@@ -77,7 +76,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
     catch (...)
     {
         // free allocated memory and rethrow the exception
-        delete mXmlFile;            mXmlFile = nullptr;
+        delete mFile;            mFile = nullptr;
         throw;
     }
 
@@ -86,7 +85,7 @@ ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, 
 
 ProjectSettings::~ProjectSettings() noexcept
 {
-    delete mXmlFile;            mXmlFile = nullptr;
+    delete mFile;            mFile = nullptr;
 }
 
 /*****************************************************************************************
@@ -108,11 +107,11 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/settings.xml"
+    // Save "core/settings.lp"
     try
     {
-        DomDocument doc(*serializeToDomElement("settings"));
-        mXmlFile->save(doc, toOriginal);
+        SExpression doc(serializeToDomElement("librepcb_project_settings"));
+        mFile->save(doc, toOriginal);
     }
     catch (Exception& e)
     {
@@ -127,14 +126,14 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ProjectSettings::serialize(DomElement& root) const
+void ProjectSettings::serialize(SExpression& root) const
 {
-    DomElement* locale_order = root.appendChild("locale_order");
+    SExpression& locale_order = root.appendList("library_locale_order", true);
     foreach (const QString& locale, mLocaleOrder)
-        locale_order->appendTextChild("locale", locale);
-    DomElement* norm_order = root.appendChild("norm_order");
+        locale_order.appendStringChild("locale", locale, true);
+    SExpression& norm_order = root.appendList("library_norm_order", true);
     foreach (const QString& norm, mNormOrder)
-        norm_order->appendTextChild("norm", norm);
+        norm_order.appendStringChild("norm", norm, true);
 }
 
 /*****************************************************************************************

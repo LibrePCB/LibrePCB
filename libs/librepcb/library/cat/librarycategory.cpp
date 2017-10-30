@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "librarycategory.h"
-#include <librepcb/common/fileio/domdocument.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -49,10 +49,8 @@ LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
                                  const QString& longElementName, bool readOnly) :
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
-    DomElement& root = mLoadingXmlFileDocument->getRoot();
-
     // read parent uuid
-    mParentUuid = root.getFirstChild("parent", true)->getText<Uuid>(false);
+    mParentUuid = mLoadingFileDocument.getValueByPath<Uuid>("parent", false);
 }
 
 LibraryCategory::~LibraryCategory() noexcept
@@ -63,10 +61,10 @@ LibraryCategory::~LibraryCategory() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-void LibraryCategory::serialize(DomElement& root) const
+void LibraryCategory::serialize(SExpression& root) const
 {
     LibraryBaseElement::serialize(root);
-    root.appendTextChild("parent", mParentUuid);
+    root.appendTokenChild("parent", mParentUuid, true);
 }
 
 bool LibraryCategory::checkAttributesValidity() const noexcept

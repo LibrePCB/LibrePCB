@@ -34,7 +34,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartXmlFile;
+class SmartSExprFile;
 
 namespace library {
 class Component;
@@ -57,7 +57,7 @@ class ComponentInstance;
  *
  * Each #project#Project object contains exactly one #Circuit object which contains the
  * whole electrical components and connections. They are created with the schematic editor
- * and used by the board editor. The whole circuit is saved in the file "circuit.xml" in
+ * and used by the board editor. The whole circuit is saved in the file "circuit.lp" in
  * the project's "core" directory.
  *
  * Each #Circuit object contains:
@@ -131,15 +131,15 @@ class Circuit final : public QObject, public SerializableObject
 
     private:
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
 
-        // File "core/circuit.xml"
-        FilePath mXmlFilepath;
-        SmartXmlFile* mXmlFile;
+        // File "core/circuit.lp"
+        FilePath mFilepath;
+        SmartSExprFile* mFile;
 
         QMap<Uuid, NetClass*> mNetClasses;
         QMap<Uuid, NetSignal*> mNetSignals;

@@ -39,7 +39,7 @@ class QPrinter;
 namespace librepcb {
 
 class SmartTextFile;
-class SmartXmlFile;
+class SmartSExprFile;
 class SmartVersionFile;
 
 namespace project {
@@ -474,8 +474,8 @@ class Project final : public QObject, public AttributeProvider
         bool mIsReadOnly; ///< the constructor will set this to true if the project was opened in read only mode
 
         // schematic and board list files
-        QScopedPointer<SmartXmlFile> mSchematicsXmlFile; ///< core/schematics.xml
-        QScopedPointer<SmartXmlFile> mBoardsXmlFile; ///< core/boards.xml
+        QScopedPointer<SmartSExprFile> mSchematicsFile; ///< core/schematics.lp
+        QScopedPointer<SmartSExprFile> mBoardsFile; ///< core/boards.lp
 
         // General
         QScopedPointer<ProjectMetadata> mProjectMetadata; ///< e.g. project name, author, ...

@@ -50,16 +50,15 @@ SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& positio
     Q_ASSERT(mLength >= 0);
 }
 
-SymbolPin::SymbolPin(const DomElement& domElement) :
+SymbolPin::SymbolPin(const SExpression& node) :
     mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getText<QString>(true); // empty string --> exception
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    mLength = domElement.getAttribute<Length>("length", true);
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    mLength = node.getValueByPath<Length>("length", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -115,16 +114,15 @@ void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept
     mRegisteredGraphicsItem = nullptr;
 }
 
-void SymbolPin::serialize(DomElement& root) const
+void SymbolPin::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    root.setAttribute("length", mLength);
-    root.setAttribute("rotation", mRotation);
-    root.setText(mName);
+    root.appendToken(mUuid);
+    root.appendStringChild("name", mName, false);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
+    root.appendTokenChild("length", mLength, false);
 }
 
 /*****************************************************************************************

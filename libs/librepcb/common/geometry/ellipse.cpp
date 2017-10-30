@@ -47,17 +47,16 @@ Ellipse::Ellipse(const QString& layerName, const Length& lineWidth, bool fill,
 {
 }
 
-Ellipse::Ellipse(const DomElement& domElement)
+Ellipse::Ellipse(const SExpression& node)
 {
-    mLayerName = domElement.getAttribute<QString>("layer", true);
-    mLineWidth = domElement.getAttribute<Length>("width", true);
-    mIsFilled = domElement.getAttribute<bool>("fill", true);
-    mIsGrabArea = domElement.getAttribute<bool>("grab_area", true);
-    mCenter.setX(domElement.getAttribute<Length>("x", true));
-    mCenter.setY(domElement.getAttribute<Length>("y", true));
-    mRadiusX = domElement.getAttribute<Length>("radius_x", true);
-    mRadiusY = domElement.getAttribute<Length>("radius_y", true);
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
+    mLayerName = node.getValueByPath<QString>("layer", true);
+    mLineWidth = node.getValueByPath<Length>("width", true);
+    mIsFilled = node.getValueByPath<bool>("fill", true);
+    mIsGrabArea = node.getValueByPath<bool>("grab", true);
+    mCenter = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    mRadiusX = node.getValueByPath<Length>("rx", true);
+    mRadiusY = node.getValueByPath<Length>("ry", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -183,19 +182,18 @@ void Ellipse::unregisterObserver(IF_EllipseObserver& object) const noexcept
     mObservers.remove(&object);
 }
 
-void Ellipse::serialize(DomElement& root) const
+void Ellipse::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("layer", mLayerName);
-    root.setAttribute("width", mLineWidth);
-    root.setAttribute("fill", mIsFilled);
-    root.setAttribute("grab_area", mIsGrabArea);
-    root.setAttribute("x", mCenter.getX());
-    root.setAttribute("y", mCenter.getY());
-    root.setAttribute("radius_x", mRadiusX);
-    root.setAttribute("radius_y", mRadiusY);
-    root.setAttribute("rotation", mRotation);
+    root.appendTokenChild("layer", mLayerName, false);
+    root.appendTokenChild("width", mLineWidth, false);
+    root.appendTokenChild("fill", mIsFilled, false);
+    root.appendTokenChild("grab", mIsGrabArea, false);
+    root.appendChild(mCenter.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
+    root.appendTokenChild("rx", mRadiusX, false);
+    root.appendTokenChild("ry", mRadiusY, false);
 }
 
 /*****************************************************************************************

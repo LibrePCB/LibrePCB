@@ -69,7 +69,7 @@ class Footprint final : public SerializableObject, private FootprintPadList::IF_
         Footprint(const Footprint& other) noexcept;
         Footprint(const Uuid& uuid, const QString& name_en_US,
                   const QString& description_en_US);
-        explicit Footprint(const DomElement& domElement);
+        explicit Footprint(const SExpression& node);
         ~Footprint() noexcept;
 
         // Getters: General
@@ -99,7 +99,7 @@ class Footprint final : public SerializableObject, private FootprintPadList::IF_
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const Footprint& rhs) const noexcept;

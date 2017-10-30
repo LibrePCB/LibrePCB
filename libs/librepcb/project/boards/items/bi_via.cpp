@@ -50,14 +50,13 @@ BI_Via::BI_Via(Board& board, const BI_Via& other) :
     init();
 }
 
-BI_Via::BI_Via(Board& board, const DomElement& domElement) :
+BI_Via::BI_Via(Board& board, const SExpression& node) :
     BI_Base(board), mNetSignal(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    QString shapeStr = domElement.getAttribute<QString>("shape", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mPosition = Point(node.getChildByPath("pos"));
+    QString shapeStr = node.getValueByPath<QString>("shape", true);
     if (shapeStr == "round") {
         mShape = Shape::Round;
     } else if (shapeStr == "square") {
@@ -68,9 +67,9 @@ BI_Via::BI_Via(Board& board, const DomElement& domElement) :
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid via shape: \"%1\"")).arg(shapeStr));
     }
-    mSize = domElement.getAttribute<Length>("size", true);
-    mDrillDiameter = domElement.getAttribute<Length>("drill", true);
-    Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", false);
+    mSize = node.getValueByPath<Length>("size", true);
+    mDrillDiameter = node.getValueByPath<Length>("drill", true);
+    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", false);
     if (!netSignalUuid.isNull()) {
         mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
@@ -276,23 +275,21 @@ void BI_Via::updateNetPoints() const noexcept
     }
 }
 
-void BI_Via::serialize(DomElement& root) const
+void BI_Via::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    switch (mShape)
-    {
-        case Shape::Round:      root.setAttribute<QString>("shape", "round"); break;
-        case Shape::Square:     root.setAttribute<QString>("shape", "square"); break;
-        case Shape::Octagon:    root.setAttribute<QString>("shape", "octagon"); break;
+    root.appendToken(mUuid);
+    root.appendTokenChild("net", mNetSignal ? mNetSignal->getUuid() : Uuid(), true);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("size", mSize, false);
+    root.appendTokenChild("drill", mDrillDiameter, false);
+    switch (mShape) {
+        case Shape::Round:      root.appendTokenChild<QString>("shape", "round", false); break;
+        case Shape::Square:     root.appendTokenChild<QString>("shape", "square", false); break;
+        case Shape::Octagon:    root.appendTokenChild<QString>("shape", "octagon", false); break;
         default: throw LogicError(__FILE__, __LINE__);
     }
-    root.setAttribute("size", mSize);
-    root.setAttribute("drill", mDrillDiameter);
-    root.setAttribute("netsignal", mNetSignal ? mNetSignal->getUuid() : Uuid());
 }
 
 /*****************************************************************************************

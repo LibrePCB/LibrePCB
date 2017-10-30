@@ -33,7 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartXmlFile;
+class SmartSExprFile;
 
 namespace project {
 
@@ -167,7 +167,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
     private: // Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         bool checkAttributesValidity() const noexcept;
 
@@ -177,9 +177,9 @@ class ProjectMetadata final : public QObject, public SerializableObject
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
 
-        // File "core/metadata.xml"
-        FilePath mXmlFilepath;
-        QScopedPointer<SmartXmlFile> mXmlFile;
+        // File "core/metadata.lp"
+        FilePath mFilepath;
+        QScopedPointer<SmartSExprFile> mFile;
 
         // Metadata
         QString mName;              ///< the name of the project

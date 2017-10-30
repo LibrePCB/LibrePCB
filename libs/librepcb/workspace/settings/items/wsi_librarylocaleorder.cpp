@@ -34,20 +34,14 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const QString& xmlTagName,
-                                               DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement)
+WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const SExpression& node) :
+    WSI_Base()
 {
-    if (xmlElement) {
-        // load setting
-        foreach (const DomElement* node, xmlElement->getChilds()) {
-            QLocale locale(node->getText<QString>(false));
-            if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
-                mList.append(locale.name());
-            }
+    if (const SExpression* child = node.tryGetChildByPath("library_locale_order")) {
+        foreach (const SExpression& childchild, child->getChildren()) {
+            mList.append(QLocale(childchild.getValueOfFirstChild<QString>(false)).name()); // can throw
         }
     } else {
-        // load defaults
         foreach (const QString& localeStr, QLocale::system().uiLanguages()) {
             QLocale locale(localeStr);
             if ((!locale.name().isEmpty()) && (!mList.contains(locale.name()))) {
@@ -193,10 +187,11 @@ void WSI_LibraryLocaleOrder::updateListWidgetItems() noexcept
     }
 }
 
-void WSI_LibraryLocaleOrder::serialize(DomElement& root) const
+void WSI_LibraryLocaleOrder::serialize(SExpression& root) const
 {
+    SExpression& child = root.appendList("library_locale_order", true);
     foreach (const QString& locale, mList) {
-        root.appendTextChild("locale", locale);
+        child.appendStringChild("locale", locale, true);
     }
 }
 

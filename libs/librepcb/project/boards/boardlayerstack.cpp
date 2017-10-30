@@ -47,12 +47,12 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other) :
             Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const DomElement& domElement) :
+BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node) :
     QObject(&board), mBoard(board), mLayersChanged(false), mInnerLayerCount(-1)
 {
     addAllLayers();
 
-    setInnerLayerCount(domElement.getAttribute<uint>("inner", true));
+    setInnerLayerCount(node.getValueByPath<uint>("inner", true));
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
@@ -96,9 +96,9 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BoardLayerStack::serialize(DomElement& root) const
+void BoardLayerStack::serialize(SExpression& root) const
 {
-    root.setAttribute("inner", mInnerLayerCount);
+    root.appendTokenChild("inner", mInnerLayerCount, false);
 }
 
 /*****************************************************************************************

@@ -63,7 +63,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
         ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept;
         ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
                                    bool isRequired, const QString& suffix) noexcept;
-        explicit ComponentSymbolVariantItem(const DomElement& domElement);
+        explicit ComponentSymbolVariantItem(const SExpression& node);
         ~ComponentSymbolVariantItem() noexcept;
 
         // Getters: Attributes
@@ -86,7 +86,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
         const ComponentPinSignalMap& getPinSignalMap()const  noexcept {return mPinSignalMap;}
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const ComponentSymbolVariantItem& rhs) const noexcept;
@@ -112,7 +112,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
  *  Class ComponentSymbolVariantItemList
  ****************************************************************************************/
 
-struct ComponentSymbolVariantItemListNameProvider {static constexpr const char* tagname = "symbol_item";};
+struct ComponentSymbolVariantItemListNameProvider {static constexpr const char* tagname = "item";};
 using ComponentSymbolVariantItemList = SerializableObjectList<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
 using CmdComponentSymbolVariantItemInsert = CmdListElementInsert<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
 using CmdComponentSymbolVariantItemRemove = CmdListElementRemove<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;

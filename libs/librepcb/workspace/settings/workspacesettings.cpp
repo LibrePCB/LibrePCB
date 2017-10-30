@@ -22,8 +22,8 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/domdocument.h>
-#include <librepcb/common/fileio/smartxmlfile.h>
+#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
 #include "workspacesettings.h"
 #include "../workspace.h"
 #include "workspacesettingsdialog.h"
@@ -39,29 +39,28 @@ namespace workspace {
  ****************************************************************************************/
 
 WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
-    QObject(nullptr), mXmlFilePath(workspace.getMetadataPath().getPathTo("settings.xml"))
+    QObject(nullptr), mFilePath(workspace.getMetadataPath().getPathTo("settings.lp"))
 {
     qDebug("Load workspace settings...");
 
     // load settings if the settings file exists
-    std::unique_ptr<DomDocument> doc;
-    if (mXmlFilePath.isExistingFile()) {
-        SmartXmlFile file(mXmlFilePath, false, true);
-        doc = file.parseFileAndBuildDomTree();
+    SExpression root;
+    if (mFilePath.isExistingFile()) {
+        SmartSExprFile file(mFilePath, false, true);
+        root = file.parseFileAndBuildDomTree();
     } else {
         qInfo("Workspace settings file not found, default settings will be used.");
     }
 
     // load all settings
-    DomElement* root = doc.get() ? &doc->getRoot() : nullptr;
-    loadSettingsItem(mAppLocale,                "app_locale",                   root);
-    loadSettingsItem(mAppDefMeasUnits,          "app_default_meas_units",       root);
-    loadSettingsItem(mProjectAutosaveInterval,  "project_autosave_interval",    root);
-    loadSettingsItem(mAppearance,               "appearance",                   root);
-    loadSettingsItem(mLibraryLocaleOrder,       "lib_locale_order",             root);
-    loadSettingsItem(mLibraryNormOrder,         "lib_norm_order",               root);
-    loadSettingsItem(mRepositories,             "repositories",                 root);
-    loadSettingsItem(mDebugTools,               "debug_tools",                  root);
+    loadSettingsItem(mAppLocale,                root);
+    loadSettingsItem(mAppDefMeasUnits,          root);
+    loadSettingsItem(mProjectAutosaveInterval,  root);
+    loadSettingsItem(mAppearance,               root);
+    loadSettingsItem(mLibraryLocaleOrder,       root);
+    loadSettingsItem(mLibraryNormOrder,         root);
+    loadSettingsItem(mRepositories,             root);
+    loadSettingsItem(mDebugTools,               root);
 
     // load the settings dialog
     mDialog.reset(new WorkspaceSettingsDialog(*this));
@@ -116,26 +115,24 @@ void WorkspaceSettings::showSettingsDialog() noexcept
  ****************************************************************************************/
 
 template<typename T>
-void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, const QString& xmlTagName,
-                                         DomElement* xmlRoot)
+void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member, SExpression& root)
 {
-    DomElement* node = xmlRoot ? xmlRoot->getFirstChild(xmlTagName, false) : nullptr;
-    member.reset(new T(xmlTagName, node));
+    member.reset(new T(root)); // can throw
     mItems.append(member.data());
 }
 
 void WorkspaceSettings::saveToFile() const
 {
-    DomDocument doc(*serializeToDomElement("workspace_settings"));
+    SExpression doc(serializeToDomElement("librepcb_workspace_settings"));
 
-    QScopedPointer<SmartXmlFile> file(SmartXmlFile::create(mXmlFilePath));
+    QScopedPointer<SmartSExprFile> file(SmartSExprFile::create(mFilePath));
     file->save(doc, true); // can throw
 }
 
-void WorkspaceSettings::serialize(DomElement& root) const
+void WorkspaceSettings::serialize(SExpression& root) const
 {
     foreach (WSI_Base* item, mItems) {
-        root.appendChild(item->serializeToDomElement(item->getXmlElementTagName()));
+        item->serialize(root);
     }
 }
 

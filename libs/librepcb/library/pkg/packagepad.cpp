@@ -43,10 +43,10 @@ PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
 {
 }
 
-PackagePad::PackagePad(const DomElement& domElement)
+PackagePad::PackagePad(const SExpression& node)
 {
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    mName = domElement.getText<QString>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mName = node.getValueByPath<QString>("name", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -68,12 +68,12 @@ void PackagePad::setName(const QString& name) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void PackagePad::serialize(DomElement& root) const
+void PackagePad::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setText(mName);
+    root.appendToken(mUuid);
+    root.appendStringChild("name", mName, false);
 }
 
 /*****************************************************************************************

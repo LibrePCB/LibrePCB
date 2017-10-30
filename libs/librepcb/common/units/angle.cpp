@@ -34,6 +34,15 @@ namespace librepcb {
 
 // General Methods
 
+QString Angle::toDegString() const noexcept
+{
+    QString str = QLocale::c().toString(toDeg(), 'f', 6);
+    for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
+        str.chop(1);
+    }
+    return str;
+}
+
 Angle Angle::abs() const noexcept
 {
     Angle a(*this);

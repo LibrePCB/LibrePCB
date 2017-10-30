@@ -20,7 +20,8 @@ LIBS += \
     -llibrepcbeagleimport \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
-    -lparseagle
+    -lparseagle \
+    -lsexpresso \
 
 INCLUDEPATH += \
     ../../libs \
@@ -30,13 +31,15 @@ DEPENDPATH += \
     ../../libs/librepcb/eagleimport \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
-    ../../libs/parseagle
+    ../../libs/parseagle \
+    ../../libs/sexpresso \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbeagleimport.a \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a \
-    $${DESTDIR}/libparseagle.a
+    $${DESTDIR}/libparseagle.a \
+    $${DESTDIR}/libsexpresso.a \
 
 SOURCES += \
     main.cpp \

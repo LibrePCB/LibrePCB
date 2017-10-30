@@ -56,11 +56,11 @@ class GraphicsLayerStackAppearanceSettings final : public SerializableObject
         GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
                                              const GraphicsLayerStackAppearanceSettings& other) noexcept;
         GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                             const DomElement& domElement);
+                                             const SExpression& node);
         ~GraphicsLayerStackAppearanceSettings() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         GraphicsLayerStackAppearanceSettings& operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept;

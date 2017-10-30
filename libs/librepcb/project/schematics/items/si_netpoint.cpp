@@ -44,19 +44,24 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) :
+SI_NetPoint::SI_NetPoint(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mNetSignal(nullptr), mSymbolPin(nullptr)
 {
     // read attributes
-    mUuid = domElement.getAttribute<Uuid>("uuid", true);
-    if (domElement.getAttribute<bool>("attached", true)) {
-        Uuid symbolUuid = domElement.getAttribute<Uuid>("symbol", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+
+    const SExpression* symNode = node.tryGetChildByPath("sym");
+    const SExpression* pinNode = node.tryGetChildByPath("pin");
+    const SExpression* posNode = node.tryGetChildByPath("pos");
+
+    if (symNode && pinNode && (!posNode)) {
+        Uuid symbolUuid = symNode->getValueOfFirstChild<Uuid>(true);
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid);
         if (!symbol) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid symbol UUID: \"%1\"")).arg(symbolUuid.toStr()));
         }
-        Uuid pinUuid = domElement.getAttribute<Uuid>("pin", true);
+        Uuid pinUuid = pinNode->getValueOfFirstChild<Uuid>(true);
         mSymbolPin = symbol->getPin(pinUuid);
         if (!mSymbolPin) {
             throw RuntimeError(__FILE__, __LINE__,
@@ -68,15 +73,16 @@ SI_NetPoint::SI_NetPoint(Schematic& schematic, const DomElement& domElement) :
                 "of the netpoint \"%1\" has no netsignal.")).arg(mUuid.toStr()));
         }
         mPosition = mSymbolPin->getPosition();
-    } else {
-        Uuid netSignalUuid = domElement.getAttribute<Uuid>("netsignal", true);
+    } else if (posNode && (!symNode) && (!pinNode)) {
+        Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
         }
-        mPosition.setX(domElement.getAttribute<Length>("x", true));
-        mPosition.setY(domElement.getAttribute<Length>("y", true));
+        mPosition = Point(node.getChildByPath("pos"));
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, tr("Invalid combination of sym/pin/pos nodes."));
     }
 
     init();
@@ -279,19 +285,17 @@ void SI_NetPoint::updateLines() const noexcept
     }
 }
 
-void SI_NetPoint::serialize(DomElement& root) const
+void SI_NetPoint::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("uuid", mUuid);
-    root.setAttribute("netsignal", mNetSignal->getUuid());
-    root.setAttribute("attached", isAttachedToPin());
+    root.appendToken(mUuid);
+    root.appendTokenChild("net", mNetSignal->getUuid(), true);
     if (isAttachedToPin()) {
-        root.setAttribute("symbol", mSymbolPin->getSymbol().getUuid());
-        root.setAttribute("pin", mSymbolPin->getLibPinUuid());
+        root.appendTokenChild("sym", mSymbolPin->getSymbol().getUuid(), true);
+        root.appendTokenChild("pin", mSymbolPin->getLibPinUuid(), false);
     } else {
-        root.setAttribute("x", mPosition.getX());
-        root.setAttribute("y", mPosition.getY());
+        root.appendChild(mPosition.serializeToDomElement("pos"), true);
     }
 }
 

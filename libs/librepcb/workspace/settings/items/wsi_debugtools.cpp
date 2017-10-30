@@ -34,12 +34,10 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_DebugTools::WSI_DebugTools(const QString& xmlTagName, DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement)
+WSI_DebugTools::WSI_DebugTools(const SExpression& node) :
+    WSI_Base()
 {
-    if (xmlElement) {
-        // load setting
-    }
+    Q_UNUSED(node);
 
     // create a QWidget
     mWidget.reset(new QWidget());
@@ -76,7 +74,7 @@ void WSI_DebugTools::revert() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void WSI_DebugTools::serialize(DomElement& root) const
+void WSI_DebugTools::serialize(SExpression& root) const
 {
     Q_UNUSED(root);
 }

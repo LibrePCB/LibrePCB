@@ -91,7 +91,7 @@ class Library final : public LibraryBaseElement
         // Private Methods
         virtual void copyTo(const FilePath& destination, bool removeSource) override;
         /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(DomElement& root) const override;
+        virtual void serialize(SExpression& root) const override;
         virtual bool checkAttributesValidity() const noexcept override;
 
 

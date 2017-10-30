@@ -43,10 +43,10 @@ Repository::Repository(const QUrl& url) noexcept :
 {
 }
 
-Repository::Repository(const DomElement& domElement) :
+Repository::Repository(const SExpression& node) :
     QObject(nullptr), mUrl()
 {
-    mUrl = domElement.getAttribute<QUrl>("url", true); // can throw
+    mUrl = node.getChildByIndex(0).getValue<QUrl>(true); // can throw
 }
 
 Repository::~Repository() noexcept
@@ -76,11 +76,11 @@ void Repository::requestLibraryList() const noexcept
     requestLibraryList(QUrl(mUrl.toString() % "/api/v1/libraries"));
 }
 
-void Repository::serialize(DomElement& root) const
+void Repository::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("url", mUrl);
+    root.appendString(mUrl);
 }
 
 /*****************************************************************************************

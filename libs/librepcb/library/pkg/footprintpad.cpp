@@ -50,19 +50,18 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& r
 {
 }
 
-FootprintPad::FootprintPad(const DomElement& domElement) :
+FootprintPad::FootprintPad(const SExpression& node) :
     mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mPackagePadUuid = domElement.getAttribute<Uuid>("package_pad", true);
-    mPosition.setX(domElement.getAttribute<Length>("x", true));
-    mPosition.setY(domElement.getAttribute<Length>("y", true));
-    mRotation = domElement.getAttribute<Angle>("rotation", true);
-    mBoardSide = stringToBoardSide(domElement.getAttribute<QString>("side", true));
-    mShape = stringToShape(domElement.getAttribute<QString>("shape", true));
-    mDrillDiameter = domElement.getAttribute<Length>("drill", true);
-    mWidth = domElement.getAttribute<Length>("width", true);
-    mHeight = domElement.getAttribute<Length>("height", true);
+    mPackagePadUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mPosition = Point(node.getChildByPath("pos"));
+    mRotation = node.getValueByPath<Angle>("rot", true);
+    mBoardSide = stringToBoardSide(node.getValueByPath<QString>("side", true));
+    mShape = stringToShape(node.getValueByPath<QString>("shape", true));
+    mDrillDiameter = node.getValueByPath<Length>("drill", true);
+    mWidth = Point(node.getChildByPath("size")).getX();
+    mHeight = Point(node.getChildByPath("size")).getY();
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -252,19 +251,17 @@ void FootprintPad::unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexce
     mRegisteredGraphicsItem = nullptr;
 }
 
-void FootprintPad::serialize(DomElement& root) const
+void FootprintPad::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.setAttribute("package_pad", mPackagePadUuid);
-    root.setAttribute("x", mPosition.getX());
-    root.setAttribute("y", mPosition.getY());
-    root.setAttribute("rotation", mRotation);
-    root.setAttribute("shape", shapeToString(mShape));
-    root.setAttribute("width", mWidth);
-    root.setAttribute("height", mHeight);
-    root.setAttribute("drill", mDrillDiameter);
-    root.setAttribute("side", boardSideToString(mBoardSide));
+    root.appendToken(mPackagePadUuid);
+    root.appendTokenChild("side", boardSideToString(mBoardSide), false);
+    root.appendTokenChild("shape", shapeToString(mShape), false);
+    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendTokenChild("rot", mRotation, false);
+    root.appendChild(Point(mWidth, mHeight).serializeToDomElement("size"), false);
+    root.appendTokenChild("drill", mDrillDiameter, false);
 }
 
 /*****************************************************************************************

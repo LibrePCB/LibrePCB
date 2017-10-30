@@ -34,16 +34,16 @@ namespace workspace {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-WSI_LibraryNormOrder::WSI_LibraryNormOrder(const QString& xmlTagName,
-                                           DomElement* xmlElement) :
-    WSI_Base(xmlTagName, xmlElement)
+WSI_LibraryNormOrder::WSI_LibraryNormOrder(const SExpression& node) :
+    WSI_Base()
 {
-    if (xmlElement) {
-        // load setting
-        foreach (const DomElement* node, xmlElement->getChilds()) {
-            mList.append(node->getText<QString>(false));
+    if (const SExpression* child = node.tryGetChildByPath("library_norm_order")) {
+        foreach (const SExpression& childchild, child->getChildren()) {
+            mList.append(childchild.getValueOfFirstChild<QString>(false));
         }
     }
+    mList.removeDuplicates();
+    mList.removeAll("");
     mListTmp = mList;
 
     // create the QListWidget
@@ -157,10 +157,11 @@ void WSI_LibraryNormOrder::updateListWidgetItems() noexcept
     mListWidget->addItems(mListTmp);
 }
 
-void WSI_LibraryNormOrder::serialize(DomElement& root) const
+void WSI_LibraryNormOrder::serialize(SExpression& root) const
 {
+    SExpression& child = root.appendList("library_norm_order", true);
     foreach (const QString& norm, mList) {
-        root.appendTextChild("norm", norm);
+        child.appendStringChild("norm", norm, true);
     }
 }
 

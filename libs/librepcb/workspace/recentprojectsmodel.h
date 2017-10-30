@@ -31,7 +31,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class SmartTextFile;
+class SmartSExprFile;
 
 namespace workspace {
 
@@ -74,7 +74,7 @@ class RecentProjectsModel : public QAbstractListModel
 
         // Attributes
         const Workspace& mWorkspace;
-        QScopedPointer<SmartTextFile> mFile;
+        QScopedPointer<SmartSExprFile> mFile;
         QList<FilePath> mRecentProjects;
 
 };

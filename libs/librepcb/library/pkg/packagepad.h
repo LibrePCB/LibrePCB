@@ -56,7 +56,7 @@ class PackagePad final : public SerializableObject
         PackagePad() = delete;
         PackagePad(const PackagePad& other) noexcept;
         PackagePad(const Uuid& uuid, const QString& name) noexcept;
-        explicit PackagePad(const DomElement& domElement);
+        explicit PackagePad(const SExpression& node);
         ~PackagePad() noexcept;
 
         // Getters
@@ -69,7 +69,7 @@ class PackagePad final : public SerializableObject
         // General Methods
 
         /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(DomElement& root) const override;
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
         bool operator==(const PackagePad& rhs) const noexcept;

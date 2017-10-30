@@ -37,11 +37,11 @@ GridProperties::GridProperties() noexcept :
 {
 }
 
-GridProperties::GridProperties(const DomElement& domElement)
+GridProperties::GridProperties(const SExpression& node)
 {
-    mType = stringToType(domElement.getAttribute<QString>("type", true));
-    mInterval = domElement.getAttribute<Length>("interval", true);
-    mUnit = domElement.getAttribute<LengthUnit>("unit", true);
+    mType = stringToType(node.getValueByPath<QString>("type", true));
+    mInterval = node.getValueByPath<Length>("interval", true);
+    mUnit = node.getValueByPath<LengthUnit>("unit", true);
 }
 
 GridProperties::GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept :
@@ -62,11 +62,11 @@ GridProperties::~GridProperties() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void GridProperties::serialize(DomElement& root) const
+void GridProperties::serialize(SExpression& root) const
 {
-    root.setAttribute("type", typeToString(mType));
-    root.setAttribute("interval", mInterval);
-    root.setAttribute("unit", mUnit);
+    root.appendTokenChild("type", typeToString(mType), false);
+    root.appendTokenChild("interval", mInterval, false);
+    root.appendTokenChild("unit", mUnit, false);
 }
 
 /*****************************************************************************************
