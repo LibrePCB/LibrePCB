@@ -60,6 +60,9 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mSelectedComponent(nullptr), mSelectedSymbVar(nullptr)
 {
     mUi->setupUi(this);
+    connect(mUi->edtSearch, &QLineEdit::textChanged,
+            this, &AddComponentDialog::searchEditTextChanged);
+
     mPreviewScene = new GraphicsScene();
     mUi->graphicsView->setScene(mPreviewScene);
     mUi->graphicsView->setOriginCrossVisible(false);
@@ -106,6 +109,20 @@ Uuid AddComponentDialog::getSelectedSymbVarUuid() const noexcept
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void AddComponentDialog::searchEditTextChanged(const QString& text) noexcept
+{
+    try {
+        QModelIndex catIndex = mUi->treeCategories->currentIndex();
+        if (text.trimmed().isEmpty() && catIndex.isValid()) {
+            setSelectedCategory(Uuid(catIndex.data(Qt::UserRole).toString()));
+        } else {
+            searchComponents(text.trimmed());
+        }
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
+}
 
 void AddComponentDialog::treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous)
 {
@@ -157,13 +174,30 @@ void AddComponentDialog::on_cbxSymbVar_currentIndexChanged(int index)
  *  Private Methods
  ****************************************************************************************/
 
-void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
+void AddComponentDialog::searchComponents(const QString& input)
 {
-    if ((categoryUuid == mSelectedCategoryUuid) && (!categoryUuid.isNull())) return;
-
     setSelectedComponent(nullptr);
     mUi->listComponents->clear();
-    //mUi->listComponents->setEnabled(false);
+
+    if (input.length() > 1) { // avoid freeze on entering first character due to huge result
+        const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+        QSet<Uuid> components = mWorkspace.getLibraryDb().getComponentsBySearchKeyword(input);
+        foreach (const Uuid& cmpUuid, components) {
+            FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);
+            if (!cmpFp.isValid()) continue;
+            QString name;
+            mWorkspace.getLibraryDb().getElementTranslations<library::Component>(cmpFp, localeOrder, &name);
+            QListWidgetItem* item = new QListWidgetItem(name);
+            item->setData(Qt::UserRole, cmpFp.toStr());
+            mUi->listComponents->addItem(item);
+        }
+    }
+}
+
+void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
+{
+    setSelectedComponent(nullptr);
+    mUi->listComponents->clear();
 
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -173,9 +207,9 @@ void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
     {
         FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);
         if (!cmpFp.isValid()) continue;
-        library::Component component(cmpFp, true); // TODO: use library metadata instead of loading the whole component
-
-        QListWidgetItem* item = new QListWidgetItem(component.getNames().value(localeOrder));
+        QString name;
+        mWorkspace.getLibraryDb().getElementTranslations<library::Component>(cmpFp, localeOrder, &name);
+        QListWidgetItem* item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, cmpFp.toStr());
         mUi->listComponents->addItem(item);
     }

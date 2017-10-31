@@ -33,11 +33,28 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QTreeView" name="treeCategories">
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLineEdit" name="edtSearch">
+           <property name="placeholderText">
+            <string>What are you looking for?</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTreeView" name="treeCategories">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="headerHidden">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QListWidget" name="listComponents">
@@ -254,6 +271,12 @@
    <header location="global">librepcb/common/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtSearch</tabstop>
+  <tabstop>treeCategories</tabstop>
+  <tabstop>listComponents</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -88,7 +88,7 @@ class AddComponentDialog final : public QDialog
 
 
     private slots:
-
+        void searchEditTextChanged(const QString& text) noexcept;
         void treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous);
         void on_listComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
         void on_cbxSymbVar_currentIndexChanged(int index);
@@ -97,6 +97,7 @@ class AddComponentDialog final : public QDialog
     private:
 
         // Private Methods
+        void searchComponents(const QString& input);
         void setSelectedCategory(const Uuid& categoryUuid);
         void setSelectedComponent(const library::Component* cmp);
         void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
