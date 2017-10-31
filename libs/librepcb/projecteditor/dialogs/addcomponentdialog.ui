@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1124</width>
-    <height>592</height>
+    <width>925</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,225 +15,147 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>1104</width>
-        <height>539</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="4,5,4">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QTreeView" name="treeCategories">
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
+        <widget class="QLineEdit" name="edtSearch">
+         <property name="placeholderText">
+          <string>What are you looking for?</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QListWidget" name="listComponents">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="sortingEnabled">
+         <property name="clearButtonEnabled">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <widget class="QTreeView" name="treeCategories">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="headerHidden">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="treeComponents">
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="verticalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
+       </property>
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+       <property name="columnCount">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,1,0,1">
+       <item>
+        <widget class="QLabel" name="lblCompName">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>No component selected</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblCompDescription">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
          <item>
-          <widget class="QGroupBox" name="gbxComponent">
-           <property name="title">
-            <string>Component</string>
+          <widget class="QLabel" name="lblSymbVar">
+           <property name="text">
+            <string>Variant:</string>
            </property>
-           <layout class="QFormLayout" name="formLayout">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Name:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="lblCompName">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>UUID:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="lblCompUuid">
-              <property name="font">
-               <font>
-                <family>Liberation Mono</family>
-               </font>
-              </property>
-              <property name="text">
-               <string>00000000-0000-0000-0000-000000000000</string>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Description:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="lblCompDescription">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="gbxSymbVar">
-           <property name="title">
-            <string>Symbol Variant</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <layout class="QFormLayout" name="formLayout_3">
-              <property name="fieldGrowthPolicy">
-               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>Name:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="cbxSymbVar"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>UUID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="lblSymbVarUuid">
-                <property name="font">
-                 <font>
-                  <family>Liberation Mono</family>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>00000000-0000-0000-0000-000000000000</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_11">
-                <property name="text">
-                 <string>Description:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLabel" name="lblSymbVarDescription">
-                <property name="text">
-                 <string>-</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>Norm:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="lblSymbVarNorm">
-                <property name="text">
-                 <string>-</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="GraphicsView" name="graphicsView">
-              <property name="verticalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
-              <property name="horizontalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+          <widget class="QComboBox" name="cbxSymbVar"/>
          </item>
         </layout>
        </item>
+       <item>
+        <widget class="GraphicsView" name="viewComponent">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblDeviceName">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>No device selected</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="GraphicsView" name="viewDevice">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
-     </widget>
-    </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -254,6 +176,10 @@
    <header location="global">librepcb/common/graphics/graphicsview.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtSearch</tabstop>
+  <tabstop>treeCategories</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

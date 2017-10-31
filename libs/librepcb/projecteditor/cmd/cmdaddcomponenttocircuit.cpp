@@ -42,10 +42,12 @@ namespace editor {
  ****************************************************************************************/
 
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(workspace::Workspace& workspace,
-        Project& project, const Uuid& component, const Uuid& symbolVariant) noexcept :
+        Project& project, const Uuid& component, const Uuid& symbolVariant,
+        const Uuid& defaultDevice) noexcept :
     UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace), mProject(project),
     mComponentUuid(component), mSymbVarUuid(symbolVariant),
+    mDefaultDeviceUuid(defaultDevice),
     mCmdAddToCircuit(nullptr)
 {
 }
@@ -87,7 +89,8 @@ bool CmdAddComponentToCircuit::performExecute()
 
     // create child command to add a new component instance to the circuit
     mCmdAddToCircuit = new CmdComponentInstanceAdd(mProject.getCircuit(),
-                                                   mComponentUuid, mSymbVarUuid);
+                                                   mComponentUuid, mSymbVarUuid,
+                                                   mDefaultDeviceUuid);
     appendChild(mCmdAddToCircuit); // can throw
 
     // execute all child commands

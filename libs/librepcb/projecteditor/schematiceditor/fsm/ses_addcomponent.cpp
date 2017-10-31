@@ -324,7 +324,8 @@ void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar
             // add selected component to circuit
             auto cmd = new CmdAddComponentToCircuit(mWorkspace, mProject,
                 mAddComponentDialog->getSelectedComponentUuid(),
-                mAddComponentDialog->getSelectedSymbVarUuid());
+                mAddComponentDialog->getSelectedSymbVarUuid(),
+                mAddComponentDialog->getSelectedDeviceUuid());
             mUndoStack.appendToCmdGroup(cmd);
             mCurrentComponent = cmd->getComponentInstance();
         }

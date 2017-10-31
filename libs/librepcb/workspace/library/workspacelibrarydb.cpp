@@ -320,6 +320,32 @@ QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) cons
     return elements;
 }
 
+QSet<Uuid> WorkspaceLibraryDb::getComponentsBySearchKeyword(const QString& keyword) const
+{
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT components.uuid FROM components, components_tr, devices, devices_tr "
+        "ON components.id=components_tr.component_id "
+        "AND devices.id=devices_tr.device_id "
+        "AND devices.component_uuid=components.uuid "
+        "WHERE components_tr.name LIKE :keyword "
+        "OR components_tr.keywords LIKE :keyword "
+        "OR devices_tr.name LIKE :keyword "
+        "OR devices_tr.keywords LIKE :keyword ");
+    query.bindValue(":keyword", "%" + keyword + "%");
+    mDb->exec(query);
+
+    QSet<Uuid> elements;
+    while (query.next()) {
+        Uuid uuid(query.value(0).toString());
+        if (!uuid.isNull()) {
+            elements.insert(uuid);
+        } else {
+            throw LogicError(__FILE__, __LINE__);
+        }
+    }
+    return elements;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/

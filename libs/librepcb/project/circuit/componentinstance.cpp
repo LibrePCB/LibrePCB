@@ -61,6 +61,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
     }
     Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant", true);
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
+    mDefaultDeviceUuid = node.getValueByPath<Uuid>("lib_device", true);
 
     // load all component attributes
     mAttributes.reset(new AttributeList(node)); // can throw
@@ -87,10 +88,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
 }
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                     const Uuid& symbVar, const QString& name) :
+        const Uuid& symbVar, const QString& name, const Uuid& defaultDevice) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
-    mUuid(Uuid::createRandom()), mName(name), mLibComponent(&cmp), mCompSymbVar(nullptr),
-    mAttributes()
+    mUuid(Uuid::createRandom()), mName(name), mDefaultDeviceUuid(defaultDevice),
+    mLibComponent(&cmp), mCompSymbVar(nullptr), mAttributes()
 {
     if (mName.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -338,6 +339,7 @@ void ComponentInstance::serialize(SExpression& root) const
     root.appendToken(mUuid);
     root.appendTokenChild("lib_component", mLibComponent->getUuid(), true);
     root.appendTokenChild("lib_variant", mCompSymbVar->getUuid(), true);
+    root.appendTokenChild("lib_device", mDefaultDeviceUuid, true);
     root.appendStringChild("name", mName, true);
     root.appendStringChild("value", mValue, false);
     mAttributes->serialize(root);

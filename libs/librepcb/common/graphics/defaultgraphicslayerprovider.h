@@ -17,81 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
+#define LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/uuid.h>
+#include "graphicslayer.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Component;
-}
-
-namespace project {
-
-class Circuit;
-class ComponentInstance;
-
 /*****************************************************************************************
- *  Class CmdComponentInstanceAdd
+ *  Class DefaultGraphicsLayerProvider
  ****************************************************************************************/
 
 /**
- * @brief The CmdComponentInstanceAdd class
+ * @brief The DefaultGraphicsLayerProvider class
  */
-class CmdComponentInstanceAdd final : public UndoCommand
+class DefaultGraphicsLayerProvider final : public IF_GraphicsLayerProvider
 {
     public:
 
         // Constructors / Destructor
-        CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
-                                const Uuid& defaultDevice = Uuid()) noexcept;
-        ~CmdComponentInstanceAdd() noexcept;
+        DefaultGraphicsLayerProvider() noexcept;
+        ~DefaultGraphicsLayerProvider() noexcept;
 
         // Getters
-        ComponentInstance* getComponentInstance() const noexcept {return mComponentInstance;}
-
+        GraphicsLayer* getLayer(const QString& name) const noexcept override;
+        QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}
 
     private:
+        void addLayer(const QString& name) noexcept;
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        Uuid mComponentUuid;
-        Uuid mSymbVarUuid;
-        Uuid mDefaultDeviceUuid;
-
-        /// @brief The created component instance
-        ComponentInstance* mComponentInstance;
+        QList<GraphicsLayer*> mLayers;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#endif // LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H

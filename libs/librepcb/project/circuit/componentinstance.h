@@ -72,13 +72,15 @@ class ComponentInstance : public QObject, public AttributeProvider,
         ComponentInstance(const ComponentInstance& other) = delete;
         explicit ComponentInstance(Circuit& circuit, const SExpression& node);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                   const Uuid& symbVar, const QString& name);
+                                   const Uuid& symbVar, const QString& name,
+                                   const Uuid& defaultDevice = Uuid());
         ~ComponentInstance() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         QString getValue(bool replaceAttributes = false) const noexcept;
+        const Uuid& getDefaultDeviceUuid() const noexcept {return mDefaultDeviceUuid;}
         const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
         const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {return *mCompSymbVar;}
         ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const noexcept {return mSignals.value(signalUuid);}
@@ -175,6 +177,9 @@ class ComponentInstance : public QObject, public AttributeProvider,
 
         /// @brief The value of this component instance in the circuit (e.g. the resistance of a resistor)
         QString mValue;
+
+        /// @brief THe default device when adding the component to a board
+        Uuid mDefaultDeviceUuid;
 
         /// @brief Pointer to the component in the project's library
         const library::Component* mLibComponent;

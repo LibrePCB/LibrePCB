@@ -36,8 +36,12 @@
 namespace librepcb {
 
 class GraphicsScene;
+class DefaultGraphicsLayerProvider;
 
 namespace library {
+class Device;
+class Package;
+class FootprintPreviewGraphicsItem;
 class Component;
 class ComponentSymbolVariant;
 class Symbol;
@@ -85,21 +89,27 @@ class AddComponentDialog final : public QDialog
         // Getters
         Uuid getSelectedComponentUuid() const noexcept;
         Uuid getSelectedSymbVarUuid() const noexcept;
+        Uuid getSelectedDeviceUuid() const noexcept;
 
 
     private slots:
-
-        void treeCategories_currentItemChanged(const QModelIndex& current, const QModelIndex& previous);
-        void on_listComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
-        void on_cbxSymbVar_currentIndexChanged(int index);
+        void searchEditTextChanged(const QString& text) noexcept;
+        void treeCategories_currentItemChanged(const QModelIndex& current,
+                                               const QModelIndex& previous) noexcept;
+        void treeComponents_currentItemChanged(QTreeWidgetItem *current,
+                                               QTreeWidgetItem *previous) noexcept;
+        void treeComponents_itemDoubleClicked(QTreeWidgetItem* item, int column) noexcept;
+        void on_cbxSymbVar_currentIndexChanged(int index) noexcept;
 
 
     private:
 
         // Private Methods
+        void searchComponents(const QString& input);
         void setSelectedCategory(const Uuid& categoryUuid);
         void setSelectedComponent(const library::Component* cmp);
         void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
+        void setSelectedDevice(const library::Device* dev);
         void accept() noexcept;
 
 
@@ -107,7 +117,9 @@ class AddComponentDialog final : public QDialog
         workspace::Workspace& mWorkspace;
         Project& mProject;
         Ui::AddComponentDialog* mUi;
-        GraphicsScene* mPreviewScene;
+        GraphicsScene* mComponentPreviewScene;
+        GraphicsScene* mDevicePreviewScene;
+        QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
         workspace::ComponentCategoryTreeModel* mCategoryTreeModel;
 
 
@@ -115,7 +127,10 @@ class AddComponentDialog final : public QDialog
         Uuid mSelectedCategoryUuid;
         const library::Component* mSelectedComponent;
         const library::ComponentSymbolVariant* mSelectedSymbVar;
+        const library::Device* mSelectedDevice;
+        const library::Package* mSelectedPackage;
         QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
+        library::FootprintPreviewGraphicsItem* mPreviewFootprintGraphicsItem;
 };
 
 /*****************************************************************************************

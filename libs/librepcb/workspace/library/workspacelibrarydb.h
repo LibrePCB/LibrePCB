@@ -106,6 +106,7 @@ class WorkspaceLibraryDb final : public QObject
         QSet<Uuid> getComponentsByCategory(const Uuid& category) const;
         QSet<Uuid> getDevicesByCategory(const Uuid& category) const;
         QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
+        QSet<Uuid> getComponentsBySearchKeyword(const QString& keyword) const;
 
         // General Methods
 

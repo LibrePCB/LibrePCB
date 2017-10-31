@@ -71,6 +71,7 @@ SOURCES += \
     geometry/hole.cpp \
     geometry/polygon.cpp \
     geometry/text.cpp \
+    graphics/defaultgraphicslayerprovider.cpp \
     graphics/ellipsegraphicsitem.cpp \
     graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
@@ -166,6 +167,7 @@ HEADERS += \
     geometry/hole.h \
     geometry/polygon.h \
     geometry/text.h \
+    graphics/defaultgraphicslayerprovider.h \
     graphics/ellipsegraphicsitem.h \
     graphics/graphicslayer.h \
     graphics/graphicsscene.h \
