@@ -78,7 +78,11 @@
        <bool>false</bool>
       </property>
       <property name="text">
-       <string>Ignore Selected Item</string>
+       <string>Approve Selected Messages</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../../../../img/images.qrc">
+        <normaloff>:/img/actions/apply.png</normaloff>:/img/actions/apply.png</iconset>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -91,6 +95,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

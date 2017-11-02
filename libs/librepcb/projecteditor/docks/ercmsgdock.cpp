@@ -218,7 +218,7 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept
     item->setText(0, QString(tr("Board Warnings (%1)")).arg(item->childCount()));
     countOfNonIgnoredErcMessages += item->childCount();
     item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)];
-    item->setText(0, QString(tr("Ignored (%1)")).arg(item->childCount()));
+    item->setText(0, QString(tr("Approved (%1)")).arg(item->childCount()));
 
     setWindowTitle(QString(tr("ERC [%1]")).arg(countOfNonIgnoredErcMessages));
 }

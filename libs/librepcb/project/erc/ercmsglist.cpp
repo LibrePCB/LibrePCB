@@ -95,8 +95,8 @@ void ErcMsgList::restoreIgnoreState()
     foreach (ErcMsg* ercMsg, mItems)
         ercMsg->setIgnored(false);
 
-    // scan ignored items and set ignore attributes
-    foreach (const SExpression& node, root.getChildren("ignore")) {
+    // scan approved items and set ignore attributes
+    foreach (const SExpression& node, root.getChildren("approved")) {
         foreach (ErcMsg* ercMsg, mItems) {
             if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node.getValueByPath<QString>("class", false))
              && (ercMsg->getOwnerKey() == node.getValueByPath<QString>("instance", false))
@@ -135,7 +135,7 @@ void ErcMsgList::serialize(SExpression& root) const
 {
     foreach (ErcMsg* ercMsg, mItems) {
         if (ercMsg->isIgnored()) {
-            SExpression& itemNode = root.appendList("ignore", true);
+            SExpression& itemNode = root.appendList("approved", true);
             itemNode.appendStringChild("class", ercMsg->getOwner().getErcMsgOwnerClassName(), true);
             itemNode.appendStringChild("instance", ercMsg->getOwnerKey(), true);
             itemNode.appendStringChild("message", ercMsg->getMsgKey(), true);
