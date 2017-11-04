@@ -58,7 +58,7 @@ class AttributeProviderDummy final : public AttributeProvider
         }
 
     signals:
-        void attributesChanged() {}
+        void attributesChanged() override {}
 };
 
 /*****************************************************************************************

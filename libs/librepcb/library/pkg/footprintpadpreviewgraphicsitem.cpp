@@ -76,7 +76,7 @@ void FootprintPadPreviewGraphicsItem::updateCacheAndRepaint() noexcept
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
 {
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);

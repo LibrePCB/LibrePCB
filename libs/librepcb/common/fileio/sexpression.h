@@ -32,7 +32,7 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace sexpresso {
-class Sexp;
+struct Sexp;
 }
 
 namespace librepcb {
