@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
-#define LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H
 
 /*****************************************************************************************
  *  Includes
@@ -33,22 +33,22 @@ namespace librepcb {
 namespace project {
 
 class Schematic;
-class SI_NetLine;
+class SI_NetSegment;
 
 /*****************************************************************************************
- *  Class CmdSchematicNetLineRemove
+ *  Class CmdSchematicNetSegmentRemove
  ****************************************************************************************/
 
 /**
- * @brief The CmdSchematicNetLineRemove class
+ * @brief The CmdSchematicNetSegmentRemove class
  */
-class CmdSchematicNetLineRemove final : public UndoCommand
+class CmdSchematicNetSegmentRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineRemove(SI_NetLine& netline) noexcept;
-        ~CmdSchematicNetLineRemove() noexcept;
+        explicit CmdSchematicNetSegmentRemove(SI_NetSegment& segment) noexcept;
+        ~CmdSchematicNetSegmentRemove() noexcept;
 
 
     private:
@@ -68,7 +68,7 @@ class CmdSchematicNetLineRemove final : public UndoCommand
         // Private Member Variables
 
         Schematic& mSchematic;
-        SI_NetLine& mNetLine;
+        SI_NetSegment& mNetSegment;
 };
 
 /*****************************************************************************************
@@ -78,4 +78,4 @@ class CmdSchematicNetLineRemove final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H

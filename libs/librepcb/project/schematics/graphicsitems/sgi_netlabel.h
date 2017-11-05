@@ -33,6 +33,7 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class LineGraphicsItem;
 
 namespace project {
 
@@ -55,6 +56,7 @@ class SGI_NetLabel final : public SGI_Base
 
         // General Methods
         void updateCacheAndRepaint() noexcept;
+        void setAnchor(const Point& pos) noexcept;
 
         // Inherited from QGraphicsItem
         QRectF boundingRect() const {return mBoundingRect;}
@@ -74,6 +76,7 @@ class SGI_NetLabel final : public SGI_Base
 
         // Attributes
         SI_NetLabel& mNetLabel;
+        QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
         // Cached Attributes
         QStaticText mStaticText;

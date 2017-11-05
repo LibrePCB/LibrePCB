@@ -279,7 +279,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 
 GraphicsLayer* SGI_Symbol::getLayer(const QString& name) const noexcept
 {
-    return mSymbol.getSchematic().getProject().getLayers().getLayer(name);
+    return mSymbol.getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

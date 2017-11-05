@@ -36,7 +36,6 @@ namespace project {
 
 CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(SI_NetLabel& netlabel) noexcept :
     UndoCommand(tr("Edit netlabel")), mNetLabel(netlabel),
-    mOldNetSignal(&netlabel.getNetSignal()), mNewNetSignal(mOldNetSignal),
     mOldPos(netlabel.getPosition()), mNewPos(mOldPos),
     mOldRotation(netlabel.getRotation()), mNewRotation(mOldRotation)
 {
@@ -46,7 +45,6 @@ CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept
 {
     if (!wasEverExecuted()) {
         // revert temporary changes
-        mNetLabel.setNetSignal(*mOldNetSignal);
         mNetLabel.setPosition(mOldPos);
         mNetLabel.setRotation(mOldRotation);
     }
@@ -55,13 +53,6 @@ CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void CmdSchematicNetLabelEdit::setNetSignal(NetSignal& netsignal, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = &netsignal;
-    if (immediate) mNetLabel.setNetSignal(*mNewNetSignal);
-}
 
 void CmdSchematicNetLabelEdit::setPosition(const Point& position, bool immediate) noexcept
 {
@@ -109,14 +100,12 @@ bool CmdSchematicNetLabelEdit::performExecute()
 
 void CmdSchematicNetLabelEdit::performUndo()
 {
-    mNetLabel.setNetSignal(*mOldNetSignal);
     mNetLabel.setPosition(mOldPos);
     mNetLabel.setRotation(mOldRotation);
 }
 
 void CmdSchematicNetLabelEdit::performRedo()
 {
-    mNetLabel.setNetSignal(*mNewNetSignal);
     mNetLabel.setPosition(mNewPos);
     mNetLabel.setRotation(mNewRotation);
 }

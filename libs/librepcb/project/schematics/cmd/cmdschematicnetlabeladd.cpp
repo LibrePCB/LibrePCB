@@ -24,6 +24,7 @@
 #include "cmdschematicnetlabeladd.h"
 #include "../schematic.h"
 #include "../items/si_netlabel.h"
+#include "../items/si_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,10 +36,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal& netsignal,
-                                                 const Point& position) noexcept :
+CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position) noexcept :
     UndoCommand(tr("Add netlabel")),
-    mSchematic(schematic), mNetSignal(&netsignal), mPosition(position), mNetLabel(nullptr)
+    mNetSegment(segment), mPosition(position), mNetLabel(nullptr)
 {
 }
 
@@ -52,7 +52,7 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 
 bool CmdSchematicNetLabelAdd::performExecute()
 {
-    mNetLabel = new SI_NetLabel(mSchematic, *mNetSignal, mPosition); // can throw
+    mNetLabel = new SI_NetLabel(mNetSegment, mPosition); // can throw
 
     performRedo(); // can throw
 
@@ -61,12 +61,12 @@ bool CmdSchematicNetLabelAdd::performExecute()
 
 void CmdSchematicNetLabelAdd::performUndo()
 {
-    mSchematic.removeNetLabel(*mNetLabel); // can throw
+    mNetSegment.removeNetLabel(*mNetLabel); // can throw
 }
 
 void CmdSchematicNetLabelAdd::performRedo()
 {
-    mSchematic.addNetLabel(*mNetLabel); // can throw
+    mNetSegment.addNetLabel(*mNetLabel); // can throw
 }
 
 /*****************************************************************************************

@@ -52,7 +52,6 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
         ~CmdSchematicNetLabelEdit() noexcept;
 
         // Setters
-        void setNetSignal(NetSignal& netsignal, bool immediate) noexcept;
         void setPosition(const Point& position, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
@@ -79,8 +78,6 @@ class CmdSchematicNetLabelEdit final : public UndoCommand
         SI_NetLabel& mNetLabel;
 
         // Misc
-        NetSignal* mOldNetSignal;
-        NetSignal* mNewNetSignal;
         Point mOldPos;
         Point mNewPos;
         Angle mOldRotation;

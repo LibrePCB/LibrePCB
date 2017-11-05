@@ -21,9 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdschematicnetlabelremove.h"
-#include "../schematic.h"
-#include "../items/si_netlabel.h"
+#include "cmdschematicnetsegmentedit.h"
 #include "../items/si_netsegment.h"
 
 /*****************************************************************************************
@@ -36,35 +34,45 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept :
-    UndoCommand(tr("Remove netlabel")),
-    mNetSegment(netlabel.getNetSegment()), mNetLabel(netlabel)
+CmdSchematicNetSegmentEdit::CmdSchematicNetSegmentEdit(SI_NetSegment& netsegment) noexcept :
+    UndoCommand(tr("Edit net segment")), mNetSegment(netsegment),
+    mOldNetSignal(&netsegment.getNetSignal()), mNewNetSignal(mOldNetSignal)
 {
 }
 
-CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
+CmdSchematicNetSegmentEdit::~CmdSchematicNetSegmentEdit() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void CmdSchematicNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewNetSignal = &netsignal;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute()
+bool CmdSchematicNetSegmentEdit::performExecute()
 {
     performRedo(); // can throw
 
-    return true;
+    return (mNewNetSignal != mOldNetSignal);
 }
 
-void CmdSchematicNetLabelRemove::performUndo()
+void CmdSchematicNetSegmentEdit::performUndo()
 {
-    mNetSegment.addNetLabel(mNetLabel); // can throw
+    mNetSegment.setNetSignal(*mOldNetSignal); // can throw
 }
 
-void CmdSchematicNetLabelRemove::performRedo()
+void CmdSchematicNetSegmentEdit::performRedo()
 {
-    mNetSegment.removeNetLabel(mNetLabel); // can throw
+    mNetSegment.setNetSignal(*mNewNetSignal); // can throw
 }
 
 /*****************************************************************************************

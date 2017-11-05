@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
-#define LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/point.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,23 +33,33 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
+class NetSignal;
+class SI_NetSegment;
+class SI_SymbolPin;
 class SI_NetPoint;
+class SI_NetLine;
 
 /*****************************************************************************************
- *  Class CmdSchematicNetPointRemove
+ *  Class CmdSchematicNetSegmentAddElements
  ****************************************************************************************/
 
 /**
- * @brief The CmdSchematicNetPointRemove class
+ * @brief The CmdSchematicNetSegmentAddElements class
  */
-class CmdSchematicNetPointRemove final : public UndoCommand
+class CmdSchematicNetSegmentAddElements final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointRemove(SI_NetPoint& netpoint) noexcept;
-        ~CmdSchematicNetPointRemove() noexcept;
+        CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept;
+        ~CmdSchematicNetSegmentAddElements() noexcept;
+
+        // General Methods
+        SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
+        SI_NetPoint* addNetPoint(const Point& position);
+        SI_NetPoint* addNetPoint(SI_SymbolPin& pin);
+        SI_NetLine* addNetLine(SI_NetLine& netline);
+        SI_NetLine* addNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint);
 
 
     private:
@@ -67,8 +78,9 @@ class CmdSchematicNetPointRemove final : public UndoCommand
 
         // Private Member Variables
 
-        Schematic& mSchematic;
-        SI_NetPoint& mNetPoint;
+        SI_NetSegment& mNetSegment;
+        QList<SI_NetPoint*> mNetPoints;
+        QList<SI_NetLine*> mNetLines;
 };
 
 /*****************************************************************************************
@@ -78,4 +90,4 @@ class CmdSchematicNetPointRemove final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H

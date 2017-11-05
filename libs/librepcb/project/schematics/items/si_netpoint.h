@@ -41,6 +41,7 @@ class NetSignal;
 class SI_NetLine;
 class SI_Symbol;
 class SI_SymbolPin;
+class SI_NetSegment;
 class ErcMsg;
 
 /*****************************************************************************************
@@ -61,9 +62,9 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         // Constructors / Destructor
         SI_NetPoint() = delete;
         SI_NetPoint(const SI_NetPoint& other) = delete;
-        SI_NetPoint(Schematic& schematic, const SExpression& node);
-        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, const Point& position);
-        SI_NetPoint(Schematic& schematic, NetSignal& netsignal, SI_SymbolPin& pin);
+        SI_NetPoint(SI_NetSegment& segment, const SExpression& node);
+        SI_NetPoint(SI_NetSegment& segment, const Point& position);
+        SI_NetPoint(SI_NetSegment& segment, SI_SymbolPin& pin);
         ~SI_NetPoint() noexcept;
 
         // Getters
@@ -71,19 +72,19 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         bool isAttachedToPin() const noexcept {return (mSymbolPin ? true : false);}
         bool isVisibleJunction() const noexcept;
         bool isOpenLineEnd() const noexcept;
-        NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
+        SI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
+        NetSignal& getNetSignalOfNetSegment() const noexcept;
         SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
         const QList<SI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}
         bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
 
         // Setters
-        void setNetSignal(NetSignal& netsignal);
         void setPinToAttach(SI_SymbolPin* pin);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) override;
-        void removeFromSchematic(GraphicsScene& scene) override;
+        void addToSchematic() override;
+        void removeFromSchematic() override;
         void registerNetLine(SI_NetLine& netline);
         void unregisterNetLine(SI_NetLine& netline);
         void updateLines() const noexcept;
@@ -115,9 +116,9 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
+        SI_NetSegment& mNetSegment;
         Uuid mUuid;
         Point mPosition;
-        NetSignal* mNetSignal;
         SI_SymbolPin* mSymbolPin;   ///< only needed if the netpoint is attached to a pin
 
         // Registered Elements

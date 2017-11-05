@@ -21,10 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdschematicnetlabelremove.h"
+#include "cmdschematicnetlabelanchorsupdate.h"
 #include "../schematic.h"
-#include "../items/si_netlabel.h"
-#include "../items/si_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,13 +34,12 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept :
-    UndoCommand(tr("Remove netlabel")),
-    mNetSegment(netlabel.getNetSegment()), mNetLabel(netlabel)
+CmdSchematicNetLabelAnchorsUpdate::CmdSchematicNetLabelAnchorsUpdate(Schematic& schematic) noexcept :
+    UndoCommand(tr("Update netlabel anchors")), mSchematic(schematic)
 {
 }
 
-CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
+CmdSchematicNetLabelAnchorsUpdate::~CmdSchematicNetLabelAnchorsUpdate() noexcept
 {
 }
 
@@ -50,21 +47,20 @@ CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute()
+bool CmdSchematicNetLabelAnchorsUpdate::performExecute()
 {
     performRedo(); // can throw
-
     return true;
 }
 
-void CmdSchematicNetLabelRemove::performUndo()
+void CmdSchematicNetLabelAnchorsUpdate::performUndo()
 {
-    mNetSegment.addNetLabel(mNetLabel); // can throw
+    mSchematic.updateAllNetLabelAnchors();
 }
 
-void CmdSchematicNetLabelRemove::performRedo()
+void CmdSchematicNetLabelAnchorsUpdate::performRedo()
 {
-    mNetSegment.removeNetLabel(mNetLabel); // can throw
+    mSchematic.updateAllNetLabelAnchors();
 }
 
 /*****************************************************************************************

@@ -24,6 +24,7 @@
 #include "si_netline.h"
 #include "../schematic.h"
 #include "si_netpoint.h"
+#include "si_netsegment.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
 #include "si_symbol.h"
@@ -41,15 +42,15 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLine::SI_NetLine(Schematic& schematic, const SExpression& node) :
-    SI_Base(schematic), mPosition(), mUuid(), mStartPoint(nullptr), mEndPoint(nullptr),
-    mWidth()
+SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node) :
+    SI_Base(segment.getSchematic()), mPosition(), mUuid(),
+    mStartPoint(nullptr), mEndPoint(nullptr), mWidth()
 {
     mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
     mWidth = node.getValueByPath<Length>("width", true);
 
     Uuid spUuid = node.getValueByPath<Uuid>("p1", true);
-    mStartPoint = mSchematic.getNetPointByUuid(spUuid);
+    mStartPoint = segment.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
@@ -57,7 +58,7 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const SExpression& node) :
     }
 
     Uuid epUuid = node.getValueByPath<Uuid>("p2", true);
-    mEndPoint = mSchematic.getNetPointByUuid(epUuid);
+    mEndPoint = segment.getNetPointByUuid(epUuid);
     if(!mEndPoint) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net point UUID: \"%1\""))
@@ -67,10 +68,10 @@ SI_NetLine::SI_NetLine(Schematic& schematic, const SExpression& node) :
     init();
 }
 
-SI_NetLine::SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+SI_NetLine::SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
                        const Length& width) :
-    SI_Base(schematic), mPosition(), mUuid(Uuid::createRandom()), mStartPoint(&startPoint),
-    mEndPoint(&endPoint), mWidth(width)
+    SI_Base(startPoint.getSchematic()), mPosition(), mUuid(Uuid::createRandom()),
+    mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(width)
 {
     init();
 }
@@ -82,10 +83,10 @@ void SI_NetLine::init()
             QString(tr("Invalid net line width: \"%1\"")).arg(mWidth.toMmString()));
     }
 
-    // check if both netpoints have the same netsignal
-    if (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal()) {
+    // check if both netpoints are in the same net segment
+    if (&mStartPoint->getNetSegment() != &mEndPoint->getNetSegment()) {
         throw LogicError(__FILE__, __LINE__,
-            tr("SI_NetLine: endpoints netsignal mismatch."));
+            tr("SI_NetLine: endpoints netsegment mismatch."));
     }
 
     // check if both netpoints are different
@@ -109,10 +110,27 @@ SI_NetLine::~SI_NetLine() noexcept
  *  Getters
  ****************************************************************************************/
 
-NetSignal& SI_NetLine::getNetSignal() const noexcept
+SI_NetSegment& SI_NetLine::getNetSegment() const noexcept
 {
-    Q_ASSERT(&mStartPoint->getNetSignal() == &mEndPoint->getNetSignal());
-    return mStartPoint->getNetSignal();
+    Q_ASSERT(mStartPoint && mEndPoint);
+    Q_ASSERT(&mStartPoint->getNetSegment() == &mEndPoint->getNetSegment());
+    return mStartPoint->getNetSegment();
+}
+
+SI_NetPoint* SI_NetLine::getOtherPoint(const SI_NetPoint& firstPoint) const noexcept
+{
+    if (&firstPoint == mStartPoint) {
+        return mEndPoint;
+    } else if (&firstPoint == mEndPoint) {
+        return mStartPoint;
+    } else {
+        return nullptr;
+    }
+}
+
+NetSignal& SI_NetLine::getNetSignalOfNetSegment() const noexcept
+{
+    return getNetSegment().getNetSignal();
 }
 
 bool SI_NetLine::isAttachedToSymbol() const noexcept
@@ -137,30 +155,35 @@ void SI_NetLine::setWidth(const Length& width) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetLine::addToSchematic(GraphicsScene& scene)
+void SI_NetLine::addToSchematic()
 {
-    if (isAddedToSchematic() || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())) {
+    if (isAddedToSchematic() || (&mStartPoint->getNetSegment() != &mEndPoint->getNetSegment())) {
         throw LogicError(__FILE__, __LINE__);
     }
+
     mStartPoint->registerNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mStartPoint->unregisterNetLine(*this);});
     mEndPoint->registerNetLine(*this); // can throw
-    mHighlightChangedConnection = connect(&getNetSignal(), &NetSignal::highlightedChanged,
+
+    mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
+                                          &NetSignal::highlightedChanged,
                                           [this](){mGraphicsItem->update();});
-    SI_Base::addToSchematic(scene, *mGraphicsItem);
+    SI_Base::addToSchematic(mGraphicsItem.data());
     sg.dismiss();
 }
 
-void SI_NetLine::removeFromSchematic(GraphicsScene& scene)
+void SI_NetLine::removeFromSchematic()
 {
-    if ((!isAddedToSchematic()) || (&mStartPoint->getNetSignal() != &mEndPoint->getNetSignal())) {
+    if ((!isAddedToSchematic()) || (&mStartPoint->getNetSegment() != &mEndPoint->getNetSegment())) {
         throw LogicError(__FILE__, __LINE__);
     }
+
     mEndPoint->unregisterNetLine(*this); // can throw
     auto sg = scopeGuard([&](){mEndPoint->registerNetLine(*this);});
     mStartPoint->unregisterNetLine(*this); // can throw
+
     disconnect(mHighlightChangedConnection);
-    SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    SI_Base::removeFromSchematic(mGraphicsItem.data());
     sg.dismiss();
 }
 

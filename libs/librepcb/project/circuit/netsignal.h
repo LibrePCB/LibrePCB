@@ -38,8 +38,7 @@ namespace project {
 class Circuit;
 class NetClass;
 class ComponentSignalInstance;
-class SI_NetPoint;
-class SI_NetLabel;
+class SI_NetSegment;
 class BI_NetPoint;
 class BI_Via;
 class ErcMsg;
@@ -76,8 +75,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         // Getters: General
         Circuit& getCircuit() const noexcept {return mCircuit;}
         const QList<ComponentSignalInstance*>& getComponentSignals() const noexcept {return mRegisteredComponentSignals;}
-        const QList<SI_NetPoint*>& getSchematicNetPoints() const noexcept {return mRegisteredSchematicNetPoints;}
-        const QList<SI_NetLabel*>& getSchematicNetLabels() const noexcept {return mRegisteredSchematicNetLabels;}
+        const QList<SI_NetSegment*>& getSchematicNetSegments() const noexcept {return mRegisteredSchematicNetSegments;}
         const QList<BI_NetPoint*>& getBoardNetPoints() const noexcept {return mRegisteredBoardNetPoints;}
         const QList<BI_Via*>& getBoardVias() const noexcept {return mRegisteredBoardVias;}
         int getRegisteredElementsCount() const noexcept;
@@ -93,10 +91,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         void removeFromCircuit();
         void registerComponentSignal(ComponentSignalInstance& signal);
         void unregisterComponentSignal(ComponentSignalInstance& signal);
-        void registerSchematicNetPoint(SI_NetPoint& netpoint);
-        void unregisterSchematicNetPoint(SI_NetPoint& netpoint);
-        void registerSchematicNetLabel(SI_NetLabel& netlabel);
-        void unregisterSchematicNetLabel(SI_NetLabel& netlabel);
+        void registerSchematicNetSegment(SI_NetSegment& netsegment);
+        void unregisterSchematicNetSegment(SI_NetSegment& netsegment);
         void registerBoardNetPoint(BI_NetPoint& netpoint);
         void unregisterBoardNetPoint(BI_NetPoint& netpoint);
         void registerBoardVia(BI_Via& via);
@@ -107,6 +103,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
 
         // Operator Overloadings
         NetSignal& operator=(const NetSignal& rhs) = delete;
+        bool operator==(const NetSignal& rhs) noexcept {return (this == &rhs);}
+        bool operator!=(const NetSignal& rhs) noexcept {return (this != &rhs);}
 
 
     signals:
@@ -133,8 +131,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
 
         // Registered Elements of this NetSignal
         QList<ComponentSignalInstance*> mRegisteredComponentSignals;
-        QList<SI_NetPoint*> mRegisteredSchematicNetPoints;
-        QList<SI_NetLabel*> mRegisteredSchematicNetLabels;
+        QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
         QList<BI_NetPoint*> mRegisteredBoardNetPoints;
         QList<BI_Via*> mRegisteredBoardVias;
 
