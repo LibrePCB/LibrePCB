@@ -38,6 +38,16 @@ lessThan(QT_MINOR_VERSION, 5) {
     DEFINES += qInfo=qDebug
 }
 
+# do not allow to use -Werror in release mode on Qt < 5.5 because Q_ASSERT() would lead
+# to warnings (resp. errors) if the argument of Q_ASSERT() is not used elsewhere.
+#   --> see: http://code.qt.io/cgit/qt/qtbase.git/tree/dist/changes-5.5.0
+CONFIG(release, debug|release) {
+    lessThan(QT_MINOR_VERSION, 5) {
+        QMAKE_CFLAGS -= -Werror
+        QMAKE_CXXFLAGS -= -Werror
+    }
+}
+
 # c++11 is obligatory!
 CONFIG += c++11
 

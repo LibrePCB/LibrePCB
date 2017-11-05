@@ -194,7 +194,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
 {
     Q_UNUSED(widget);
 

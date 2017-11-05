@@ -129,7 +129,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
 {
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);

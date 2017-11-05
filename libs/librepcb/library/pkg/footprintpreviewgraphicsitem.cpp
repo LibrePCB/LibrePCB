@@ -181,7 +181,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
 {
     Q_UNUSED(widget);
 

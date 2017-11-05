@@ -73,15 +73,15 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public Attribut
         void updateCacheAndRepaint() noexcept;
 
         // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+        QRectF boundingRect() const noexcept override {return mBoundingRect;}
+        QPainterPath shape() const noexcept override {return mShape;}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
 
     signals:
 
         /// @copydoc AttributeProvider::attributesChanged()
-        void attributesChanged() {}
+        void attributesChanged() override {}
 
 
     private:

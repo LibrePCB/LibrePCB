@@ -216,7 +216,8 @@ TEST_F(SerializableObjectListTest, testConstIterator)
     const List l{mMocks[0], mMocks[1], mMocks[2]};
     int i = 0;
     for (const auto& mock : l) {
-        EXPECT_EQ(*mMocks[i++], mock);
+        EXPECT_EQ(*mMocks[i], mock);
+        ++i;
     }
     EXPECT_EQ(3, i);
 }
