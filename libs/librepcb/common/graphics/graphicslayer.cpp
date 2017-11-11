@@ -236,6 +236,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sSchematicSheetFrames,     {tr("Sheet Frames"),                Qt::black,                  Qt::darkGray,               true});
         h.insert(sSchematicNetLines,        {tr("Netlines"),                    Qt::darkGreen,              Qt::green,                  true});
         h.insert(sSchematicNetLabels,       {tr("Netlabels"),                   Qt::darkGreen,              Qt::green,                  true});
+        h.insert(sSchematicNetLabelAnchors, {tr("Netlabel Anchors"),            Qt::darkGray,               Qt::gray,                   true});
         h.insert(sSchematicDocumentation,   {tr("Documentation"),               Qt::darkGray,               Qt::gray,                   true});
         h.insert(sSchematicComments,        {tr("Comments"),                    Qt::darkBlue,               Qt::blue,                   true});
         h.insert(sSchematicGuide,           {tr("Guide"),                       Qt::darkYellow,             Qt::yellow,                 true});

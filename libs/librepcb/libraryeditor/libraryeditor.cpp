@@ -143,6 +143,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addLayer(GraphicsLayer::sSymbolValues);
     addLayer(GraphicsLayer::sSchematicNetLines);
     addLayer(GraphicsLayer::sSchematicNetLabels);
+    addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
     addLayer(GraphicsLayer::sSchematicDocumentation);
     addLayer(GraphicsLayer::sSchematicComments);
     addLayer(GraphicsLayer::sSchematicGuide);

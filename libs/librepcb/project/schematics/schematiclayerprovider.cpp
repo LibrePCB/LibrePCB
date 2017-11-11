@@ -50,6 +50,7 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project):
     addLayer(GraphicsLayer::sSymbolValues);
     addLayer(GraphicsLayer::sSchematicNetLines);
     addLayer(GraphicsLayer::sSchematicNetLabels);
+    addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
     addLayer(GraphicsLayer::sSchematicDocumentation);
     addLayer(GraphicsLayer::sSchematicComments);
     addLayer(GraphicsLayer::sSchematicGuide);
