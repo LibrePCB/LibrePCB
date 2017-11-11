@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include "units/point.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -74,6 +75,33 @@ class Toolbox final
         }
 
         static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen) noexcept;
+
+        /**
+         * @brief Calculate the point on a given line which is nearest to a given point
+         *
+         * @param p         An arbitrary point
+         * @param l1        Start point of the line
+         * @param l2        End point of the line
+         *
+         * @return Nearest point on the given line (either l1, l2, or a point between them)
+         *
+         * @warning This method works with floating point numbers and thus the result may
+         *          not be perfectly precise.
+         */
+        static Point nearestPointOnLine(const Point& p, const Point& l1, const Point& l2) noexcept;
+
+        /**
+         * @brief Calculate the shortest distance between a given point and a given line
+         *
+         * @param p         An arbitrary point
+         * @param l1        Start point of the line
+         * @param l2        End point of the line
+         * @param nearest   If not `nullptr`, the nearest point is returned here
+         *
+         * @return Shortest distance between the given point and the given line (>=0)
+         */
+        static Length shortestDistanceBetweenPointAndLine(const Point& p, const Point& l1,
+                                                          const Point& l2, Point* nearest = nullptr) noexcept;
 };
 
 /*****************************************************************************************
