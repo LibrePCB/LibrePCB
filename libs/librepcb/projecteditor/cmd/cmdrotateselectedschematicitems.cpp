@@ -33,6 +33,8 @@
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabelanchorsupdate.h>
+#include <librepcb/project/schematics/schematicselectionquery.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -62,52 +64,56 @@ CmdRotateSelectedSchematicItems::~CmdRotateSelectedSchematicItems() noexcept
 bool CmdRotateSelectedSchematicItems::performExecute()
 {
     // get all selected items
-    QList<SI_Base*> items = mSchematic.getSelectedItems(false, true, false, true, false, false,
-                                                        false, false, false, false, false);
-
-    // no items selected --> nothing to do here
-    if (items.isEmpty()) {
-        return false;
-    }
+    std::unique_ptr<SchematicSelectionQuery> query(mSchematic.createSelectionQuery());
+    query->addSelectedSymbols();
+    query->addSelectedNetPoints(SchematicSelectionQuery::NetPointFilter::Floating);
+    query->addNetPointsOfNetLines(SchematicSelectionQuery::NetLineFilter::All,
+                                  SchematicSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedNetLabels();
 
     // find the center of all elements
     Point center = Point(0, 0);
-    foreach (SI_Base* item, items) {
-        center += item->getPosition();
+    int count = 0;
+    foreach (SI_Symbol* symbol, query->getSymbols()) {
+        center += symbol->getPosition();
+        ++count;
     }
-    center /= items.count();
-    center.mapToGrid(mSchematic.getGridProperties().getInterval());
+    foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
+        center += netpoint->getPosition();
+        ++count;
+    }
+    foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
+        center += netlabel->getPosition();
+        ++count;
+    }
+    if (count > 0) {
+        center /= count;
+        center.mapToGrid(mSchematic.getGridProperties().getInterval());
+    } else {
+        // no items selected --> nothing to do here
+        return false;
+    }
 
     // rotate all selected elements
-    foreach (SI_Base* item, items) {
-        switch (item->getType())
-        {
-            case SI_Base::Type_t::Symbol: {
-                SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item); Q_ASSERT(symbol);
-                CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
-                cmd->rotate(mAngle, center, false);
-                appendChild(cmd);
-                break;
-            }
-            case SI_Base::Type_t::NetPoint: {
-                SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(item); Q_ASSERT(netpoint);
-                CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
-                cmd->setPosition(netpoint->getPosition().rotated(mAngle, center), false);
-                appendChild(cmd);
-                break;
-            }
-            case SI_Base::Type_t::NetLabel: {
-                SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item); Q_ASSERT(netlabel);
-                CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
-                cmd->rotate(mAngle, center, false);
-                appendChild(cmd);
-                break;
-            }
-            default: {
-                qCritical() << "Unknown schematic item type:" << static_cast<int>(item->getType());
-                break;
-            }
-        }
+    foreach (SI_Symbol* symbol, query->getSymbols()) {
+        CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
+        cmd->rotate(mAngle, center, false);
+        appendChild(cmd);
+    }
+    foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
+        CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
+        cmd->setPosition(netpoint->getPosition().rotated(mAngle, center), false);
+        appendChild(cmd);
+    }
+    foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
+        CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
+        cmd->rotate(mAngle, center, false);
+        appendChild(cmd);
+    }
+
+    // if something was modified, trigger anchors update of all netlabels
+    if (getChildCount() > 0) {
+        appendChild(new CmdSchematicNetLabelAnchorsUpdate(mSchematic));
     }
 
     // execute all child commands

@@ -32,8 +32,9 @@
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
+#include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
@@ -41,8 +42,6 @@
 #include <librepcb/project/circuit/componentsignalinstance.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointremove.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
@@ -51,7 +50,7 @@
 #include <librepcb/common/gridproperties.h>
 #include "../../cmd/cmdcombineschematicnetpoints.h"
 #include "../../cmd/cmdplaceschematicnetpoint.h"
-#include "../../cmd/cmdcombineallnetsignalsunderschematicnetpoint.h"
+#include "../../cmd/cmdcombineallitemsunderschematicnetpoint.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -71,8 +70,7 @@ SES_DrawWire::SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorU
     mPositioningNetLine1(nullptr), mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr), mPositioningNetPoint2(nullptr),
     // command toolbar actions / widgets:
-    mNetClassLabel(nullptr), mNetClassComboBox(nullptr), mNetSignalLabel(nullptr),
-    mNetSignalComboBox(nullptr), mWidthLabel(nullptr), mWidthComboBox(nullptr)
+    mWidthLabel(nullptr), mWidthComboBox(nullptr)
 {
 }
 
@@ -128,54 +126,6 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept
                 [this, mode](){mWireMode = mode; updateWireModeActionsCheckedState();});
     }
 
-    // add the "Netclass:" label to the toolbar
-    mNetClassLabel = new QLabel(tr("Netclass:"));
-    mNetClassLabel->setIndent(10);
-    mEditorUi.commandToolbar->addWidget(mNetClassLabel);
-
-    // add the netclasses combobox to the toolbar
-    mNetClassComboBox = new QComboBox();
-    mNetClassComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    mNetClassComboBox->setInsertPolicy(QComboBox::NoInsert);
-    mNetClassComboBox->setEditable(true);
-    foreach (NetClass* netclass, mEditor.getProject().getCircuit().getNetClasses())
-        mNetClassComboBox->addItem(netclass->getName(), netclass->getUuid().toStr());
-    mNetClassComboBox->model()->sort(0);
-    mNetClassComboBox->setCurrentIndex(0);
-    mNetClassAddCon = connect(&mProject.getCircuit(), &Circuit::netClassAdded,
-        [this](NetClass& netclass){if (mNetClassComboBox) {
-        mNetClassComboBox->addItem(netclass.getName(), netclass.getUuid().toStr());
-        mNetClassComboBox->model()->sort(0);}});
-    mNetClassRemoveCon = connect(&mProject.getCircuit(), &Circuit::netClassRemoved,
-        [this](NetClass& netclass){if (mNetClassComboBox) {
-        mNetClassComboBox->removeItem(mNetClassComboBox->findData(netclass.getUuid().toStr()));
-        mNetClassComboBox->model()->sort(0);}});
-    mEditorUi.commandToolbar->addWidget(mNetClassComboBox);
-
-    // add the "Signal:" label to the toolbar
-    mNetSignalLabel = new QLabel(tr("Signal:"));
-    mNetSignalLabel->setIndent(10);
-    mEditorUi.commandToolbar->addWidget(mNetSignalLabel);
-
-    // add the netsignals combobox to the toolbar
-    mNetSignalComboBox = new QComboBox();
-    mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
-    mNetSignalComboBox->setEditable(true);
-    foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
-        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
-    mNetSignalComboBox->model()->sort(0);
-    mNetSignalComboBox->setCurrentIndex(-1);
-    mNetSignalAddCon = connect(&mProject.getCircuit(), &Circuit::netSignalAdded,
-        [this](NetSignal& netsignal){if (mNetSignalComboBox) {
-        mNetSignalComboBox->addItem(netsignal.getName(), netsignal.getUuid().toStr());
-        mNetSignalComboBox->model()->sort(0);}});
-    mNetSignalRemoveCon = connect(&mProject.getCircuit(), &Circuit::netSignalRemoved,
-        [this](NetSignal& netsignal){if (mNetSignalComboBox) {
-        mNetSignalComboBox->removeItem(mNetSignalComboBox->findData(netsignal.getUuid().toStr()));
-        mNetSignalComboBox->model()->sort(0);}});
-    mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
-
     // add the "Width:" label to the toolbar
     mWidthLabel = new QLabel(tr("Width:"));
     mWidthLabel->setIndent(10);
@@ -206,14 +156,8 @@ bool SES_DrawWire::exit(SEE_Base* event) noexcept
         abortPositioning(true);
 
     // Remove actions / widgets from the "command" toolbar
-    disconnect(mNetClassAddCon);    disconnect(mNetClassRemoveCon);
-    disconnect(mNetSignalAddCon);   disconnect(mNetSignalRemoveCon);
     delete mWidthComboBox;          mWidthComboBox = nullptr;
     delete mWidthLabel;             mWidthLabel = nullptr;
-    delete mNetSignalComboBox;      mNetSignalComboBox = nullptr;
-    delete mNetSignalLabel;         mNetSignalLabel = nullptr;
-    delete mNetClassComboBox;       mNetClassComboBox = nullptr;
-    delete mNetClassLabel;          mNetClassLabel = nullptr;
     qDeleteAll(mWireModeActions);   mWireModeActions.clear();
     qDeleteAll(mActionSeparators);  mActionSeparators.clear();
 
@@ -364,55 +308,32 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
         if (fixedPoint) {
             mFixedNetPoint = fixedPoint;
         } else {
-            QString netclassName = mNetClassComboBox->currentText().trimmed();
-            QString netsignalName = mNetSignalComboBox->currentText().trimmed();
-            CmdPlaceSchematicNetPoint* cmd = new CmdPlaceSchematicNetPoint(schematic, pos,
-                                                                           netclassName,
-                                                                           netsignalName);
+            CmdPlaceSchematicNetPoint* cmd = new CmdPlaceSchematicNetPoint(schematic, pos);
             mUndoStack.appendToCmdGroup(cmd); // can throw
             mFixedNetPoint = cmd->getNetPoint();
         }
         Q_ASSERT(mFixedNetPoint);
-        NetSignal* netsignal = &mFixedNetPoint->getNetSignal();
-        NetClass* netclass = &netsignal->getNetClass();
 
-        // update the command toolbar
-        mNetClassComboBox->setCurrentIndex(mNetClassComboBox->findData(netclass->getUuid().toStr()));
-        mNetSignalComboBox->setCurrentIndex(mNetSignalComboBox->findData(netsignal->getUuid().toStr()));
+        // add more netpoints & netlines
+        CmdSchematicNetSegmentAddElements* cmd = new CmdSchematicNetSegmentAddElements(
+                                                     mFixedNetPoint->getNetSegment());
+        SI_NetPoint* p2 = cmd->addNetPoint(pos); Q_ASSERT(p2); // second netpoint
+        SI_NetLine* l1 = cmd->addNetLine(*mFixedNetPoint, *p2); Q_ASSERT(l1); // first netline
+        SI_NetPoint* p3 = cmd->addNetPoint(pos); Q_ASSERT(p3); // third netpoint
+        SI_NetLine* l2 = cmd->addNetLine(*p2, *p3); Q_ASSERT(l2); // second netline
+        mUndoStack.appendToCmdGroup(cmd); // can throw
 
-        // add second netpoint
-        CmdSchematicNetPointAdd* cmdNetPointAdd2 = new CmdSchematicNetPointAdd(
-            schematic, *netsignal, pos);
-        mUndoStack.appendToCmdGroup(cmdNetPointAdd2);
-        mPositioningNetPoint1 = cmdNetPointAdd2->getNetPoint();
-        Q_ASSERT(mPositioningNetPoint1);
-
-        // add first netline
-        CmdSchematicNetLineAdd* cmdNetLineAdd1 = new CmdSchematicNetLineAdd(
-            schematic, *mFixedNetPoint, *cmdNetPointAdd2->getNetPoint());
-        mUndoStack.appendToCmdGroup(cmdNetLineAdd1);
-        mPositioningNetLine1 = cmdNetLineAdd1->getNetLine();
-        Q_ASSERT(mPositioningNetLine1);
-
-        // add third netpoint
-        CmdSchematicNetPointAdd* cmdNetPointAdd3 = new CmdSchematicNetPointAdd(
-            schematic, *netsignal, pos);
-        mUndoStack.appendToCmdGroup(cmdNetPointAdd3);
-        mPositioningNetPoint2 = cmdNetPointAdd3->getNetPoint();
-        Q_ASSERT(mPositioningNetPoint2);
-
-        // add second netline
-        CmdSchematicNetLineAdd* cmdNetLineAdd2 = new CmdSchematicNetLineAdd(
-            schematic, *cmdNetPointAdd2->getNetPoint(), *cmdNetPointAdd3->getNetPoint());
-        mUndoStack.appendToCmdGroup(cmdNetLineAdd2);
-        mPositioningNetLine2 = cmdNetLineAdd2->getNetLine();
-        Q_ASSERT(mPositioningNetLine2);
+        // update members
+        mPositioningNetPoint1 = p2;
+        mPositioningNetLine1 = l1;
+        mPositioningNetPoint2 = p3;
+        mPositioningNetLine2 = l2;
 
         // properly place the new netpoints/netlines according the current wire mode
         updateNetpointPositions(pos);
 
         // highlight all elements of the current netsignal
-        mCircuit.setHighlightedNetSignal(netsignal);
+        mCircuit.setHighlightedNetSignal(&mFixedNetPoint->getNetSignalOfNetSegment());
 
         return true;
     }
@@ -439,17 +360,23 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
 
         try
         {
+            // create a new undo command group to make all changes atomic
+            QScopedPointer<UndoCommandGroup> cmdGroup(new UndoCommandGroup("Add schematic netline"));
+
             // remove p1 if p1 == p0 || p1 == p2
             if (mPositioningNetPoint1->getPosition() == mFixedNetPoint->getPosition()) {
-                mUndoStack.appendToCmdGroup(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mFixedNetPoint));
+                cmdGroup->appendChild(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mFixedNetPoint));
             } else if (mPositioningNetPoint1->getPosition() == mPositioningNetPoint2->getPosition()) {
-                mUndoStack.appendToCmdGroup(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mPositioningNetPoint2));
+                cmdGroup->appendChild(new CmdCombineSchematicNetPoints(*mPositioningNetPoint1, *mPositioningNetPoint2));
             }
 
             // combine all schematic items under "mPositioningNetPoint2" together
-            auto* cmd = new CmdCombineAllNetSignalsUnderSchematicNetPoint(*mPositioningNetPoint2);
-            mUndoStack.appendToCmdGroup(cmd);
-            finishCommand = cmd->hasCombinedSomeItems();
+            auto* cmdCombineItems = new CmdCombineAllItemsUnderSchematicNetPoint(*mPositioningNetPoint2);
+            cmdGroup->appendChild(cmdCombineItems);
+
+            // execute all undo commands
+            mUndoStack.appendToCmdGroup(cmdGroup.take());
+            finishCommand = cmdCombineItems->hasCombinedSomeItems();
         }
         catch (UserCanceled& e)
         {
@@ -498,7 +425,6 @@ bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept
         mPositioningNetLine2 = nullptr;
         mPositioningNetPoint1 = nullptr;
         mPositioningNetPoint2 = nullptr;
-        mNetSignalComboBox->setCurrentIndex(-1);
         mUndoStack.abortCmdGroup(); // can throw
         return true;
     }

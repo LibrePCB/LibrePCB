@@ -26,6 +26,7 @@
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netline.h>
+#include <librepcb/project/schematics/items/si_netsegment.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
@@ -37,12 +38,9 @@
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentedit.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -75,23 +73,8 @@ bool CmdCombineNetSignals::performExecute()
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-    // change netsignal of all netlabels
-    foreach (SI_NetLabel* label, mNetSignalToRemove.getSchematicNetLabels()) {
-        auto* cmd = new CmdSchematicNetLabelEdit(*label);
-        cmd->setNetSignal(mResultingNetSignal, false);
-        execNewChildCmd(cmd); // can throw
-    }
-
-    // determine all schematic elements which need to be removed temporary
-    QList<SI_NetPoint*> schematicNetPoints = mNetSignalToRemove.getSchematicNetPoints();
-    QSet<SI_NetLine*> schematicNetLines;
-    foreach (SI_NetPoint* point, schematicNetPoints) {
-        foreach (SI_NetLine* line, point->getLines()) {
-            schematicNetLines.insert(line);
-        }
-    }
-
-    // determine all board elements which need to be removed temporary
+    // determine all elements which need to be removed temporary
+    QList<SI_NetSegment*> schematicNetSegments = mNetSignalToRemove.getSchematicNetSegments();
     QList<BI_Via*> boardVias = mNetSignalToRemove.getBoardVias();
     QList<BI_NetPoint*> boardNetPoints = mNetSignalToRemove.getBoardNetPoints();
     QSet<BI_NetLine*> boardNetLines;
@@ -101,14 +84,9 @@ bool CmdCombineNetSignals::performExecute()
         }
     }
 
-    // remove all schematic netlines
-    foreach (SI_NetLine* netline, schematicNetLines) {
-        execNewChildCmd(new CmdSchematicNetLineRemove(*netline)); // can throw
-    }
-
-    // remove all schematic netpoints
-    foreach (SI_NetPoint* netpoint, schematicNetPoints) {
-        execNewChildCmd(new CmdSchematicNetPointRemove(*netpoint)); // can throw
+    // remove all schematic netsegments
+    foreach (SI_NetSegment* netsegment, schematicNetSegments) {
+        execNewChildCmd(new CmdSchematicNetSegmentRemove(*netsegment));
     }
 
     // remove all board netlines
@@ -152,17 +130,12 @@ bool CmdCombineNetSignals::performExecute()
         execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
     }
 
-    // re-add all schematic netpoints
-    foreach (SI_NetPoint* netpoint, schematicNetPoints) {
-        CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
+    // re-add all schematic netsegments
+    foreach (SI_NetSegment* netsegment, schematicNetSegments) {
+        auto* cmd = new CmdSchematicNetSegmentEdit(*netsegment);
         cmd->setNetSignal(mResultingNetSignal);
-        execNewChildCmd(cmd); // can throw
-        execNewChildCmd(new CmdSchematicNetPointAdd(*netpoint)); // can throw
-    }
-
-    // re-add all schematic netlines
-    foreach (SI_NetLine* netline, schematicNetLines) {
-        execNewChildCmd(new CmdSchematicNetLineAdd(*netline)); // can throw
+        execNewChildCmd(cmd);
+        execNewChildCmd(new CmdSchematicNetSegmentAdd(*netsegment));
     }
 
     // remove the old netsignal

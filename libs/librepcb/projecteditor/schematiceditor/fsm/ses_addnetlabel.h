@@ -66,8 +66,8 @@ class SES_AddNetLabel final : public SES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        bool addLabel(Schematic& schematic) noexcept;
-        bool updateLabel(Schematic& schematic, const Point& pos) noexcept;
+        bool addLabel(Schematic& schematic, const Point& pos) noexcept;
+        bool updateLabel(const Point& pos) noexcept;
         bool fixLabel(const Point& pos) noexcept;
 
 

@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
-#define LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#ifndef LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#define LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,26 +34,28 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetPoint;
+class NetSignal;
+class ComponentSignalInstance;
+class SI_NetSegment;
 
 namespace editor {
 
 /*****************************************************************************************
- *  Class CmdCombineSchematicNetPoints
+ *  Class CmdChangeNetSignalOfSchematicNetSegment
  ****************************************************************************************/
 
 /**
- * @brief This undo command combines two schematic netpoints together
- *
- * @note Both netpoints must have the same netsegment!
+ * @brief The CmdChangeNetSignalOfSchematicNetSegment class
  */
-class CmdCombineSchematicNetPoints final : public UndoCommandGroup
+class CmdChangeNetSignalOfSchematicNetSegment final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        CmdCombineSchematicNetPoints(SI_NetPoint& toBeRemoved, SI_NetPoint& result) noexcept;
-        ~CmdCombineSchematicNetPoints() noexcept;
+        CmdChangeNetSignalOfSchematicNetSegment() = delete;
+        CmdChangeNetSignalOfSchematicNetSegment(const CmdChangeNetSignalOfSchematicNetSegment& other) = delete;
+        CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg, NetSignal& newSig) noexcept;
+        ~CmdChangeNetSignalOfSchematicNetSegment() noexcept;
 
 
     private:
@@ -61,10 +65,15 @@ class CmdCombineSchematicNetPoints final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
+        void changeNetSignalOfNetSegment();
+        void updateCompSigInstNetSignal(ComponentSignalInstance& cmpSig);
+
+
+        // Private Member Variables
 
         // Attributes from the constructor
-        SI_NetPoint& mNetPointToBeRemoved;
-        SI_NetPoint& mResultingNetPoint;
+        SI_NetSegment& mNetSegment;
+        NetSignal& mNewNetSignal;
 };
 
 /*****************************************************************************************
@@ -75,4 +84,4 @@ class CmdCombineSchematicNetPoints final : public UndoCommandGroup
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#endif // LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H

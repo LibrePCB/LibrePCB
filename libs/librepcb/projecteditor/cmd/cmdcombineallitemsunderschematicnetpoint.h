@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
-#define LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#ifndef LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H
+#define LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/point.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,26 +33,29 @@
 namespace librepcb {
 namespace project {
 
+class Circuit;
+class Schematic;
 class SI_NetPoint;
 
 namespace editor {
 
 /*****************************************************************************************
- *  Class CmdCombineSchematicNetPoints
+ *  Class CmdCombineAllItemsUnderSchematicNetPoint
  ****************************************************************************************/
 
 /**
- * @brief This undo command combines two schematic netpoints together
- *
- * @note Both netpoints must have the same netsegment!
+ * @brief The CmdCombineAllItemsUnderSchematicNetPoint class
  */
-class CmdCombineSchematicNetPoints final : public UndoCommandGroup
+class CmdCombineAllItemsUnderSchematicNetPoint final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        CmdCombineSchematicNetPoints(SI_NetPoint& toBeRemoved, SI_NetPoint& result) noexcept;
-        ~CmdCombineSchematicNetPoints() noexcept;
+        CmdCombineAllItemsUnderSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        ~CmdCombineAllItemsUnderSchematicNetPoint() noexcept;
+
+        // Getters
+        bool hasCombinedSomeItems() const noexcept {return mHasCombinedSomeItems;}
 
 
     private:
@@ -63,8 +67,12 @@ class CmdCombineSchematicNetPoints final : public UndoCommandGroup
 
 
         // Attributes from the constructor
-        SI_NetPoint& mNetPointToBeRemoved;
-        SI_NetPoint& mResultingNetPoint;
+        Circuit& mCircuit;
+        Schematic& mSchematic;
+        SI_NetPoint& mNetPoint;
+
+        // Private Member Variables
+        bool mHasCombinedSomeItems;
 };
 
 /*****************************************************************************************
@@ -75,4 +83,4 @@ class CmdCombineSchematicNetPoints final : public UndoCommandGroup
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#endif // LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H
