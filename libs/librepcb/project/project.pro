@@ -78,13 +78,15 @@ SOURCES += \
     project.cpp \
     schematics/cmd/cmdschematicadd.cpp \
     schematics/cmd/cmdschematicnetlabeladd.cpp \
+    schematics/cmd/cmdschematicnetlabelanchorsupdate.cpp \
     schematics/cmd/cmdschematicnetlabeledit.cpp \
     schematics/cmd/cmdschematicnetlabelremove.cpp \
-    schematics/cmd/cmdschematicnetlineadd.cpp \
-    schematics/cmd/cmdschematicnetlineremove.cpp \
-    schematics/cmd/cmdschematicnetpointadd.cpp \
     schematics/cmd/cmdschematicnetpointedit.cpp \
-    schematics/cmd/cmdschematicnetpointremove.cpp \
+    schematics/cmd/cmdschematicnetsegmentadd.cpp \
+    schematics/cmd/cmdschematicnetsegmentaddelements.cpp \
+    schematics/cmd/cmdschematicnetsegmentedit.cpp \
+    schematics/cmd/cmdschematicnetsegmentremove.cpp \
+    schematics/cmd/cmdschematicnetsegmentremoveelements.cpp \
     schematics/cmd/cmdschematicremove.cpp \
     schematics/cmd/cmdsymbolinstanceadd.cpp \
     schematics/cmd/cmdsymbolinstanceedit.cpp \
@@ -99,10 +101,12 @@ SOURCES += \
     schematics/items/si_netlabel.cpp \
     schematics/items/si_netline.cpp \
     schematics/items/si_netpoint.cpp \
+    schematics/items/si_netsegment.cpp \
     schematics/items/si_symbol.cpp \
     schematics/items/si_symbolpin.cpp \
     schematics/schematic.cpp \
     schematics/schematiclayerprovider.cpp \
+    schematics/schematicselectionquery.cpp \
     settings/cmd/cmdprojectsettingschange.cpp \
     settings/projectsettings.cpp \
 
@@ -165,13 +169,15 @@ HEADERS += \
     project.h \
     schematics/cmd/cmdschematicadd.h \
     schematics/cmd/cmdschematicnetlabeladd.h \
+    schematics/cmd/cmdschematicnetlabelanchorsupdate.h \
     schematics/cmd/cmdschematicnetlabeledit.h \
     schematics/cmd/cmdschematicnetlabelremove.h \
-    schematics/cmd/cmdschematicnetlineadd.h \
-    schematics/cmd/cmdschematicnetlineremove.h \
-    schematics/cmd/cmdschematicnetpointadd.h \
     schematics/cmd/cmdschematicnetpointedit.h \
-    schematics/cmd/cmdschematicnetpointremove.h \
+    schematics/cmd/cmdschematicnetsegmentadd.h \
+    schematics/cmd/cmdschematicnetsegmentaddelements.h \
+    schematics/cmd/cmdschematicnetsegmentedit.h \
+    schematics/cmd/cmdschematicnetsegmentremove.h \
+    schematics/cmd/cmdschematicnetsegmentremoveelements.h \
     schematics/cmd/cmdschematicremove.h \
     schematics/cmd/cmdsymbolinstanceadd.h \
     schematics/cmd/cmdsymbolinstanceedit.h \
@@ -186,10 +192,12 @@ HEADERS += \
     schematics/items/si_netlabel.h \
     schematics/items/si_netline.h \
     schematics/items/si_netpoint.h \
+    schematics/items/si_netsegment.h \
     schematics/items/si_symbol.h \
     schematics/items/si_symbolpin.h \
     schematics/schematic.h \
     schematics/schematiclayerprovider.h \
+    schematics/schematicselectionquery.h \
     settings/cmd/cmdprojectsettingschange.h \
     settings/projectsettings.h \
 

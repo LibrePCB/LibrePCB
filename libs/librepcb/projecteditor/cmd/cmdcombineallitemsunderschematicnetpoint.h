@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
-#define LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H
+#define LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommand.h>
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/point.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,23 +33,29 @@
 namespace librepcb {
 namespace project {
 
+class Circuit;
 class Schematic;
-class SI_NetLine;
+class SI_NetPoint;
+
+namespace editor {
 
 /*****************************************************************************************
- *  Class CmdSchematicNetLineRemove
+ *  Class CmdCombineAllItemsUnderSchematicNetPoint
  ****************************************************************************************/
 
 /**
- * @brief The CmdSchematicNetLineRemove class
+ * @brief The CmdCombineAllItemsUnderSchematicNetPoint class
  */
-class CmdSchematicNetLineRemove final : public UndoCommand
+class CmdCombineAllItemsUnderSchematicNetPoint final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetLineRemove(SI_NetLine& netline) noexcept;
-        ~CmdSchematicNetLineRemove() noexcept;
+        CmdCombineAllItemsUnderSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+        ~CmdCombineAllItemsUnderSchematicNetPoint() noexcept;
+
+        // Getters
+        bool hasCombinedSomeItems() const noexcept {return mHasCombinedSomeItems;}
 
 
     private:
@@ -58,24 +65,22 @@ class CmdSchematicNetLineRemove final : public UndoCommand
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
+        // Attributes from the constructor
+        Circuit& mCircuit;
+        Schematic& mSchematic;
+        SI_NetPoint& mNetPoint;
 
         // Private Member Variables
-
-        Schematic& mSchematic;
-        SI_NetLine& mNetLine;
+        bool mHasCombinedSomeItems;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLINEREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDCOMBINEALLITEMSUNDERSCHEMATICNETPOINT_H

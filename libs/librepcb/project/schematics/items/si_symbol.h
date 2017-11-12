@@ -86,8 +86,8 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         void setRotation(const Angle& newRotation) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) override;
-        void removeFromSchematic(GraphicsScene& scene) override;
+        void addToSchematic() override;
+        void removeFromSchematic() override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;

@@ -25,10 +25,12 @@
 #include <QPrinter>
 #include "sgi_netlabel.h"
 #include "../items/si_netlabel.h"
+#include "../items/si_netsegment.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
+#include <librepcb/common/graphics/linegraphicsitem.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -62,6 +64,10 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel) noexcept :
         sOriginCrossLines.append(QLineF(0, -crossSizePx, 0, crossSizePx));
     }
 
+    // create anchor graphics item
+    mAnchorGraphicsItem.reset(new LineGraphicsItem(this));
+    mAnchorGraphicsItem->setLayer(getLayer(GraphicsLayer::sSchematicNetLabelAnchors));
+
     updateCacheAndRepaint();
 }
 
@@ -80,7 +86,7 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept
     mRotate180 = (mNetLabel.getRotation().mappedTo180deg() <= -Angle::deg90()
                   || mNetLabel.getRotation().mappedTo180deg() > Angle::deg90());
 
-    mStaticText.setText(mNetLabel.getNetSignal().getName());
+    mStaticText.setText(mNetLabel.getNetSignalOfNetSegment().getName());
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -mStaticText.size().width() : 0);
     mTextOrigin.setY(mRotate180 ? 0 : -0.5-mStaticText.size().height());
@@ -94,6 +100,11 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept
     update();
 }
 
+void SGI_NetLabel::setAnchor(const Point& pos) noexcept
+{
+    mAnchorGraphicsItem->setLine(Point(), Point::fromPx(mapFromScene(pos.toPxQPointF())));
+}
+
 /*****************************************************************************************
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
@@ -104,7 +115,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    bool highlight = mNetLabel.isSelected() || mNetLabel.getNetSignal().isHighlighted();
+    bool highlight = mNetLabel.isSelected() || mNetLabel.getNetSignalOfNetSegment().isHighlighted();
 
     GraphicsLayer* layer = getLayer(GraphicsLayer::sSchematicReferences); Q_ASSERT(layer);
     if ((layer->isVisible()) && (lod > 2) && (!deviceIsPrinter))
@@ -164,7 +175,7 @@ void SGI_NetLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
 GraphicsLayer* SGI_NetLabel::getLayer(const QString& name) const noexcept
 {
-    return mNetLabel.getSchematic().getProject().getLayers().getLayer(name);
+    return mNetLabel.getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

@@ -26,9 +26,15 @@
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointremove.h>
+#include <librepcb/project/schematics/items/si_netlabel.h>
+#include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabelremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -61,28 +67,44 @@ bool CmdCombineSchematicNetPoints::performExecute()
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-    // TODO: do not create redundant netlines!
+    // check whether both netpoints have the same netsegment
+    if (mNetPointToBeRemoved.getNetSegment() != mResultingNetPoint.getNetSegment())
+        throw LogicError(__FILE__, __LINE__);
 
     // change netpoint of all affected netlines
+    // TODO: do not create redundant netlines!
+    auto* cmdAdd = new CmdSchematicNetSegmentAddElements(mResultingNetPoint.getNetSegment());
+    auto* cmdRemove = new CmdSchematicNetSegmentRemoveElements(mResultingNetPoint.getNetSegment());
     foreach (SI_NetLine* line, mNetPointToBeRemoved.getLines()) {
-        SI_NetPoint* otherPoint;
-        if (&line->getStartPoint() == &mNetPointToBeRemoved) {
-            otherPoint = &line->getEndPoint();
-        } else if (&line->getEndPoint() == &mNetPointToBeRemoved) {
-            otherPoint = &line->getStartPoint();
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
-        // TODO: maybe add the ability to change start-/endpoint of lines instead
-        //       of remove the line and add a completely new line (attributes are lost!)
-        execNewChildCmd(new CmdSchematicNetLineRemove(*line)); // can throw
+        SI_NetPoint* otherPoint = line->getOtherPoint(mNetPointToBeRemoved); Q_ASSERT(otherPoint);
+        cmdRemove->removeNetLine(*line);
         if (otherPoint != &mResultingNetPoint) {
-            execNewChildCmd(new CmdSchematicNetLineAdd(line->getSchematic(), mResultingNetPoint, *otherPoint)); // can throw
+            cmdAdd->addNetLine(mResultingNetPoint, *otherPoint);
         }
     }
 
     // remove the unused netpoint
-    execNewChildCmd(new CmdSchematicNetPointRemove(mNetPointToBeRemoved)); // can throw
+    cmdRemove->removeNetPoint(mNetPointToBeRemoved);
+
+    // execute undo commands
+    execNewChildCmd(cmdAdd); // can throw
+    execNewChildCmd(cmdRemove); // can throw
+
+    // re-connect symbol pin if required
+    if (mNetPointToBeRemoved.isAttachedToPin()) {
+        SI_SymbolPin* pin = mNetPointToBeRemoved.getSymbolPin(); Q_ASSERT(pin);
+        if (!mResultingNetPoint.isAttachedToPin()) {
+            Q_ASSERT(!mResultingNetPoint.getSymbolPin());
+            execNewChildCmd(new CmdSchematicNetSegmentRemove(mResultingNetPoint.getNetSegment())); // can throw
+            CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(mResultingNetPoint);
+            cmd->setPinToAttach(pin);
+            execNewChildCmd(cmd); // can throw
+            execNewChildCmd(new CmdSchematicNetSegmentAdd(mResultingNetPoint.getNetSegment())); // can throw
+        } else {
+            throw RuntimeError(__FILE__, __LINE__, tr("Could not combine two "
+                "schematic netpoints because both are attached to a symbol pin."));
+        }
+    }
 
     undoScopeGuard.dismiss(); // no undo required
     return true;

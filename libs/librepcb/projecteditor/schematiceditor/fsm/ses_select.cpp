@@ -37,10 +37,12 @@
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
+#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
 #include "../../cmd/cmdcombinenetsignals.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
 #include "../../cmd/cmdrotateselectedschematicitems.h"
 #include "../../cmd/cmdmoveselectedschematicitems.h"
+#include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -306,30 +308,27 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case SI_Base::Type_t::NetLabel:
             {
                 SI_NetLabel* label = dynamic_cast<SI_NetLabel*>(items.first()); Q_ASSERT(label);
-                NetSignal& netsignal = label->getNetSignal();
-                QString name = QInputDialog::getText(&mEditor, tr("Change Net Name"),
-                                                     tr("New Net Name:"),QLineEdit::Normal,
+                NetSignal& netsignal = label->getNetSignalOfNetSegment();
+                QString name = QInputDialog::getText(&mEditor, tr("Change net of segment"),
+                                                     tr("New net name:"), QLineEdit::Normal,
                                                      netsignal.getName());
-                if (!name.isNull())
-                {
-                    try
-                    {
-                        // change name
+                if (!name.isNull()) {
+                    try {
+                        // change netsignal of netsegment
+                        mUndoStack.beginCmdGroup(tr("Change netsignal of netsegment"));
                         NetSignal* newSignal = mCircuit.getNetSignalByName(name);
-                        if (newSignal)
-                        {
-                            auto* cmd = new CmdCombineNetSignals(mProject.getCircuit(), netsignal, *newSignal);
-                            mUndoStack.execCmd(cmd);
+                        if (!newSignal) {
+                            CmdNetSignalAdd* cmd = new CmdNetSignalAdd(mProject.getCircuit(),
+                                                                       netsignal.getNetClass(),
+                                                                       name);
+                            mUndoStack.appendToCmdGroup(cmd);
+                            newSignal = cmd->getNetSignal();
+                            Q_ASSERT(newSignal);
                         }
-                        else
-                        {
-                            auto* cmd = new CmdNetSignalEdit(mCircuit, netsignal);
-                            cmd->setName(name, false);
-                            mUndoStack.execCmd(cmd);
-                        }
-                    }
-                    catch (Exception& e)
-                    {
+                        mUndoStack.appendToCmdGroup(new CmdChangeNetSignalOfSchematicNetSegment(
+                                                    label->getNetSegment(), *newSignal));
+                        mUndoStack.commitCmdGroup();
+                    } catch (const Exception& e) {
                         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                     }
                 }

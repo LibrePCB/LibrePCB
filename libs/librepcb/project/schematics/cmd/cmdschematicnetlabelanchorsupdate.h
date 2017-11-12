@@ -17,55 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdschematicnetlabelremove.h"
-#include "../schematic.h"
-#include "../items/si_netlabel.h"
-#include "../items/si_netsegment.h"
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept :
-    UndoCommand(tr("Remove netlabel")),
-    mNetSegment(netlabel.getNetSegment()), mNetLabel(netlabel)
-{
-}
-
-CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
-{
-}
+class Schematic;
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Class CmdSchematicNetLabelAnchorsUpdate
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute()
+/**
+ * @brief The CmdSchematicNetLabelAnchorsUpdate class
+ *
+ * This is just a convenience undo cummand to update all netlabel anchors in a schematic.
+ */
+class CmdSchematicNetLabelAnchorsUpdate final : public UndoCommand
 {
-    performRedo(); // can throw
+    public:
 
-    return true;
-}
+        // Constructors / Destructor
+        CmdSchematicNetLabelAnchorsUpdate(Schematic& schematic) noexcept;
+        ~CmdSchematicNetLabelAnchorsUpdate() noexcept;
 
-void CmdSchematicNetLabelRemove::performUndo()
-{
-    mNetSegment.addNetLabel(mNetLabel); // can throw
-}
 
-void CmdSchematicNetLabelRemove::performRedo()
-{
-    mNetSegment.removeNetLabel(mNetLabel); // can throw
-}
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
+
+        // Private Member Variables
+        Schematic& mSchematic;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -73,3 +76,5 @@ void CmdSchematicNetLabelRemove::performRedo()
 
 } // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H

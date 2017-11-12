@@ -21,9 +21,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdschematicnetlabelremove.h"
-#include "../schematic.h"
-#include "../items/si_netlabel.h"
+#include "cmdschematicnetsegmentaddelements.h"
+#include "../items/si_netpoint.h"
+#include "../items/si_netline.h"
 #include "../items/si_netsegment.h"
 
 /*****************************************************************************************
@@ -36,35 +36,69 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept :
-    UndoCommand(tr("Remove netlabel")),
-    mNetSegment(netlabel.getNetSegment()), mNetLabel(netlabel)
+CmdSchematicNetSegmentAddElements::CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept :
+    UndoCommand(tr("Add net segment elements")),
+    mNetSegment(segment)
 {
 }
 
-CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
+CmdSchematicNetSegmentAddElements::~CmdSchematicNetSegmentAddElements() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(SI_NetPoint& netpoint)
+{
+    mNetPoints.append(&netpoint);
+    return &netpoint;
+}
+
+SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(const Point& position)
+{
+    SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, position); // can throw
+    return addNetPoint(*netpoint);
+}
+
+SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(SI_SymbolPin& pin)
+{
+    SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, pin); // can throw
+    return addNetPoint(*netpoint);
+}
+
+SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetLine& netline)
+{
+    mNetLines.append(&netline);
+    return &netline;
+}
+
+SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint)
+{
+    SI_NetLine* netline = new SI_NetLine(startPoint, endPoint, Length(158750)); // can throw
+    return addNetLine(*netline);
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute()
+bool CmdSchematicNetSegmentAddElements::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdSchematicNetLabelRemove::performUndo()
+void CmdSchematicNetSegmentAddElements::performUndo()
 {
-    mNetSegment.addNetLabel(mNetLabel); // can throw
+    mNetSegment.removeNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
 }
 
-void CmdSchematicNetLabelRemove::performRedo()
+void CmdSchematicNetSegmentAddElements::performRedo()
 {
-    mNetSegment.removeNetLabel(mNetLabel); // can throw
+    mNetSegment.addNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
 }
 
 /*****************************************************************************************

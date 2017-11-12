@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_netlabel.h"
+#include "si_netsegment.h"
 #include "../schematic.h"
 #include "../../circuit/netsignal.h"
 #include "../../circuit/circuit.h"
@@ -39,34 +40,27 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, const SExpression& node) :
-    SI_Base(schematic), mUuid(), mPosition(), mRotation(), mNetSignal(nullptr)
+SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node) :
+    SI_Base(segment.getSchematic()), mNetSegment(segment), mUuid(), mPosition(),
+    mRotation()
 {
     // read attributes
     mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
-    mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-    if(!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
-    }
     mPosition = Point(node.getChildByPath("pos"));
     mRotation = node.getValueByPath<Angle>("rot", true);
 
     init();
 }
 
-SI_NetLabel::SI_NetLabel(Schematic& schematic, NetSignal& netsignal, const Point& position) :
-    SI_Base(schematic), mUuid(Uuid::createRandom()), mPosition(position), mRotation(0),
-    mNetSignal(&netsignal)
+SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position) :
+    SI_Base(segment.getSchematic()), mNetSegment(segment), mUuid(Uuid::createRandom()),
+    mPosition(position), mRotation(0)
 {
     init();
 }
 
 void SI_NetLabel::init()
 {
-    connect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
-
     // create the graphics item
     mGraphicsItem.reset(new SGI_NetLabel(*this));
     mGraphicsItem->setPos(mPosition.toPxQPointF());
@@ -81,33 +75,24 @@ SI_NetLabel::~SI_NetLabel() noexcept
 }
 
 /*****************************************************************************************
- *  Setters
+ *  Getters
  ****************************************************************************************/
 
-void SI_NetLabel::setNetSignal(NetSignal& netsignal) noexcept
+NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept
 {
-    if (&netsignal != mNetSignal) {
-        if (netsignal.getCircuit() != getCircuit()) {
-            throw LogicError(__FILE__, __LINE__);
-        }
-        if (isAddedToSchematic()) {
-            mNetSignal->unregisterSchematicNetLabel(*this); // can throw
-            auto sg = scopeGuard([&](){mNetSignal->registerSchematicNetLabel(*this);});
-            netsignal.registerSchematicNetLabel(*this); // can throw
-            sg.dismiss();
-        }
-        disconnect(mNetSignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
-        connect(&netsignal, &NetSignal::nameChanged, this, &SI_NetLabel::netSignalNameChanged);
-        mNetSignal = &netsignal;
-        mGraphicsItem->updateCacheAndRepaint();
-    }
+    return mNetSegment.getNetSignal();
 }
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
 
 void SI_NetLabel::setPosition(const Point& position) noexcept
 {
     if (position != mPosition) {
         mPosition = position;
         mGraphicsItem->setPos(mPosition.toPxQPointF());
+        updateAnchor();
     }
 }
 
@@ -117,6 +102,7 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept
         mRotation = rotation;
         mGraphicsItem->setRotation(-mRotation.toDeg());
         mGraphicsItem->updateCacheAndRepaint();
+        updateAnchor();
     }
 }
 
@@ -124,25 +110,31 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_NetLabel::addToSchematic(GraphicsScene& scene)
+void SI_NetLabel::updateAnchor() noexcept
+{
+    mGraphicsItem->setAnchor(mNetSegment.calcNearestPoint(mPosition));
+}
+
+void SI_NetLabel::addToSchematic()
 {
     if (isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mNetSignal->registerSchematicNetLabel(*this); // can throw
-    mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+    mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
+                                          &NetSignal::highlightedChanged,
                                           [this](){mGraphicsItem->update();});
-    SI_Base::addToSchematic(scene, *mGraphicsItem);
+    SI_Base::addToSchematic(mGraphicsItem.data());
+    mGraphicsItem->updateCacheAndRepaint();
+    updateAnchor();
 }
 
-void SI_NetLabel::removeFromSchematic(GraphicsScene& scene)
+void SI_NetLabel::removeFromSchematic()
 {
     if (!isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mNetSignal->unregisterSchematicNetLabel(*this); // can throw
     disconnect(mHighlightChangedConnection);
-    SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    SI_Base::removeFromSchematic(mGraphicsItem.data());
 }
 
 void SI_NetLabel::serialize(SExpression& root) const
@@ -150,7 +142,6 @@ void SI_NetLabel::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendToken(mUuid);
-    root.appendTokenChild("net", mNetSignal->getUuid(), true);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
     root.appendTokenChild("rot", mRotation, false);
 }
@@ -171,23 +162,12 @@ void SI_NetLabel::setSelected(bool selected) noexcept
 }
 
 /*****************************************************************************************
- *  Private Slots
- ****************************************************************************************/
-
-void SI_NetLabel::netSignalNameChanged(const QString& newName) noexcept
-{
-    Q_UNUSED(newName);
-    mGraphicsItem->updateCacheAndRepaint();
-}
-
-/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
 bool SI_NetLabel::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                             return false;
-    if (mNetSignal == nullptr)                      return false;
     return true;
 }
 

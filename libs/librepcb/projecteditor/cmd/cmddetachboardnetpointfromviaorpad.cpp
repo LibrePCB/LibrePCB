@@ -105,8 +105,10 @@ void CmdDetachBoardNetPointFromViaOrPad::removeNetPointWithAllNetlines()
         removeNetLineWithUnusedNetpoints(*netline); // can throw
     }
 
-    // the netpoint itself should be already removed now
-    Q_ASSERT(!mNetPoint.isAddedToBoard());
+    // remove the netpoint itself if not already done
+    if (mNetPoint.isAddedToBoard()) {
+        execNewChildCmd(new CmdBoardNetPointRemove(mNetPoint)); // can throw
+    }
 }
 
 void CmdDetachBoardNetPointFromViaOrPad::removeNetLineWithUnusedNetpoints(BI_NetLine& l)

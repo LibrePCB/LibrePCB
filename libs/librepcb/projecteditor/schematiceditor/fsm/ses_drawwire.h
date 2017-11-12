@@ -114,14 +114,6 @@ class SES_DrawWire final : public SES_Base
         // Widgets for the command toolbar
         QHash<WireMode, QAction*> mWireModeActions;
         QList<QAction*> mActionSeparators;
-        QLabel* mNetClassLabel;
-        QComboBox* mNetClassComboBox;
-        QMetaObject::Connection mNetClassAddCon;
-        QMetaObject::Connection mNetClassRemoveCon;
-        QLabel* mNetSignalLabel;
-        QComboBox* mNetSignalComboBox;
-        QMetaObject::Connection mNetSignalAddCon;
-        QMetaObject::Connection mNetSignalRemoveCon;
         QLabel* mWidthLabel;
         QComboBox* mWidthComboBox;
 };

@@ -37,7 +37,6 @@ namespace project {
 
 CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept :
     UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldNetSignal(&point.getNetSignal()), mNewNetSignal(mOldNetSignal),
     mOldSymbolPin(point.getSymbolPin()), mNewSymbolPin(mOldSymbolPin),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
@@ -53,12 +52,6 @@ CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void CmdSchematicNetPointEdit::setNetSignal(NetSignal& netsignal) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = &netsignal;
-}
 
 void CmdSchematicNetPointEdit::setPinToAttach(SI_SymbolPin* pin) noexcept
 {
@@ -94,8 +87,6 @@ bool CmdSchematicNetPointEdit::performExecute()
 void CmdSchematicNetPointEdit::performUndo()
 {
     ScopeGuardList sgl;
-    mNetPoint.setNetSignal(*mOldNetSignal); // can throw
-    sgl.add([&](){mNetPoint.setNetSignal(*mNewNetSignal);});
     mNetPoint.setPinToAttach(mOldSymbolPin); // can throw
     sgl.add([&](){mNetPoint.setPinToAttach(mNewSymbolPin);});
     mNetPoint.setPosition(mOldPos);
@@ -105,8 +96,6 @@ void CmdSchematicNetPointEdit::performUndo()
 void CmdSchematicNetPointEdit::performRedo()
 {
     ScopeGuardList sgl;
-    mNetPoint.setNetSignal(*mNewNetSignal); // can throw
-    sgl.add([&](){mNetPoint.setNetSignal(*mOldNetSignal);});
     mNetPoint.setPinToAttach(mNewSymbolPin); // can throw
     sgl.add([&](){mNetPoint.setPinToAttach(mOldSymbolPin);});
     mNetPoint.setPosition(mNewPos);

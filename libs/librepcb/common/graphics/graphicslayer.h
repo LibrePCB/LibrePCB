@@ -60,6 +60,7 @@ class GraphicsLayer : public QObject
         static constexpr const char* sSchematicSheetFrames    = "sch_scheet_frames";      ///< e.g. A4 sheet frame + text boxes
         static constexpr const char* sSchematicNetLines       = "sch_net_lines";          ///< librepcb::project::SI_NetLine
         static constexpr const char* sSchematicNetLabels      = "sch_net_labels";         ///< librepcb::project::SI_NetLabel
+        static constexpr const char* sSchematicNetLabelAnchors= "sch_net_label_anchors";  ///< anchor line of librepcb::project::SI_NetLabel
         static constexpr const char* sSchematicDocumentation  = "sch_documentation";      ///< for documentation purposes, e.g. text
         static constexpr const char* sSchematicComments       = "sch_comments";           ///< for personal comments, e.g. text
         static constexpr const char* sSchematicGuide          = "sch_guide";              ///< e.g. for boxes around circuits

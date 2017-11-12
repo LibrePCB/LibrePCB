@@ -133,7 +133,7 @@ bool SI_SymbolPin::isRequired() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_SymbolPin::addToSchematic(GraphicsScene& scene)
+void SI_SymbolPin::addToSchematic()
 {
     if (isAddedToSchematic() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -145,11 +145,11 @@ void SI_SymbolPin::addToSchematic(GraphicsScene& scene)
         mHighlightChangedConnection = connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
                                               [this](){mGraphicsItem->update();});
     }
-    SI_Base::addToSchematic(scene, *mGraphicsItem);
+    SI_Base::addToSchematic(mGraphicsItem.data());
     updateErcMessages();
 }
 
-void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene)
+void SI_SymbolPin::removeFromSchematic()
 {
     if ((!isAddedToSchematic()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -160,7 +160,7 @@ void SI_SymbolPin::removeFromSchematic(GraphicsScene& scene)
     if (getCompSigInstNetSignal()) {
         disconnect(mHighlightChangedConnection);
     }
-    SI_Base::removeFromSchematic(scene, *mGraphicsItem);
+    SI_Base::removeFromSchematic(mGraphicsItem.data());
     updateErcMessages();
 }
 
@@ -168,7 +168,7 @@ void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint)
 {
     if ((!isAddedToSchematic()) || (!mComponentSignalInstance) || (mRegisteredNetPoint)
         || (netpoint.getSchematic() != mSchematic)
-        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
+        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
     {
         throw LogicError(__FILE__, __LINE__);
     }
@@ -180,7 +180,7 @@ void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint)
 {
     if ((!isAddedToSchematic()) || (!mComponentSignalInstance)
         || (mRegisteredNetPoint != &netpoint)
-        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
+        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
     {
         throw LogicError(__FILE__, __LINE__);
     }

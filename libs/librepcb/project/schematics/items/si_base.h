@@ -56,6 +56,7 @@ class SI_Base : public QObject
 
         // Types
         enum class Type_t {
+            NetSegment, ///< librepcb#project#SI_NetSegment
             NetPoint,   ///< librepcb#project#SI_NetPoint
             NetLine,    ///< librepcb#project#SI_NetLine
             NetLabel,   ///< librepcb#project#SI_NetLabel
@@ -83,8 +84,8 @@ class SI_Base : public QObject
         virtual void setSelected(bool selected) noexcept;
 
         // General Methods
-        virtual void addToSchematic(GraphicsScene& scene) = 0;
-        virtual void removeFromSchematic(GraphicsScene& scene) = 0;
+        virtual void addToSchematic() = 0;
+        virtual void removeFromSchematic() = 0;
 
         // Operator Overloadings
         SI_Base& operator=(const SI_Base& rhs) = delete;
@@ -93,8 +94,8 @@ class SI_Base : public QObject
     protected:
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene, SGI_Base& item) noexcept;
-        void removeFromSchematic(GraphicsScene& scene, SGI_Base& item) noexcept;
+        void addToSchematic(SGI_Base* item) noexcept;
+        void removeFromSchematic(SGI_Base* item) noexcept;
 
 
     protected:

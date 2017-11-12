@@ -69,6 +69,8 @@ SGI_NetPoint::~SGI_NetPoint() noexcept
 
 void SGI_NetPoint::updateCacheAndRepaint() noexcept
 {
+    setToolTip(mNetPoint.getNetSignalOfNetSegment().getName());
+
     prepareGeometryChange();
     mIsVisibleJunction = mNetPoint.isVisibleJunction();
     mIsOpenLineEnd = mNetPoint.isOpenLineEnd();
@@ -86,7 +88,7 @@ void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     Q_UNUSED(widget);
 
     const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
+    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
     if (mLayer->isVisible() && mIsVisibleJunction) {
         painter->setPen(Qt::NoPen);

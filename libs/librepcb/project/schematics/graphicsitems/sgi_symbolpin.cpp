@@ -209,7 +209,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
 GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept
 {
-    return mPin.getSymbol().getSchematic().getProject().getLayers().getLayer(name);
+    return mPin.getSymbol().getProject().getLayers().getLayer(name);
 }
 
 /*****************************************************************************************

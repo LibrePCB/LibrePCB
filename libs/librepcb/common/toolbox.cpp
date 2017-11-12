@@ -51,6 +51,31 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath &path, const QPen &pen) n
     }
 }
 
+Point Toolbox::nearestPointOnLine(const Point& p, const Point& l1, const Point& l2) noexcept
+{
+    Point a = l2 - l1;
+    Point b = p - l1;
+    Point c = p - l2;
+    qreal d = ((b.getX().toMm() * a.getX().toMm()) + (b.getY().toMm() * a.getY().toMm()));
+    qreal e = ((a.getX().toMm() * a.getX().toMm()) + (a.getY().toMm() * a.getY().toMm()));
+    if (a.isOrigin() || b.isOrigin() || (d <= 0.0)) {
+        return l1;
+    } else if (c.isOrigin() || (e <= d)) {
+        return l2;
+    } else {
+        Q_ASSERT(e > 0.0);
+        return l1 + Point::fromMm(a.getX().toMm() * d / e, a.getY().toMm() * d / e);
+    }
+}
+
+Length Toolbox::shortestDistanceBetweenPointAndLine(const Point& p, const Point& l1,
+                                                    const Point& l2, Point* nearest) noexcept
+{
+    Point np = nearestPointOnLine(p, l1, l2);
+    if (nearest) { *nearest = np; }
+    return (p - np).getLength();
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

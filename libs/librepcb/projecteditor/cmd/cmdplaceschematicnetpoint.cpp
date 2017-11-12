@@ -32,16 +32,17 @@
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/items/si_netsegment.h>
 #include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include "cmdcombinenetsignals.h"
 #include "cmdcombineschematicnetpoints.h"
-#include "cmdcombineallnetsignalsunderschematicnetpoint.h"
+#include "cmdcombineallitemsunderschematicnetpoint.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -54,11 +55,10 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdPlaceSchematicNetPoint::CmdPlaceSchematicNetPoint(Schematic& schematic,
-        const Point& pos, const QString& netclass, const QString& netsignal) noexcept :
+CmdPlaceSchematicNetPoint::CmdPlaceSchematicNetPoint(Schematic& schematic, const Point& pos) noexcept :
     UndoCommandGroup(tr("Place Schematic Netpoint")),
     mCircuit(schematic.getProject().getCircuit()), mSchematic(schematic), mPosition(pos),
-    mNetClassName(netclass),  mNetSignalName(netsignal), mNetPoint(nullptr)
+    mNetPoint(nullptr)
 {
 }
 
@@ -80,15 +80,16 @@ bool CmdPlaceSchematicNetPoint::performExecute()
 
     // determine whether we have to create a new netpoint or not
     if (netpointsUnderCursor.isEmpty()) {
-        NetSignal* netsignal = getOrCreateNewNetSignal(); // can throw
-        mNetPoint = createNewNetPoint(*netsignal);
+        NetSignal& netsignal = createNewNetSignal(); // can throw
+        SI_NetSegment& netsegment = createNewNetSegment(netsignal); // can throw
+        mNetPoint = &createNewNetPoint(netsegment); // can throw
     } else {
         mNetPoint = netpointsUnderCursor.first();
     }
     Q_ASSERT(mNetPoint);
 
-    // merge all net items under the resulting netpoint together
-    execNewChildCmd(new CmdCombineAllNetSignalsUnderSchematicNetPoint(*mNetPoint)); // can throw
+    // merge all schematic items under the resulting netpoint together
+    execNewChildCmd(new CmdCombineAllItemsUnderSchematicNetPoint(*mNetPoint)); // can throw
 
     undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);
@@ -98,38 +99,38 @@ bool CmdPlaceSchematicNetPoint::performExecute()
  *  Private Methods
  ****************************************************************************************/
 
-NetSignal* CmdPlaceSchematicNetPoint::getOrCreateNewNetSignal()
+NetSignal& CmdPlaceSchematicNetPoint::createNewNetSignal()
 {
-    NetSignal* netsignal = mCircuit.getNetSignalByName(mNetSignalName);
-    if (netsignal) {
-        return netsignal;
-    } else {
-        NetClass* netclass = mCircuit.getNetClassByName(mNetClassName);
-        if (!netclass) {
-            // add new netclass
-            CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, mNetClassName);
-            execNewChildCmd(cmd); // can throw
-            netclass = cmd->getNetClass();
-        }
-        Q_ASSERT(netclass);
-
-        // add new netsignal
-        CmdNetSignalAdd* cmd = nullptr;
-        if (mNetSignalName.isEmpty()) {
-            cmd = new CmdNetSignalAdd(mCircuit, *netclass); // auto-name
-        } else {
-            cmd = new CmdNetSignalAdd(mCircuit, *netclass, mNetSignalName);
-        }
+    // get or add netclass with the name "default"
+    NetClass* netclass = mCircuit.getNetClassByName("default");
+    if (!netclass) {
+        CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, "default");
         execNewChildCmd(cmd); // can throw
-        return cmd->getNetSignal();
+        netclass = cmd->getNetClass();
     }
+    Q_ASSERT(netclass);
+
+    // add new netsignal
+    CmdNetSignalAdd* cmd = new CmdNetSignalAdd(mCircuit, *netclass); // auto-name
+    execNewChildCmd(cmd); // can throw
+    NetSignal* netsignal = cmd->getNetSignal(); Q_ASSERT(netsignal);
+    return *netsignal;
 }
 
-SI_NetPoint* CmdPlaceSchematicNetPoint::createNewNetPoint(NetSignal& netsignal)
+SI_NetSegment& CmdPlaceSchematicNetPoint::createNewNetSegment(NetSignal& netsignal)
 {
-    CmdSchematicNetPointAdd* cmd = new CmdSchematicNetPointAdd(mSchematic, netsignal, mPosition);
+    CmdSchematicNetSegmentAdd* cmd = new CmdSchematicNetSegmentAdd(mSchematic, netsignal);
     execNewChildCmd(cmd); // can throw
-    return cmd->getNetPoint();
+    SI_NetSegment* netsegment = cmd->getNetSegment(); Q_ASSERT(netsegment);
+    return *netsegment;
+}
+
+SI_NetPoint& CmdPlaceSchematicNetPoint::createNewNetPoint(SI_NetSegment& netsegment)
+{
+    CmdSchematicNetSegmentAddElements* cmd = new CmdSchematicNetSegmentAddElements(netsegment);
+    SI_NetPoint* netpoint = cmd->addNetPoint(mPosition); Q_ASSERT(netpoint);
+    execNewChildCmd(cmd); // can throw
+    return *netpoint;
 }
 
 /*****************************************************************************************

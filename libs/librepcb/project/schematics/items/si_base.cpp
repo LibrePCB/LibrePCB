@@ -75,17 +75,21 @@ void SI_Base::setSelected(bool selected) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void SI_Base::addToSchematic(GraphicsScene& scene, SGI_Base& item) noexcept
+void SI_Base::addToSchematic(SGI_Base* item) noexcept
 {
     Q_ASSERT(!mIsAddedToSchematic);
-    scene.addItem(item);
+    if (item) {
+        mSchematic.getGraphicsScene().addItem(*item);
+    }
     mIsAddedToSchematic = true;
 }
 
-void SI_Base::removeFromSchematic(GraphicsScene& scene, SGI_Base& item) noexcept
+void SI_Base::removeFromSchematic(SGI_Base* item) noexcept
 {
     Q_ASSERT(mIsAddedToSchematic);
-    scene.removeItem(item);
+    if (item) {
+        mSchematic.getGraphicsScene().removeItem(*item);
+    }
     mIsAddedToSchematic = false;
 }
 

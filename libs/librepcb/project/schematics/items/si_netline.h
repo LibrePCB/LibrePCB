@@ -36,6 +36,7 @@ namespace project {
 
 class NetSignal;
 class SI_NetPoint;
+class SI_NetSegment;
 
 /*****************************************************************************************
  *  Class SI_NetLine
@@ -53,25 +54,27 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLine() = delete;
         SI_NetLine(const SI_NetLine& other) = delete;
-        SI_NetLine(Schematic& schematic, const SExpression& node);
-        SI_NetLine(Schematic& schematic, SI_NetPoint& startPoint, SI_NetPoint& endPoint,
+        SI_NetLine(SI_NetSegment& segment, const SExpression& node);
+        SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
                    const Length& width);
         ~SI_NetLine() noexcept;
 
         // Getters
+        SI_NetSegment& getNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Length& getWidth() const noexcept {return mWidth;}
         SI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
-        NetSignal& getNetSignal() const noexcept;
+        SI_NetPoint* getOtherPoint(const SI_NetPoint& firstPoint) const noexcept;
+        NetSignal& getNetSignalOfNetSegment() const noexcept;
         bool isAttachedToSymbol() const noexcept;
 
         // Setters
         void setWidth(const Length& width) noexcept;
 
         // General Methods
-        void addToSchematic(GraphicsScene& scene) override;
-        void removeFromSchematic(GraphicsScene& scene) override;
+        void addToSchematic() override;
+        void removeFromSchematic() override;
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()

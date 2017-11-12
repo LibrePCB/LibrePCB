@@ -36,6 +36,7 @@ namespace project {
 class NetSignal;
 class Schematic;
 class SI_NetLabel;
+class SI_NetSegment;
 
 /*****************************************************************************************
  *  Class CmdSchematicNetLabelAdd
@@ -49,8 +50,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdSchematicNetLabelAdd(Schematic& schematic, NetSignal& netsignal,
-                                const Point& position) noexcept;
+        CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position) noexcept;
         ~CmdSchematicNetLabelAdd() noexcept;
 
         // Getters
@@ -73,8 +73,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
 
         // Private Member Variables
 
-        Schematic& mSchematic;
-        NetSignal* mNetSignal;
+        SI_NetSegment& mNetSegment;
         Point mPosition;
         SI_NetLabel* mNetLabel;
 };

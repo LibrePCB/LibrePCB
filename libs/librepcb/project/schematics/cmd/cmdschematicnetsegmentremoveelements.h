@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
-#define LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVEELEMENTS_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVEELEMENTS_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,23 +32,28 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
+class SI_NetSegment;
 class SI_NetPoint;
+class SI_NetLine;
 
 /*****************************************************************************************
- *  Class CmdSchematicNetPointRemove
+ *  Class CmdSchematicNetSegmentRemoveElements
  ****************************************************************************************/
 
 /**
- * @brief The CmdSchematicNetPointRemove class
+ * @brief The CmdSchematicNetSegmentRemoveElements class
  */
-class CmdSchematicNetPointRemove final : public UndoCommand
+class CmdSchematicNetSegmentRemoveElements final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdSchematicNetPointRemove(SI_NetPoint& netpoint) noexcept;
-        ~CmdSchematicNetPointRemove() noexcept;
+        CmdSchematicNetSegmentRemoveElements(SI_NetSegment& segment) noexcept;
+        ~CmdSchematicNetSegmentRemoveElements() noexcept;
+
+        // General Methods
+        void removeNetPoint(SI_NetPoint& netpoint);
+        void removeNetLine(SI_NetLine& netline);
 
 
     private:
@@ -67,8 +72,9 @@ class CmdSchematicNetPointRemove final : public UndoCommand
 
         // Private Member Variables
 
-        Schematic& mSchematic;
-        SI_NetPoint& mNetPoint;
+        SI_NetSegment& mNetSegment;
+        QList<SI_NetPoint*> mNetPoints;
+        QList<SI_NetLine*> mNetLines;
 };
 
 /*****************************************************************************************
@@ -78,4 +84,4 @@ class CmdSchematicNetPointRemove final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVEELEMENTS_H
