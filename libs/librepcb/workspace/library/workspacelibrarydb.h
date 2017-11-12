@@ -150,7 +150,7 @@ class WorkspaceLibraryDb final : public QObject
 
         // Attributes
         Workspace& mWorkspace;
-        QScopedPointer<SQLiteDatabase> mDb; ///< the SQLite database "library_cache.sqlite"
+        QScopedPointer<SQLiteDatabase> mDb; ///< the SQLite database "cache.sqlite"
         QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
         // Constants

@@ -71,7 +71,7 @@ void WorkspaceLibraryScanner::run() noexcept
         libraries.append(mWorkspace.getRemoteLibraries().values());
 
         // open SQLite database
-        FilePath dbFilePath = mWorkspace.getMetadataPath().getPathTo("library_cache.sqlite");
+        FilePath dbFilePath = mWorkspace.getLibrariesPath().getPathTo("cache.sqlite");
         SQLiteDatabase db(dbFilePath); // can throw
 
         // begin database transaction

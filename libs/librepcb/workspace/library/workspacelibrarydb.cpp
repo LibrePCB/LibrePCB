@@ -55,7 +55,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws):
     qDebug("Load workspace library database...");
 
     // open SQLite database
-    FilePath dbFilePath = ws.getMetadataPath().getPathTo("library_cache.sqlite");
+    FilePath dbFilePath = ws.getLibrariesPath().getPathTo("cache.sqlite");
     mDb.reset(new SQLiteDatabase(dbFilePath)); // can throw
 
     // if the db has an old version, just remove the whole db and create a new one
