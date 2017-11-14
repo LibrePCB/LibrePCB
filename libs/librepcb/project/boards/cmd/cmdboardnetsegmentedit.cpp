@@ -21,9 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardnetlineadd.h"
-#include "../board.h"
-#include "../items/bi_netline.h"
+#include "cmdboardnetsegmentedit.h"
+#include "../items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,49 +34,45 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardNetLineAdd::CmdBoardNetLineAdd(BI_NetLine& netline) noexcept :
-    UndoCommand(tr("Add board trace")),
-    mBoard(netline.getBoard()), mStartPoint(netline.getStartPoint()),
-    mEndPoint(netline.getEndPoint()), mNetLine(&netline)
+CmdBoardNetSegmentEdit::CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept :
+    UndoCommand(tr("Edit net segment")), mNetSegment(netsegment),
+    mOldNetSignal(&netsegment.getNetSignal()), mNewNetSignal(mOldNetSignal)
 {
 }
 
-CmdBoardNetLineAdd::CmdBoardNetLineAdd(Board& board, BI_NetPoint& startPoint,
-                                       BI_NetPoint& endPoint, const Length& width) noexcept :
-    UndoCommand(tr("Add board trace")),
-    mBoard(board), mStartPoint(startPoint), mEndPoint(endPoint), mWidth(width),
-    mNetLine(nullptr)
+CmdBoardNetSegmentEdit::~CmdBoardNetSegmentEdit() noexcept
 {
 }
 
-CmdBoardNetLineAdd::~CmdBoardNetLineAdd() noexcept
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void CmdBoardNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
+    Q_ASSERT(!wasEverExecuted());
+    mNewNetSignal = &netsignal;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetLineAdd::performExecute()
+bool CmdBoardNetSegmentEdit::performExecute()
 {
-    if (!mNetLine) {
-        // create new netline
-        mNetLine = new BI_NetLine(mBoard, mStartPoint, mEndPoint, mWidth); // can throw
-    }
-
     performRedo(); // can throw
 
-    return true;
+    return (mNewNetSignal != mOldNetSignal);
 }
 
-void CmdBoardNetLineAdd::performUndo()
+void CmdBoardNetSegmentEdit::performUndo()
 {
-    mBoard.removeNetLine(*mNetLine); // can throw
+    mNetSegment.setNetSignal(*mOldNetSignal); // can throw
 }
 
-void CmdBoardNetLineAdd::performRedo()
+void CmdBoardNetSegmentEdit::performRedo()
 {
-    mBoard.addNetLine(*mNetLine); // can throw
+    mNetSegment.setNetSignal(*mNewNetSignal); // can throw
 }
 
 /*****************************************************************************************

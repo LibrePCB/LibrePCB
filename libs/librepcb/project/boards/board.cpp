@@ -38,12 +38,15 @@
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_via.h"
+#include "items/bi_netsegment.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
 #include <librepcb/library/cmp/component.h>
 #include "items/bi_polygon.h"
 #include "boardlayerstack.h"
 #include "boardusersettings.h"
+#include "boardselectionquery.h"
+#include "../circuit/netsignal.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -91,41 +94,11 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
             copiedDeviceInstances.insert(device, copy);
         }
 
-        // copy vias
-        QHash<const BI_Via*, BI_Via*> copiedVias;
-        foreach (const BI_Via* via, other.mVias) {
-            BI_Via* copy = new BI_Via(*this, *via);
-            Q_ASSERT(!getViaByUuid(copy->getUuid()));
-            mVias.append(copy);
-            copiedVias.insert(via, copy);
-        }
-
-        // copy netpoints
-        QHash<const BI_NetPoint*, BI_NetPoint*> copiedNetPoints;
-        foreach (const BI_NetPoint* netpoint, other.mNetPoints) {
-            BI_FootprintPad* pad = nullptr;
-            if (netpoint->getFootprintPad()) {
-                const BI_Device* oldDevice = &netpoint->getFootprintPad()->getFootprint().getDeviceInstance();
-                const BI_Device* newDevice = copiedDeviceInstances.value(oldDevice, nullptr);
-                Q_ASSERT(newDevice);
-                pad = newDevice->getFootprint().getPad(netpoint->getFootprintPad()->getLibPadUuid());
-                Q_ASSERT(pad);
-            }
-            BI_Via* via = copiedVias.value(netpoint->getVia(), nullptr);
-            BI_NetPoint* copy = new BI_NetPoint(*this, *netpoint, pad, via);
-            Q_ASSERT(!getNetPointByUuid(copy->getUuid()));
-            mNetPoints.append(copy);
-            copiedNetPoints.insert(netpoint, copy);
-        }
-
-        // copy netlines
-        foreach (const BI_NetLine* netline, other.mNetLines) {
-            BI_NetPoint* start = copiedNetPoints.value(&netline->getStartPoint());
-            BI_NetPoint* end = copiedNetPoints.value(&netline->getEndPoint());
-            Q_ASSERT(start && end);
-            BI_NetLine* copy = new BI_NetLine(*this, *netline, *start, *end);
-            Q_ASSERT(!getNetLineByUuid(copy->getUuid()));
-            mNetLines.append(copy);
+        // copy netsegments
+        foreach (const BI_NetSegment* netsegment, other.mNetSegments) {
+            BI_NetSegment* copy = new BI_NetSegment(*this, *netsegment, copiedDeviceInstances);
+            Q_ASSERT(!getNetSegmentByUuid(copy->getUuid()));
+            mNetSegments.append(copy);
         }
 
         // copy polygons
@@ -150,9 +123,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
-        qDeleteAll(mNetLines);          mNetLines.clear();
-        qDeleteAll(mNetPoints);         mNetPoints.clear();
-        qDeleteAll(mVias);              mVias.clear();
+        qDeleteAll(mNetSegments);       mNetSegments.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
         mUserSettings.reset();
         mDesignRules.reset();
@@ -226,37 +197,15 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                 mDeviceInstances.insert(device->getComponentInstanceUuid(), device);
             }
 
-            // Load all vias
-            foreach (const SExpression& node, root.getChildren("via")) {
-                BI_Via* via = new BI_Via(*this, node);
-                if (getViaByUuid(via->getUuid())) {
+            // Load all netsegments
+            foreach (const SExpression& node, root.getChildren("netsegment")) {
+                BI_NetSegment* netsegment = new BI_NetSegment(*this, node);
+                if (getNetSegmentByUuid(netsegment->getUuid())) {
                     throw RuntimeError(__FILE__, __LINE__,
-                        QString(tr("There is already a via with the UUID \"%1\"!"))
-                        .arg(via->getUuid().toStr()));
+                        QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+                        .arg(netsegment->getUuid().toStr()));
                 }
-                mVias.append(via);
-            }
-
-            // Load all netpoints
-            foreach (const SExpression& node, root.getChildren("netpoint")) {
-                BI_NetPoint* netpoint = new BI_NetPoint(*this, node);
-                if (getNetPointByUuid(netpoint->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__,
-                        QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-                        .arg(netpoint->getUuid().toStr()));
-                }
-                mNetPoints.append(netpoint);
-            }
-
-            // Load all netlines
-            foreach (const SExpression& node, root.getChildren("netline")) {
-                BI_NetLine* netline = new BI_NetLine(*this, node);
-                if (getNetLineByUuid(netline->getUuid())) {
-                    throw RuntimeError(__FILE__, __LINE__,
-                        QString(tr("There is already a netline with the UUID \"%1\"!"))
-                        .arg(netline->getUuid().toStr()));
-                }
-                mNetLines.append(netline);
+                mNetSegments.append(netsegment);
             }
 
             // Load all polygons
@@ -282,9 +231,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
-        qDeleteAll(mNetLines);          mNetLines.clear();
-        qDeleteAll(mNetPoints);         mNetPoints.clear();
-        qDeleteAll(mVias);              mVias.clear();
+        qDeleteAll(mNetSegments);       mNetSegments.clear();
         qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
         mUserSettings.reset();
         mDesignRules.reset();
@@ -304,9 +251,7 @@ Board::~Board() noexcept
 
     // delete all items
     qDeleteAll(mPolygons);          mPolygons.clear();
-    qDeleteAll(mNetLines);          mNetLines.clear();
-    qDeleteAll(mNetPoints);         mNetPoints.clear();
-    qDeleteAll(mVias);              mVias.clear();
+    qDeleteAll(mNetSegments);       mNetSegments.clear();
     qDeleteAll(mDeviceInstances);   mDeviceInstances.clear();
 
     mUserSettings.reset();
@@ -323,113 +268,7 @@ Board::~Board() noexcept
 
 bool Board::isEmpty() const noexcept
 {
-    return (mDeviceInstances.isEmpty() &&
-            mVias.isEmpty() &&
-            mNetPoints.isEmpty() &&
-            mNetLines.isEmpty());
-}
-
-QList<BI_Base*> Board::getSelectedItems(bool vias,
-                                        bool footprintPads,
-                                        bool floatingPoints,
-                                        bool attachedPoints,
-                                        bool floatingPointsFromFloatingLines,
-                                        bool attachedPointsFromFloatingLines,
-                                        bool floatingPointsFromAttachedLines,
-                                        bool attachedPointsFromAttachedLines,
-                                        bool attachedPointsFromFootprints,
-                                        bool floatingLines,
-                                        bool attachedLines,
-                                        bool attachedLinesFromFootprints) const noexcept
-{
-    // TODO: this method is incredible ugly ;)
-
-    QList<BI_Base*> list;
-    foreach (BI_Device* component, mDeviceInstances)
-    {
-        BI_Footprint& footprint = component->getFootprint();
-
-        // footprint
-        if (footprint.isSelected())
-            list.append(&footprint);
-
-        // pads
-        foreach (BI_FootprintPad* pad, footprint.getPads())
-        {
-            // pad
-            if (pad->isSelected() && footprintPads)
-                list.append(pad);
-
-            // attached netpoints & netlines
-            foreach (BI_NetPoint* attachedNetPoint, pad->getNetPoints()) {
-                if (footprint.isSelected() && attachedPointsFromFootprints && attachedNetPoint)
-                {
-                    if (!list.contains(attachedNetPoint))
-                        list.append(attachedNetPoint);
-                }
-                if (footprint.isSelected() && attachedLinesFromFootprints && attachedNetPoint)
-                {
-                    foreach (BI_NetLine* attachedNetLine, attachedNetPoint->getLines())
-                    {
-                        if (!list.contains(attachedNetLine))
-                            list.append(attachedNetLine);
-                    }
-                }
-            }
-        }
-    }
-    foreach (BI_Via* via, mVias)
-    {
-        if (via->isSelected() && vias) {
-            list.append(via);
-        }
-    }
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-    {
-        if (netpoint->isSelected())
-        {
-            if (((!netpoint->isAttached()) && floatingPoints)
-               || (netpoint->isAttached() && attachedPoints))
-            {
-                if (!list.contains(netpoint))
-                    list.append(netpoint);
-            }
-        }
-    }
-    foreach (BI_NetLine* netline, mNetLines)
-    {
-        if (netline->isSelected())
-        {
-            // netline
-            if (((!netline->isAttached()) && floatingLines)
-               || (netline->isAttached() && attachedLines))
-            {
-                if (!list.contains(netline))
-                    list.append(netline);
-            }
-            // netpoints from netlines
-            BI_NetPoint* p1 = &netline->getStartPoint();
-            BI_NetPoint* p2 = &netline->getEndPoint();
-            if ( ((!netline->isAttached()) && (!p1->isAttached()) && floatingPointsFromFloatingLines)
-              || ((!netline->isAttached()) && ( p1->isAttached()) && attachedPointsFromFloatingLines)
-              || (( netline->isAttached()) && (!p1->isAttached()) && floatingPointsFromAttachedLines)
-              || (( netline->isAttached()) && ( p1->isAttached()) && attachedPointsFromAttachedLines))
-            {
-                if (!list.contains(p1))
-                    list.append(p1);
-            }
-            if ( ((!netline->isAttached()) && (!p2->isAttached()) && floatingPointsFromFloatingLines)
-              || ((!netline->isAttached()) && ( p2->isAttached()) && attachedPointsFromFloatingLines)
-              || (( netline->isAttached()) && (!p2->isAttached()) && floatingPointsFromAttachedLines)
-              || (( netline->isAttached()) && ( p2->isAttached()) && attachedPointsFromAttachedLines))
-            {
-                if (!list.contains(p2))
-                    list.append(p2);
-            }
-        }
-    }
-
-    return list;
+    return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty());
 }
 
 QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
@@ -438,29 +277,19 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     QList<BI_Base*> list;   // Note: The order of adding the items is very important (the
                             // top most item must appear as the first item in the list)!
     // vias
-    foreach (BI_Via* via, mVias)
-    {
-        if (via->isSelectable() && via->getGrabAreaScenePx().contains(scenePosPx)) {
-            list.append(via);
-        }
+    foreach (BI_Via* via, getViasAtScenePos(pos, nullptr)) {
+        list.append(via);
     }
     // netpoints
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-    {
-        if (netpoint->isSelectable() && netpoint->getGrabAreaScenePx().contains(scenePosPx)) {
-            list.append(netpoint);
-        }
+    foreach (BI_NetPoint* netpoint, getNetPointsAtScenePos(pos, nullptr, nullptr)) {
+        list.append(netpoint);
     }
     // netlines
-    foreach (BI_NetLine* netline, mNetLines)
-    {
-        if (netline->isSelectable() && netline->getGrabAreaScenePx().contains(scenePosPx)) {
-            list.append(netline);
-        }
+    foreach (BI_NetLine* netline, getNetLinesAtScenePos(pos, nullptr, nullptr)) {
+        list.append(netline);
     }
     // footprints & pads
-    foreach (BI_Device* device, mDeviceInstances)
-    {
+    foreach (BI_Device* device, mDeviceInstances) {
         BI_Footprint& footprint = device->getFootprint();
         if (footprint.isSelectable() && footprint.getGrabAreaScenePx().contains(scenePosPx)) {
             if (footprint.getIsMirrored()) {
@@ -469,8 +298,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
                 list.prepend(&footprint);
             }
         }
-        foreach (BI_FootprintPad* pad, footprint.getPads())
-        {
+        foreach (BI_FootprintPad* pad, footprint.getPads()) {
             if (pad->isSelectable() && pad->getGrabAreaScenePx().contains(scenePosPx)) {
                 if (pad->getIsMirrored()) {
                     list.append(pad);
@@ -486,12 +314,9 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
 QList<BI_Via*> Board::getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept
 {
     QList<BI_Via*> list;
-    foreach (BI_Via* via, mVias)
-    {
-        if (via->isSelectable() && via->getGrabAreaScenePx().contains(pos.toPxQPointF())
-            && ((!netsignal) || (via->getNetSignal() == netsignal)))
-        {
-            list.append(via);
+    foreach (BI_NetSegment* segment, mNetSegments) {
+        if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+            segment->getViasAtScenePos(pos, list);
         }
     }
     return list;
@@ -501,13 +326,9 @@ QList<BI_NetPoint*> Board::getNetPointsAtScenePos(const Point& pos, const Graphi
                                                   const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetPoint*> list;
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-    {
-        if (netpoint->isSelectable() && netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF())
-            && ((!layer) || (&netpoint->getLayer() == layer))
-            && ((!netsignal) || (&netpoint->getNetSignal() == netsignal)))
-        {
-            list.append(netpoint);
+    foreach (BI_NetSegment* segment, mNetSegments) {
+        if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+            segment->getNetPointsAtScenePos(pos, layer, list);
         }
     }
     return list;
@@ -517,13 +338,9 @@ QList<BI_NetLine*> Board::getNetLinesAtScenePos(const Point& pos, const Graphics
                                                 const NetSignal* netsignal) const noexcept
 {
     QList<BI_NetLine*> list;
-    foreach (BI_NetLine* netline, mNetLines)
-    {
-        if (netline->isSelectable() && netline->getGrabAreaScenePx().contains(pos.toPxQPointF())
-            && ((!layer) || (&netline->getLayer() == layer))
-            && ((!netsignal) || (&netline->getNetSignal() == netsignal)))
-        {
-            list.append(netline);
+    foreach (BI_NetSegment* segment, mNetSegments) {
+        if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+            segment->getNetLinesAtScenePos(pos, layer, list);
         }
     }
     return list;
@@ -553,12 +370,8 @@ QList<BI_Base*> Board::getAllItems() const noexcept
     QList<BI_Base*> items;
     foreach (BI_Device* device, mDeviceInstances)
         items.append(device);
-    foreach (BI_Via* via, mVias)
-        items.append(via);
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-        items.append(netpoint);
-    foreach (BI_NetLine* netline, mNetLines)
-        items.append(netline);
+    foreach (BI_NetSegment* netsegment, mNetSegments)
+        items.append(netsegment);
     foreach (BI_Polygon* polygon, mPolygons)
         items.append(polygon);
     return items;
@@ -594,7 +407,7 @@ void Board::addDeviceInstance(BI_Device& instance)
             .arg(instance.getComponentInstance().getUuid().toStr()));
     }
     // add to board
-    instance.addToBoard(*mGraphicsScene); // can throw
+    instance.addToBoard(); // can throw
     mDeviceInstances.insert(instance.getComponentInstanceUuid(), &instance);
     updateErcMessages();
     emit deviceAdded(instance);
@@ -606,131 +419,51 @@ void Board::removeDeviceInstance(BI_Device& instance)
         throw LogicError(__FILE__, __LINE__);
     }
     // remove from board
-    instance.removeFromBoard(*mGraphicsScene); // can throw
+    instance.removeFromBoard(); // can throw
     mDeviceInstances.remove(instance.getComponentInstanceUuid());
     updateErcMessages();
     emit deviceRemoved(instance);
 }
 
 /*****************************************************************************************
- *  NetPoint Methods
+ *  NetSegment Methods
  ****************************************************************************************/
 
-BI_Via* Board::getViaByUuid(const Uuid& uuid) const noexcept
+BI_NetSegment* Board::getNetSegmentByUuid(const Uuid& uuid) const noexcept
 {
-    foreach (BI_Via* via, mVias) {
-        if (via->getUuid() == uuid)
-            return via;
+    foreach (BI_NetSegment* netsegment, mNetSegments) {
+        if (netsegment->getUuid() == uuid)
+            return netsegment;
     }
     return nullptr;
 }
 
-void Board::addVia(BI_Via& via)
+void Board::addNetSegment(BI_NetSegment& netsegment)
 {
-    if ((!mIsAddedToProject) || (mVias.contains(&via)) || (&via.getBoard() != this)) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    // check if there is no via with the same uuid in the list
-    if (getViaByUuid(via.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a via with the UUID \"%1\"!"))
-            .arg(via.getUuid().toStr()));
-    }
-    // add to board
-    via.addToBoard(*mGraphicsScene); // can throw
-    mVias.append(&via);
-}
-
-void Board::removeVia(BI_Via& via)
-{
-    if ((!mIsAddedToProject) || (!mVias.contains(&via))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    // remove from board
-    via.removeFromBoard(*mGraphicsScene); // can throw
-    mVias.removeOne(&via);
-}
-
-/*****************************************************************************************
- *  NetPoint Methods
- ****************************************************************************************/
-
-BI_NetPoint* Board::getNetPointByUuid(const Uuid& uuid) const noexcept
-{
-    foreach (BI_NetPoint* netpoint, mNetPoints) {
-        if (netpoint->getUuid() == uuid)
-            return netpoint;
-    }
-    return nullptr;
-}
-
-void Board::addNetPoint(BI_NetPoint& netpoint)
-{
-    if ((!mIsAddedToProject) || (mNetPoints.contains(&netpoint))
-        || (&netpoint.getBoard() != this))
+    if ((!mIsAddedToProject) || (mNetSegments.contains(&netsegment))
+        || (&netsegment.getBoard() != this))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no netpoint with the same uuid in the list
-    if (getNetPointByUuid(netpoint.getUuid())) {
+    // check if there is no netsegment with the same uuid in the list
+    if (getNetSegmentByUuid(netsegment.getUuid())) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-            .arg(netpoint.getUuid().toStr()));
+            QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+            .arg(netsegment.getUuid().toStr()));
     }
     // add to board
-    netpoint.addToBoard(*mGraphicsScene); // can throw
-    mNetPoints.append(&netpoint);
+    netsegment.addToBoard(); // can throw
+    mNetSegments.append(&netsegment);
 }
 
-void Board::removeNetPoint(BI_NetPoint& netpoint)
+void Board::removeNetSegment(BI_NetSegment& netsegment)
 {
-    if ((!mIsAddedToProject) || (!mNetPoints.contains(&netpoint))) {
+    if ((!mIsAddedToProject) || (!mNetSegments.contains(&netsegment))) {
         throw LogicError(__FILE__, __LINE__);
     }
     // remove from board
-    netpoint.removeFromBoard(*mGraphicsScene); // can throw
-    mNetPoints.removeOne(&netpoint);
-}
-
-/*****************************************************************************************
- *  NetLine Methods
- ****************************************************************************************/
-
-BI_NetLine* Board::getNetLineByUuid(const Uuid& uuid) const noexcept
-{
-    foreach (BI_NetLine* netline, mNetLines) {
-        if (netline->getUuid() == uuid)
-            return netline;
-    }
-    return nullptr;
-}
-
-void Board::addNetLine(BI_NetLine& netline)
-{
-    if ((!mIsAddedToProject) || (mNetLines.contains(&netline))
-        || (&netline.getBoard() != this))
-    {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    // check if there is no netline with the same uuid in the list
-    if (getNetLineByUuid(netline.getUuid())) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a netline with the UUID \"%1\"!"))
-            .arg(netline.getUuid().toStr()));
-    }
-    // add to board
-    netline.addToBoard(*mGraphicsScene); // can throw
-    mNetLines.append(&netline);
-}
-
-void Board::removeNetLine(BI_NetLine& netline)
-{
-    if ((!mIsAddedToProject) || (!mNetLines.contains(&netline))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    // remove from board
-    netline.removeFromBoard(*mGraphicsScene); // can throw
-    mNetLines.removeOne(&netline);
+    netsegment.removeFromBoard(); // can throw
+    mNetSegments.removeOne(&netsegment);
 }
 
 /*****************************************************************************************
@@ -744,7 +477,7 @@ void Board::addPolygon(BI_Polygon& polygon)
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    polygon.addToBoard(*mGraphicsScene); // can throw
+    polygon.addToBoard(); // can throw
     mPolygons.append(&polygon);
 }
 
@@ -753,7 +486,7 @@ void Board::removePolygon(BI_Polygon& polygon)
     if ((!mIsAddedToProject) || (!mPolygons.contains(&polygon))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    polygon.removeFromBoard(*mGraphicsScene); // can throw
+    polygon.removeFromBoard(); // can throw
     mPolygons.removeOne(&polygon);
 }
 
@@ -770,8 +503,8 @@ void Board::addToProject()
     ScopeGuardList sgl(items.count());
     for (int i = 0; i < items.count(); ++i) {
         BI_Base* item = items.at(i);
-        item->addToBoard(*mGraphicsScene); // can throw
-        sgl.add([this, item](){item->removeFromBoard(*mGraphicsScene);});
+        item->addToBoard(); // can throw
+        sgl.add([item](){item->removeFromBoard();});
     }
     mIsAddedToProject = true;
     updateErcMessages();
@@ -787,8 +520,8 @@ void Board::removeFromProject()
     ScopeGuardList sgl(items.count());
     for (int i = items.count()-1; i >= 0; --i) {
         BI_Base* item = items.at(i);
-        item->removeFromBoard(*mGraphicsScene); // can throw
-        sgl.add([this, item](){item->addToBoard(*mGraphicsScene);});
+        item->removeFromBoard(); // can throw
+        sgl.add([item](){item->addToBoard();});
     }
     mIsAddedToProject = false;
     updateErcMessages();
@@ -834,26 +567,20 @@ void Board::showInView(GraphicsView& view) noexcept
 void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept
 {
     mGraphicsScene->setSelectionRect(p1, p2);
-    if (updateItems)
-    {
+    if (updateItems) {
         QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-        foreach (BI_Device* component, mDeviceInstances)
-        {
+        foreach (BI_Device* component, mDeviceInstances) {
             BI_Footprint& footprint = component->getFootprint();
             bool selectFootprint = footprint.isSelectable() && footprint.getGrabAreaScenePx().intersects(rectPx);
             footprint.setSelected(selectFootprint);
-            foreach (BI_FootprintPad* pad, footprint.getPads())
-            {
+            foreach (BI_FootprintPad* pad, footprint.getPads()) {
                 bool selectPad = pad->isSelectable() && pad->getGrabAreaScenePx().intersects(rectPx);
                 pad->setSelected(selectFootprint || selectPad);
             }
         }
-        foreach (BI_Via* via, mVias)
-            via->setSelected(via->isSelectable() && via->getGrabAreaScenePx().intersects(rectPx));
-        foreach (BI_NetPoint* netpoint, mNetPoints)
-            netpoint->setSelected(netpoint->isSelectable() && netpoint->getGrabAreaScenePx().intersects(rectPx));
-        foreach (BI_NetLine* netline, mNetLines)
-            netline->setSelected(netline->isSelectable() && netline->getGrabAreaScenePx().intersects(rectPx));
+        foreach (BI_NetSegment* segment, mNetSegments) {
+            segment->setSelectionRect(rectPx);
+        }
     }
 }
 
@@ -861,12 +588,16 @@ void Board::clearSelection() const noexcept
 {
     foreach (BI_Device* device, mDeviceInstances)
         device->getFootprint().setSelected(false);
-    foreach (BI_Via* via, mVias)
-        via->setSelected(false);
-    foreach (BI_NetPoint* netpoint, mNetPoints)
-        netpoint->setSelected(false);
-    foreach (BI_NetLine* netline, mNetLines)
-        netline->setSelected(false);
+    foreach (BI_NetSegment* segment, mNetSegments) {
+        segment->clearSelection();
+    }
+}
+
+std::unique_ptr<BoardSelectionQuery> Board::createSelectionQuery() const noexcept
+{
+    return std::unique_ptr<BoardSelectionQuery>(
+        new BoardSelectionQuery(mDeviceInstances, mNetSegments, mPolygons,
+                                const_cast<Board*>(this)));
 }
 
 /*****************************************************************************************
@@ -922,11 +653,7 @@ void Board::serialize(SExpression& root) const
     root.appendLineBreak();
     serializePointerContainer(root, mDeviceInstances, "device");
     root.appendLineBreak();
-    serializePointerContainer(root, mVias, "via");
-    root.appendLineBreak();
-    serializePointerContainer(root, mNetPoints, "netpoint");
-    root.appendLineBreak();
-    serializePointerContainer(root, mNetLines, "netline");
+    serializePointerContainer(root, mNetSegments, "netsegment");
     root.appendLineBreak();
     serializePointerContainer(root, mPolygons, "polygon");
     root.appendLineBreak();

@@ -25,6 +25,7 @@
 #include "bi_netline.h"
 #include "bi_footprint.h"
 #include "bi_footprintpad.h"
+#include "bi_netsegment.h"
 #include "bi_device.h"
 #include "bi_via.h"
 #include "../board.h"
@@ -48,10 +49,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
-                         BI_Via* via) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(other.mPosition),
-    mLayer(nullptr), mNetSignal(other.mNetSignal), mFootprintPad(pad), mVia(via)
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other,
+                         BI_FootprintPad* pad, BI_Via* via) :
+    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
+    mPosition(other.mPosition), mLayer(nullptr), mFootprintPad(pad), mVia(via)
 {
     mLayer = mBoard.getLayerStack().getLayer(other.getLayer().getName());
 
@@ -64,8 +65,8 @@ BI_NetPoint::BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, const SExpression& node) :
-    BI_Base(board), mLayer(nullptr), mNetSignal(nullptr), mFootprintPad(nullptr),
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
+    BI_Base(segment.getBoard()), mNetSegment(segment), mLayer(nullptr), mFootprintPad(nullptr),
     mVia(nullptr)
 {
     // read attributes
@@ -79,13 +80,6 @@ BI_NetPoint::BI_NetPoint(Board& board, const SExpression& node) :
             .arg(layerName));
     }
 
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
-    mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-    if(!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
-    }
-
     const SExpression* viaNode = node.tryGetChildByPath("via");
     const SExpression* devNode = node.tryGetChildByPath("dev");
     const SExpression* padNode = node.tryGetChildByPath("pad");
@@ -93,7 +87,7 @@ BI_NetPoint::BI_NetPoint(Board& board, const SExpression& node) :
 
     if (viaNode && (!devNode) && (!padNode) && (!posNode)) {
         Uuid viaUuid = viaNode->getValueOfFirstChild<Uuid>(true);
-        mVia = mBoard.getViaByUuid(viaUuid);
+        mVia = mNetSegment.getViaByUuid(viaUuid);
         if (!mVia) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid via UUID: \"%1\"")).arg(viaUuid.toStr()));
@@ -122,26 +116,23 @@ BI_NetPoint::BI_NetPoint(Board& board, const SExpression& node) :
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                         const Point& position) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(position), mLayer(&layer),
-    mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(nullptr)
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, const Point& position) :
+    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
+    mPosition(position), mLayer(&layer), mFootprintPad(nullptr), mVia(nullptr)
 {
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                         BI_FootprintPad& pad) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(pad.getPosition()),
-    mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(&pad), mVia(nullptr)
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, BI_FootprintPad& pad) :
+    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
+    mPosition(pad.getPosition()), mLayer(&layer), mFootprintPad(&pad), mVia(nullptr)
 {
     init();
 }
 
-BI_NetPoint::BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                         BI_Via& via) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(via.getPosition()),
-    mLayer(&layer), mNetSignal(&netsignal), mFootprintPad(nullptr), mVia(&via)
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, BI_Via& via) :
+    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
+    mPosition(via.getPosition()), mLayer(&layer), mFootprintPad(nullptr), mVia(&via)
 {
     init();
 }
@@ -184,6 +175,11 @@ BI_NetPoint::~BI_NetPoint() noexcept
  *  Getters
  ****************************************************************************************/
 
+NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept
+{
+    return mNetSegment.getNetSignal();
+}
+
 Length BI_NetPoint::getMaxLineWidth() const noexcept
 {
     Length w = 0;
@@ -209,26 +205,6 @@ void BI_NetPoint::setLayer(GraphicsLayer& layer)
     }
 }
 
-void BI_NetPoint::setNetSignal(NetSignal& netsignal)
-{
-    if (&netsignal == mNetSignal) {
-        return;
-    }
-    if ((isUsed()) || (netsignal.getCircuit() != getCircuit())) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (isAddedToBoard()) {
-        if (isAttached()) {
-            throw LogicError(__FILE__, __LINE__);
-        }
-        mNetSignal->unregisterBoardNetPoint(*this); // can throw
-        auto sg = scopeGuard([&](){mNetSignal->registerBoardNetPoint(*this);});
-        netsignal.registerBoardNetPoint(*this); // can throw
-        sg.dismiss();
-    }
-    mNetSignal = &netsignal;
-}
-
 void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad)
 {
     if (pad == mFootprintPad) {
@@ -246,7 +222,7 @@ void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad)
         }
         if (pad) {
             // attach to new pad
-            if (pad->getCompSigInstNetSignal() != mNetSignal) {
+            if (pad->getCompSigInstNetSignal() != &mNetSegment.getNetSignal()) {
                 throw LogicError(__FILE__, __LINE__);
             }
             pad->registerNetPoint(*this); // can throw
@@ -276,7 +252,9 @@ void BI_NetPoint::setViaToAttach(BI_Via* via)
         }
         if (via) {
             // attach to new via
-            if (via->getNetSignal() != mNetSignal) throw LogicError(__FILE__, __LINE__);
+            if (&via->getNetSegment() != &mNetSegment) {
+                throw LogicError(__FILE__, __LINE__);
+            }
             via->registerNetPoint(*this); // can throw
             sgl.add([&](){via->unregisterNetPoint(*this);});
             setPosition(via->getPosition());
@@ -300,63 +278,52 @@ void BI_NetPoint::setPosition(const Point& position) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_NetPoint::addToBoard(GraphicsScene& scene)
+void BI_NetPoint::addToBoard()
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    ScopeGuardList sgl;
-    mNetSignal->registerBoardNetPoint(*this); // can throw
-    sgl.add([&](){mNetSignal->unregisterBoardNetPoint(*this);});
     if (isAttachedToPad()) {
-        // check if mNetSignal is correct (would be a bug if not)
-        if (mFootprintPad->getCompSigInstNetSignal() != mNetSignal) {
+        // check if netsignal is correct (would be a bug if not)
+        if (mFootprintPad->getCompSigInstNetSignal() != &mNetSegment.getNetSignal()) {
             throw LogicError(__FILE__, __LINE__);
         }
         mFootprintPad->registerNetPoint(*this); // can throw
-        sgl.add([&](){mFootprintPad->unregisterNetPoint(*this);});
     } else if (isAttachedToVia()) {
-        // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mVia->getNetSignal()) {
+        // check if netsignal is correct (would be a bug if not)
+        if (&mVia->getNetSegment() != &mNetSegment) {
             throw LogicError(__FILE__, __LINE__);
         }
         mVia->registerNetPoint(*this); // can throw
-        sgl.add([&](){mVia->unregisterNetPoint(*this);});
     }
-    mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
+    mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
+                                          &NetSignal::highlightedChanged,
                                           [this](){mGraphicsItem->update();});
     mErcMsgDeadNetPoint->setVisible(true);
-    BI_Base::addToBoard(scene, *mGraphicsItem);
-    sgl.dismiss();
+    BI_Base::addToBoard(mGraphicsItem.data());
 }
 
-void BI_NetPoint::removeFromBoard(GraphicsScene& scene)
+void BI_NetPoint::removeFromBoard()
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    ScopeGuardList sgl;
     if (isAttachedToPad()) {
-        // check if mNetSignal is correct (would be a bug if not)
-        if (mFootprintPad->getCompSigInstNetSignal() != mNetSignal) {
+        // check if netsignal is correct (would be a bug if not)
+        if (mFootprintPad->getCompSigInstNetSignal() != &mNetSegment.getNetSignal()) {
             throw LogicError(__FILE__, __LINE__);
         }
         mFootprintPad->unregisterNetPoint(*this); // can throw
-        sgl.add([&](){mFootprintPad->registerNetPoint(*this);});
     } else if (isAttachedToVia()) {
-        // check if mNetSignal is correct (would be a bug if not)
-        if (mNetSignal != mVia->getNetSignal()) {
+        // check if netsignal is correct (would be a bug if not)
+        if (&mVia->getNetSegment() != &mNetSegment) {
             throw LogicError(__FILE__, __LINE__);
         }
         mVia->unregisterNetPoint(*this); // can throw
-        sgl.add([&](){mVia->registerNetPoint(*this);});
     }
-    mNetSignal->unregisterBoardNetPoint(*this); // can throw
-    sgl.add([&](){mNetSignal->registerBoardNetPoint(*this);});
     disconnect(mHighlightChangedConnection);
     mErcMsgDeadNetPoint->setVisible(false);
-    BI_Base::removeFromBoard(scene, *mGraphicsItem);
-    sgl.dismiss();
+    BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
 void BI_NetPoint::registerNetLine(BI_NetLine& netline)
@@ -395,7 +362,6 @@ void BI_NetPoint::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendToken(mUuid);
-    root.appendTokenChild("net", mNetSignal->getUuid(), true);
     root.appendTokenChild("layer", mLayer->getName(), false);
     if (isAttachedToPad()) {
         root.appendTokenChild("dev", mFootprintPad->getFootprint().getComponentInstanceUuid(), true);
@@ -434,9 +400,8 @@ void BI_NetPoint::setSelected(bool selected) noexcept
 bool BI_NetPoint::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                             return false;
-    if (mNetSignal == nullptr)                      return false;
-    if (isAttachedToPad() && (mNetSignal != mFootprintPad->getCompSigInstNetSignal())) return false;
-    if (isAttachedToVia() && (mNetSignal != mVia->getNetSignal())) return false;
+    if (isAttachedToPad() && (&mNetSegment.getNetSignal() != mFootprintPad->getCompSigInstNetSignal())) return false;
+    if (isAttachedToVia() && (&mNetSegment != &mVia->getNetSegment())) return false;
     return true;
 }
 

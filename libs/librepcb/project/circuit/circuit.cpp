@@ -215,6 +215,17 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept
     return nullptr;
 }
 
+NetSignal* Circuit:: getNetSignalWithMostElements() const noexcept
+{
+    NetSignal* netsignal = nullptr;
+    foreach (NetSignal* ns, mNetSignals) {
+        if ((!netsignal) || (ns->getRegisteredElementsCount() > netsignal->getRegisteredElementsCount())) {
+            netsignal = ns;
+        }
+    }
+    return netsignal;
+}
+
 void Circuit::addNetSignal(NetSignal& netsignal)
 {
     if (&netsignal.getCircuit() != this) {

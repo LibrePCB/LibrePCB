@@ -74,29 +74,21 @@ void BI_Base::setSelected(bool selected) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Base::addToBoard() noexcept
+void BI_Base::addToBoard(BGI_Base* item) noexcept
 {
     Q_ASSERT(!mIsAddedToBoard);
+    if (item) {
+        mBoard.getGraphicsScene().addItem(*item);
+    }
     mIsAddedToBoard = true;
 }
 
-void BI_Base::removeFromBoard() noexcept
+void BI_Base::removeFromBoard(BGI_Base* item) noexcept
 {
     Q_ASSERT(mIsAddedToBoard);
-    mIsAddedToBoard = false;
-}
-
-void BI_Base::addToBoard(GraphicsScene& scene, BGI_Base& item) noexcept
-{
-    Q_ASSERT(!mIsAddedToBoard);
-    scene.addItem(item);
-    mIsAddedToBoard = true;
-}
-
-void BI_Base::removeFromBoard(GraphicsScene& scene, BGI_Base& item) noexcept
-{
-    Q_ASSERT(mIsAddedToBoard);
-    scene.removeItem(item);
+    if (item) {
+        mBoard.getGraphicsScene().removeItem(*item);
+    }
     mIsAddedToBoard = false;
 }
 

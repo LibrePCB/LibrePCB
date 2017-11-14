@@ -24,13 +24,13 @@
 #include "bi_via.h"
 #include "bi_netpoint.h"
 #include "bi_netline.h"
+#include "bi_netsegment.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/scopeguardlist.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -42,16 +42,16 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BI_Via::BI_Via(Board& board, const BI_Via& other) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(other.mPosition),
-    mShape(other.mShape), mSize(other.mSize), mDrillDiameter(other.mDrillDiameter),
-    mNetSignal(other.mNetSignal)
+BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other) :
+    BI_Base(netsegment.getBoard()), mNetSegment(netsegment), mUuid(Uuid::createRandom()),
+    mPosition(other.mPosition), mShape(other.mShape), mSize(other.mSize),
+    mDrillDiameter(other.mDrillDiameter)
 {
     init();
 }
 
-BI_Via::BI_Via(Board& board, const SExpression& node) :
-    BI_Base(board), mNetSignal(nullptr)
+BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node) :
+    BI_Base(netsegment.getBoard()), mNetSegment(netsegment)
 {
     // read attributes
     mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
@@ -69,22 +69,14 @@ BI_Via::BI_Via(Board& board, const SExpression& node) :
     }
     mSize = node.getValueByPath<Length>("size", true);
     mDrillDiameter = node.getValueByPath<Length>("drill", true);
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", false);
-    if (!netSignalUuid.isNull()) {
-        mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-        if(!mNetSignal) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
-        }
-    }
 
     init();
 }
 
-BI_Via::BI_Via(Board& board, const Point& position, Shape shape, const Length& size,
-               const Length& drillDiameter, NetSignal* netsignal) :
-    BI_Base(board), mUuid(Uuid::createRandom()), mPosition(position), mShape(shape),
-    mSize(size), mDrillDiameter(drillDiameter), mNetSignal(netsignal)
+BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape, const Length& size,
+               const Length& drillDiameter) :
+    BI_Base(netsegment.getBoard()), mNetSegment(netsegment), mUuid(Uuid::createRandom()),
+    mPosition(position), mShape(shape), mSize(size), mDrillDiameter(drillDiameter)
 {
     init();
 }
@@ -110,6 +102,11 @@ BI_Via::~BI_Via() noexcept
 /*****************************************************************************************
  *  Getters
  ****************************************************************************************/
+
+NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept
+{
+    return mNetSegment.getNetSignal();
+}
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept
 {
@@ -160,30 +157,6 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const 
  *  Setters
  ****************************************************************************************/
 
-void BI_Via::setNetSignal(NetSignal* netsignal)
-{
-    if (netsignal == mNetSignal) {
-        return;
-    }
-    if ((isUsed()) || (netsignal && (netsignal->getCircuit() != getCircuit()))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (isAddedToBoard()) {
-        ScopeGuardList sgl;
-        if (mNetSignal) {
-            mNetSignal->unregisterBoardVia(*this); // can throw
-            sgl.add([&](){mNetSignal->registerBoardVia(*this);});
-        }
-        if (netsignal) {
-            netsignal->registerBoardVia(*this); // can throw
-            sgl.add([&](){netsignal->unregisterBoardVia(*this);});
-        }
-        sgl.dismiss();
-    }
-    mNetSignal = netsignal;
-    mGraphicsItem->updateCacheAndRepaint();
-}
-
 void BI_Via::setPosition(const Point& position) noexcept
 {
     if (position != mPosition) {
@@ -221,35 +194,30 @@ void BI_Via::setDrillDiameter(const Length& diameter) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Via::addToBoard(GraphicsScene& scene)
+void BI_Via::addToBoard()
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    if (mNetSignal) {
-        mNetSignal->registerBoardVia(*this); // can throw
-        mHighlightChangedConnection = connect(mNetSignal, &NetSignal::highlightedChanged,
-                                              [this](){mGraphicsItem->update();});
-    }
-    BI_Base::addToBoard(scene, *mGraphicsItem);
+    mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
+                                          &NetSignal::highlightedChanged,
+                                          [this](){mGraphicsItem->update();});
+    BI_Base::addToBoard(mGraphicsItem.data());
 }
 
-void BI_Via::removeFromBoard(GraphicsScene& scene)
+void BI_Via::removeFromBoard()
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    if (mNetSignal) {
-        mNetSignal->unregisterBoardVia(*this); // can throw
-        disconnect(mHighlightChangedConnection);
-    }
-    BI_Base::removeFromBoard(scene, *mGraphicsItem);
+    disconnect(mHighlightChangedConnection);
+    BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
 void BI_Via::registerNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
-        || (netpoint.getBoard() != mBoard) || (&netpoint.getNetSignal() != mNetSignal))
+        || (netpoint.getBoard() != mBoard) || (&netpoint.getNetSegment() != &mNetSegment))
     {
         throw LogicError(__FILE__, __LINE__);
     }
@@ -280,7 +248,6 @@ void BI_Via::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendToken(mUuid);
-    root.appendTokenChild("net", mNetSignal ? mNetSignal->getUuid() : Uuid(), true);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
     root.appendTokenChild("size", mSize, false);
     root.appendTokenChild("drill", mDrillDiameter, false);

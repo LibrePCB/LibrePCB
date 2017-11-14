@@ -21,9 +21,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardnetlineremove.h"
+#include "cmdboardnetsegmentremove.h"
 #include "../board.h"
-#include "../items/bi_netline.h"
+#include "../items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,13 +35,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardNetLineRemove::CmdBoardNetLineRemove(BI_NetLine& netline) noexcept :
-    UndoCommand(tr("Remove board trace")),
-    mBoard(netline.getBoard()), mNetLine(netline)
+CmdBoardNetSegmentRemove::CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept :
+    UndoCommand(tr("Remove net segment")),
+    mBoard(segment.getBoard()), mNetSegment(segment)
 {
 }
 
-CmdBoardNetLineRemove::~CmdBoardNetLineRemove() noexcept
+CmdBoardNetSegmentRemove::~CmdBoardNetSegmentRemove() noexcept
 {
 }
 
@@ -49,21 +49,21 @@ CmdBoardNetLineRemove::~CmdBoardNetLineRemove() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetLineRemove::performExecute()
+bool CmdBoardNetSegmentRemove::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdBoardNetLineRemove::performUndo()
+void CmdBoardNetSegmentRemove::performUndo()
 {
-    mBoard.addNetLine(mNetLine); // can throw
+    mBoard.addNetSegment(mNetSegment); // can throw
 }
 
-void CmdBoardNetLineRemove::performRedo()
+void CmdBoardNetSegmentRemove::performRedo()
 {
-    mBoard.removeNetLine(mNetLine); // can throw
+    mBoard.removeNetSegment(mNetSegment); // can throw
 }
 
 /*****************************************************************************************

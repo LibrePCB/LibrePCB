@@ -39,8 +39,7 @@ class Circuit;
 class NetClass;
 class ComponentSignalInstance;
 class SI_NetSegment;
-class BI_NetPoint;
-class BI_Via;
+class BI_NetSegment;
 class ErcMsg;
 
 /*****************************************************************************************
@@ -76,8 +75,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         Circuit& getCircuit() const noexcept {return mCircuit;}
         const QList<ComponentSignalInstance*>& getComponentSignals() const noexcept {return mRegisteredComponentSignals;}
         const QList<SI_NetSegment*>& getSchematicNetSegments() const noexcept {return mRegisteredSchematicNetSegments;}
-        const QList<BI_NetPoint*>& getBoardNetPoints() const noexcept {return mRegisteredBoardNetPoints;}
-        const QList<BI_Via*>& getBoardVias() const noexcept {return mRegisteredBoardVias;}
+        const QList<BI_NetSegment*>& getBoardNetSegments() const noexcept {return mRegisteredBoardNetSegments;}
         int getRegisteredElementsCount() const noexcept;
         bool isUsed() const noexcept;
         bool isNameForced() const noexcept;
@@ -93,10 +91,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         void unregisterComponentSignal(ComponentSignalInstance& signal);
         void registerSchematicNetSegment(SI_NetSegment& netsegment);
         void unregisterSchematicNetSegment(SI_NetSegment& netsegment);
-        void registerBoardNetPoint(BI_NetPoint& netpoint);
-        void unregisterBoardNetPoint(BI_NetPoint& netpoint);
-        void registerBoardVia(BI_Via& via);
-        void unregisterBoardVia(BI_Via& via);
+        void registerBoardNetSegment(BI_NetSegment& netsegment);
+        void unregisterBoardNetSegment(BI_NetSegment& netsegment);
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
@@ -132,8 +128,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         // Registered Elements of this NetSignal
         QList<ComponentSignalInstance*> mRegisteredComponentSignals;
         QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
-        QList<BI_NetPoint*> mRegisteredBoardNetPoints;
-        QList<BI_Via*> mRegisteredBoardVias;
+        QList<BI_NetSegment*> mRegisteredBoardNetSegments;
 
         // ERC Messages
         /// @brief the ERC message for unused netsignals

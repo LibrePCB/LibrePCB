@@ -80,8 +80,8 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         bool isUsed() const noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;

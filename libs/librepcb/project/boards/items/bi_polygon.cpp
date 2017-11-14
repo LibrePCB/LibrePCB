@@ -80,20 +80,20 @@ BI_Polygon::~BI_Polygon() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Polygon::addToBoard(GraphicsScene& scene)
+void BI_Polygon::addToBoard()
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    BI_Base::addToBoard(scene, *mGraphicsItem);
+    BI_Base::addToBoard(mGraphicsItem.data());
 }
 
-void BI_Polygon::removeFromBoard(GraphicsScene& scene)
+void BI_Polygon::removeFromBoard()
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    BI_Base::removeFromBoard(scene, *mGraphicsItem);
+    BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
 void BI_Polygon::serialize(SExpression& root) const

@@ -59,6 +59,8 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
     mPackagePad = mFootprint.getDeviceInstance().getLibPackage().getPads().get(padUuid).get(); // can throw
     Uuid cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getPadSignalMap().get(padUuid)->getSignalUuid(); // can throw
     mComponentSignalInstance = mFootprint.getDeviceInstance().getComponentInstance().getSignalInstance(cmpSignalUuid);
+    connect(mComponentSignalInstance, &ComponentSignalInstance::netSignalChanged,
+            this, &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
 
     mGraphicsItem.reset(new BGI_FootprintPad(*this));
     updatePosition();
@@ -123,7 +125,7 @@ NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_FootprintPad::addToBoard(GraphicsScene& scene)
+void BI_FootprintPad::addToBoard()
 {
     if (isAddedToBoard() || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -131,14 +133,11 @@ void BI_FootprintPad::addToBoard(GraphicsScene& scene)
     if (mComponentSignalInstance) {
         mComponentSignalInstance->registerFootprintPad(*this); // can throw
     }
-    if (getCompSigInstNetSignal()) {
-        mHighlightChangedConnection = connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
-                                              [this](){mGraphicsItem->update();});
-    }
-    BI_Base::addToBoard(scene, *mGraphicsItem);
+    componentSignalInstanceNetSignalChanged(getCompSigInstNetSignal());
+    BI_Base::addToBoard(mGraphicsItem.data());
 }
 
-void BI_FootprintPad::removeFromBoard(GraphicsScene& scene)
+void BI_FootprintPad::removeFromBoard()
 {
     if ((!isAddedToBoard()) || isUsed()) {
         throw LogicError(__FILE__, __LINE__);
@@ -146,10 +145,8 @@ void BI_FootprintPad::removeFromBoard(GraphicsScene& scene)
     if (mComponentSignalInstance) {
         mComponentSignalInstance->unregisterFootprintPad(*this); // can throw
     }
-    if (getCompSigInstNetSignal()) {
-        disconnect(mHighlightChangedConnection);
-    }
-    BI_Base::removeFromBoard(scene, *mGraphicsItem);
+    componentSignalInstanceNetSignalChanged(nullptr);
+    BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
 void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
@@ -157,7 +154,7 @@ void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
         || (netpoint.getBoard() != mBoard)
         || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
-        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal())
+        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal())
         || (!netpoint.getLayer().isCopperLayer())
         || (!isOnLayer(netpoint.getLayer().getName())))
     {
@@ -171,7 +168,7 @@ void BI_FootprintPad::unregisterNetPoint(BI_NetPoint& netpoint)
 {
     if ((!isAddedToBoard()) || (!mComponentSignalInstance)
         || (getNetPointOfLayer(netpoint.getLayer().getName()) != &netpoint)
-        || (&netpoint.getNetSignal() != mComponentSignalInstance->getNetSignal()))
+        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
     {
         throw LogicError(__FILE__, __LINE__);
     }
@@ -223,6 +220,17 @@ void BI_FootprintPad::setSelected(bool selected) noexcept
 void BI_FootprintPad::footprintAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
+}
+
+void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* netsignal)
+{
+    if (mHighlightChangedConnection) {
+        disconnect(mHighlightChangedConnection);
+    }
+    if (netsignal) {
+        mHighlightChangedConnection = connect(netsignal, &NetSignal::highlightedChanged,
+                                              [this](){mGraphicsItem->update();});
+    }
 }
 
 /*****************************************************************************************

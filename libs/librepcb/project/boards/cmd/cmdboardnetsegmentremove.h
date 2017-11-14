@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDBOARDNETLINEADD_H
-#define LIBREPCB_PROJECT_CMDBOARDNETLINEADD_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
+#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/units/length.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,28 +33,22 @@ namespace librepcb {
 namespace project {
 
 class Board;
-class BI_NetPoint;
-class BI_NetLine;
+class BI_NetSegment;
 
 /*****************************************************************************************
- *  Class CmdBoardNetLineAdd
+ *  Class CmdBoardNetSegmentRemove
  ****************************************************************************************/
 
 /**
- * @brief The CmdBoardNetLineAdd class
+ * @brief The CmdBoardNetSegmentRemove class
  */
-class CmdBoardNetLineAdd final : public UndoCommand
+class CmdBoardNetSegmentRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdBoardNetLineAdd(BI_NetLine& netline) noexcept;
-        CmdBoardNetLineAdd(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
-                           const Length& width) noexcept;
-        ~CmdBoardNetLineAdd() noexcept;
-
-        // Getters
-        BI_NetLine* getNetLine() const noexcept {return mNetLine;}
+        explicit CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept;
+        ~CmdBoardNetSegmentRemove() noexcept;
 
 
     private:
@@ -75,10 +68,7 @@ class CmdBoardNetLineAdd final : public UndoCommand
         // Private Member Variables
 
         Board& mBoard;
-        BI_NetPoint& mStartPoint;
-        BI_NetPoint& mEndPoint;
-        Length mWidth;
-        BI_NetLine* mNetLine;
+        BI_NetSegment& mNetSegment;
 };
 
 /*****************************************************************************************
@@ -88,4 +78,4 @@ class CmdBoardNetLineAdd final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETLINEADD_H
+#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H

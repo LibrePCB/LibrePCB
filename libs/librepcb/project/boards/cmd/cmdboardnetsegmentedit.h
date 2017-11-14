@@ -17,68 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H
+#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardviaadd.h"
-#include "../board.h"
-#include "../items/bi_via.h"
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-CmdBoardViaAdd::CmdBoardViaAdd(BI_Via& via) noexcept :
-    UndoCommand(tr("Add via")),
-    mBoard(via.getBoard()), mPosition(), mShape(), mSize(), mDrillDiameter(),
-    mNetSignal(nullptr), mVia(&via)
-{
-}
-
-CmdBoardViaAdd::CmdBoardViaAdd(Board& board, const Point& position, BI_Via::Shape shape,
-        const Length& size, const Length& drillDiameter, NetSignal* netsignal) noexcept :
-    UndoCommand(tr("Add via")),
-    mBoard(board), mPosition(position), mShape(shape), mSize(size),
-    mDrillDiameter(drillDiameter), mNetSignal(netsignal), mVia(nullptr)
-{
-}
-
-CmdBoardViaAdd::~CmdBoardViaAdd() noexcept
-{
-}
+class BI_NetSegment;
+class NetSignal;
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Class CmdBoardNetSegmentEdit
  ****************************************************************************************/
 
-bool CmdBoardViaAdd::performExecute()
+/**
+ * @brief The CmdBoardNetSegmentEdit class
+ */
+class CmdBoardNetSegmentEdit final : public UndoCommand
 {
-    if (!mVia) {
-        // create new via
-        mVia = new BI_Via(mBoard, mPosition, mShape, mSize, mDrillDiameter, mNetSignal);
-    }
+    public:
 
-    performRedo(); // can throw
+        // Constructors / Destructor
+        explicit CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept;
+        ~CmdBoardNetSegmentEdit() noexcept;
 
-    return true;
-}
+        // Setters
+        void setNetSignal(NetSignal& netsignal) noexcept;
 
-void CmdBoardViaAdd::performUndo()
-{
-    mBoard.removeVia(*mVia); // can throw
-}
 
-void CmdBoardViaAdd::performRedo()
-{
-    mBoard.addVia(*mVia); // can throw
-}
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
+
+        // Private Member Variables
+
+        // Attributes from the constructor
+        BI_NetSegment& mNetSegment;
+
+        // General Attributes
+        NetSignal* mOldNetSignal;
+        NetSignal* mNewNetSignal;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -86,3 +84,5 @@ void CmdBoardViaAdd::performRedo()
 
 } // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H

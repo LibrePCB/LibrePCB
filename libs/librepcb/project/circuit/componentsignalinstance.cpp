@@ -179,6 +179,7 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal)
     mNetSignal = netsignal;
     updateErcMessages();
     sgl.dismiss();
+    emit netSignalChanged(mNetSignal);
 }
 
 /*****************************************************************************************

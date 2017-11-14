@@ -36,7 +36,6 @@ namespace project {
 
 CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept :
     UndoCommand(tr("Edit via")), mVia(via),
-    mOldNetSignal(via.getNetSignal()), mNewNetSignal(mOldNetSignal),
     mOldPos(via.getPosition()), mNewPos(mOldPos),
     mOldShape(via.getShape()), mNewShape(mOldShape),
     mOldSize(via.getSize()), mNewSize(mOldSize),
@@ -47,28 +46,16 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept :
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept
 {
     if (!wasEverExecuted()) {
-        try {
-            mVia.setPosition(mOldPos);
-            mVia.setShape(mOldShape);
-            mVia.setSize(mOldSize);
-            mVia.setDrillDiameter(mOldDrillDiameter);
-            mVia.setNetSignal(mOldNetSignal); // can throw
-        } catch (Exception& e) {
-            qCritical() << "Unexpected exception thrown:" << e.getMsg();
-        }
+        mVia.setPosition(mOldPos);
+        mVia.setShape(mOldShape);
+        mVia.setSize(mOldSize);
+        mVia.setDrillDiameter(mOldDrillDiameter);
     }
 }
 
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void CmdBoardViaEdit::setNetSignal(NetSignal* netsignal, bool immediate)
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = netsignal;
-    if (immediate) mVia.setNetSignal(mNewNetSignal); // can throw
-}
 
 void CmdBoardViaEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
@@ -118,7 +105,6 @@ bool CmdBoardViaEdit::performExecute()
 
 void CmdBoardViaEdit::performUndo()
 {
-    mVia.setNetSignal(mOldNetSignal); // can throw
     mVia.setPosition(mOldPos);
     mVia.setShape(mOldShape);
     mVia.setSize(mOldSize);
@@ -127,7 +113,6 @@ void CmdBoardViaEdit::performUndo()
 
 void CmdBoardViaEdit::performRedo()
 {
-    mVia.setNetSignal(mNewNetSignal); // can throw
     mVia.setPosition(mNewPos);
     mVia.setShape(mNewShape);
     mVia.setSize(mNewSize);

@@ -21,9 +21,11 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardnetpointremove.h"
+#include "cmdboardnetsegmentremoveelements.h"
 #include "../board.h"
 #include "../items/bi_netpoint.h"
+#include "../items/bi_netline.h"
+#include "../items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,35 +37,54 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardNetPointRemove::CmdBoardNetPointRemove(BI_NetPoint& netpoint) noexcept :
-    UndoCommand(tr("Remove netpoint")),
-    mBoard(netpoint.getBoard()), mNetPoint(netpoint)
+CmdBoardNetSegmentRemoveElements::CmdBoardNetSegmentRemoveElements(BI_NetSegment& segment) noexcept :
+    UndoCommand(tr("Remove net segment elements")),
+    mNetSegment(segment)
 {
 }
 
-CmdBoardNetPointRemove::~CmdBoardNetPointRemove() noexcept
+CmdBoardNetSegmentRemoveElements::~CmdBoardNetSegmentRemoveElements() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void CmdBoardNetSegmentRemoveElements::removeVia(BI_Via& via)
+{
+    mVias.append(&via);
+}
+
+void CmdBoardNetSegmentRemoveElements::removeNetPoint(BI_NetPoint& netpoint)
+{
+    mNetPoints.append(&netpoint);
+}
+
+void CmdBoardNetSegmentRemoveElements::removeNetLine(BI_NetLine& netline)
+{
+    mNetLines.append(&netline);
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardNetPointRemove::performExecute()
+bool CmdBoardNetSegmentRemoveElements::performExecute()
 {
     performRedo(); // can throw
 
     return true;
 }
 
-void CmdBoardNetPointRemove::performUndo()
+void CmdBoardNetSegmentRemoveElements::performUndo()
 {
-    mBoard.addNetPoint(mNetPoint); // can throw
+    mNetSegment.addElements(mVias, mNetPoints, mNetLines); // can throw
 }
 
-void CmdBoardNetPointRemove::performRedo()
+void CmdBoardNetSegmentRemoveElements::performRedo()
 {
-    mBoard.removeNetPoint(mNetPoint); // can throw
+    mNetSegment.removeElements(mVias, mNetPoints, mNetLines); // can throw
 }
 
 /*****************************************************************************************

@@ -17,38 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDBOARDNETLINEREMOVE_H
-#define LIBREPCB_PROJECT_CMDBOARDNETLINEREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
+#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/point.h>
+#include "../items/bi_via.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class GraphicsLayer;
+
 namespace project {
 
-class Board;
+class NetSignal;
+class BI_NetSegment;
+class BI_FootprintPad;
+class BI_NetPoint;
 class BI_NetLine;
 
 /*****************************************************************************************
- *  Class CmdBoardNetLineRemove
+ *  Class CmdBoardNetSegmentAddElements
  ****************************************************************************************/
 
 /**
- * @brief The CmdBoardNetLineRemove class
+ * @brief The CmdBoardNetSegmentAddElements class
  */
-class CmdBoardNetLineRemove final : public UndoCommand
+class CmdBoardNetSegmentAddElements final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdBoardNetLineRemove(BI_NetLine& netline) noexcept;
-        ~CmdBoardNetLineRemove() noexcept;
+        CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept;
+        ~CmdBoardNetSegmentAddElements() noexcept;
+
+        // General Methods
+        BI_Via* addVia(BI_Via& via);
+        BI_Via* addVia(const Point& position, BI_Via::Shape shape,
+                       const Length& size, const Length& drillDiameter);
+        BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
+        BI_NetPoint* addNetPoint(GraphicsLayer& layer, const Point& position);
+        BI_NetPoint* addNetPoint(GraphicsLayer& layer, BI_FootprintPad& pad);
+        BI_NetPoint* addNetPoint(GraphicsLayer& layer, BI_Via& via);
+        BI_NetLine* addNetLine(BI_NetLine& netline);
+        BI_NetLine* addNetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint,
+                               const Length& width);
 
 
     private:
@@ -66,9 +86,10 @@ class CmdBoardNetLineRemove final : public UndoCommand
 
 
         // Private Member Variables
-
-        Board& mBoard;
-        BI_NetLine& mNetLine;
+        BI_NetSegment& mNetSegment;
+        QList<BI_Via*> mVias;
+        QList<BI_NetPoint*> mNetPoints;
+        QList<BI_NetLine*> mNetLines;
 };
 
 /*****************************************************************************************
@@ -78,4 +99,4 @@ class CmdBoardNetLineRemove final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETLINEREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
