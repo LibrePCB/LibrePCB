@@ -31,15 +31,12 @@
 #include <librepcb/project/circuit/netclass.h>
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
 #include <librepcb/common/gridproperties.h>
@@ -348,46 +345,31 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
             mFixedNetPoint = cmd->getNetPoint();
         }
         Q_ASSERT(mFixedNetPoint);
-        NetSignal* netsignal = &mFixedNetPoint->getNetSignal();
         GraphicsLayer* layer = &mFixedNetPoint->getLayer();
 
         // update the command toolbar
         mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getName()));
 
-        // add second netpoint
-        CmdBoardNetPointAdd* cmdNetPointAdd2 = new CmdBoardNetPointAdd(
-            board, *layer, *netsignal, pos);
-        mUndoStack.appendToCmdGroup(cmdNetPointAdd2);
-        mPositioningNetPoint1 = cmdNetPointAdd2->getNetPoint();
-        Q_ASSERT(mPositioningNetPoint1);
+        // add more netpoints & netlines
+        CmdBoardNetSegmentAddElements* cmd = new CmdBoardNetSegmentAddElements(
+            mFixedNetPoint->getNetSegment());
+        BI_NetPoint* p2 = cmd->addNetPoint(*layer, pos); Q_ASSERT(p2); // second netpoint
+        BI_NetLine* l1 = cmd->addNetLine(*mFixedNetPoint, *p2, mCurrentWidth); Q_ASSERT(l1); // first netline
+        BI_NetPoint* p3 = cmd->addNetPoint(*layer, pos); Q_ASSERT(p3); // third netpoint
+        BI_NetLine* l2 = cmd->addNetLine(*p2, *p3, mCurrentWidth); Q_ASSERT(l2); // second netline
+        mUndoStack.appendToCmdGroup(cmd); // can throw
 
-        // add first netline
-        CmdBoardNetLineAdd* cmdNetLineAdd1 = new CmdBoardNetLineAdd(
-            board, *mFixedNetPoint, *cmdNetPointAdd2->getNetPoint(), mCurrentWidth);
-        mUndoStack.appendToCmdGroup(cmdNetLineAdd1);
-        mPositioningNetLine1 = cmdNetLineAdd1->getNetLine();
-        Q_ASSERT(mPositioningNetLine1);
-
-        // add third netpoint
-        CmdBoardNetPointAdd* cmdNetPointAdd3 = new CmdBoardNetPointAdd(
-            board, *layer, *netsignal, pos);
-        mUndoStack.appendToCmdGroup(cmdNetPointAdd3);
-        mPositioningNetPoint2 = cmdNetPointAdd3->getNetPoint();
-        Q_ASSERT(mPositioningNetPoint2);
-
-        // add second netline
-        CmdBoardNetLineAdd* cmdNetLineAdd2 = new CmdBoardNetLineAdd(
-            board, *cmdNetPointAdd2->getNetPoint(), *cmdNetPointAdd3->getNetPoint(),
-            mCurrentWidth);
-        mUndoStack.appendToCmdGroup(cmdNetLineAdd2);
-        mPositioningNetLine2 = cmdNetLineAdd2->getNetLine();
-        Q_ASSERT(mPositioningNetLine2);
+        // update members
+        mPositioningNetPoint1 = p2;
+        mPositioningNetLine1 = l1;
+        mPositioningNetPoint2 = p3;
+        mPositioningNetLine2 = l2;
 
         // properly place the new netpoints/netlines according the current wire mode
         updateNetpointPositions(pos);
 
         // highlight all elements of the current netsignal
-        mCircuit.setHighlightedNetSignal(netsignal);
+        mCircuit.setHighlightedNetSignal(&mFixedNetPoint->getNetSignalOfNetSegment());
 
         return true;
     }

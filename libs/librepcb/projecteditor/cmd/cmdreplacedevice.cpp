@@ -31,8 +31,8 @@
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
 #include "cmdadddevicetoboard.h"
 
@@ -69,25 +69,20 @@ bool CmdReplaceDevice::performExecute()
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
     // remember which netpoints are connected to which component signal instance
-    QList<BI_NetPoint*> attachedNetPoints;
     QHash<BI_NetPoint*, ComponentSignalInstance*> netpointSignalMapping;
     foreach (BI_FootprintPad* pad, mDeviceInstance.getFootprint().getPads()) {
         foreach (BI_NetPoint* netpoint, pad->getNetPoints()) {
-            if (!attachedNetPoints.contains(netpoint)) {
-                attachedNetPoints.append(netpoint);
-                netpointSignalMapping.insert(netpoint, pad->getComponentSignalInstance());
-            }
+            netpointSignalMapping.insert(netpoint, pad->getComponentSignalInstance());
         }
     }
 
     // disconnect all netpoints/netlines
-    QList<BI_NetLine*> attachedNetLines;
-    foreach (BI_NetPoint* netpoint, attachedNetPoints) {
-        foreach (BI_NetLine* netline, netpoint->getLines()) {
-            execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
-            if (!attachedNetLines.contains(netline)) {
-                attachedNetLines.append(netline);
-            }
+    QSet<BI_NetSegment*> attachedNetSegments;
+    foreach (BI_NetPoint* netpoint, netpointSignalMapping.keys()) {
+        BI_NetSegment& segment = netpoint->getNetSegment();
+        if (!attachedNetSegments.contains(&segment)) {
+            attachedNetSegments.insert(&segment);
+            execNewChildCmd(new CmdBoardNetSegmentRemove(segment)); // can throw
         }
         CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
         cmd->setPadToAttach(nullptr);
@@ -107,7 +102,7 @@ bool CmdReplaceDevice::performExecute()
     Q_ASSERT(newDevice);
 
     // reconnect all netpoints/netlines
-    foreach (BI_NetPoint* netpoint, attachedNetPoints) {
+    foreach (BI_NetPoint* netpoint, netpointSignalMapping.keys()) {
         ComponentSignalInstance* cmpSig = netpointSignalMapping.value(netpoint);
         BI_FootprintPad* newPad = nullptr;
         foreach (BI_FootprintPad* pad, newDevice->getFootprint().getPads()) {
@@ -120,8 +115,8 @@ bool CmdReplaceDevice::performExecute()
         cmd->setPadToAttach(newPad);
         execNewChildCmd(cmd); // can throw
     }
-    foreach (BI_NetLine* netline, attachedNetLines) {
-        execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
+    foreach (BI_NetSegment* netsegment, attachedNetSegments) {
+        execNewChildCmd(new CmdBoardNetSegmentAdd(*netsegment)); // can throw
     }
 
     undoScopeGuard.dismiss(); // no undo required

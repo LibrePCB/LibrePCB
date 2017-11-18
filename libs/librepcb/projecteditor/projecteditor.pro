@@ -41,6 +41,7 @@ SOURCES += \
     cmd/cmdcombineallitemsunderboardnetpoint.cpp \
     cmd/cmdcombineallitemsunderschematicnetpoint.cpp \
     cmd/cmdcombineboardnetpoints.cpp \
+    cmd/cmdcombineboardnetsegments.cpp \
     cmd/cmdcombinenetsignals.cpp \
     cmd/cmdcombineschematicnetpoints.cpp \
     cmd/cmdcombineschematicnetsegments.cpp \
@@ -54,7 +55,6 @@ SOURCES += \
     cmd/cmdremoveselectedboarditems.cpp \
     cmd/cmdremoveselectedschematicitems.cpp \
     cmd/cmdremoveunusednetsignals.cpp \
-    cmd/cmdremoveviafromboard.cpp \
     cmd/cmdreplacedevice.cpp \
     cmd/cmdrotateselectedboarditems.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
@@ -101,6 +101,7 @@ HEADERS += \
     cmd/cmdcombineallitemsunderboardnetpoint.h \
     cmd/cmdcombineallitemsunderschematicnetpoint.h \
     cmd/cmdcombineboardnetpoints.h \
+    cmd/cmdcombineboardnetsegments.h \
     cmd/cmdcombinenetsignals.h \
     cmd/cmdcombineschematicnetpoints.h \
     cmd/cmdcombineschematicnetsegments.h \
@@ -114,7 +115,6 @@ HEADERS += \
     cmd/cmdremoveselectedboarditems.h \
     cmd/cmdremoveselectedschematicitems.h \
     cmd/cmdremoveunusednetsignals.h \
-    cmd/cmdremoveviafromboard.h \
     cmd/cmdreplacedevice.h \
     cmd/cmdrotateselectedboarditems.h \
     cmd/cmdrotateselectedschematicitems.h \

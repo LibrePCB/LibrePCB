@@ -71,6 +71,7 @@ class BES_AddVia final : public BES_Base
         bool updateVia(Board& board, const Point& pos) noexcept;
         bool fixVia(const Point& pos) noexcept;
         void updateShapeActionsCheckedState() noexcept;
+        void setNetSignal(NetSignal* netsignal) noexcept;
 
 
         // General Attributes
@@ -80,7 +81,7 @@ class BES_AddVia final : public BES_Base
         Length mCurrentViaSize;
         Length mCurrentViaDrillDiameter;
         NetSignal* mCurrentViaNetSignal;
-        QScopedPointer<CmdBoardViaEdit> mEditCmd;
+        QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
         // Widgets for the command toolbar
         QHash<int, QAction*> mShapeActions;

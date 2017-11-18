@@ -17,58 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
+#define LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdremoveviafromboard.h"
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/boards/cmd/cmdboardviaremove.h>
-#include "cmddetachboardnetpointfromviaorpad.h"
+#include <librepcb/common/units/point.h>
+#include <librepcb/common/undocommandgroup.h>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
+
+class BI_NetSegment;
+class BI_NetPoint;
+class BI_NetLine;
+class BI_Via;
+
 namespace editor {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class CmdCombineBoardNetSegments
  ****************************************************************************************/
 
-CmdRemoveViaFromBoard::CmdRemoveViaFromBoard(BI_Via& via) noexcept :
-    UndoCommandGroup(tr("Remove via from board")),
-    mVia(via)
+/**
+ * @brief This undo command combines two board netsegments together
+ *
+ * @note Both netsegments must have the same netsignal!
+ */
+class CmdCombineBoardNetSegments final : public UndoCommandGroup
 {
-}
+    public:
 
-CmdRemoveViaFromBoard::~CmdRemoveViaFromBoard() noexcept
-{
-}
+        // Constructors / Destructor
+        CmdCombineBoardNetSegments() = delete;
+        CmdCombineBoardNetSegments(const CmdCombineBoardNetSegments& other) = delete;
+        CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved, BI_NetPoint& junction) noexcept;
+        ~CmdCombineBoardNetSegments() noexcept;
 
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
+        // Operator Overloadings
+        CmdCombineBoardNetSegments& operator=(const CmdCombineBoardNetSegments& rhs) = delete;
 
-bool CmdRemoveViaFromBoard::performExecute()
-{
-    // if an error occurs, undo all already executed child commands
-    auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-    // detach all used netpoints && remove all unused netpoints + netlines
-    foreach (BI_NetPoint* netpoint, mVia.getNetPoints()) { Q_ASSERT(netpoint);
-        execNewChildCmd(new CmdDetachBoardNetPointFromViaOrPad(*netpoint)); // can throw
-    }
+    private:
 
-    // remove the via itself
-    execNewChildCmd(new CmdBoardViaRemove(mVia)); // can throw
+        // Private Methods
 
-    undoScopeGuard.dismiss(); // no undo required
-    return (getChildCount() > 0);
-}
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        BI_NetPoint& addNetPointToVia(BI_Via& via);
+        BI_NetPoint& addNetPointInMiddleOfNetLine(BI_NetLine& l, const Point& pos);
+
+
+        // Attributes from the constructor
+        BI_NetSegment& mNetSegmentToBeRemoved;
+        BI_NetPoint& mJunctionNetPoint;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -77,3 +86,6 @@ bool CmdRemoveViaFromBoard::performExecute()
 } // namespace editor
 } // namespace project
 } // namespace librepcb
+
+
+#endif // LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H

@@ -33,6 +33,10 @@ namespace librepcb {
 namespace project {
 
 class Board;
+class BI_Via;
+class BI_NetPoint;
+class BI_NetLine;
+class BI_NetSegment;
 
 namespace editor {
 
@@ -45,6 +49,16 @@ namespace editor {
  */
 class CmdRemoveSelectedBoardItems final : public UndoCommandGroup
 {
+    private:
+        // Private Types
+        struct NetSegmentItems {
+            QSet<BI_Via*> vias;
+            QSet<BI_NetPoint*> netpoints;
+            QSet<BI_NetLine*> netlines;
+        };
+        typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
+
+
     public:
 
         // Constructors / Destructor
@@ -58,6 +72,18 @@ class CmdRemoveSelectedBoardItems final : public UndoCommandGroup
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
+
+        void splitUpNetSegment(BI_NetSegment& netsegment, const NetSegmentItems& selectedItems);
+        void createNewSubNetSegment(BI_NetSegment& netsegment, const NetSegmentItems& items);
+        QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(BI_NetSegment& segment,
+                                                                   const NetSegmentItems& removedItems) noexcept;
+        void findAllConnectedNetPointsAndNetLines(BI_NetPoint& netpoint,
+                                                  QSet<BI_Via*>& availableVias,
+                                                  QSet<BI_NetPoint*>& availableNetPoints,
+                                                  QSet<BI_NetLine*>& availableNetLines,
+                                                  QSet<BI_Via*>& vias,
+                                                  QSet<BI_NetPoint*>& netpoints,
+                                                  QSet<BI_NetLine*>& netlines) const noexcept;
 
 
         // Attributes from the constructor
