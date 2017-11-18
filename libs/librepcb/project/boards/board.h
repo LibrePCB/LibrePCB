@@ -23,6 +23,7 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
+#include <memory>
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/attributes/attributeprovider.h>
@@ -53,11 +54,13 @@ class BI_Device;
 class BI_Base;
 class BI_FootprintPad;
 class BI_Via;
+class BI_NetSegment;
 class BI_NetPoint;
 class BI_NetLine;
 class BI_Polygon;
 class BoardLayerStack;
 class BoardUserSettings;
+class BoardSelectionQuery;
 
 /*****************************************************************************************
  *  Class Board
@@ -108,22 +111,11 @@ class Board final : public QObject, public AttributeProvider,
         Project& getProject() const noexcept {return mProject;}
         const FilePath& getFilePath() const noexcept {return mFilePath;}
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+        GraphicsScene& getGraphicsScene () const noexcept {return *mGraphicsScene;}
         BoardLayerStack& getLayerStack() noexcept {return *mLayerStack;}
         BoardDesignRules& getDesignRules() noexcept {return *mDesignRules;}
         const BoardDesignRules& getDesignRules() const noexcept {return *mDesignRules;}
         bool isEmpty() const noexcept;
-        QList<BI_Base*> getSelectedItems(bool vias,
-                                         bool footprintPads,
-                                         bool floatingPoints,
-                                         bool attachedPoints,
-                                         bool floatingPointsFromFloatingLines,
-                                         bool attachedPointsFromFloatingLines,
-                                         bool floatingPointsFromAttachedLines,
-                                         bool attachedPointsFromAttachedLines,
-                                         bool attachedPointsFromFootprints,
-                                         bool floatingLines,
-                                         bool attachedLines,
-                                         bool attachedLinesFromFootprints) const noexcept;
         QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
         QList<BI_Via*> getViasAtScenePos(const Point& pos, const NetSignal* netsignal) const noexcept;
         QList<BI_NetPoint*> getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
@@ -148,22 +140,11 @@ class Board final : public QObject, public AttributeProvider,
         void addDeviceInstance(BI_Device& instance);
         void removeDeviceInstance(BI_Device& instance);
 
-        // Via Methods
-        const QList<BI_Via*>& getVias() const noexcept {return mVias;}
-        BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
-        void addVia(BI_Via& via);
-        void removeVia(BI_Via& via);
-
-        // NetPoint Methods
-        BI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-        void addNetPoint(BI_NetPoint& netpoint);
-        void removeNetPoint(BI_NetPoint& netpoint);
-
-        // NetLine Methods
-        const QList<BI_NetLine*>& getNetLines() const noexcept {return mNetLines;}
-        BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
-        void addNetLine(BI_NetLine& netline);
-        void removeNetLine(BI_NetLine& netline);
+        // NetSegment Methods
+        const QList<BI_NetSegment*>& getNetSegments() const noexcept {return mNetSegments;}
+        BI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+        void addNetSegment(BI_NetSegment& netsegment);
+        void removeNetSegment(BI_NetSegment& netsegment);
 
         // Polygon Methods
         const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
@@ -179,6 +160,7 @@ class Board final : public QObject, public AttributeProvider,
         const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
         void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
         void clearSelection() const noexcept;
+        std::unique_ptr<BoardSelectionQuery> createSelectionQuery() const noexcept;
 
         // Inherited from AttributeProvider
         /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
@@ -237,9 +219,7 @@ class Board final : public QObject, public AttributeProvider,
 
         // items
         QMap<Uuid, BI_Device*> mDeviceInstances;
-        QList<BI_Via*> mVias;
-        QList<BI_NetPoint*> mNetPoints;
-        QList<BI_NetLine*> mNetLines;
+        QList<BI_NetSegment*> mNetSegments;
         QList<BI_Polygon*> mPolygons;
 
         // ERC messages

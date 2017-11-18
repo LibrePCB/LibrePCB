@@ -37,8 +37,7 @@
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
+#include <librepcb/project/boards/boardselectionquery.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -70,22 +69,29 @@ bool CmdFlipSelectedBoardItems::performExecute()
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
     // get all selected items
-    QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, true, false, false,
-                                                    false, false, true, true, true, false);
-
-    // no items selected --> nothing to do here
-    if (items.isEmpty()) {
-        undoScopeGuard.dismiss();
-        return false;
-    }
+    std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
+    query->addSelectedFootprints();
+    query->addSelectedVias();
 
     // find the center of all elements
     Point center = Point(0, 0);
-    foreach (BI_Base* item, items) {
-        center += item->getPosition();
+    int count = 0;
+    foreach (BI_Footprint* footprint, query->getFootprints()) {
+        center += footprint->getPosition();
+        ++count;
     }
-    center /= items.count();
-    center.mapToGrid(mBoard.getGridProperties().getInterval());
+    foreach (BI_Via* via, query->getVias()) {
+        center += via->getPosition();
+        ++count;
+    }
+    if (count > 0) {
+        center /= count;
+        center.mapToGrid(mBoard.getGridProperties().getInterval());
+    } else {
+        // no items selected --> nothing to do here
+        undoScopeGuard.dismiss();
+        return false;
+    }
 
     // TODO: make this feature more sophisticated!
 
@@ -140,23 +146,17 @@ bool CmdFlipSelectedBoardItems::performExecute()
     }*/
 
     // move all vias
-    foreach (BI_Base* item, items) {
-        if (item->getType() == BI_Base::Type_t::Via) {
-            BI_Via* via = dynamic_cast<BI_Via*>(item); Q_ASSERT(via);
-            CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
-            cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
-            execNewChildCmd(cmd); // can throw
-        }
+    foreach (BI_Via* via, query->getVias()) { Q_ASSERT(via);
+        CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
+        cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
+        execNewChildCmd(cmd); // can throw
     }
 
     // flip all device instances
-    foreach (BI_Base* item, items) {
-        if (item->getType() == BI_Base::Type_t::Footprint) {
-            BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
-            CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(footprint->getDeviceInstance());
-            cmd->mirror(center, mOrientation, false); // can throw
-            execNewChildCmd(cmd); // can throw
-        }
+    foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
+        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(footprint->getDeviceInstance());
+        cmd->mirror(center, mOrientation, false); // can throw
+        execNewChildCmd(cmd); // can throw
     }
 
     // reconnect all netlines

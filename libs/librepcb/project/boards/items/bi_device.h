@@ -92,8 +92,8 @@ class BI_Device final : public BI_Base, public AttributeProvider,
         void setIsMirrored(bool mirror);
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;

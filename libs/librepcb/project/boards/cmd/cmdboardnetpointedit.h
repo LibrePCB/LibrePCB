@@ -58,7 +58,6 @@ class CmdBoardNetPointEdit final : public UndoCommand
 
         // Setters
         void setLayer(GraphicsLayer& layer) noexcept;
-        void setNetSignal(NetSignal& netsignal) noexcept;
         void setPadToAttach(BI_FootprintPad* pad) noexcept;
         void setViaToAttach(BI_Via* via) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
@@ -87,8 +86,6 @@ class CmdBoardNetPointEdit final : public UndoCommand
         // General Attributes
         GraphicsLayer* mOldLayer;
         GraphicsLayer* mNewLayer;
-        NetSignal* mOldNetSignal;
-        NetSignal* mNewNetSignal;
         BI_FootprintPad* mOldFootprintPad;
         BI_FootprintPad* mNewFootprintPad;
         BI_Via* mOldVia;

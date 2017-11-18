@@ -52,7 +52,6 @@ class CmdBoardViaEdit final : public UndoCommand
         ~CmdBoardViaEdit() noexcept;
 
         // Setters
-        void setNetSignal(NetSignal* netsignal, bool immediate);
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setShape(BI_Via::Shape shape, bool immediate) noexcept;
@@ -80,8 +79,6 @@ class CmdBoardViaEdit final : public UndoCommand
         BI_Via& mVia;
 
         // General Attributes
-        NetSignal* mOldNetSignal;
-        NetSignal* mNewNetSignal;
         Point mOldPos;
         Point mNewPos;
         BI_Via::Shape mOldShape;

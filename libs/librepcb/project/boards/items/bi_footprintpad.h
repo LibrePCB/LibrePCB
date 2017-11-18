@@ -79,8 +79,8 @@ class BI_FootprintPad final : public BI_Base
         bool isSelectable() const noexcept override;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
         void registerNetPoint(BI_NetPoint& netpoint);
         void unregisterNetPoint(BI_NetPoint& netpoint);
         void updatePosition() noexcept;
@@ -100,6 +100,7 @@ class BI_FootprintPad final : public BI_Base
     private slots:
 
         void footprintAttributesChanged();
+        void componentSignalInstanceNetSignalChanged(NetSignal* netsignal);
 
 
     private:

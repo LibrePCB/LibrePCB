@@ -26,9 +26,12 @@
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
+#include <librepcb/project/boards/items/bi_netsegment.h>
+#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -61,29 +64,57 @@ bool CmdCombineBoardNetPoints::performExecute()
     // if an error occurs, undo all already executed child commands
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
-    // TODO: do not create redundant netlines!
+    // check whether both netpoints have the same netsegment
+    if (mNetPointToBeRemoved.getNetSegment() != mResultingNetPoint.getNetSegment())
+        throw LogicError(__FILE__, __LINE__);
 
     // change netpoint of all affected netlines
+    // TODO: do not create redundant netlines!
+    auto* cmdAdd = new CmdBoardNetSegmentAddElements(mResultingNetPoint.getNetSegment());
+    auto* cmdRemove = new CmdBoardNetSegmentRemoveElements(mResultingNetPoint.getNetSegment());
     foreach (BI_NetLine* line, mNetPointToBeRemoved.getLines()) {
-        BI_NetPoint* otherPoint;
-        if (&line->getStartPoint() == &mNetPointToBeRemoved) {
-            otherPoint = &line->getEndPoint();
-        } else if (&line->getEndPoint() == &mNetPointToBeRemoved) {
-            otherPoint = &line->getStartPoint();
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
-        // TODO: maybe add the ability to change start-/endpoint of lines instead
-        //       of remove the line and add a completely new line (attributes are lost!)
-        execNewChildCmd(new CmdBoardNetLineRemove(*line)); // can throw
+        BI_NetPoint* otherPoint = line->getOtherPoint(mNetPointToBeRemoved); Q_ASSERT(otherPoint);
+        cmdRemove->removeNetLine(*line);
         if (otherPoint != &mResultingNetPoint) {
-            execNewChildCmd(new CmdBoardNetLineAdd(line->getBoard(), mResultingNetPoint,
-                                                   *otherPoint, line->getWidth())); // can throw
+            cmdAdd->addNetLine(mResultingNetPoint, *otherPoint, line->getWidth());
         }
     }
 
     // remove the unused netpoint
-    execNewChildCmd(new CmdBoardNetPointRemove(mNetPointToBeRemoved)); // can throw
+    cmdRemove->removeNetPoint(mNetPointToBeRemoved);
+
+    // execute undo commands
+    execNewChildCmd(cmdAdd); // can throw
+    execNewChildCmd(cmdRemove); // can throw
+
+    // re-connect pads and vias if required
+    if (mNetPointToBeRemoved.isAttachedToPad()) {
+        BI_FootprintPad* pad = mNetPointToBeRemoved.getFootprintPad(); Q_ASSERT(pad);
+        if (!mResultingNetPoint.isAttached()) {
+            Q_ASSERT(!mResultingNetPoint.getFootprintPad());
+            execNewChildCmd(new CmdBoardNetSegmentRemove(mResultingNetPoint.getNetSegment())); // can throw
+            CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(mResultingNetPoint);
+            cmd->setPadToAttach(pad);
+            execNewChildCmd(cmd); // can throw
+            execNewChildCmd(new CmdBoardNetSegmentAdd(mResultingNetPoint.getNetSegment())); // can throw
+        } else {
+            throw RuntimeError(__FILE__, __LINE__, tr("Could not combine two "
+                "schematic netpoints because both are attached to a pad or via."));
+        }
+    } else if (mNetPointToBeRemoved.isAttachedToVia()) {
+        BI_Via* via = mNetPointToBeRemoved.getVia(); Q_ASSERT(via);
+        if (!mResultingNetPoint.isAttached()) {
+            Q_ASSERT(!mResultingNetPoint.getVia());
+            execNewChildCmd(new CmdBoardNetSegmentRemove(mResultingNetPoint.getNetSegment())); // can throw
+            CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(mResultingNetPoint);
+            cmd->setViaToAttach(via);
+            execNewChildCmd(cmd); // can throw
+            execNewChildCmd(new CmdBoardNetSegmentAdd(mResultingNetPoint.getNetSegment())); // can throw
+        } else {
+            throw RuntimeError(__FILE__, __LINE__, tr("Could not combine two "
+                "schematic netpoints because both are attached to a pad or via."));
+        }
+    }
 
     undoScopeGuard.dismiss(); // no undo required
     return true;

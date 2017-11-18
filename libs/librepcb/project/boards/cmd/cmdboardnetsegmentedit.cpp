@@ -21,9 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardviaadd.h"
-#include "../board.h"
-#include "../items/bi_via.h"
+#include "cmdboardnetsegmentedit.h"
+#include "../items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -35,49 +34,45 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardViaAdd::CmdBoardViaAdd(BI_Via& via) noexcept :
-    UndoCommand(tr("Add via")),
-    mBoard(via.getBoard()), mPosition(), mShape(), mSize(), mDrillDiameter(),
-    mNetSignal(nullptr), mVia(&via)
+CmdBoardNetSegmentEdit::CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept :
+    UndoCommand(tr("Edit net segment")), mNetSegment(netsegment),
+    mOldNetSignal(&netsegment.getNetSignal()), mNewNetSignal(mOldNetSignal)
 {
 }
 
-CmdBoardViaAdd::CmdBoardViaAdd(Board& board, const Point& position, BI_Via::Shape shape,
-        const Length& size, const Length& drillDiameter, NetSignal* netsignal) noexcept :
-    UndoCommand(tr("Add via")),
-    mBoard(board), mPosition(position), mShape(shape), mSize(size),
-    mDrillDiameter(drillDiameter), mNetSignal(netsignal), mVia(nullptr)
+CmdBoardNetSegmentEdit::~CmdBoardNetSegmentEdit() noexcept
 {
 }
 
-CmdBoardViaAdd::~CmdBoardViaAdd() noexcept
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void CmdBoardNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept
 {
+    Q_ASSERT(!wasEverExecuted());
+    mNewNetSignal = &netsignal;
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdBoardViaAdd::performExecute()
+bool CmdBoardNetSegmentEdit::performExecute()
 {
-    if (!mVia) {
-        // create new via
-        mVia = new BI_Via(mBoard, mPosition, mShape, mSize, mDrillDiameter, mNetSignal);
-    }
-
     performRedo(); // can throw
 
-    return true;
+    return (mNewNetSignal != mOldNetSignal);
 }
 
-void CmdBoardViaAdd::performUndo()
+void CmdBoardNetSegmentEdit::performUndo()
 {
-    mBoard.removeVia(*mVia); // can throw
+    mNetSegment.setNetSignal(*mOldNetSignal); // can throw
 }
 
-void CmdBoardViaAdd::performRedo()
+void CmdBoardNetSegmentEdit::performRedo()
 {
-    mBoard.addVia(*mVia); // can throw
+    mNetSegment.setNetSignal(*mNewNetSignal); // can throw
 }
 
 /*****************************************************************************************

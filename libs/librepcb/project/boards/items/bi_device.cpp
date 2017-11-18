@@ -201,29 +201,29 @@ void BI_Device::setIsMirrored(bool mirror)
     }
 }
 
-void BI_Device::addToBoard(GraphicsScene& scene)
+void BI_Device::addToBoard()
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
     mCompInstance->registerDevice(*this); // can throw
     auto sg = scopeGuard([&](){mCompInstance->unregisterDevice(*this);});
-    mFootprint->addToBoard(scene); // can throw
+    mFootprint->addToBoard(); // can throw
     sg.dismiss();
-    BI_Base::addToBoard();
+    BI_Base::addToBoard(nullptr);
     updateErcMessages();
 }
 
-void BI_Device::removeFromBoard(GraphicsScene& scene)
+void BI_Device::removeFromBoard()
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mFootprint->removeFromBoard(scene); // can throw
-    auto sg = scopeGuard([&](){mFootprint->addToBoard(scene);});
+    mFootprint->removeFromBoard(); // can throw
+    auto sg = scopeGuard([&](){mFootprint->addToBoard();});
     mCompInstance->unregisterDevice(*this); // can throw
     sg.dismiss();
-    BI_Base::removeFromBoard();
+    BI_Base::removeFromBoard(nullptr);
     updateErcMessages();
 }
 

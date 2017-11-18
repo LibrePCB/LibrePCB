@@ -39,6 +39,8 @@ namespace project {
 class Circuit;
 class Board;
 class BI_NetPoint;
+class BI_NetSegment;
+class NetSignal;
 
 namespace editor {
 
@@ -67,8 +69,10 @@ class CmdPlaceBoardNetPoint final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
+        BI_NetSegment& createNewNetSegment(NetSignal& netsignal);
         BI_NetPoint* createNewNetPoint();
         BI_NetPoint* createNewNetPointAtPad();
+        BI_NetPoint* createNewNetPointInLine();
 
 
         // Attributes from the constructor

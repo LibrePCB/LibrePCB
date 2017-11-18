@@ -27,11 +27,10 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/cmd/cmdboardviaremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -80,11 +79,8 @@ bool CmdDetachBoardNetPointFromViaOrPad::performExecute()
 
 void CmdDetachBoardNetPointFromViaOrPad::detachNetPoint()
 {
-    // disconnect all netlines
-    QList<BI_NetLine*> netlines = mNetPoint.getLines();
-    foreach (BI_NetLine* netline, netlines) {
-        execNewChildCmd(new CmdBoardNetLineRemove(*netline));
-    }
+    // disconnect whole netsegment
+    execNewChildCmd(new CmdBoardNetSegmentRemove(mNetPoint.getNetSegment()));
 
     // detach netpoint from via or pad
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(mNetPoint);
@@ -92,40 +88,25 @@ void CmdDetachBoardNetPointFromViaOrPad::detachNetPoint()
     cmd->setPadToAttach(nullptr);
     execNewChildCmd(cmd); // can throw
 
-    // re-connect all netlines
-    foreach (BI_NetLine* netline, netlines) {
-        execNewChildCmd(new CmdBoardNetLineAdd(*netline));
-    }
+    // re-connect whole netsegment
+    execNewChildCmd(new CmdBoardNetSegmentAdd(mNetPoint.getNetSegment()));
 }
 
 void CmdDetachBoardNetPointFromViaOrPad::removeNetPointWithAllNetlines()
 {
+    // remove the netpoint itself
+    QScopedPointer<CmdBoardNetSegmentRemoveElements> cmd(
+        new CmdBoardNetSegmentRemoveElements(mNetPoint.getNetSegment()));
+    cmd->removeNetPoint(mNetPoint);
+
     // remove all connected netlines
     foreach (BI_NetLine* netline, mNetPoint.getLines()) { Q_ASSERT(netline);
-        removeNetLineWithUnusedNetpoints(*netline); // can throw
+        cmd->removeNetLine(*netline);
+        BI_NetPoint* other = netline->getOtherPoint(mNetPoint); Q_ASSERT(other);
+        if (other->getLines().count() <= 1) { cmd->removeNetPoint(*other); }
     }
 
-    // remove the netpoint itself if not already done
-    if (mNetPoint.isAddedToBoard()) {
-        execNewChildCmd(new CmdBoardNetPointRemove(mNetPoint)); // can throw
-    }
-}
-
-void CmdDetachBoardNetPointFromViaOrPad::removeNetLineWithUnusedNetpoints(BI_NetLine& l)
-{
-    // remove the netline itself
-    execNewChildCmd(new CmdBoardNetLineRemove(l)); // can throw
-
-    // remove endpoints of the netline which are no longer required
-    removeNetpointIfUnused(l.getStartPoint()); // can throw
-    removeNetpointIfUnused(l.getEndPoint()); // can throw
-}
-
-void CmdDetachBoardNetPointFromViaOrPad::removeNetpointIfUnused(BI_NetPoint& p)
-{
-    if (p.getLines().count() == 0) {
-        execNewChildCmd(new CmdBoardNetPointRemove(p)); // can throw
-    }
+    execNewChildCmd(cmd.take()); // can throw
 }
 
 /*****************************************************************************************

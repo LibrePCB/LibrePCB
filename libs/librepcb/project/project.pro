@@ -24,18 +24,18 @@ SOURCES += \
     boards/board.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
+    boards/boardselectionquery.cpp \
     boards/boardusersettings.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/cmd/cmdboarddesignrulesmodify.cpp \
     boards/cmd/cmdboardlayerstackedit.cpp \
-    boards/cmd/cmdboardnetlineadd.cpp \
-    boards/cmd/cmdboardnetlineremove.cpp \
-    boards/cmd/cmdboardnetpointadd.cpp \
     boards/cmd/cmdboardnetpointedit.cpp \
-    boards/cmd/cmdboardnetpointremove.cpp \
-    boards/cmd/cmdboardviaadd.cpp \
+    boards/cmd/cmdboardnetsegmentadd.cpp \
+    boards/cmd/cmdboardnetsegmentaddelements.cpp \
+    boards/cmd/cmdboardnetsegmentedit.cpp \
+    boards/cmd/cmdboardnetsegmentremove.cpp \
+    boards/cmd/cmdboardnetsegmentremoveelements.cpp \
     boards/cmd/cmdboardviaedit.cpp \
-    boards/cmd/cmdboardviaremove.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
     boards/cmd/cmddeviceinstanceedit.cpp \
     boards/cmd/cmddeviceinstanceremove.cpp \
@@ -52,6 +52,7 @@ SOURCES += \
     boards/items/bi_footprintpad.cpp \
     boards/items/bi_netline.cpp \
     boards/items/bi_netpoint.cpp \
+    boards/items/bi_netsegment.cpp \
     boards/items/bi_polygon.cpp \
     boards/items/bi_via.cpp \
     circuit/circuit.cpp \
@@ -114,18 +115,18 @@ HEADERS += \
     boards/board.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
+    boards/boardselectionquery.h \
     boards/boardusersettings.h \
     boards/cmd/cmdboardadd.h \
     boards/cmd/cmdboarddesignrulesmodify.h \
     boards/cmd/cmdboardlayerstackedit.h \
-    boards/cmd/cmdboardnetlineadd.h \
-    boards/cmd/cmdboardnetlineremove.h \
-    boards/cmd/cmdboardnetpointadd.h \
     boards/cmd/cmdboardnetpointedit.h \
-    boards/cmd/cmdboardnetpointremove.h \
-    boards/cmd/cmdboardviaadd.h \
+    boards/cmd/cmdboardnetsegmentadd.h \
+    boards/cmd/cmdboardnetsegmentaddelements.h \
+    boards/cmd/cmdboardnetsegmentedit.h \
+    boards/cmd/cmdboardnetsegmentremove.h \
+    boards/cmd/cmdboardnetsegmentremoveelements.h \
     boards/cmd/cmdboardviaedit.h \
-    boards/cmd/cmdboardviaremove.h \
     boards/cmd/cmddeviceinstanceadd.h \
     boards/cmd/cmddeviceinstanceedit.h \
     boards/cmd/cmddeviceinstanceremove.h \
@@ -142,6 +143,7 @@ HEADERS += \
     boards/items/bi_footprintpad.h \
     boards/items/bi_netline.h \
     boards/items/bi_netpoint.h \
+    boards/items/bi_netsegment.h \
     boards/items/bi_polygon.h \
     boards/items/bi_via.h \
     circuit/circuit.h \

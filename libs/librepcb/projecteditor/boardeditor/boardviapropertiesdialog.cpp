@@ -25,8 +25,6 @@
 #include "boardviapropertiesdialog.h"
 #include "ui_boardviapropertiesdialog.h"
 #include <librepcb/common/undostack.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
@@ -69,13 +67,7 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project& project, BI_Via& via
     mUi->spbxDrillDiameter->setValue(mVia.getDrillDiameter().toMm());
 
     // netsignal combobox
-    mUi->cbxNetSignal->addItem("");
-    foreach (NetSignal* netsignal, mProject.getCircuit().getNetSignals()) {
-        mUi->cbxNetSignal->addItem(netsignal->getName());
-    }
-    QString netsignal = mVia.getNetSignal() ? mVia.getNetSignal()->getName() : "";
-    mUi->cbxNetSignal->setCurrentText(netsignal);
-    mUi->cbxNetSignal->model()->sort(0);
+    mUi->lblNetSignal->setText(mVia.getNetSignalOfNetSegment().getName());
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept
@@ -116,25 +108,16 @@ void BoardViaPropertiesDialog::accept()
 
 bool BoardViaPropertiesDialog::applyChanges() noexcept
 {
-    try
-    {
-        QString netsignalStr = mUi->cbxNetSignal->currentText();
-        NetSignal* netsignal = mProject.getCircuit().getNetSignalByName(netsignalStr);
-        if ((!netsignal) && (!netsignalStr.isEmpty())) {
-            throw RuntimeError(__FILE__, __LINE__, tr("Invalid net signal."));
-        }
+    try {
         QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
         cmd->setShape(static_cast<BI_Via::Shape>(mUi->cbxShape->currentData().toInt()), false);
         cmd->setPosition(Point(Length::fromMm(mUi->spbxPosX->value()),
                                Length::fromMm(mUi->spbxPosY->value())), false);
         cmd->setSize(Length::fromMm(mUi->spbxSize->value()), false);
         cmd->setDrillDiameter(Length::fromMm(mUi->spbxDrillDiameter->value()), false);
-        cmd->setNetSignal(netsignal, false); // can throw
         mUndoStack.execCmd(cmd.take());
         return true;
-    }
-    catch (Exception& e)
-    {
+    } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }

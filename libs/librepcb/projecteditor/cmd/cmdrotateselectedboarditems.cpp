@@ -32,6 +32,7 @@
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/boardselectionquery.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -60,53 +61,52 @@ CmdRotateSelectedBoardItems::~CmdRotateSelectedBoardItems() noexcept
 bool CmdRotateSelectedBoardItems::performExecute()
 {
     // get all selected items
-    QList<BI_Base*> items = mBoard.getSelectedItems(true, false, true, false, true, false,
-                                                    false, false, false, false, false, false);
-
-    // no items selected --> nothing to do here
-    if (items.isEmpty()) {
-        return false;
-    }
+    std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
+    query->addSelectedFootprints();
+    query->addSelectedVias();
+    query->addSelectedNetPoints(BoardSelectionQuery::NetPointFilter::Floating);
+    query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
+                                  BoardSelectionQuery::NetPointFilter::Floating);
 
     // find the center of all elements
     Point center = Point(0, 0);
-    foreach (BI_Base* item, items) {
-        center += item->getPosition();
+    int count = 0;
+    foreach (BI_Footprint* footprint, query->getFootprints()) {
+        center += footprint->getPosition();
+        ++count;
     }
-    center /= items.count();
-    center.mapToGrid(mBoard.getGridProperties().getInterval());
+    foreach (BI_Via* via, query->getVias()) {
+        center += via->getPosition();
+        ++count;
+    }
+    foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
+        center += netpoint->getPosition();
+        ++count;
+    }
+    if (count > 0) {
+        center /= count;
+        center.mapToGrid(mBoard.getGridProperties().getInterval());
+    } else {
+        // no items selected --> nothing to do here
+        return false;
+    }
 
     // rotate all selected elements
-    foreach (BI_Base* item, items) {
-        switch (item->getType())
-        {
-            case BI_Base::Type_t::Footprint: {
-                BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item); Q_ASSERT(footprint);
-                BI_Device& device = footprint->getDeviceInstance();
-                CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
-                cmd->rotate(mAngle, center, false);
-                appendChild(cmd);
-                break;
-            }
-            case BI_Base::Type_t::Via: {
-                BI_Via* via = dynamic_cast<BI_Via*>(item); Q_ASSERT(via);
-                CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
-                cmd->setPosition(via->getPosition().rotated(mAngle, center), false);
-                appendChild(cmd);
-                break;
-            }
-            case BI_Base::Type_t::NetPoint: {
-                BI_NetPoint* point = dynamic_cast<BI_NetPoint*>(item); Q_ASSERT(point);
-                CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*point);
-                cmd->setPosition(point->getPosition().rotated(mAngle, center), false);
-                appendChild(cmd);
-                break;
-            }
-            default: {
-                qCritical() << "Unknown board item type:" << static_cast<int>(item->getType());
-                break;
-            }
-        }
+    foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
+        BI_Device& device = footprint->getDeviceInstance();
+        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
+        cmd->rotate(mAngle, center, false);
+        appendChild(cmd);
+    }
+    foreach (BI_Via* via, query->getVias()) { Q_ASSERT(via);
+        CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
+        cmd->setPosition(via->getPosition().rotated(mAngle, center), false);
+        appendChild(cmd);
+    }
+    foreach (BI_NetPoint* netpoint, query->getNetPoints()) { Q_ASSERT(netpoint);
+        CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
+        cmd->setPosition(netpoint->getPosition().rotated(mAngle, center), false);
+        appendChild(cmd);
     }
 
     // execute all child commands

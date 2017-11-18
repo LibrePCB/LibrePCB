@@ -45,6 +45,7 @@ class NetSignal;
 class BI_NetLine;
 class BI_Footprint;
 class BI_FootprintPad;
+class BI_NetSegment;
 class BI_Via;
 class ErcMsg;
 
@@ -66,15 +67,12 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         // Constructors / Destructor
         BI_NetPoint() = delete;
         BI_NetPoint(const BI_NetPoint& other) = delete;
-        BI_NetPoint(Board& board, const BI_NetPoint& other, BI_FootprintPad* pad,
+        BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other, BI_FootprintPad* pad,
                     BI_Via* via);
-        BI_NetPoint(Board& board, const SExpression& node);
-        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                    const Point& position);
-        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                    BI_FootprintPad& pad);
-        BI_NetPoint(Board& board, GraphicsLayer& layer, NetSignal& netsignal,
-                    BI_Via& via);
+        BI_NetPoint(BI_NetSegment& segment, const SExpression& node);
+        BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, const Point& position);
+        BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, BI_FootprintPad& pad);
+        BI_NetPoint(BI_NetSegment& segment, GraphicsLayer& layer, BI_Via& via);
         ~BI_NetPoint() noexcept;
 
         // Getters
@@ -83,7 +81,8 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         bool isAttachedToPad() const noexcept {return (mFootprintPad ? true : false);}
         bool isAttachedToVia() const noexcept {return (mVia ? true : false);}
         bool isAttached() const noexcept {return (isAttachedToPad() || isAttachedToVia());}
-        NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
+        BI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
+        NetSignal& getNetSignalOfNetSegment() const noexcept;
         BI_FootprintPad* getFootprintPad() const noexcept {return mFootprintPad;}
         BI_Via* getVia() const noexcept {return mVia;}
         const QList<BI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}
@@ -92,16 +91,14 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         bool isSelectable() const noexcept override;
 
         // Setters
-
         void setLayer(GraphicsLayer& layer);
-        void setNetSignal(NetSignal& netsignal);
         void setPadToAttach(BI_FootprintPad* pad);
         void setViaToAttach(BI_Via* via);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
         void registerNetLine(BI_NetLine& netline);
         void unregisterNetLine(BI_NetLine& netline);
         void updateLines() const noexcept;
@@ -135,10 +132,10 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
+        BI_NetSegment& mNetSegment;
         Uuid mUuid;
         Point mPosition;
         GraphicsLayer* mLayer;
-        NetSignal* mNetSignal;
         BI_FootprintPad* mFootprintPad; ///< only needed if the netpoint is attached to a pad
         BI_Via* mVia;                   ///< only needed if the netpoint is attached to a via
 

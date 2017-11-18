@@ -21,31 +21,27 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdremoveviafromboard.h"
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/boards/cmd/cmdboardviaremove.h>
-#include "cmddetachboardnetpointfromviaorpad.h"
+#include "cmdboardnetsegmentremove.h"
+#include "../board.h"
+#include "../items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
-namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdRemoveViaFromBoard::CmdRemoveViaFromBoard(BI_Via& via) noexcept :
-    UndoCommandGroup(tr("Remove via from board")),
-    mVia(via)
+CmdBoardNetSegmentRemove::CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept :
+    UndoCommand(tr("Remove net segment")),
+    mBoard(segment.getBoard()), mNetSegment(segment)
 {
 }
 
-CmdRemoveViaFromBoard::~CmdRemoveViaFromBoard() noexcept
+CmdBoardNetSegmentRemove::~CmdBoardNetSegmentRemove() noexcept
 {
 }
 
@@ -53,27 +49,26 @@ CmdRemoveViaFromBoard::~CmdRemoveViaFromBoard() noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdRemoveViaFromBoard::performExecute()
+bool CmdBoardNetSegmentRemove::performExecute()
 {
-    // if an error occurs, undo all already executed child commands
-    auto undoScopeGuard = scopeGuard([&](){performUndo();});
+    performRedo(); // can throw
 
-    // detach all used netpoints && remove all unused netpoints + netlines
-    foreach (BI_NetPoint* netpoint, mVia.getNetPoints()) { Q_ASSERT(netpoint);
-        execNewChildCmd(new CmdDetachBoardNetPointFromViaOrPad(*netpoint)); // can throw
-    }
+    return true;
+}
 
-    // remove the via itself
-    execNewChildCmd(new CmdBoardViaRemove(mVia)); // can throw
+void CmdBoardNetSegmentRemove::performUndo()
+{
+    mBoard.addNetSegment(mNetSegment); // can throw
+}
 
-    undoScopeGuard.dismiss(); // no undo required
-    return (getChildCount() > 0);
+void CmdBoardNetSegmentRemove::performRedo()
+{
+    mBoard.removeNetSegment(mNetSegment); // can throw
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb

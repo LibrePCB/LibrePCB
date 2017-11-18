@@ -56,6 +56,7 @@ class BI_Base : public QObject
 
         // Types
         enum class Type_t {
+            NetSegment,     ///< librepcb#project#BI_NetSegment
             NetPoint,       ///< librepcb#project#BI_NetPoint
             NetLine,        ///< librepcb#project#BI_NetLine
             Via,            ///< librepcb#project#BI_Via
@@ -87,8 +88,8 @@ class BI_Base : public QObject
         virtual void setSelected(bool selected) noexcept;
 
         // General Methods
-        virtual void addToBoard(GraphicsScene& scene) = 0;
-        virtual void removeFromBoard(GraphicsScene& scene) = 0;
+        virtual void addToBoard() = 0;
+        virtual void removeFromBoard() = 0;
 
         // Operator Overloadings
         BI_Base& operator=(const BI_Base& rhs) = delete;
@@ -97,10 +98,8 @@ class BI_Base : public QObject
     protected:
 
         // General Methods
-        void addToBoard() noexcept;
-        void removeFromBoard() noexcept;
-        void addToBoard(GraphicsScene& scene, BGI_Base& item) noexcept;
-        void removeFromBoard(GraphicsScene& scene, BGI_Base& item) noexcept;
+        void addToBoard(BGI_Base* item) noexcept;
+        void removeFromBoard(BGI_Base* item) noexcept;
 
 
     protected:

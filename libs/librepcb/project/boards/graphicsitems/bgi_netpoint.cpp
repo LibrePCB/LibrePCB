@@ -65,6 +65,8 @@ bool BGI_NetPoint::isSelectable() const noexcept
 
 void BGI_NetPoint::updateCacheAndRepaint() noexcept
 {
+    setToolTip(mNetPoint.getNetSignalOfNetSegment().getName());
+
     prepareGeometryChange();
 
     // set Z value
@@ -85,7 +87,7 @@ void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignal().isHighlighted();
+    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
 #ifdef QT_DEBUG
     GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);

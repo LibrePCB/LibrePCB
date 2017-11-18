@@ -68,8 +68,6 @@ class CmdDetachBoardNetPointFromViaOrPad final : public UndoCommandGroup
         // Helper Methods
         void detachNetPoint();
         void removeNetPointWithAllNetlines();
-        void removeNetLineWithUnusedNetpoints(BI_NetLine& l);
-        void removeNetpointIfUnused(BI_NetPoint& p);
 
 
         // Private Member Variables

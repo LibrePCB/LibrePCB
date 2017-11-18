@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDBOARDVIAREMOVE_H
-#define LIBREPCB_PROJECT_CMDBOARDVIAREMOVE_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADD_H
+#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADD_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,23 +32,28 @@
 namespace librepcb {
 namespace project {
 
+class NetSignal;
 class Board;
-class BI_Via;
+class BI_NetSegment;
 
 /*****************************************************************************************
- *  Class CmdBoardViaRemove
+ *  Class CmdBoardNetSegmentAdd
  ****************************************************************************************/
 
 /**
- * @brief The CmdBoardViaRemove class
+ * @brief The CmdBoardNetSegmentAdd class
  */
-class CmdBoardViaRemove final : public UndoCommand
+class CmdBoardNetSegmentAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        explicit CmdBoardViaRemove(BI_Via& via) noexcept;
-        ~CmdBoardViaRemove() noexcept;
+        explicit CmdBoardNetSegmentAdd(BI_NetSegment& segment) noexcept;
+        CmdBoardNetSegmentAdd(Board& board, NetSignal& netsignal) noexcept;
+        ~CmdBoardNetSegmentAdd() noexcept;
+
+        // Getters
+        BI_NetSegment* getNetSegment() const noexcept {return mNetSegment;}
 
 
     private:
@@ -68,7 +73,8 @@ class CmdBoardViaRemove final : public UndoCommand
         // Private Member Variables
 
         Board& mBoard;
-        BI_Via& mVia;
+        NetSignal& mNetSignal;
+        BI_NetSegment* mNetSegment;
 };
 
 /*****************************************************************************************
@@ -78,4 +84,4 @@ class CmdBoardViaRemove final : public UndoCommand
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDVIAREMOVE_H
+#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADD_H

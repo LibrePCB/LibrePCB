@@ -116,6 +116,10 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
         ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
 
 
+    signals:
+        void netSignalChanged(NetSignal* netsignal);
+
+
     private slots:
 
         void netSignalNameChanged(const QString& newName) noexcept;

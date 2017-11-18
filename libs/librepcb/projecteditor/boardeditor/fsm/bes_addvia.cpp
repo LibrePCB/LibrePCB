@@ -28,7 +28,10 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/cmd/cmdboardviaadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/circuit/circuit.h>
@@ -85,8 +88,11 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     // clear board selection because selection does not make sense in this state
     board->clearSelection();
 
-    // reset current via settings
-    mCurrentViaNetSignal = nullptr;
+    // get most used net signal
+    if (!mCurrentViaNetSignal) {
+        mCurrentViaNetSignal = mCircuit.getNetSignalWithMostElements();
+    }
+    if (!mCurrentViaNetSignal) return false;
 
     // add a new via
     if (!addVia(*board)) return false;
@@ -163,7 +169,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
     mNetSignalComboBox->setEditable(false);
-    mNetSignalComboBox->addItem(""); // no netsignal
     foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
         mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
     mNetSignalComboBox->model()->sort(0);
@@ -171,7 +176,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
     connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
             [this](const QString& value)
-            {mCurrentViaNetSignal = mEditor.getProject().getCircuit().getNetSignalByName(value);});
+            {setNetSignal(mEditor.getProject().getCircuit().getNetSignalByName(value));});
 
     return true;
 }
@@ -279,16 +284,20 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept
 bool BES_AddVia::addVia(Board& board) noexcept
 {
     Q_ASSERT(mUndoCmdActive == false);
+    Q_ASSERT(mCurrentViaNetSignal);
 
     try
     {
         mUndoStack.beginCmdGroup(tr("Add via to board"));
         mUndoCmdActive = true;
-        CmdBoardViaAdd* cmdAdd = new CmdBoardViaAdd(board, Point(0, 0), mCurrentViaShape,
-            mCurrentViaSize, mCurrentViaDrillDiameter, mCurrentViaNetSignal);
-        mUndoStack.appendToCmdGroup(cmdAdd);
-        mCurrentVia = cmdAdd->getVia();
-        mEditCmd.reset(new CmdBoardViaEdit(*mCurrentVia));
+        CmdBoardNetSegmentAdd* cmdAddSeg = new CmdBoardNetSegmentAdd(board, *mCurrentViaNetSignal);
+        mUndoStack.appendToCmdGroup(cmdAddSeg);
+        BI_NetSegment* netsegment = cmdAddSeg->getNetSegment(); Q_ASSERT(netsegment);
+        CmdBoardNetSegmentAddElements* cmdAddVia = new CmdBoardNetSegmentAddElements(*netsegment);
+        mCurrentVia = cmdAddVia->addVia(Point(0, 0), mCurrentViaShape, mCurrentViaSize,
+                                        mCurrentViaDrillDiameter); Q_ASSERT(mCurrentVia);
+        mUndoStack.appendToCmdGroup(cmdAddVia);
+        mViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentVia));
         return true;
     }
     catch (Exception& e)
@@ -310,11 +319,10 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept
 
     try
     {
-        mEditCmd->setPosition(pos, true);
-        mEditCmd->setShape(mCurrentViaShape, true);
-        mEditCmd->setSize(mCurrentViaSize, true);
-        mEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
-        mEditCmd->setNetSignal(mCurrentViaNetSignal, true); // can throw
+        mViaEditCmd->setPosition(pos, true);
+        mViaEditCmd->setShape(mCurrentViaShape, true);
+        mViaEditCmd->setSize(mCurrentViaSize, true);
+        mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
         return true;
     }
     catch (Exception& e)
@@ -330,8 +338,8 @@ bool BES_AddVia::fixVia(const Point& pos) noexcept
 
     try
     {
-        mEditCmd->setPosition(pos, false);
-        mUndoStack.appendToCmdGroup(mEditCmd.take());
+        mViaEditCmd->setPosition(pos, false);
+        mUndoStack.appendToCmdGroup(mViaEditCmd.take());
         mUndoStack.commitCmdGroup();
         mUndoCmdActive = false;
         return true;
@@ -354,6 +362,21 @@ void BES_AddVia::updateShapeActionsCheckedState() noexcept
     {
         mShapeActions.value(key)->setCheckable(key == static_cast<int>(mCurrentViaShape));
         mShapeActions.value(key)->setChecked(key == static_cast<int>(mCurrentViaShape));
+    }
+}
+
+void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept
+{
+    try {
+        if (!netsignal) throw LogicError(__FILE__, __LINE__);
+        mCurrentViaNetSignal = netsignal;
+        mUndoStack.appendToCmdGroup(new CmdBoardNetSegmentRemove(mCurrentVia->getNetSegment()));
+        CmdBoardNetSegmentEdit* cmdEdit = new CmdBoardNetSegmentEdit(mCurrentVia->getNetSegment());
+        cmdEdit->setNetSignal(*mCurrentViaNetSignal);
+        mUndoStack.appendToCmdGroup(cmdEdit);
+        mUndoStack.appendToCmdGroup(new CmdBoardNetSegmentAdd(mCurrentVia->getNetSegment()));
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     }
 }
 

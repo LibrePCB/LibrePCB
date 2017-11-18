@@ -66,6 +66,8 @@ bool BGI_NetLine::isSelectable() const noexcept
 
 void BGI_NetLine::updateCacheAndRepaint() noexcept
 {
+    setToolTip(mNetLine.getNetSignalOfNetSegment().getName());
+
     prepareGeometryChange();
 
     // set Z value
@@ -99,7 +101,7 @@ void BGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    bool highlight = mNetLine.isSelected() || mNetLine.getNetSignal().isHighlighted();
+    bool highlight = mNetLine.isSelected() || mNetLine.getNetSignalOfNetSegment().isHighlighted();
 
     // draw line
     if (mLayer->isVisible())

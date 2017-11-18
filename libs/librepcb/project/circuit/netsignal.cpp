@@ -28,8 +28,7 @@
 #include "../erc/ercmsg.h"
 #include "componentsignalinstance.h"
 #include "../schematics/items/si_netsegment.h"
-#include "../boards/items/bi_netpoint.h"
-#include "../boards/items/bi_via.h"
+#include "../boards/items/bi_netsegment.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -81,8 +80,7 @@ int NetSignal::getRegisteredElementsCount() const noexcept
     int count = 0;
     count += mRegisteredComponentSignals.count();
     count += mRegisteredSchematicNetSegments.count();
-    count += mRegisteredBoardNetPoints.count();
-    count += mRegisteredBoardVias.count();
+    count += mRegisteredBoardNetSegments.count();
     return count;
 }
 
@@ -197,43 +195,23 @@ void NetSignal::unregisterSchematicNetSegment(SI_NetSegment& netsegment)
     updateErcMessages();
 }
 
-void NetSignal::registerBoardNetPoint(BI_NetPoint& netpoint)
+void NetSignal::registerBoardNetSegment(BI_NetSegment& netsegment)
 {
-    if ((!mIsAddedToCircuit) || (mRegisteredBoardNetPoints.contains(&netpoint))
-        || (netpoint.getCircuit() != mCircuit))
+    if ((!mIsAddedToCircuit) || (mRegisteredBoardNetSegments.contains(&netsegment))
+        || (netsegment.getCircuit() != mCircuit))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredBoardNetPoints.append(&netpoint);
+    mRegisteredBoardNetSegments.append(&netsegment);
     updateErcMessages();
 }
 
-void NetSignal::unregisterBoardNetPoint(BI_NetPoint& netpoint)
+void NetSignal::unregisterBoardNetSegment(BI_NetSegment& netsegment)
 {
-    if ((!mIsAddedToCircuit) || (!mRegisteredBoardNetPoints.contains(&netpoint))) {
+    if ((!mIsAddedToCircuit) || (!mRegisteredBoardNetSegments.contains(&netsegment))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredBoardNetPoints.removeOne(&netpoint);
-    updateErcMessages();
-}
-
-void NetSignal::registerBoardVia(BI_Via& via)
-{
-    if ((!mIsAddedToCircuit) || (mRegisteredBoardVias.contains(&via))
-        || (via.getCircuit() != mCircuit))
-    {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredBoardVias.append(&via);
-    updateErcMessages();
-}
-
-void NetSignal::unregisterBoardVia(BI_Via& via)
-{
-    if ((!mIsAddedToCircuit) || (!mRegisteredBoardVias.contains(&via))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredBoardVias.removeOne(&via);
+    mRegisteredBoardNetSegments.removeOne(&netsegment);
     updateErcMessages();
 }
 

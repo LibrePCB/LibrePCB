@@ -40,6 +40,7 @@ namespace project {
 
 class NetSignal;
 class BI_NetPoint;
+class BI_NetSegment;
 
 /*****************************************************************************************
  *  Class BI_NetLine
@@ -57,19 +58,19 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         // Constructors / Destructor
         BI_NetLine() = delete;
         BI_NetLine(const BI_NetLine& other) = delete;
-        BI_NetLine(Board& board, const BI_NetLine& other, BI_NetPoint& startPoint,
-                   BI_NetPoint& endPoint);
-        BI_NetLine(Board& board, const SExpression& node);
-        BI_NetLine(Board& board, BI_NetPoint& startPoint, BI_NetPoint& endPoint,
-                   const Length& width);
+        BI_NetLine(const BI_NetLine& other, BI_NetPoint& startPoint, BI_NetPoint& endPoint);
+        BI_NetLine(BI_NetSegment& segment, const SExpression& node);
+        BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const Length& width);
         ~BI_NetLine() noexcept;
 
         // Getters
+        BI_NetSegment& getNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Length& getWidth() const noexcept {return mWidth;}
         BI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         BI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
-        NetSignal& getNetSignal() const noexcept;
+        BI_NetPoint* getOtherPoint(const BI_NetPoint& firstPoint) const noexcept;
+        NetSignal& getNetSignalOfNetSegment() const noexcept;
         GraphicsLayer& getLayer() const noexcept;
         bool isAttached() const noexcept;
         bool isAttachedToFootprint() const noexcept;
@@ -80,8 +81,8 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         void setWidth(const Length& width) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
         void updateLine() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()

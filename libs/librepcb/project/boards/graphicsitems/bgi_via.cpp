@@ -76,7 +76,7 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
-    setToolTip(mVia.getNetSignal() ? mVia.getNetSignal()->getName() : QString());
+    setToolTip(mVia.getNetSignalOfNetSegment().getName());
 
     mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
@@ -105,8 +105,8 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    NetSignal* netsignal = mVia.getNetSignal();
-    bool highlight = mVia.isSelected() || (netsignal && netsignal->isHighlighted());
+    NetSignal& netsignal = mVia.getNetSignalOfNetSegment();
+    bool highlight = mVia.isSelected() || (netsignal.isHighlighted());
 
     if (mDrawStopMask && mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
         // draw bottom stop mask
@@ -122,11 +122,9 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
         painter->drawPath(mVia.toQPainterPathPx(Length(0), true));
 
         // draw netsignal name
-        if (netsignal) {
-            painter->setFont(mFont);
-            painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-            painter->drawText(mBoundingRect, Qt::AlignCenter, netsignal->getName());
-        }
+        painter->setFont(mFont);
+        painter->setPen(mViaLayer->getColor(highlight).lighter(150));
+        painter->drawText(mBoundingRect, Qt::AlignCenter, netsignal.getName());
     }
 
     if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {

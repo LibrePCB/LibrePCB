@@ -136,31 +136,31 @@ bool BI_Footprint::isUsed() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Footprint::addToBoard(GraphicsScene& scene)
+void BI_Footprint::addToBoard()
 {
     if (isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
     ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
-        pad->addToBoard(scene); // can throw
-        sgl.add([pad, &scene](){pad->removeFromBoard(scene);});
+        pad->addToBoard(); // can throw
+        sgl.add([pad](){pad->removeFromBoard();});
     }
-    BI_Base::addToBoard(scene, *mGraphicsItem);
+    BI_Base::addToBoard(mGraphicsItem.data());
     sgl.dismiss();
 }
 
-void BI_Footprint::removeFromBoard(GraphicsScene& scene)
+void BI_Footprint::removeFromBoard()
 {
     if (!isAddedToBoard()) {
         throw LogicError(__FILE__, __LINE__);
     }
     ScopeGuardList sgl(mPads.count());
     foreach (BI_FootprintPad* pad, mPads) {
-        pad->removeFromBoard(scene); // can throw
-        sgl.add([pad, &scene](){pad->addToBoard(scene);});
+        pad->removeFromBoard(); // can throw
+        sgl.add([pad](){pad->addToBoard();});
     }
-    BI_Base::removeFromBoard(scene, *mGraphicsItem);
+    BI_Base::removeFromBoard(mGraphicsItem.data());
     sgl.dismiss();
 }
 

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDREMOVEVIAFROMBOARD_H
-#define LIBREPCB_PROJECT_CMDREMOVEVIAFROMBOARD_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
+#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,29 +32,30 @@
 namespace librepcb {
 namespace project {
 
+class BI_NetSegment;
 class BI_Via;
-
-namespace editor {
+class BI_NetPoint;
+class BI_NetLine;
 
 /*****************************************************************************************
- *  Class CmdRemoveViaFromBoard
+ *  Class CmdBoardNetSegmentRemoveElements
  ****************************************************************************************/
 
 /**
- * @brief The CmdRemoveViaFromBoard class
+ * @brief The CmdBoardNetSegmentRemoveElements class
  */
-class CmdRemoveViaFromBoard final : public UndoCommandGroup
+class CmdBoardNetSegmentRemoveElements final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdRemoveViaFromBoard() = delete;
-        CmdRemoveViaFromBoard(const CmdRemoveViaFromBoard& other) = delete;
-        CmdRemoveViaFromBoard(BI_Via& via) noexcept;
-        ~CmdRemoveViaFromBoard() noexcept;
+        CmdBoardNetSegmentRemoveElements(BI_NetSegment& segment) noexcept;
+        ~CmdBoardNetSegmentRemoveElements() noexcept;
 
-        // Operator Overloadings
-        CmdRemoveViaFromBoard& operator=(const CmdRemoveViaFromBoard& other) = delete;
+        // General Methods
+        void removeVia(BI_Via& via);
+        void removeNetPoint(BI_NetPoint& netpoint);
+        void removeNetLine(BI_NetLine& netline);
 
 
     private:
@@ -64,19 +65,25 @@ class CmdRemoveViaFromBoard final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
 
         // Private Member Variables
-
-        // Attributes from the constructor
-        BI_Via& mVia;
+        BI_NetSegment& mNetSegment;
+        QList<BI_Via*> mVias;
+        QList<BI_NetPoint*> mNetPoints;
+        QList<BI_NetLine*> mNetLines;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDREMOVEVIAFROMBOARD_H
+#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H

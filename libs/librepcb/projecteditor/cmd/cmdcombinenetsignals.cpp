@@ -28,13 +28,9 @@
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetlineremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcb/project/boards/cmd/cmdboardviaadd.h>
-#include <librepcb/project/boards/cmd/cmdboardviaremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
@@ -75,33 +71,16 @@ bool CmdCombineNetSignals::performExecute()
 
     // determine all elements which need to be removed temporary
     QList<SI_NetSegment*> schematicNetSegments = mNetSignalToRemove.getSchematicNetSegments();
-    QList<BI_Via*> boardVias = mNetSignalToRemove.getBoardVias();
-    QList<BI_NetPoint*> boardNetPoints = mNetSignalToRemove.getBoardNetPoints();
-    QSet<BI_NetLine*> boardNetLines;
-    foreach (BI_NetPoint* netpoint, boardNetPoints) { Q_ASSERT(netpoint);
-        foreach (BI_NetLine* netline, netpoint->getLines()) { Q_ASSERT(netline);
-            boardNetLines.insert(netline);
-        }
-    }
+    QList<BI_NetSegment*> boardNetSegments = mNetSignalToRemove.getBoardNetSegments();
 
     // remove all schematic netsegments
     foreach (SI_NetSegment* netsegment, schematicNetSegments) {
         execNewChildCmd(new CmdSchematicNetSegmentRemove(*netsegment));
     }
 
-    // remove all board netlines
-    foreach (BI_NetLine* netline, boardNetLines) {
-        execNewChildCmd(new CmdBoardNetLineRemove(*netline)); // can throw
-    }
-
-    // remove all board netpoints
-    foreach (BI_NetPoint* netpoint, boardNetPoints) {
-        execNewChildCmd(new CmdBoardNetPointRemove(*netpoint)); // can throw
-    }
-
-    // remove all board vias
-    foreach (BI_Via* via, boardVias) {
-        execNewChildCmd(new CmdBoardViaRemove(*via)); // can throw
+    // remove all board netsegments
+    foreach (BI_NetSegment* netsegment, boardNetSegments) {
+        execNewChildCmd(new CmdBoardNetSegmentRemove(*netsegment)); // can throw
     }
 
     // change netsignal of all component signal instances
@@ -109,25 +88,12 @@ bool CmdCombineNetSignals::performExecute()
         execNewChildCmd(new CmdCompSigInstSetNetSignal(*signal, &mResultingNetSignal)); // can throw
     }
 
-    // re-add all board vias
-    foreach (BI_Via* via, boardVias) {
-        CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
-        cmd->setNetSignal(&mResultingNetSignal, false);
-        execNewChildCmd(cmd); // can throw
-        execNewChildCmd(new CmdBoardViaAdd(*via)); // can throw
-    }
-
-    // re-add all board netpoints
-    foreach (BI_NetPoint* netpoint, boardNetPoints) {
-        CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
+    // re-add all board netsegments
+    foreach (BI_NetSegment* netsegment, boardNetSegments) {
+        CmdBoardNetSegmentEdit* cmd = new CmdBoardNetSegmentEdit(*netsegment);
         cmd->setNetSignal(mResultingNetSignal);
         execNewChildCmd(cmd); // can throw
-        execNewChildCmd(new CmdBoardNetPointAdd(*netpoint)); // can throw
-    }
-
-    // re-add all board netlines
-    foreach (BI_NetLine* netline, boardNetLines) {
-        execNewChildCmd(new CmdBoardNetLineAdd(*netline)); // can throw
+        execNewChildCmd(new CmdBoardNetSegmentAdd(*netsegment)); // can throw
     }
 
     // re-add all schematic netsegments

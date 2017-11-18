@@ -40,7 +40,7 @@ class BoardLayer;
 
 namespace project {
 
-class NetSignal;
+class BI_NetSegment;
 class BI_NetPoint;
 class ErcMsg;
 
@@ -63,18 +63,19 @@ class BI_Via final : public BI_Base, public SerializableObject
         // Constructors / Destructor
         BI_Via() = delete;
         BI_Via(const BI_Via& other) = delete;
-        BI_Via(Board& board, const BI_Via& other);
-        BI_Via(Board& board, const SExpression& node);
-        BI_Via(Board& board, const Point& position, BI_Via::Shape shape,
-               const Length& size, const Length& drillDiameter, NetSignal* netsignal);
+        BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
+        BI_Via(BI_NetSegment& netsegment, const SExpression& node);
+        BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+               const Length& size, const Length& drillDiameter);
         ~BI_Via() noexcept;
 
         // Getters
+        BI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
+        NetSignal& getNetSignalOfNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
         Shape getShape() const noexcept {return mShape;}
         const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
         const Length& getSize() const noexcept {return mSize;}
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
         const QMap<QString, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
         BI_NetPoint* getNetPointOfLayer(const QString& layerName) const noexcept {return mRegisteredNetPoints.value(layerName, nullptr);}
         bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
@@ -83,15 +84,14 @@ class BI_Via final : public BI_Base, public SerializableObject
         bool isSelectable() const noexcept override;
 
         // Setters
-        void setNetSignal(NetSignal* netsignal);
         void setPosition(const Point& position) noexcept;
         void setShape(Shape shape) noexcept;
         void setSize(const Length& size) noexcept;
         void setDrillDiameter(const Length& diameter) noexcept;
 
         // General Methods
-        void addToBoard(GraphicsScene& scene) override;
-        void removeFromBoard(GraphicsScene& scene) override;
+        void addToBoard() override;
+        void removeFromBoard() override;
         void registerNetPoint(BI_NetPoint& netpoint);
         void unregisterNetPoint(BI_NetPoint& netpoint);
         void updateNetPoints() const noexcept;
@@ -121,6 +121,7 @@ class BI_Via final : public BI_Base, public SerializableObject
 
 
         // General
+        BI_NetSegment& mNetSegment;
         QScopedPointer<BGI_Via> mGraphicsItem;
         QMetaObject::Connection mHighlightChangedConnection;
 
@@ -130,7 +131,6 @@ class BI_Via final : public BI_Base, public SerializableObject
         Shape mShape;
         Length mSize;
         Length mDrillDiameter;
-        NetSignal* mNetSignal;
 
         // Registered Elements
         QMap<QString, BI_NetPoint*> mRegisteredNetPoints;   ///< key: layer name

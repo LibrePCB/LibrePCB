@@ -36,6 +36,7 @@
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_via.h"
+#include "items/bi_netsegment.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
 #include "items/bi_polygon.h"
@@ -98,8 +99,10 @@ void BoardGerberExport::exportDrillsPTH() const
     }
 
     // vias
-    foreach (const BI_Via* via, mBoard.getVias()) {
-        gen.drill(via->getPosition(), via->getDrillDiameter());
+    foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+        foreach (const BI_Via* via, netsegment->getVias()) {
+            gen.drill(via->getPosition(), via->getDrillDiameter());
+        }
     }
 
     gen.generate();
@@ -184,18 +187,24 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
     }
 
     // draw vias
-    foreach (const BI_Via* via, mBoard.getVias()) {
-        Q_ASSERT(via);
-        drawVia(gen, *via, layerName);
+    foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+        Q_ASSERT(netsegment);
+        foreach (const BI_Via* via, netsegment->getVias()) {
+            Q_ASSERT(via);
+            drawVia(gen, *via, layerName);
+        }
     }
 
     // draw traces
-    foreach (const BI_NetLine* netline, mBoard.getNetLines()) {
-        Q_ASSERT(netline);
-        if (netline->getLayer().getName() == layerName) {
-            gen.drawLine(netline->getStartPoint().getPosition(),
-                         netline->getEndPoint().getPosition(),
-                         netline->getWidth());
+    foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+        Q_ASSERT(netsegment);
+        foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
+            Q_ASSERT(netline);
+            if (netline->getLayer().getName() == layerName) {
+                gen.drawLine(netline->getStartPoint().getPosition(),
+                             netline->getEndPoint().getPosition(),
+                             netline->getWidth());
+            }
         }
     }
 

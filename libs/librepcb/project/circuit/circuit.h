@@ -96,6 +96,7 @@ class Circuit final : public QObject, public SerializableObject
         const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {return mNetSignals;}
         NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
         NetSignal* getNetSignalByName(const QString& name) const noexcept;
+        NetSignal* getNetSignalWithMostElements() const noexcept;
         void addNetSignal(NetSignal& netsignal);
         void removeNetSignal(NetSignal& netsignal);
         void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName);

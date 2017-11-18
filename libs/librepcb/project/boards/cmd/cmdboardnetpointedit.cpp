@@ -40,7 +40,6 @@ namespace project {
 CmdBoardNetPointEdit::CmdBoardNetPointEdit(BI_NetPoint& point) noexcept :
     UndoCommand(tr("Edit netpoint")), mNetPoint(point),
     mOldLayer(&point.getLayer()), mNewLayer(mOldLayer),
-    mOldNetSignal(&point.getNetSignal()), mNewNetSignal(mOldNetSignal),
     mOldFootprintPad(point.getFootprintPad()), mNewFootprintPad(mOldFootprintPad),
     mOldVia(point.getVia()), mNewVia(mOldVia),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
@@ -62,12 +61,6 @@ void CmdBoardNetPointEdit::setLayer(GraphicsLayer& layer) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayer = &layer;
-}
-
-void CmdBoardNetPointEdit::setNetSignal(NetSignal& netsignal) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = &netsignal;
 }
 
 void CmdBoardNetPointEdit::setPadToAttach(BI_FootprintPad* pad) noexcept
@@ -114,8 +107,6 @@ void CmdBoardNetPointEdit::performUndo()
     ScopeGuardList sgl;
     mNetPoint.setLayer(*mOldLayer); // can throw
     sgl.add([&](){mNetPoint.setLayer(*mNewLayer);});
-    mNetPoint.setNetSignal(*mOldNetSignal); // can throw
-    sgl.add([&](){mNetPoint.setNetSignal(*mNewNetSignal);});
     mNetPoint.setPadToAttach(mOldFootprintPad); // can throw
     sgl.add([&](){mNetPoint.setPadToAttach(mNewFootprintPad);});
     mNetPoint.setViaToAttach(mOldVia); // can throw
@@ -129,8 +120,6 @@ void CmdBoardNetPointEdit::performRedo()
     ScopeGuardList sgl;
     mNetPoint.setLayer(*mNewLayer); // can throw
     sgl.add([&](){mNetPoint.setLayer(*mOldLayer);});
-    mNetPoint.setNetSignal(*mNewNetSignal); // can throw
-    sgl.add([&](){mNetPoint.setNetSignal(*mOldNetSignal);});
     mNetPoint.setPadToAttach(mNewFootprintPad); // can throw
     sgl.add([&](){mNetPoint.setPadToAttach(mOldFootprintPad);});
     mNetPoint.setViaToAttach(mNewVia); // can throw
