@@ -178,6 +178,7 @@ QList<QString> BoardLayersDock::getCommonLayers() const noexcept
     layers.append(GraphicsLayer::sBoardDrillsNpth);
     layers.append(GraphicsLayer::sBoardViasTht);
     layers.append(GraphicsLayer::sBoardPadsTht);
+    layers.append(GraphicsLayer::sBoardAirWires);
     return layers;
 }
 
