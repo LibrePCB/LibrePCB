@@ -35,6 +35,7 @@ SOURCES += \
     boards/cmd/cmdboardnetsegmentedit.cpp \
     boards/cmd/cmdboardnetsegmentremove.cpp \
     boards/cmd/cmdboardnetsegmentremoveelements.cpp \
+    boards/cmd/cmdboardremove.cpp \
     boards/cmd/cmdboardviaedit.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
     boards/cmd/cmddeviceinstanceedit.cpp \
@@ -126,6 +127,7 @@ HEADERS += \
     boards/cmd/cmdboardnetsegmentedit.h \
     boards/cmd/cmdboardnetsegmentremove.h \
     boards/cmd/cmdboardnetsegmentremoveelements.h \
+    boards/cmd/cmdboardremove.h \
     boards/cmd/cmdboardviaedit.h \
     boards/cmd/cmddeviceinstanceadd.h \
     boards/cmd/cmddeviceinstanceedit.h \

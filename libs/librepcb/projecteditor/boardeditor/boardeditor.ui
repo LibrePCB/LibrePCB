@@ -124,6 +124,7 @@
     <addaction name="separator"/>
     <addaction name="actionNewBoard"/>
     <addaction name="actionCopyBoard"/>
+    <addaction name="actionRemoveBoard"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
@@ -602,6 +603,15 @@
   <action name="actionLayerStackSetup">
    <property name="text">
     <string>Layer Stack Setup</string>
+   </property>
+  </action>
+  <action name="actionRemoveBoard">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Board</string>
    </property>
   </action>
  </widget>

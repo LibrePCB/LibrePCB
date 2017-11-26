@@ -40,6 +40,7 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/boards/cmd/cmdboardadd.h>
+#include <librepcb/project/boards/cmd/cmdboardremove.h>
 #include <librepcb/project/boards/cmd/cmdboarddesignrulesmodify.h>
 #include "../docks/ercmsgdock.h"
 #include "unplacedcomponentsdock.h"
@@ -366,6 +367,22 @@ void BoardEditor::on_actionCopyBoard_triggered()
     }
     catch (Exception& e)
     {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
+}
+
+void BoardEditor::on_actionRemoveBoard_triggered()
+{
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    QMessageBox::StandardButton btn = QMessageBox::question(this, tr("Remove board"),
+        QString(tr("Are you really sure to remove the board \"%1\"?")).arg(board->getName()));
+    if (btn != QMessageBox::Yes) return;
+
+    try {
+        mProjectEditor.getUndoStack().execCmd(new CmdBoardRemove(*board));
+    } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
 }

@@ -103,6 +103,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         void on_actionProjectClose_triggered();
         void on_actionNewBoard_triggered();
         void on_actionCopyBoard_triggered();
+        void on_actionRemoveBoard_triggered();
         void on_actionGrid_triggered();
         void on_actionExportAsPdf_triggered();
         void on_actionGenerateFabricationData_triggered();
