@@ -22,6 +22,7 @@ LIBS += \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lsexpresso \
+    -lclipper \
 
 INCLUDEPATH += \
     ../../libs
@@ -32,13 +33,15 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/sexpresso \
+    ../../libs/clipper \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbworkspace.a \
     $${DESTDIR}/liblibrepcbproject.a \
     $${DESTDIR}/liblibrepcblibrary.a \
     $${DESTDIR}/liblibrepcbcommon.a \
-    $${DESTDIR}/libsexpresso.a
+    $${DESTDIR}/libsexpresso.a \
+    $${DESTDIR}/libclipper.a \
 
 SOURCES += \
     main.cpp \

@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
+    clipper \
     hoedown \
     googletest \
     librepcb \
@@ -8,4 +9,4 @@ SUBDIRS = \
     quazip \
     sexpresso
 
-librepcb.depends = parseagle hoedown quazip sexpresso
+librepcb.depends = clipper parseagle hoedown quazip sexpresso
