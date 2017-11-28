@@ -84,7 +84,6 @@ class PolygonSegment final : public SerializableObject
         // Getters
         const Point& getEndPos() const noexcept {return mEndPos;}
         const Angle& getAngle() const noexcept {return mAngle;}
-        Point calcArcCenter(const Point& startPos) const noexcept;
 
         // Setters
         void setEndPos(const Point& pos) noexcept;

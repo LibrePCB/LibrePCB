@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "polygon.h"
+#include "../toolbox.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -41,30 +42,6 @@ PolygonSegment::PolygonSegment(const SExpression& node)
 {
     mEndPos = Point(node.getChildByPath("pos"));
     mAngle = node.getValueByPath<Angle>("angle", true);
-}
-
-Point PolygonSegment::calcArcCenter(const Point& startPos) const noexcept
-{
-    if (mAngle == 0) {
-        // there is no arc center...just return the middle of start- and endpoint
-        return (startPos + mEndPos) / 2;
-    } else {
-        // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
-        qreal x0 = startPos.getX().toMm();
-        qreal y0 = startPos.getY().toMm();
-        qreal x1 = mEndPos.getX().toMm();
-        qreal y1 = mEndPos.getY().toMm();
-        qreal angle = mAngle.mappedTo180deg().toRad();
-        qreal angleSgn = (angle >= 0) ? 1 : -1;
-        qreal d = qSqrt((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0));
-        qreal r = d / (2 * qSin(angle / 2));
-        qreal h = qSqrt(r*r - d*d/4);
-        qreal u = (x1 - x0) / d;
-        qreal v = (y1 - y0) / d;
-        qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
-        qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
-        return Point::fromMm(a, b);
-    }
 }
 
 void PolygonSegment::setEndPos(const Point& pos) noexcept
@@ -190,7 +167,9 @@ Point Polygon::getStartPointOfSegment(int index) const noexcept
 Point Polygon::calcCenterOfArcSegment(int index) const noexcept
 {
     if (index >= 0 && index < mSegments.count()) {
-        return mSegments[index]->calcArcCenter(getStartPointOfSegment(index));
+        return Toolbox::arcCenter(getStartPointOfSegment(index),
+                                  mSegments[index]->getEndPos(),
+                                  mSegments[index]->getAngle());
     } else {
         qCritical() << "Invalid polygon segment index:" << index;
         return Point();
@@ -216,26 +195,15 @@ const QPainterPath& Polygon::toQPainterPathPx() const noexcept
             if (segment.getAngle() == 0) {
                 mPainterPathPx.lineTo(segment.getEndPos().toPxQPointF());
             } else {
-                // TODO: this is very provisional and may contain bugs...
-                // all lengths in pixels
-                qreal x1 = lastPos.toPxQPointF().x();
-                qreal y1 = lastPos.toPxQPointF().y();
-                qreal x2 = segment.getEndPos().toPxQPointF().x();
-                qreal y2 = segment.getEndPos().toPxQPointF().y();
-                qreal x3 = (x1+x2)/qreal(2);
-                qreal y3 = (y1+y2)/qreal(2);
-                qreal dx = x2-x1;
-                qreal dy = y2-y1;
-                qreal q = qSqrt(dx*dx + dy*dy);
-                qreal r = qAbs(q / (qreal(2) * qSin(segment.getAngle().toRad()/qreal(2))));
-                qreal rh = r * qCos(segment.getAngle().mappedTo180deg().toRad()/qreal(2));
-                qreal hx = -dy * rh / q;
-                qreal hy = dx * rh / q;
-                qreal cx = x3 + hx * (segment.getAngle().mappedTo180deg() > 0 ? -1 : 1);
-                qreal cy = y3 + hy * (segment.getAngle().mappedTo180deg() > 0 ? -1 : 1);
-                QRectF rect(cx-r, cy-r, 2*r, 2*r);
-                qreal startAngleDeg = -qRadiansToDegrees(qAtan2(y1-cy, x1-cx));
-                mPainterPathPx.arcTo(rect, startAngleDeg, segment.getAngle().toDeg());
+                QPointF centerPx = Toolbox::arcCenter(lastPos, segment.getEndPos(),
+                                                    segment.getAngle()).toPxQPointF();
+                qreal radiusPx = Toolbox::arcRadius(lastPos, segment.getEndPos(),
+                                                  segment.getAngle()).abs().toPx();
+                QPointF diffPx = lastPos.toPxQPointF() - centerPx;
+                qreal startAngleDeg = -qRadiansToDegrees(qAtan2(diffPx.y(), diffPx.x()));
+                mPainterPathPx.arcTo(centerPx.x() - radiusPx, centerPx.y() - radiusPx,
+                                     radiusPx * 2, radiusPx * 2,
+                                     startAngleDeg, segment.getAngle().toDeg());
             }
             lastPos = segment.getEndPos();
         }
