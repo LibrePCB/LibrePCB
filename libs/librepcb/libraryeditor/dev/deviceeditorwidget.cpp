@@ -56,6 +56,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context, const FilePath& f
 {
     mUi->setupUi(this);
     setWindowIcon(QIcon(":/img/library/device.png"));
+    connect(mUi->edtName, &QLineEdit::textChanged, this, &QWidget::setWindowTitle);
 
     // show graphics scenes
     mComponentGraphicsScene.reset(new GraphicsScene());

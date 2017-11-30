@@ -45,6 +45,7 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context, const FileP
 {
     mUi->setupUi(this);
     setWindowIcon(QIcon(":/img/library/component.png"));
+    connect(mUi->edtName, &QLineEdit::textChanged, this, &QWidget::setWindowTitle);
 
     // insert category list editor widget
     mCategoriesEditorWidget.reset(new ComponentCategoryListEditorWidget(mContext.workspace, this));
