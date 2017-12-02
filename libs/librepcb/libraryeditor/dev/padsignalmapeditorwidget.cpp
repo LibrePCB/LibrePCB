@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "padsignalmapeditorwidget.h"
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/dev/cmd/cmddevicepadsignalmapitemedit.h>
 
@@ -208,8 +209,9 @@ void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
     mTable->setVerticalHeaderItem(row, headerItem);
 
     // pad
-    QTableWidgetItem* padItem = new QTableWidgetItem(padName);
+    QTableWidgetItem* padItem = new QTableWidgetItem();
     padItem->setFlags(padItem->flags() & ~Qt::ItemFlags(Qt::ItemIsEditable));
+    padItem->setData(Qt::DisplayRole, Toolbox::stringOrNumberToQVariant(padName));
     padItem->setData(Qt::UserRole, padUuid.toStr());
     mTable->setItem(row, COLUMN_PAD, padItem);
 
