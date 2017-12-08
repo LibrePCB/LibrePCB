@@ -86,7 +86,7 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const noexcept
         GraphicsLayer::sBoardOutlines,
         GraphicsLayer::sBoardMillingPth,
         GraphicsLayer::sBoardDocumentation,
-        GraphicsLayer::sBoardcGuide,
+        GraphicsLayer::sBoardGuide,
         GraphicsLayer::sTopPlacement,
         GraphicsLayer::sTopDocumentation,
         GraphicsLayer::sTopNames,
@@ -199,7 +199,7 @@ void BoardLayerStack::addAllLayers() noexcept
     addLayer(GraphicsLayer::sBoardAlignment);
     addLayer(GraphicsLayer::sBoardDocumentation);
     addLayer(GraphicsLayer::sBoardComments);
-    addLayer(GraphicsLayer::sBoardcGuide);
+    addLayer(GraphicsLayer::sBoardGuide);
 
 #ifdef QT_DEBUG
     // debug layers

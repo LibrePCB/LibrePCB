@@ -159,7 +159,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addLayer(GraphicsLayer::sBoardAlignment);
     addLayer(GraphicsLayer::sBoardDocumentation);
     addLayer(GraphicsLayer::sBoardComments);
-    addLayer(GraphicsLayer::sBoardcGuide);
+    addLayer(GraphicsLayer::sBoardGuide);
     addLayer(GraphicsLayer::sTopCopper);
     for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
         addLayer(GraphicsLayer::getInnerLayerName(i));

@@ -90,7 +90,7 @@ class GraphicsLayer : public QObject
         static constexpr const char* sBoardAlignment          = "brd_alignment";          ///< alignment helpers in devices
         static constexpr const char* sBoardDocumentation      = "brd_documentation";      ///< for documentation purposes, e.g. text
         static constexpr const char* sBoardComments           = "brd_comments";           ///< for personal comments, e.g. text
-        static constexpr const char* sBoardcGuide             = "brd_guide";              ///< e.g. for boxes around circuits
+        static constexpr const char* sBoardGuide              = "brd_guide";              ///< e.g. for boxes around circuits
 
         // symmetric board layers
         static constexpr const char* sTopPlacement            = "top_placement";          ///< placement information (e.g. outline) of devices

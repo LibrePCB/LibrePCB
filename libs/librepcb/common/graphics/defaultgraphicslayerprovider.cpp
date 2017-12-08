@@ -97,7 +97,7 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept
     addLayer(GraphicsLayer::sBoardAlignment);
     addLayer(GraphicsLayer::sBoardDocumentation);
     addLayer(GraphicsLayer::sBoardComments);
-    addLayer(GraphicsLayer::sBoardcGuide);
+    addLayer(GraphicsLayer::sBoardGuide);
 }
 
 DefaultGraphicsLayerProvider::~DefaultGraphicsLayerProvider() noexcept

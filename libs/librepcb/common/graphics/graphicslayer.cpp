@@ -200,7 +200,7 @@ const QStringList& GraphicsLayer::getBoardGeometryElementLayerNames() noexcept
         sBoardAlignment,
         sBoardDocumentation,
         sBoardComments,
-        sBoardcGuide,
+        sBoardGuide,
         sTopPlacement,
         sTopHiddenGrabAreas,
         sTopDocumentation,
@@ -261,7 +261,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sBoardAlignment,           {tr("Alignment"),                   Qt::darkCyan,               Qt::cyan,                   true});
         h.insert(sBoardDocumentation,       {tr("Documentation"),               Qt::white,                  Qt::lightGray,              true});
         h.insert(sBoardComments,            {tr("Comments"),                    Qt::yellow,                 Qt::darkYellow,             true});
-        h.insert(sBoardcGuide,              {tr("Guide"),                       Qt::darkYellow,             Qt::yellow,                 true});
+        h.insert(sBoardGuide,               {tr("Guide"),                       Qt::darkYellow,             Qt::yellow,                 true});
         // board symmetric
         h.insert(sTopPlacement,             {tr("Top Placement"),               QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
         h.insert(sBotPlacement,             {tr("Bot Placement"),               QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
@@ -279,8 +279,8 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sBotValues,                {tr("Bot Values"),                  QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
         h.insert(sTopCourtyard,             {tr("Top Courtyard"),               QColor(255, 0, 255, 70),    QColor(255, 0, 255, 90),    false});
         h.insert(sBotCourtyard,             {tr("Bot Courtyard"),               QColor(0, 255, 255, 70),    QColor(0, 255, 255, 90),    false});
-        h.insert(sTopStopMask,              {tr("Top Stop Mask"),               QColor(255, 255, 255, 100), QColor(255, 0, 0, 150),     false});
-        h.insert(sBotStopMask,              {tr("Bot Stop Mask"),               QColor(255, 255, 255, 100), QColor(255, 0, 0, 150),     false});
+        h.insert(sTopStopMask,              {tr("Top Stop Mask"),               QColor(255, 255, 255, 100), QColor(255, 255, 255, 150), false});
+        h.insert(sBotStopMask,              {tr("Bot Stop Mask"),               QColor(255, 255, 255, 100), QColor(255, 255, 255, 150), false});
         h.insert(sTopSolderPaste,           {tr("Top Solder Paste"),            QColor(224, 224, 224, 100), QColor(224, 224, 224, 120), false});
         h.insert(sBotSolderPaste,           {tr("Bot Solder Paste"),            QColor(224, 224, 224, 100), QColor(224, 224, 224, 120), false});
         h.insert(sTopFinish,                {tr("Top Finish"),                  QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130),     true});
