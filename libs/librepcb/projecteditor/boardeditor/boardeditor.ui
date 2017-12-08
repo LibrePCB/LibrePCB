@@ -126,6 +126,8 @@
     <addaction name="actionLayerStackSetup"/>
     <addaction name="actionModifyDesignRules"/>
     <addaction name="separator"/>
+    <addaction name="actionRebuildPlanes"/>
+    <addaction name="separator"/>
     <addaction name="actionNewBoard"/>
     <addaction name="actionCopyBoard"/>
     <addaction name="actionRemoveBoard"/>
@@ -211,6 +213,8 @@
    <addaction name="actionToolAddVia"/>
    <addaction name="actionToolDrawTrace"/>
    <addaction name="actionToolDrawPolygon"/>
+   <addaction name="separator"/>
+   <addaction name="actionRebuildPlanes"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
    <property name="windowTitle">
@@ -637,6 +641,13 @@
    </property>
    <property name="text">
     <string>Draw Polygon</string>
+  <action name="actionRebuildPlanes">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/rebuild_plane.png</normaloff>:/img/actions/rebuild_plane.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rebuild Planes</string>
    </property>
   </action>
  </widget>

@@ -32,6 +32,7 @@
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include <librepcb/common/dialogs/boarddesignrulesdialog.h>
@@ -473,6 +474,12 @@ void BoardEditor::on_actionModifyDesignRules_triggered()
     } catch (Exception& e) {
         QMessageBox::warning(this, tr("Error"), e.getMsg());
     }
+}
+
+void BoardEditor::on_actionRebuildPlanes_triggered()
+{
+    Board* board = getActiveBoard();
+    if (board) board->rebuildAllPlanes();
 }
 
 void BoardEditor::on_tabBar_currentChanged(int index)
