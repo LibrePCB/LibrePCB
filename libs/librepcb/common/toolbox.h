@@ -102,6 +102,14 @@ class Toolbox final
          */
         static Length shortestDistanceBetweenPointAndLine(const Point& p, const Point& l1,
                                                           const Point& l2, Point* nearest = nullptr) noexcept;
+
+        /**
+         * @brief Convert a numeric or non-numeric string to the corresponding QVariant
+         *
+         * @param string  The string to be converted
+         * @return A QVariant with either a QVariant::Int or a QVariant::String
+         */
+        static QVariant stringOrNumberToQVariant(const QString& string) noexcept;
 };
 
 /*****************************************************************************************

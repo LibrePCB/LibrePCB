@@ -76,6 +76,16 @@ Length Toolbox::shortestDistanceBetweenPointAndLine(const Point& p, const Point&
     return (p - np).getLength();
 }
 
+QVariant Toolbox::stringOrNumberToQVariant(const QString& string) noexcept
+{
+    bool isInt;
+    int intval = string.toInt(&isInt, 10);
+    if (isInt) {
+        return QVariant(intval);
+    }
+    return QVariant(string);
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

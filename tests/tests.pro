@@ -72,6 +72,7 @@ SOURCES += \
     common/scopeguardtest.cpp \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
+    common/toolboxtest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     eagleimport/deviceconvertertest.cpp \
