@@ -23,6 +23,8 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QFileDialog>
+#include <QQuickView>
+#include <QQmlContext>
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include <librepcb/workspace/workspace.h>
@@ -411,14 +413,11 @@ void ControlPanel::projectEditorClosed() noexcept
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About LibrePCB"), QString(tr(
-        "<h1>About LibrePCB</h1>"
-        "<p>LibrePCB is a free & open source schematic/layout-editor.</p>"
-        "<p>Version: %1 (%2)</p>"
-        "<p>Please see <a href='http://librepcb.org/'>librepcb.org</a> for more information.</p>"
-        "You can find the project on GitHub:<br>"
-        "<a href='https://github.com/LibrePCB/LibrePCB'>https://github.com/LibrePCB/LibrePCB</a>"))
-        .arg(qApp->getAppVersion().toPrettyStr(3), qApp->getGitVersion()));
+    QQuickView *view = new QQuickView(QUrl("qrc:/qml/dialogs/about.qml"));
+    view->rootContext()->setContextProperty("view", view);
+    view->rootContext()->setContextProperty("appVersion", qApp->getAppVersion().toPrettyStr(3));
+    view->rootContext()->setContextProperty("gitVersion", qApp->getGitVersion());
+    view->show();
 }
 
 void ControlPanel::on_actionNew_Project_triggered()
