@@ -329,11 +329,11 @@ void Schematic::addToProject()
     ScopeGuardList sgl(mSymbols.count() + mNetSegments.count());
     foreach (SI_Symbol* symbol, mSymbols) {
         symbol->addToSchematic(); // can throw
-        sgl.add([this, symbol](){symbol->removeFromSchematic();});
+        sgl.add([symbol](){symbol->removeFromSchematic();});
     }
     foreach (SI_NetSegment* segment, mNetSegments) {
         segment->addToSchematic(); // can throw
-        sgl.add([this, segment](){segment->removeFromSchematic();});
+        sgl.add([segment](){segment->removeFromSchematic();});
     }
 
     mIsAddedToProject = true;
@@ -350,11 +350,11 @@ void Schematic::removeFromProject()
     ScopeGuardList sgl(mSymbols.count() + mNetSegments.count());
     foreach (SI_NetSegment* segment, mNetSegments) {
         segment->removeFromSchematic(); // can throw
-        sgl.add([this, segment](){segment->addToSchematic();});
+        sgl.add([segment](){segment->addToSchematic();});
     }
     foreach (SI_Symbol* symbol, mSymbols) {
         symbol->removeFromSchematic(); // can throw
-        sgl.add([this, symbol](){symbol->addToSchematic();});
+        sgl.add([symbol](){symbol->addToSchematic();});
     }
 
     mIsAddedToProject = false;
