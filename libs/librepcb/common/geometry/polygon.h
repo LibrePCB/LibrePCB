@@ -199,6 +199,8 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
         Polygon translated(const Point& offset) const noexcept;
         Polygon& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
         Polygon rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
+        Polygon& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
+        Polygon mirrored(Qt::Orientation orientation, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
         bool close() noexcept;

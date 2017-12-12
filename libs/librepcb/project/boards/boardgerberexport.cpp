@@ -263,8 +263,10 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     for (const Polygon& polygon : footprint.getLibFootprint().getPolygons()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == polygon.getLayerName()) {
-            Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
-            Polygon p = polygon.rotated(rot).translate(footprint.getPosition());
+            Polygon p = polygon;
+            if (footprint.getIsMirrored()) p.mirror(Qt::Horizontal);
+            p.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
+            p.translate(footprint.getPosition());
             p.setLineWidth(calcWidthOfLayer(p.getLineWidth(), layer));
             gen.drawPolygonOutline(p);
             if (p.isFilled()) {
@@ -277,8 +279,10 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     for (const Ellipse& ellipse : footprint.getLibFootprint().getEllipses()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == ellipse.getLayerName()) {
-            Angle rot = footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation();
-            Ellipse e = ellipse.rotated(rot).translate(footprint.getPosition());
+            Ellipse e = ellipse;
+            if (footprint.getIsMirrored()) e.setCenter(e.getCenter().mirrored(Qt::Horizontal));
+            e.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
+            e.translate(footprint.getPosition());
             e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
             gen.drawEllipseOutline(e);
             if (e.isFilled()) {

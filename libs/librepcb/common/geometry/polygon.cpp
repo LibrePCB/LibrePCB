@@ -313,6 +313,20 @@ Polygon Polygon::rotated(const Angle& angle, const Point& center) const noexcept
     return Polygon(*this).rotate(angle, center);
 }
 
+Polygon& Polygon::mirror(Qt::Orientation orientation, const Point& center) noexcept
+{
+    setStartPos(mStartPos.mirrored(orientation, center));
+    for (PolygonSegment& segment : mSegments) {
+        segment.setEndPos(segment.getEndPos().mirrored(orientation, center));
+        segment.setAngle(-segment.getAngle());
+    }
+    return *this;
+}
+
+Polygon Polygon::mirrored(Qt::Orientation orientation, const Point& center) const noexcept
+{
+    return Polygon(*this).mirror(orientation, center);
+}
 
 /*****************************************************************************************
  *  General Methods
