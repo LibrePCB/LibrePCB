@@ -27,23 +27,27 @@ The project is still in a quite early development stage (no stable release avail
 - Automatic netlist synchronisation between schematic and board
 
 
-## Installation
-
-There are no stable releases available yet, so basically you need to compile
-LibrePCB by yourself. Nevertheless there are easier ways to get LibrePCB running:
-
-- For Windows there are nightly builds available to download: 
-  [librepcb-nightly.zip](https://ci.appveyor.com/api/projects/librepcb/librepcb/artifacts/build/librepcb-nightly.zip?branch=master)
-- For Linux there are nightly [AppImages](http://appimage.org/) available on [Bintray](https://bintray.com/librepcb):
-  [LibrePCB-Nightly-Linux-x86_64.AppImage](https://bintray.com/librepcb/LibrePCB-Nightly/download_file?file_path=LibrePCB-Nightly-Linux-x86_64.AppImage)
-- On Arch Linux you can install the package 
-  [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
-- Using a [Docker](https://www.docker.com/) container you can build and run LibrePCB
-  on any Linux without cluttering up your system with all the requirements. Just follow
-  [these instructions](https://github.com/LibrePCB/LibrePCB/tree/master/dev/docker).
+## Installation & Usage
 
 *Warning: Because LibrePCB's file format is not yet considered as stable (i.e.
 breaking changes can occur), you should not yet use LibrePCB productively!*
+
+**Please read our [documentation](https://docs.librepcb.org/) to see how you can
+install and use LibrePCB.**
+The [Getting Started](https://docs.librepcb.org/getting_started/) guide
+gives you a quick introduction to LibrePCB.
+
+In addition to the installation methods described in the documentation, Arch
+Linux users can also install the package
+[librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
+The package clones and builds the latest (unstable!) version of the `master`
+branch from GitHub.
+
+
+## Contributing
+
+Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for
+details.
 
 
 ## Development
@@ -56,6 +60,13 @@ To compile LibrePCB, you need the following software components:
 - [Qt](http://www.qt.io/download-open-source/) >= 5.2
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
+
+#### Prepared Docker Image
+
+Instead of installing the dependencies manually on your system (see instructions
+below), you can also use our [Docker](https://www.docker.com/) image with all
+dependencies pre-installed. Just follow
+[these instructions](https://github.com/LibrePCB/LibrePCB/tree/master/dev/docker).
 
 #### Installation on Debian/Ubuntu/Mint
 
@@ -80,9 +91,9 @@ sudo pacman -S qt5-doc qtcreator # optional
 
 #### Installation on Windows
 
-Download and run the 
-[Qt for Windows (MinGW) installer](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe) 
-from [here](https://www.qt.io/download-open-source/). LibrePCB does not compile 
+Download and run the
+[Qt for Windows (MinGW) installer](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe)
+from [here](https://www.qt.io/download-open-source/). LibrePCB does not compile
 with MSVC, so you must install following components with the Qt installer:
 
 - The MinGW compiler itself
@@ -139,18 +150,15 @@ On a Unix/Linux system, LibrePCB can be installed with `sudo make install`.
 ### Workspace
 
 At the first startup, LibrePCB asks for a workspace directory where the library
-elements and projects will be saved.  For developers there is a demo workspace
-inclusive library and projects in the submodule "dev/demo-workspace/".
-
-*Note: As LibrePCB is still under heavy developement, it's highly recommended to
-use this demo workspace. Otherwise you won't be able to create/use any 
-components and some parts of the application will not work properly.*
+elements and projects are located. For developers there is a demo workspace
+inclusive some libraries and projects in the submodule
+[`dev/demo-workspace/`](https://github.com/LibrePCB/demo-workspace).
 
 
 ## Credits
 
 - First of all, many thanks to all of our [contributors](AUTHORS.md)!
-- Thanks also to [cloudscale.ch](https://www.cloudscale.ch/) for sponsoring our 
+- Thanks also to [cloudscale.ch](https://www.cloudscale.ch/) for sponsoring our
   API server!
 
 
