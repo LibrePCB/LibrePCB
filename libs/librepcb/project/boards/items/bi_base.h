@@ -98,8 +98,8 @@ class BI_Base : public QObject
     protected:
 
         // General Methods
-        void addToBoard(BGI_Base* item) noexcept;
-        void removeFromBoard(BGI_Base* item) noexcept;
+        void addToBoard(QGraphicsItem* item) noexcept;
+        void removeFromBoard(QGraphicsItem* item) noexcept;
 
 
     protected:

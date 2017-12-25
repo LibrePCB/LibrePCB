@@ -23,10 +23,11 @@
 #include <QtCore>
 #include "bi_polygon.h"
 #include "../board.h"
+#include "../boardlayerstack.h"
 #include "../../project.h"
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/geometry/polygon.h>
-#include "../graphicsitems/bgi_polygon.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -62,9 +63,8 @@ BI_Polygon::BI_Polygon(Board& board, const QString& layerName, const Length& lin
 
 void BI_Polygon::init()
 {
-    mGraphicsItem.reset(new BGI_Polygon(*this));
-    mGraphicsItem->setPos(getPosition().toPxQPointF());
-    mGraphicsItem->setRotation(Angle::deg0().toDeg());
+    mGraphicsItem.reset(new PolygonGraphicsItem(*mPolygon, mBoard.getLayerStack()));
+    mGraphicsItem->setZValue(Board::ZValue_Default);
 
     // connect to the "attributes changed" signal of the board
     connect(&mBoard, &Board::attributesChanged, this, &BI_Polygon::boardAttributesChanged);
@@ -112,13 +112,14 @@ QPainterPath BI_Polygon::getGrabAreaScenePx() const noexcept
 
 bool BI_Polygon::isSelectable() const noexcept
 {
-    return mGraphicsItem->isSelectable();
+    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(mPolygon->getLayerName());
+    return layer && layer->isVisible();
 }
 
 void BI_Polygon::setSelected(bool selected) noexcept
 {
     BI_Base::setSelected(selected);
-    mGraphicsItem->update();
+    mGraphicsItem->setSelected(selected);
 }
 
 /*****************************************************************************************
@@ -127,7 +128,7 @@ void BI_Polygon::setSelected(bool selected) noexcept
 
 void BI_Polygon::boardAttributesChanged()
 {
-    mGraphicsItem->updateCacheAndRepaint();
+    mGraphicsItem->update();
 }
 
 /*****************************************************************************************

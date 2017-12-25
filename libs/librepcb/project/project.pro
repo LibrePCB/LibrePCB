@@ -45,7 +45,6 @@ SOURCES += \
     boards/graphicsitems/bgi_footprintpad.cpp \
     boards/graphicsitems/bgi_netline.cpp \
     boards/graphicsitems/bgi_netpoint.cpp \
-    boards/graphicsitems/bgi_polygon.cpp \
     boards/graphicsitems/bgi_via.cpp \
     boards/items/bi_base.cpp \
     boards/items/bi_device.cpp \
@@ -137,7 +136,6 @@ HEADERS += \
     boards/graphicsitems/bgi_footprintpad.h \
     boards/graphicsitems/bgi_netline.h \
     boards/graphicsitems/bgi_netpoint.h \
-    boards/graphicsitems/bgi_polygon.h \
     boards/graphicsitems/bgi_via.h \
     boards/items/bi_base.h \
     boards/items/bi_device.h \

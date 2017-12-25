@@ -33,6 +33,7 @@
 namespace librepcb {
 
 class Polygon;
+class PolygonGraphicsItem;
 
 namespace project {
 
@@ -66,6 +67,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject
         ~BI_Polygon() noexcept;
 
         // Getters
+        Polygon& getPolygon() noexcept {return *mPolygon;}
         const Polygon& getPolygon() const noexcept {return *mPolygon;}
         bool isSelectable() const noexcept override;
 
@@ -98,7 +100,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject
 
         // General
         QScopedPointer<Polygon> mPolygon;
-        QScopedPointer<BGI_Polygon> mGraphicsItem;
+        QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 };
 
 /*****************************************************************************************
