@@ -106,6 +106,7 @@
     <addaction name="actionToolSelect"/>
     <addaction name="actionToolAddVia"/>
     <addaction name="actionToolDrawTrace"/>
+    <addaction name="actionToolDrawPolygon"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -206,7 +207,7 @@
    <addaction name="actionToolSelect"/>
    <addaction name="actionToolAddVia"/>
    <addaction name="actionToolDrawTrace"/>
-   <addaction name="actionToolAddDevice"/>
+   <addaction name="actionToolDrawPolygon"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
    <property name="windowTitle">
@@ -571,18 +572,6 @@
     <string>Copy Board</string>
    </property>
   </action>
-  <action name="actionToolAddDevice">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
-     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add Device</string>
-   </property>
-  </action>
   <action name="actionGenerateFabricationData">
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
@@ -612,6 +601,15 @@
    </property>
    <property name="text">
     <string>Remove Board</string>
+   </property>
+  </action>
+  <action name="actionToolDrawPolygon">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Polygon</string>
    </property>
   </action>
  </widget>
