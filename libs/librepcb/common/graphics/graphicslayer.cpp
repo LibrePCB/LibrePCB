@@ -253,7 +253,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         // board asymmetric
         h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),                Qt::lightGray,              Qt::white,                  true});
         h.insert(sBoardOutlines,            {tr("Board Outlines"),              QColor(255, 255, 255, 180), QColor(255, 255, 255, 220), true});
-        h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),               Qt::cyan,                   Qt::blue,                   true});
+        h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),               QColor(0, 255, 255, 150),   QColor(0, 255, 255, 220),   true});
         h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),               QColor(255, 255, 255, 150), QColor(255, 255, 255, 220), true});
         h.insert(sBoardPadsTht,             {tr("Pads"),                        QColor(0, 255, 0, 150),     QColor(0, 255, 0, 220),     true});
         h.insert(sBoardViasTht,             {tr("Vias"),                        QColor(0, 255, 0, 150),     QColor(0, 255, 0, 220),     true});
