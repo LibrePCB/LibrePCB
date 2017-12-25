@@ -32,7 +32,8 @@ namespace librepcb {
  *  Static Methods
  ****************************************************************************************/
 
-QPainterPath Toolbox::shapeFromPath(const QPainterPath &path, const QPen &pen) noexcept
+QPainterPath Toolbox::shapeFromPath(const QPainterPath &path, const QPen &pen,
+                                    const QBrush& brush, const Length& minWidth) noexcept
 {
     // http://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/graphicsview/qgraphicsitem.cpp
     // Function: qt_graphicsItem_shapeFromPath()
@@ -42,11 +43,13 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath &path, const QPen &pen) n
     } else {
         QPainterPathStroker ps;
         ps.setCapStyle(pen.capStyle());
-        ps.setWidth(qMax(pen.widthF(), qreal(0.00000001)));
+        ps.setWidth(qMax(qMax(pen.widthF(), 0.00000001), minWidth.toPx()));
         ps.setJoinStyle(pen.joinStyle());
         ps.setMiterLimit(pen.miterLimit());
         QPainterPath p = ps.createStroke(path);
-        p.addPath(path);
+        if (brush != Qt::NoBrush) {
+            p.addPath(path);
+        }
         return p;
     }
 }

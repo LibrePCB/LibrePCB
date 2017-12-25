@@ -90,6 +90,7 @@ void PrimitivePathGraphicsItem::setLineLayer(const GraphicsLayer* layer) noexcep
     }
     updateColors();
     updateVisibility();
+    updateBoundingRectAndShape(); // grab area may have changed
 }
 
 void PrimitivePathGraphicsItem::setFillLayer(const GraphicsLayer* layer) noexcept
@@ -103,6 +104,7 @@ void PrimitivePathGraphicsItem::setFillLayer(const GraphicsLayer* layer) noexcep
     }
     updateColors();
     updateVisibility();
+    updateBoundingRectAndShape(); // grab area may have changed
 }
 
 /*****************************************************************************************
@@ -111,43 +113,34 @@ void PrimitivePathGraphicsItem::setFillLayer(const GraphicsLayer* layer) noexcep
 
 void PrimitivePathGraphicsItem::layerColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
 {
-    if (mLineLayer == &layer) {
-        mPen.setColor(newColor);
-    }
-    if (mFillLayer == &layer) {
-        mBrush.setColor(newColor);
-    }
-    update();
+    Q_UNUSED(layer);
+    Q_UNUSED(newColor);
+    updateColors();
+    updateVisibility();
 }
 
 void PrimitivePathGraphicsItem::layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
 {
-    if (mLineLayer == &layer) {
-        mPenHighlighted.setColor(newColor);
-    }
-    if (mFillLayer == &layer) {
-        mBrushHighlighted.setColor(newColor);
-    }
-    update();
+    Q_UNUSED(layer);
+    Q_UNUSED(newColor);
+    updateColors();
+    updateVisibility();
 }
 
 void PrimitivePathGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept
 {
+    Q_UNUSED(layer);
     Q_UNUSED(newVisible);
-    if (mLineLayer == &layer) {
-        mPen.setStyle(layer.isVisible() ? Qt::SolidLine : Qt::NoPen);
-        mPenHighlighted.setStyle(layer.isVisible() ? Qt::SolidLine : Qt::NoPen);
-    }
-    if (mFillLayer == &layer) {
-        mBrush.setStyle(layer.isVisible() ? Qt::SolidPattern : Qt::NoBrush);
-        mBrushHighlighted.setStyle(layer.isVisible() ? Qt::SolidPattern : Qt::NoBrush);
-    }
+    updateColors();
     updateVisibility();
 }
 
 void PrimitivePathGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
 {
-    layerVisibleChanged(layer, newEnabled);
+    Q_UNUSED(layer);
+    Q_UNUSED(newEnabled);
+    updateColors();
+    updateVisibility();
 }
 
 /*****************************************************************************************
@@ -173,7 +166,7 @@ void PrimitivePathGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 
 void PrimitivePathGraphicsItem::updateColors() noexcept
 {
-    if (mLineLayer) {
+    if (mLineLayer && mLineLayer->isVisible()) {
         mPen.setStyle(Qt::SolidLine);
         mPenHighlighted.setStyle(Qt::SolidLine);
         mPen.setColor(mLineLayer->getColor(false));
@@ -183,7 +176,7 @@ void PrimitivePathGraphicsItem::updateColors() noexcept
         mPenHighlighted.setStyle(Qt::NoPen);
     }
 
-    if (mFillLayer) {
+    if (mFillLayer && mFillLayer->isVisible()) {
         mBrush.setStyle(Qt::SolidPattern);
         mBrushHighlighted.setStyle(Qt::SolidPattern);
         mBrush.setColor(mFillLayer->getColor(false));
@@ -198,7 +191,7 @@ void PrimitivePathGraphicsItem::updateColors() noexcept
 void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept
 {
     prepareGeometryChange();
-    mShape = Toolbox::shapeFromPath(mPainterPath, mPen);
+    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush, Length(200000));
     mBoundingRect = mShape.controlPointRect();
     update();
 }

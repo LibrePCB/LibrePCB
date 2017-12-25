@@ -74,7 +74,8 @@ class Toolbox final
             return rect.adjusted(-offset, -offset, offset, offset);
         }
 
-        static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen) noexcept;
+        static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen,
+                                          const QBrush& brush, const Length& minWidth = Length(0)) noexcept;
 
         /**
          * @brief Calculate the point on a given line which is nearest to a given point
