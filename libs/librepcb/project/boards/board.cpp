@@ -28,6 +28,7 @@
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include "../project.h"
+#include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
@@ -163,6 +164,11 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // load default user settings
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
+
+            // add 160x100mm board outline (Eurocard size)
+            QScopedPointer<Polygon> polygon(Polygon::createRect(GraphicsLayer::sBoardOutlines,
+                Length(0), false, false, Point(0, 0), Length(160000000), Length(100000000)));
+            mPolygons.append(new BI_Polygon(*this, *polygon));
         }
         else
         {
