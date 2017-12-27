@@ -121,7 +121,9 @@ void SymbolPinGraphicsItem::setSelected(bool selected) noexcept
 
 QPainterPath SymbolPinGraphicsItem::shape() const noexcept
 {
-    return mCircleGraphicsItem->shape();
+    QPainterPath p;
+    p.addEllipse(mCircleGraphicsItem->boundingRect());
+    return p;
 }
 
 void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
