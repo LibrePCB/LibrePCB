@@ -87,7 +87,7 @@ class BoardSelectionQuery final : public QObject
         const QSet<BI_NetPoint*>& getNetPoints() const noexcept { return mResultNetPoints; }
         const QSet<BI_NetLine*>& getNetLines() const noexcept { return mResultNetLines; }
         const QSet<BI_Via*>& getVias() const noexcept { return mResultVias; }
-        //const QSet<BI_Polygon*>& getPolygons() const noexcept { return mResultPolygons; }
+        const QSet<BI_Polygon*>& getPolygons() const noexcept { return mResultPolygons; }
         int getResultCount() const noexcept;
         bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
@@ -97,6 +97,7 @@ class BoardSelectionQuery final : public QObject
         void addSelectedNetPoints(NetPointFilters f) noexcept;
         void addSelectedNetLines(NetLineFilters f) noexcept;
         void addNetPointsOfNetLines(NetLineFilters lf, NetPointFilters pf) noexcept;
+        void addSelectedPolygons() noexcept;
 
         // Operator Overloadings
         BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;
@@ -118,7 +119,7 @@ class BoardSelectionQuery final : public QObject
         QSet<BI_NetPoint*> mResultNetPoints;
         QSet<BI_NetLine*> mResultNetLines;
         QSet<BI_Via*> mResultVias;
-        //QSet<BI_Polygon*> mResultPolygons;
+        QSet<BI_Polygon*> mResultPolygons;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(BoardSelectionQuery::NetPointFilters)

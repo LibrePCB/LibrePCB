@@ -129,6 +129,15 @@ void BoardSelectionQuery::addNetPointsOfNetLines(NetLineFilters lf, NetPointFilt
     }
 }
 
+void BoardSelectionQuery::addSelectedPolygons() noexcept
+{
+    foreach (BI_Polygon* polygon, mPolygons) {
+        if (polygon->isSelected()) {
+            mResultPolygons.insert(polygon);
+        }
+    }
+}
+
 bool BoardSelectionQuery::doesNetPointMatchFilter(const BI_NetPoint& p, NetPointFilters f) noexcept
 {
     if (f.testFlag(NetPointFilter::Floating) && (!p.isAttached())) return true;

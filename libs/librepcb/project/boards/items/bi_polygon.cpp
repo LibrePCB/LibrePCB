@@ -53,6 +53,13 @@ BI_Polygon::BI_Polygon(Board& board, const SExpression& node) :
     init();
 }
 
+BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon) :
+    BI_Base(board)
+{
+    mPolygon.reset(new Polygon(polygon));
+    init();
+}
+
 BI_Polygon::BI_Polygon(Board& board, const QString& layerName, const Length& lineWidth, bool fill,
                        bool isGrabArea, const Point& startPos) :
     BI_Base(board)

@@ -308,6 +308,12 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
             }
         }
     }
+    // polygons
+    foreach (BI_Polygon* polygon, mPolygons) {
+        if (polygon->isSelectable() && polygon->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(polygon);
+        }
+    }
     return list;
 }
 
@@ -581,6 +587,10 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
         foreach (BI_NetSegment* segment, mNetSegments) {
             segment->setSelectionRect(rectPx);
         }
+        foreach (BI_Polygon* polygon, mPolygons) {
+            bool select = polygon->isSelectable() && polygon->getGrabAreaScenePx().intersects(rectPx);
+            polygon->setSelected(select);
+        }
     }
 }
 
@@ -590,6 +600,9 @@ void Board::clearSelection() const noexcept
         device->getFootprint().setSelected(false);
     foreach (BI_NetSegment* segment, mNetSegments) {
         segment->clearSelection();
+    }
+    foreach (BI_Polygon* polygon, mPolygons) {
+        polygon->setSelected(false);
     }
 }
 
