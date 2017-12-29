@@ -17,49 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDPOLYGONREMOVE_H
+#define LIBREPCB_PROJECT_CMDBOARDPOLYGONREMOVE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class CmdPolygonMove;
-
 namespace project {
 
 class Board;
-class CmdDeviceInstanceEdit;
-class CmdBoardViaEdit;
-class CmdBoardNetPointEdit;
-
-namespace editor {
+class BI_Polygon;
 
 /*****************************************************************************************
- *  Class CmdMoveSelectedBoardItems
+ *  Class CmdBoardPolygonRemove
  ****************************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedBoardItems class
+ * @brief The CmdBoardPolygonRemove class
  */
-class CmdMoveSelectedBoardItems final : public UndoCommandGroup
+class CmdBoardPolygonRemove final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
-        ~CmdMoveSelectedBoardItems() noexcept;
-
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+        explicit CmdBoardPolygonRemove(BI_Polygon& polygon) noexcept;
+        ~CmdBoardPolygonRemove() noexcept;
 
 
     private:
@@ -69,25 +58,24 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
 
         // Private Member Variables
-        Board& mBoard;
-        Point mStartPos;
-        Point mDeltaPos;
 
-        // Move commands
-        QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-        QList<CmdBoardViaEdit*> mViaEditCmds;
-        QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-        QList<CmdPolygonMove*> mPolygonMoveCmds;
+        Board& mBoard;
+        BI_Polygon& mPolygon;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#endif // LIBREPCB_PROJECT_CMDBOARDPOLYGONREMOVE_H

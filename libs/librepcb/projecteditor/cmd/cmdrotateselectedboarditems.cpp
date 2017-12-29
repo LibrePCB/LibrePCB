@@ -23,12 +23,15 @@
 #include <QtCore>
 #include "cmdrotateselectedboarditems.h"
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/common/geometry/polygon.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
@@ -67,6 +70,7 @@ bool CmdRotateSelectedBoardItems::performExecute()
     query->addSelectedNetPoints(BoardSelectionQuery::NetPointFilter::Floating);
     query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
                                   BoardSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedPolygons();
 
     // find the center of all elements
     Point center = Point(0, 0);
@@ -82,6 +86,14 @@ bool CmdRotateSelectedBoardItems::performExecute()
     foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
         center += netpoint->getPosition();
         ++count;
+    }
+    foreach (BI_Polygon* polygon, query->getPolygons()) {
+        center += polygon->getPolygon().getStartPos();
+        ++count;
+        for (PolygonSegment& segment : polygon->getPolygon().getSegments()) {
+            center += segment.getEndPos();
+            ++count;
+        }
     }
     if (count > 0) {
         center /= count;
@@ -106,6 +118,11 @@ bool CmdRotateSelectedBoardItems::performExecute()
     foreach (BI_NetPoint* netpoint, query->getNetPoints()) { Q_ASSERT(netpoint);
         CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
         cmd->setPosition(netpoint->getPosition().rotated(mAngle, center), false);
+        appendChild(cmd);
+    }
+    foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);
+        CmdPolygonMove* cmd = new CmdPolygonMove(polygon->getPolygon());
+        cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
 

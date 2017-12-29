@@ -63,7 +63,7 @@ class BEE_Base
             //StartMove,          ///< start command: move elements
             //StartDrawText,      ///< start command: draw text
             //StartDrawRect,      ///< start command: draw rect
-            //StartDrawPolygon,   ///< start command: draw polygon
+            StartDrawPolygon,   ///< start command: draw polygon
             //StartDrawCircle,    ///< start command: draw circle
             //StartDrawEllipse,   ///< start command: draw ellipse
             StartDrawTrace,     ///< start command: draw trace

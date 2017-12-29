@@ -74,7 +74,7 @@ void BI_Base::setSelected(bool selected) noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BI_Base::addToBoard(BGI_Base* item) noexcept
+void BI_Base::addToBoard(QGraphicsItem* item) noexcept
 {
     Q_ASSERT(!mIsAddedToBoard);
     if (item) {
@@ -83,7 +83,7 @@ void BI_Base::addToBoard(BGI_Base* item) noexcept
     mIsAddedToBoard = true;
 }
 
-void BI_Base::removeFromBoard(BGI_Base* item) noexcept
+void BI_Base::removeFromBoard(QGraphicsItem* item) noexcept
 {
     Q_ASSERT(mIsAddedToBoard);
     if (item) {

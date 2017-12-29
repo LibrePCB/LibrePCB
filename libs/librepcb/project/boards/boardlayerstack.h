@@ -61,6 +61,7 @@ class BoardLayerStack final : public QObject, public SerializableObject,
         // Getters
         Board& getBoard() const noexcept {return mBoard;}
         int getInnerLayerCount() const noexcept {return mInnerLayerCount;}
+        QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
         /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
         QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}

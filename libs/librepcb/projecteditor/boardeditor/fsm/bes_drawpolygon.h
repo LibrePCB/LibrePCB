@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_SELECT_H
-#define LIBREPCB_PROJECT_BES_SELECT_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H
+#define LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
 #include "bes_base.h"
 
 /*****************************************************************************************
@@ -31,31 +32,33 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class UndoCommandGroup;
-class Polygon;
+class CmdPolygonEdit;
+class CmdPolygonSegmentEdit;
+class GraphicsLayerComboBox;
 
 namespace project {
+
+class BI_Polygon;
+
 namespace editor {
 
-class CmdMoveSelectedBoardItems;
-
 /*****************************************************************************************
- *  Class BES_Select
+ *  Class BES_DrawPolygon
  ****************************************************************************************/
 
 /**
- * @brief The BES_Select class
+ * @brief The BES_DrawPolygon class
  */
-class BES_Select final : public BES_Base
+class BES_DrawPolygon final : public BES_Base
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                            GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_Select();
+        explicit BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                                 GraphicsView& editorGraphicsView, UndoStack& undoStack);
+        ~BES_DrawPolygon() noexcept;
 
         // General Methods
         ProcRetVal process(BEE_Base* event) noexcept override;
@@ -63,37 +66,50 @@ class BES_Select final : public BES_Base
         bool exit(BEE_Base* event) noexcept override;
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
         ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateIdleSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                              Board& board) noexcept;
-        ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
-                                                             Board* board) noexcept;
-        ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                                Board* board) noexcept;
-        bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
-        bool rotateSelectedItems(const Angle& angle) noexcept;
-        bool flipSelectedItems(Qt::Orientation orientation) noexcept;
-        bool removeSelectedItems() noexcept;
-        void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
+        ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
+        ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
+        ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
+        bool start(Board& board, const Point& pos) noexcept;
+        bool addSegment(Board& board, const Point& pos) noexcept;
+        bool abort(bool showErrMsgBox) noexcept;
+        void updateSegmentPosition(const Point& cursorPos) noexcept;
+        void layerComboBoxLayerChanged(const QString& layerName) noexcept;
+        void widthComboBoxTextChanged(const QString& width) noexcept;
+        void filledCheckBoxCheckedChanged(bool checked) noexcept;
+        void makeSelectedLayerVisible() noexcept;
 
 
-        // Types
-        /// enum for all possible substates
-        enum SubState {
-            SubState_Idle,      ///< left mouse button is not pressed (default state)
-            SubState_Moving     ///< left mouse button is pressed
+    private: // Types
+
+        /// Internal FSM States (substates)
+        enum class SubState {
+            Idle,
+            Positioning,
         };
 
 
-        // Attributes
-        SubState mSubState;     ///< the current substate
-        QScopedPointer<CmdMoveSelectedBoardItems> mSelectedItemsMoveCommand;
+    private: // Data
+
+        // State
+        SubState mSubState;
+        QString mCurrentLayerName;
+        Length mCurrentWidth;
+        bool mCurrentIsFilled;
+        BI_Polygon* mCurrentPolygon;
+        CmdPolygonEdit* mCmdEditCurrentPolygon;
+        CmdPolygonSegmentEdit* mCmdEditCurrentSegment;
+        Point mLastSegmentPos;
+
+        // Widgets for the command toolbar
+        QList<QAction*> mActionSeparators;
+        QLabel* mLayerLabel;
+        GraphicsLayerComboBox* mLayerComboBox;
+        QLabel* mWidthLabel;
+        QComboBox* mWidthComboBox;
+        QLabel* mFillLabel;
+        QCheckBox* mFillCheckBox;
 };
 
 /*****************************************************************************************
@@ -104,4 +120,4 @@ class BES_Select final : public BES_Base
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_SELECT_H
+#endif // LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H

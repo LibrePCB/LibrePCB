@@ -28,6 +28,7 @@
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/boarddesignrules.h>
 #include "../project.h"
+#include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
@@ -163,6 +164,11 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // load default user settings
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
+
+            // add 160x100mm board outline (Eurocard size)
+            QScopedPointer<Polygon> polygon(Polygon::createRect(GraphicsLayer::sBoardOutlines,
+                Length(0), false, false, Point(0, 0), Length(160000000), Length(100000000)));
+            mPolygons.append(new BI_Polygon(*this, *polygon));
         }
         else
         {
@@ -306,6 +312,12 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
                     list.insert(1, pad);
                 }
             }
+        }
+    }
+    // polygons
+    foreach (BI_Polygon* polygon, mPolygons) {
+        if (polygon->isSelectable() && polygon->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(polygon);
         }
     }
     return list;
@@ -581,6 +593,10 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
         foreach (BI_NetSegment* segment, mNetSegments) {
             segment->setSelectionRect(rectPx);
         }
+        foreach (BI_Polygon* polygon, mPolygons) {
+            bool select = polygon->isSelectable() && polygon->getGrabAreaScenePx().intersects(rectPx);
+            polygon->setSelected(select);
+        }
     }
 }
 
@@ -590,6 +606,9 @@ void Board::clearSelection() const noexcept
         device->getFootprint().setSelected(false);
     foreach (BI_NetSegment* segment, mNetSegments) {
         segment->clearSelection();
+    }
+    foreach (BI_Polygon* polygon, mPolygons) {
+        polygon->setSelected(false);
     }
 }
 

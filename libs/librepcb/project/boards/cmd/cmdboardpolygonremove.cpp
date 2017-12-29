@@ -17,77 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_POLYGON_H
-#define LIBREPCB_PROJECT_BGI_POLYGON_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "bgi_base.h"
+#include "cmdboardpolygonremove.h"
+#include "../board.h"
+#include "../items/bi_polygon.h"
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-
-class Polygon;
-class GraphicsLayer;
-
 namespace project {
 
-class BI_Polygon;
-
 /*****************************************************************************************
- *  Class BGI_Polygon
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The BGI_Polygon class
- *
- * @author ubruhin
- * @date 2016-01-12
- */
-class BGI_Polygon final : public BGI_Base
+CmdBoardPolygonRemove::CmdBoardPolygonRemove(BI_Polygon& polygon) noexcept :
+    UndoCommand(tr("Remove polygon from board")),
+    mBoard(polygon.getBoard()), mPolygon(polygon)
 {
-    public:
+}
 
-        // Constructors / Destructor
-        explicit BGI_Polygon(BI_Polygon& polygon) noexcept;
-        ~BGI_Polygon() noexcept;
+CmdBoardPolygonRemove::~CmdBoardPolygonRemove() noexcept
+{
+}
 
-        // Getters
-        bool isSelectable() const noexcept;
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+bool CmdBoardPolygonRemove::performExecute()
+{
+    performRedo(); // can throw
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+    return true;
+}
 
+void CmdBoardPolygonRemove::performUndo()
+{
+    mBoard.addPolygon(mPolygon); // can throw
+}
 
-    private:
-
-        // make some methods inaccessible...
-        BGI_Polygon() = delete;
-        BGI_Polygon(const BGI_Polygon& other) = delete;
-        BGI_Polygon& operator=(const BGI_Polygon& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(QString name) const noexcept;
-
-        // General Attributes
-        BI_Polygon& mBiPolygon;
-        const Polygon& mPolygon;
-
-        // Cached Attributes
-        GraphicsLayer* mLayer;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-};
+void CmdBoardPolygonRemove::performRedo()
+{
+    mBoard.removePolygon(mPolygon); // can throw
+}
 
 /*****************************************************************************************
  *  End of File
@@ -95,5 +72,3 @@ class BGI_Polygon final : public BGI_Base
 
 } // namespace project
 } // namespace librepcb
-
-#endif // LIBREPCB_PROJECT_BGI_POLYGON_H

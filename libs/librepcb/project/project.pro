@@ -35,6 +35,8 @@ SOURCES += \
     boards/cmd/cmdboardnetsegmentedit.cpp \
     boards/cmd/cmdboardnetsegmentremove.cpp \
     boards/cmd/cmdboardnetsegmentremoveelements.cpp \
+    boards/cmd/cmdboardpolygonadd.cpp \
+    boards/cmd/cmdboardpolygonremove.cpp \
     boards/cmd/cmdboardremove.cpp \
     boards/cmd/cmdboardviaedit.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
@@ -45,7 +47,6 @@ SOURCES += \
     boards/graphicsitems/bgi_footprintpad.cpp \
     boards/graphicsitems/bgi_netline.cpp \
     boards/graphicsitems/bgi_netpoint.cpp \
-    boards/graphicsitems/bgi_polygon.cpp \
     boards/graphicsitems/bgi_via.cpp \
     boards/items/bi_base.cpp \
     boards/items/bi_device.cpp \
@@ -127,6 +128,8 @@ HEADERS += \
     boards/cmd/cmdboardnetsegmentedit.h \
     boards/cmd/cmdboardnetsegmentremove.h \
     boards/cmd/cmdboardnetsegmentremoveelements.h \
+    boards/cmd/cmdboardpolygonadd.h \
+    boards/cmd/cmdboardpolygonremove.h \
     boards/cmd/cmdboardremove.h \
     boards/cmd/cmdboardviaedit.h \
     boards/cmd/cmddeviceinstanceadd.h \
@@ -137,7 +140,6 @@ HEADERS += \
     boards/graphicsitems/bgi_footprintpad.h \
     boards/graphicsitems/bgi_netline.h \
     boards/graphicsitems/bgi_netpoint.h \
-    boards/graphicsitems/bgi_polygon.h \
     boards/graphicsitems/bgi_via.h \
     boards/items/bi_base.h \
     boards/items/bi_device.h \

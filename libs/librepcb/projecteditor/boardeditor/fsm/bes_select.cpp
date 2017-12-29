@@ -25,10 +25,13 @@
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/workspace/workspace.h>
@@ -333,6 +336,26 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             return ForceStayInState;
         }
+
+        case BI_Base::Type_t::Polygon: {
+            BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Polygon");
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openPolygonPropertiesDialog(*board, polygon->getPolygon());
+            }
+            return ForceStayInState;
+        }
+
         default:
             break;
     }
@@ -352,6 +375,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                 BI_Via* via = dynamic_cast<BI_Via*>(items.first()); Q_ASSERT(via);
                 BoardViaPropertiesDialog dialog(mProject, *via, mUndoStack, &mEditor);
                 dialog.exec();
+                return ForceStayInState;
+            }
+            case BI_Base::Type_t::Polygon: {
+                BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
+                openPolygonPropertiesDialog(*board, polygon->getPolygon());
                 return ForceStayInState;
             }
             default: {
@@ -484,6 +512,13 @@ bool BES_Select::removeSelectedItems() noexcept
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
+}
+
+void BES_Select::openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept
+{
+    PolygonPropertiesDialog dialog(polygon, mUndoStack,
+        board.getLayerStack().getAllowedPolygonLayers());
+    dialog.exec();
 }
 
 /*****************************************************************************************
