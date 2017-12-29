@@ -59,7 +59,6 @@ class ConverterDb final
         Uuid getSymbolUuid(const QString& symbolName);
         Uuid getSymbolPinUuid(const Uuid& symbolUuid, const QString& pinName);
         Uuid getFootprintUuid(const QString& packageName);
-        Uuid getFootprintPadUuid(const Uuid& footprintUuid, const QString& padName);
         Uuid getPackageUuid(const QString& packageName);
         Uuid getPackagePadUuid(const Uuid& footprintUuid, const QString& padName);
         Uuid getComponentUuid(const QString& deviceSetName);

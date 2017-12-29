@@ -142,9 +142,9 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
     }
 
     foreach (const parseagle::ThtPad& pad, mPackage.getThtPads()) {
+        Uuid uuid = mDb.getPackagePadUuid(footprint.getUuid(), pad.getName());
         QString name = pad.getName();
-        package->getPads().append(std::make_shared<library::PackagePad>(
-            mDb.getPackagePadUuid(footprint.getUuid(), pad.getName()), name));
+        package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
         Length drillDiameter = Length::fromMm(pad.getDrillDiameter());
         Length outerDiameter = Length::fromMm(pad.getOuterDiameter());
@@ -170,16 +170,15 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
                 throw Exception(__FILE__, __LINE__, "Unknown shape");
         }
         Angle rot = Angle::fromDeg(pad.getRotation().getAngle());
-        std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(
-            mDb.getFootprintPadUuid(footprint.getUuid(), pad.getName()), pos, rot, shape,
-            width, height, drillDiameter, library::FootprintPad::BoardSide::THT));
+        std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(uuid, pos,
+            rot, shape, width, height, drillDiameter, library::FootprintPad::BoardSide::THT));
         footprint.getPads().append(fptPad);
     }
 
     foreach (const parseagle::SmtPad& pad, mPackage.getSmtPads()) {
+        Uuid uuid = mDb.getPackagePadUuid(footprint.getUuid(), pad.getName());
         QString name = pad.getName();
-        package->getPads().append(std::make_shared<library::PackagePad>(
-            mDb.getPackagePadUuid(footprint.getUuid(), pad.getName()), name));
+        package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         QString layerName = convertBoardLayer(pad.getLayer());
         library::FootprintPad::BoardSide side;
         if (layerName == GraphicsLayer::sTopCopper) {
@@ -193,10 +192,8 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Angle rot = Angle::fromDeg(pad.getRotation().getAngle());
         Length width = Length::fromMm(pad.getWidth());
         Length height = Length::fromMm(pad.getHeight());
-        std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(
-            mDb.getFootprintPadUuid(footprint.getUuid(), pad.getName()), pos, rot,
-            library::FootprintPad::Shape::RECT, width, height,
-            Length(0), side));
+        std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(uuid, pos,
+            rot, library::FootprintPad::Shape::RECT, width, height, Length(0), side));
         footprint.getPads().append(fptPad);
     }
 

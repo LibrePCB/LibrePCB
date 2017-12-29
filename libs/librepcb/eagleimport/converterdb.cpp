@@ -61,11 +61,6 @@ Uuid ConverterDb::getFootprintUuid(const QString& packageName)
     return getOrCreateUuid("packages_to_footprints", packageName);
 }
 
-Uuid ConverterDb::getFootprintPadUuid(const Uuid& footprintUuid, const QString& padName)
-{
-    return getOrCreateUuid("footprint_pads", footprintUuid.toStr(), padName);
-}
-
 Uuid ConverterDb::getPackageUuid(const QString& packageName)
 {
     return getOrCreateUuid("packages_to_packages", packageName);
