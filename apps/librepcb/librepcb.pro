@@ -16,7 +16,7 @@ include(../../common.pri)
 # Set preprocessor defines
 exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
 
-QT += core widgets opengl network xml printsupport sql
+QT += core widgets opengl network xml printsupport sql quick
 
 win32 {
     # Windows-specific configurations
@@ -85,7 +85,8 @@ TRANSLATIONS = \
     ../../i18n/librepcb_gsw_CH.ts
 
 RESOURCES += \
-    ../../img/images.qrc
+    ../../img/images.qrc \
+    ../../qml/qml.qrc \
 
 SOURCES += \
     controlpanel/controlpanel.cpp \
