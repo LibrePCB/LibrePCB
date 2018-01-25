@@ -112,7 +112,16 @@ git clone --recursive https://github.com/LibrePCB/LibrePCB.git && cd LibrePCB
 #### Using Qt Creator
 
 Building with [Qt Creator](http://doc.qt.io/qtcreator/) is probably the easiest
-way. To keep build time as low as possible make sure to set the correct make
+way. Simply open the `librepcb.pro` file.
+
+When opening a project in Qt Creator for the first time, you need to configure
+the Desktop kit:
+
+![qtcreator_run](doc/qtcreator_desktopkit.png)
+
+Click on the "Configure Project" button to get started.
+
+Note: To keep build time as low as possible make sure to set the correct make
 flags to use all available CPU cores to build. See this [stackoverflow
 answer](https://stackoverflow.com/questions/8860712/setting-default-make-options-for-qt-creator).
 
