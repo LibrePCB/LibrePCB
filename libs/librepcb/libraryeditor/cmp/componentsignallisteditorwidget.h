@@ -57,8 +57,8 @@ class ComponentSignalListEditorWidget final : public QWidget,
             COLUMN_NAME = 0,
             //COLUMN_ROLE,
             COLUMN_ISREQUIRED,
-            COLUMN_ISNEGATED,
-            COLUMN_ISCLOCK,
+            //COLUMN_ISNEGATED,
+            //COLUMN_ISCLOCK,
             COLUMN_FORCEDNETNAME,
             COLUMN_BUTTONS,
             _COLUMN_COUNT
@@ -84,8 +84,8 @@ class ComponentSignalListEditorWidget final : public QWidget,
         void tableCellChanged(int row, int column) noexcept;
         //void signalRoleChanged(const SignalRole& role) noexcept;
         void isRequiredChanged(bool checked) noexcept;
-        void isNegatedChanged(bool checked) noexcept;
-        void isClockChanged(bool checked) noexcept;
+        //void isNegatedChanged(bool checked) noexcept;
+        //void isClockChanged(bool checked) noexcept;
         void btnAddRemoveClicked() noexcept;
 
 
@@ -99,16 +99,16 @@ class ComponentSignalListEditorWidget final : public QWidget,
     private: // Methods
         void updateTable() noexcept;
         void setTableRowContent(int row, const Uuid& uuid, const QString& name,
-                                /*const SignalRole& role,*/ bool required, bool negated,
-                                bool clock, const QString& forcedNetName) noexcept;
+                                /*const SignalRole& role,*/ bool required, /*bool negated,
+                                bool clock,*/ const QString& forcedNetName) noexcept;
         void addSignal(const QString& name, /*const SignalRole& role,*/ bool required,
-                       bool negated, bool clock, const QString& forcedNetName) noexcept;
+                       /*bool negated, bool clock,*/ const QString& forcedNetName) noexcept;
         void removeSignal(const Uuid& uuid) noexcept;
         bool setName(const Uuid& uuid, const QString& name) noexcept;
         //void setRole(const Uuid& uuid, const SignalRole& role) noexcept;
         void setIsRequired(const Uuid& uuid, bool required) noexcept;
-        void setIsNegated(const Uuid& uuid, bool negated) noexcept;
-        void setIsClock(const Uuid& uuid, bool clock) noexcept;
+        //void setIsNegated(const Uuid& uuid, bool negated) noexcept;
+        //void setIsClock(const Uuid& uuid, bool clock) noexcept;
         void setForcedNetName(const Uuid& uuid, const QString& netname) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
         Uuid getUuidOfRow(int row) const noexcept;
