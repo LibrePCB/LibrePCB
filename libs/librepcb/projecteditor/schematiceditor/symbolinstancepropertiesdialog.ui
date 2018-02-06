@@ -74,6 +74,13 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Pos. X:</string>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
          <widget class="QDoubleSpinBox" name="spbxSymbInstPosX">
           <property name="sizePolicy">
@@ -181,33 +188,6 @@
           </property>
           <property name="singleStep">
            <double>45.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Mirror:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QCheckBox" name="cbxSymbInstMirror">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Pos. X:</string>
           </property>
          </widget>
         </item>
