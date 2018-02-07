@@ -43,7 +43,7 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath &path, const QPen &pen,
     } else {
         QPainterPathStroker ps;
         ps.setCapStyle(pen.capStyle());
-        ps.setWidth(qMax(qMax(pen.widthF(), 0.00000001), minWidth.toPx()));
+        ps.setWidth(qMax(qMax(pen.widthF(), qreal(0.00000001)), minWidth.toPx()));
         ps.setJoinStyle(pen.joinStyle());
         ps.setMiterLimit(pen.miterLimit());
         QPainterPath p = ps.createStroke(path);
