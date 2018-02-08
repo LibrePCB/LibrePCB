@@ -109,6 +109,9 @@
     <addaction name="actionToolDrawPolygon"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Help</string>
     </property>
@@ -255,6 +258,9 @@
    </property>
   </action>
   <action name="actionPrint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
@@ -264,6 +270,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionQuit">
@@ -285,6 +294,9 @@
    </property>
    <property name="text">
     <string>PDF Export</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionShowControlPanel">
@@ -340,6 +352,9 @@
    <property name="shortcut">
     <string>F1</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionRotate_CCW">
    <property name="icon">
@@ -376,6 +391,9 @@
    <property name="shortcut">
     <string>Ctrl+C</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionCut">
    <property name="icon">
@@ -388,6 +406,9 @@
    <property name="shortcut">
     <string>Ctrl+X</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionPaste">
    <property name="icon">
@@ -399,6 +420,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionRemove">
@@ -467,6 +491,9 @@
    </property>
    <property name="toolTip">
     <string>Project Settings</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionAbout">

@@ -120,6 +120,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnSchematicUp">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -142,6 +145,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="btnSchematicDown">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>

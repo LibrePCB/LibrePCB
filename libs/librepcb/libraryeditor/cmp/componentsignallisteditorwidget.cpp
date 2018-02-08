@@ -51,18 +51,18 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(QWidget* parent
     mTable->setHorizontalHeaderItem(COLUMN_NAME,          new QTableWidgetItem(tr("Name")));
     //mTable->setHorizontalHeaderItem(COLUMN_ROLE,          new QTableWidgetItem(tr("Role (ERC)")));
     mTable->setHorizontalHeaderItem(COLUMN_ISREQUIRED,    new QTableWidgetItem(tr("Required")));
-    mTable->setHorizontalHeaderItem(COLUMN_ISNEGATED,     new QTableWidgetItem(tr("Negated")));
-    mTable->setHorizontalHeaderItem(COLUMN_ISCLOCK,       new QTableWidgetItem(tr("Clock")));
+    //mTable->setHorizontalHeaderItem(COLUMN_ISNEGATED,     new QTableWidgetItem(tr("Negated")));
+    //mTable->setHorizontalHeaderItem(COLUMN_ISCLOCK,       new QTableWidgetItem(tr("Clock")));
     mTable->setHorizontalHeaderItem(COLUMN_FORCEDNETNAME, new QTableWidgetItem(tr("Forced Net")));
     mTable->setHorizontalHeaderItem(COLUMN_BUTTONS,       new QTableWidgetItem(""));
     mTable->horizontalHeaderItem(COLUMN_ISREQUIRED)->setTextAlignment(Qt::AlignCenter);
-    mTable->horizontalHeaderItem(COLUMN_ISNEGATED)->setTextAlignment(Qt::AlignCenter);
-    mTable->horizontalHeaderItem(COLUMN_ISCLOCK)->setTextAlignment(Qt::AlignCenter);
+    //mTable->horizontalHeaderItem(COLUMN_ISNEGATED)->setTextAlignment(Qt::AlignCenter);
+    //mTable->horizontalHeaderItem(COLUMN_ISCLOCK)->setTextAlignment(Qt::AlignCenter);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,          QHeaderView::Stretch);
     //mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ROLE,          QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISREQUIRED,    QHeaderView::ResizeToContents);
-    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISNEGATED,     QHeaderView::ResizeToContents);
-    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISCLOCK,       QHeaderView::ResizeToContents);
+    //mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISNEGATED,     QHeaderView::ResizeToContents);
+    //mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISCLOCK,       QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_FORCEDNETNAME, QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_BUTTONS,       QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setMinimumSectionSize(10);
@@ -166,7 +166,7 @@ void ComponentSignalListEditorWidget::isRequiredChanged(bool checked) noexcept
     }
 }
 
-void ComponentSignalListEditorWidget::isNegatedChanged(bool checked) noexcept
+/*void ComponentSignalListEditorWidget::isNegatedChanged(bool checked) noexcept
 {
     if (!mSignalList) return;
     int row = getRowOfTableCellWidget(sender());
@@ -182,7 +182,7 @@ void ComponentSignalListEditorWidget::isClockChanged(bool checked) noexcept
     if (isExistingSignalRow(row)) {
         setIsClock(getUuidOfRow(row), checked);
     }
-}
+}*/
 
 void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept
 {
@@ -194,14 +194,16 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept
         //    (mTable->cellWidget(row, COLUMN_ROLE)); Q_ASSERT(roleComboBox);
         const CenteredCheckBox* requiredCheckBox = dynamic_cast<const CenteredCheckBox*>
             (mTable->cellWidget(row, COLUMN_ISREQUIRED)); Q_ASSERT(requiredCheckBox);
-        const CenteredCheckBox* negatedCheckBox = dynamic_cast<const CenteredCheckBox*>
-            (mTable->cellWidget(row, COLUMN_ISNEGATED)); Q_ASSERT(negatedCheckBox);
-        const CenteredCheckBox* clockCheckBox = dynamic_cast<const CenteredCheckBox*>
-            (mTable->cellWidget(row, COLUMN_ISCLOCK)); Q_ASSERT(clockCheckBox);
+        //const CenteredCheckBox* negatedCheckBox = dynamic_cast<const CenteredCheckBox*>
+        //    (mTable->cellWidget(row, COLUMN_ISNEGATED)); Q_ASSERT(negatedCheckBox);
+        //const CenteredCheckBox* clockCheckBox = dynamic_cast<const CenteredCheckBox*>
+        //    (mTable->cellWidget(row, COLUMN_ISCLOCK)); Q_ASSERT(clockCheckBox);
         const QTableWidgetItem* netNameItem = mTable->item(row, COLUMN_FORCEDNETNAME); Q_ASSERT(netNameItem);
         addSignal(cleanName(nameItem->text()), /*roleComboBox->getCurrentItem(),*/
-                  requiredCheckBox->isChecked(), negatedCheckBox->isChecked(),
-                  clockCheckBox->isChecked(), cleanForcedNetName(netNameItem->text()));
+                  requiredCheckBox->isChecked(),
+                  //negatedCheckBox->isChecked(),
+                  //clockCheckBox->isChecked(),
+                  cleanForcedNetName(netNameItem->text()));
     } else if (isExistingSignalRow(row)) {
         removeSignal(getUuidOfRow(row));
     }
@@ -252,14 +254,14 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
 
         // special row for adding a new signal
         setTableRowContent(newSignalRow(), Uuid(), "", /*SignalRole::passive(),*/ false,
-                           false, false, "");
+                           /*false, false,*/ "");
 
         // existing signals
         for (int i = 0; i < mSignalList->count(); ++i) {
             const ComponentSignal& signal = *mSignalList->at(i);
             setTableRowContent(indexToRow(i), signal.getUuid(), signal.getName(),
-                               /*signal.getRole(),*/ signal.isRequired(), signal.isNegated(),
-                               signal.isClock(), signal.getForcedNetName());
+                               /*signal.getRole(),*/ signal.isRequired(), /*signal.isNegated(),
+                               signal.isClock(),*/ signal.getForcedNetName());
             if (signal.getUuid() == mSelectedSignal) {
                 selectedRow = indexToRow(i);
             }
@@ -279,8 +281,8 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
 }
 
 void ComponentSignalListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
-    const QString& name, /*const SignalRole& role,*/ bool required, bool negated,
-    bool clock, const QString& forcedNetName) noexcept
+    const QString& name, /*const SignalRole& role,*/ bool required, /*bool negated,
+    bool clock,*/ const QString& forcedNetName) noexcept
 {
     // header
     QString header = uuid.isNull() ? tr("Add new signal:") : uuid.toStr().left(13) % "...";
@@ -313,20 +315,20 @@ void ComponentSignalListEditorWidget::setTableRowContent(int row, const Uuid& uu
     mTable->setCellWidget(row, COLUMN_ISREQUIRED, requiredCheckBox);
 
     // negated
-    CenteredCheckBox* negatedCheckBox = new CenteredCheckBox(this);
-    negatedCheckBox->setProperty("row", row);
-    negatedCheckBox->setChecked(negated);
-    connect(negatedCheckBox, &CenteredCheckBox::toggled,
-            this, &ComponentSignalListEditorWidget::isNegatedChanged);
-    mTable->setCellWidget(row, COLUMN_ISNEGATED, negatedCheckBox);
+    //CenteredCheckBox* negatedCheckBox = new CenteredCheckBox(this);
+    //negatedCheckBox->setProperty("row", row);
+    //negatedCheckBox->setChecked(negated);
+    //connect(negatedCheckBox, &CenteredCheckBox::toggled,
+    //        this, &ComponentSignalListEditorWidget::isNegatedChanged);
+    //mTable->setCellWidget(row, COLUMN_ISNEGATED, negatedCheckBox);
 
     // clock
-    CenteredCheckBox* clockCheckBox = new CenteredCheckBox(this);
-    clockCheckBox->setProperty("row", row);
-    clockCheckBox->setChecked(clock);
-    connect(clockCheckBox, &CenteredCheckBox::toggled,
-            this, &ComponentSignalListEditorWidget::isClockChanged);
-    mTable->setCellWidget(row, COLUMN_ISCLOCK, clockCheckBox);
+    //CenteredCheckBox* clockCheckBox = new CenteredCheckBox(this);
+    //clockCheckBox->setProperty("row", row);
+    //clockCheckBox->setChecked(clock);
+    //connect(clockCheckBox, &CenteredCheckBox::toggled,
+    //        this, &ComponentSignalListEditorWidget::isClockChanged);
+    //mTable->setCellWidget(row, COLUMN_ISCLOCK, clockCheckBox);
 
     // forced net name
     mTable->setItem(row, COLUMN_FORCEDNETNAME, new QTableWidgetItem(forcedNetName));
@@ -352,15 +354,15 @@ void ComponentSignalListEditorWidget::setTableRowContent(int row, const Uuid& uu
 }
 
 void ComponentSignalListEditorWidget::addSignal(const QString& name, /*const SignalRole& role,*/
-    bool required, bool negated, bool clock, const QString& forcedNetName) noexcept
+    bool required, /*bool negated, bool clock,*/ const QString& forcedNetName) noexcept
 {
     try {
         throwIfNameEmptyOrExists(name);
         std::shared_ptr<ComponentSignal> signal(new ComponentSignal(Uuid::createRandom(), name)); // can throw
         //signal->setRole(role);
         signal->setIsRequired(required);
-        signal->setIsNegated(negated);
-        signal->setIsClock(clock);
+        //signal->setIsNegated(negated);
+        //signal->setIsClock(clock);
         signal->setForcedNetName(forcedNetName);
         if (mUndoStack) {
             mUndoStack->execCmd(new CmdComponentSignalInsert(*mSignalList, signal));
@@ -440,7 +442,7 @@ void ComponentSignalListEditorWidget::setIsRequired(const Uuid& uuid, bool requi
     }
 }
 
-void ComponentSignalListEditorWidget::setIsNegated(const Uuid& uuid, bool negated) noexcept
+/*void ComponentSignalListEditorWidget::setIsNegated(const Uuid& uuid, bool negated) noexcept
 {
     try {
         ComponentSignal* signal = mSignalList->get(uuid).get(); // can throw
@@ -472,7 +474,7 @@ void ComponentSignalListEditorWidget::setIsClock(const Uuid& uuid, bool clock) n
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not edit signal"), e.getMsg());
     }
-}
+}*/
 
 void ComponentSignalListEditorWidget::setForcedNetName(const Uuid& uuid, const QString& netname) noexcept
 {
