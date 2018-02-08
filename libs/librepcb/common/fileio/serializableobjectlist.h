@@ -379,19 +379,22 @@ class SerializableObjectList : public SerializableObject
  ****************************************************************************************/
 
 #if (QT_VERSION > QT_VERSION_CHECK(5, 9, 0))
-#define QFOREACHCONTAINER_TEMPLATE QtPrivate::QForeachContainer
-#else
-#define QFOREACHCONTAINER_TEMPLATE QForeachContainer
+namespace QtPrivate {
 #endif
 
 template <typename T, typename P>
-class QFOREACHCONTAINER_TEMPLATE<librepcb::SerializableObjectList<T, P>> { public:
+class QForeachContainer<librepcb::SerializableObjectList<T, P>> { public:
     ~QForeachContainer() = delete;
 };
 template <typename T, typename P>
-class QFOREACHCONTAINER_TEMPLATE<const librepcb::SerializableObjectList<T, P>> { public:
+class QForeachContainer<const librepcb::SerializableObjectList<T, P>> { public:
     ~QForeachContainer() = delete;
 };
+
+
+#if (QT_VERSION > QT_VERSION_CHECK(5, 9, 0))
+} // namespace QtPrivate
+#endif
 
 /*****************************************************************************************
  *  End of File
