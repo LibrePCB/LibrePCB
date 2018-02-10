@@ -63,6 +63,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
 
         // Getters
         Project& getProject() const noexcept {return mProject;}
+        const Uuid& getUuid() const noexcept {return mUuid;}
 
         /**
          * @brief Get the name of the project
@@ -182,6 +183,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
         QScopedPointer<SmartSExprFile> mFile;
 
         // Metadata
+        Uuid mUuid;                 ///< the UUID of the project
         QString mName;              ///< the name of the project
         QString mAuthor;            ///< the author of the project
         QString mVersion;           ///< the version of the project (arbitrary string)

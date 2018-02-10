@@ -47,6 +47,7 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
     if (create) {
         mFile.reset(SmartSExprFile::create(mFilepath));
 
+        mUuid = Uuid::createRandom();
         mName = mProject.getFilepath().getCompleteBasename();
         mAuthor = SystemInfo::getFullUsername();
         mVersion = "v1";
@@ -55,6 +56,12 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
         mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
         SExpression root = mFile->parseFileAndBuildDomTree();
 
+        if (root.getChildByIndex(0).isString()) {
+            mUuid = root.getChildByIndex(0).getValue<Uuid>(true);
+        } else {
+            // backward compatibility, remove this some time!
+            mUuid = Uuid::createRandom();
+        }
         mName = root.getValueByPath<QString>("name", false);
         mAuthor = root.getValueByPath<QString>("author", false);
         mVersion = root.getValueByPath<QString>("version", false);
@@ -142,6 +149,7 @@ void ProjectMetadata::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
+    root.appendToken(mUuid);
     root.appendStringChild("name", mName, true);
     root.appendStringChild("author", mAuthor, true);
     root.appendStringChild("version", mVersion, true);
