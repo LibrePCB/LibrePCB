@@ -131,7 +131,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
         Angle rot = Angle::fromDeg(text.getRotation().getAngle());
         Alignment align(HAlign::left(), VAlign::bottom());
         symbol->getTexts().append(std::make_shared<Text>(
-            layerName, textStr, pos, rot, height, align));
+            Uuid::createRandom(), layerName, textStr, pos, rot, height, align));
     }
 
     foreach (const parseagle::Pin& pin, mSymbol.getPins()) {

@@ -181,8 +181,8 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept
     try {
         mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add symbol text"));
-        mCurrentText = new Text(mLastLayerName, mLastText, pos, mLastRotation,
-                                mLastHeight, getAlignment());
+        mCurrentText = new Text(Uuid::createRandom(), mLastLayerName, mLastText, pos,
+                                mLastRotation, mLastHeight, getAlignment());
         mContext.undoStack.appendToCmdGroup(
             new CmdTextInsert(mContext.symbol.getTexts(), std::shared_ptr<Text>(mCurrentText)));
         mEditCmd.reset(new CmdTextEdit(*mCurrentText));

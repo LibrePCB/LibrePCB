@@ -179,7 +179,8 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept
     try {
         mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add footprint text"));
-        mCurrentText = new Text(mLastLayerName, mLastText, pos, mLastRotation, mLastHeight,
+        mCurrentText = new Text(Uuid::createRandom(), mLastLayerName, mLastText, pos,
+                                mLastRotation, mLastHeight,
                                 Alignment(HAlign::left(), VAlign::bottom()));
         mContext.undoStack.appendToCmdGroup(
             new CmdTextInsert(mContext.currentFootprint->getTexts(), std::shared_ptr<Text>(mCurrentText)));
