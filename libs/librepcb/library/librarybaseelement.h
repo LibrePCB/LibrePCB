@@ -73,7 +73,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
         const Version& getVersion() const noexcept {return mVersion;}
         const QString& getAuthor() const noexcept {return mAuthor;}
         const QDateTime& getCreated() const noexcept {return mCreated;}
-        const QDateTime& getLastModified() const noexcept {return mLastModified;}
         bool isDeprecated() const noexcept {return mIsDeprecated;}
         const LocalizedNameMap& getNames() const noexcept {return mNames;}
         const LocalizedDescriptionMap& getDescriptions() const noexcept {return mDescriptions;}
@@ -83,7 +82,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
         // Setters
         void setVersion(const Version& version) noexcept {mVersion = version;}
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
-        void setLastModified(const QDateTime& modified) noexcept {mLastModified = modified.toUTC();}
         void setDeprecated(bool deprecated) noexcept {mIsDeprecated = deprecated;}
         void setName(const QString& locale, const QString& name) noexcept {mNames.insert(locale, name);}
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions.insert(locale, desc);}
@@ -133,7 +131,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
         Version mVersion;
         QString mAuthor;
         QDateTime mCreated;
-        QDateTime mLastModified;
         bool mIsDeprecated;
         LocalizedNameMap mNames;
         LocalizedDescriptionMap mDescriptions;

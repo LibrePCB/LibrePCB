@@ -68,7 +68,6 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     mUi->lblUrl->setText(QString("<a href='%1'>%2</a>").arg(
         lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
     mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
-    mUi->lblLastModified->setText(lib->getLastModified().toString(Qt::TextDate));
     mUi->lblDeprecated->setText(lib->isDeprecated() ?
         tr("Yes - Consider switching to another library.") : tr("No"));
 

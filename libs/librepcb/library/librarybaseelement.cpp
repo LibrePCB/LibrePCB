@@ -49,8 +49,7 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName),
     mUuid(uuid), mVersion(version), mAuthor(author),
-    mCreated(QDateTime::currentDateTime()), mLastModified(QDateTime::currentDateTime()),
-    mIsDeprecated(false)
+    mCreated(QDateTime::currentDateTime()), mIsDeprecated(false)
 {
     FileUtils::makePath(mDirectory); // can throw
 
@@ -105,7 +104,6 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mVersion = mLoadingFileDocument.getValueByPath<Version>("version", true);
     mAuthor = mLoadingFileDocument.getValueByPath<QString>("author", false);
     mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created", true);
-    mLastModified = mLoadingFileDocument.getValueByPath<QDateTime>("modified", true);
     mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated", true);
 
     // read names, descriptions and keywords in all available languages
@@ -251,14 +249,13 @@ void LibraryBaseElement::serialize(SExpression& root) const
     }
 
     root.appendTokenChild("uuid", mUuid, true);
-    root.appendStringChild("version", mVersion, true);
-    root.appendStringChild("author", mAuthor, true);
-    root.appendTokenChild("created", mCreated, true);
-    root.appendTokenChild("modified", mLastModified, true);
-    root.appendTokenChild("deprecated", mIsDeprecated, true);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mKeywords.serialize(root);
+    root.appendStringChild("author", mAuthor, true);
+    root.appendStringChild("version", mVersion, true);
+    root.appendTokenChild("created", mCreated, true);
+    root.appendTokenChild("deprecated", mIsDeprecated, true);
 }
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept
