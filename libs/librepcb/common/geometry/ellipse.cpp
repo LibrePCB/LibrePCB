@@ -32,31 +32,48 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Ellipse::Ellipse(const Ellipse& other) noexcept :
-    mLayerName(other.mLayerName), mLineWidth(other.mLineWidth), mIsFilled(other.mIsFilled),
-    mIsGrabArea(other.mIsGrabArea), mCenter(other.mCenter), mRadiusX(other.mRadiusX),
-    mRadiusY(other.mRadiusY), mRotation(other.mRotation)
+Ellipse::Ellipse(const Ellipse& other) noexcept
 {
+    *this = other; // use assignment operator
 }
 
-Ellipse::Ellipse(const QString& layerName, const Length& lineWidth, bool fill,
+Ellipse::Ellipse(const Uuid& uuid, const Ellipse& other) noexcept :
+    Ellipse(other)
+{
+    mUuid = uuid;
+}
+
+Ellipse::Ellipse(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
                  bool isGrabArea, const Point& center, const Length& radiusX,
                  const Length& radiusY, const Angle& rotation) noexcept :
-    mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
-    mCenter(center), mRadiusX(radiusX), mRadiusY(radiusY), mRotation(rotation)
+    mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
+    mIsGrabArea(isGrabArea), mCenter(center), mRadiusX(radiusX), mRadiusY(radiusY),
+    mRotation(rotation)
 {
 }
 
 Ellipse::Ellipse(const SExpression& node)
 {
+    if (node.getChildByIndex(0).isString()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    } else {
+        // backward compatibility, remove this some time!
+        mUuid = Uuid::createRandom();
+    }
     mLayerName = node.getValueByPath<QString>("layer", true);
     mLineWidth = node.getValueByPath<Length>("width", true);
     mIsFilled = node.getValueByPath<bool>("fill", true);
     mIsGrabArea = node.getValueByPath<bool>("grab", true);
     mCenter = Point(node.getChildByPath("pos"));
     mRotation = node.getValueByPath<Angle>("rot", true);
-    mRadiusX = node.getValueByPath<Length>("rx", true);
-    mRadiusY = node.getValueByPath<Length>("ry", true);
+    if (node.tryGetChildByPath("size")) {
+        mRadiusX = Point(node.getChildByPath("size")).getX() / 2; // size to radius
+        mRadiusY = Point(node.getChildByPath("size")).getY() / 2; // size to radius
+    } else {
+        // backward compatibility, remove this some time!
+        mRadiusX = node.getValueByPath<Length>("rx", true);
+        mRadiusY = node.getValueByPath<Length>("ry", true);
+    }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -151,21 +168,11 @@ Ellipse& Ellipse::translate(const Point& offset) noexcept
     return *this;
 }
 
-Ellipse Ellipse::translated(const Point& offset) const noexcept
-{
-    return Ellipse(*this).translate(offset);
-}
-
 Ellipse& Ellipse::rotate(const Angle& angle, const Point& center) noexcept
 {
     mCenter.rotate(angle, center);
     mRotation += angle;
     return *this;
-}
-
-Ellipse Ellipse::rotated(const Angle& angle, const Point& center) const noexcept
-{
-    return Ellipse(*this).rotate(angle, center);
 }
 
 /*****************************************************************************************
@@ -186,14 +193,14 @@ void Ellipse::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
+    root.appendToken(mUuid);
     root.appendTokenChild("layer", mLayerName, false);
     root.appendTokenChild("width", mLineWidth, false);
-    root.appendTokenChild("fill", mIsFilled, false);
+    root.appendTokenChild("fill", mIsFilled, true);
     root.appendTokenChild("grab", mIsGrabArea, false);
-    root.appendChild(mCenter.serializeToDomElement("pos"), true);
+    root.appendChild(Point(mRadiusX * 2, mRadiusY * 2).serializeToDomElement("size"), false);
+    root.appendChild(mCenter.serializeToDomElement("pos"), false);
     root.appendTokenChild("rot", mRotation, false);
-    root.appendTokenChild("rx", mRadiusX, false);
-    root.appendTokenChild("ry", mRadiusY, false);
 }
 
 /*****************************************************************************************
@@ -202,6 +209,7 @@ void Ellipse::serialize(SExpression& root) const
 
 bool Ellipse::operator==(const Ellipse& rhs) const noexcept
 {
+    if (mUuid != rhs.mUuid)                 return false;
     if (mLayerName != rhs.mLayerName)       return false;
     if (mLineWidth != rhs.mLineWidth)       return false;
     if (mIsFilled != rhs.mIsFilled)         return false;
@@ -215,6 +223,7 @@ bool Ellipse::operator==(const Ellipse& rhs) const noexcept
 
 Ellipse& Ellipse::operator=(const Ellipse& rhs) noexcept
 {
+    mUuid = rhs.mUuid;
     mLayerName = rhs.mLayerName;
     mLineWidth = rhs.mLineWidth;
     mIsFilled = rhs.mIsFilled;
@@ -232,6 +241,7 @@ Ellipse& Ellipse::operator=(const Ellipse& rhs) noexcept
 
 bool Ellipse::checkAttributesValidity() const noexcept
 {
+    if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
     if (mRadiusX <= 0)          return false;

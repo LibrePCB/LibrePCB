@@ -97,8 +97,8 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Length lineWidth = Length::fromMm(circle.getWidth());
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
-        footprint->getEllipses().append(std::make_shared<Ellipse>(layerName,
-            lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
+        footprint->getEllipses().append(std::make_shared<Ellipse>(Uuid::createRandom(),
+            layerName, lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
     }
 
     foreach (const parseagle::Polygon& polygon, mPackage.getPolygons()) {
