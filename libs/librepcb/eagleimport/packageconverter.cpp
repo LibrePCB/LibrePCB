@@ -141,7 +141,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
     foreach (const parseagle::Hole& hole, mPackage.getHoles()) {
         Point pos = Point::fromMm(hole.getPosition().x, hole.getPosition().y);
         Length diameter = Length::fromMm(hole.getDiameter());
-        footprint->getHoles().append(std::make_shared<Hole>(pos, diameter));
+        footprint->getHoles().append(std::make_shared<Hole>(Uuid::createRandom(), pos, diameter));
     }
 
     foreach (const parseagle::ThtPad& pad, mPackage.getThtPads()) {
