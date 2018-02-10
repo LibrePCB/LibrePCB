@@ -53,7 +53,8 @@ PackageConverter::~PackageConverter() noexcept
 
 std::unique_ptr<library::Package> PackageConverter::generate() const
 {
-    library::Footprint footprint(mDb.getFootprintUuid(mPackage.getName()), "default", "");
+    std::shared_ptr<library::Footprint> footprint(
+        new library::Footprint(mDb.getFootprintUuid(mPackage.getName()), "default", ""));
 
     std::unique_ptr<library::Package> package(
         new library::Package(mDb.getPackageUuid(mPackage.getName()), Version("0.1"),
@@ -67,7 +68,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Point startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
         Point endpos = Point::fromMm(wire.getP2().x, wire.getP2().y);
         Angle angle = Angle::fromDeg(wire.getCurve());
-        footprint.getPolygons().append(std::shared_ptr<Polygon>(Polygon::createCurve(
+        footprint->getPolygons().append(std::shared_ptr<Polygon>(Polygon::createCurve(
             layerName, lineWidth, fill, isGrabArea, startpos, endpos, angle)));
     }
 
@@ -85,7 +86,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
         polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
         polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
-        footprint.getPolygons().append(polygon);
+        footprint->getPolygons().append(polygon);
     }
 
     foreach (const parseagle::Circle& circle, mPackage.getCircles()) {
@@ -95,7 +96,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Length lineWidth = Length::fromMm(circle.getWidth());
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
-        footprint.getEllipses().append(std::make_shared<Ellipse>(layerName,
+        footprint->getEllipses().append(std::make_shared<Ellipse>(layerName,
             lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
     }
 
@@ -116,7 +117,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
             }
         }
         newPolygon->close();
-        footprint.getPolygons().append(newPolygon);
+        footprint->getPolygons().append(newPolygon);
     }
 
     foreach (const parseagle::Text& text, mPackage.getTexts()) {
@@ -131,18 +132,18 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Point pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
         Angle rot = Angle::fromDeg(text.getRotation().getAngle());
         Alignment align(HAlign::left(), VAlign::bottom());
-        footprint.getTexts().append(std::make_shared<Text>(
+        footprint->getTexts().append(std::make_shared<Text>(
             layerName, textStr, pos, rot, height, align));
     }
 
     foreach (const parseagle::Hole& hole, mPackage.getHoles()) {
         Point pos = Point::fromMm(hole.getPosition().x, hole.getPosition().y);
         Length diameter = Length::fromMm(hole.getDiameter());
-        footprint.getHoles().append(std::make_shared<Hole>(pos, diameter));
+        footprint->getHoles().append(std::make_shared<Hole>(pos, diameter));
     }
 
     foreach (const parseagle::ThtPad& pad, mPackage.getThtPads()) {
-        Uuid uuid = mDb.getPackagePadUuid(footprint.getUuid(), pad.getName());
+        Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
         QString name = pad.getName();
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
@@ -172,11 +173,11 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Angle rot = Angle::fromDeg(pad.getRotation().getAngle());
         std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(uuid, pos,
             rot, shape, width, height, drillDiameter, library::FootprintPad::BoardSide::THT));
-        footprint.getPads().append(fptPad);
+        footprint->getPads().append(fptPad);
     }
 
     foreach (const parseagle::SmtPad& pad, mPackage.getSmtPads()) {
-        Uuid uuid = mDb.getPackagePadUuid(footprint.getUuid(), pad.getName());
+        Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
         QString name = pad.getName();
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         QString layerName = convertBoardLayer(pad.getLayer());
@@ -194,10 +195,10 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         Length height = Length::fromMm(pad.getHeight());
         std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(uuid, pos,
             rot, library::FootprintPad::Shape::RECT, width, height, Length(0), side));
-        footprint.getPads().append(fptPad);
+        footprint->getPads().append(fptPad);
     }
 
-    package->getFootprints().append(std::make_shared<library::Footprint>(footprint));
+    package->getFootprints().append(footprint);
 
     return package;
 }
