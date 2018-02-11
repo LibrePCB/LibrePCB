@@ -51,6 +51,8 @@ namespace library {
  *  - UUID
  *  - Symbol UUID
  *  - Pin-signal-mapping
+ *
+ * @todo Rename class to "ComponentGate" (or similar) and rename related classes if needed
  */
 class ComponentSymbolVariantItem final : public SerializableObject
 {
@@ -112,7 +114,7 @@ class ComponentSymbolVariantItem final : public SerializableObject
  *  Class ComponentSymbolVariantItemList
  ****************************************************************************************/
 
-struct ComponentSymbolVariantItemListNameProvider {static constexpr const char* tagname = "item";};
+struct ComponentSymbolVariantItemListNameProvider {static constexpr const char* tagname = "gate";};
 using ComponentSymbolVariantItemList = SerializableObjectList<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
 using CmdComponentSymbolVariantItemInsert = CmdListElementInsert<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;
 using CmdComponentSymbolVariantItemRemove = CmdListElementRemove<ComponentSymbolVariantItem, ComponentSymbolVariantItemListNameProvider>;

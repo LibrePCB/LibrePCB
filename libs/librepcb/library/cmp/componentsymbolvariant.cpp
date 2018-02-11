@@ -62,6 +62,11 @@ ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node) :
     // Load all symbol variant items
     mSymbolItems.loadFromDomElement(node);
 
+    // backward compatibility, remove this some time!
+    foreach (const SExpression& node, node.getChildren("item")) {
+        mSymbolItems.append(std::make_shared<ComponentSymbolVariantItem>(node)); // can throw
+    }
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
