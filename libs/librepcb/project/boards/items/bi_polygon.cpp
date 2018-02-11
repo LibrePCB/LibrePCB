@@ -61,10 +61,10 @@ BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon) :
 }
 
 BI_Polygon::BI_Polygon(Board& board, const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
-                       bool isGrabArea, const Point& startPos) :
+                       bool isGrabArea, const Path& path) :
     BI_Base(board)
 {
-    mPolygon.reset(new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, startPos));
+    mPolygon.reset(new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, path));
     init();
 }
 

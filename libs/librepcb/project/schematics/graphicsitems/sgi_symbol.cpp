@@ -78,7 +78,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
 
     // polygons
     for (const Polygon& polygon : mLibSymbol.getPolygons()) {
-        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
         qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
@@ -166,7 +166,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
-        painter->drawPath(polygon.toQPainterPathPx());
+        painter->drawPath(polygon.getPath().toQPainterPathPx());
     }
 
     // draw all ellipses

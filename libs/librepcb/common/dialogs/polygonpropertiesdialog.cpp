@@ -26,7 +26,6 @@
 #include "ui_polygonpropertiesdialog.h"
 #include "../geometry/polygon.h"
 #include "../geometry/cmd/cmdpolygonedit.h"
-#include "../geometry/cmd/cmdpolygonsegmentedit.h"
 #include "../graphics/graphicslayer.h"
 #include "../undostack.h"
 
@@ -55,12 +54,11 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
     mUi->cbxFillArea->setChecked(mPolygon.isFilled());
     mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
 
-    // load segments
-    mUi->tableWidget->setRowCount(mPolygon.getSegments().count() + 1);
-    setSegmentsTableRow(0, mPolygon.getStartPos(), Angle::deg0());
-    for (int i = 0; i < mPolygon.getSegments().count(); ++i) {
-        const PolygonSegment& segment = *mPolygon.getSegments().at(i);
-        setSegmentsTableRow(i + 1, segment.getEndPos(), segment.getAngle());
+    // load vertices
+    mUi->tableWidget->setRowCount(mPolygon.getPath().getVertices().count());
+    for (int i = 0; i < mPolygon.getPath().getVertices().count(); ++i) {
+        const Vertex& vertex = mPolygon.getPath().getVertices().at(i);
+        setVertexTableRow(i, vertex.getPos(), vertex.getAngle());
     }
 }
 
@@ -93,8 +91,6 @@ void PolygonPropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
 bool PolygonPropertiesDialog::applyChanges() noexcept
 {
     try {
-        UndoStackTransaction transaction(mUndoStack, tr("Edit polygon"));
-        // polygon
         QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(mPolygon));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
             cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
@@ -102,17 +98,12 @@ bool PolygonPropertiesDialog::applyChanges() noexcept
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
         cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
-        cmd->setStartPos(getSegmentsTableRowPos(0), false);
-        transaction.append(cmd.take());
-        // segments
-        for (int i = 1; i < mUi->tableWidget->rowCount(); ++i) {
-            PolygonSegment& segment = *mPolygon.getSegments()[i - 1];
-            QScopedPointer<CmdPolygonSegmentEdit> cmd(new CmdPolygonSegmentEdit(segment));
-            cmd->setEndPos(getSegmentsTableRowPos(i), false);
-            cmd->setAngle(getSegmentsTableRowAngle(i), false);
-            transaction.append(cmd.take());
+        Path path;
+        for (int i = 0; i < mUi->tableWidget->rowCount(); ++i) {
+            path.addVertex(getVertexTableRow(i));
         }
-        transaction.commit();
+        cmd->setPath(path, false);
+        mUndoStack.execCmd(cmd.take());
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
@@ -120,7 +111,7 @@ bool PolygonPropertiesDialog::applyChanges() noexcept
     }
 }
 
-void PolygonPropertiesDialog::setSegmentsTableRow(int row, const Point& pos,
+void PolygonPropertiesDialog::setVertexTableRow(int row, const Point& pos,
                                                   const Angle& angle) noexcept
 {
     mUi->tableWidget->setItem(row, 0, new QTableWidgetItem(pos.getX().toMmString()));
@@ -130,17 +121,14 @@ void PolygonPropertiesDialog::setSegmentsTableRow(int row, const Point& pos,
     mUi->tableWidget->setItem(row, 2, angleItem);
 }
 
-Point PolygonPropertiesDialog::getSegmentsTableRowPos(int row)
+Vertex PolygonPropertiesDialog::getVertexTableRow(int row)
 {
     QTableWidgetItem* col0 = mUi->tableWidget->item(row, 0); Q_ASSERT(col0);
     QTableWidgetItem* col1 = mUi->tableWidget->item(row, 1); Q_ASSERT(col1);
-    return Point(Length::fromMm(col0->text()), Length::fromMm(col1->text()));
-}
-
-Angle PolygonPropertiesDialog::getSegmentsTableRowAngle(int row)
-{
     QTableWidgetItem* col2 = mUi->tableWidget->item(row, 2); Q_ASSERT(col2);
-    return Angle::fromDeg(col2->text());
+    Point pos = Point(Length::fromMm(col0->text()), Length::fromMm(col1->text()));
+    Angle angle = Angle::fromDeg(col2->text());
+    return Vertex(pos, angle);
 }
 
 void PolygonPropertiesDialog::selectLayerNameInCombobox(const QString& name) noexcept

@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class CmdPolygonMove;
+class CmdPolygonEdit;
 
 namespace project {
 
@@ -79,7 +79,7 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
         QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
         QList<CmdBoardViaEdit*> mViaEditCmds;
         QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-        QList<CmdPolygonMove*> mPolygonMoveCmds;
+        QList<CmdPolygonEdit*> mPolygonEditCmds;
 };
 
 /*****************************************************************************************

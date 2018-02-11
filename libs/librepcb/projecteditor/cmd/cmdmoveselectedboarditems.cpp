@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdmoveselectedboarditems.h"
-#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
@@ -75,8 +75,8 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
         mNetPointEditCmds.append(cmd);
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);
-        CmdPolygonMove* cmd = new CmdPolygonMove(polygon->getPolygon());
-        mPolygonMoveCmds.append(cmd);
+        CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
+        mPolygonEditCmds.append(cmd);
     }
 }
 
@@ -104,7 +104,7 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
-        foreach (CmdPolygonMove* cmd, mPolygonMoveCmds) {
+        foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
         mDeltaPos = delta;
@@ -122,7 +122,7 @@ bool CmdMoveSelectedBoardItems::performExecute()
         qDeleteAll(mDeviceEditCmds);    mDeviceEditCmds.clear();
         qDeleteAll(mViaEditCmds);       mViaEditCmds.clear();
         qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
-        qDeleteAll(mPolygonMoveCmds);   mPolygonMoveCmds.clear();
+        qDeleteAll(mPolygonEditCmds);   mPolygonEditCmds.clear();
         return false;
     }
 
@@ -135,7 +135,7 @@ bool CmdMoveSelectedBoardItems::performExecute()
     foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
         appendChild(cmd); // can throw
     }
-    foreach (CmdPolygonMove* cmd, mPolygonMoveCmds) {
+    foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
         appendChild(cmd); // can throw
     }
 

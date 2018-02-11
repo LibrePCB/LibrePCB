@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../path.h"
 #include "../../undocommand.h"
 #include "../../units/all_length_units.h"
 
@@ -56,7 +57,7 @@ class CmdPolygonEdit final : public UndoCommand
         void setLineWidth(const Length& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setStartPos(const Point& pos, bool immediate) noexcept;
+        void setPath(const Path& path, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
@@ -92,8 +93,8 @@ class CmdPolygonEdit final : public UndoCommand
         bool mNewIsFilled;
         bool mOldIsGrabArea;
         bool mNewIsGrabArea;
-        Point mOldStartPos;
-        Point mNewStartPos;
+        Path mOldPath;
+        Path mNewPath;
 };
 
 /*****************************************************************************************

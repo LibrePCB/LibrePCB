@@ -26,7 +26,6 @@
 #include "ui_boardeditor.h"
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonsegmentedit.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
@@ -51,7 +50,7 @@ BES_DrawPolygon::BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
     BES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mSubState(SubState::Idle), mCurrentLayerName(GraphicsLayer::sBoardOutlines),
     mCurrentWidth(0), mCurrentIsFilled(false),
-    mCmdEditCurrentPolygon(nullptr), mCmdEditCurrentSegment(nullptr),
+    mCmdEditCurrentPolygon(nullptr),
     // command toolbar actions / widgets:
     mLayerLabel(nullptr), mLayerComboBox(nullptr), mWidthLabel(nullptr),
     mWidthComboBox(nullptr), mFillLabel(nullptr), mFillCheckBox(nullptr)
@@ -269,19 +268,14 @@ bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept
         mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
         mSubState = SubState::Positioning;
 
-        // add polygon with two segments
+        // add polygon with three vertices
+        Path path({Vertex(pos), Vertex(pos), Vertex(pos)});
         mCurrentPolygon = new BI_Polygon(board, Uuid::createRandom(), mCurrentLayerName,
-            mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, pos);
-        mCurrentPolygon->getPolygon().getSegments().append(
-            std::make_shared<PolygonSegment>(pos, Angle::deg0()));
-        mCurrentPolygon->getPolygon().getSegments().append(
-            std::make_shared<PolygonSegment>(pos, Angle::deg0())); // back to startpoint
+            mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, path);
         mUndoStack.appendToCmdGroup(new CmdBoardPolygonAdd(*mCurrentPolygon));
 
-        // start edit commands
+        // start undo command
         mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
-        mCmdEditCurrentSegment = new CmdPolygonSegmentEdit(
-            *mCurrentPolygon->getPolygon().getSegments().first());
         mLastSegmentPos = pos;
         makeSelectedLayerVisible();
         return true;
@@ -304,10 +298,9 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
     }
 
     try {
-        // if the polygon has more than 2 segments, start a new undo command
-        if (mCurrentPolygon->getPolygon().getSegments().count() > 2) {
+        // if the polygon has more than 2 vertices, start a new undo command
+        if (mCurrentPolygon->getPolygon().getPath().getVertices().count() > 2) {
             mUndoStack.appendToCmdGroup(mCmdEditCurrentPolygon); mCmdEditCurrentPolygon = nullptr;
-            mUndoStack.appendToCmdGroup(mCmdEditCurrentSegment); mCmdEditCurrentSegment = nullptr;
             mUndoStack.commitCmdGroup();
             mSubState = SubState::Idle;
 
@@ -316,17 +309,11 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
             mSubState = SubState::Positioning;
         }
 
-        // add new segment
-        int index =  mCurrentPolygon->getPolygon().getSegments().count() - 1;
-        QScopedPointer<CmdPolygonSegmentInsert> cmd(
-            new CmdPolygonSegmentInsert(mCurrentPolygon->getPolygon().getSegments(),
-            std::make_shared<PolygonSegment>(pos, Angle::deg0()), index));
-        mUndoStack.appendToCmdGroup(cmd.take());
-
-        // start edit commands
+        // add new segment and start new edit command
+        Path newPath = mCurrentPolygon->getPolygon().getPath();
+        newPath.addVertex(pos, Angle::deg0());
         mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
-        mCmdEditCurrentSegment = new CmdPolygonSegmentEdit(
-            *mCurrentPolygon->getPolygon().getSegments().value(index));
+        mCmdEditCurrentPolygon->setPath(newPath, true);
         mLastSegmentPos = pos;
         return true;
     } catch (Exception e) {
@@ -339,7 +326,6 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
 bool BES_DrawPolygon::abort(bool showErrMsgBox) noexcept
 {
     try {
-        delete mCmdEditCurrentSegment; mCmdEditCurrentSegment = nullptr;
         delete mCmdEditCurrentPolygon; mCmdEditCurrentPolygon = nullptr;
         mCurrentPolygon = nullptr;
         mUndoStack.abortCmdGroup(); // can throw
@@ -353,8 +339,10 @@ bool BES_DrawPolygon::abort(bool showErrMsgBox) noexcept
 
 void BES_DrawPolygon::updateSegmentPosition(const Point& cursorPos) noexcept
 {
-    if (mCmdEditCurrentSegment) {
-        mCmdEditCurrentSegment->setEndPos(cursorPos, true);
+    if (mCmdEditCurrentPolygon) {
+        Path newPath = mCurrentPolygon->getPolygon().getPath();
+        newPath.getVertices().last().setPos(cursorPos);
+        mCmdEditCurrentPolygon->setPath(newPath, true);
     }
 }
 

@@ -166,9 +166,9 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
 
             // add 160x100mm board outline (Eurocard size)
-            QScopedPointer<Polygon> polygon(Polygon::createRect(Uuid::createRandom(), GraphicsLayer::sBoardOutlines,
-                Length(0), false, false, Point(0, 0), Length(160000000), Length(100000000)));
-            mPolygons.append(new BI_Polygon(*this, *polygon));
+            Polygon polygon(Uuid::createRandom(), GraphicsLayer::sBoardOutlines, Length(0),
+                false, false, Path::rect(Point(0, 0), Point(160000000, 100000000)));
+            mPolygons.append(new BI_Polygon(*this, polygon));
         }
         else
         {

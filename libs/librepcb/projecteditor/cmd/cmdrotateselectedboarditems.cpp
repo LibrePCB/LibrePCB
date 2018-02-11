@@ -24,7 +24,7 @@
 #include "cmdrotateselectedboarditems.h"
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_device.h>
@@ -88,10 +88,8 @@ bool CmdRotateSelectedBoardItems::performExecute()
         ++count;
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) {
-        center += polygon->getPolygon().getStartPos();
-        ++count;
-        for (PolygonSegment& segment : polygon->getPolygon().getSegments()) {
-            center += segment.getEndPos();
+        for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
+            center += vertex.getPos();
             ++count;
         }
     }
@@ -121,7 +119,7 @@ bool CmdRotateSelectedBoardItems::performExecute()
         appendChild(cmd);
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);
-        CmdPolygonMove* cmd = new CmdPolygonMove(polygon->getPolygon());
+        CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }

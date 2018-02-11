@@ -57,10 +57,10 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
     while (findLineRectangle(lines)) {
         QSet<LengthBase_t> xValues, yValues;
         foreach (const Polygon* line, lines) {
-            xValues.insert(line->getStartPos().getX().toNm());
-            xValues.insert(line->getSegments().first()->getEndPos().getX().toNm());
-            yValues.insert(line->getStartPos().getY().toNm());
-            yValues.insert(line->getSegments().first()->getEndPos().getY().toNm());
+            xValues.insert(line->getPath().getVertices().at(0).getPos().getX().toNm());
+            xValues.insert(line->getPath().getVertices().at(1).getPos().getX().toNm());
+            yValues.insert(line->getPath().getVertices().at(0).getPos().getY().toNm());
+            yValues.insert(line->getPath().getVertices().at(1).getPos().getY().toNm());
         }
         if (xValues.count() != 2 || yValues.count() != 2) break;
         //Q_ASSERT(xValues.count() == 2 && yValues.count() == 2);
@@ -72,14 +72,9 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         // create the new polygon
         QString layerName = lines.first()->getLayerName();
         Length lineWidth = lines.first()->getLineWidth();
-
-        Polygon* rect = new Polygon(Uuid::createRandom(), layerName, lineWidth,
-                                    fillArea, isGrabArea, p1);
-        rect->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
-        rect->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
-        rect->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
-        rect->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
-        mLibraryElement.getPolygons().append(std::shared_ptr<Polygon>(rect));
+        Path rectPath({Vertex(p1), Vertex(p2), Vertex(p3), Vertex(p4), Vertex(p1)});
+        mLibraryElement.getPolygons().append(std::make_shared<Polygon>(
+            Uuid::createRandom(), layerName, lineWidth, fillArea, isGrabArea, rectPath));
 
         // remove all lines
         foreach (Polygon* line, lines)
@@ -97,7 +92,7 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
     // find lines
     QList<Polygon*> linePolygons;
     for (Polygon& polygon : mLibraryElement.getPolygons()) {
-        if (polygon.getSegments().count() == 1)
+        if (polygon.getPath().getVertices().count() == 2)
             linePolygons.append(&polygon);
     }
 
@@ -106,7 +101,7 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
     Length width;
     for (int i=0; i<linePolygons.count(); i++) {
         lines.clear();
-        Point p = linePolygons.at(i)->getStartPos();
+        Point p = linePolygons.at(i)->getPath().getVertices().first().getPos();
         if (findHLine(linePolygons, p, nullptr, &line)) {
             lines.append(line);
             width = line->getLineWidth();
@@ -133,8 +128,8 @@ bool PolygonSimplifier<LibElemType>::findHLine(const QList<Polygon*>& lines, Poi
 {
     foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}
-        Point p1 = polygon->getStartPos();
-        Point p2 = polygon->getSegments().first()->getEndPos();
+        Point p1 = polygon->getPath().getVertices().at(0).getPos();
+        Point p2 = polygon->getPath().getVertices().at(1).getPos();
         if ((p1 == p) && (p2.getY() == p.getY())) {
             *line = polygon;
             p = p2;
@@ -154,8 +149,8 @@ bool PolygonSimplifier<LibElemType>::findVLine(const QList<Polygon*>& lines, Poi
 {
     foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}
-        Point p1 = polygon->getStartPos();
-        Point p2 = polygon->getSegments().first()->getEndPos();
+        Point p1 = polygon->getPath().getVertices().at(0).getPos();
+        Point p2 = polygon->getPath().getVertices().at(1).getPos();
         if ((p1 == p) && (p2.getX() == p.getX())) {
             *line = polygon;
             p = p2;

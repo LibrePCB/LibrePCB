@@ -26,7 +26,7 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/cmd/cmdellipseedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
@@ -62,7 +62,7 @@ CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::
 
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = context.symbolGraphicsItem.getSelectedPolygons();
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        mPolygonEditCmds.append(new CmdPolygonMove(polygon->getPolygon()));
+        mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
     }
 
     QList<QSharedPointer<TextGraphicsItem>> texts = context.symbolGraphicsItem.getSelectedTexts();
@@ -93,7 +93,7 @@ void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdEllipseEdit* cmd, mEllipseEditCmds) {
             cmd->setDeltaToStartCenter(delta, true);
         }
-        foreach (CmdPolygonMove* cmd, mPolygonEditCmds) {
+        foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
         foreach (CmdTextEdit* cmd, mTextEditCmds) {

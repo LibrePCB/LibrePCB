@@ -103,7 +103,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
 
     // polygons
     for (const Polygon& polygon : mFootprint.getPolygons()) {
-        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
         qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
@@ -210,7 +210,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw polygon
-        painter->drawPath(polygon.toQPainterPathPx());
+        painter->drawPath(polygon.getPath().toQPainterPathPx());
     }
 
     // draw all ellipses

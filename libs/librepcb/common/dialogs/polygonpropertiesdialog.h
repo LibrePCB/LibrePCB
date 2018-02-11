@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include "../geometry/vertex.h"
 #include "../units/all_length_units.h"
 
 /*****************************************************************************************
@@ -69,9 +70,8 @@ class PolygonPropertiesDialog final : public QDialog
 
     private: // Methods
         bool applyChanges() noexcept;
-        void setSegmentsTableRow(int row, const Point& pos, const Angle& angle) noexcept;
-        Point getSegmentsTableRowPos(int row);
-        Angle getSegmentsTableRowAngle(int row);
+        void setVertexTableRow(int row, const Point& pos, const Angle& angle) noexcept;
+        Vertex getVertexTableRow(int row);
         void selectLayerNameInCombobox(const QString& name) noexcept;
 
 

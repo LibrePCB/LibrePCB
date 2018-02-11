@@ -64,8 +64,8 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
         Point startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
         Point endpos = Point::fromMm(wire.getP2().x, wire.getP2().y);
         Angle angle = Angle::fromDeg(wire.getCurve());
-        symbol->getPolygons().append(std::shared_ptr<Polygon>(Polygon::createCurve(
-            Uuid::createRandom(), layerName, lineWidth, fill, isGrabArea, startpos, endpos, angle)));
+        symbol->getPolygons().append(std::make_shared<Polygon>(Uuid::createRandom(),
+            layerName, lineWidth, fill, isGrabArea, Path::line(startpos, endpos, angle)));
     }
 
     foreach (const parseagle::Rectangle& rect, mSymbol.getRectangles()) {
@@ -74,16 +74,9 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
         bool isGrabArea = true;
         Length lineWidth = 0;
         Point p1 = Point::fromMm(rect.getP1().x, rect.getP1().y);
-        Point p2 = Point::fromMm(rect.getP2().x, rect.getP1().y);
-        Point p3 = Point::fromMm(rect.getP2().x, rect.getP2().y);
-        Point p4 = Point::fromMm(rect.getP1().x, rect.getP2().y);
-        std::shared_ptr<Polygon> polygon(new Polygon(
-            Uuid::createRandom(), layerName, lineWidth, fill, isGrabArea, p1));
-        polygon->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
-        polygon->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
-        polygon->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
-        polygon->getSegments().append(std::make_shared<PolygonSegment>(p1, Angle::deg0()));
-        symbol->getPolygons().append(polygon);
+        Point p2 = Point::fromMm(rect.getP2().x, rect.getP2().y);
+        symbol->getPolygons().append(std::make_shared<Polygon>(Uuid::createRandom(),
+            layerName, lineWidth, fill, isGrabArea, Path::rect(p1, p2)));
     }
 
     foreach (const parseagle::Circle& circle, mSymbol.getCircles()) {
@@ -102,20 +95,16 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
         bool fill = false;
         bool isGrabArea = true;
         Length lineWidth = Length::fromMm(polygon.getWidth());
-        std::shared_ptr<Polygon> newPolygon(new Polygon(
-            Uuid::createRandom(), layerName, lineWidth, fill, isGrabArea, Point(0, 0)));
+        Path path;
         for (int i = 0; i < polygon.getVertices().count(); ++i) {
             const parseagle::Vertex vertex = polygon.getVertices().at(i);
-            Point p = Point::fromMm(vertex.getPosition().x, vertex.getPosition().y);
+            Point pos = Point::fromMm(vertex.getPosition().x, vertex.getPosition().y);
             Angle angle = Angle::fromDeg(vertex.getCurve());
-            if (i == 0) {
-                newPolygon->setStartPos(p);
-            } else {
-                newPolygon->getSegments().append(std::make_shared<PolygonSegment>(p, angle));
-            }
+            path.addVertex(pos, angle);
         }
-        newPolygon->close();
-        symbol->getPolygons().append(newPolygon);
+        path.close();
+        symbol->getPolygons().append(std::make_shared<Polygon>(Uuid::createRandom(),
+            layerName, lineWidth, fill, isGrabArea, path));
     }
 
     foreach (const parseagle::Text& text, mSymbol.getTexts()) {
