@@ -72,6 +72,9 @@ class SQLiteDatabaseTest : public ::testing::Test
 
         static WorkerResult threadWorker(FilePath fp, int options, int duration) noexcept
         {
+            // increase thread priority because the multithreading tests are time critical
+            QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
+
             try {
                 qint64 count = 0;
                 SQLiteDatabase db(fp);
@@ -218,6 +221,10 @@ TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads)
     SQLiteDatabase db(mTempDbFilePath);
     db.exec("CREATE TABLE test (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)");
 
+    // increase thread priority because the multithreading tests are time critical
+    QThread::Priority originalThreadPriority = QThread::currentThread()->priority();
+    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
+
     // run worker threads (2 sequential writers and 4 parallel readers)
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     QFuture<WorkerResult> w1 = startWorkerThread(&pool, WRITING | TRANSACTION, 5000);
@@ -229,6 +236,9 @@ TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads)
     QFuture<WorkerResult> w2 = startWorkerThread(&pool, WRITING | NO_TRANSACTION, 5000);
     waitUntilAllWorkersFinished();
     qint64 duration = QDateTime::currentMSecsSinceEpoch() - startTime;
+
+    // restore thread priority
+    QThread::currentThread()->setPriority(originalThreadPriority);
 
     // get row count
     QSqlQuery query = db.prepareQuery("SELECT COUNT(*) FROM test");
