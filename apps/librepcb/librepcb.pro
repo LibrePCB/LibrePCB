@@ -112,13 +112,8 @@ FORMS += \
     firstrunwizard/firstrunwizardpage_workspacepath.ui \
 
 # Custom compiler "lrelease" for qm generation
-isEmpty(QMAKE_LRELEASE) {
-    contains(QMAKE_HOST.os,"Windows"){ 
-        QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\lrelease.exe
-    } else { 
-        QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-    }
-}
+isEmpty(QMAKE_LRELEASE): QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+
 lrelease.input = TRANSLATIONS
 lrelease.output = $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
 lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
