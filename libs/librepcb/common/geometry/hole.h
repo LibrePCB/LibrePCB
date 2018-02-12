@@ -74,11 +74,13 @@ class Hole final : public SerializableObject
         // Constructors / Destructor
         Hole() = delete;
         Hole(const Hole& other) noexcept;
-        Hole(const Point& position, const Length& diameter) noexcept;
+        Hole(const Uuid& uuid, const Hole& other) noexcept;
+        Hole(const Uuid& uuid, const Point& position, const Length& diameter) noexcept;
         explicit Hole(const SExpression& node);
         ~Hole() noexcept;
 
         // Getters
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Length& getDiameter() const noexcept {return mDiameter;}
 
@@ -104,6 +106,7 @@ class Hole final : public SerializableObject
 
 
     private: // Data
+        Uuid mUuid;
         Point mPosition;
         Length mDiameter;
 

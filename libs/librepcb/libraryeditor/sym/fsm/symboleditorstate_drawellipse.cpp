@@ -158,8 +158,8 @@ bool SymbolEditorState_DrawEllipse::startAddEllipse(const Point& pos) noexcept
     try {
         mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add symbol ellipse"));
-        mCurrentEllipse = new Ellipse(mLastLayerName, mLastLineWidth, mLastFill,
-                                      mLastGrabArea, pos, Length(0), Length(0),
+        mCurrentEllipse = new Ellipse(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
+                                      mLastFill, mLastGrabArea, pos, Length(0), Length(0),
                                       Angle::deg0());
         mContext.undoStack.appendToCmdGroup(new CmdEllipseInsert(
             mContext.symbol.getEllipses(), std::shared_ptr<Ellipse>(mCurrentEllipse)));

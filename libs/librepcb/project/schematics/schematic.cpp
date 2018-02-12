@@ -77,7 +77,12 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
             // the schematic seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getValueByPath<Uuid>("uuid", true);
+            if (root.getChildByIndex(0).isString()) {
+                mUuid = root.getChildByIndex(0).getValue<Uuid>(true);
+            } else {
+                // backward compatibility, remove this some time!
+                mUuid = root.getValueByPath<Uuid>("uuid", true);
+            }
             mName = root.getValueByPath<QString>("name", true);
 
             // Load grid properties
@@ -487,7 +492,7 @@ void Schematic::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendTokenChild("uuid", mUuid, true);
+    root.appendToken(mUuid);
     root.appendStringChild("name", mName, true);
     root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
     root.appendLineBreak();

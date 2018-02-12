@@ -166,7 +166,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
 
             // add 160x100mm board outline (Eurocard size)
-            QScopedPointer<Polygon> polygon(Polygon::createRect(GraphicsLayer::sBoardOutlines,
+            QScopedPointer<Polygon> polygon(Polygon::createRect(Uuid::createRandom(), GraphicsLayer::sBoardOutlines,
                 Length(0), false, false, Point(0, 0), Length(160000000), Length(100000000)));
             mPolygons.append(new BI_Polygon(*this, *polygon));
         }
@@ -177,7 +177,12 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
             // the board seems to be ready to open, so we will create all needed objects
 
-            mUuid = root.getValueByPath<Uuid>("uuid", true);
+            if (root.getChildByIndex(0).isString()) {
+                mUuid = root.getChildByIndex(0).getValue<Uuid>(true);
+            } else {
+                // backward compatibility, remove this some time!
+                mUuid = root.getValueByPath<Uuid>("uuid", true);
+            }
             mName = root.getValueByPath<QString>("name", true);
 
             // Load grid properties
@@ -664,7 +669,7 @@ void Board::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendTokenChild("uuid", mUuid, true);
+    root.appendToken(mUuid);
     root.appendStringChild("name", mName, true);
     root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
     root.appendChild(mLayerStack->serializeToDomElement("layers"), true);

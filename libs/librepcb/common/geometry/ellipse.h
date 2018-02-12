@@ -80,13 +80,15 @@ class Ellipse : public SerializableObject
         // Constructors / Destructor
         Ellipse() = delete;
         Ellipse(const Ellipse& other) noexcept;
-        Ellipse(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
-                const Point& center, const Length& radiusX, const Length& radiusY,
-                const Angle& rotation) noexcept;
+        Ellipse(const Uuid& uuid, const Ellipse& other) noexcept;
+        Ellipse(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+                bool fill, bool isGrabArea, const Point& center, const Length& radiusX,
+                const Length& radiusY, const Angle& rotation) noexcept;
         explicit Ellipse(const SExpression& node);
         virtual ~Ellipse() noexcept;
 
         // Getters
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getLayerName() const noexcept {return mLayerName;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
@@ -109,9 +111,7 @@ class Ellipse : public SerializableObject
 
         // Transformations
         Ellipse& translate(const Point& offset) noexcept;
-        Ellipse translated(const Point& offset) const noexcept;
         Ellipse& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-        Ellipse rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
         void registerObserver(IF_EllipseObserver& object) const noexcept;
@@ -131,13 +131,14 @@ class Ellipse : public SerializableObject
 
 
     private: // Data
+        Uuid mUuid;
         QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
         Point mCenter;
-        Length mRadiusX;
-        Length mRadiusY;
+        Length mRadiusX; // TODO: change radius (x/y) to size (width/height)
+        Length mRadiusY; // TODO: change radius (x/y) to size (width/height)
         Angle mRotation;
 
         // Misc

@@ -100,7 +100,12 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mLoadingFileDocument = sexprFile.parseFileAndBuildDomTree();
 
     // read attributes
-    mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid", true);
+    if (mLoadingFileDocument.getChildByIndex(0).isString()) {
+        mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>(true);
+    } else {
+        // backward compatibility, remove this some time!
+        mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid", true);
+    }
     mVersion = mLoadingFileDocument.getValueByPath<Version>("version", true);
     mAuthor = mLoadingFileDocument.getValueByPath<QString>("author", false);
     mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created", true);
@@ -248,7 +253,7 @@ void LibraryBaseElement::serialize(SExpression& root) const
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    root.appendTokenChild("uuid", mUuid, true);
+    root.appendToken(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mKeywords.serialize(root);

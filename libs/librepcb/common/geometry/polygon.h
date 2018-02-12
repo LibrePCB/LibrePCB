@@ -168,12 +168,14 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
         // Constructors / Destructor
         Polygon() = delete;
         Polygon(const Polygon& other) noexcept;
-        Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
-                const Point& startPos) noexcept;
+        Polygon(const Uuid& uuid, const Polygon& other) noexcept;
+        Polygon(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+                bool fill, bool isGrabArea, const Point& startPos) noexcept;
         explicit Polygon(const SExpression& node);
         ~Polygon() noexcept;
 
         // Getters
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getLayerName() const noexcept {return mLayerName;}
         const Length& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
@@ -196,11 +198,8 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
 
         // Transformations
         Polygon& translate(const Point& offset) noexcept;
-        Polygon translated(const Point& offset) const noexcept;
         Polygon& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-        Polygon rotated(const Angle& angle, const Point& center = Point(0, 0)) const noexcept;
         Polygon& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
-        Polygon mirrored(Qt::Orientation orientation, const Point& center = Point(0, 0)) const noexcept;
 
         // General Methods
         bool close() noexcept;
@@ -216,13 +215,17 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
         Polygon& operator=(const Polygon& rhs) noexcept;
 
         // Static Methods
-        static Polygon* createLine(const QString& layerName, const Length& lineWidth, bool fill,
-                                   bool isGrabArea, const Point& p1, const Point& p2) noexcept;
-        static Polygon* createCurve(const QString& layerName, const Length& lineWidth, bool fill,
-                                    bool isGrabArea, const Point& p1, const Point& p2, const Angle& angle) noexcept;
-        static Polygon* createRect(const QString& layerName, const Length& lineWidth, bool fill,
-                                   bool isGrabArea, const Point& pos, const Length& width, const Length& height) noexcept;
-        static Polygon* createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill,
+        static Polygon* createLine(const Uuid& uuid, const QString& layerName,
+                                   const Length& lineWidth, bool fill, bool isGrabArea,
+                                   const Point& p1, const Point& p2) noexcept;
+        static Polygon* createCurve(const Uuid& uuid, const QString& layerName,
+                                    const Length& lineWidth, bool fill, bool isGrabArea,
+                                    const Point& p1, const Point& p2, const Angle& angle) noexcept;
+        static Polygon* createRect(const Uuid& uuid, const QString& layerName,
+                                   const Length& lineWidth, bool fill, bool isGrabArea,
+                                   const Point& pos, const Length& width, const Length& height) noexcept;
+        static Polygon* createCenteredRect(const Uuid& uuid, const QString& layerName,
+                                           const Length& lineWidth, bool fill,
                                            bool isGrabArea, const Point& center,
                                            const Length& width, const Length& height) noexcept;
 
@@ -238,6 +241,7 @@ class Polygon final : public SerializableObject, private PolygonSegmentList::IF_
 
 
     private: // Data
+        Uuid mUuid;
         QString mLayerName;
         Length mLineWidth;
         bool mIsFilled;

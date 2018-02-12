@@ -32,18 +32,30 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Hole::Hole(const Hole& other) noexcept :
-    mPosition(other.mPosition), mDiameter(other.mDiameter)
+Hole::Hole(const Hole& other) noexcept
 {
+    *this = other; // use assignment operator
 }
 
-Hole::Hole(const Point& position, const Length& diameter) noexcept :
-    mPosition(position), mDiameter(diameter)
+Hole::Hole(const Uuid& uuid, const Hole& other) noexcept :
+    Hole(other)
+{
+    mUuid = uuid;
+}
+
+Hole::Hole(const Uuid& uuid, const Point& position, const Length& diameter) noexcept :
+    mUuid(uuid), mPosition(position), mDiameter(diameter)
 {
 }
 
 Hole::Hole(const SExpression& node)
 {
+    if (node.getChildByIndex(0).isString()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    } else {
+        // backward compatibility, remove this some time!
+        mUuid = Uuid::createRandom();
+    }
     mPosition = Point(node.getChildByPath("pos"));
     mDiameter = node.getValueByPath<Length>("dia", true);
 
@@ -95,8 +107,9 @@ void Hole::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendToken(mUuid);
     root.appendTokenChild("dia", mDiameter, false);
+    root.appendChild(mPosition.serializeToDomElement("pos"), false);
 }
 
 /*****************************************************************************************
@@ -105,6 +118,7 @@ void Hole::serialize(SExpression& root) const
 
 bool Hole::operator==(const Hole& rhs) const noexcept
 {
+    if (mUuid != rhs.mUuid)                     return false;
     if (mPosition != rhs.mPosition)             return false;
     if (mDiameter != rhs.mDiameter)             return false;
     return true;
@@ -112,6 +126,7 @@ bool Hole::operator==(const Hole& rhs) const noexcept
 
 Hole& Hole::operator=(const Hole& rhs) noexcept
 {
+    mUuid = rhs.mUuid;
     mPosition = rhs.mPosition;
     mDiameter = rhs.mDiameter;
     return *this;
@@ -123,6 +138,7 @@ Hole& Hole::operator=(const Hole& rhs) noexcept
 
 bool Hole::checkAttributesValidity() const noexcept
 {
+    if (mUuid.isNull())          return false;
     if (mDiameter <= 0)          return false;
     return true;
 }

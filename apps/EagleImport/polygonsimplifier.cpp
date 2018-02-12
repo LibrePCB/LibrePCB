@@ -73,7 +73,8 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         QString layerName = lines.first()->getLayerName();
         Length lineWidth = lines.first()->getLineWidth();
 
-        Polygon* rect = new Polygon(layerName, lineWidth, fillArea, isGrabArea, p1);
+        Polygon* rect = new Polygon(Uuid::createRandom(), layerName, lineWidth,
+                                    fillArea, isGrabArea, p1);
         rect->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
         rect->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
         rect->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));

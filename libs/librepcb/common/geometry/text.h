@@ -79,12 +79,15 @@ class Text final : public SerializableObject
         // Constructors / Destructor
         Text() = delete;
         Text(const Text& other) noexcept;
-        Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
-             const Length& height, const Alignment& align) noexcept;
+        Text(const Uuid& uuid, const Text& other) noexcept;
+        Text(const Uuid& uuid, const QString& layerName, const QString& text,
+             const Point& pos, const Angle& rotation, const Length& height,
+             const Alignment& align) noexcept;
         explicit Text(const SExpression& node);
         ~Text() noexcept;
 
         // Getters
+        const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getLayerName() const noexcept {return mLayerName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
@@ -118,6 +121,7 @@ class Text final : public SerializableObject
 
 
     private: // Data
+        Uuid mUuid;
         QString mLayerName;
         QString mText;
         Point mPosition;

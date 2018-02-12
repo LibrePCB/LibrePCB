@@ -270,10 +270,12 @@ bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept
         mSubState = SubState::Positioning;
 
         // add polygon with two segments
-        Polygon p(mCurrentLayerName, mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, pos);
-        p.getSegments().append(std::make_shared<PolygonSegment>(pos, Angle::deg0()));
-        p.getSegments().append(std::make_shared<PolygonSegment>(pos, Angle::deg0())); // back to startpoint
-        mCurrentPolygon = new BI_Polygon(board, p);
+        mCurrentPolygon = new BI_Polygon(board, Uuid::createRandom(), mCurrentLayerName,
+            mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, pos);
+        mCurrentPolygon->getPolygon().getSegments().append(
+            std::make_shared<PolygonSegment>(pos, Angle::deg0()));
+        mCurrentPolygon->getPolygon().getSegments().append(
+            std::make_shared<PolygonSegment>(pos, Angle::deg0())); // back to startpoint
         mUndoStack.appendToCmdGroup(new CmdBoardPolygonAdd(*mCurrentPolygon));
 
         // start edit commands

@@ -191,8 +191,8 @@ bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept
     try {
         // add polygon
         mContext.undoStack.beginCmdGroup(tr("Add symbol polygon"));
-        mCurrentPolygon.reset(new Polygon(mLastLayerName, mLastLineWidth, mLastFill,
-                                          mLastGrabArea, pos));
+        mCurrentPolygon.reset(new Polygon(Uuid::createRandom(), mLastLayerName,
+                                          mLastLineWidth, mLastFill, mLastGrabArea, pos));
         mContext.undoStack.appendToCmdGroup(
             new CmdPolygonInsert(mContext.currentFootprint->getPolygons(), mCurrentPolygon));
         mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));

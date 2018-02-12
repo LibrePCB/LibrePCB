@@ -125,16 +125,28 @@ Polygon::Polygon(const Polygon& other) noexcept :
     *this = other; // use assignment operator
 }
 
-Polygon::Polygon(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
-                 const Point& startPos) noexcept :
-    mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill), mIsGrabArea(isGrabArea),
-    mStartPos(startPos), mSegments(this)
+Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
+    Polygon(other)
+{
+    mUuid = uuid;
+}
+
+Polygon::Polygon(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+                 bool fill, bool isGrabArea, const Point& startPos) noexcept :
+    mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
+    mIsGrabArea(isGrabArea), mStartPos(startPos), mSegments(this)
 {
 }
 
 Polygon::Polygon(const SExpression& node) :
     mSegments(this)
 {
+    if (node.getChildByIndex(0).isString()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    } else {
+        // backward compatibility, remove this some time!
+        mUuid = Uuid::createRandom();
+    }
     mLayerName = node.getValueByPath<QString>("layer", true);
     mLineWidth = node.getValueByPath<Length>("width", true);
     mIsFilled = node.getValueByPath<bool>("fill", true);
@@ -294,11 +306,6 @@ Polygon& Polygon::translate(const Point& offset) noexcept
     return *this;
 }
 
-Polygon Polygon::translated(const Point& offset) const noexcept
-{
-    return Polygon(*this).translate(offset);
-}
-
 Polygon& Polygon::rotate(const Angle& angle, const Point& center) noexcept
 {
     setStartPos(mStartPos.rotated(angle, center));
@@ -306,11 +313,6 @@ Polygon& Polygon::rotate(const Angle& angle, const Point& center) noexcept
         segment.setEndPos(segment.getEndPos().rotated(angle, center));
     }
     return *this;
-}
-
-Polygon Polygon::rotated(const Angle& angle, const Point& center) const noexcept
-{
-    return Polygon(*this).rotate(angle, center);
 }
 
 Polygon& Polygon::mirror(Qt::Orientation orientation, const Point& center) noexcept
@@ -321,11 +323,6 @@ Polygon& Polygon::mirror(Qt::Orientation orientation, const Point& center) noexc
         segment.setAngle(-segment.getAngle());
     }
     return *this;
-}
-
-Polygon Polygon::mirrored(Qt::Orientation orientation, const Point& center) const noexcept
-{
-    return Polygon(*this).mirror(orientation, center);
 }
 
 /*****************************************************************************************
@@ -356,9 +353,10 @@ void Polygon::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
+    root.appendToken(mUuid);
     root.appendTokenChild("layer", mLayerName, false);
-    root.appendTokenChild("width", mLineWidth, false);
-    root.appendTokenChild("fill", mIsFilled, true);
+    root.appendTokenChild("width", mLineWidth, true);
+    root.appendTokenChild("fill", mIsFilled, false);
     root.appendTokenChild("grab", mIsGrabArea, false);
     root.appendChild(mStartPos.serializeToDomElement("pos"), false);
     serializeObjectContainer(root, mSegments, "segment");
@@ -370,7 +368,8 @@ void Polygon::serialize(SExpression& root) const
 
 bool Polygon::operator==(const Polygon& rhs) const noexcept
 {
-    if (mLayerName != rhs.mLayerName)           return false;
+    if (mUuid != rhs.mUuid)                 return false;
+    if (mLayerName != rhs.mLayerName)       return false;
     if (mLineWidth != rhs.mLineWidth)       return false;
     if (mIsFilled != rhs.mIsFilled)         return false;
     if (mIsGrabArea != rhs.mIsGrabArea)     return false;
@@ -381,6 +380,7 @@ bool Polygon::operator==(const Polygon& rhs) const noexcept
 
 Polygon& Polygon::operator=(const Polygon& rhs) noexcept
 {
+    mUuid = rhs.mUuid;
     mLayerName = rhs.mLayerName;
     mLineWidth = rhs.mLineWidth;
     mIsFilled = rhs.mIsFilled;
@@ -395,31 +395,32 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Polygon* Polygon::createLine(const QString& layerName, const Length& lineWidth, bool fill,
-                             bool isGrabArea, const Point& p1, const Point& p2) noexcept
+Polygon* Polygon::createLine(const Uuid& uuid, const QString& layerName,
+    const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2) noexcept
 {
-    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, p1);
     p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
     return p;
 }
 
-Polygon* Polygon::createCurve(const QString& layerName, const Length& lineWidth, bool fill,
-                              bool isGrabArea, const Point& p1, const Point& p2,
-                              const Angle& angle) noexcept
+Polygon* Polygon::createCurve(const Uuid& uuid, const QString& layerName,
+    const Length& lineWidth, bool fill, bool isGrabArea, const Point& p1, const Point& p2,
+    const Angle& angle) noexcept
 {
-    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, p1);
     p->getSegments().append(std::make_shared<PolygonSegment>(p2, angle));
     return p;
 }
 
-Polygon* Polygon::createRect(const QString& layerName, const Length& lineWidth, bool fill, bool isGrabArea,
-                             const Point& pos, const Length& width, const Length& height) noexcept
+Polygon* Polygon::createRect(const Uuid& uuid, const QString& layerName,
+    const Length& lineWidth, bool fill, bool isGrabArea, const Point& pos,
+    const Length& width, const Length& height) noexcept
 {
     Point p1 = Point(pos.getX(),            pos.getY());
     Point p2 = Point(pos.getX() + width,    pos.getY());
     Point p3 = Point(pos.getX() + width,    pos.getY() + height);
     Point p4 = Point(pos.getX(),            pos.getY() + height);
-    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, p1);
     p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
     p->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
     p->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
@@ -427,15 +428,15 @@ Polygon* Polygon::createRect(const QString& layerName, const Length& lineWidth, 
     return p;
 }
 
-Polygon* Polygon::createCenteredRect(const QString& layerName, const Length& lineWidth, bool fill,
-                                     bool isGrabArea, const Point& center,
-                                     const Length& width, const Length& height) noexcept
+Polygon* Polygon::createCenteredRect(const Uuid& uuid, const QString& layerName,
+    const Length& lineWidth, bool fill, bool isGrabArea, const Point& center,
+    const Length& width, const Length& height) noexcept
 {
     Point p1 = Point(center.getX() - width/2, center.getY() + height/2);
     Point p2 = Point(center.getX() + width/2, center.getY() + height/2);
     Point p3 = Point(center.getX() + width/2, center.getY() - height/2);
     Point p4 = Point(center.getX() - width/2, center.getY() - height/2);
-    Polygon* p = new Polygon(layerName, lineWidth, fill, isGrabArea, p1);
+    Polygon* p = new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, p1);
     p->getSegments().append(std::make_shared<PolygonSegment>(p2, Angle::deg0()));
     p->getSegments().append(std::make_shared<PolygonSegment>(p3, Angle::deg0()));
     p->getSegments().append(std::make_shared<PolygonSegment>(p4, Angle::deg0()));
@@ -489,6 +490,7 @@ void Polygon::polygonSegmentAngleChanged(const PolygonSegment& segment, const An
 
 bool Polygon::checkAttributesValidity() const noexcept
 {
+    if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
     return true;

@@ -32,22 +32,34 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Text::Text(const Text& other) noexcept :
-    mLayerName(other.mLayerName), mText(other.mText), mPosition(other.mPosition),
-    mRotation(other.mRotation), mHeight(other.mHeight), mAlign(other.mAlign)
+Text::Text(const Text& other) noexcept
 {
+    *this = other; // use assignment operator
 }
 
-Text::Text(const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
+Text::Text(const Uuid& uuid, const Text& other) noexcept :
+    Text(other)
+{
+    mUuid = uuid;
+}
+
+Text::Text(const Uuid& uuid, const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
            const Length& height, const Alignment& align) noexcept :
-    mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation), mHeight(height),
-    mAlign(align)
+    mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
+    mHeight(height), mAlign(align)
 {
 }
 
 Text::Text(const SExpression& node)
 {
-    mText = node.getChildByIndex(0).getValue<QString>(true);
+    if (!Uuid(node.getChildByIndex(0).getValue<QString>(false)).isNull()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+        mText = node.getValueByPath<QString>("value", true);
+    } else {
+        // backward compatibility, remove this some time!
+        mUuid = Uuid::createRandom();
+        mText = node.getChildByIndex(0).getValue<QString>(true);
+    }
     mLayerName = node.getValueByPath<QString>("layer", true);
 
     // load geometry attributes
@@ -144,12 +156,13 @@ void Text::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendString(mText);
+    root.appendToken(mUuid);
     root.appendTokenChild("layer", mLayerName, false);
-    root.appendChild(mAlign.serializeToDomElement("align"), false);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
+    root.appendStringChild("value", mText, false);
+    root.appendChild(mAlign.serializeToDomElement("align"), true);
     root.appendTokenChild("height", mHeight, false);
+    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendTokenChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************
@@ -158,7 +171,8 @@ void Text::serialize(SExpression& root) const
 
 bool Text::operator==(const Text& rhs) const noexcept
 {
-    if (mLayerName != rhs.mLayerName)           return false;
+    if (mUuid != rhs.mUuid)                 return false;
+    if (mLayerName != rhs.mLayerName)       return false;
     if (mText != rhs.mText)                 return false;
     if (mPosition != rhs.mPosition)         return false;
     if (mRotation != rhs.mRotation)         return false;
@@ -169,6 +183,7 @@ bool Text::operator==(const Text& rhs) const noexcept
 
 Text& Text::operator=(const Text& rhs) noexcept
 {
+    mUuid = rhs.mUuid;
     mLayerName = rhs.mLayerName;
     mText = rhs.mText;
     mPosition = rhs.mPosition;
@@ -184,6 +199,7 @@ Text& Text::operator=(const Text& rhs) noexcept
 
 bool Text::checkAttributesValidity() const noexcept
 {
+    if (mUuid.isNull())     return false;
     if (mText.isEmpty())    return false;
     if (mHeight <= 0)       return false;
     return true;

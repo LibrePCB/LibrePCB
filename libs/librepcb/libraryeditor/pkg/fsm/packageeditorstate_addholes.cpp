@@ -129,7 +129,7 @@ bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept
     try {
         mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add hole"));
-        mCurrentHole = new Hole(pos, mLastDiameter);
+        mCurrentHole = new Hole(Uuid::createRandom(), pos, mLastDiameter);
         mContext.undoStack.appendToCmdGroup(new CmdHoleInsert(
             mContext.currentFootprint->getHoles(), std::shared_ptr<Hole>(mCurrentHole)));
         mEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
