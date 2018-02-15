@@ -33,7 +33,6 @@
 namespace librepcb {
 
 class CmdPolygonEdit;
-class CmdPolygonSegmentEdit;
 class GraphicsLayerComboBox;
 
 namespace project {
@@ -99,7 +98,6 @@ class BES_DrawPolygon final : public BES_Base
         bool mCurrentIsFilled;
         BI_Polygon* mCurrentPolygon;
         CmdPolygonEdit* mCmdEditCurrentPolygon;
-        CmdPolygonSegmentEdit* mCmdEditCurrentSegment;
         Point mLastSegmentPos;
 
         // Widgets for the command toolbar

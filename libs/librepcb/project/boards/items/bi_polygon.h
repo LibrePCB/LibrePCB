@@ -33,6 +33,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class Path;
 class Polygon;
 class PolygonGraphicsItem;
 
@@ -65,7 +66,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject
         BI_Polygon(Board& board, const SExpression& node);
         BI_Polygon(Board& board, const Polygon& polygon);
         BI_Polygon(Board& board, const Uuid& uuid, const QString& layerName,
-                   const Length& lineWidth, bool fill, bool isGrabArea, const Point& startPos);
+                   const Length& lineWidth, bool fill, bool isGrabArea, const Path& path);
         ~BI_Polygon() noexcept;
 
         // Getters

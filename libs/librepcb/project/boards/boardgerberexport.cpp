@@ -212,9 +212,8 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
     foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
         Q_ASSERT(polygon);
         if (layerName == polygon->getPolygon().getLayerName()) {
-            Polygon p(polygon->getPolygon());
-            p.setLineWidth(calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName));
-            gen.drawPolygonOutline(p);
+            Length lineWidth = calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName);
+            gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth);
         }
     }
 }
@@ -263,14 +262,13 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     for (const Polygon& polygon : footprint.getLibFootprint().getPolygons()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == polygon.getLayerName()) {
-            Polygon p = polygon;
-            if (footprint.getIsMirrored()) p.mirror(Qt::Horizontal);
-            p.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
-            p.translate(footprint.getPosition());
-            p.setLineWidth(calcWidthOfLayer(p.getLineWidth(), layer));
-            gen.drawPolygonOutline(p);
-            if (p.isFilled()) {
-                gen.drawPolygonArea(p);
+            Path path = polygon.getPath();
+            if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
+            path.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
+            path.translate(footprint.getPosition());
+            gen.drawPathOutline(path, calcWidthOfLayer(polygon.getLineWidth(), layer));
+            if (polygon.isFilled()) {
+                gen.drawPathArea(path);
             }
         }
     }

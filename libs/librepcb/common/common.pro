@@ -64,13 +64,13 @@ SOURCES += \
     geometry/cmd/cmdellipseedit.cpp \
     geometry/cmd/cmdholeedit.cpp \
     geometry/cmd/cmdpolygonedit.cpp \
-    geometry/cmd/cmdpolygonmove.cpp \
-    geometry/cmd/cmdpolygonsegmentedit.cpp \
     geometry/cmd/cmdtextedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
+    geometry/path.cpp \
     geometry/polygon.cpp \
     geometry/text.cpp \
+    geometry/vertex.cpp \
     graphics/defaultgraphicslayerprovider.cpp \
     graphics/ellipsegraphicsitem.cpp \
     graphics/graphicslayer.cpp \
@@ -160,13 +160,13 @@ HEADERS += \
     geometry/cmd/cmdellipseedit.h \
     geometry/cmd/cmdholeedit.h \
     geometry/cmd/cmdpolygonedit.h \
-    geometry/cmd/cmdpolygonmove.h \
-    geometry/cmd/cmdpolygonsegmentedit.h \
     geometry/cmd/cmdtextedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
+    geometry/path.h \
     geometry/polygon.h \
     geometry/text.h \
+    geometry/vertex.h \
     graphics/defaultgraphicslayerprovider.h \
     graphics/ellipsegraphicsitem.h \
     graphics/graphicslayer.h \

@@ -38,7 +38,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
         const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent) noexcept :
     PrimitivePathGraphicsItem(parent), mPolygon(polygon), mLayerProvider(lp)
 {
-    setPath(mPolygon.toQPainterPathPx());
+    setPath(mPolygon.getPath().toQPainterPathPx());
     setLineWidth(mPolygon.getLineWidth());
     setLineLayer(mLayerProvider.getLayer(mPolygon.getLayerName()));
     updateFillLayer();
@@ -80,36 +80,9 @@ void PolygonGraphicsItem::polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept
     updateFillLayer();
 }
 
-void PolygonGraphicsItem::polygonStartPosChanged(const Point& newStartPos) noexcept
+void PolygonGraphicsItem::polygonPathChanged(const Path& newPath) noexcept
 {
-    Q_UNUSED(newStartPos);
-    setPath(mPolygon.toQPainterPathPx());
-}
-
-void PolygonGraphicsItem::polygonSegmentAdded(int newSegmentIndex) noexcept
-{
-    Q_UNUSED(newSegmentIndex);
-    setPath(mPolygon.toQPainterPathPx());
-}
-
-void PolygonGraphicsItem::polygonSegmentRemoved(int oldSegmentIndex) noexcept
-{
-    Q_UNUSED(oldSegmentIndex);
-    setPath(mPolygon.toQPainterPathPx());
-}
-
-void PolygonGraphicsItem::polygonSegmentEndPosChanged(int segmentIndex, const Point& newEndPos) noexcept
-{
-    Q_UNUSED(segmentIndex);
-    Q_UNUSED(newEndPos);
-    setPath(mPolygon.toQPainterPathPx());
-}
-
-void PolygonGraphicsItem::polygonSegmentAngleChanged(int segmentIndex, const Angle& newAngle) noexcept
-{
-    Q_UNUSED(segmentIndex);
-    Q_UNUSED(newAngle);
-    setPath(mPolygon.toQPainterPathPx());
+    setPath(newPath.toQPainterPathPx());
 }
 
 void PolygonGraphicsItem::updateFillLayer() noexcept

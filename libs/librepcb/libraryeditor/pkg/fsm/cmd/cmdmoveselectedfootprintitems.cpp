@@ -27,7 +27,7 @@
 #include <librepcb/common/geometry/cmd/cmdellipseedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
@@ -65,7 +65,7 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
 
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = context.currentGraphicsItem->getSelectedPolygons();
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        mPolygonEditCmds.append(new CmdPolygonMove(polygon->getPolygon()));
+        mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
     }
 
     QList<QSharedPointer<TextGraphicsItem>> texts = context.currentGraphicsItem->getSelectedTexts();
@@ -101,7 +101,7 @@ void CmdMoveSelectedFootprintItems::setCurrentPosition(const Point& pos) noexcep
         foreach (CmdEllipseEdit* cmd, mEllipseEditCmds) {
             cmd->setDeltaToStartCenter(delta, true);
         }
-        foreach (CmdPolygonMove* cmd, mPolygonEditCmds) {
+        foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
         foreach (CmdTextEdit* cmd, mTextEditCmds) {

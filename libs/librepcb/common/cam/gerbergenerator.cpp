@@ -24,9 +24,10 @@
 #include "gerbergenerator.h"
 #include "gerberaperturelist.h"
 #include "../geometry/ellipse.h"
-#include "../geometry/polygon.h"
+#include "../geometry/path.h"
 #include "../fileio/smarttextfile.h"
 #include "../application.h"
+#include "../toolbox.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -94,66 +95,70 @@ void GerberGenerator::drawEllipseArea(const Ellipse& ellipse) noexcept
     }
 }
 
-void GerberGenerator::drawPolygonOutline(const Polygon& polygon) noexcept
+void GerberGenerator::drawPathOutline(const Path& path, const Length& lineWidth) noexcept
 {
-    setCurrentAperture(mApertureList->setCircle(polygon.getLineWidth(), Length(0)));
-    moveToPosition(polygon.getStartPos());
-    for (int i = 0; i < polygon.getSegments().count(); ++i) {
-        std::shared_ptr<const PolygonSegment> segment = polygon.getSegments().at(i);
-        if (segment->getAngle() == 0) {
+    if (path.getVertices().count() < 2) {
+        qWarning() << "Invalid path was ignored in gerber output!";
+        return;
+    }
+    setCurrentAperture(mApertureList->setCircle(lineWidth, Length(0)));
+    moveToPosition(path.getVertices().first().getPos());
+    for (int i = 1; i < path.getVertices().count(); ++i) {
+        const Vertex& vertex = path.getVertices().at(i);
+        if (vertex.getAngle() == 0) {
             // linear segment
-            linearInterpolateToPosition(segment->getEndPos());
+            linearInterpolateToPosition(vertex.getPos());
         } else {
             // arc segment
-            if (segment->getAngle().abs() <= Angle::deg90()) {
+            if (vertex.getAngle().abs() <= Angle::deg90()) {
                 setMultiQuadrantArcModeOff();
             } else {
                 setMultiQuadrantArcModeOn();
             }
-            if (segment->getAngle() < 0) {
+            if (vertex.getAngle() < 0) {
                 switchToCircularCwInterpolationModeG02();
             } else {
                 switchToCircularCcwInterpolationModeG03();
             }
-            circularInterpolateToPosition(polygon.getStartPointOfSegment(i),
-                                          polygon.calcCenterOfArcSegment(i),
-                                          segment->getEndPos());
+            Point start = path.getVertices().at(i-1).getPos();
+            Point center = Toolbox::arcCenter(start, vertex.getPos(), vertex.getAngle());
+            circularInterpolateToPosition(start, center, vertex.getPos());
             switchToLinearInterpolationModeG01();
         }
     }
 }
 
-void GerberGenerator::drawPolygonArea(const Polygon& polygon) noexcept
+void GerberGenerator::drawPathArea(const Path& path) noexcept
 {
+    if (!path.isClosed()) {
+        qWarning() << "Non-closed path was ignored in gerber output!";
+        return;
+    }
     setCurrentAperture(mApertureList->setCircle(Length(0), Length(0)));
     setRegionModeOn();
-    moveToPosition(polygon.getStartPos());
-    for (int i = 0; i < polygon.getSegments().count(); ++i) {
-        std::shared_ptr<const PolygonSegment> segment = polygon.getSegments().at(i);
-        if (segment->getAngle() == 0) {
+    moveToPosition(path.getVertices().first().getPos());
+    for (int i = 1; i < path.getVertices().count(); ++i) {
+        const Vertex& vertex = path.getVertices().at(i);
+        if (vertex.getAngle() == 0) {
             // linear segment
-            linearInterpolateToPosition(segment->getEndPos());
+            linearInterpolateToPosition(vertex.getPos());
         } else {
             // arc segment
-            if (segment->getAngle().abs() <= Angle::deg90()) {
+            if (vertex.getAngle().abs() <= Angle::deg90()) {
                 setMultiQuadrantArcModeOff();
             } else {
                 setMultiQuadrantArcModeOn();
             }
-            if (segment->getAngle() < 0) {
+            if (vertex.getAngle() < 0) {
                 switchToCircularCwInterpolationModeG02();
             } else {
                 switchToCircularCcwInterpolationModeG03();
             }
-            circularInterpolateToPosition(polygon.getStartPointOfSegment(i),
-                                          polygon.calcCenterOfArcSegment(i),
-                                          segment->getEndPos());
+            Point start = path.getVertices().at(i-1).getPos();
+            Point center = Toolbox::arcCenter(start, vertex.getPos(), vertex.getAngle());
+            circularInterpolateToPosition(start, center, vertex.getPos());
             switchToLinearInterpolationModeG01();
         }
-    }
-    if (!polygon.isClosed()) {
-        qCritical() << "Accidentally generated gerber export of a non-closed polygon!";
-        linearInterpolateToPosition(polygon.getStartPos());
     }
     setRegionModeOff();
 }

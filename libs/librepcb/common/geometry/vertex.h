@@ -17,53 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDPOLYGONMOVE_H
-#define LIBREPCB_CMDPOLYGONMOVE_H
+#ifndef LIBREPCB_VERTEX_H
+#define LIBREPCB_VERTEX_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../../undocommandgroup.h"
-#include "../../units/all_length_units.h"
+#include "../fileio/serializableobject.h"
+#include "../units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class Polygon;
-class CmdPolygonEdit;
-class CmdPolygonSegmentEdit;
-
 /*****************************************************************************************
- *  Class CmdPolygonMove
+ *  Class Vertex
  ****************************************************************************************/
 
 /**
- * @brief The CmdPolygonMove class
+ * @brief The Vertex class
  */
-class CmdPolygonMove final : public UndoCommandGroup
+class Vertex final : public SerializableObject
 {
     public:
 
         // Constructors / Destructor
-        CmdPolygonMove() = delete;
-        CmdPolygonMove(const CmdPolygonMove& other) = delete;
-        explicit CmdPolygonMove(Polygon& polygon) noexcept;
-        ~CmdPolygonMove() noexcept;
+        Vertex() noexcept : mPos(), mAngle() {}
+        Vertex(const Vertex& other) noexcept : mPos(other.mPos), mAngle(other.mAngle) {}
+        explicit Vertex(const Point& pos, const Angle& angle = Angle::deg0()) noexcept :
+            mPos(pos), mAngle(angle) {}
+        explicit Vertex(const SExpression& node);
+        ~Vertex() noexcept {}
+
+        // Getters
+        const Point& getPos() const noexcept {return mPos;}
+        const Angle& getAngle() const noexcept {return mAngle;}
 
         // Setters
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void setPos(const Point& pos) noexcept {mPos = pos;}
+        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
+
+        // General Methods
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(SExpression& root) const override;
 
         // Operator Overloadings
-        CmdPolygonMove& operator=(const CmdPolygonMove& rhs) = delete;
+        bool operator==(const Vertex& rhs) const noexcept;
+        bool operator!=(const Vertex& rhs) const noexcept {return !(*this == rhs);}
+        Vertex& operator=(const Vertex& rhs) noexcept;
 
 
     private: // Data
-        CmdPolygonEdit* mPolygonEditCmd;
-        QList<CmdPolygonSegmentEdit*> mSegmentEditCmds;
+        Point mPos;
+        Angle mAngle;
 };
 
 /*****************************************************************************************
@@ -72,4 +80,4 @@ class CmdPolygonMove final : public UndoCommandGroup
 
 } // namespace librepcb
 
-#endif // LIBREPCB_CMDPOLYGONMOVE_H
+#endif // LIBREPCB_VERTEX_H

@@ -39,7 +39,7 @@ CmdPolygonEdit::CmdPolygonEdit(Polygon& polygon) noexcept :
     mOldLineWidth(polygon.getLineWidth()), mNewLineWidth(mOldLineWidth),
     mOldIsFilled(polygon.isFilled()), mNewIsFilled(mOldIsFilled),
     mOldIsGrabArea(polygon.isGrabArea()), mNewIsGrabArea(mOldIsGrabArea),
-    mOldStartPos(polygon.getStartPos()), mNewStartPos(mOldStartPos)
+    mOldPath(polygon.getPath()), mNewPath(mOldPath)
 {
 }
 
@@ -82,25 +82,21 @@ void CmdPolygonEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept
     if (immediate) mPolygon.setIsGrabArea(mNewIsGrabArea);
 }
 
-void CmdPolygonEdit::setStartPos(const Point& pos, bool immediate) noexcept
+void CmdPolygonEdit::setPath(const Path& path, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
-    mNewStartPos = pos;
-    if (immediate) mPolygon.setStartPos(mNewStartPos);
+    mNewPath = path;
+    if (immediate) mPolygon.setPath(mNewPath);
 }
 
 void CmdPolygonEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
 {
-    Q_ASSERT(!wasEverExecuted());
-    mNewStartPos = mOldStartPos + deltaPos;
-    if (immediate) mPolygon.setStartPos(mNewStartPos);
+    setPath(mOldPath.translated(deltaPos), immediate);
 }
 
 void CmdPolygonEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
-    Q_ASSERT(!wasEverExecuted());
-    mNewStartPos.rotate(angle, center);
-    if (immediate) mPolygon.setStartPos(mNewStartPos);
+    setPath(mNewPath.rotated(angle, center), immediate);
 }
 
 /*****************************************************************************************
@@ -115,7 +111,7 @@ bool CmdPolygonEdit::performExecute()
     if (mNewLineWidth   != mOldLineWidth)   return true;
     if (mNewIsFilled    != mOldIsFilled)    return true;
     if (mNewIsGrabArea  != mOldIsGrabArea)  return true;
-    if (mNewStartPos    != mOldStartPos)    return true;
+    if (mNewPath        != mOldPath)        return true;
     return false;
 }
 
@@ -125,7 +121,7 @@ void CmdPolygonEdit::performUndo()
     mPolygon.setLineWidth(mOldLineWidth);
     mPolygon.setIsFilled(mOldIsFilled);
     mPolygon.setIsGrabArea(mOldIsGrabArea);
-    mPolygon.setStartPos(mOldStartPos);
+    mPolygon.setPath(mOldPath);
 }
 
 void CmdPolygonEdit::performRedo()
@@ -134,7 +130,7 @@ void CmdPolygonEdit::performRedo()
     mPolygon.setLineWidth(mNewLineWidth);
     mPolygon.setIsFilled(mNewIsFilled);
     mPolygon.setIsGrabArea(mNewIsGrabArea);
-    mPolygon.setStartPos(mNewStartPos);
+    mPolygon.setPath(mNewPath);
 }
 
 /*****************************************************************************************

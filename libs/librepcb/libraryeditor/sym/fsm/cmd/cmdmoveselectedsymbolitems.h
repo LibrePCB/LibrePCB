@@ -35,7 +35,7 @@ namespace librepcb {
 
 class CmdEllipseEdit;
 class CmdTextEdit;
-class CmdPolygonMove;
+class CmdPolygonEdit;
 
 namespace library {
 
@@ -89,7 +89,7 @@ class CmdMoveSelectedSymbolItems final : public UndoCommandGroup
         // Move commands
         QList<CmdSymbolPinEdit*> mPinEditCmds;
         QList<CmdEllipseEdit*> mEllipseEditCmds;
-        QList<CmdPolygonMove*> mPolygonEditCmds;
+        QList<CmdPolygonEdit*> mPolygonEditCmds;
         QList<CmdTextEdit*> mTextEditCmds;
 };
 

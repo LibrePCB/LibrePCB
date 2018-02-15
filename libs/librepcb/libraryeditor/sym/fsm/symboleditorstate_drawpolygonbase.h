@@ -34,10 +34,8 @@
 namespace librepcb {
 
 class Polygon;
-class PolygonSegment;
 class PolygonGraphicsItem;
 class CmdPolygonEdit;
-class CmdPolygonSegmentEdit;
 
 namespace library {
 namespace editor {
@@ -99,7 +97,6 @@ class SymbolEditorState_DrawPolygonBase : public SymbolEditorState
         QScopedPointer<CmdPolygonEdit> mEditCmd;
         std::shared_ptr<Polygon> mCurrentPolygon;
         Point mSegmentStartPos;
-        std::vector<std::unique_ptr<CmdPolygonSegmentEdit>> mSegmentEditCmds;
         PolygonGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory

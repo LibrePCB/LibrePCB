@@ -68,11 +68,7 @@ class PolygonGraphicsItem final : public PrimitivePathGraphicsItem, public IF_Po
         void polygonLineWidthChanged(const Length& newLineWidth) noexcept override;
         void polygonIsFilledChanged(bool newIsFilled) noexcept override;
         void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-        void polygonStartPosChanged(const Point& newStartPos) noexcept override;
-        void polygonSegmentAdded(int newSegmentIndex) noexcept override;
-        void polygonSegmentRemoved(int oldSegmentIndex) noexcept override;
-        void polygonSegmentEndPosChanged(int segmentIndex, const Point& newEndPos) noexcept override;
-        void polygonSegmentAngleChanged(int segmentIndex, const Angle& newAngle) noexcept override;
+        void polygonPathChanged(const Path& newPath) noexcept override;
         void updateFillLayer() noexcept;
 
 

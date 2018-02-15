@@ -101,7 +101,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
-        QPainterPath polygonPath = polygon.toQPainterPathPx();
+        QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
         qreal w = polygon.getLineWidth().toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (!polygon.isGrabArea()) continue;
@@ -213,7 +213,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
 
         // draw polygon
-        painter->drawPath(polygon.toQPainterPathPx());
+        painter->drawPath(polygon.getPath().toQPainterPathPx());
     }
 
     // draw all ellipses

@@ -26,7 +26,7 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/cmd/cmdellipseedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonmove.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
@@ -83,7 +83,11 @@ bool CmdRotateSelectedSymbolItems::performExecute()
         center += ellipse->getEllipse().getCenter();
     }
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        center += polygon->getPolygon().calcCenter();
+        --count; // polygon itself does not count
+        foreach (const Vertex& vertex, polygon->getPolygon().getPath().getVertices()) {
+            center += vertex.getPos();
+            ++count;
+        }
     }
     foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
         center += text->getText().getPosition();
@@ -103,7 +107,7 @@ bool CmdRotateSelectedSymbolItems::performExecute()
         appendChild(cmd);
     }
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        CmdPolygonMove* cmd = new CmdPolygonMove(polygon->getPolygon());
+        CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }

@@ -27,7 +27,6 @@
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonsegmentedit.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
@@ -55,7 +54,6 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(const Conte
 
 SymbolEditorState_DrawPolygonBase::~SymbolEditorState_DrawPolygonBase() noexcept
 {
-    Q_ASSERT(mSegmentEditCmds.empty());
     Q_ASSERT(mEditCmd.isNull());
     Q_ASSERT(mCurrentPolygon == nullptr);
     Q_ASSERT(mCurrentGraphicsItem == nullptr);
@@ -155,9 +153,10 @@ bool SymbolEditorState_DrawPolygonBase::processGraphicsSceneLeftMouseButtonPress
 {
     Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
     if (mCurrentPolygon) {
+        Point startPos = mCurrentPolygon->getPath().getVertices().first().getPos();
         if (currentPos == mSegmentStartPos) {
             return abort();
-        } else if ((currentPos == mCurrentPolygon->getStartPos()) || (mMode == Mode::RECT)) {
+        } else if ((currentPos == startPos) || (mMode == Mode::RECT)) {
             return addNextSegment(currentPos) && abort();
         } else {
             return addNextSegment(currentPos);
@@ -188,31 +187,27 @@ bool SymbolEditorState_DrawPolygonBase::processAbortCommand() noexcept
 bool SymbolEditorState_DrawPolygonBase::start(const Point& pos) noexcept
 {
     try {
+        // create path
+        Path path;
+        for (int i = 0; i < ((mMode == Mode::RECT) ? 5 : 2); ++i) {
+            path.addVertex(pos, mLastAngle);
+        }
+
         // add polygon
+        mSegmentStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add symbol polygon"));
         mCurrentPolygon.reset(new Polygon(Uuid::createRandom(), mLastLayerName,
-                                          mLastLineWidth, mLastFill, mLastGrabArea, pos));
-        mContext.undoStack.appendToCmdGroup(
-            new CmdPolygonInsert(mContext.symbol.getPolygons(), mCurrentPolygon));
+            mLastLineWidth, mLastFill, mLastGrabArea, path));
+        mContext.undoStack.appendToCmdGroup(new CmdPolygonInsert(
+            mContext.symbol.getPolygons(), mCurrentPolygon));
         mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
         mCurrentGraphicsItem = mContext.symbolGraphicsItem.getPolygonGraphicsItem(*mCurrentPolygon);
         Q_ASSERT(mCurrentGraphicsItem);
         mCurrentGraphicsItem->setSelected(true);
-
-        // add segment(s)
-        mSegmentStartPos = pos;
-        int count = (mMode == Mode::RECT) ? 4 : 1;
-        for (int i = 0; i < count; ++i) {
-            std::shared_ptr<PolygonSegment> segment(new PolygonSegment(pos, mLastAngle));
-            mContext.undoStack.appendToCmdGroup(
-                new CmdPolygonSegmentInsert(mCurrentPolygon->getSegments(), segment));
-            mSegmentEditCmds.emplace_back(new CmdPolygonSegmentEdit(*segment));
-        }
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
         mCurrentGraphicsItem = nullptr;
-        mSegmentEditCmds.clear();
         mEditCmd.reset();
         mCurrentPolygon.reset();
         return false;
@@ -224,7 +219,6 @@ bool SymbolEditorState_DrawPolygonBase::abort() noexcept
     try {
         mCurrentGraphicsItem->setSelected(false);
         mCurrentGraphicsItem = nullptr;
-        mSegmentEditCmds.clear();
         mEditCmd.reset();
         mCurrentPolygon.reset();
         mContext.undoStack.abortCmdGroup();
@@ -241,41 +235,37 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment(const Point& pos) noexcep
         // commit current
         updateCurrentPosition(pos);
         mContext.undoStack.appendToCmdGroup(mEditCmd.take());
-        for (std::unique_ptr<CmdPolygonSegmentEdit>& cmd : mSegmentEditCmds) {
-            mContext.undoStack.appendToCmdGroup(cmd.release());
-        }
-        mSegmentEditCmds.clear();
         mContext.undoStack.commitCmdGroup();
 
         // add next
         mSegmentStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add symbol polygon"));
         mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
-        std::shared_ptr<PolygonSegment> segment(new PolygonSegment(pos, mLastAngle));
-        mContext.undoStack.appendToCmdGroup(
-            new CmdPolygonSegmentInsert(mCurrentPolygon->getSegments(), segment));
-        mSegmentEditCmds.emplace_back(
-            new CmdPolygonSegmentEdit(*segment));
+        Path newPath = mCurrentPolygon->getPath();
+        newPath.addVertex(pos, mLastAngle);
+        mEditCmd->setPath(newPath, true);
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-        mSegmentEditCmds.clear();
         return false;
     }
 }
 
 bool SymbolEditorState_DrawPolygonBase::updateCurrentPosition(const Point& pos) noexcept
 {
+    if ((!mCurrentPolygon) || (!mEditCmd)) return false;
+    QVector<Vertex> vertices = mCurrentPolygon->getPath().getVertices();
+    int count = vertices.count();
     if (mMode == Mode::RECT) {
-        Q_ASSERT(mSegmentEditCmds.size() == 4);
-        Point start = mCurrentPolygon->getStartPos();
-        mSegmentEditCmds[0]->setEndPos(Point(pos.getX(), start.getY()), true);
-        mSegmentEditCmds[1]->setEndPos(pos, true);
-        mSegmentEditCmds[2]->setEndPos(Point(start.getX(), pos.getY()), true);
+        Q_ASSERT(count >= 5);
+        vertices[count - 4].setPos(Point(pos.getX(), vertices[count - 5].getPos().getY()));
+        vertices[count - 3].setPos(pos);
+        vertices[count - 2].setPos(Point(vertices[count - 5].getPos().getX(), pos.getY()));
     } else {
-        Q_ASSERT(mSegmentEditCmds.size() == 1);
-        mSegmentEditCmds.front()->setEndPos(pos, true);
+        Q_ASSERT(count >= 2);
+        vertices[count - 1].setPos(pos);
     }
+    mEditCmd->setPath(Path(vertices), true);
     return true;
 }
 
@@ -301,8 +291,10 @@ void SymbolEditorState_DrawPolygonBase::lineWidthSpinBoxValueChanged(double valu
 void SymbolEditorState_DrawPolygonBase::angleSpinBoxValueChanged(double value) noexcept
 {
     mLastAngle = Angle::fromDeg(value);
-    if (!mSegmentEditCmds.empty()) {
-        mSegmentEditCmds.back()->setAngle(mLastAngle, true);
+    if (mCurrentPolygon && mEditCmd) {
+        Path path = mCurrentPolygon->getPath();
+        path.getVertices().last().setAngle(mLastAngle);
+        mEditCmd->setPath(path, true);
     }
 }
 

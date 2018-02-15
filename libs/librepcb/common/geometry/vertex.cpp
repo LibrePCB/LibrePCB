@@ -21,8 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdpolygonsegmentedit.h"
-#include "../polygon.h"
+#include "vertex.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -33,75 +32,41 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdPolygonSegmentEdit::CmdPolygonSegmentEdit(PolygonSegment& segment) noexcept :
-    UndoCommand(tr("Edit polygon segment")), mSegment(segment),
-    mOldEndPos(segment.getEndPos()), mNewEndPos(mOldEndPos),
-    mOldAngle(segment.getAngle()), mNewAngle(mOldAngle)
+Vertex::Vertex(const SExpression& node)
 {
-}
-
-CmdPolygonSegmentEdit::~CmdPolygonSegmentEdit() noexcept
-{
-    if (!wasEverExecuted()) {
-        performUndo(); // discard possible executed immediate changes
+    try {
+        mPos = Point(node.getChildByPath("pos"));
+        mAngle = node.getValueByPath<Angle>("angle", true);
+    } catch (const Exception& e) {
+        throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
+                             QString(), e.getMsg());
     }
 }
 
 /*****************************************************************************************
- *  Setters
+ *  General Methods
  ****************************************************************************************/
 
-void CmdPolygonSegmentEdit::setEndPos(const Point& pos, bool immediate) noexcept
+void Vertex::serialize(SExpression& root) const
 {
-    Q_ASSERT(!wasEverExecuted());
-    mNewEndPos = pos;
-    if (immediate) mSegment.setEndPos(mNewEndPos);
-}
-
-void CmdPolygonSegmentEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewEndPos = mOldEndPos + deltaPos;
-    if (immediate) mSegment.setEndPos(mNewEndPos);
-}
-
-void CmdPolygonSegmentEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewEndPos.rotate(angle, center);
-    if (immediate) mSegment.setEndPos(mNewEndPos);
-}
-
-void CmdPolygonSegmentEdit::setAngle(const Angle& angle, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewAngle = angle;
-    if (immediate) mSegment.setAngle(mNewAngle);
+    root.appendChild(mPos.serializeToDomElement("pos"), false);
+    root.appendTokenChild("angle", mAngle, false);
 }
 
 /*****************************************************************************************
- *  Inherited from UndoCommand
+ *  Operator Overloadings
  ****************************************************************************************/
 
-bool CmdPolygonSegmentEdit::performExecute()
+bool Vertex::operator==(const Vertex& rhs) const noexcept
 {
-    performRedo(); // can throw
-
-    if (mNewEndPos  != mOldEndPos)  return true;
-    if (mNewAngle   != mOldAngle)   return true;
-    return false;
+    return mPos == rhs.mPos && mAngle == rhs.mAngle;
 }
 
-void CmdPolygonSegmentEdit::performUndo()
+Vertex& Vertex::operator=(const Vertex& rhs) noexcept
 {
-    mSegment.setEndPos(mOldEndPos);
-    mSegment.setAngle(mOldAngle);
-}
-
-void CmdPolygonSegmentEdit::performRedo()
-{
-    mSegment.setEndPos(mNewEndPos);
-    mSegment.setAngle(mNewAngle);
+    mPos = rhs.mPos;
+    mAngle = rhs.mAngle;
+    return *this;
 }
 
 /*****************************************************************************************

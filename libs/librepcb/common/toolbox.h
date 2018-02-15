@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "units/point.h"
+#include "units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -76,6 +76,9 @@ class Toolbox final
 
         static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen,
                                           const QBrush& brush, const Length& minWidth = Length(0)) noexcept;
+
+        static Length arcRadius(const Point& p1, const Point& p2, const Angle& a) noexcept;
+        static Point arcCenter(const Point& p1, const Point& p2, const Angle& a) noexcept;
 
         /**
          * @brief Calculate the point on a given line which is nearest to a given point
