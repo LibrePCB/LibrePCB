@@ -318,30 +318,30 @@ class Angle
 
 
         // Operators
-        Angle&  operator=(const Angle& rhs)         {mMicrodegrees = rhs.mMicrodegrees; return *this;}
-        Angle&  operator+=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees + rhs.mMicrodegrees) % 360000000; return *this;}
-        Angle&  operator-=(const Angle& rhs)        {mMicrodegrees = (mMicrodegrees - rhs.mMicrodegrees) % 360000000; return *this;}
-        Angle   operator+(const Angle& rhs) const   {return Angle(mMicrodegrees + rhs.mMicrodegrees);}
-        Angle   operator-() const                   {return Angle(-mMicrodegrees);}
-        Angle   operator-(const Angle& rhs) const   {return Angle(mMicrodegrees - rhs.mMicrodegrees);}
-        Angle   operator*(const Angle& rhs) const   {return Angle(mMicrodegrees * rhs.mMicrodegrees);}
-        Angle   operator*(qint32 rhs) const         {return Angle(mMicrodegrees * rhs);}
-        Angle   operator/(const Angle& rhs) const   {return Angle(mMicrodegrees / rhs.mMicrodegrees);}
-        Angle   operator/(qint32 rhs) const         {return Angle(mMicrodegrees / rhs);}
-        Angle   operator%(const Angle& rhs) const   {return Angle(mMicrodegrees % rhs.mMicrodegrees);}
-        bool    operator>(const Angle& rhs) const   {return mMicrodegrees > rhs.mMicrodegrees;}
-        bool    operator>(qint32 rhs) const         {return mMicrodegrees > rhs;}
-        bool    operator<(const Angle& rhs) const   {return mMicrodegrees < rhs.mMicrodegrees;}
-        bool    operator<(qint32 rhs) const         {return mMicrodegrees < rhs;}
-        bool    operator>=(const Angle& rhs) const  {return mMicrodegrees >= rhs.mMicrodegrees;}
-        bool    operator>=(qint32 rhs) const        {return mMicrodegrees >= rhs;}
-        bool    operator<=(const Angle& rhs) const  {return mMicrodegrees <= rhs.mMicrodegrees;}
-        bool    operator<=(qint32 rhs) const        {return mMicrodegrees <= rhs;}
-        bool    operator==(const Angle& rhs) const  {return mMicrodegrees == rhs.mMicrodegrees;}
-        bool    operator==(qint32 rhs) const        {return mMicrodegrees == rhs;}
-        bool    operator!=(const Angle& rhs) const  {return mMicrodegrees != rhs.mMicrodegrees;}
-        bool    operator!=(qint32 rhs) const        {return mMicrodegrees != rhs;}
-        operator bool() const {return mMicrodegrees != 0;}
+        Angle&   operator=(const Angle& rhs)        {mMicrodegrees = rhs.mMicrodegrees; return *this;}
+        Angle&   operator+=(const Angle& rhs)       {mMicrodegrees = (mMicrodegrees + rhs.mMicrodegrees) % 360000000; return *this;}
+        Angle&   operator-=(const Angle& rhs)       {mMicrodegrees = (mMicrodegrees - rhs.mMicrodegrees) % 360000000; return *this;}
+        Angle    operator+(const Angle& rhs) const  {return Angle(mMicrodegrees + rhs.mMicrodegrees);}
+        Angle    operator-() const                  {return Angle(-mMicrodegrees);}
+        Angle    operator-(const Angle& rhs) const  {return Angle(mMicrodegrees - rhs.mMicrodegrees);}
+        Angle    operator*(const Angle& rhs) const  {return Angle(mMicrodegrees * rhs.mMicrodegrees);}
+        Angle    operator*(qint32 rhs) const        {return Angle(mMicrodegrees * rhs);}
+        Angle    operator/(const Angle& rhs) const  {return Angle(mMicrodegrees / rhs.mMicrodegrees);}
+        Angle    operator/(qint32 rhs) const        {return Angle(mMicrodegrees / rhs);}
+        Angle    operator%(const Angle& rhs) const  {return Angle(mMicrodegrees % rhs.mMicrodegrees);}
+        bool     operator>(const Angle& rhs) const  {return mMicrodegrees > rhs.mMicrodegrees;}
+        bool     operator>(qint32 rhs) const        {return mMicrodegrees > rhs;}
+        bool     operator<(const Angle& rhs) const  {return mMicrodegrees < rhs.mMicrodegrees;}
+        bool     operator<(qint32 rhs) const        {return mMicrodegrees < rhs;}
+        bool     operator>=(const Angle& rhs) const {return mMicrodegrees >= rhs.mMicrodegrees;}
+        bool     operator>=(qint32 rhs) const       {return mMicrodegrees >= rhs;}
+        bool     operator<=(const Angle& rhs) const {return mMicrodegrees <= rhs.mMicrodegrees;}
+        bool     operator<=(qint32 rhs) const       {return mMicrodegrees <= rhs;}
+        bool     operator==(const Angle& rhs) const {return mMicrodegrees == rhs.mMicrodegrees;}
+        bool     operator==(qint32 rhs) const       {return mMicrodegrees == rhs;}
+        bool     operator!=(const Angle& rhs) const {return mMicrodegrees != rhs.mMicrodegrees;}
+        bool     operator!=(qint32 rhs) const       {return mMicrodegrees != rhs;}
+        explicit operator bool() const              {return mMicrodegrees != 0;}
 
     private:
 

@@ -160,28 +160,28 @@ bool BoardDesignRules::doesViaRequireStopMask(const Length& drillDia) const noex
 Length BoardDesignRules::calcStopMaskClearance(const Length& padSize) const noexcept
 {
     return qBound(mStopMaskClearanceMin,
-                  padSize.scaled(mStopMaskClearanceRatio),
+                  padSize.scaled(mStopMaskClearanceRatio.toNormalized()),
                   mStopMaskClearanceMax);
 }
 
 Length BoardDesignRules::calcCreamMaskClearance(const Length& padSize) const noexcept
 {
     return qBound(mCreamMaskClearanceMin,
-                  padSize.scaled(mCreamMaskClearanceRatio),
+                  padSize.scaled(mCreamMaskClearanceRatio.toNormalized()),
                   mCreamMaskClearanceMax);
 }
 
 Length BoardDesignRules::calcPadRestring(const Length& drillDia) const noexcept
 {
     return qBound(mRestringPadMin,
-                  drillDia.scaled(mRestringPadRatio),
+                  drillDia.scaled(mRestringPadRatio.toNormalized()),
                   mRestringPadMax);
 }
 
 Length BoardDesignRules::calcViaRestring(const Length& drillDia) const noexcept
 {
     return qBound(mRestringViaMin,
-                  drillDia.scaled(mRestringViaRatio),
+                  drillDia.scaled(mRestringViaRatio.toNormalized()),
                   mRestringViaMax);
 }
 
