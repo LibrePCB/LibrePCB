@@ -276,12 +276,19 @@ Path Path::octagon(const Length& width, const Length& height) noexcept
     return p;
 }
 
-Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle, qreal tolerance) noexcept
+Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
+                   const Length& maxTolerance) noexcept
 {
+    // return straight line if radius is smaller than half of the allowed tolerance
+    Length radiusAbs = Toolbox::arcRadius(p1, p2, angle).abs();
+    if (radiusAbs <= maxTolerance.abs() / 2) {
+        return line(p1, p2);
+    }
+
     // calculate how many lines we need to create
-    Length radius = Toolbox::arcRadius(p1, p2, angle).abs();
-    qreal y = qBound(0.0, tolerance, (qreal)radius.toNm() / 4);
-    qreal stepsPerRad = qMin(0.5 / qAcos(1 - y / radius.toNm()), radius.toNm() / 2.0);
+    qreal radiusAbsNm = static_cast<qreal>(radiusAbs.toNm());
+    qreal y = qBound(0.0, static_cast<qreal>(maxTolerance.toNm()), radiusAbsNm / 4);
+    qreal stepsPerRad = qMin(0.5 / qAcos(1 - y / radiusAbsNm), radiusAbsNm / 2);
     int steps = qCeil(stepsPerRad * angle.abs().toRad());
 
     // some other very complex calculations...
