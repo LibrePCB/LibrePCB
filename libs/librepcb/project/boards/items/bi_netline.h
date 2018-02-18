@@ -26,6 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
 #include "../graphicsitems/bgi_netline.h"
 
@@ -76,6 +77,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         bool isAttachedToFootprint() const noexcept;
         bool isAttachedToVia() const noexcept;
         bool isSelectable() const noexcept override;
+        Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
 
         // Setters
         void setWidth(const Length& width) noexcept;

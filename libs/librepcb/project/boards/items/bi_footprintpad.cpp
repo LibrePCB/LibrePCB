@@ -213,6 +213,16 @@ void BI_FootprintPad::setSelected(bool selected) noexcept
     mGraphicsItem->update();
 }
 
+Path BI_FootprintPad::getOutline(const Length& expansion) const noexcept
+{
+    return mFootprintPad->getOutline(expansion);
+}
+
+Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept
+{
+    return getOutline(expansion).rotated(mRotation).translated(mPosition);
+}
+
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/

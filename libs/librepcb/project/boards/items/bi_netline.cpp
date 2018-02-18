@@ -166,6 +166,16 @@ bool BI_NetLine::isAttachedToFootprint() const noexcept
     return (mStartPoint->isAttachedToPad() || mEndPoint->isAttachedToPad());
 }
 
+Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept
+{
+    Length width = mWidth + (expansion * 2);
+    if (width > 0) {
+        return Path::obround(mStartPoint->getPosition(), mEndPoint->getPosition(), width);
+    } else {
+        return Path();
+    }
+}
+
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
