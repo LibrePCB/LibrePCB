@@ -26,6 +26,7 @@ CONFIG += staticlib
 INCLUDEPATH += \
     ../../quazip \
     ../../sexpresso \
+    ../../ \
 
 SOURCES += \
     alignment.cpp \

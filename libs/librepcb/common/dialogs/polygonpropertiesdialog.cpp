@@ -55,11 +55,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
     mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
 
     // load vertices
-    mUi->tableWidget->setRowCount(mPolygon.getPath().getVertices().count());
-    for (int i = 0; i < mPolygon.getPath().getVertices().count(); ++i) {
-        const Vertex& vertex = mPolygon.getPath().getVertices().at(i);
-        setVertexTableRow(i, vertex.getPos(), vertex.getAngle());
-    }
+    mUi->pathEditorWidget->setPath(mPolygon.getPath());
 }
 
 PolygonPropertiesDialog::~PolygonPropertiesDialog() noexcept
@@ -98,37 +94,13 @@ bool PolygonPropertiesDialog::applyChanges() noexcept
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
         cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
-        Path path;
-        for (int i = 0; i < mUi->tableWidget->rowCount(); ++i) {
-            path.addVertex(getVertexTableRow(i));
-        }
-        cmd->setPath(path, false);
+        cmd->setPath(mUi->pathEditorWidget->getPath(), false); // can throw
         mUndoStack.execCmd(cmd.take());
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
         return false;
     }
-}
-
-void PolygonPropertiesDialog::setVertexTableRow(int row, const Point& pos,
-                                                  const Angle& angle) noexcept
-{
-    mUi->tableWidget->setItem(row, 0, new QTableWidgetItem(pos.getX().toMmString()));
-    mUi->tableWidget->setItem(row, 1, new QTableWidgetItem(pos.getY().toMmString()));
-    QTableWidgetItem* angleItem = new QTableWidgetItem(angle.toDegString());
-    if (row == 0) angleItem->setFlags(Qt::NoItemFlags);
-    mUi->tableWidget->setItem(row, 2, angleItem);
-}
-
-Vertex PolygonPropertiesDialog::getVertexTableRow(int row)
-{
-    QTableWidgetItem* col0 = mUi->tableWidget->item(row, 0); Q_ASSERT(col0);
-    QTableWidgetItem* col1 = mUi->tableWidget->item(row, 1); Q_ASSERT(col1);
-    QTableWidgetItem* col2 = mUi->tableWidget->item(row, 2); Q_ASSERT(col2);
-    Point pos = Point(Length::fromMm(col0->text()), Length::fromMm(col1->text()));
-    Angle angle = Angle::fromDeg(col2->text());
-    return Vertex(pos, angle);
 }
 
 void PolygonPropertiesDialog::selectLayerNameInCombobox(const QString& name) noexcept

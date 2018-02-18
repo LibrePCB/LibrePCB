@@ -77,40 +77,13 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustToContents</enum>
+    <widget class="librepcb::PathEditorWidget" name="pathEditorWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="showDropIndicator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="verticalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>80</number>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Pos. X</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Pos. Y</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Angle</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
@@ -125,6 +98,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::PathEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/patheditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

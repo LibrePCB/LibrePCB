@@ -70,8 +70,6 @@ class PolygonPropertiesDialog final : public QDialog
 
     private: // Methods
         bool applyChanges() noexcept;
-        void setVertexTableRow(int row, const Point& pos, const Angle& angle) noexcept;
-        Vertex getVertexTableRow(int row);
         void selectLayerNameInCombobox(const QString& name) noexcept;
 
 
