@@ -39,6 +39,7 @@
 #include "items/bi_netsegment.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
+#include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 
 /*****************************************************************************************
@@ -204,6 +205,15 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
                 gen.drawLine(netline->getStartPoint().getPosition(),
                              netline->getEndPoint().getPosition(),
                              netline->getWidth());
+            }
+        }
+    }
+
+    // draw planes
+    foreach (const BI_Plane* plane, mBoard.getPlanes()) { Q_ASSERT(plane);
+        if (plane->getLayerName() == layerName) {
+            foreach (const Path& fragment, plane->getFragments()) {
+                gen.drawPathArea(fragment);
             }
         }
     }

@@ -58,6 +58,7 @@ class BI_NetSegment;
 class BI_NetPoint;
 class BI_NetLine;
 class BI_Polygon;
+class BI_Plane;
 class BoardLayerStack;
 class BoardUserSettings;
 class BoardSelectionQuery;
@@ -146,6 +147,12 @@ class Board final : public QObject, public AttributeProvider,
         void addNetSegment(BI_NetSegment& netsegment);
         void removeNetSegment(BI_NetSegment& netsegment);
 
+        // Plane Methods
+        const QList<BI_Plane*>& getPlanes() const noexcept {return mPlanes;}
+        void addPlane(BI_Plane& plane);
+        void removePlane(BI_Plane& plane);
+        void rebuildAllPlanes() noexcept;
+
         // Polygon Methods
         const QList<BI_Polygon*>& getPolygons() const noexcept {return mPolygons;}
         void addPolygon(BI_Polygon& polygon);
@@ -220,6 +227,7 @@ class Board final : public QObject, public AttributeProvider,
         // items
         QMap<Uuid, BI_Device*> mDeviceInstances;
         QList<BI_NetSegment*> mNetSegments;
+        QList<BI_Plane*> mPlanes;
         QList<BI_Polygon*> mPolygons;
 
         // ERC messages

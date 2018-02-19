@@ -29,6 +29,7 @@
 #include "componentsignalinstance.h"
 #include "../schematics/items/si_netsegment.h"
 #include "../boards/items/bi_netsegment.h"
+#include "../boards/items/bi_plane.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -81,6 +82,7 @@ int NetSignal::getRegisteredElementsCount() const noexcept
     count += mRegisteredComponentSignals.count();
     count += mRegisteredSchematicNetSegments.count();
     count += mRegisteredBoardNetSegments.count();
+    count += mRegisteredBoardPlanes.count();
     return count;
 }
 
@@ -212,6 +214,26 @@ void NetSignal::unregisterBoardNetSegment(BI_NetSegment& netsegment)
         throw LogicError(__FILE__, __LINE__);
     }
     mRegisteredBoardNetSegments.removeOne(&netsegment);
+    updateErcMessages();
+}
+
+void NetSignal::registerBoardPlane(BI_Plane& plane)
+{
+    if ((!mIsAddedToCircuit) || (mRegisteredBoardPlanes.contains(&plane))
+        || (plane.getCircuit() != mCircuit))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardPlanes.append(&plane);
+    updateErcMessages();
+}
+
+void NetSignal::unregisterBoardPlane(BI_Plane& plane)
+{
+    if ((!mIsAddedToCircuit) || (!mRegisteredBoardPlanes.contains(&plane))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    mRegisteredBoardPlanes.removeOne(&plane);
     updateErcMessages();
 }
 
