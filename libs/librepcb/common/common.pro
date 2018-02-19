@@ -103,6 +103,7 @@ SOURCES += \
     units/lengthunit.cpp \
     units/point.cpp \
     units/ratio.cpp \
+    utils/clipperhelpers.cpp \
     utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
     utils/toolbarproxy.cpp \
@@ -204,6 +205,7 @@ HEADERS += \
     units/lengthunit.h \
     units/point.h \
     units/ratio.h \
+    utils/clipperhelpers.h \
     utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
     utils/toolbarproxy.h \
