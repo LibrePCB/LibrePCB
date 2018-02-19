@@ -58,28 +58,31 @@ bool Path::isClosed() const noexcept
     }
 }
 
-const QPainterPath& Path::toQPainterPathPx() const noexcept
+const QPainterPath& Path::toQPainterPathPx(bool close) const noexcept
 {
     if (mPainterPathPx.isEmpty()) {
-        Point lastPos;
-        for (int i = 0; i < mVertices.count(); ++i) {
-            const Vertex& v = mVertices.at(i);
+        int count = mVertices.count();
+        if (close && (!isClosed()) && (count > 0)) ++count; // add implicit last point
+        for (int i = 0; i < count; ++i) {
+            const Vertex& v = mVertices.at(i % mVertices.count()); // wrap around!
             if (i == 0) {
                 mPainterPathPx.moveTo(v.getPos().toPxQPointF());
-            } else if (v.getAngle() == 0) {
+                continue;
+            }
+            const Vertex& v0 = mVertices.at(i-1);
+            if (v0.getAngle() == 0) {
                 mPainterPathPx.lineTo(v.getPos().toPxQPointF());
             } else {
-                QPointF centerPx = Toolbox::arcCenter(lastPos, v.getPos(),
-                                                    v.getAngle()).toPxQPointF();
-                qreal radiusPx = Toolbox::arcRadius(lastPos, v.getPos(),
-                                                  v.getAngle()).abs().toPx();
-                QPointF diffPx = lastPos.toPxQPointF() - centerPx;
+                QPointF centerPx = Toolbox::arcCenter(v0.getPos(), v.getPos(),
+                                                      v0.getAngle()).toPxQPointF();
+                qreal radiusPx = Toolbox::arcRadius(v0.getPos(), v.getPos(),
+                                                    v0.getAngle()).abs().toPx();
+                QPointF diffPx = v0.getPos().toPxQPointF() - centerPx;
                 qreal startAngleDeg = -qRadiansToDegrees(qAtan2(diffPx.y(), diffPx.x()));
                 mPainterPathPx.arcTo(centerPx.x() - radiusPx, centerPx.y() - radiusPx,
                                      radiusPx * 2, radiusPx * 2,
-                                     startAngleDeg, v.getAngle().toDeg());
+                                     startAngleDeg, v0.getAngle().toDeg());
             }
-            lastPos = v.getPos();
         }
     }
     return mPainterPathPx;
@@ -206,21 +209,21 @@ Path Path::obround(const Length& width, const Length& height) noexcept
     Length ry = height / 2;
     if (width > height) {
         p.addVertex(Point(ry - rx, ry),     Angle::deg0());
-        p.addVertex(Point(rx - ry, ry),     Angle::deg0());
-        p.addVertex(Point(rx - ry, -ry),   -Angle::deg180());
-        p.addVertex(Point(ry - rx, -ry),    Angle::deg0());
-        p.addVertex(Point(ry - rx, ry),    -Angle::deg180());
+        p.addVertex(Point(rx - ry, ry),    -Angle::deg180());
+        p.addVertex(Point(rx - ry, -ry),    Angle::deg0());
+        p.addVertex(Point(ry - rx, -ry),   -Angle::deg180());
+        p.addVertex(Point(ry - rx, ry),     Angle::deg0());
     } else if (width < height) {
         p.addVertex(Point(rx - ry, rx),     Angle::deg0());
-        p.addVertex(Point(ry - rx, rx),     Angle::deg0());
-        p.addVertex(Point(ry - rx, -rx),   -Angle::deg180());
-        p.addVertex(Point(rx - ry, -rx),    Angle::deg0());
-        p.addVertex(Point(rx - ry, rx),    -Angle::deg180());
+        p.addVertex(Point(ry - rx, rx),    -Angle::deg180());
+        p.addVertex(Point(ry - rx, -rx),    Angle::deg0());
+        p.addVertex(Point(rx - ry, -rx),   -Angle::deg180());
+        p.addVertex(Point(rx - ry, rx),     Angle::deg0());
     } else {
         Q_ASSERT(width == height);
-        p.addVertex(Point(rx,  0),  Angle::deg0());
-        p.addVertex(Point(-rx, 0), -Angle::deg180());
         p.addVertex(Point(rx,  0), -Angle::deg180());
+        p.addVertex(Point(-rx, 0), -Angle::deg180());
+        p.addVertex(Point(rx,  0),  Angle::deg0());
     }
     return p;
 }

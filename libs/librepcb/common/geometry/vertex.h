@@ -71,7 +71,7 @@ class Vertex final : public SerializableObject
 
     private: // Data
         Point mPos;
-        Angle mAngle;
+        Angle mAngle; ///< angle of the line between this vertex and the following vertex
 };
 
 /*****************************************************************************************

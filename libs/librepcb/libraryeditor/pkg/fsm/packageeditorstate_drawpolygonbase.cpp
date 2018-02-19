@@ -191,7 +191,7 @@ bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept
         // create path
         Path path;
         for (int i = 0; i < ((mMode == Mode::RECT) ? 5 : 2); ++i) {
-            path.addVertex(pos, mLastAngle);
+            path.addVertex(pos, (i == 0) ? mLastAngle : Angle::deg0());
         }
 
         // add polygon
@@ -243,7 +243,8 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment(const Point& pos) noexce
         mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
         mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
         Path newPath = mCurrentPolygon->getPath();
-        newPath.addVertex(pos, mLastAngle);
+        newPath.getVertices().last().setAngle(mLastAngle);
+        newPath.addVertex(pos, Angle::deg0());
         mEditCmd->setPath(newPath, true);
         return true;
     } catch (const Exception& e) {
@@ -294,8 +295,10 @@ void PackageEditorState_DrawPolygonBase::angleSpinBoxValueChanged(double value) 
     mLastAngle = Angle::fromDeg(value);
     if (mCurrentPolygon && mEditCmd) {
         Path path = mCurrentPolygon->getPath();
-        path.getVertices().last().setAngle(mLastAngle);
-        mEditCmd->setPath(path, true);
+        if (path.getVertices().count() > 1) {
+            path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+            mEditCmd->setPath(path, true);
+        }
     }
 }
 

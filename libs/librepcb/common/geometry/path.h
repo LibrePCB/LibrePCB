@@ -63,7 +63,7 @@ class Path final : public SerializableObject
         bool isClosed() const noexcept;
         QVector<Vertex>& getVertices() noexcept {invalidatePainterPath(); return mVertices;}
         const QVector<Vertex>& getVertices() const noexcept {return mVertices;}
-        const QPainterPath& toQPainterPathPx() const noexcept;
+        const QPainterPath& toQPainterPathPx(bool close = false) const noexcept;
 
         // Transformations
         Path& translate(const Point& offset) noexcept;

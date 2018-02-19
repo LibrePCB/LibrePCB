@@ -104,25 +104,25 @@ void GerberGenerator::drawPathOutline(const Path& path, const Length& lineWidth)
     setCurrentAperture(mApertureList->setCircle(lineWidth, Length(0)));
     moveToPosition(path.getVertices().first().getPos());
     for (int i = 1; i < path.getVertices().count(); ++i) {
-        const Vertex& vertex = path.getVertices().at(i);
-        if (vertex.getAngle() == 0) {
+        const Vertex& v = path.getVertices().at(i);
+        const Vertex& v0 = path.getVertices().at(i-1);
+        if (v0.getAngle() == 0) {
             // linear segment
-            linearInterpolateToPosition(vertex.getPos());
+            linearInterpolateToPosition(v.getPos());
         } else {
             // arc segment
-            if (vertex.getAngle().abs() <= Angle::deg90()) {
+            if (v0.getAngle().abs() <= Angle::deg90()) {
                 setMultiQuadrantArcModeOff();
             } else {
                 setMultiQuadrantArcModeOn();
             }
-            if (vertex.getAngle() < 0) {
+            if (v0.getAngle() < 0) {
                 switchToCircularCwInterpolationModeG02();
             } else {
                 switchToCircularCcwInterpolationModeG03();
             }
-            Point start = path.getVertices().at(i-1).getPos();
-            Point center = Toolbox::arcCenter(start, vertex.getPos(), vertex.getAngle());
-            circularInterpolateToPosition(start, center, vertex.getPos());
+            Point center = Toolbox::arcCenter(v0.getPos(), v.getPos(), v0.getAngle());
+            circularInterpolateToPosition(v0.getPos(), center, v.getPos());
             switchToLinearInterpolationModeG01();
         }
     }
@@ -138,25 +138,25 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept
     setRegionModeOn();
     moveToPosition(path.getVertices().first().getPos());
     for (int i = 1; i < path.getVertices().count(); ++i) {
-        const Vertex& vertex = path.getVertices().at(i);
-        if (vertex.getAngle() == 0) {
+        const Vertex& v = path.getVertices().at(i);
+        const Vertex& v0 = path.getVertices().at(i-1);
+        if (v0.getAngle() == 0) {
             // linear segment
-            linearInterpolateToPosition(vertex.getPos());
+            linearInterpolateToPosition(v.getPos());
         } else {
             // arc segment
-            if (vertex.getAngle().abs() <= Angle::deg90()) {
+            if (v0.getAngle().abs() <= Angle::deg90()) {
                 setMultiQuadrantArcModeOff();
             } else {
                 setMultiQuadrantArcModeOn();
             }
-            if (vertex.getAngle() < 0) {
+            if (v0.getAngle() < 0) {
                 switchToCircularCwInterpolationModeG02();
             } else {
                 switchToCircularCcwInterpolationModeG03();
             }
-            Point start = path.getVertices().at(i-1).getPos();
-            Point center = Toolbox::arcCenter(start, vertex.getPos(), vertex.getAngle());
-            circularInterpolateToPosition(start, center, vertex.getPos());
+            Point center = Toolbox::arcCenter(v0.getPos(), v.getPos(), v0.getAngle());
+            circularInterpolateToPosition(v0.getPos(), center, v.getPos());
             switchToLinearInterpolationModeG01();
         }
     }

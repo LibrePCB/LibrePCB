@@ -71,8 +71,8 @@ Polygon::Polygon(const SExpression& node)
         // backward compatibility, remove this some time!
         mPath.addVertex(Point(node.getChildByPath("pos")));
         foreach (const SExpression& child, node.getChildren("segment")) {
-            mPath.addVertex(Point(child.getChildByPath("pos")),
-                            child.getValueByPath<Angle>("angle", true));
+            mPath.getVertices().last().setAngle(child.getValueByPath<Angle>("angle", true));
+            mPath.addVertex(Point(child.getChildByPath("pos")));
         }
     }
 
