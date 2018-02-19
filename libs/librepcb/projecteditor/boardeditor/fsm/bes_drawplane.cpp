@@ -21,18 +21,22 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "bes_drawpolygon.h"
+#include "bes_drawplane.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/cmd/cmdboardpolygonadd.h>
+#include <librepcb/project/boards/items/bi_plane.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneadd.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
+#include "../boardeditor.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -45,19 +49,19 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BES_DrawPolygon::BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                                 GraphicsView& editorGraphicsView, UndoStack& undoStack) :
+BES_DrawPlane::BES_DrawPlane(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                             GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     BES_Base(editor, editorUi, editorGraphicsView, undoStack),
-    mSubState(SubState::Idle), mCurrentLayerName(GraphicsLayer::sBoardOutlines),
-    mCurrentWidth(0), mCurrentIsFilled(false),
-    mCmdEditCurrentPolygon(nullptr),
+    mSubState(SubState::Idle), mCurrentNetSignal(nullptr),
+    mCurrentLayerName(GraphicsLayer::sTopCopper),
+    mCmdEditCurrentPlane(nullptr),
     // command toolbar actions / widgets:
-    mLayerLabel(nullptr), mLayerComboBox(nullptr), mWidthLabel(nullptr),
-    mWidthComboBox(nullptr), mFillLabel(nullptr), mFillCheckBox(nullptr)
+    mNetSignalLabel(nullptr), mNetSignalComboBox(nullptr), mLayerLabel(nullptr),
+    mLayerComboBox(nullptr)
 {
 }
 
-BES_DrawPolygon::~BES_DrawPolygon() noexcept
+BES_DrawPlane::~BES_DrawPlane()
 {
     Q_ASSERT(mSubState == SubState::Idle);
 }
@@ -66,7 +70,7 @@ BES_DrawPolygon::~BES_DrawPolygon() noexcept
  *  General Methods
  ****************************************************************************************/
 
-BES_Base::ProcRetVal BES_DrawPolygon::process(BEE_Base* event) noexcept
+BES_Base::ProcRetVal BES_DrawPlane::process(BEE_Base* event) noexcept
 {
     switch (mSubState) {
         case SubState::Idle:
@@ -79,13 +83,38 @@ BES_Base::ProcRetVal BES_DrawPolygon::process(BEE_Base* event) noexcept
     }
 }
 
-bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
+bool BES_DrawPlane::entry(BEE_Base* event) noexcept
 {
     Q_UNUSED(event);
     Q_ASSERT(mSubState == SubState::Idle);
 
     // clear board selection because selection does not make sense in this state
     if (mEditor.getActiveBoard()) mEditor.getActiveBoard()->clearSelection();
+
+    // get most used net signalmNetSignalComboBox
+    if (!mCurrentNetSignal) {
+        mCurrentNetSignal = mCircuit.getNetSignalWithMostElements();
+    }
+    if (!mCurrentNetSignal) return false;
+
+    // add the "Signal:" label to the toolbar
+    mNetSignalLabel = new QLabel(tr("Signal:"));
+    mNetSignalLabel->setIndent(10);
+    mEditorUi.commandToolbar->addWidget(mNetSignalLabel);
+
+    // add the netsignals combobox to the toolbar
+    mNetSignalComboBox = new QComboBox();
+    mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
+    mNetSignalComboBox->setEditable(false);
+    foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
+        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
+    mNetSignalComboBox->model()->sort(0);
+    mNetSignalComboBox->setCurrentText(mCurrentNetSignal ? mCurrentNetSignal->getName() : "");
+    mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
+    connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
+            [this](const QString& value)
+            {setNetSignal(mEditor.getProject().getCircuit().getNetSignalByName(value));});
 
     // add the "Layer:" label to the toolbar
     mLayerLabel = new QLabel(tr("Layer:"));
@@ -95,49 +124,18 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
     // add the layers combobox to the toolbar
     mLayerComboBox = new GraphicsLayerComboBox();
     if (mEditor.getActiveBoard()) {
-        mLayerComboBox->setLayers(mEditor.getActiveBoard()->getLayerStack().getAllowedPolygonLayers());
+        QList<GraphicsLayer*> layers;
+        foreach (GraphicsLayer* layer, mEditor.getActiveBoard()->getLayerStack().getAllLayers()) {
+            if (layer->isCopperLayer() && layer->isEnabled()) {
+                layers.append(layer);
+            }
+        }
+        mLayerComboBox->setLayers(layers);
     }
     mLayerComboBox->setCurrentLayer(mCurrentLayerName);
     mEditorUi.commandToolbar->addWidget(mLayerComboBox);
     connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged,
-            this, &BES_DrawPolygon::layerComboBoxLayerChanged);
-
-    // add the "Width:" label to the toolbar
-    mWidthLabel = new QLabel(tr("Width:"));
-    mWidthLabel->setIndent(10);
-    mEditorUi.commandToolbar->addWidget(mWidthLabel);
-
-    // add the widths combobox to the toolbar
-    mWidthComboBox = new QComboBox();
-    mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    mWidthComboBox->setInsertPolicy(QComboBox::NoInsert);
-    mWidthComboBox->setEditable(true);
-    mWidthComboBox->addItem("0");
-    mWidthComboBox->addItem("0.2");
-    mWidthComboBox->addItem("0.3");
-    mWidthComboBox->addItem("0.5");
-    mWidthComboBox->addItem("0.8");
-    mWidthComboBox->addItem("1");
-    mWidthComboBox->addItem("1.5");
-    mWidthComboBox->addItem("2");
-    mWidthComboBox->addItem("2.5");
-    mWidthComboBox->addItem("3");
-    mWidthComboBox->setCurrentIndex(mWidthComboBox->findText(QString::number(mCurrentWidth.toMm())));
-    mEditorUi.commandToolbar->addWidget(mWidthComboBox);
-    connect(mWidthComboBox, &QComboBox::currentTextChanged,
-            this, &BES_DrawPolygon::widthComboBoxTextChanged);
-
-    // add the "Filled:" label to the toolbar
-    mFillLabel = new QLabel(tr("Filled:"));
-    mFillLabel->setIndent(10);
-    mEditorUi.commandToolbar->addWidget(mFillLabel);
-
-    // add the filled checkbox to the toolbar
-    mFillCheckBox = new QCheckBox();
-    mFillCheckBox->setChecked(mCurrentIsFilled);
-    mEditorUi.commandToolbar->addWidget(mFillCheckBox);
-    connect(mFillCheckBox, &QCheckBox::toggled,
-            this, &BES_DrawPolygon::filledCheckBoxCheckedChanged);
+            this, &BES_DrawPlane::layerComboBoxLayerChanged);
 
     // change the cursor
     mEditorGraphicsView.setCursor(Qt::CrossCursor);
@@ -145,7 +143,7 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
     return true;
 }
 
-bool BES_DrawPolygon::exit(BEE_Base* event) noexcept
+bool BES_DrawPlane::exit(BEE_Base* event) noexcept
 {
     Q_UNUSED(event);
 
@@ -153,12 +151,10 @@ bool BES_DrawPolygon::exit(BEE_Base* event) noexcept
     if (mSubState != SubState::Idle) abort(true);
 
     // Remove actions / widgets from the "command" toolbar
-    delete mFillCheckBox;           mFillCheckBox = nullptr;
-    delete mFillLabel;              mFillLabel = nullptr;
-    delete mWidthComboBox;          mWidthComboBox = nullptr;
-    delete mWidthLabel;             mWidthLabel = nullptr;
     delete mLayerComboBox;          mLayerComboBox = nullptr;
     delete mLayerLabel;             mLayerLabel = nullptr;
+    delete mNetSignalComboBox;      mNetSignalComboBox = nullptr;
+    delete mNetSignalLabel;         mNetSignalLabel = nullptr;
     qDeleteAll(mActionSeparators);  mActionSeparators.clear();
 
     // change the cursor
@@ -171,7 +167,7 @@ bool BES_DrawPolygon::exit(BEE_Base* event) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-BES_Base::ProcRetVal BES_DrawPolygon::processSubStateIdle(BEE_Base* event) noexcept
+BES_Base::ProcRetVal BES_DrawPlane::processSubStateIdle(BEE_Base* event) noexcept
 {
     switch (event->getType()) {
         case BEE_Base::GraphicsViewEvent:
@@ -181,7 +177,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processSubStateIdle(BEE_Base* event) noexc
     }
 }
 
-BES_Base::ProcRetVal BES_DrawPolygon::processIdleSceneEvent(BEE_Base* event) noexcept
+BES_Base::ProcRetVal BES_DrawPlane::processIdleSceneEvent(BEE_Base* event) noexcept
 {
     QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
@@ -208,7 +204,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processIdleSceneEvent(BEE_Base* event) noe
     return PassToParentState;
 }
 
-BES_Base::ProcRetVal BES_DrawPolygon::processSubStatePositioning(BEE_Base* event) noexcept
+BES_Base::ProcRetVal BES_DrawPlane::processSubStatePositioning(BEE_Base* event) noexcept
 {
     switch (event->getType()) {
         case BEE_Base::AbortCommand:
@@ -221,7 +217,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processSubStatePositioning(BEE_Base* event
     }
 }
 
-BES_Base::ProcRetVal BES_DrawPolygon::processPositioningSceneEvent(BEE_Base* event) noexcept
+BES_Base::ProcRetVal BES_DrawPlane::processPositioningSceneEvent(BEE_Base* event) noexcept
 {
     QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
     Q_ASSERT(qevent); if (!qevent) return PassToParentState;
@@ -249,7 +245,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processPositioningSceneEvent(BEE_Base* eve
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
             Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
-            updateSegmentPosition(pos);
+            updateVertexPosition(pos);
             return ForceStayInState;
         }
 
@@ -260,23 +256,23 @@ BES_Base::ProcRetVal BES_DrawPolygon::processPositioningSceneEvent(BEE_Base* eve
     return PassToParentState;
 }
 
-bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept
+bool BES_DrawPlane::start(Board& board, const Point& pos) noexcept
 {
     try {
         // start a new undo command
         Q_ASSERT(mSubState == SubState::Idle);
-        mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
+        mUndoStack.beginCmdGroup(tr("Draw board plane"));
         mSubState = SubState::Positioning;
 
-        // add polygon with three vertices
-        Path path({Vertex(pos), Vertex(pos), Vertex(pos)});
-        mCurrentPolygon = new BI_Polygon(board, Uuid::createRandom(), mCurrentLayerName,
-            mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, path);
-        mUndoStack.appendToCmdGroup(new CmdBoardPolygonAdd(*mCurrentPolygon));
+        // add plane with two vertices
+        Path path({Vertex(pos), Vertex(pos)});
+        mCurrentPlane = new BI_Plane(board, Uuid::createRandom(), mCurrentLayerName,
+            *mCurrentNetSignal, path);
+        mUndoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
         // start undo command
-        mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
-        mLastSegmentPos = pos;
+        mCmdEditCurrentPlane = new CmdBoardPlaneEdit(*mCurrentPlane, false);
+        mLastVertexPos = pos;
         makeSelectedLayerVisible();
         return true;
     } catch (Exception e) {
@@ -286,35 +282,35 @@ bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept
     }
 }
 
-bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
+bool BES_DrawPlane::addSegment(Board& board, const Point& pos) noexcept
 {
     Q_UNUSED(board);
     Q_ASSERT(mSubState == SubState::Positioning);
 
     // abort if no segment drawn
-    if (pos == mLastSegmentPos) {
+    if (pos == mLastVertexPos) {
         abort(true);
         return false;
     }
 
     try {
-        // if the polygon has more than 2 vertices, start a new undo command
-        if (mCurrentPolygon->getPolygon().getPath().getVertices().count() > 2) {
-            mUndoStack.appendToCmdGroup(mCmdEditCurrentPolygon); mCmdEditCurrentPolygon = nullptr;
+        // if the plane has more than 2 vertices, start a new undo command
+        if (mCurrentPlane->getOutline().getVertices().count() > 2) {
+            mUndoStack.appendToCmdGroup(mCmdEditCurrentPlane); mCmdEditCurrentPlane = nullptr;
             mUndoStack.commitCmdGroup();
             mSubState = SubState::Idle;
 
             // start a new undo command
-            mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
+            mUndoStack.beginCmdGroup(tr("Draw board plane"));
             mSubState = SubState::Positioning;
-            mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
+            mCmdEditCurrentPlane = new CmdBoardPlaneEdit(*mCurrentPlane, false);
         }
 
         // add new vertex
-        Path newPath = mCurrentPolygon->getPolygon().getPath();
+        Path newPath = mCurrentPlane->getOutline();
         newPath.addVertex(pos, Angle::deg0());
-        mCmdEditCurrentPolygon->setPath(newPath, true);
-        mLastSegmentPos = pos;
+        mCmdEditCurrentPlane->setOutline(newPath, true);
+        mLastVertexPos = pos;
         return true;
     } catch (Exception e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
@@ -323,11 +319,11 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
     }
 }
 
-bool BES_DrawPolygon::abort(bool showErrMsgBox) noexcept
+bool BES_DrawPlane::abort(bool showErrMsgBox) noexcept
 {
     try {
-        delete mCmdEditCurrentPolygon; mCmdEditCurrentPolygon = nullptr;
-        mCurrentPolygon = nullptr;
+        delete mCmdEditCurrentPlane; mCmdEditCurrentPlane = nullptr;
+        mCurrentPlane = nullptr;
         mUndoStack.abortCmdGroup(); // can throw
         mSubState = SubState::Idle;
         return true;
@@ -337,47 +333,43 @@ bool BES_DrawPolygon::abort(bool showErrMsgBox) noexcept
     }
 }
 
-void BES_DrawPolygon::updateSegmentPosition(const Point& cursorPos) noexcept
+void BES_DrawPlane::updateVertexPosition(const Point& cursorPos) noexcept
 {
-    if (mCmdEditCurrentPolygon) {
-        Path newPath = mCurrentPolygon->getPolygon().getPath();
+    if (mCmdEditCurrentPlane) {
+        Path newPath = mCurrentPlane->getOutline();
         newPath.getVertices().last().setPos(cursorPos);
-        mCmdEditCurrentPolygon->setPath(newPath, true);
+        mCmdEditCurrentPlane->setOutline(newPath, true);
     }
 }
 
-void BES_DrawPolygon::layerComboBoxLayerChanged(const QString& layerName) noexcept
+void BES_DrawPlane::layerComboBoxLayerChanged(const QString& layerName) noexcept
 {
     mCurrentLayerName = layerName;
-    if (mCmdEditCurrentPolygon) {
-        mCmdEditCurrentPolygon->setLayerName(mCurrentLayerName, true);
+    if (mCmdEditCurrentPlane) {
+        mCmdEditCurrentPlane->setLayerName(mCurrentLayerName, true);
         makeSelectedLayerVisible();
     }
 }
 
-void BES_DrawPolygon::widthComboBoxTextChanged(const QString& width) noexcept
+void BES_DrawPlane::makeSelectedLayerVisible() noexcept
 {
-    try {mCurrentWidth = Length::fromMm(width);} catch (...) {return;}
-    if (mCmdEditCurrentPolygon) {
-        mCmdEditCurrentPolygon->setLineWidth(mCurrentWidth, true);
-    }
-}
-
-void BES_DrawPolygon::filledCheckBoxCheckedChanged(bool checked) noexcept
-{
-    mCurrentIsFilled = checked;
-    if (mCmdEditCurrentPolygon) {
-        mCmdEditCurrentPolygon->setIsFilled(mCurrentIsFilled, true);
-        mCmdEditCurrentPolygon->setIsGrabArea(mCurrentIsFilled, true);
-    }
-}
-
-void BES_DrawPolygon::makeSelectedLayerVisible() noexcept
-{
-    if (mCurrentPolygon) {
-        Board& board = mCurrentPolygon->getBoard();
+    if (mCurrentPlane) {
+        Board& board = mCurrentPlane->getBoard();
         GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
         if (layer && layer->isEnabled()) layer->setVisible(true);
+    }
+}
+
+void BES_DrawPlane::setNetSignal(NetSignal* netsignal) noexcept
+{
+    try {
+        if (!netsignal) throw LogicError(__FILE__, __LINE__);
+        mCurrentNetSignal = netsignal;
+        if (mCmdEditCurrentPlane) {
+            mCmdEditCurrentPlane->setNetSignal(*mCurrentNetSignal);
+        }
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     }
 }
 

@@ -66,6 +66,7 @@ class BEE_Base
             StartDrawPolygon,   ///< start command: draw polygon
             //StartDrawCircle,    ///< start command: draw circle
             //StartDrawEllipse,   ///< start command: draw ellipse
+            StartDrawPlane,     ///< start command: draw plane
             StartDrawTrace,     ///< start command: draw trace
             StartAddVia,        ///< start command: add via
             //StartAddNetLabel,   ///< start command: add netlabel

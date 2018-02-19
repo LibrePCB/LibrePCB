@@ -53,6 +53,7 @@
         <file>actions/recent.png</file>
         <file>actions/down.png</file>
         <file>actions/up.png</file>
+        <file>actions/add_plane.png</file>
         <file>actions/rebuild_plane.png</file>
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>

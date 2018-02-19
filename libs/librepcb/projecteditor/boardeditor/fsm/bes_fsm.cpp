@@ -32,6 +32,7 @@
 #include "bes_drawpolygon.h"
 #include "bes_addvia.h"
 #include "bes_adddevice.h"
+#include "bes_drawplane.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,6 +56,7 @@ BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mSubStates.insert(State_DrawPolygon, new BES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_AddVia, new BES_AddVia(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_AddDevice, new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_DrawPlane, new BES_DrawPlane(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
     // go to state "Select"
     if (mSubStates[State_Select]->entry(nullptr)) {
@@ -151,6 +153,9 @@ BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
         case BEE_Base::StartSelect:
             event->setAccepted(true);
             return State_Select;
+        case BEE_Base::StartDrawPlane:
+            event->setAccepted(true);
+            return State_DrawPlane;
         case BEE_Base::StartDrawTrace:
             event->setAccepted(true);
             return State_DrawTrace;

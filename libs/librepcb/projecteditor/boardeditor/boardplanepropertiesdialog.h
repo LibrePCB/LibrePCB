@@ -17,71 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H
+#define LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <QtWidgets>
+#include <librepcb/common/geometry/vertex.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class CmdPolygonEdit;
+class UndoStack;
+class UndoCommand;
 
 namespace project {
 
-class Board;
-class CmdDeviceInstanceEdit;
-class CmdBoardViaEdit;
-class CmdBoardNetPointEdit;
-class CmdBoardPlaneEdit;
+class Project;
+class BI_Plane;
 
 namespace editor {
 
+namespace Ui {
+class BoardPlanePropertiesDialog;
+}
+
 /*****************************************************************************************
- *  Class CmdMoveSelectedBoardItems
+ *  Class BoardPlanePropertiesDialog
  ****************************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedBoardItems class
+ * @brief The BoardPlanePropertiesDialog class
  */
-class CmdMoveSelectedBoardItems final : public UndoCommandGroup
+class BoardPlanePropertiesDialog final : public QDialog
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
-        ~CmdMoveSelectedBoardItems() noexcept;
+        BoardPlanePropertiesDialog() = delete;
+        BoardPlanePropertiesDialog(const BoardPlanePropertiesDialog& other) = delete;
+        BoardPlanePropertiesDialog(Project& project, BI_Plane& plane,
+                                   UndoStack& undoStack, QWidget* parent) noexcept;
+        ~BoardPlanePropertiesDialog() noexcept;
 
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
-
-
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+    private: // GUI Events
+        void buttonBoxClicked(QAbstractButton* button) noexcept;
 
 
-        // Private Member Variables
-        Board& mBoard;
-        Point mStartPos;
-        Point mDeltaPos;
+    private: // Methods
+        bool applyChanges() noexcept;
 
-        // Move commands
-        QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-        QList<CmdBoardViaEdit*> mViaEditCmds;
-        QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-        QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
-        QList<CmdPolygonEdit*> mPolygonEditCmds;
+        // General
+        Project& mProject;
+        BI_Plane& mPlane;
+        QScopedPointer<Ui::BoardPlanePropertiesDialog> mUi;
+        UndoStack& mUndoStack;
 };
 
 /*****************************************************************************************
@@ -92,4 +88,4 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#endif // LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H

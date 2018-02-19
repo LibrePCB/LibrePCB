@@ -24,11 +24,13 @@ SOURCES += \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
+    boardeditor/boardplanepropertiesdialog.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
     boardeditor/fabricationoutputdialog.cpp \
     boardeditor/fsm/bes_adddevice.cpp \
     boardeditor/fsm/bes_addvia.cpp \
     boardeditor/fsm/bes_base.cpp \
+    boardeditor/fsm/bes_drawplane.cpp \
     boardeditor/fsm/bes_drawpolygon.cpp \
     boardeditor/fsm/bes_drawtrace.cpp \
     boardeditor/fsm/bes_fsm.cpp \
@@ -85,11 +87,13 @@ HEADERS += \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
+    boardeditor/boardplanepropertiesdialog.h \
     boardeditor/boardviapropertiesdialog.h \
     boardeditor/fabricationoutputdialog.h \
     boardeditor/fsm/bes_adddevice.h \
     boardeditor/fsm/bes_addvia.h \
     boardeditor/fsm/bes_base.h \
+    boardeditor/fsm/bes_drawplane.h \
     boardeditor/fsm/bes_drawpolygon.h \
     boardeditor/fsm/bes_drawtrace.h \
     boardeditor/fsm/bes_fsm.h \
@@ -146,6 +150,7 @@ FORMS += \
     boardeditor/boardeditor.ui \
     boardeditor/boardlayersdock.ui \
     boardeditor/boardlayerstacksetupdialog.ui \
+    boardeditor/boardplanepropertiesdialog.ui \
     boardeditor/boardviapropertiesdialog.ui \
     boardeditor/fabricationoutputdialog.ui \
     boardeditor/unplacedcomponentsdock.ui \

@@ -34,6 +34,7 @@
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
 #include <librepcb/project/boards/cmd/cmdboardpolygonremove.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 #include "cmdremovedevicefromboard.h"
@@ -74,6 +75,7 @@ bool CmdRemoveSelectedBoardItems::performExecute()
     query->addSelectedNetLines(BoardSelectionQuery::NetLineFilter::All);
     query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
                                   BoardSelectionQuery::NetPointFilter::AllConnectedLinesSelected);
+    query->addSelectedPlanes();
     query->addSelectedPolygons();
 
     // clear selection because these items will be removed now
@@ -112,6 +114,11 @@ bool CmdRemoveSelectedBoardItems::performExecute()
     foreach (BI_Footprint* footprint, query->getFootprints()) {
         BI_Device& device = footprint->getDeviceInstance();
         execNewChildCmd(new CmdRemoveDeviceFromBoard(device)); // can throw
+    }
+
+    // remove planes
+    foreach (BI_Plane* plane, query->getPlanes()) {
+        execNewChildCmd(new CmdBoardPlaneRemove(*plane)); // can throw
     }
 
     // remove polygons

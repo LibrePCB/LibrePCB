@@ -34,6 +34,7 @@
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 
 /*****************************************************************************************
@@ -59,6 +60,7 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     query->addSelectedNetLines(BoardSelectionQuery::NetLineFilter::All);
     query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
                                   BoardSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedPlanes();
     query->addSelectedPolygons();
 
     foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
@@ -73,6 +75,10 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     foreach (BI_NetPoint* netpoint, query->getNetPoints()) { Q_ASSERT(netpoint);
         CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
         mNetPointEditCmds.append(cmd);
+    }
+    foreach (BI_Plane* plane, query->getPlanes()) { Q_ASSERT(plane);
+        CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
+        mPlaneEditCmds.append(cmd);
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);
         CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
@@ -104,6 +110,9 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
+        foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
         foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
@@ -122,6 +131,7 @@ bool CmdMoveSelectedBoardItems::performExecute()
         qDeleteAll(mDeviceEditCmds);    mDeviceEditCmds.clear();
         qDeleteAll(mViaEditCmds);       mViaEditCmds.clear();
         qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
+        qDeleteAll(mPlaneEditCmds);     mPlaneEditCmds.clear();
         qDeleteAll(mPolygonEditCmds);   mPolygonEditCmds.clear();
         return false;
     }
@@ -133,6 +143,9 @@ bool CmdMoveSelectedBoardItems::performExecute()
         appendChild(cmd); // can throw
     }
     foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
+        appendChild(cmd); // can throw
+    }
+    foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
         appendChild(cmd); // can throw
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
