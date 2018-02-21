@@ -47,7 +47,7 @@
 #endif
 #define WINVER 0x0600
 #define _WIN32_WINNT 0x0600
-#include <Windows.h>
+#include <windows.h>
 #else
 #error "Unknown operating system!"
 #endif
