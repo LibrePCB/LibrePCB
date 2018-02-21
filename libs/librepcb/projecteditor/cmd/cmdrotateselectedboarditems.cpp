@@ -31,10 +31,12 @@
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 
 /*****************************************************************************************
@@ -70,6 +72,7 @@ bool CmdRotateSelectedBoardItems::performExecute()
     query->addSelectedNetPoints(BoardSelectionQuery::NetPointFilter::Floating);
     query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
                                   BoardSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedPlanes();
     query->addSelectedPolygons();
 
     // find the center of all elements
@@ -86,6 +89,12 @@ bool CmdRotateSelectedBoardItems::performExecute()
     foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
         center += netpoint->getPosition();
         ++count;
+    }
+    foreach (BI_Plane* plane, query->getPlanes()) {
+        for (const Vertex& vertex : plane->getOutline().getVertices()) {
+            center += vertex.getPos();
+            ++count;
+        }
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) {
         for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
@@ -116,6 +125,11 @@ bool CmdRotateSelectedBoardItems::performExecute()
     foreach (BI_NetPoint* netpoint, query->getNetPoints()) { Q_ASSERT(netpoint);
         CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
         cmd->setPosition(netpoint->getPosition().rotated(mAngle, center), false);
+        appendChild(cmd);
+    }
+    foreach (BI_Plane* plane, query->getPlanes()) { Q_ASSERT(plane);
+        CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
+        cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);

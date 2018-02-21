@@ -84,14 +84,13 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 
     // determine stop mask clearance
     mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(mVia.getDrillDiameter());
-    mStopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(mVia.getSize());
+    Length stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(mVia.getSize());
 
-    // set shape and bounding rect
-    qreal shapeRadius = (mVia.getSize()/2).toPx();
-    qreal stopMaskRadius = ((mVia.getSize() + mStopMaskClearance*2) / 2).toPx();
-    mBoundingRect = QRectF(-stopMaskRadius, -stopMaskRadius, 2*stopMaskRadius, 2*stopMaskRadius);
-    mShape = QPainterPath();
-    mShape.addEllipse(QRectF(-shapeRadius, -shapeRadius, 2*shapeRadius, 2*shapeRadius));
+    // set shapes and bounding rect
+    mShape = mVia.getOutline().toQPainterPathPx();
+    mCopper = mVia.toQPainterPathPx();
+    mStopMask = mVia.getOutline(stopMaskClearance).toQPainterPathPx();
+    mBoundingRect = mStopMask.boundingRect();
 
     update();
 }
@@ -112,26 +111,26 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
         // draw bottom stop mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-        painter->drawPath(mVia.toQPainterPathPx(mStopMaskClearance, false));
+        painter->drawPath(mStopMask);
     }
 
     if (mViaLayer && mViaLayer->isVisible()) {
         // draw via
         painter->setPen(Qt::NoPen);
         painter->setBrush(mViaLayer->getColor(highlight));
-        painter->drawPath(mVia.toQPainterPathPx(Length(0), true));
+        painter->drawPath(mCopper);
 
         // draw netsignal name
         painter->setFont(mFont);
         painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-        painter->drawText(mBoundingRect, Qt::AlignCenter, netsignal.getName());
+        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, netsignal.getName());
     }
 
     if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
         // draw top stop mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-        painter->drawPath(mVia.toQPainterPathPx(mStopMaskClearance, false));
+        painter->drawPath(mStopMask);
     }
 
 #ifdef QT_DEBUG

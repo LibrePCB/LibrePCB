@@ -84,9 +84,11 @@ class BGI_Via final : public BGI_Base
 
         // Cached Attributes
         bool mDrawStopMask;
-        Length mStopMaskClearance;
-        QRectF mBoundingRect;
         QPainterPath mShape;
+        QPainterPath mCopper;
+        QPainterPath mStopMask;
+        QPainterPath mCreamMask;
+        QRectF mBoundingRect;
         QFont mFont;
 };
 

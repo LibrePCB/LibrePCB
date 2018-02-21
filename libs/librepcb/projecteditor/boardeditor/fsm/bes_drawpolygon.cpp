@@ -307,12 +307,12 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
             // start a new undo command
             mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
             mSubState = SubState::Positioning;
+            mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
         }
 
-        // add new segment and start new edit command
+        // add new vertex
         Path newPath = mCurrentPolygon->getPolygon().getPath();
         newPath.addVertex(pos, Angle::deg0());
-        mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
         mCmdEditCurrentPolygon->setPath(newPath, true);
         mLastSegmentPos = pos;
         return true;

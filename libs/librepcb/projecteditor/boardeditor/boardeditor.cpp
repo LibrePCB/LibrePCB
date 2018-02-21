@@ -32,6 +32,7 @@
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include <librepcb/common/dialogs/boarddesignrulesdialog.h>
@@ -135,6 +136,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     mToolsActionGroup->addAction(BES_FSM::State::State_DrawTrace, mUi->actionToolDrawTrace);
     mToolsActionGroup->addAction(BES_FSM::State::State_AddVia, mUi->actionToolAddVia);
     mToolsActionGroup->addAction(BES_FSM::State::State_DrawPolygon, mUi->actionToolDrawPolygon);
+    mToolsActionGroup->addAction(BES_FSM::State::State_DrawPlane, mUi->actionToolAddPlane);
     mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
     connect(mFsm, &BES_FSM::stateChanged,
             mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
@@ -475,6 +477,12 @@ void BoardEditor::on_actionModifyDesignRules_triggered()
     }
 }
 
+void BoardEditor::on_actionRebuildPlanes_triggered()
+{
+    Board* board = getActiveBoard();
+    if (board) board->rebuildAllPlanes();
+}
+
 void BoardEditor::on_tabBar_currentChanged(int index)
 {
     setActiveBoardIndex(index);
@@ -506,6 +514,9 @@ void BoardEditor::toolActionGroupChangeTriggered(const QVariant& newTool) noexce
             break;
         case BES_FSM::State::State_DrawPolygon:
             mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawPolygon), true);
+            break;
+        case BES_FSM::State::State_DrawPlane:
+            mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawPlane), true);
             break;
         case BES_FSM::State::State_AddVia:
             mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);

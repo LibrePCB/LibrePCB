@@ -35,6 +35,10 @@ class UndoCommandGroup;
 class Polygon;
 
 namespace project {
+
+class BI_Via;
+class BI_Plane;
+
 namespace editor {
 
 class CmdMoveSelectedBoardItems;
@@ -80,6 +84,8 @@ class BES_Select final : public BES_Base
         bool rotateSelectedItems(const Angle& angle) noexcept;
         bool flipSelectedItems(Qt::Orientation orientation) noexcept;
         bool removeSelectedItems() noexcept;
+        void openViaPropertiesDialog(BI_Via& via) noexcept;
+        void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
         void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
 
 

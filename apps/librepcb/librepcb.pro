@@ -49,6 +49,7 @@ LIBS += \
     -llibrepcblibrary \
     -llibrepcbcommon \
     -lsexpresso \
+    -lclipper \
     -lquazip -lz
 
 INCLUDEPATH += \
@@ -66,6 +67,7 @@ DEPENDPATH += \
     ../../libs/librepcb/common \
     ../../libs/quazip \
     ../../libs/sexpresso \
+    ../../libs/clipper \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
@@ -78,6 +80,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a \
     $${DESTDIR}/libquazip.a \
     $${DESTDIR}/libsexpresso.a \
+    $${DESTDIR}/libclipper.a \
 
 TRANSLATIONS = \
     ../../i18n/librepcb_de.ts \

@@ -40,6 +40,7 @@ class Board;
 class CmdDeviceInstanceEdit;
 class CmdBoardViaEdit;
 class CmdBoardNetPointEdit;
+class CmdBoardPlaneEdit;
 
 namespace editor {
 
@@ -79,6 +80,7 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
         QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
         QList<CmdBoardViaEdit*> mViaEditCmds;
         QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
+        QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
         QList<CmdPolygonEdit*> mPolygonEditCmds;
 };
 

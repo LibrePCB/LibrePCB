@@ -40,6 +40,7 @@ class NetClass;
 class ComponentSignalInstance;
 class SI_NetSegment;
 class BI_NetSegment;
+class BI_Plane;
 class ErcMsg;
 
 /*****************************************************************************************
@@ -76,6 +77,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         const QList<ComponentSignalInstance*>& getComponentSignals() const noexcept {return mRegisteredComponentSignals;}
         const QList<SI_NetSegment*>& getSchematicNetSegments() const noexcept {return mRegisteredSchematicNetSegments;}
         const QList<BI_NetSegment*>& getBoardNetSegments() const noexcept {return mRegisteredBoardNetSegments;}
+        const QList<BI_Plane*>& getBoardPlanes() const noexcept {return mRegisteredBoardPlanes;}
         int getRegisteredElementsCount() const noexcept;
         bool isUsed() const noexcept;
         bool isNameForced() const noexcept;
@@ -93,6 +95,8 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         void unregisterSchematicNetSegment(SI_NetSegment& netsegment);
         void registerBoardNetSegment(BI_NetSegment& netsegment);
         void unregisterBoardNetSegment(BI_NetSegment& netsegment);
+        void registerBoardPlane(BI_Plane& plane);
+        void unregisterBoardPlane(BI_Plane& plane);
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
@@ -129,6 +133,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         QList<ComponentSignalInstance*> mRegisteredComponentSignals;
         QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
         QList<BI_NetSegment*> mRegisteredBoardNetSegments;
+        QList<BI_Plane*> mRegisteredBoardPlanes;
 
         // ERC Messages
         /// @brief the ERC message for unused netsignals

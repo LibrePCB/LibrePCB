@@ -22,6 +22,7 @@ LIBS += \
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lparseagle \
     -lsexpresso \
+    -lclipper \
 
 INCLUDEPATH += \
     ../../libs \
@@ -33,6 +34,7 @@ DEPENDPATH += \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
     ../../libs/sexpresso \
+    ../../libs/clipper \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbeagleimport.a \
@@ -40,6 +42,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a \
     $${DESTDIR}/libparseagle.a \
     $${DESTDIR}/libsexpresso.a \
+    $${DESTDIR}/libclipper.a \
 
 SOURCES += \
     main.cpp \

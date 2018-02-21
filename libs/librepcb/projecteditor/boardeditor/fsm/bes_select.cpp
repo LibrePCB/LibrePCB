@@ -29,6 +29,7 @@
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
@@ -40,6 +41,7 @@
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
 #include "../boardviapropertiesdialog.h"
+#include "../boardplanepropertiesdialog.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdmoveselectedboarditems.h"
 #include "../../cmd/cmdrotateselectedboarditems.h"
@@ -337,6 +339,25 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             return ForceStayInState;
         }
 
+        case BI_Base::Type_t::Plane: {
+            BI_Plane* plane = dynamic_cast<BI_Plane*>(items.first()); Q_ASSERT(plane);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Plane");
+            QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"), tr("Plane Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openPlanePropertiesDialog(*plane);
+            }
+            return ForceStayInState;
+        }
+
         case BI_Base::Type_t::Polygon: {
             BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
 
@@ -373,8 +394,12 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         {
             case BI_Base::Type_t::Via: {
                 BI_Via* via = dynamic_cast<BI_Via*>(items.first()); Q_ASSERT(via);
-                BoardViaPropertiesDialog dialog(mProject, *via, mUndoStack, &mEditor);
-                dialog.exec();
+                openViaPropertiesDialog(*via);
+                return ForceStayInState;
+            }
+            case BI_Base::Type_t::Plane: {
+                BI_Plane* plane = dynamic_cast<BI_Plane*>(items.first()); Q_ASSERT(plane);
+                openPlanePropertiesDialog(*plane);
                 return ForceStayInState;
             }
             case BI_Base::Type_t::Polygon: {
@@ -512,6 +537,18 @@ bool BES_Select::removeSelectedItems() noexcept
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
+}
+
+void BES_Select::openViaPropertiesDialog(BI_Via& via) noexcept
+{
+    BoardViaPropertiesDialog dialog(mProject, via, mUndoStack, &mEditor);
+    dialog.exec();
+}
+
+void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept
+{
+    BoardPlanePropertiesDialog dialog(mProject, plane, mUndoStack, &mEditor);
+    dialog.exec();
 }
 
 void BES_Select::openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept

@@ -26,6 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include "../graphicsitems/bgi_footprintpad.h"
+#include <librepcb/common/geometry/path.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -77,6 +78,8 @@ class BI_FootprintPad final : public BI_Base
         NetSignal* getCompSigInstNetSignal() const noexcept;
         bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
         bool isSelectable() const noexcept override;
+        Path getOutline(const Length& expansion = Length(0)) const noexcept;
+        Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
 
         // General Methods
         void addToBoard() override;

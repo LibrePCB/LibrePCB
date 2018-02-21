@@ -113,43 +113,30 @@ bool BI_Via::isOnLayer(const QString& layerName) const noexcept
     return GraphicsLayer::isCopperLayer(layerName);
 }
 
-QPainterPath BI_Via::toQPainterPathPx(const Length& clearance, bool hole) const noexcept
+Path BI_Via::getOutline(const Length& expansion) const noexcept
 {
-    QPainterPath p;
+    Length size = mSize + (expansion * 2);
+    if (size > 0) {
+        switch (mShape) {
+            case Shape::Round:      return Path::circle(size);
+            case Shape::Square:     return Path::centeredRect(size, size);
+            case Shape::Octagon:    return Path::octagon(size, size);
+            default:                Q_ASSERT(false); break;
+        }
+    }
+    return Path();
+}
+
+Path BI_Via::getSceneOutline(const Length& expansion) const noexcept
+{
+    return getOutline(expansion).translated(mPosition);
+}
+
+QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept
+{
+    QPainterPath p = getOutline(expansion).toQPainterPathPx();
     p.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
-    switch (mShape)
-    {
-        case Shape::Round: {
-            qreal dia = (mSize + clearance*2).toPx();
-            p.addEllipse(-dia/2, -dia/2, dia, dia);
-            break;
-        }
-        case Shape::Square: {
-            qreal size = (mSize + clearance*2).toPx();
-            p.addRect(-size/2, -size/2, size, size);
-            break;
-        }
-        case Shape::Octagon: {
-            qreal r = (mSize/2 + clearance).toPx();
-            qreal a = r * (2 - qSqrt(2));
-            QPolygonF octagon;
-            octagon.append(QPointF(r, r-a));
-            octagon.append(QPointF(r-a, r));
-            octagon.append(QPointF(a-r, r));
-            octagon.append(QPointF(-r, r-a));
-            octagon.append(QPointF(-r, a-r));
-            octagon.append(QPointF(a-r, -r));
-            octagon.append(QPointF(r-a, -r));
-            octagon.append(QPointF(r, a-r));
-            p.addPolygon(octagon);
-            break;
-        }
-        default: Q_ASSERT(false); break;
-    }
-    if (hole) {
-        // remove hole
-        p.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
-    }
+    p.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
     return p;
 }
 

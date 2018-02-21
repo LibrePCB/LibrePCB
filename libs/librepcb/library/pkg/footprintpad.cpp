@@ -94,87 +94,27 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept
     }
 }
 
-QRectF FootprintPad::getBoundingRectPx() const noexcept
+Path FootprintPad::getOutline(const Length& expansion) const noexcept
 {
-    return QRectF(-mWidth.toPx()/2, -mHeight.toPx()/2, mWidth.toPx(), mHeight.toPx());
-}
-
-const QPainterPath& FootprintPad::toQPainterPathPx() const noexcept
-{
-    if (mPainterPathPx.isEmpty()) {
-        mPainterPathPx.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
-        QRectF rect = getBoundingRectPx();
-        switch (mShape)
-        {
-            case Shape::ROUND: {
-                qreal radius = qMin(mWidth.toPx(), mHeight.toPx())/2;
-                mPainterPathPx.addRoundedRect(rect, radius, radius);
-                break;
-            }
-            case Shape::RECT: {
-                mPainterPathPx.addRect(rect);
-                break;
-            }
-            case Shape::OCTAGON: {
-                qreal rx = mWidth.toPx()/2;
-                qreal ry = mHeight.toPx()/2;
-                qreal a = qMin(rx, ry) * (2 - qSqrt(2));
-                QPolygonF octagon;
-                octagon.append(QPointF(rx, ry-a));
-                octagon.append(QPointF(rx-a, ry));
-                octagon.append(QPointF(a-rx, ry));
-                octagon.append(QPointF(-rx, ry-a));
-                octagon.append(QPointF(-rx, a-ry));
-                octagon.append(QPointF(a-rx, -ry));
-                octagon.append(QPointF(rx-a, -ry));
-                octagon.append(QPointF(rx, a-ry));
-                mPainterPathPx.addPolygon(octagon);
-                break;
-            }
-            default: Q_ASSERT(false); break;
-        }
-        // remove hole if THT
-        if (mBoardSide == BoardSide::THT) {
-            mPainterPathPx.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
+    Length width = mWidth + (expansion * 2);
+    Length height = mHeight + (expansion * 2);
+    if (width > 0 && height > 0) {
+        switch (mShape) {
+            case Shape::ROUND:      return Path::obround(width, height);
+            case Shape::RECT:       return Path::centeredRect(width, height);
+            case Shape::OCTAGON:    return Path::octagon(width, height);
+            default:                Q_ASSERT(false); break;
         }
     }
-    return mPainterPathPx;
+    return Path();
 }
 
-QPainterPath FootprintPad::toMaskQPainterPathPx(const Length& clearance) const noexcept
+QPainterPath FootprintPad::toQPainterPathPx(const Length& expansion) const noexcept
 {
-    QPainterPath p;
-    qreal w = qMax(mWidth + clearance*2, Length(0)).toPx();
-    qreal h = qMax(mHeight + clearance*2, Length(0)).toPx();
-    QRectF rect(-w/2, -h/2, w, h);
-    switch (mShape)
-    {
-        case Shape::ROUND: {
-            qreal radius = qMin(w, h)/2;
-            p.addRoundedRect(rect, radius, radius);
-            break;
-        }
-        case Shape::RECT: {
-            p.addRect(rect);
-            break;
-        }
-        case Shape::OCTAGON: {
-            qreal rx = w/2;
-            qreal ry = h/2;
-            qreal a = qMin(rx, ry) * (2 - qSqrt(2));
-            QPolygonF octagon;
-            octagon.append(QPointF(rx, ry-a));
-            octagon.append(QPointF(rx-a, ry));
-            octagon.append(QPointF(a-rx, ry));
-            octagon.append(QPointF(-rx, ry-a));
-            octagon.append(QPointF(-rx, a-ry));
-            octagon.append(QPointF(a-rx, -ry));
-            octagon.append(QPointF(rx-a, -ry));
-            octagon.append(QPointF(rx, a-ry));
-            p.addPolygon(octagon);
-            break;
-        }
-        default: Q_ASSERT(false); break;
+    QPainterPath p = getOutline(expansion).toQPainterPathPx();
+    if (mBoardSide == BoardSide::THT) {
+        p.setFillRule(Qt::OddEvenFill); // important to subtract the hole!
+        p.addEllipse(QPointF(0, 0), mDrillDiameter.toPx()/2, mDrillDiameter.toPx()/2);
     }
     return p;
 }
@@ -202,35 +142,30 @@ void FootprintPad::setRotation(const Angle& rot) noexcept
 void FootprintPad::setShape(Shape shape) noexcept
 {
     mShape = shape;
-    mPainterPathPx = QPainterPath(); // invalidate painter path
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setWidth(const Length& width) noexcept
 {
     mWidth = width;
-    mPainterPathPx = QPainterPath(); // invalidate painter path
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setHeight(const Length& height) noexcept
 {
     mHeight = height;
-    mPainterPathPx = QPainterPath(); // invalidate painter path
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setDrillDiameter(const Length& diameter) noexcept
 {
     mDrillDiameter = diameter;
-    mPainterPathPx = QPainterPath(); // invalidate painter path
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
 
 void FootprintPad::setBoardSide(BoardSide side) noexcept
 {
     mBoardSide = side;
-    mPainterPathPx = QPainterPath(); // invalidate painter path
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLayerName(getLayerName());
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setShape(toQPainterPathPx());
 }
@@ -291,7 +226,6 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept
     mHeight = rhs.mHeight;
     mDrillDiameter = rhs.mDrillDiameter;
     mBoardSide = rhs.mBoardSide;
-    mPainterPathPx = rhs.mPainterPathPx;
     return *this;
 }
 

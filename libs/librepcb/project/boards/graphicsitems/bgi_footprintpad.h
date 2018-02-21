@@ -94,10 +94,11 @@ class BGI_FootprintPad final : public BGI_Base
         GraphicsLayer* mBottomStopMaskLayer;
         GraphicsLayer* mTopCreamMaskLayer;
         GraphicsLayer* mBottomCreamMaskLayer;
-        Length mStopMaskClearance;
-        Length mCreamMaskClearance;
-        QRectF mBoundingRect;
         QPainterPath mShape;
+        QPainterPath mCopper;
+        QPainterPath mStopMask;
+        QPainterPath mCreamMask;
+        QRectF mBoundingRect;
         QFont mFont;
 };
 

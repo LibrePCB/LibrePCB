@@ -30,6 +30,7 @@
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
 #include "items/bi_via.h"
+#include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 
 /*****************************************************************************************
@@ -44,10 +45,11 @@ namespace project {
 
 BoardSelectionQuery::BoardSelectionQuery(const QMap<Uuid, BI_Device*>& deviceInstances,
                                          const QList<BI_NetSegment*>& netsegments,
+                                         const QList<BI_Plane*>& planes,
                                          const QList<BI_Polygon*>& polygons,
                                          QObject* parent) :
     QObject(parent), mDevices(deviceInstances),
-    mNetSegments(netsegments), mPolygons(polygons)
+    mNetSegments(netsegments), mPlanes(planes), mPolygons(polygons)
 {
 }
 
@@ -65,8 +67,9 @@ int BoardSelectionQuery::getResultCount() const noexcept
             mResultFootprints.count() +
             mResultNetPoints.count() +
             mResultNetLines.count() +
-            mResultVias.count();// +
-            //mResultPolygons.count();
+            mResultVias.count() +
+            mResultPlanes.count() +
+            mResultPolygons.count();
 }
 
 /*****************************************************************************************
@@ -125,6 +128,15 @@ void BoardSelectionQuery::addNetPointsOfNetLines(NetLineFilters lf, NetPointFilt
             if (doesNetPointMatchFilter(netline->getEndPoint(), pf)) {
                 mResultNetPoints.insert(&netline->getEndPoint());
             }
+        }
+    }
+}
+
+void BoardSelectionQuery::addSelectedPlanes() noexcept
+{
+    foreach (BI_Plane* plane, mPlanes) {
+        if (plane->isSelected()) {
+            mResultPlanes.insert(plane);
         }
     }
 }

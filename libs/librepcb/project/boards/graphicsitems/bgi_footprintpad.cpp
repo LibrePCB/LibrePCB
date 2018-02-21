@@ -110,16 +110,15 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
 
     // determine stop/cream mask clearance
     Length size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
-    mStopMaskClearance = mPad.getBoard().getDesignRules().calcStopMaskClearance(size);
-    mCreamMaskClearance = -mPad.getBoard().getDesignRules().calcCreamMaskClearance(size);
+    Length stopMaskClearance = mPad.getBoard().getDesignRules().calcStopMaskClearance(size);
+    Length creamMaskClearance = -mPad.getBoard().getDesignRules().calcCreamMaskClearance(size);
 
-    // set shape and bounding rect
-    mShape = QPainterPath();
-    mShape.setFillRule(Qt::WindingFill);
-    qreal w = (mLibPad.getWidth() + mStopMaskClearance*2).toPx();
-    qreal h = (mLibPad.getHeight() + mStopMaskClearance*2).toPx();
-    mShape.addRect(mLibPad.getBoundingRectPx());
-    mBoundingRect = QRectF(-w/2, -h/2, w, h);
+    // set shapes and bounding rect
+    mShape = mLibPad.getOutline().toQPainterPathPx();
+    mCopper = mLibPad.toQPainterPathPx();
+    mStopMask = mLibPad.getOutline(stopMaskClearance).toQPainterPathPx();
+    mCreamMask = mLibPad.getOutline(creamMaskClearance).toQPainterPathPx();
+    mBoundingRect = mStopMask.boundingRect();
 
     update();
 }
@@ -142,39 +141,39 @@ void BGI_FootprintPad::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
         // draw bottom cream mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mBottomCreamMaskLayer->getColor(highlight));
-        painter->drawPath(mLibPad.toMaskQPainterPathPx(mCreamMaskClearance));
+        painter->drawPath(mCreamMask);
     }
 
     if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
         // draw bottom stop mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-        painter->drawPath(mLibPad.toMaskQPainterPathPx(mStopMaskClearance));
+        painter->drawPath(mStopMask);
     }
 
     if (mPadLayer && mPadLayer->isVisible()) {
         // draw pad
         painter->setPen(Qt::NoPen);
         painter->setBrush(mPadLayer->getColor(highlight));
-        painter->drawPath(mLibPad.toQPainterPathPx());
+        painter->drawPath(mCopper);
         // draw pad text
         painter->setFont(mFont);
         painter->setPen(mPadLayer->getColor(highlight).lighter(150));
-        painter->drawText(mLibPad.getBoundingRectPx(), Qt::AlignCenter, mPad.getDisplayText());
+        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, mPad.getDisplayText());
     }
 
     if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
         // draw top stop mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-        painter->drawPath(mLibPad.toMaskQPainterPathPx(mStopMaskClearance));
+        painter->drawPath(mStopMask);
     }
 
     if (mTopCreamMaskLayer && mTopCreamMaskLayer->isVisible()) {
         // draw top cream mask
         painter->setPen(Qt::NoPen);
         painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
-        painter->drawPath(mLibPad.toMaskQPainterPathPx(mCreamMaskClearance));
+        painter->drawPath(mCreamMask);
     }
 
 #ifdef QT_DEBUG
