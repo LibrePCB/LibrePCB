@@ -18,6 +18,10 @@ RUN /opt/LibrePCB/dev/docker/make_librepcb.sh
 RUN mkdir -p /root/.config/LibrePCB/ \
   && cp /opt/LibrePCB/dev/docker/LibrePCB.conf /root/.config/LibrePCB/LibrePCB.conf
 
+# ensure that the USER env var is set appropriately
+ARG DOCKER_USER=root
+ENV USER=$DOCKER_USER
+
 # set working directory and default command to execute
 WORKDIR /opt/LibrePCB
 CMD bash -C "/opt/LibrePCB/dev/docker/startup.sh";"bash"
