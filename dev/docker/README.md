@@ -36,3 +36,9 @@ Different examples to run the docker container "librepcb:git":
 ./run_container.sh dia                      # run Dia (diagram editor)
 ```
 
+#### Troubleshooting
+
+* "QXcbConnection: Could not connect to display :0"
+    * Give docker the rights to access the X-Server with: `xhost +local:docker`
+* "error gathering device information while adding custom device "/dev/dri/card0"
+    * install a newer version of docker (appears to be working as of 17.12.1-ce)
