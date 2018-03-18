@@ -8,7 +8,7 @@ deploy: off
 environment:
   global:
     MINGW: C:\Qt\Tools\mingw530_32
-    QTDIR: C:\Qt\5.9.3\mingw53_32
+    QTDIR: C:\Qt\5.9\mingw53_32
     VCRT_DIR: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Redist\x86\Microsoft.VC120.CRT'
 
 init:
