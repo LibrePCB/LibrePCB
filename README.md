@@ -34,12 +34,12 @@ about the currently available features, limitations and known bugs.
 *Warning: Because LibrePCB's file format is not yet considered as stable (i.e.
 breaking changes can occur), you should not yet use LibrePCB productively!*
 
-**Please read our [documentation](https://docs.librepcb.org/) to see how you can
+**Please read our [user manual](https://docs.librepcb.org/) to see how you can
 install and use LibrePCB.**
 The [Getting Started](https://docs.librepcb.org/getting_started/) guide
 gives you a quick introduction to LibrePCB.
 
-In addition to the installation methods described in the documentation, Arch
+In addition to the installation methods described in the user manual, Arch
 Linux users can also install the package
 [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
 The package clones and builds the latest (unstable!) version of the `master`
@@ -51,6 +51,7 @@ branch from GitHub.
 Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for
 details.
 
+For internal details take a look at the [automatically generated documentation (doxygen)](http://librepcb.org/LibrePCB-Doxygen/master/)
 
 ## Development
 
