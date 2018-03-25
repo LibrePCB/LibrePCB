@@ -175,6 +175,13 @@ Ellipse& Ellipse::rotate(const Angle& angle, const Point& center) noexcept
     return *this;
 }
 
+Ellipse& Ellipse::mirror(Qt::Orientation orientation, const Point& center) noexcept
+{
+    mCenter.mirror(orientation, center);
+    mRotation = -mRotation;
+    return *this;
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/

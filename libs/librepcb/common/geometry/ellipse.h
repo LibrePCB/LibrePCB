@@ -112,6 +112,7 @@ class Ellipse : public SerializableObject
         // Transformations
         Ellipse& translate(const Point& offset) noexcept;
         Ellipse& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
+        Ellipse& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
 
         // General Methods
         void registerObserver(IF_EllipseObserver& object) const noexcept;

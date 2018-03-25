@@ -273,8 +273,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == polygon.getLayerName()) {
             Path path = polygon.getPath();
+            path.rotate(footprint.getRotation());
             if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
-            path.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
             path.translate(footprint.getPosition());
             gen.drawPathOutline(path, calcWidthOfLayer(polygon.getLineWidth(), layer));
             if (polygon.isFilled()) {
@@ -288,8 +288,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == ellipse.getLayerName()) {
             Ellipse e = ellipse;
-            if (footprint.getIsMirrored()) e.setCenter(e.getCenter().mirrored(Qt::Horizontal));
-            e.rotate(footprint.getIsMirrored() ? -footprint.getRotation() : footprint.getRotation());
+            e.rotate(footprint.getRotation());
+            if (footprint.getIsMirrored()) e.mirror(Qt::Horizontal);
             e.translate(footprint.getPosition());
             e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
             gen.drawEllipseOutline(e);
