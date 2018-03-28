@@ -137,6 +137,17 @@ class FileUtils final
          */
         static void makePath(const FilePath& path);
 
+        /**
+         * @brief Get all files in a given directory (optionally filtered by extension)
+         *
+         * @param dir           Filepath to a directory (must exist)
+         * @param filter        Only files matching this filter are returned
+         *
+         * @return A list of filepaths to files in the specified directory
+         */
+        static QList<FilePath> getFilesInDirectory(const FilePath& dir,
+                                                   const QStringList& filters = QStringList());
+
 
         // Operator Overloadings
         FileUtils& operator=(const FileUtils& rhs) = delete;

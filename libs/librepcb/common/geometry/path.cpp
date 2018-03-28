@@ -308,7 +308,7 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
     return p;
 }
 
-QPainterPath Path::toQPainterPathPx(const QList<Path>& paths) noexcept
+QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths) noexcept
 {
     QPainterPath p;
     foreach (const Path& path, paths) {
