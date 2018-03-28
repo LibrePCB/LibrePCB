@@ -33,6 +33,9 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class StrokeFont;
+class StrokeFontPool;
+
 /*****************************************************************************************
  *  Macros
  ****************************************************************************************/
@@ -70,6 +73,9 @@ class Application final : public QApplication
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
         const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
         FilePath getResourcesFilePath(const QString& filepath) const noexcept;
+        const StrokeFontPool& getStrokeFonts() const noexcept {return *mStrokeFontPool;}
+        QString getDefaultStrokeFontName() const noexcept {return "newstroke.bene";}
+        const StrokeFont& getDefaultStrokeFont() const noexcept;
 
         // Reimplemented from QApplication
         bool notify(QObject* receiver, QEvent* e);
@@ -86,6 +92,7 @@ class Application final : public QApplication
         QString mGitVersion;
         Version mFileFormatVersion;
         FilePath mResourcesDir;
+        QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all application stroke fonts
 };
 
 /*****************************************************************************************

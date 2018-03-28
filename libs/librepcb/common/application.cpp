@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "application.h"
 #include "exceptions.h"
+#include "font/strokefontpool.h"
 #include "units/all_length_units.h"
 
 /*****************************************************************************************
@@ -67,6 +68,10 @@ Application::Application(int& argc, char** argv) noexcept :
     // determine the path to the resources directory (e.g. /usr/share/librepcb)
     mResourcesDir = executableDirPath.getPathTo("../share/librepcb");
     Q_ASSERT(mResourcesDir.isValid());
+
+    // load all stroke fonts
+    mStrokeFontPool.reset(new StrokeFontPool(getResourcesFilePath("fontobene")));
+    getDefaultStrokeFont(); // ensure that the default font is available (aborts if not)
 }
 
 Application::~Application() noexcept
@@ -80,6 +85,15 @@ Application::~Application() noexcept
 FilePath Application::getResourcesFilePath(const QString& filepath) const noexcept
 {
     return mResourcesDir.getPathTo(filepath);
+}
+
+const StrokeFont& Application::getDefaultStrokeFont() const noexcept
+{
+    try {
+        return mStrokeFontPool->getFont(getDefaultStrokeFontName());
+    } catch (const Exception& e) {
+        qFatal("Default stroke font could not be loaded!"); // aborts the application!!!
+    }
 }
 
 /*****************************************************************************************
