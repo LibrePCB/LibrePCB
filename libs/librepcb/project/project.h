@@ -41,6 +41,7 @@ namespace librepcb {
 class SmartTextFile;
 class SmartSExprFile;
 class SmartVersionFile;
+class StrokeFontPool;
 
 namespace project {
 
@@ -132,6 +133,13 @@ class Project final : public QObject, public AttributeProvider
          * @return See #mIsRestored
          */
         bool isRestored() const noexcept {return mIsRestored;}
+
+        /**
+         * @brief Get the StrokeFontPool which contains all stroke fonts of the project
+         *
+         * @return A reference to the librepcb::StrokeFontPool object
+         */
+        StrokeFontPool& getStrokeFonts() const noexcept {return *mStrokeFontPool;}
 
         /**
          * @brief Get the ProjectMetadata object which contains all project metadata
@@ -479,6 +487,7 @@ class Project final : public QObject, public AttributeProvider
         QScopedPointer<SmartSExprFile> mBoardsFile; ///< core/boards.lp
 
         // General
+        QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all fonts from ./resources/fontobene/
         QScopedPointer<ProjectMetadata> mProjectMetadata; ///< e.g. project name, author, ...
         QScopedPointer<ProjectSettings> mProjectSettings; ///< all project specific settings
         QScopedPointer<ProjectLibrary> mProjectLibrary; ///< the library which contains all elements needed in this project

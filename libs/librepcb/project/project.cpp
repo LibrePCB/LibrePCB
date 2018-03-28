@@ -29,6 +29,7 @@
 #include <librepcb/common/fileio/smartversionfile.h>
 #include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/font/strokefontpool.h>
 #include "project.h"
 #include "library/projectlibrary.h"
 #include "circuit/circuit.h"
@@ -175,6 +176,19 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         } else {
             mProjectFile.reset(new SmartTextFile(mFilepath, mIsRestored, mIsReadOnly));
         }
+
+        // copy and/or load stroke fonts
+        FilePath fontobeneDir = mPath.getPathTo("resources/fontobene");
+        if (create || (!fontobeneDir.isExistingDir()) || fontobeneDir.isEmptyDir()) {
+            FilePath src = qApp->getResourcesFilePath("fontobene");
+            qInfo() << "No fonts found in project, copy application fonts from" << src.toNative();
+            // don't use FileUtils::copyDirRecursively() because we only want *.bene files
+            FileUtils::makePath(fontobeneDir);
+            foreach (const FilePath& fp, FileUtils::getFilesInDirectory(src, {"*.bene"})) {
+                FileUtils::copyFile(fp, fontobeneDir.getPathTo(fp.getFilename()));
+            }
+        }
+        mStrokeFontPool.reset(new StrokeFontPool(fontobeneDir));
 
         // Create all needed objects
         mProjectMetadata.reset(new ProjectMetadata(*this, mIsRestored, mIsReadOnly, create));
