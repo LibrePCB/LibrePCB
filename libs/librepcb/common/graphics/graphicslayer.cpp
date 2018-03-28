@@ -257,10 +257,10 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),               QColor(255, 255, 255, 150), QColor(255, 255, 255, 220), true});
         h.insert(sBoardPadsTht,             {tr("Pads"),                        QColor(0, 255, 0, 150),     QColor(0, 255, 0, 220),     true});
         h.insert(sBoardViasTht,             {tr("Vias"),                        QColor(0, 255, 0, 150),     QColor(0, 255, 0, 220),     true});
-        h.insert(sBoardMeasures,            {tr("Measures"),                    Qt::lightGray,              Qt::gray,                   true});
+        h.insert(sBoardMeasures,            {tr("Measures"),                    Qt::gray,                   Qt::lightGray,              true});
         h.insert(sBoardAlignment,           {tr("Alignment"),                   Qt::darkCyan,               Qt::cyan,                   true});
-        h.insert(sBoardDocumentation,       {tr("Documentation"),               Qt::white,                  Qt::lightGray,              true});
-        h.insert(sBoardComments,            {tr("Comments"),                    Qt::yellow,                 Qt::darkYellow,             true});
+        h.insert(sBoardDocumentation,       {tr("Documentation"),               Qt::lightGray,              Qt::white,                  true});
+        h.insert(sBoardComments,            {tr("Comments"),                    QColor(255, 165, 0, 180),   QColor(255, 165, 0, 255),   true});
         h.insert(sBoardGuide,               {tr("Guide"),                       Qt::darkYellow,             Qt::yellow,                 true});
         // board symmetric
         h.insert(sTopPlacement,             {tr("Top Placement"),               QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
