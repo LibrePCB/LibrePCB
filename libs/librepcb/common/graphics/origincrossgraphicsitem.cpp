@@ -39,6 +39,7 @@ OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
     mPen.setWidth(0);
     mPenHighlighted.setWidth(0);
     updateBoundingRectAndShape();
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
     setVisible(false);
 }
 

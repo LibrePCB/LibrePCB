@@ -53,6 +53,7 @@ SOURCES += \
     dialogs/gridsettingsdialog.cpp \
     dialogs/holepropertiesdialog.cpp \
     dialogs/polygonpropertiesdialog.cpp \
+    dialogs/stroketextpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
     fileio/directorylock.cpp \
@@ -68,11 +69,13 @@ SOURCES += \
     geometry/cmd/cmdellipseedit.cpp \
     geometry/cmd/cmdholeedit.cpp \
     geometry/cmd/cmdpolygonedit.cpp \
+    geometry/cmd/cmdstroketextedit.cpp \
     geometry/cmd/cmdtextedit.cpp \
     geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/path.cpp \
     geometry/polygon.cpp \
+    geometry/stroketext.cpp \
     geometry/text.cpp \
     geometry/vertex.cpp \
     graphics/defaultgraphicslayerprovider.cpp \
@@ -87,6 +90,7 @@ SOURCES += \
     graphics/primitiveellipsegraphicsitem.cpp \
     graphics/primitivepathgraphicsitem.cpp \
     graphics/primitivetextgraphicsitem.cpp \
+    graphics/stroketextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
     network/filedownload.cpp \
@@ -147,6 +151,7 @@ HEADERS += \
     dialogs/gridsettingsdialog.h \
     dialogs/holepropertiesdialog.h \
     dialogs/polygonpropertiesdialog.h \
+    dialogs/stroketextpropertiesdialog.h \
     dialogs/textpropertiesdialog.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
@@ -168,11 +173,13 @@ HEADERS += \
     geometry/cmd/cmdellipseedit.h \
     geometry/cmd/cmdholeedit.h \
     geometry/cmd/cmdpolygonedit.h \
+    geometry/cmd/cmdstroketextedit.h \
     geometry/cmd/cmdtextedit.h \
     geometry/ellipse.h \
     geometry/hole.h \
     geometry/path.h \
     geometry/polygon.h \
+    geometry/stroketext.h \
     geometry/text.h \
     geometry/vertex.h \
     graphics/defaultgraphicslayerprovider.h \
@@ -188,6 +195,7 @@ HEADERS += \
     graphics/primitiveellipsegraphicsitem.h \
     graphics/primitivepathgraphicsitem.h \
     graphics/primitivetextgraphicsitem.h \
+    graphics/stroketextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
     network/filedownload.h \
@@ -233,6 +241,7 @@ FORMS += \
     dialogs/gridsettingsdialog.ui \
     dialogs/holepropertiesdialog.ui \
     dialogs/polygonpropertiesdialog.ui \
+    dialogs/stroketextpropertiesdialog.ui \
     dialogs/textpropertiesdialog.ui \
     widgets/alignmentselector.ui \
 
