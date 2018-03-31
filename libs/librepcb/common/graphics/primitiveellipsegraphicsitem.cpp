@@ -46,6 +46,9 @@ PrimitiveEllipseGraphicsItem::PrimitiveEllipseGraphicsItem(QGraphicsItem* parent
 
 PrimitiveEllipseGraphicsItem::~PrimitiveEllipseGraphicsItem() noexcept
 {
+    // unregister from graphics layers
+    setLineLayer(nullptr);
+    setFillLayer(nullptr);
 }
 
 /*****************************************************************************************
@@ -151,6 +154,17 @@ void PrimitiveEllipseGraphicsItem::layerEnabledChanged(const GraphicsLayer& laye
     Q_UNUSED(newEnabled);
     updateColors();
     updateVisibility();
+}
+
+void PrimitiveEllipseGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+{
+    if (&layer == mLineLayer) {
+        setLineLayer(nullptr);
+    } else if (&layer == mFillLayer) {
+        setFillLayer(nullptr);
+    } else {
+        Q_ASSERT(false);
+    }
 }
 
 /*****************************************************************************************

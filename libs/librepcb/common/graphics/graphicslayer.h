@@ -216,6 +216,7 @@ class IF_GraphicsLayerObserver
         virtual void layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept = 0;
         virtual void layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept = 0;
         virtual void layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept = 0;
+        virtual void layerDestroyed(const GraphicsLayer& layer) noexcept = 0;
 };
 
 /*****************************************************************************************

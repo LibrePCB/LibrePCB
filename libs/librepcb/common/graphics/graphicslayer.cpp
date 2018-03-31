@@ -48,6 +48,10 @@ GraphicsLayer::GraphicsLayer(const QString& name) noexcept :
 
 GraphicsLayer::~GraphicsLayer() noexcept
 {
+    foreach (IF_GraphicsLayerObserver* object, mObservers) {
+        object->layerDestroyed(*this);
+    }
+    Q_ASSERT(mObservers.isEmpty());
 }
 
 /*****************************************************************************************

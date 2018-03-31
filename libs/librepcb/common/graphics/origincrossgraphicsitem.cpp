@@ -44,6 +44,8 @@ OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
 
 OriginCrossGraphicsItem::~OriginCrossGraphicsItem() noexcept
 {
+    // unregister from graphics layer
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************
@@ -114,7 +116,14 @@ void OriginCrossGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, bo
 
 void OriginCrossGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
 {
+    Q_ASSERT(&layer == mLayer);
     layerVisibleChanged(layer, newEnabled);
+}
+
+void OriginCrossGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+{
+    Q_ASSERT(&layer == mLayer);
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************

@@ -48,6 +48,8 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(QGraphicsItem* parent) noex
 
 PrimitiveTextGraphicsItem::~PrimitiveTextGraphicsItem() noexcept
 {
+    // unregister from graphics layer
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************
@@ -150,7 +152,14 @@ void PrimitiveTextGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, 
 
 void PrimitiveTextGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
 {
+    Q_ASSERT(&layer == mLayer);
     layerVisibleChanged(layer, newEnabled);
+}
+
+void PrimitiveTextGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+{
+    Q_ASSERT(&layer == mLayer);
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************

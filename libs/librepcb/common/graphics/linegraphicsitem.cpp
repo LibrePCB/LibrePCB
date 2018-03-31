@@ -47,6 +47,8 @@ LineGraphicsItem::LineGraphicsItem(QGraphicsItem* parent) noexcept :
 
 LineGraphicsItem::~LineGraphicsItem() noexcept
 {
+    // unregister from graphics layer
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************
@@ -121,7 +123,14 @@ void LineGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, bool newV
 
 void LineGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
 {
+    Q_ASSERT(&layer == mLayer);
     layerVisibleChanged(layer, newEnabled);
+}
+
+void LineGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+{
+    Q_ASSERT(&layer == mLayer);
+    setLayer(nullptr);
 }
 
 /*****************************************************************************************

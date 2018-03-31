@@ -66,6 +66,7 @@ class PrimitivePathGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerO
         void layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept override;
         void layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept override;
         void layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept override;
+        void layerDestroyed(const GraphicsLayer& layer) noexcept override;
 
         // Inherited from QGraphicsItem
         QRectF boundingRect() const noexcept override {return mBoundingRect;}

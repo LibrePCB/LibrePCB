@@ -50,6 +50,9 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(QGraphicsItem* parent) noex
 
 PrimitivePathGraphicsItem::~PrimitivePathGraphicsItem() noexcept
 {
+    // unregister from graphics layers
+    setLineLayer(nullptr);
+    setFillLayer(nullptr);
 }
 
 /*****************************************************************************************
@@ -141,6 +144,17 @@ void PrimitivePathGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, 
     Q_UNUSED(newEnabled);
     updateColors();
     updateVisibility();
+}
+
+void PrimitivePathGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+{
+    if (&layer == mLineLayer) {
+        setLineLayer(nullptr);
+    } else if (&layer == mFillLayer) {
+        setFillLayer(nullptr);
+    } else {
+        Q_ASSERT(false);
+    }
 }
 
 /*****************************************************************************************
