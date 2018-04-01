@@ -40,6 +40,7 @@
 #include <librepcb/library/elements.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
+#include "../deviceinstancepropertiesdialog.h"
 #include "../boardviapropertiesdialog.h"
 #include "../boardplanepropertiesdialog.h"
 #include "../../cmd/cmdadddevicetoboard.h"
@@ -332,9 +333,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             else if (action == aProperties)
             {
-                // open the properties editor dialog of the selected item
-                //SymbolInstancePropertiesDialog dialog(mProject, cmp, *symbol, mUndoStack, &mEditor);
-                //dialog.exec();
+                openDevicePropertiesDialog(devInst);
             }
             return ForceStayInState;
         }
@@ -392,6 +391,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         if (items.isEmpty()) return PassToParentState;
         switch (items.first()->getType())
         {
+            case BI_Base::Type_t::Footprint: {
+                BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first()); Q_ASSERT(footprint);
+                openDevicePropertiesDialog(footprint->getDeviceInstance());
+                return ForceLeaveState;
+            }
             case BI_Base::Type_t::Via: {
                 BI_Via* via = dynamic_cast<BI_Via*>(items.first()); Q_ASSERT(via);
                 openViaPropertiesDialog(*via);
@@ -537,6 +541,12 @@ bool BES_Select::removeSelectedItems() noexcept
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
+}
+
+void BES_Select::openDevicePropertiesDialog(BI_Device& device) noexcept
+{
+    DeviceInstancePropertiesDialog dialog(mProject, device, mUndoStack, &mEditor);
+    dialog.exec();
 }
 
 void BES_Select::openViaPropertiesDialog(BI_Via& via) noexcept

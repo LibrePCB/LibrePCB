@@ -141,7 +141,10 @@ bool CmdDeviceInstanceEdit::performExecute()
 {
     performRedo(); // can throw
 
-    return true; // TODO: determine if the device was really modified
+    if (mNewPos != mOldPos)                 return true;
+    if (mNewRotation != mOldRotation)       return true;
+    if (mNewMirrored != mOldMirrored)       return true;
+    return false;
 }
 
 void CmdDeviceInstanceEdit::performUndo()
