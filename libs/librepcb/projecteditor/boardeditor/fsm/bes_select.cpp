@@ -31,8 +31,10 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
+#include <librepcb/project/boards/items/bi_stroketext.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
+#include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/workspace/workspace.h>
@@ -376,6 +378,25 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             return ForceStayInState;
         }
 
+        case BI_Base::Type_t::StrokeText: {
+            BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Text");
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openStrokeTextPropertiesDialog(*board, text->getText());
+            }
+            return ForceStayInState;
+        }
+
         default:
             break;
     }
@@ -409,6 +430,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case BI_Base::Type_t::Polygon: {
                 BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
                 openPolygonPropertiesDialog(*board, polygon->getPolygon());
+                return ForceStayInState;
+            }
+            case BI_Base::Type_t::StrokeText: {
+                BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
+                openStrokeTextPropertiesDialog(*board, text->getText());
                 return ForceStayInState;
             }
             default: {
@@ -564,6 +590,13 @@ void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept
 void BES_Select::openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept
 {
     PolygonPropertiesDialog dialog(polygon, mUndoStack,
+        board.getLayerStack().getAllowedPolygonLayers());
+    dialog.exec();
+}
+
+void BES_Select::openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept
+{
+    StrokeTextPropertiesDialog dialog(text, mUndoStack,
         board.getLayerStack().getAllowedPolygonLayers());
     dialog.exec();
 }

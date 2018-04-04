@@ -25,6 +25,7 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_device.h>
@@ -33,6 +34,7 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
+#include <librepcb/project/boards/items/bi_stroketext.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
@@ -74,6 +76,7 @@ bool CmdRotateSelectedBoardItems::performExecute()
                                   BoardSelectionQuery::NetPointFilter::Floating);
     query->addSelectedPlanes();
     query->addSelectedPolygons();
+    query->addSelectedBoardStrokeTexts();
 
     // find the center of all elements
     Point center = Point(0, 0);
@@ -102,6 +105,11 @@ bool CmdRotateSelectedBoardItems::performExecute()
             ++count;
         }
     }
+    foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+        center += text->getPosition();
+        ++count;
+    }
+
     if (count > 0) {
         center /= count;
         center.mapToGrid(mBoard.getGridProperties().getInterval());
@@ -134,6 +142,11 @@ bool CmdRotateSelectedBoardItems::performExecute()
     }
     foreach (BI_Polygon* polygon, query->getPolygons()) { Q_ASSERT(polygon);
         CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
+        cmd->rotate(mAngle, center, false);
+        appendChild(cmd);
+    }
+    foreach (BI_StrokeText* text, query->getStrokeTexts()) { Q_ASSERT(text);
+        CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
