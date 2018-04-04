@@ -275,8 +275,8 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr, QColo
         h.insert(sBotGrabAreas,             {tr("Bot Grab Areas"),              QColor(255, 255, 255, 20),  QColor(255, 255, 255, 50),  false});
         h.insert(sTopHiddenGrabAreas,       {tr("Top Hidden Grab Areas"),       QColor(255, 255, 255, 40),  QColor(255, 255, 255, 70),  false});
         h.insert(sBotHiddenGrabAreas,       {tr("Bot Hidden Grab Areas"),       QColor(255, 255, 255, 40),  QColor(255, 255, 255, 70),  false});
-        h.insert(sTopReferences,            {tr("Top References"),              QColor(255, 255, 255, 50),  QColor(255, 255, 255, 80),  true});
-        h.insert(sBotReferences,            {tr("Bot References"),              QColor(255, 255, 255, 50),  QColor(255, 255, 255, 80),  true});
+        h.insert(sTopReferences,            {tr("Top References"),              QColor(255, 255, 255, 100), QColor(255, 255, 255, 180), true});
+        h.insert(sBotReferences,            {tr("Bot References"),              QColor(255, 255, 255, 100), QColor(255, 255, 255, 180), true});
         h.insert(sTopNames,                 {tr("Top Names"),                   QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
         h.insert(sBotNames,                 {tr("Bot Names"),                   QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
         h.insert(sTopValues,                {tr("Top Values"),                  QColor(224, 224, 224, 150), QColor(224, 224, 224, 220), true});
