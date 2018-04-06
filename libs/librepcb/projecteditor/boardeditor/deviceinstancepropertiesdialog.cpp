@@ -118,7 +118,7 @@ void DeviceInstancePropertiesDialog::buttonBoxClicked(QAbstractButton* button) n
     }
 }
 
-void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
+void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e) noexcept
 {
     switch (e->key()) {
         case Qt::Key_Return:
