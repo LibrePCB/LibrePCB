@@ -73,6 +73,7 @@ class DeviceInstancePropertiesDialog final : public QDialog
     private: // Methods
         void buttonBoxClicked(QAbstractButton* button) noexcept;
         void keyPressEvent(QKeyEvent* e);
+        void accept();
         bool applyChanges() noexcept;
 
 

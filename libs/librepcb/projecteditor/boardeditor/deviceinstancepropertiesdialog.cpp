@@ -135,6 +135,13 @@ void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
     }
 }
 
+void DeviceInstancePropertiesDialog::accept()
+{
+    if (applyChanges()) {
+        QDialog::accept();
+    }
+}
+
 bool DeviceInstancePropertiesDialog::applyChanges() noexcept
 {
     try {
