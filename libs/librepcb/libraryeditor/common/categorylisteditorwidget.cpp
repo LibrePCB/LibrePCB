@@ -180,7 +180,7 @@ QList<Uuid> CategoryListEditorWidget<ComponentCategory>::getCategoryParents(cons
 template <>
 QList<Uuid> CategoryListEditorWidget<PackageCategory>::getCategoryParents(const Uuid& category) const
 {
-    return mWorkspace.getLibraryDb().getComponentCategoryParents(category);
+    return mWorkspace.getLibraryDb().getPackageCategoryParents(category);
 }
 
 template <typename ElementType>
