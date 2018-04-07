@@ -27,13 +27,13 @@
 #include <QtWidgets>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/attributes/attributeprovider.h>
+#include <librepcb/common/geometry/stroketext.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class Text;
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
 
@@ -97,17 +97,6 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public Attribut
         QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 
-        // Types
-
-        struct CachedTextProperties_t {
-            QString text;
-            qreal fontSize;
-            bool rotate180;
-            Qt::Alignment align;
-            QRectF textRect;
-        };
-
-
         // General Attributes
         const IF_GraphicsLayerProvider& mLayerProvider;
         const Footprint& mFootprint;
@@ -115,14 +104,13 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem, public Attribut
         //const Device* mDevice;
         const Component* mComponent;
         const AttributeProvider* mAttributeProvider;
-        QFont mFont;
         bool mDrawBoundingRect;
         QStringList mLocaleOrder;
+        StrokeTextList mStrokeTexts;
 
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 /*****************************************************************************************

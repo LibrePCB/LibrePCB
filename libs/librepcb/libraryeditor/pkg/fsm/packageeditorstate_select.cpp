@@ -29,11 +29,11 @@
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/ellipsepropertiesdialog.h>
-#include <librepcb/common/dialogs/textpropertiesdialog.h>
+#include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include "cmd/cmdmoveselectedfootprintitems.h"
 #include "cmd/cmdrotateselectedfootprintitems.h"
@@ -97,7 +97,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGrap
             QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
             QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
             QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-            QList<QSharedPointer<TextGraphicsItem>> texts;
+            QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
             QList<QSharedPointer<HoleGraphicsItem>> holes;
             int count = mContext.currentGraphicsItem->getItemsAtPosition(pos,
                             &pads, &ellipses, &polygons, &texts, &holes);
@@ -256,7 +256,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos
     QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
     QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
     QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-    QList<QSharedPointer<TextGraphicsItem>> texts;
+    QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
     QList<QSharedPointer<HoleGraphicsItem>> holes;
     mContext.currentGraphicsItem->getItemsAtPosition(pos, &pads, &ellipses, &polygons, &texts, &holes);
 
@@ -268,10 +268,9 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos
         dialog.exec();
         return true;
     } else if (texts.count() > 0) {
-        TextGraphicsItem* item = dynamic_cast<TextGraphicsItem*>(texts.first().data()); Q_ASSERT(item);
-        TextPropertiesDialog dialog(item->getText(), mContext.undoStack,
-                                    mContext.layerProvider.getBoardGeometryElementLayers(),
-                                    &mContext.editorWidget);
+        StrokeTextGraphicsItem* item = dynamic_cast<StrokeTextGraphicsItem*>(texts.first().data()); Q_ASSERT(item);
+        StrokeTextPropertiesDialog dialog(item->getText(), mContext.undoStack,
+            mContext.layerProvider.getBoardGeometryElementLayers(), &mContext.editorWidget);
         dialog.exec();
         return true;
     } else if (polygons.count() > 0) {

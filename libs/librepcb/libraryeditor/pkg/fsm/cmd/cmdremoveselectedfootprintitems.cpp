@@ -27,7 +27,7 @@
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 
 /*****************************************************************************************
@@ -74,8 +74,8 @@ bool CmdRemoveSelectedFootprintItems::performExecute()
     }
 
     // remove texts
-    foreach (const auto& text, mContext.currentGraphicsItem->getSelectedTexts()) {
-        appendChild(new CmdTextRemove(mContext.currentFootprint->getTexts(), &text->getText()));
+    foreach (const auto& text, mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
+        appendChild(new CmdStrokeTextRemove(mContext.currentFootprint->getStrokeTexts(), &text->getText()));
     }
 
     // remove holes
