@@ -109,9 +109,7 @@ void DeviceInstancePropertiesDialog::buttonBoxClicked(QAbstractButton* button) n
             applyChanges();
             break;
         case QDialogButtonBox::AcceptRole:
-            if (applyChanges()) {
-                accept();
-            }
+            accept();
             break;
         case QDialogButtonBox::RejectRole:
             reject();
@@ -120,7 +118,7 @@ void DeviceInstancePropertiesDialog::buttonBoxClicked(QAbstractButton* button) n
     }
 }
 
-void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
+void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e) noexcept
 {
     switch (e->key()) {
         case Qt::Key_Return:
@@ -132,6 +130,13 @@ void DeviceInstancePropertiesDialog::keyPressEvent(QKeyEvent* e)
         default:
             QDialog::keyPressEvent(e);
             break;
+    }
+}
+
+void DeviceInstancePropertiesDialog::accept() noexcept
+{
+    if (applyChanges()) {
+        QDialog::accept();
     }
 }
 
