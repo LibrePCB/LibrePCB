@@ -41,6 +41,7 @@
 #include "items/bi_netline.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
+#include "items/bi_stroketext.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -224,6 +225,19 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
         if (layerName == polygon->getPolygon().getLayerName()) {
             Length lineWidth = calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName);
             gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth);
+        }
+    }
+
+    // draw stroke texts
+    foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) { Q_ASSERT(text);
+        if (layerName == text->getText().getLayerName()) {
+            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            foreach (Path path, text->getText().getPaths()) {
+                path.rotate(text->getText().getRotation());
+                if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
+                path.translate(text->getText().getPosition());
+                gen.drawPathOutline(path, lineWidth);
+            }
         }
     }
 }
