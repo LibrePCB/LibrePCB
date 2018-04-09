@@ -1,16 +1,14 @@
 <!---
 Verify first that your issue/request is not already reported on GitHub.
--->
-
-##### ISSUE TYPE
 
 This issue tracker is only for the bug reports, for different issues see:
 
  - Feature Idea: Please report feature ideas in the
-   [RFC repo](https://github.com/LibrePCB/librepcb-rfcs)
+   RFC repo: https://github.com/LibrePCB/librepcb-rfcs
  - Documentation Report: Please report documentation issues in the
-   [documentation repo](https://github.com/LibrePCB/librepcb-doc)
- - Bug Report: You have come to the right place!
+   documentation repo: https://github.com/LibrePCB/librepcb-doc
+ - Bug Report: You have come to the right place! ☺
+-->
 
 ##### LibrePCB VERSION
 <!--- Paste the git hash of the LibrePCB version used between quotes below -->
