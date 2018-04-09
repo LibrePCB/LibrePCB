@@ -37,6 +37,7 @@
 #include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
 #include <librepcb/project/boards/cmd/cmdboardpolygonremove.h>
 #include <librepcb/project/boards/cmd/cmdboardstroketextremove.h>
+#include <librepcb/project/boards/cmd/cmdfootprintstroketextremove.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 #include "cmdremovedevicefromboard.h"
 
@@ -79,6 +80,7 @@ bool CmdRemoveSelectedBoardItems::performExecute()
     query->addSelectedPlanes();
     query->addSelectedPolygons();
     query->addSelectedBoardStrokeTexts();
+    query->addSelectedFootprintStrokeTexts();
 
     // clear selection because these items will be removed now
     mBoard.clearSelection();
@@ -130,7 +132,11 @@ bool CmdRemoveSelectedBoardItems::performExecute()
 
     // remove stroke texts
     foreach (BI_StrokeText* text, query->getStrokeTexts()) {
-        execNewChildCmd(new CmdBoardStrokeTextRemove(*text)); // can throw
+        if (BI_Footprint* footprint = text->getFootprint()) {
+            execNewChildCmd(new CmdFootprintStrokeTextRemove(*footprint, *text)); // can throw
+        } else {
+            execNewChildCmd(new CmdBoardStrokeTextRemove(*text)); // can throw
+        }
     }
 
     undoScopeGuard.dismiss(); // no undo required

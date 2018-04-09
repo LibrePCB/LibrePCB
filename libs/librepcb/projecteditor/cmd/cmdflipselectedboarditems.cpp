@@ -75,6 +75,7 @@ bool CmdFlipSelectedBoardItems::performExecute()
     query->addSelectedFootprints();
     query->addSelectedVias();
     query->addSelectedBoardStrokeTexts();
+    query->addSelectedFootprintStrokeTexts();
 
     // find the center of all elements
     Point center = Point(0, 0);
@@ -88,8 +89,11 @@ bool CmdFlipSelectedBoardItems::performExecute()
         ++count;
     }
     foreach (BI_StrokeText* text, query->getStrokeTexts()) {
-        center += text->getPosition();
-        ++count;
+        // do not count texts of footprints if the footprint is selected too
+        if (!query->getFootprints().contains(text->getFootprint())) {
+            center += text->getPosition();
+            ++count;
+        }
     }
     if (count > 0) {
         center /= count;

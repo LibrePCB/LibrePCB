@@ -106,6 +106,7 @@ class BoardSelectionQuery final : public QObject
         void addSelectedPlanes() noexcept;
         void addSelectedPolygons() noexcept;
         void addSelectedBoardStrokeTexts() noexcept;
+        void addSelectedFootprintStrokeTexts() noexcept;
 
         // Operator Overloadings
         BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;

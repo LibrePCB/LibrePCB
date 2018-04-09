@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_ADDDEVICE_H
-#define LIBREPCB_PROJECT_BES_ADDDEVICE_H
+#ifndef LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
+#define LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "bes_base.h"
+#include <librepcb/common/undocommandgroup.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,61 +32,41 @@
 namespace librepcb {
 namespace project {
 
-class Board;
-class ComponentInstance;
-class BI_Device;
-class CmdDeviceInstanceEditAll;
-
-namespace editor {
+class BI_Footprint;
 
 /*****************************************************************************************
- *  Class BES_AddDevice
+ *  Class CmdFootprintStrokeTextsReset
  ****************************************************************************************/
 
 /**
- * @brief The BES_AddDevice class
+ * @brief The CmdFootprintStrokeTextsReset class
  */
-class BES_AddDevice final : public BES_Base
+class CmdFootprintStrokeTextsReset final : public UndoCommandGroup
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        BES_AddDevice(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_AddDevice();
-
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+        CmdFootprintStrokeTextsReset(BI_Footprint& footprint) noexcept;
+        ~CmdFootprintStrokeTextsReset() noexcept;
 
 
     private:
 
         // Private Methods
-        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        void startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt);
-        bool abortCommand(bool showErrMsgBox) noexcept;
-        void rotateDevice(const Angle& angle) noexcept;
-        void mirrorDevice(Qt::Orientation orientation) noexcept;
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
 
 
-        // General Attributes
-        bool mIsUndoCmdActive;
-
-        // information about the current device to place
-        BI_Device* mCurrentDeviceToPlace;
-        QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
+        // Private Member Variables
+        BI_Footprint& mFootprint;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_ADDDEVICE_H
+#endif // LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H

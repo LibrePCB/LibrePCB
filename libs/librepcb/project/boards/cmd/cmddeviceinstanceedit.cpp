@@ -59,14 +59,14 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void CmdDeviceInstanceEdit::setPosition(Point& pos, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewPos = pos;
     if (immediate) mDevice.setPosition(mNewPos);
 }
 
-void CmdDeviceInstanceEdit::setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept
+void CmdDeviceInstanceEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewPos = mOldPos + deltaPos;

@@ -162,6 +162,17 @@ void BoardSelectionQuery::addSelectedBoardStrokeTexts() noexcept
     }
 }
 
+void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept
+{
+    foreach (BI_Device* device, mDevices) {
+        foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
+            if (text->isSelected()) {
+                mResultStrokeTexts.insert(text);
+            }
+        }
+    }
+}
+
 bool BoardSelectionQuery::doesNetPointMatchFilter(const BI_NetPoint& p, NetPointFilters f) noexcept
 {
     if (f.testFlag(NetPointFilter::Floating) && (!p.isAttached())) return true;

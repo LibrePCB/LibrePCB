@@ -47,7 +47,11 @@ SOURCES += \
     boards/cmd/cmdboardviaedit.cpp \
     boards/cmd/cmddeviceinstanceadd.cpp \
     boards/cmd/cmddeviceinstanceedit.cpp \
+    boards/cmd/cmddeviceinstanceeditall.cpp \
     boards/cmd/cmddeviceinstanceremove.cpp \
+    boards/cmd/cmdfootprintstroketextadd.cpp \
+    boards/cmd/cmdfootprintstroketextremove.cpp \
+    boards/cmd/cmdfootprintstroketextsreset.cpp \
     boards/graphicsitems/bgi_base.cpp \
     boards/graphicsitems/bgi_footprint.cpp \
     boards/graphicsitems/bgi_footprintpad.cpp \
@@ -149,7 +153,11 @@ HEADERS += \
     boards/cmd/cmdboardviaedit.h \
     boards/cmd/cmddeviceinstanceadd.h \
     boards/cmd/cmddeviceinstanceedit.h \
+    boards/cmd/cmddeviceinstanceeditall.h \
     boards/cmd/cmddeviceinstanceremove.h \
+    boards/cmd/cmdfootprintstroketextadd.h \
+    boards/cmd/cmdfootprintstroketextremove.h \
+    boards/cmd/cmdfootprintstroketextsreset.h \
     boards/graphicsitems/bgi_base.h \
     boards/graphicsitems/bgi_footprint.h \
     boards/graphicsitems/bgi_footprintpad.h \

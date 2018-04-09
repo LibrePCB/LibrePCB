@@ -32,7 +32,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Text;
+class StrokeText;
 class GraphicsLayer;
 
 namespace library {
@@ -84,27 +84,13 @@ class BGI_Footprint final : public BGI_Base
         GraphicsLayer* getLayer(QString name) const noexcept;
 
 
-        // Types
-
-        struct CachedTextProperties_t {
-            QString text;
-            int fontPixelSize;
-            qreal scaleFactor;
-            bool rotate180;
-            int flags;
-            QRectF textRect;    // not scaled
-        };
-
-
         // General Attributes
         BI_Footprint& mFootprint;
         const library::Footprint& mLibFootprint;
-        QFont mFont;
 
         // Cached Attributes
         QRectF mBoundingRect;
         QPainterPath mShape;
-        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 /*****************************************************************************************

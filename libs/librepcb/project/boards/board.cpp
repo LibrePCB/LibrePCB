@@ -48,6 +48,7 @@
 #include "items/bi_stroketext.h"
 #include "items/bi_plane.h"
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/pkg/footprint.h>
 #include "items/bi_polygon.h"
 #include "boardlayerstack.h"
 #include "boardusersettings.h"
@@ -263,6 +264,22 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                 BI_StrokeText* text = new BI_StrokeText(*this, node);
                 mStrokeTexts.append(text);
             }
+
+            //////////////////////////////////////////////////////////////////////////////
+            // TODO: Backward compatibility, remove this some time!
+            int strokeTextCount = mStrokeTexts.count();
+            foreach (const BI_Device* device, mDeviceInstances) {
+                foreach (const BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
+                    Q_UNUSED(text);
+                    ++strokeTextCount;
+                }
+            }
+            if (strokeTextCount == 0) {
+                foreach (const BI_Device* device, mDeviceInstances) {
+                    device->getFootprint().resetStrokeTextsToLibraryFootprint(); // can throw
+                }
+            }
+            //////////////////////////////////////////////////////////////////////////////
         }
 
         rebuildAllPlanes();
@@ -366,9 +383,13 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
                 }
             }
         }
-        foreach (BI_StrokeText* text, footprint.getStrokeTexts()) {
+        foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
             if (text->isSelectable() && text->getGrabAreaScenePx().contains(scenePosPx)) {
-                list.append(text);
+                if (GraphicsLayer::isTopLayer(text->getText().getLayerName())) {
+                    list.prepend(text);
+                } else {
+                    list.append(text);
+                }
             }
         }
     }
@@ -721,6 +742,10 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
             foreach (BI_FootprintPad* pad, footprint.getPads()) {
                 bool selectPad = pad->isSelectable() && pad->getGrabAreaScenePx().intersects(rectPx);
                 pad->setSelected(selectFootprint || selectPad);
+            }
+            foreach (BI_StrokeText* text, footprint.getStrokeTexts()) {
+                bool selectText = text->isSelectable() && text->getGrabAreaScenePx().intersects(rectPx);
+                text->setSelected(selectFootprint || selectText);
             }
         }
         foreach (BI_NetSegment* segment, mNetSegments) {

@@ -65,6 +65,7 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     query->addSelectedPlanes();
     query->addSelectedPolygons();
     query->addSelectedBoardStrokeTexts();
+    query->addSelectedFootprintStrokeTexts();
 
     foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
         BI_Device& device = footprint->getDeviceInstance();

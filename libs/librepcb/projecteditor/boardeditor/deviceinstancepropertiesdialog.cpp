@@ -30,7 +30,7 @@
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
 #include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
 #include <librepcb/library/dev/device.h>
 #include <librepcb/library/pkg/package.h>
 
@@ -158,7 +158,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept
         Point pos(Length::fromMm(mUi->spbxPosX->value()),
                   Length::fromMm(mUi->spbxPosY->value()));
         Angle rotation = Angle::fromDeg(mUi->spbxRotation->value());
-        QScopedPointer<CmdDeviceInstanceEdit> cmdDev(new CmdDeviceInstanceEdit(mDevice));
+        QScopedPointer<CmdDeviceInstanceEditAll> cmdDev(new CmdDeviceInstanceEditAll(mDevice));
         cmdDev->setPosition(pos, false);
         cmdDev->setRotation(rotation, false);
         cmdDev->setMirrored(mUi->cbxMirror->isChecked(), false); // can throw

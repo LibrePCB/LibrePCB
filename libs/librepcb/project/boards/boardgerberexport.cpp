@@ -313,7 +313,18 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
         }
     }
 
-    // TODO: draw texts
+    // draw stroke texts (from footprint instance, *NOT* from library footprint!)
+    foreach (const BI_StrokeText* text, footprint.getStrokeTexts()) {
+        if (layerName == text->getText().getLayerName()) {
+            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            foreach (Path path, text->getText().getPaths()) {
+                path.rotate(text->getText().getRotation());
+                if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
+                path.translate(text->getPosition());
+                gen.drawPathOutline(path, lineWidth);
+            }
+        }
+    }
 
     // draw holes
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
