@@ -11,12 +11,9 @@ This issue tracker is only for the bug reports, for different issues see:
 -->
 
 ##### LibrePCB VERSION
-<!--- Paste the git hash of the LibrePCB version used between quotes below. You
-can find the version in the first line of the terminal output or in the
-"Help->About" dialog. -->
-```
-
-```
+<!--- Paste the git hash of the LibrePCB version used below. You can find the
+version in the first line of the terminal output or in the "Help->About"
+dialog. -->
 
 ##### OS / ENVIRONMENT
 <!--- Mention the OS you are running LibrePCB from. -->
@@ -26,14 +23,12 @@ can find the version in the first line of the terminal output or in the
 
 ##### STEPS TO REPRODUCE
 <!--- Try to show exactly how to reproduce the problem, using a minimal
-test-case. -->
-
-<!--- You can also paste gist.github.com links for larger log output / stack
-traces -->
+test-case. You can also paste gist.github.com links for larger log output /
+stack traces -->
 
 ##### EXPECTED RESULTS
 <!--- What did you expect to happen when running the steps above? -->
 
 ##### ACTUAL RESULTS
-<!--- What actually happened? If possible run with extra verbosity (-vvvv) -->
+<!--- What actually happened? -->
 
