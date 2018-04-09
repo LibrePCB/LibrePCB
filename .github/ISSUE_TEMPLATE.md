@@ -11,7 +11,9 @@ This issue tracker is only for the bug reports, for different issues see:
 -->
 
 ##### LibrePCB VERSION
-<!--- Paste the git hash of the LibrePCB version used between quotes below -->
+<!--- Paste the git hash of the LibrePCB version used between quotes below. You
+can find the version in the first line of the terminal output or in the
+"Help->About" dialog. -->
 ```
 
 ```
