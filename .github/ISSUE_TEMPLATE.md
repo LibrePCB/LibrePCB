@@ -1,7 +1,7 @@
 <!---
-Verify first that your issue/request is not already reported on GitHub.
+Please verify first that your issue/request is not already reported on GitHub.
 
-This issue tracker is only for the bug reports, for different issues see:
+This issue tracker is only for bug reports, for other issues see:
 
  - Feature Idea: Please report feature ideas in the
    RFC repo: https://github.com/LibrePCB/librepcb-rfcs
@@ -16,7 +16,7 @@ version in the first line of the terminal output or in the "Help->About"
 dialog. -->
 
 ##### OS / ENVIRONMENT
-<!--- Mention the OS you are running LibrePCB from. -->
+<!--- Mention the OS you are running LibrePCB on. -->
 
 ##### SUMMARY
 <!--- Explain the problem briefly -->
