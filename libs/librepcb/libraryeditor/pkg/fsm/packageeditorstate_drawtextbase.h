@@ -32,9 +32,9 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Text;
-class TextGraphicsItem;
-class CmdTextEdit;
+class StrokeText;
+class StrokeTextGraphicsItem;
+class CmdStrokeTextEdit;
 
 namespace library {
 
@@ -93,9 +93,9 @@ class PackageEditorState_DrawTextBase : public PackageEditorState
     private: // Types / Data
         Mode mMode;
         Point mStartPos;
-        QScopedPointer<CmdTextEdit> mEditCmd;
-        Text* mCurrentText;
-        TextGraphicsItem* mCurrentGraphicsItem;
+        QScopedPointer<CmdStrokeTextEdit> mEditCmd;
+        StrokeText* mCurrentText;
+        StrokeTextGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
         QString mLastLayerName;

@@ -61,7 +61,7 @@ class BEE_Base
             AbortCommand,       ///< abort the currently active command (esc)
             StartSelect,        ///< start command: select elements
             //StartMove,          ///< start command: move elements
-            //StartDrawText,      ///< start command: draw text
+            StartAddStrokeText, ///< start command: add stroke text
             //StartDrawRect,      ///< start command: draw rect
             StartDrawPolygon,   ///< start command: draw polygon
             //StartDrawCircle,    ///< start command: draw circle

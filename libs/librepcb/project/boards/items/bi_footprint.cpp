@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "bi_footprint.h"
 #include "bi_footprintpad.h"
+#include "../cmd/cmdfootprintstroketextsreset.h"
 #include "../board.h"
 #include "../../project.h"
 #include "../../circuit/circuit.h"
@@ -32,6 +33,7 @@
 #include <librepcb/library/dev/device.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
+#include <librepcb/common/font/strokefontpool.h>
 #include "bi_device.h"
 
 /*****************************************************************************************
@@ -47,29 +49,36 @@ namespace project {
 BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other) :
     BI_Base(device.getBoard()), mDevice(device)
 {
-    Q_UNUSED(other);
+    foreach (const BI_StrokeText* text, other.mStrokeTexts) {
+        addStrokeText(*new BI_StrokeText(mBoard, *text));
+    }
     init();
 }
 
 BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node) :
     BI_Base(device.getBoard()), mDevice(device)
 {
-    Q_UNUSED(node);
+    foreach (const SExpression& node, node.getChildren("stroke_text")) {
+        addStrokeText(*new BI_StrokeText(mBoard, node)); // can throw
+    }
     init();
 }
 
 BI_Footprint::BI_Footprint(BI_Device& device) :
     BI_Base(device.getBoard()), mDevice(device)
 {
+    resetStrokeTextsToLibraryFootprint();
     init();
 }
 
 void BI_Footprint::init()
 {
+    // create graphics item
     mGraphicsItem.reset(new BGI_Footprint(*this));
     mGraphicsItem->setPos(mDevice.getPosition().toPxQPointF());
     updateGraphicsItemTransform();
 
+    // load pads
     const library::Device& libDev = mDevice.getLibDevice();
     for (const library::FootprintPad& libPad : getLibFootprint().getPads()) {
         BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad.getPackagePadUuid());
@@ -95,13 +104,12 @@ void BI_Footprint::init()
             this, &BI_Footprint::deviceInstanceRotated);
     connect(&mDevice, &BI_Device::mirrored,
             this, &BI_Footprint::deviceInstanceMirrored);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 BI_Footprint::~BI_Footprint() noexcept
 {
     qDeleteAll(mPads);              mPads.clear();
+    qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
     mGraphicsItem.reset();
 }
 
@@ -133,8 +141,47 @@ bool BI_Footprint::isUsed() const noexcept
 }
 
 /*****************************************************************************************
+ *  StrokeText Methods
+ ****************************************************************************************/
+
+void BI_Footprint::addStrokeText(BI_StrokeText& text)
+{
+    if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != &mBoard)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+
+    // set font and attribute substitutor for all text items
+    // TODO: move this to BI_StrokeText?!
+    text.setFootprint(this);
+    text.getText().setAttributeProvider(this);
+    text.getText().setFont(&getProject().getStrokeFonts().getFont(mBoard.getDefaultFontName())); // can throw
+
+    if (isAddedToBoard()) {
+        text.addToBoard(); // can throw
+    }
+    mStrokeTexts.append(&text);
+}
+
+void BI_Footprint::removeStrokeText(BI_StrokeText& text)
+{
+    if (!mStrokeTexts.contains(&text)) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    if (isAddedToBoard()) {
+        text.removeFromBoard(); // can throw
+    }
+    mStrokeTexts.removeOne(&text);
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void BI_Footprint::resetStrokeTextsToLibraryFootprint()
+{
+    CmdFootprintStrokeTextsReset cmd(*this);
+    cmd.execute(); // can throw
+}
 
 void BI_Footprint::addToBoard()
 {
@@ -145,6 +192,10 @@ void BI_Footprint::addToBoard()
     foreach (BI_FootprintPad* pad, mPads) {
         pad->addToBoard(); // can throw
         sgl.add([pad](){pad->removeFromBoard();});
+    }
+    foreach (BI_StrokeText* text, mStrokeTexts) {
+        text->addToBoard(); // can throw
+        sgl.add([text](){text->removeFromBoard();});
     }
     BI_Base::addToBoard(mGraphicsItem.data());
     sgl.dismiss();
@@ -160,18 +211,19 @@ void BI_Footprint::removeFromBoard()
         pad->removeFromBoard(); // can throw
         sgl.add([pad](){pad->addToBoard();});
     }
+    foreach (BI_StrokeText* text, mStrokeTexts) {
+        text->removeFromBoard(); // can throw
+        sgl.add([text](){text->addToBoard();});
+    }
     BI_Base::removeFromBoard(mGraphicsItem.data());
     sgl.dismiss();
 }
 
 void BI_Footprint::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    Q_UNUSED(root);
-    //root.appendStringChild("uuid", mUuid);
-    //root.appendStringChild("gen_comp_instance", mComponentInstance->getUuid());
-    //root.appendStringChild("symbol_item", mSymbVarItem->getUuid());
+    foreach (const BI_StrokeText* text, mStrokeTexts) {
+        root.appendChild(text->serializeToDomElement("stroke_text"), true);
+    }
 }
 
 /*****************************************************************************************
@@ -229,6 +281,8 @@ void BI_Footprint::setSelected(bool selected) noexcept
     mGraphicsItem->update();
     foreach (BI_FootprintPad* pad, mPads)
         pad->setSelected(selected);
+    foreach (BI_StrokeText* text, mStrokeTexts)
+        text->setSelected(selected);
 }
 
 /*****************************************************************************************
@@ -247,6 +301,9 @@ void BI_Footprint::deviceInstanceMoved(const Point& pos)
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads) {
         pad->updatePosition();
+    }
+    foreach (BI_StrokeText* text, mStrokeTexts) {
+        text->updateGraphicsItems();
     }
 }
 
@@ -280,13 +337,6 @@ void BI_Footprint::updateGraphicsItemTransform() noexcept
     if (mDevice.getIsMirrored()) t.scale(qreal(-1), qreal(1));
     t.rotate(-mDevice.getRotation().toDeg());
     mGraphicsItem->setTransform(t);
-}
-
-bool BI_Footprint::checkAttributesValidity() const noexcept
-{
-    //if (mUuid.isNull())                 return false;
-    //if (mComponentInstance == nullptr)    return false;
-    return true;
 }
 
 /*****************************************************************************************

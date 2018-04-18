@@ -25,7 +25,7 @@
 #include "footprintgraphicsitem.h"
 #include "footprint.h"
 #include "footprintpadgraphicsitem.h"
-#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
@@ -52,8 +52,8 @@ FootprintGraphicsItem::FootprintGraphicsItem(Footprint& fpt, const IF_GraphicsLa
     for (Ellipse& ellipse : mFootprint.getEllipses()) {
         addEllipse(ellipse);
     }
-    for (Text& text : mFootprint.getTexts()) {
-        addText(text);
+    for (StrokeText& text : mFootprint.getStrokeTexts()) {
+        addStrokeText(text);
     }
     for (Hole& hole : mFootprint.getHoles()) {
         addHole(hole);
@@ -87,9 +87,9 @@ PolygonGraphicsItem* FootprintGraphicsItem::getPolygonGraphicsItem(const Polygon
     return mPolygonGraphicsItems.value(&polygon).data();
 }
 
-TextGraphicsItem* FootprintGraphicsItem::getTextGraphicsItem(const Text& text) noexcept
+StrokeTextGraphicsItem* FootprintGraphicsItem::getTextGraphicsItem(const StrokeText& text) noexcept
 {
-    return mTextGraphicsItems.value(&text).data();
+    return mStrokeTextGraphicsItems.value(&text).data();
 }
 
 HoleGraphicsItem* FootprintGraphicsItem::getHoleGraphicsItem(const Hole& hole) noexcept
@@ -101,7 +101,7 @@ int FootprintGraphicsItem::getItemsAtPosition(const Point& pos,
     QList<QSharedPointer<FootprintPadGraphicsItem> >* pads,
     QList<QSharedPointer<EllipseGraphicsItem> >* ellipses,
     QList<QSharedPointer<PolygonGraphicsItem> >* polygons,
-    QList<QSharedPointer<TextGraphicsItem> >* texts,
+    QList<QSharedPointer<StrokeTextGraphicsItem> >* texts,
     QList<QSharedPointer<HoleGraphicsItem> >* holes) noexcept
 {
     int count = 0;
@@ -133,7 +133,7 @@ int FootprintGraphicsItem::getItemsAtPosition(const Point& pos,
         }
     }
     if (texts) {
-        foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
+        foreach (const QSharedPointer<StrokeTextGraphicsItem>& item, mStrokeTextGraphicsItems) {
             QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
             if (item->shape().contains(mappedPos)) {
                 texts->append(item);
@@ -186,10 +186,10 @@ QList<QSharedPointer<PolygonGraphicsItem> > FootprintGraphicsItem::getSelectedPo
     return polygons;
 }
 
-QList<QSharedPointer<TextGraphicsItem> > FootprintGraphicsItem::getSelectedTexts() noexcept
+QList<QSharedPointer<StrokeTextGraphicsItem> > FootprintGraphicsItem::getSelectedStrokeTexts() noexcept
 {
-    QList<QSharedPointer<TextGraphicsItem>> texts;
-    foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
+    QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& item, mStrokeTextGraphicsItems) {
         if (item->isSelected()) {
             texts.append(item);
         }
@@ -262,17 +262,17 @@ void FootprintGraphicsItem::removePolygon(Polygon& polygon) noexcept
     mPolygonGraphicsItems.remove(&polygon); // this deletes the graphics item
 }
 
-void FootprintGraphicsItem::addText(Text& text) noexcept
+void FootprintGraphicsItem::addStrokeText(StrokeText& text) noexcept
 {
-    Q_ASSERT(!mTextGraphicsItems.contains(&text));
-    QSharedPointer<TextGraphicsItem> item(new TextGraphicsItem(text, mLayerProvider, this));
-    mTextGraphicsItems.insert(&text, item);
+    Q_ASSERT(!mStrokeTextGraphicsItems.contains(&text));
+    QSharedPointer<StrokeTextGraphicsItem> item(new StrokeTextGraphicsItem(text, mLayerProvider, this));
+    mStrokeTextGraphicsItems.insert(&text, item);
 }
 
-void FootprintGraphicsItem::removeText(Text& text) noexcept
+void FootprintGraphicsItem::removeStrokeText(StrokeText& text) noexcept
 {
-    Q_ASSERT(mTextGraphicsItems.contains(&text));
-    mTextGraphicsItems.remove(&text); // this deletes the graphics item
+    Q_ASSERT(mStrokeTextGraphicsItems.contains(&text));
+    mStrokeTextGraphicsItems.remove(&text); // this deletes the graphics item
 }
 
 void FootprintGraphicsItem::addHole(Hole& hole) noexcept
@@ -303,7 +303,7 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept
         QPainterPath mappedPath = mapToItem(item.data(), path);
         item->setSelected(item->shape().intersects(mappedPath));
     }
-    foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& item, mStrokeTextGraphicsItems) {
         QPainterPath mappedPath = mapToItem(item.data(), path);
         item->setSelected(item->shape().intersects(mappedPath));
     }

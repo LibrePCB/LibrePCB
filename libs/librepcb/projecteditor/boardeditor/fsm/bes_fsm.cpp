@@ -30,6 +30,7 @@
 #include "bes_select.h"
 #include "bes_drawtrace.h"
 #include "bes_drawpolygon.h"
+#include "bes_addstroketext.h"
 #include "bes_addvia.h"
 #include "bes_adddevice.h"
 #include "bes_drawplane.h"
@@ -54,6 +55,7 @@ BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mSubStates.insert(State_Select, new BES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_DrawTrace, new BES_DrawTrace(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_DrawPolygon, new BES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+    mSubStates.insert(State_AddStrokeText, new BES_AddStrokeText(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_AddVia, new BES_AddVia(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_AddDevice, new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
     mSubStates.insert(State_DrawPlane, new BES_DrawPlane(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
@@ -162,6 +164,9 @@ BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
         case BEE_Base::StartDrawPolygon:
             event->setAccepted(true);
             return State_DrawPolygon;
+        case BEE_Base::StartAddStrokeText:
+            event->setAccepted(true);
+            return State_AddStrokeText;
         case BEE_Base::StartAddVia:
             event->setAccepted(true);
             return State_AddVia;

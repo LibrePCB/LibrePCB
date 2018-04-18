@@ -155,6 +155,24 @@ void FileUtils::makePath(const FilePath& path)
     }
 }
 
+QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir, const QStringList& filters)
+{
+    if (!dir.isExistingDir()) {
+        throw LogicError(__FILE__, __LINE__,
+            QString(tr("The directory \"%1\" does not exist."))
+            .arg(dir.toNative()));
+    }
+
+    QList<FilePath> files;
+    QDir qDir(dir.toStr());
+    qDir.setFilter(QDir::Files);
+    if (!filters.isEmpty()) qDir.setNameFilters(filters);
+    foreach (const QFileInfo& info, qDir.entryInfoList()) {
+        files.append(FilePath(info.absoluteFilePath()));
+    }
+    return files;
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

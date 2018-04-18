@@ -41,6 +41,7 @@
 #include "items/bi_netline.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
+#include "items/bi_stroketext.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -226,6 +227,19 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
             gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth);
         }
     }
+
+    // draw stroke texts
+    foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) { Q_ASSERT(text);
+        if (layerName == text->getText().getLayerName()) {
+            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            foreach (Path path, text->getText().getPaths()) {
+                path.rotate(text->getText().getRotation());
+                if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
+                path.translate(text->getText().getPosition());
+                gen.drawPathOutline(path, lineWidth);
+            }
+        }
+    }
 }
 
 void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, const QString& layerName) const
@@ -299,7 +313,18 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
         }
     }
 
-    // TODO: draw texts
+    // draw stroke texts (from footprint instance, *NOT* from library footprint!)
+    foreach (const BI_StrokeText* text, footprint.getStrokeTexts()) {
+        if (layerName == text->getText().getLayerName()) {
+            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            foreach (Path path, text->getText().getPaths()) {
+                path.rotate(text->getText().getRotation());
+                if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
+                path.translate(text->getPosition());
+                gen.drawPathOutline(path, lineWidth);
+            }
+        }
+    }
 
     // draw holes
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {

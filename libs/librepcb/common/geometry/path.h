@@ -98,7 +98,7 @@ class Path final : public SerializableObject
         static Path octagon(const Length& width, const Length& height) noexcept;
         static Path flatArc(const Point& p1, const Point& p2, const Angle& angle,
                             const Length& maxTolerance) noexcept;
-        static QPainterPath toQPainterPathPx(const QList<Path>& paths) noexcept;
+        static QPainterPath toQPainterPathPx(const QVector<Path>& paths) noexcept;
 
 
     private: // Methods

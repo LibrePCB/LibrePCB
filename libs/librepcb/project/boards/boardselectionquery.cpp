@@ -32,6 +32,7 @@
 #include "items/bi_via.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
+#include "items/bi_stroketext.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -47,9 +48,10 @@ BoardSelectionQuery::BoardSelectionQuery(const QMap<Uuid, BI_Device*>& deviceIns
                                          const QList<BI_NetSegment*>& netsegments,
                                          const QList<BI_Plane*>& planes,
                                          const QList<BI_Polygon*>& polygons,
+                                         const QList<BI_StrokeText*>& strokeTexts,
                                          QObject* parent) :
     QObject(parent), mDevices(deviceInstances),
-    mNetSegments(netsegments), mPlanes(planes), mPolygons(polygons)
+    mNetSegments(netsegments), mPlanes(planes), mPolygons(polygons), mStrokeTexts(strokeTexts)
 {
 }
 
@@ -69,7 +71,8 @@ int BoardSelectionQuery::getResultCount() const noexcept
             mResultNetLines.count() +
             mResultVias.count() +
             mResultPlanes.count() +
-            mResultPolygons.count();
+            mResultPolygons.count() +
+            mResultStrokeTexts.count();
 }
 
 /*****************************************************************************************
@@ -146,6 +149,26 @@ void BoardSelectionQuery::addSelectedPolygons() noexcept
     foreach (BI_Polygon* polygon, mPolygons) {
         if (polygon->isSelected()) {
             mResultPolygons.insert(polygon);
+        }
+    }
+}
+
+void BoardSelectionQuery::addSelectedBoardStrokeTexts() noexcept
+{
+    foreach (BI_StrokeText* text, mStrokeTexts) {
+        if (text->isSelected()) {
+            mResultStrokeTexts.insert(text);
+        }
+    }
+}
+
+void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept
+{
+    foreach (BI_Device* device, mDevices) {
+        foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
+            if (text->isSelected()) {
+                mResultStrokeTexts.insert(text);
+            }
         }
     }
 }

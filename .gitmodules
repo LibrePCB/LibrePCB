@@ -19,3 +19,9 @@
 [submodule "libs/sexpresso"]
 	path = libs/sexpresso
 	url = https://github.com/LibrePCB/sexpresso.git
+[submodule "libs/fontobene"]
+	path = libs/fontobene
+	url = https://github.com/fontobene/fontobene-qt5.git
+[submodule "share/librepcb/fontobene"]
+	path = share/librepcb/fontobene
+	url = https://github.com/LibrePCB/fontobene-fonts.git

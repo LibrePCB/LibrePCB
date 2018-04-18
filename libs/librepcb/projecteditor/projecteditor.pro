@@ -29,6 +29,7 @@ SOURCES += \
     boardeditor/deviceinstancepropertiesdialog.cpp \
     boardeditor/fabricationoutputdialog.cpp \
     boardeditor/fsm/bes_adddevice.cpp \
+    boardeditor/fsm/bes_addstroketext.cpp \
     boardeditor/fsm/bes_addvia.cpp \
     boardeditor/fsm/bes_base.cpp \
     boardeditor/fsm/bes_drawplane.cpp \
@@ -93,6 +94,7 @@ HEADERS += \
     boardeditor/deviceinstancepropertiesdialog.h \
     boardeditor/fabricationoutputdialog.h \
     boardeditor/fsm/bes_adddevice.h \
+    boardeditor/fsm/bes_addstroketext.h \
     boardeditor/fsm/bes_addvia.h \
     boardeditor/fsm/bes_base.h \
     boardeditor/fsm/bes_drawplane.h \

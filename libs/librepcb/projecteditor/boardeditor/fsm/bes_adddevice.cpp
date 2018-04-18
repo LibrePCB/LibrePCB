@@ -28,7 +28,7 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
 #include "../../cmd/cmdadddevicetoboard.h"
 
 /*****************************************************************************************
@@ -252,7 +252,7 @@ void BES_AddDevice::startAddingDevice(ComponentInstance& cmp, const Uuid& dev, c
 
         // add command to move the current device
         Q_ASSERT(mCurrentDeviceEditCmd.isNull());
-        mCurrentDeviceEditCmd.reset(new CmdDeviceInstanceEdit(*mCurrentDeviceToPlace));
+        mCurrentDeviceEditCmd.reset(new CmdDeviceInstanceEditAll(*mCurrentDeviceToPlace));
     }
     catch (Exception& e)
     {

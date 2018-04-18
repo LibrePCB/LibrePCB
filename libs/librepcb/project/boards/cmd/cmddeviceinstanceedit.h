@@ -34,6 +34,7 @@ namespace librepcb {
 namespace project {
 
 class BI_Device;
+class CmdDeviceInstanceEditAll;
 
 /*****************************************************************************************
  *  Class CmdDeviceInstanceEdit
@@ -51,8 +52,8 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         ~CmdDeviceInstanceEdit() noexcept;
 
         // General Methods
-        void setPosition(Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
+        void setPosition(const Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
         void setMirrored(bool mirrored, bool immediate);
@@ -85,6 +86,8 @@ class CmdDeviceInstanceEdit final : public UndoCommand
         Angle mNewRotation;
         bool mOldMirrored;
         bool mNewMirrored;
+
+        friend class CmdDeviceInstanceEditAll;
 };
 
 /*****************************************************************************************

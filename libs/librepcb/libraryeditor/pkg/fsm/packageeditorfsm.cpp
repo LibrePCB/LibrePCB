@@ -22,9 +22,11 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "packageeditorfsm.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include "packageeditorstate_select.h"
 #include "packageeditorstate_addpads.h"
@@ -110,6 +112,8 @@ bool PackageEditorFsm::processChangeCurrentFootprint(const std::shared_ptr<Footp
 
     mContext.currentFootprint = fpt;
     if (mContext.currentFootprint) {
+        // set font to default application font
+        mContext.currentFootprint->setStrokeFontForAllTexts(&qApp->getDefaultStrokeFont());
         // load graphics items recursively
         mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(*mContext.currentFootprint,
                                                                      mContext.layerProvider));

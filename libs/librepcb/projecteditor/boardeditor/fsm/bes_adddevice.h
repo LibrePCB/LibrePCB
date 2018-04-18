@@ -35,7 +35,7 @@ namespace project {
 class Board;
 class ComponentInstance;
 class BI_Device;
-class CmdDeviceInstanceEdit;
+class CmdDeviceInstanceEditAll;
 
 namespace editor {
 
@@ -78,7 +78,7 @@ class BES_AddDevice final : public BES_Base
 
         // information about the current device to place
         BI_Device* mCurrentDeviceToPlace;
-        QScopedPointer<CmdDeviceInstanceEdit> mCurrentDeviceEditCmd;
+        QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
 };
 
 /*****************************************************************************************

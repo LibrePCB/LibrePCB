@@ -36,12 +36,12 @@ namespace librepcb {
 
 class Ellipse;
 class Polygon;
-class Text;
+class StrokeText;
 class Hole;
 class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class EllipseGraphicsItem;
-class TextGraphicsItem;
+class StrokeTextGraphicsItem;
 class HoleGraphicsItem;
 
 namespace library {
@@ -75,18 +75,18 @@ class FootprintGraphicsItem final : public QGraphicsItem
         FootprintPadGraphicsItem* getPadGraphicsItem(const FootprintPad& pin) noexcept;
         EllipseGraphicsItem* getEllipseGraphicsItem(const Ellipse& ellipse) noexcept;
         PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
-        TextGraphicsItem* getTextGraphicsItem(const Text& text) noexcept;
+        StrokeTextGraphicsItem* getTextGraphicsItem(const StrokeText& text) noexcept;
         HoleGraphicsItem* getHoleGraphicsItem(const Hole& hole) noexcept;
         int getItemsAtPosition(const Point& pos,
                                QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
                                QList<QSharedPointer<EllipseGraphicsItem>>* ellipses,
                                QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-                               QList<QSharedPointer<TextGraphicsItem>>* texts,
+                               QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
                                QList<QSharedPointer<HoleGraphicsItem>>* holes) noexcept;
         QList<QSharedPointer<FootprintPadGraphicsItem>> getSelectedPads() noexcept;
         QList<QSharedPointer<EllipseGraphicsItem>> getSelectedEllipses() noexcept;
         QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
-        QList<QSharedPointer<TextGraphicsItem>> getSelectedTexts() noexcept;
+        QList<QSharedPointer<StrokeTextGraphicsItem>> getSelectedStrokeTexts() noexcept;
         QList<QSharedPointer<HoleGraphicsItem>> getSelectedHoles() noexcept;
 
         // Setters
@@ -100,8 +100,8 @@ class FootprintGraphicsItem final : public QGraphicsItem
         void removeEllipse(Ellipse& ellipse) noexcept;
         void addPolygon(Polygon& polygon) noexcept;
         void removePolygon(Polygon& polygon) noexcept;
-        void addText(Text& text) noexcept;
-        void removeText(Text& text) noexcept;
+        void addStrokeText(StrokeText& text) noexcept;
+        void removeStrokeText(StrokeText& text) noexcept;
         void addHole(Hole& hole) noexcept;
         void removeHole(Hole& hole) noexcept;
         void setSelectionRect(const QRectF rect) noexcept;
@@ -121,7 +121,7 @@ class FootprintGraphicsItem final : public QGraphicsItem
         QHash<const FootprintPad*, QSharedPointer<FootprintPadGraphicsItem>> mPadGraphicsItems;
         QHash<const Ellipse*, QSharedPointer<EllipseGraphicsItem>> mEllipseGraphicsItems;
         QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>> mPolygonGraphicsItems;
-        QHash<const Text*, QSharedPointer<TextGraphicsItem>> mTextGraphicsItems;
+        QHash<const StrokeText*, QSharedPointer<StrokeTextGraphicsItem>> mStrokeTextGraphicsItems;
         QHash<const Hole*, QSharedPointer<HoleGraphicsItem>> mHoleGraphicsItems;
 };
 

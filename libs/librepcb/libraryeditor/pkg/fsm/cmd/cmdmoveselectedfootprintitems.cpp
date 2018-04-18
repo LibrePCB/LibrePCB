@@ -25,14 +25,14 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/cmd/cmdellipseedit.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
 
@@ -68,9 +68,9 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
         mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
     }
 
-    QList<QSharedPointer<TextGraphicsItem>> texts = context.currentGraphicsItem->getSelectedTexts();
-    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
-        mTextEditCmds.append(new CmdTextEdit(text->getText()));
+    QList<QSharedPointer<StrokeTextGraphicsItem>> texts = context.currentGraphicsItem->getSelectedStrokeTexts();
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& text, texts) {Q_ASSERT(text);
+        mTextEditCmds.append(new CmdStrokeTextEdit(text->getText()));
     }
 
     QList<QSharedPointer<HoleGraphicsItem>> holes = context.currentGraphicsItem->getSelectedHoles();
@@ -104,7 +104,7 @@ void CmdMoveSelectedFootprintItems::setCurrentPosition(const Point& pos) noexcep
         foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
-        foreach (CmdTextEdit* cmd, mTextEditCmds) {
+        foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
         foreach (CmdHoleEdit* cmd, mHoleEditCmds) {

@@ -31,8 +31,11 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
+#include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
+#include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/workspace/workspace.h>
@@ -257,6 +260,8 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
             QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove %1")).arg(cmpInst.getName()));
             menu.addSeparator();
+            QAction* aResetTexts = menu.addAction(QIcon(":/img/actions/undo.png"), "Reset all texts");
+            menu.addSeparator();
             QMenu* aChangeDeviceMenu = menu.addMenu(tr("Change Device"));
             aChangeDeviceMenu->setEnabled(devicesList.count() > 0);
             foreach (const Uuid& deviceUuid, devicesList) {
@@ -276,7 +281,6 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 }
             }
             QMenu* aChangeFootprintMenu = menu.addMenu(tr("Change Footprint"));
-
             for (const library::Footprint& footprint : devInst.getLibPackage().getFootprints()) {
                 QAction* a = aChangeFootprintMenu->addAction(footprint.getNames().value(localeOrder));
                 a->setData(footprint.getUuid().toStr());
@@ -292,26 +296,24 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
 
             // execute the context menu
             QAction* action = menu.exec(mouseEvent->screenPos());
-            if (action == nullptr)
-            {
+            if (action == nullptr) {
                 // aborted --> nothing to do
-            }
-            else if (action == aRotateCCW)
-            {
+            } else if (action == aRotateCCW) {
                 rotateSelectedItems(Angle::deg90());
-            }
-            else if (action == aFlipH)
-            {
+            } else if (action == aFlipH) {
                 flipSelectedItems(Qt::Horizontal);
             }
-            else if (action == aRemove)
-            {
+            else if (action == aRemove) {
                 removeSelectedItems();
             }
-            else if (!action->data().toUuid().isNull())
-            {
-                try
-                {
+            else if (action == aResetTexts) {
+                try {
+                    mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
+                } catch (Exception& e) {
+                    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+                }
+            } else if (!action->data().toUuid().isNull()) {
+                try {
                     Uuid uuid(action->data().toString());
                     Uuid deviceUuid = devInst.getLibDevice().getUuid();
                     Uuid footprintUuid = Uuid(); // TODO
@@ -325,14 +327,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                     CmdReplaceDevice* cmd = new CmdReplaceDevice(mWorkspace, *board, devInst,
                                                                  deviceUuid, footprintUuid);
                     mUndoStack.execCmd(cmd);
-                }
-                catch (Exception& e)
-                {
+                } catch (Exception& e) {
                     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
                 }
             }
-            else if (action == aProperties)
-            {
+            else if (action == aProperties) {
                 openDevicePropertiesDialog(devInst);
             }
             return ForceStayInState;
@@ -376,6 +375,25 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             return ForceStayInState;
         }
 
+        case BI_Base::Type_t::StrokeText: {
+            BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Text");
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openStrokeTextPropertiesDialog(*board, text->getText());
+            }
+            return ForceStayInState;
+        }
+
         default:
             break;
     }
@@ -409,6 +427,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case BI_Base::Type_t::Polygon: {
                 BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
                 openPolygonPropertiesDialog(*board, polygon->getPolygon());
+                return ForceStayInState;
+            }
+            case BI_Base::Type_t::StrokeText: {
+                BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
+                openStrokeTextPropertiesDialog(*board, text->getText());
                 return ForceStayInState;
             }
             default: {
@@ -564,6 +587,13 @@ void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept
 void BES_Select::openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept
 {
     PolygonPropertiesDialog dialog(polygon, mUndoStack,
+        board.getLayerStack().getAllowedPolygonLayers());
+    dialog.exec();
+}
+
+void BES_Select::openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept
+{
+    StrokeTextPropertiesDialog dialog(text, mUndoStack,
         board.getLayerStack().getAllowedPolygonLayers());
     dialog.exec();
 }

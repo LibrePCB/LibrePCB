@@ -24,6 +24,7 @@
 #include "cmdflipselectedboarditems.h"
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
@@ -34,6 +35,7 @@
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/items/bi_stroketext.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
@@ -72,6 +74,8 @@ bool CmdFlipSelectedBoardItems::performExecute()
     std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
     query->addSelectedFootprints();
     query->addSelectedVias();
+    query->addSelectedBoardStrokeTexts();
+    query->addSelectedFootprintStrokeTexts();
 
     // find the center of all elements
     Point center = Point(0, 0);
@@ -83,6 +87,13 @@ bool CmdFlipSelectedBoardItems::performExecute()
     foreach (BI_Via* via, query->getVias()) {
         center += via->getPosition();
         ++count;
+    }
+    foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+        // do not count texts of footprints if the footprint is selected too
+        if (!query->getFootprints().contains(text->getFootprint())) {
+            center += text->getPosition();
+            ++count;
+        }
     }
     if (count > 0) {
         center /= count;
@@ -156,6 +167,13 @@ bool CmdFlipSelectedBoardItems::performExecute()
     foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
         CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(footprint->getDeviceInstance());
         cmd->mirror(center, mOrientation, false); // can throw
+        execNewChildCmd(cmd); // can throw
+    }
+
+    // flip all stroke texts
+    foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+        CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
+        cmd->mirror(center, mOrientation, false);
         execNewChildCmd(cmd); // can throw
     }
 

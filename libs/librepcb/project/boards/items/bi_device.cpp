@@ -80,8 +80,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node) :
     mAttributes.loadFromDomElement(node); // can throw
 
     // load footprint
-    mFootprint.reset(new BI_Footprint(*this));
-    //mFootprint.reset(new BI_Footprint(*this, *node.getFirstChild("footprint", true)));
+    mFootprint.reset(new BI_Footprint(*this, node));
 
     init();
 }
@@ -238,6 +237,7 @@ void BI_Device::serialize(SExpression& root) const
     root.appendTokenChild("rot", mRotation, false);
     root.appendTokenChild("mirror", mIsMirrored, false);
     mAttributes.serialize(root);
+    mFootprint->serialize(root);
 }
 
 /*****************************************************************************************

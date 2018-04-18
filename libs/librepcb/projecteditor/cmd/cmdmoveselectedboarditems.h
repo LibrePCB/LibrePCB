@@ -33,6 +33,7 @@
 namespace librepcb {
 
 class CmdPolygonEdit;
+class CmdStrokeTextEdit;
 
 namespace project {
 
@@ -82,6 +83,7 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
         QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
         QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
         QList<CmdPolygonEdit*> mPolygonEditCmds;
+        QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
 };
 
 /*****************************************************************************************

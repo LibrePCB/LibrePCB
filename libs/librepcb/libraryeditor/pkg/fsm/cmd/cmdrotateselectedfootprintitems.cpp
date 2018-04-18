@@ -25,7 +25,7 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/cmd/cmdellipseedit.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintpad.h>
@@ -33,7 +33,7 @@
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/common/graphics/ellipsegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
 
@@ -69,7 +69,7 @@ bool CmdRotateSelectedFootprintItems::performExecute()
     QList<QSharedPointer<FootprintPadGraphicsItem>> pads = mContext.currentGraphicsItem->getSelectedPads();
     QList<QSharedPointer<EllipseGraphicsItem>> ellipses = mContext.currentGraphicsItem->getSelectedEllipses();
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = mContext.currentGraphicsItem->getSelectedPolygons();
-    QList<QSharedPointer<TextGraphicsItem>> texts = mContext.currentGraphicsItem->getSelectedTexts();
+    QList<QSharedPointer<StrokeTextGraphicsItem>> texts = mContext.currentGraphicsItem->getSelectedStrokeTexts();
     QList<QSharedPointer<HoleGraphicsItem>> holes = mContext.currentGraphicsItem->getSelectedHoles();
     int count = pads.count() + ellipses.count() + polygons.count() + texts.count();
 
@@ -93,7 +93,7 @@ bool CmdRotateSelectedFootprintItems::performExecute()
             ++count;
         }
     }
-    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& text, texts) {Q_ASSERT(text);
         center += text->getText().getPosition();
     }
     foreach (const QSharedPointer<HoleGraphicsItem>& hole, holes) {Q_ASSERT(hole);
@@ -118,8 +118,8 @@ bool CmdRotateSelectedFootprintItems::performExecute()
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
-    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
-        CmdTextEdit* cmd = new CmdTextEdit(text->getText());
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& text, texts) {Q_ASSERT(text);
+        CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }

@@ -137,6 +137,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     mToolsActionGroup->addAction(BES_FSM::State::State_AddVia, mUi->actionToolAddVia);
     mToolsActionGroup->addAction(BES_FSM::State::State_DrawPolygon, mUi->actionToolDrawPolygon);
     mToolsActionGroup->addAction(BES_FSM::State::State_DrawPlane, mUi->actionToolAddPlane);
+    mToolsActionGroup->addAction(BES_FSM::State::State_AddStrokeText, mUi->actionToolAddText);
     mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
     connect(mFsm, &BES_FSM::stateChanged,
             mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
@@ -520,6 +521,9 @@ void BoardEditor::toolActionGroupChangeTriggered(const QVariant& newTool) noexce
             break;
         case BES_FSM::State::State_AddVia:
             mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);
+            break;
+        case BES_FSM::State::State_AddStrokeText:
+            mFsm->processEvent(new BEE_Base(BEE_Base::StartAddStrokeText), true);
             break;
         default: Q_ASSERT(false); qCritical() << "Unknown tool triggered!"; break;
     }

@@ -107,6 +107,7 @@
     <addaction name="actionToolAddVia"/>
     <addaction name="actionToolDrawTrace"/>
     <addaction name="actionToolDrawPolygon"/>
+    <addaction name="actionToolAddText"/>
     <addaction name="actionToolAddPlane"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -214,6 +215,7 @@
    <addaction name="actionToolAddVia"/>
    <addaction name="actionToolDrawTrace"/>
    <addaction name="actionToolDrawPolygon"/>
+   <addaction name="actionToolAddText"/>
    <addaction name="actionToolAddPlane"/>
    <addaction name="separator"/>
    <addaction name="actionRebuildPlanes"/>
@@ -661,6 +663,15 @@
    </property>
    <property name="text">
     <string>Add Plane</string>
+   </property>
+  </action>
+  <action name="actionToolAddText">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/add_text.png</normaloff>:/img/actions/add_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Text</string>
    </property>
   </action>
  </widget>

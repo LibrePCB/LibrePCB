@@ -52,6 +52,7 @@ class BES_FSM final : public BES_Base
             State_Select,       ///< @see #project#BES_Select
             State_DrawTrace,    ///< @see #project#BES_DrawTrace
             State_DrawPolygon,  ///< @see librepcb#project#BES_DrawPolygon
+            State_AddStrokeText,///< @see librepcb#project#BES_AddStrokeText
             State_AddVia,       ///< @see librepcb#project#BES_AddVia
             State_AddDevice,    ///< @see librepcb#project#BES_AddDevice
             State_DrawPlane,    ///< @see #project#BES_DrawPlane

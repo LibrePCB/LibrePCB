@@ -317,7 +317,7 @@ void FootprintListEditorWidget::copyFootprint(const Uuid& uuid) noexcept
         copy->getPads() = original->getPads();
         copy->getPolygons() = original->getPolygons();
         copy->getEllipses() = original->getEllipses();
-        copy->getTexts() = original->getTexts();
+        copy->getStrokeTexts() = original->getStrokeTexts();
         copy->getHoles() = original->getHoles();
         mUndoStack->execCmd(new CmdFootprintInsert(*mFootprintList, copy)); // can throw
         updateTable(copy->getUuid());

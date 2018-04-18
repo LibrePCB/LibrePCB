@@ -36,16 +36,16 @@ namespace library {
  ****************************************************************************************/
 
 Footprint::Footprint(const Footprint& other) noexcept :
-    mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
-    mRegisteredGraphicsItem(nullptr)
+    mPads(this), mPolygons(this), mEllipses(this), mStrokeTexts(this), mHoles(this),
+    mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
     *this = other;
 }
 
 Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
                      const QString& description_en_US) :
-    mUuid(uuid), mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
-    mRegisteredGraphicsItem(nullptr)
+    mUuid(uuid), mPads(this), mPolygons(this), mEllipses(this), mStrokeTexts(this), mHoles(this),
+    mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
     Q_ASSERT(mUuid.isNull() == false);
     mNames.setDefaultValue(name_en_US);
@@ -53,8 +53,8 @@ Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
 }
 
 Footprint::Footprint(const SExpression& node) :
-    mPads(this), mPolygons(this), mEllipses(this), mTexts(this), mHoles(this),
-    mRegisteredGraphicsItem(nullptr)
+    mPads(this), mPolygons(this), mEllipses(this), mStrokeTexts(this), mHoles(this),
+    mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
     mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
@@ -65,8 +65,13 @@ Footprint::Footprint(const SExpression& node) :
     mPads.loadFromDomElement(node);
     mPolygons.loadFromDomElement(node);
     mEllipses.loadFromDomElement(node);
-    mTexts.loadFromDomElement(node);
+    mStrokeTexts.loadFromDomElement(node);
     mHoles.loadFromDomElement(node);
+
+    // backward compatibility, remove this some time!
+    foreach (const SExpression& child, node.getChildren("text")) {
+        mStrokeTexts.append(std::make_shared<StrokeText>(child));
+    }
 }
 
 Footprint::~Footprint() noexcept
@@ -77,6 +82,14 @@ Footprint::~Footprint() noexcept
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
+
+void Footprint::setStrokeFontForAllTexts(const StrokeFont* font) noexcept
+{
+    mStrokeFont = font;
+    for (StrokeText& text : mStrokeTexts) {
+        text.setFont(mStrokeFont);
+    }
+}
 
 void Footprint::registerGraphicsItem(FootprintGraphicsItem& item) noexcept
 {
@@ -98,7 +111,7 @@ void Footprint::serialize(SExpression& root) const
     mPads.serialize(root);
     mPolygons.serialize(root);
     mEllipses.serialize(root);
-    mTexts.serialize(root);
+    mStrokeTexts.serialize(root);
     mHoles.serialize(root);
 }
 
@@ -114,7 +127,7 @@ bool Footprint::operator==(const Footprint& rhs) const noexcept
     if (mPads != rhs.mPads)                     return false;
     if (mPolygons != rhs.mPolygons)             return false;
     if (mEllipses != rhs.mEllipses)             return false;
-    if (mTexts != rhs.mTexts)                   return false;
+    if (mStrokeTexts != rhs.mStrokeTexts)                   return false;
     if (mHoles != rhs.mHoles)                   return false;
     return true;
 }
@@ -127,7 +140,7 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept
     mPads = rhs.mPads;
     mPolygons = rhs.mPolygons;
     mEllipses = rhs.mEllipses;
-    mTexts = rhs.mTexts;
+    mStrokeTexts = rhs.mStrokeTexts;
     mHoles = rhs.mHoles;
     return *this;
 }
@@ -160,12 +173,13 @@ void Footprint::listObjectAdded(const EllipseList& list, int newIndex,
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addEllipse(*ptr);
 }
 
-void Footprint::listObjectAdded(const TextList& list, int newIndex,
-                                const std::shared_ptr<Text>& ptr) noexcept
+void Footprint::listObjectAdded(const StrokeTextList& list, int newIndex,
+                                const std::shared_ptr<StrokeText>& ptr) noexcept
 {
     Q_UNUSED(newIndex);
-    Q_ASSERT(&list == &mTexts);
-    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addText(*ptr);
+    Q_ASSERT(&list == &mStrokeTexts);
+    ptr->setFont(mStrokeFont);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addStrokeText(*ptr);
 }
 
 void Footprint::listObjectAdded(const HoleList& list, int newIndex,
@@ -200,12 +214,12 @@ void Footprint::listObjectRemoved(const EllipseList& list, int oldIndex,
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeEllipse(*ptr);
 }
 
-void Footprint::listObjectRemoved(const TextList& list, int oldIndex,
-                                  const std::shared_ptr<Text>& ptr) noexcept
+void Footprint::listObjectRemoved(const StrokeTextList& list, int oldIndex,
+                                  const std::shared_ptr<StrokeText>& ptr) noexcept
 {
     Q_UNUSED(oldIndex);
-    Q_ASSERT(&list == &mTexts);
-    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeText(*ptr);
+    Q_ASSERT(&list == &mStrokeTexts);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeStrokeText(*ptr);
 }
 
 void Footprint::listObjectRemoved(const HoleList& list, int oldIndex,
