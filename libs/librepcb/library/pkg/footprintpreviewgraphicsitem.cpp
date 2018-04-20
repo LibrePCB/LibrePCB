@@ -217,7 +217,7 @@ QString FootprintPreviewGraphicsItem::getBuiltInAttributeValue(const QString& ke
     if (mComponent && (key == QLatin1String("NAME"))) {
         return mComponent->getPrefixes().getDefaultValue() % "?";
     }
-    return "##" % key;
+    return "{{ '{{' }}" % key % "{{ '}}' }}";
 }
 
 /*****************************************************************************************

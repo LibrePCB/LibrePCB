@@ -557,7 +557,7 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
     } else if (key == QLatin1String("PAGES")) {
         return QString::number(mSchematics.count());
     } else if (key == QLatin1String("PAGE_X_OF_Y")) {
-        return "Page #PAGE of #PAGES"; // do not translate this, must be the same for every user!
+        return "Page {{PAGE}} of {{PAGES}}"; // do not translate this, must be the same for every user!
     } else {
         return QString();
     }
