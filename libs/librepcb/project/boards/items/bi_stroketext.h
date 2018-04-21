@@ -69,6 +69,7 @@ class BI_StrokeText final : public BI_Base, public SerializableObject,
         // Getters
         StrokeText& getText() noexcept {return *mText;}
         const StrokeText& getText() const noexcept {return *mText;}
+        const Uuid& getUuid() const noexcept; // convenience function, e.g. for template usage
         bool isSelectable() const noexcept override;
 
         // General Methods

@@ -154,6 +154,11 @@ QPainterPath BI_StrokeText::getGrabAreaScenePx() const noexcept
     return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
+const Uuid& BI_StrokeText::getUuid() const noexcept
+{
+    return mText->getUuid();
+}
+
 bool BI_StrokeText::isSelectable() const noexcept
 {
     const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(mText->getLayerName());

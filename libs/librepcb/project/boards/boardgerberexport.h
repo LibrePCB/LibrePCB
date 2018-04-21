@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -35,6 +35,7 @@ namespace librepcb {
 
 class Polygon;
 class Ellipse;
+class ExcellonGenerator;
 class GerberGenerator;
 
 namespace project {
@@ -55,7 +56,7 @@ class BI_FootprintPad;
  * @author ubruhin
  * @date 2016-01-10
  */
-class BoardGerberExport final : public QObject
+class BoardGerberExport final : public QObject, public AttributeProvider
 {
         Q_OBJECT
 
@@ -64,28 +65,48 @@ class BoardGerberExport final : public QObject
         // Constructors / Destructor
         BoardGerberExport() = delete;
         BoardGerberExport(const BoardGerberExport& other) = delete;
-        BoardGerberExport(const Board& board, const FilePath& outputDir) noexcept;
+        BoardGerberExport(const Board& board) noexcept;
         ~BoardGerberExport() noexcept;
+
+        // Getters
+        FilePath getOutputDirectory() const noexcept;
 
         // General Methods
         void exportAllLayers() const;
+
+        // Inherited from AttributeProvider
+        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
 
         // Operator Overloadings
         BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
 
 
+    signals:
+        void attributesChanged() override;
+
+
     private:
 
         // Private Methods
-        void exportDrillsPTH() const;
+        void exportDrills() const;
+        void exportDrillsNpth() const;
+        void exportDrillsPth() const;
         void exportLayerBoardOutlines() const;
         void exportLayerTopCopper() const;
-        void exportLayerTopSolderMask() const;
-        void exportLayerTopSilkscreen() const;
+        void exportLayerInnerCopper() const;
         void exportLayerBottomCopper() const;
+        void exportLayerTopSolderMask() const;
         void exportLayerBottomSolderMask() const;
+        void exportLayerTopSilkscreen() const;
         void exportLayerBottomSilkscreen() const;
+        void exportLayerTopSolderPaste() const;
+        void exportLayerBottomSolderPaste() const;
 
+        int drawNpthDrills(ExcellonGenerator& gen) const;
+        int drawPthDrills(ExcellonGenerator& gen) const;
         void drawLayer(GerberGenerator& gen, const QString& layerName) const;
         void drawVia(GerberGenerator& gen, const BI_Via& via, const QString& layerName) const;
         void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, const QString& layerName) const;
@@ -95,12 +116,20 @@ class BoardGerberExport final : public QObject
 
         // Static Methods
         static Length calcWidthOfLayer(const Length& width, const QString& name) noexcept;
+        template <typename T>
+        static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
+            // sort a list of objects by their UUID to get reproducable gerber files
+            QList<T*> copy = list;
+            qSort(copy.begin(), copy.end(),
+                  [](const T* o1, const T* o2){return o1->getUuid() < o2->getUuid();});
+            return copy;
+        }
 
 
         // Private Member Variables
         const Project& mProject;
         const Board& mBoard;
-        FilePath mOutputDirectory;
+        mutable int mCurrentInnerCopperLayer;
 };
 
 /*****************************************************************************************

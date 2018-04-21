@@ -119,6 +119,7 @@ class Board final : public QObject, public AttributeProvider,
         const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
         GraphicsScene& getGraphicsScene () const noexcept {return *mGraphicsScene;}
         BoardLayerStack& getLayerStack() noexcept {return *mLayerStack;}
+        const BoardLayerStack& getLayerStack() const noexcept {return *mLayerStack;}
         BoardDesignRules& getDesignRules() noexcept {return *mDesignRules;}
         const BoardDesignRules& getDesignRules() const noexcept {return *mDesignRules;}
         BoardFabricationOutputSettings& getFabricationOutputSettings() noexcept {return *mFabricationOutputSettings;}

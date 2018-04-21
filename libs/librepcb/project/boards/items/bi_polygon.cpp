@@ -117,6 +117,11 @@ QPainterPath BI_Polygon::getGrabAreaScenePx() const noexcept
     return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
+const Uuid& BI_Polygon::getUuid() const noexcept
+{
+    return mPolygon->getUuid();
+}
+
 bool BI_Polygon::isSelectable() const noexcept
 {
     const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(mPolygon->getLayerName());

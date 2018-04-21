@@ -65,13 +65,14 @@ class FabricationOutputDialog final : public QDialog
 
 
     private slots:
-
-        void on_btnSelectDir_clicked();
+        void on_btnDefaultSuffixes_clicked();
+        void on_btnProtelSuffixes_clicked();
         void on_btnGenerate_clicked();
         void on_btnBrowseOutputDir_clicked();
 
-
     private:
+        QStringList getTopSilkscreenLayers() const noexcept;
+        QStringList getBotSilkscreenLayers() const noexcept;
 
         Project& mProject;
         Board& mBoard;

@@ -74,7 +74,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         const Uuid& getComponentInstanceUuid() const noexcept;
         BI_Device& getDeviceInstance() const noexcept {return mDevice;}
         BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {return mPads.value(padUuid);}
-        const QHash<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
+        const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept {return mPads;}
         const library::Footprint& getLibFootprint() const noexcept;
         const Angle& getRotation() const noexcept;
         bool isSelectable() const noexcept override;
@@ -131,7 +131,7 @@ class BI_Footprint final : public BI_Base, public SerializableObject,
         // General
         BI_Device& mDevice;
         QScopedPointer<BGI_Footprint> mGraphicsItem;
-        QHash<Uuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
+        QMap<Uuid, BI_FootprintPad*> mPads; ///< key: footprint pad UUID
         QList<BI_StrokeText*> mStrokeTexts;
 };
 
