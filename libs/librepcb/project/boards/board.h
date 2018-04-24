@@ -59,6 +59,7 @@ class BI_NetPoint;
 class BI_NetLine;
 class BI_Polygon;
 class BI_StrokeText;
+class BI_Hole;
 class BI_Plane;
 class BoardLayerStack;
 class BoardFabricationOutputSettings;
@@ -172,6 +173,11 @@ class Board final : public QObject, public AttributeProvider,
         void addStrokeText(BI_StrokeText& text);
         void removeStrokeText(BI_StrokeText& text);
 
+        // Hole Methods
+        const QList<BI_Hole*>& getHoles() const noexcept {return mHoles;}
+        void addHole(BI_Hole& hole);
+        void removeHole(BI_Hole& hole);
+
         // General Methods
         void addToProject();
         void removeFromProject();
@@ -246,6 +252,7 @@ class Board final : public QObject, public AttributeProvider,
         QList<BI_Plane*> mPlanes;
         QList<BI_Polygon*> mPolygons;
         QList<BI_StrokeText*> mStrokeTexts;
+        QList<BI_Hole*> mHoles;
 
         // ERC messages
         QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;

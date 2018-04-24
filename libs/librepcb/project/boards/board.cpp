@@ -46,6 +46,7 @@
 #include "items/bi_netline.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
+#include "items/bi_hole.h"
 #include "items/bi_plane.h"
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/pkg/footprint.h>
@@ -132,6 +133,12 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
             mStrokeTexts.append(copy);
         }
 
+        // copy holes
+        foreach (const BI_Hole* hole, other.mHoles) {
+            BI_Hole* copy = new BI_Hole(*this, *hole);
+            mHoles.append(copy);
+        }
+
         // rebuildAllPlanes(); --> fragments are copied too, so no need to rebuild them
         updateErcMessages();
         updateIcon();
@@ -148,6 +155,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
     {
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mHoles);             mHoles.clear();
         qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
         qDeleteAll(mPlanes);            mPlanes.clear();
@@ -282,6 +290,12 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                 mStrokeTexts.append(text);
             }
 
+            // Load all holes
+            foreach (const SExpression& node, root.getChildren("hole")) {
+                BI_Hole* hole = new BI_Hole(*this, node);
+                mHoles.append(hole);
+            }
+
             //////////////////////////////////////////////////////////////////////////////
             // TODO: Backward compatibility, remove this some time!
             int strokeTextCount = mStrokeTexts.count();
@@ -315,6 +329,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     {
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mHoles);             mHoles.clear();
         qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
         qDeleteAll(mPlanes);            mPlanes.clear();
@@ -338,6 +353,7 @@ Board::~Board() noexcept
     qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
 
     // delete all items
+    qDeleteAll(mHoles);             mHoles.clear();
     qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
     qDeleteAll(mPolygons);          mPolygons.clear();
     qDeleteAll(mPlanes);            mPlanes.clear();
@@ -363,7 +379,8 @@ bool Board::isEmpty() const noexcept
             mNetSegments.isEmpty() &&
             mPlanes.isEmpty() &&
             mPolygons.isEmpty() &&
-            mStrokeTexts.isEmpty());
+            mStrokeTexts.isEmpty() &&
+            mHoles.isEmpty());
 }
 
 QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
@@ -428,6 +445,12 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
     foreach (BI_StrokeText* text, mStrokeTexts) {
         if (text->isSelectable() && text->getGrabAreaScenePx().contains(scenePosPx)) {
             list.append(text);
+        }
+    }
+    // holes
+    foreach (BI_Hole* hole, mHoles) {
+        if (hole->isSelectable() && hole->getGrabAreaScenePx().contains(scenePosPx)) {
+            list.append(hole);
         }
     }
     return list;
@@ -500,6 +523,8 @@ QList<BI_Base*> Board::getAllItems() const noexcept
         items.append(polygon);
     foreach (BI_StrokeText* text, mStrokeTexts)
         items.append(text);
+    foreach (BI_Hole* hole, mHoles)
+        items.append(hole);
     return items;
 }
 
@@ -676,6 +701,30 @@ void Board::removeStrokeText(BI_StrokeText& text)
 }
 
 /*****************************************************************************************
+ *  Hole Methods
+ ****************************************************************************************/
+
+void Board::addHole(BI_Hole& hole)
+{
+    if ((!mIsAddedToProject) || (mHoles.contains(&hole))
+        || (&hole.getBoard() != this))
+    {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    hole.addToBoard(); // can throw
+    mHoles.append(&hole);
+}
+
+void Board::removeHole(BI_Hole& hole)
+{
+    if ((!mIsAddedToProject) || (!mHoles.contains(&hole))) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    hole.removeFromBoard(); // can throw
+    mHoles.removeOne(&hole);
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
@@ -782,6 +831,10 @@ void Board::setSelectionRect(const Point& p1, const Point& p2, bool updateItems)
             bool select = text->isSelectable() && text->getGrabAreaScenePx().intersects(rectPx);
             text->setSelected(select);
         }
+        foreach (BI_Hole* hole, mHoles) {
+            bool select = hole->isSelectable() && hole->getGrabAreaScenePx().intersects(rectPx);
+            hole->setSelected(select);
+        }
     }
 }
 
@@ -801,13 +854,16 @@ void Board::clearSelection() const noexcept
     foreach (BI_StrokeText* text, mStrokeTexts) {
         text->setSelected(false);
     }
+    foreach (BI_Hole* hole, mHoles) {
+        hole->setSelected(false);
+    }
 }
 
 std::unique_ptr<BoardSelectionQuery> Board::createSelectionQuery() const noexcept
 {
     return std::unique_ptr<BoardSelectionQuery>(
         new BoardSelectionQuery(mDeviceInstances, mNetSegments, mPlanes, mPolygons,
-                                mStrokeTexts, const_cast<Board*>(this)));
+                                mStrokeTexts, mHoles, const_cast<Board*>(this)));
 }
 
 /*****************************************************************************************
@@ -872,6 +928,8 @@ void Board::serialize(SExpression& root) const
     serializePointerContainer(root, mPolygons, "polygon");
     root.appendLineBreak();
     serializePointerContainer(root, mStrokeTexts, "stroke_text");
+    root.appendLineBreak();
+    serializePointerContainer(root, mHoles, "hole");
     root.appendLineBreak();
 }
 
