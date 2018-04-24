@@ -25,6 +25,7 @@
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
+#include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
@@ -36,6 +37,7 @@
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/project/boards/items/bi_hole.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
@@ -76,6 +78,7 @@ bool CmdFlipSelectedBoardItems::performExecute()
     query->addSelectedVias();
     query->addSelectedBoardStrokeTexts();
     query->addSelectedFootprintStrokeTexts();
+    query->addSelectedHoles();
 
     // find the center of all elements
     Point center = Point(0, 0);
@@ -94,6 +97,10 @@ bool CmdFlipSelectedBoardItems::performExecute()
             center += text->getPosition();
             ++count;
         }
+    }
+    foreach (BI_Hole* hole, query->getHoles()) {
+        center += hole->getPosition();
+        ++count;
     }
     if (count > 0) {
         center /= count;
@@ -174,6 +181,13 @@ bool CmdFlipSelectedBoardItems::performExecute()
     foreach (BI_StrokeText* text, query->getStrokeTexts()) {
         CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
         cmd->mirror(center, mOrientation, false);
+        execNewChildCmd(cmd); // can throw
+    }
+
+    // move all holes
+    foreach (BI_Hole* hole, query->getHoles()) {
+        CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
+        cmd->setPosition(hole->getPosition().mirrored(mOrientation, center), false);
         execNewChildCmd(cmd); // can throw
     }
 

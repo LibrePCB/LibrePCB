@@ -17,75 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
+#define LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include "bes_base.h"
+#include <librepcb/project/boards/items/bi_hole.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class CmdPolygonEdit;
-class CmdStrokeTextEdit;
 class CmdHoleEdit;
 
 namespace project {
 
 class Board;
-class CmdDeviceInstanceEdit;
-class CmdBoardViaEdit;
-class CmdBoardNetPointEdit;
-class CmdBoardPlaneEdit;
 
 namespace editor {
 
 /*****************************************************************************************
- *  Class CmdMoveSelectedBoardItems
+ *  Class BES_AddHole
  ****************************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedBoardItems class
+ * @brief The BES_AddHole class
  */
-class CmdMoveSelectedBoardItems final : public UndoCommandGroup
+class BES_AddHole final : public BES_Base
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
-        ~CmdMoveSelectedBoardItems() noexcept;
+        explicit BES_AddHole(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                             GraphicsView& editorGraphicsView, UndoStack& undoStack);
+        ~BES_AddHole();
 
         // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+        ProcRetVal process(BEE_Base* event) noexcept override;
+        bool entry(BEE_Base* event) noexcept override;
+        bool exit(BEE_Base* event) noexcept override;
 
 
     private:
 
         // Private Methods
+        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+        bool addHole(Board& board, const Point& pos) noexcept;
+        void updateHolePosition(const Point& pos) noexcept;
+        bool fixHole(const Point& pos) noexcept;
+        void diameterSpinBoxValueChanged(double value) noexcept;
+        void makeLayerVisible() noexcept;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
 
+        // State
+        bool mUndoCmdActive;
+        BI_Hole* mHole;
+        QScopedPointer<CmdHoleEdit> mEditCmd;
+        Length mCurrentDiameter;
 
-        // Private Member Variables
-        Board& mBoard;
-        Point mStartPos;
-        Point mDeltaPos;
-
-        // Move commands
-        QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-        QList<CmdBoardViaEdit*> mViaEditCmds;
-        QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-        QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
-        QList<CmdPolygonEdit*> mPolygonEditCmds;
-        QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
-        QList<CmdHoleEdit*> mHoleEditCmds;
+        // Widgets for the command toolbar
+        QScopedPointer<QLabel> mDiameterLabel;
+        QScopedPointer<QDoubleSpinBox> mDiameterSpinBox;
 };
 
 /*****************************************************************************************
@@ -96,4 +94,4 @@ class CmdMoveSelectedBoardItems final : public UndoCommandGroup
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#endif // LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H

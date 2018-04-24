@@ -24,6 +24,7 @@
 #include "cmdmoveselectedboarditems.h"
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
+#include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
@@ -33,6 +34,7 @@
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/project/boards/items/bi_hole.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
@@ -66,6 +68,7 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     query->addSelectedPolygons();
     query->addSelectedBoardStrokeTexts();
     query->addSelectedFootprintStrokeTexts();
+    query->addSelectedHoles();
 
     foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
         BI_Device& device = footprint->getDeviceInstance();
@@ -91,6 +94,10 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
     foreach (BI_StrokeText* text, query->getStrokeTexts()) { Q_ASSERT(text);
         CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
         mStrokeTextEditCmds.append(cmd);
+    }
+    foreach (BI_Hole* hole, query->getHoles()) { Q_ASSERT(hole);
+        CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
+        mHoleEditCmds.append(cmd);
     }
 }
 
@@ -127,6 +134,9 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
+        foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+            cmd->setDeltaToStartPos(delta, true);
+        }
         mDeltaPos = delta;
     }
 }
@@ -145,6 +155,7 @@ bool CmdMoveSelectedBoardItems::performExecute()
         qDeleteAll(mPlaneEditCmds);     mPlaneEditCmds.clear();
         qDeleteAll(mPolygonEditCmds);   mPolygonEditCmds.clear();
         qDeleteAll(mStrokeTextEditCmds);mStrokeTextEditCmds.clear();
+        qDeleteAll(mHoleEditCmds);      mHoleEditCmds.clear();
         return false;
     }
 
@@ -164,6 +175,9 @@ bool CmdMoveSelectedBoardItems::performExecute()
         appendChild(cmd); // can throw
     }
     foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+        appendChild(cmd); // can throw
+    }
+    foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
         appendChild(cmd); // can throw
     }
 

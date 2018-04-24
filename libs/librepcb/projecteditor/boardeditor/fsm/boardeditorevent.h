@@ -62,6 +62,7 @@ class BEE_Base
             StartSelect,        ///< start command: select elements
             //StartMove,          ///< start command: move elements
             StartAddStrokeText, ///< start command: add stroke text
+            StartAddHole,       ///< start command: add hole
             //StartDrawRect,      ///< start command: draw rect
             StartDrawPolygon,   ///< start command: draw polygon
             //StartDrawCircle,    ///< start command: draw circle
