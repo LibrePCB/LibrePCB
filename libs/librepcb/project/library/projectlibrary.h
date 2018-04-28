@@ -34,6 +34,7 @@
 namespace librepcb {
 
 namespace library {
+class LibraryBaseElement;
 class Symbol;
 class Package;
 class Component;
@@ -144,6 +145,9 @@ class ProjectLibrary final : public QObject
         QList<library::Package*> mRemovedPackages;
         QList<library::Component*> mRemovedComponents;
         QList<library::Device*> mRemovedDevices;
+
+        // Temporary, ugly performance improvement to avoid unnecessary file write operations
+        QSet<library::LibraryBaseElement*> mSavedLibraryElements;
 };
 
 /*****************************************************************************************

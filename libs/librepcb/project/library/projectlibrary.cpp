@@ -300,6 +300,15 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
             if (element->getFilePath().getParentDir().getParentDir() != mLibraryPath) {
                 element->moveIntoParentDirectory(parentDir);
             }
+            if (toOriginal && (!mSavedLibraryElements.contains(element))) {
+                // TODO:
+                // - first save to temporary files! Not yet supported by LibraryBaseElement :(
+                // - only save if needed (to improve performance)
+                //  - either if file format was upgraded
+                //  - or if library element was modified (not yet supported anyway)
+                element->save(); // can throw
+                mSavedLibraryElements.insert(element);
+            }
             if (toOriginal && addedElementsList.contains(element))
                 addedElementsList.removeOne(element);
         }
