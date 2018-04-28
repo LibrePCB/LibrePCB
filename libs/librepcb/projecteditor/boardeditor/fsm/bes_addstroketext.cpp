@@ -57,7 +57,7 @@ BES_AddStrokeText::BES_AddStrokeText(BoardEditor& editor, Ui::BoardEditor& edito
                                      GraphicsView& editorGraphicsView, UndoStack& undoStack) :
     BES_Base(editor, editorUi, editorGraphicsView, undoStack), mUndoCmdActive(false),
     mText(nullptr), mCurrentLayerName(GraphicsLayer::sBoardDocumentation),
-    mCurrentText("#PROJECT"), mCurrentHeight(1500000), mCurrentMirror(false)
+    mCurrentText("{{PROJECT}}"), mCurrentHeight(1500000), mCurrentMirror(false)
 {
 }
 
@@ -119,10 +119,10 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept
     mTextComboBox.reset(new QComboBox());
     mTextComboBox->setEditable(true);
     mTextComboBox->setMinimumContentsLength(20);
-    mTextComboBox->addItem("#BOARD");
-    mTextComboBox->addItem("#PROJECT");
-    mTextComboBox->addItem("#AUTHOR");
-    mTextComboBox->addItem("#VERSION");
+    mTextComboBox->addItem("{{BOARD}}");
+    mTextComboBox->addItem("{{PROJECT}}");
+    mTextComboBox->addItem("{{AUTHOR}}");
+    mTextComboBox->addItem("{{VERSION}}");
     mTextComboBox->setCurrentIndex(mTextComboBox->findText(mCurrentText));
     mTextComboBox->setCurrentText(mCurrentText);
     connect(mTextComboBox.data(), &QComboBox::currentTextChanged,

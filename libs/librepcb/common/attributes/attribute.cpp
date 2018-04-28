@@ -47,6 +47,10 @@ Attribute::Attribute(const SExpression& node) :
     mUnit = mType->getUnitFromString(node.getValueByPath<QString>("unit", false));
     mValue = node.getValueByPath<QString>("value", false);
 
+    // backward compatibility - remove this some time!
+    mValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
+    mValue.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 

@@ -33,39 +33,47 @@ namespace librepcb {
  *  Public Methods
  ****************************************************************************************/
 
-QString AttributeSubstitutor::substitute(QString str, const AttributeProvider* ap) noexcept
+QString AttributeSubstitutor::substitute(QString str, const AttributeProvider* ap,
+                                         FilterFunction filter) noexcept
 {
     int startPos = 0;
     int length = 0;
+    int outerVariableStart = -1;
+    int outerVariableEnd = -1; // counted from end of string
     QString value;
     QStringList keys;
     QSet<QString> keyBacktrace; // avoid endless recursion
     while (searchVariablesInText(str, startPos, startPos, length, keys)) {
-        if (keys.count() > 0) {
-            bool keyFound = false;
-            foreach (const QString& key, keys) {
-                if (key == "#") {
-                    // replace "##" by "#" (escaping)
-                    str.remove(startPos, 1);
-                    startPos++;
-                    keyFound = true;
-                    break;
-                } else if ((getValueOfKey(key, value, ap)) && (!keyBacktrace.contains(key))) {
-                    // replace "#KEY" with the value of KEY
-                    str.replace(startPos, length, value);
-                    keyBacktrace.insert(key);
-                    keyFound = true;
-                    break;
-                }
-            }
-            if (!keyFound) {
-                // attribute not found, remove "#KEY" from str
-                str.remove(startPos, length);
-            }
-        } else {
-            // standalone "#", skip it
-            startPos++;
+        if (filter && (startPos + length > str.length() - outerVariableEnd)) {
+            applyFilter(str, outerVariableStart, outerVariableEnd, filter);
         }
+        if (filter && (outerVariableStart < 0)) {
+            outerVariableStart = startPos;
+            outerVariableEnd = str.length() - length - startPos;
+        }
+        bool keyFound = false;
+        foreach (const QString& key, keys) {
+            if (key.startsWith('\'') && key.endsWith('\'')) {
+                // replace "{{'VALUE'}}" with "VALUE"
+                str.replace(startPos, length, key.mid(1, key.length()-2));
+                startPos += key.length() - 2; // do not search for variables in the value
+                keyFound = true;
+                break;
+            } else if ((getValueOfKey(key, value, ap)) && (!keyBacktrace.contains(key))) {
+                // replace "{{KEY}}" with the value of KEY
+                str.replace(startPos, length, value);
+                keyBacktrace.insert(key);
+                keyFound = true;
+                break;
+            }
+        }
+        if (!keyFound) {
+            // attribute not found, remove "{{KEY}}" from str
+            str.remove(startPos, length);
+        }
+    }
+    if (filter && (outerVariableStart >= 0)) {
+        applyFilter(str, outerVariableStart, outerVariableEnd, filter);
     }
     return str;
 }
@@ -77,39 +85,32 @@ QString AttributeSubstitutor::substitute(QString str, const AttributeProvider* a
 bool AttributeSubstitutor::searchVariablesInText(const QString& text, int startPos, int& pos,
                                                  int& length, QStringList& keys) noexcept
 {
-    if (startPos >= text.length()) return false;
-    int keyPos = text.indexOf("#", startPos);   // index of '#'
-    if (keyPos < startPos) return false;
-    if (isEscapedSharp(text, keyPos + 1)) {
-        pos = keyPos;
-        length = 2;
-        keys = QStringList{"#"};
+    QRegularExpression re("\\{\\{(.*?)\\}\\}");
+    QRegularExpressionMatch match = re.match(text, startPos);
+    if (match.hasMatch() && match.capturedLength() > 0) {
+        pos = match.capturedStart();
+        if (text.midRef(pos).startsWith("{{ '}}' }}")) {
+            // special case to escape '}}' as it doesn't work with the regex above
+            length = 10;
+            keys = QStringList{"'}}'"};
+        } else {
+            length = match.capturedLength();
+            keys = match.captured(1).split(" or ");
+            for (QString& key : keys) {key = key.trimmed();}
+        }
         return true;
     } else {
-        int keyLength = getLengthOfKeys(text, keyPos + 1) + 1;  // length inclusive '#'
-        pos = keyPos;
-        length = keyLength;
-        keys = text.mid(keyPos+1, keyLength-1).split('|', QString::SkipEmptyParts);
-        return true;
+        return false;
     }
 }
 
-bool AttributeSubstitutor::isEscapedSharp(const QString& text, int startPos) noexcept
+void AttributeSubstitutor::applyFilter(QString& str, int& start, int& end,
+                                       FilterFunction filter) noexcept
 {
-    return ((text.length() > startPos) && (text.at(startPos) == '#'));
-}
-
-int AttributeSubstitutor::getLengthOfKeys(const QString& text, int startPos) noexcept
-{
-    QString allowedChars("_|0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-    int manualEnd = text.indexOf("||", startPos);
-    if (manualEnd >= 0) {manualEnd += 2;}
-    for (int i = startPos; i < text.length(); ++i) {
-        if ((!allowedChars.contains(text.at(i))) || (i == manualEnd)) {
-            return i - startPos;
-        }
-    }
-    return text.length() - startPos;
+    int length = str.length() - end - start;
+    str.replace(start, length, filter(str.mid(start, length)));
+    start = -1;
+    end = -1;
 }
 
 bool AttributeSubstitutor::getValueOfKey(const QString& key, QString& value,

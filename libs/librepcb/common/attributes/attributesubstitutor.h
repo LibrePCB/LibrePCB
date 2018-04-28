@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <functional>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -38,7 +39,7 @@ class AttributeProvider;
 
 /**
  * @brief The AttributeSubstitutor class substitutes attribute keys in strings with their
- *        actual values (e.g. replace "#NAME" by "U42", a component's name)
+ *        actual values (e.g. replace "{{NAME}}" by "U42", a component's name)
  *
  * Please read the documentation about the @ref doc_attributes_system to get an idea how
  * the @ref doc_attributes_system works in detail.
@@ -49,15 +50,18 @@ class AttributeProvider;
  * @author ubruhin
  * @date 2017-09-19
  *
- * @todo Fix side-effect of the endless loop detection ("#FOO #FOO" is currently
- *       substituted by "#FOO " because of the endless loop detection, even if there is
+ * @todo Fix side-effect of the endless loop detection ("{{FOO}} {{FOO}}" is currently
+ *       substituted by "{{FOO}} " because of the endless loop detection, even if there is
  *       actually no endless loop).
- * @todo Properly implement multiple key substitution ("#FOO|BAR" is currently substituted
- *       by "#FOO", even if the attribute #FOO indirectly evaluates to an empty string).
+ * @todo Properly implement multiple key substitution ("{{FOO or BAR}}" is currently
+ *       substituted by "{{FOO}}", even if the attribute {{FOO}} indirectly evaluates to
+ *       an empty string).
  */
 class AttributeSubstitutor final
 {
     public:
+
+        using FilterFunction = std::function<QString(const QString&)>;
 
         // Constructors / Destructor / Operator Overloadings
         AttributeSubstitutor() = delete;
@@ -71,38 +75,37 @@ class AttributeSubstitutor final
         /**
          * @brief Substitute all attribute keys in a string with their attribute values
          *
-         * In addition to attributes substitution, this method also performs escaping of
-         * the '#' character.
-         *
-         * @param str       A string which can contain variables ("#NAME"). The attributes
-         *                  will be substituted directly in this string.
+         * @param str       A string which can contain variables ("{{NAME}}"). The
+         *                  attributes will be substituted directly in this string.
          *
          * @return True if str was modified in some way, false if not
          */
-        static QString substitute(QString str, const AttributeProvider* ap = nullptr) noexcept;
+        static QString substitute(QString str, const AttributeProvider* ap = nullptr,
+                                  FilterFunction filter = nullptr) noexcept;
 
 
     private: // Methods
 
         /**
-         * @brief Search the next variables ("#KEY|FALLBACK") in a given text
+         * @brief Search the next variables (e.g. "{{KEY or FALLBACK}}") in a given text
          *
          * @param text      A text which can contain variables
          * @param startPos  The search start index (use 0 to search in the whole text)
          * @param pos       The index of the next variable in the specified text (index of
-         *                  the '#' character, or -1 if no variable found) will be written
-         *                  into this variable.
-         * @param length    If a variable is found, the length (incl. '#') will be written
-         *                  into this variable.
-         * @param keys      The variable key names (text after '#', split by '|')
+         *                  the first '{' character, or -1 if no variable found) will be
+         *                  written into this variable.
+         * @param length    If a variable is found, the length (incl. '{{}}') will be
+         *                  written into this variable.
+         * @param keys      The variable key names (text between '{{' and '}}', split by
+         *                 ' or ')
          *
          * @return          true if a variable is found, false if not
          */
         static bool searchVariablesInText(const QString& text, int startPos, int& pos,
-                                         int& length, QStringList& keys) noexcept;
+                                          int& length, QStringList& keys) noexcept;
 
-        static bool isEscapedSharp(const QString& text, int startPos) noexcept;
-        static int getLengthOfKeys(const QString& text, int startPos) noexcept;
+        static void applyFilter(QString& str, int& start, int& end, FilterFunction filter) noexcept;
+
         static bool getValueOfKey(const QString& key, QString& value,
                                   const AttributeProvider* ap) noexcept;
 };

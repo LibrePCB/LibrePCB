@@ -73,6 +73,10 @@ Text::Text(const SExpression& node)
     // text alignment
     mAlign = Alignment(node.getChildByPath("align"));
 
+    // backward compatibility - remove this some time!
+    mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
+    mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
+
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 

@@ -109,11 +109,14 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
 
     foreach (const parseagle::Text& text, mSymbol.getTexts()) {
         QString layerName = convertSchematicLayer(text.getLayer());
-        QString textStr = text.getValue().replace('>', '#');
+        QString textStr = text.getValue();
+        if (textStr.startsWith(">")) {
+            textStr = "{{" + textStr.mid(1) + "}}";
+        }
         Length height = Length::fromMm(text.getSize()) * 2;
-        if (textStr == "#NAME") {
+        if (textStr == "{{NAME}}") {
             height = Length::fromMm(3.175);
-        } else if (textStr == "#VALUE") {
+        } else if (textStr == "{{VALUE}}") {
             height = Length::fromMm(2.5);
         }
         Point pos = Point::fromMm(text.getPosition().x, text.getPosition().y);

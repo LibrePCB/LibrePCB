@@ -113,7 +113,10 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
 
     foreach (const parseagle::Text& text, mPackage.getTexts()) {
         QString layerName = convertBoardLayer(text.getLayer());
-        QString textStr = text.getValue().replace('>', '#');
+        QString textStr = text.getValue();
+        if (textStr.startsWith(">")) {
+            textStr = "{{" + textStr.mid(1) + "}}";
+        }
         Length height = Length::fromMm(text.getSize());
         Point pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
         Angle rot = Angle::fromDeg(text.getRotation().getAngle());

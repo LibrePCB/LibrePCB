@@ -36,12 +36,12 @@ namespace librepcb {
 
 /**
  * @brief The AttributeProvider class defines an interface for classes which provides
- *        some attributes which can be used as variables in texts (like "#NAME")
+ *        some attributes which can be used as variables in texts (like "{{NAME}}")
  *
  * For example library symbols can contain text elements which contains variables, for
- * example the most importants texts "#NAME" and "#VALUE". All these variables will be
- * parsed and replaced with their values when such a text is displayed in a schematic of a
- * project.
+ * example the most importants texts "{{NAME}}" and "{{VALUE}}". All these variables will
+ * be parsed and replaced with their values when such a text is displayed in a schematic
+ * of a project.
  *
  * Please read the documentation about the @ref doc_attributes_system to get an idea how
  * the @ref doc_attributes_system works in detail.
@@ -68,9 +68,9 @@ class AttributeProvider
         virtual ~AttributeProvider() noexcept {}
 
         /**
-         * @brief Get the value of an attribute which can be used in texts (like "#NAME")
+         * @brief Get the value of an attribute which can be used in texts (like "{{NAME}}")
          *
-         * @param key   The attribute key name (e.g. "NAME" in "#NAME").
+         * @param key   The attribute key name (e.g. "NAME" in "{{NAME}}").
          *
          * @return The value of the specified attribute (empty if attribute not found)
          */
@@ -79,7 +79,7 @@ class AttributeProvider
         /**
          * @brief Get the value of a user defined attribute (if available)
          *
-         * @param key   The attribute name (e.g. "NAME" for "#NAME")
+         * @param key   The attribute name (e.g. "NAME" for "{{NAME}}")
          *
          * @return The value of the attribute (empty string if not found)
          */
@@ -91,7 +91,7 @@ class AttributeProvider
         /**
          * @brief Get the value of a built-in attribute (if available)
          *
-         * @param key   The attribute name (e.g. "NAME" for "#NAME")
+         * @param key   The attribute name (e.g. "NAME" for "{{NAME}}")
          *
          * @return The value of the attribute (empty string if not found)
          */

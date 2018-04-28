@@ -307,7 +307,7 @@ QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) 
     } else if (mComponent && (key == QLatin1String("NAME"))) {
         return mComponent->getPrefixes().getDefaultValue() % "?";
     } else {
-        return "##" % key;
+        return "{{ '{{' }}" % key % "{{ '}}' }}";
     }
 }
 
