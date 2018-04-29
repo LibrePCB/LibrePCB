@@ -61,6 +61,15 @@ HoleGraphicsItem::~HoleGraphicsItem() noexcept
 }
 
 /*****************************************************************************************
+ *  Inherited from QGraphicsItem
+ ****************************************************************************************/
+
+QPainterPath HoleGraphicsItem::shape() const noexcept
+{
+    return PrimitiveEllipseGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
+}
+
+/*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
@@ -73,6 +82,14 @@ void HoleGraphicsItem::holeDiameterChanged(const Length& newDiameter) noexcept
 {
     setRadius(newDiameter / 2, newDiameter / 2);
     mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
+}
+
+QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) noexcept
+{
+    if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
+        mOriginCrossGraphicsItem->setSelected(value.toBool());
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
 
 /*****************************************************************************************

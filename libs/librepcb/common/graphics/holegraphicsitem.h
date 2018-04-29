@@ -60,6 +60,9 @@ class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_Ho
         // Getters
         Hole& getHole() noexcept {return mHole;}
 
+        // Inherited from QGraphicsItem
+        QPainterPath shape() const noexcept override;
+
         // Operator Overloadings
         HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
@@ -67,6 +70,7 @@ class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_Ho
     private: // Methods
         void holePositionChanged(const Point& newPos) noexcept override;
         void holeDiameterChanged(const Length& newDiameter) noexcept override;
+        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
 
 
     private: // Data

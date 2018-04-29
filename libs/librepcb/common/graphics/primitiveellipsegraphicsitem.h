@@ -71,9 +71,9 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
         void layerDestroyed(const GraphicsLayer& layer) noexcept override;
 
         // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+        virtual QRectF boundingRect() const noexcept override {return mBoundingRect;}
+        virtual QPainterPath shape() const noexcept override {return mShape;}
+        virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
         // Operator Overloadings
         PrimitiveEllipseGraphicsItem& operator=(const PrimitiveEllipseGraphicsItem& rhs) = delete;
