@@ -22,6 +22,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     boards/board.cpp \
+    boards/boardfabricationoutputsettings.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
     boards/boardplanefragmentsbuilder.cpp \
@@ -128,6 +129,7 @@ SOURCES += \
 
 HEADERS += \
     boards/board.h \
+    boards/boardfabricationoutputsettings.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
     boards/boardplanefragmentsbuilder.h \
