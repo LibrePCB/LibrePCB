@@ -17,72 +17,88 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLEGRAPHICSITEM_H
-#define LIBREPCB_HOLEGRAPHICSITEM_H
+#ifndef LIBREPCB_PROJECT_BI_HOLE_H
+#define LIBREPCB_PROJECT_BI_HOLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "primitiveellipsegraphicsitem.h"
-#include "../geometry/hole.h"
+#include "bi_base.h"
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/hole.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
+class HoleGraphicsItem;
+
+namespace project {
+
+class Project;
+class Board;
 
 /*****************************************************************************************
- *  Class HoleGraphicsItem
+ *  Class BI_Hole
  ****************************************************************************************/
 
 /**
- * @brief The HoleGraphicsItem class is the graphical representation of a librepcb::Text
- *
- * @author ubruhin
- * @date 2017-05-30
+ * @brief The BI_Hole class
  */
-class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_HoleObserver
+class BI_Hole final : public BI_Base, public SerializableObject
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        HoleGraphicsItem() = delete;
-        HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-        HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                         QGraphicsItem* parent = nullptr) noexcept;
-        ~HoleGraphicsItem() noexcept;
+        BI_Hole() = delete;
+        BI_Hole(const BI_Hole& other) = delete;
+        BI_Hole(Board& board, const BI_Hole& other);
+        BI_Hole(Board& board, const SExpression& node);
+        BI_Hole(Board& board, const Hole& hole);
+        ~BI_Hole() noexcept;
 
         // Getters
-        Hole& getHole() noexcept {return mHole;}
+        Hole& getHole() noexcept {return *mHole;}
+        const Hole& getHole() const noexcept {return *mHole;}
+        const Uuid& getUuid() const noexcept; // convenience function, e.g. for template usage
+        bool isSelectable() const noexcept override;
 
-        // Inherited from QGraphicsItem
-        QPainterPath shape() const noexcept override;
+        // General Methods
+        void addToBoard() override;
+        void removeFromBoard() override;
+
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(SExpression& root) const override;
+
+        // Inherited from BI_Base
+        Type_t getType() const noexcept override {return BI_Base::Type_t::Hole;}
+        const Point& getPosition() const noexcept override;
+        bool getIsMirrored() const noexcept override {return false;}
+        QPainterPath getGrabAreaScenePx() const noexcept override;
+        void setSelected(bool selected) noexcept override;
 
         // Operator Overloadings
-        HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
+        BI_Hole& operator=(const BI_Hole& rhs) = delete;
 
 
     private: // Methods
-        void holePositionChanged(const Point& newPos) noexcept override;
-        void holeDiameterChanged(const Length& newDiameter) noexcept override;
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
+        void init();
 
 
     private: // Data
-        Hole& mHole;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+        QScopedPointer<Hole> mHole;
+        QScopedPointer<HoleGraphicsItem> mGraphicsItem;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_HOLEGRAPHICSITEM_H
+#endif // LIBREPCB_PROJECT_BI_HOLE_H

@@ -35,6 +35,7 @@
 #include "items/bi_netpoint.h"
 #include "items/bi_netline.h"
 #include "items/bi_polygon.h"
+#include "items/bi_hole.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -152,6 +153,14 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
             }
             c.AddPath(createPadCutOut(*pad), ClipperLib::ptClip, true);
         }
+    }
+
+    // subtract board holes
+    for (const BI_Hole* hole : mPlane.getBoard().getHoles()) {
+        Length dia = hole->getHole().getDiameter() + mPlane.getMinClearance() * 2;
+        Path path = Path::circle(dia).translated(hole->getHole().getPosition());
+        c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
+                  ClipperLib::ptClip, true);
     }
 
     // subtract net segment items

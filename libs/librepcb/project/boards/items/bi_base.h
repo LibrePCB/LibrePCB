@@ -65,6 +65,7 @@ class BI_Base : public QObject
             FootprintPad,   ///< librepcb#project#BI_FootprintPad
             Polygon,        ///< librepcb#project#BI_Polygon
             StrokeText,     ///< librepcb#project#BI_StrokeText
+            Hole,           ///< librepcb#project#BI_Hole
             Plane,          ///< librepcb#project#BI_Plane
         };
 

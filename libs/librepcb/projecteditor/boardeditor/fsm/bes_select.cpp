@@ -32,10 +32,12 @@
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
 #include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/project/boards/items/bi_hole.h>
 #include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
+#include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/workspace/workspace.h>
@@ -394,6 +396,25 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             return ForceStayInState;
         }
 
+        case BI_Base::Type_t::Hole: {
+            BI_Hole* hole = dynamic_cast<BI_Hole*>(items.first()); Q_ASSERT(hole);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Hole");
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openHolePropertiesDialog(*board, hole->getHole());
+            }
+            return ForceStayInState;
+        }
+
         default:
             break;
     }
@@ -432,6 +453,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
             case BI_Base::Type_t::StrokeText: {
                 BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
                 openStrokeTextPropertiesDialog(*board, text->getText());
+                return ForceStayInState;
+            }
+            case BI_Base::Type_t::Hole: {
+                BI_Hole* hole = dynamic_cast<BI_Hole*>(items.first()); Q_ASSERT(hole);
+                openHolePropertiesDialog(*board, hole->getHole());
                 return ForceStayInState;
             }
             default: {
@@ -595,6 +621,13 @@ void BES_Select::openStrokeTextPropertiesDialog(Board& board, StrokeText& text) 
 {
     StrokeTextPropertiesDialog dialog(text, mUndoStack,
         board.getLayerStack().getAllowedPolygonLayers());
+    dialog.exec();
+}
+
+void BES_Select::openHolePropertiesDialog(Board& board, Hole& hole) noexcept
+{
+    Q_UNUSED(board);
+    HolePropertiesDialog dialog(hole, mUndoStack);
     dialog.exec();
 }
 

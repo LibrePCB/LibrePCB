@@ -43,6 +43,7 @@ class BI_NetPoint;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
+class BI_Hole;
 
 /*****************************************************************************************
  *  Class BoardSelectionQuery
@@ -82,6 +83,7 @@ class BoardSelectionQuery final : public QObject
                             const QList<BI_Plane*>& planes,
                             const QList<BI_Polygon*>& polygons,
                             const QList<BI_StrokeText*>& strokeTexts,
+                            const QList<BI_Hole*>& holes,
                             QObject* parent = nullptr);
         ~BoardSelectionQuery() noexcept;
 
@@ -94,6 +96,7 @@ class BoardSelectionQuery final : public QObject
         const QSet<BI_Plane*>& getPlanes() const noexcept { return mResultPlanes; }
         const QSet<BI_Polygon*>& getPolygons() const noexcept { return mResultPolygons; }
         const QSet<BI_StrokeText*>& getStrokeTexts() const noexcept { return mResultStrokeTexts; }
+        const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
         int getResultCount() const noexcept;
         bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
@@ -107,6 +110,7 @@ class BoardSelectionQuery final : public QObject
         void addSelectedPolygons() noexcept;
         void addSelectedBoardStrokeTexts() noexcept;
         void addSelectedFootprintStrokeTexts() noexcept;
+        void addSelectedHoles() noexcept;
 
         // Operator Overloadings
         BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;
@@ -123,6 +127,7 @@ class BoardSelectionQuery final : public QObject
         const QList<BI_Plane*>& mPlanes;
         const QList<BI_Polygon*>& mPolygons;
         const QList<BI_StrokeText*>& mStrokeTexts;
+        const QList<BI_Hole*>& mHoles;
 
         // query result
         //QSet<BI_Device*> mResultDeviceInstances;
@@ -133,6 +138,7 @@ class BoardSelectionQuery final : public QObject
         QSet<BI_Plane*> mResultPlanes;
         QSet<BI_Polygon*> mResultPolygons;
         QSet<BI_StrokeText*> mResultStrokeTexts;
+        QSet<BI_Hole*> mResultHoles;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(BoardSelectionQuery::NetPointFilters)

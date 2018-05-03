@@ -34,6 +34,7 @@ namespace librepcb {
 class UndoCommandGroup;
 class Polygon;
 class StrokeText;
+class Hole;
 
 namespace project {
 
@@ -91,6 +92,7 @@ class BES_Select final : public BES_Base
         void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
         void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
         void openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept;
+        void openHolePropertiesDialog(Board& board, Hole& hole) noexcept;
 
 
         // Types

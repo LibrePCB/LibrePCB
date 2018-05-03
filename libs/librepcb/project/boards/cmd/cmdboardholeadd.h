@@ -17,72 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLEGRAPHICSITEM_H
-#define LIBREPCB_HOLEGRAPHICSITEM_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDHOLEADD_H
+#define LIBREPCB_PROJECT_CMDBOARDHOLEADD_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "primitiveellipsegraphicsitem.h"
-#include "../geometry/hole.h"
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+namespace project {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
+class Board;
+class BI_Hole;
 
 /*****************************************************************************************
- *  Class HoleGraphicsItem
+ *  Class CmdBoardHoleAdd
  ****************************************************************************************/
 
 /**
- * @brief The HoleGraphicsItem class is the graphical representation of a librepcb::Text
- *
- * @author ubruhin
- * @date 2017-05-30
+ * @brief The CmdBoardHoleAdd class
  */
-class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_HoleObserver
+class CmdBoardHoleAdd final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        HoleGraphicsItem() = delete;
-        HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-        HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                         QGraphicsItem* parent = nullptr) noexcept;
-        ~HoleGraphicsItem() noexcept;
+        explicit CmdBoardHoleAdd(BI_Hole& hole) noexcept;
+        ~CmdBoardHoleAdd() noexcept;
 
         // Getters
-        Hole& getHole() noexcept {return mHole;}
-
-        // Inherited from QGraphicsItem
-        QPainterPath shape() const noexcept override;
-
-        // Operator Overloadings
-        HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
+        BI_Hole* getHole() const noexcept {return mHole;}
 
 
-    private: // Methods
-        void holePositionChanged(const Point& newPos) noexcept override;
-        void holeDiameterChanged(const Length& newDiameter) noexcept override;
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
 
 
-    private: // Data
-        Hole& mHole;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+        // Private Member Variables
+        Board& mBoard;
+        BI_Hole* mHole;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_HOLEGRAPHICSITEM_H
+#endif // LIBREPCB_PROJECT_CMDBOARDHOLEADD_H

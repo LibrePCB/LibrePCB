@@ -30,6 +30,8 @@ SOURCES += \
     boards/boardusersettings.cpp \
     boards/cmd/cmdboardadd.cpp \
     boards/cmd/cmdboarddesignrulesmodify.cpp \
+    boards/cmd/cmdboardholeadd.cpp \
+    boards/cmd/cmdboardholeremove.cpp \
     boards/cmd/cmdboardlayerstackedit.cpp \
     boards/cmd/cmdboardnetpointedit.cpp \
     boards/cmd/cmdboardnetsegmentadd.cpp \
@@ -64,6 +66,7 @@ SOURCES += \
     boards/items/bi_device.cpp \
     boards/items/bi_footprint.cpp \
     boards/items/bi_footprintpad.cpp \
+    boards/items/bi_hole.cpp \
     boards/items/bi_netline.cpp \
     boards/items/bi_netpoint.cpp \
     boards/items/bi_netsegment.cpp \
@@ -137,6 +140,8 @@ HEADERS += \
     boards/boardusersettings.h \
     boards/cmd/cmdboardadd.h \
     boards/cmd/cmdboarddesignrulesmodify.h \
+    boards/cmd/cmdboardholeadd.h \
+    boards/cmd/cmdboardholeremove.h \
     boards/cmd/cmdboardlayerstackedit.h \
     boards/cmd/cmdboardnetpointedit.h \
     boards/cmd/cmdboardnetsegmentadd.h \
@@ -171,6 +176,7 @@ HEADERS += \
     boards/items/bi_device.h \
     boards/items/bi_footprint.h \
     boards/items/bi_footprintpad.h \
+    boards/items/bi_hole.h \
     boards/items/bi_netline.h \
     boards/items/bi_netpoint.h \
     boards/items/bi_netsegment.h \

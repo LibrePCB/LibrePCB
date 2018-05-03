@@ -17,72 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLEGRAPHICSITEM_H
-#define LIBREPCB_HOLEGRAPHICSITEM_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
+#define LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "primitiveellipsegraphicsitem.h"
-#include "../geometry/hole.h"
+#include "bes_base.h"
+#include <librepcb/project/boards/items/bi_hole.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
+class CmdHoleEdit;
+
+namespace project {
+
+class Board;
+
+namespace editor {
 
 /*****************************************************************************************
- *  Class HoleGraphicsItem
+ *  Class BES_AddHole
  ****************************************************************************************/
 
 /**
- * @brief The HoleGraphicsItem class is the graphical representation of a librepcb::Text
- *
- * @author ubruhin
- * @date 2017-05-30
+ * @brief The BES_AddHole class
  */
-class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_HoleObserver
+class BES_AddHole final : public BES_Base
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        HoleGraphicsItem() = delete;
-        HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-        HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                         QGraphicsItem* parent = nullptr) noexcept;
-        ~HoleGraphicsItem() noexcept;
+        explicit BES_AddHole(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                             GraphicsView& editorGraphicsView, UndoStack& undoStack);
+        ~BES_AddHole();
 
-        // Getters
-        Hole& getHole() noexcept {return mHole;}
-
-        // Inherited from QGraphicsItem
-        QPainterPath shape() const noexcept override;
-
-        // Operator Overloadings
-        HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
+        // General Methods
+        ProcRetVal process(BEE_Base* event) noexcept override;
+        bool entry(BEE_Base* event) noexcept override;
+        bool exit(BEE_Base* event) noexcept override;
 
 
-    private: // Methods
-        void holePositionChanged(const Point& newPos) noexcept override;
-        void holeDiameterChanged(const Length& newDiameter) noexcept override;
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
+    private:
+
+        // Private Methods
+        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+        bool addHole(Board& board, const Point& pos) noexcept;
+        void updateHolePosition(const Point& pos) noexcept;
+        bool fixHole(const Point& pos) noexcept;
+        void diameterSpinBoxValueChanged(double value) noexcept;
+        void makeLayerVisible() noexcept;
 
 
-    private: // Data
-        Hole& mHole;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+        // State
+        bool mUndoCmdActive;
+        BI_Hole* mHole;
+        QScopedPointer<CmdHoleEdit> mEditCmd;
+        Length mCurrentDiameter;
+
+        // Widgets for the command toolbar
+        QScopedPointer<QLabel> mDiameterLabel;
+        QScopedPointer<QDoubleSpinBox> mDiameterSpinBox;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
+} // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_HOLEGRAPHICSITEM_H
+#endif // LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H

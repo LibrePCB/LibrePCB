@@ -33,6 +33,7 @@
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
+#include "items/bi_hole.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -49,9 +50,11 @@ BoardSelectionQuery::BoardSelectionQuery(const QMap<Uuid, BI_Device*>& deviceIns
                                          const QList<BI_Plane*>& planes,
                                          const QList<BI_Polygon*>& polygons,
                                          const QList<BI_StrokeText*>& strokeTexts,
+                                         const QList<BI_Hole*>& holes,
                                          QObject* parent) :
     QObject(parent), mDevices(deviceInstances),
-    mNetSegments(netsegments), mPlanes(planes), mPolygons(polygons), mStrokeTexts(strokeTexts)
+    mNetSegments(netsegments), mPlanes(planes), mPolygons(polygons),
+    mStrokeTexts(strokeTexts), mHoles(holes)
 {
 }
 
@@ -72,7 +75,8 @@ int BoardSelectionQuery::getResultCount() const noexcept
             mResultVias.count() +
             mResultPlanes.count() +
             mResultPolygons.count() +
-            mResultStrokeTexts.count();
+            mResultStrokeTexts.count() +
+            mResultHoles.count();
 }
 
 /*****************************************************************************************
@@ -169,6 +173,15 @@ void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept
             if (text->isSelected()) {
                 mResultStrokeTexts.insert(text);
             }
+        }
+    }
+}
+
+void BoardSelectionQuery::addSelectedHoles() noexcept
+{
+    foreach (BI_Hole* hole, mHoles) {
+        if (hole->isSelected()) {
+            mResultHoles.insert(hole);
         }
     }
 }

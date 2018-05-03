@@ -21,79 +21,115 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "holegraphicsitem.h"
-#include "origincrossgraphicsitem.h"
-#include "../graphics/graphicslayer.h"
+#include "bi_hole.h"
+#include "../board.h"
+#include "../boardlayerstack.h"
+#include "../../project.h"
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/holegraphicsitem.h>
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
+namespace project {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                                   QGraphicsItem* parent) noexcept :
-    PrimitiveEllipseGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
+BI_Hole::BI_Hole(Board& board, const BI_Hole& other) :
+    BI_Base(board)
 {
-    setPosition(mHole.getPosition());
-    setRadius(mHole.getDiameter() / 2, mHole.getDiameter() / 2);
-    setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-    setZValue(5);
-
-    // add origin cross
-    mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setRotation(Angle::deg45());
-    mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
-    mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
-
-    // register to the text to get attribute updates
-    mHole.registerObserver(*this);
+    mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
+    init();
 }
 
-HoleGraphicsItem::~HoleGraphicsItem() noexcept
+BI_Hole::BI_Hole(Board& board, const SExpression& node) :
+    BI_Base(board)
 {
-    mHole.unregisterObserver(*this);
+    mHole.reset(new Hole(node));
+    init();
+
+}
+
+BI_Hole::BI_Hole(Board& board, const Hole& hole) :
+    BI_Base(board)
+{
+    mHole.reset(new Hole(hole));
+    init();
+}
+
+void BI_Hole::init()
+{
+    mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
+}
+
+BI_Hole::~BI_Hole() noexcept
+{
+    mGraphicsItem.reset();
+    mHole.reset();
 }
 
 /*****************************************************************************************
- *  Inherited from QGraphicsItem
+ *  General Methods
  ****************************************************************************************/
 
-QPainterPath HoleGraphicsItem::shape() const noexcept
+void BI_Hole::addToBoard()
 {
-    return PrimitiveEllipseGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept
-{
-    setPosition(newPos);
-}
-
-void HoleGraphicsItem::holeDiameterChanged(const Length& newDiameter) noexcept
-{
-    setRadius(newDiameter / 2, newDiameter / 2);
-    mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
-}
-
-QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) noexcept
-{
-    if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
-        mOriginCrossGraphicsItem->setSelected(value.toBool());
+    if (isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
     }
-    return QGraphicsItem::itemChange(change, value);
+    BI_Base::addToBoard(mGraphicsItem.data());
+}
+
+void BI_Hole::removeFromBoard()
+{
+    if (!isAddedToBoard()) {
+        throw LogicError(__FILE__, __LINE__);
+    }
+    BI_Base::removeFromBoard(mGraphicsItem.data());
+}
+
+void BI_Hole::serialize(SExpression& root) const
+{
+    mHole->serialize(root);
+}
+
+/*****************************************************************************************
+ *  Inherited from BI_Base
+ ****************************************************************************************/
+
+const Point& BI_Hole::getPosition() const noexcept
+{
+    return mHole->getPosition();
+}
+
+QPainterPath BI_Hole::getGrabAreaScenePx() const noexcept
+{
+    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+}
+
+const Uuid& BI_Hole::getUuid() const noexcept
+{
+    return mHole->getUuid();
+}
+
+bool BI_Hole::isSelectable() const noexcept
+{
+    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(GraphicsLayer::sBoardDrillsNpth);
+    return layer && layer->isVisible();
+}
+
+void BI_Hole::setSelected(bool selected) noexcept
+{
+    BI_Base::setSelected(selected);
+    mGraphicsItem->setSelected(selected);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace project
 } // namespace librepcb

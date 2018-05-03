@@ -45,6 +45,7 @@
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
+#include "items/bi_hole.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -276,7 +277,11 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const
         }
     }
 
-    // TODO: board holes
+    // board holes
+    foreach (const BI_Hole* hole, mBoard.getHoles()) {
+        gen.drill(hole->getHole().getPosition(), hole->getHole().getDiameter());
+        ++count;
+    }
 
     return count;
 }
