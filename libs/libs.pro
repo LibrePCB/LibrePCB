@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     clipper \
+    delaunay-triangulation \
     fontobene \
     hoedown \
     googletest \
@@ -10,4 +11,12 @@ SUBDIRS = \
     quazip \
     sexpresso
 
-librepcb.depends = clipper fontobene parseagle hoedown quazip sexpresso
+librepcb.depends = \
+    clipper \
+    delaunay-triangulation \
+    fontobene \
+    parseagle \
+    hoedown \
+    quazip \
+    sexpresso \
+

@@ -25,3 +25,6 @@
 [submodule "share/librepcb/fontobene"]
 	path = share/librepcb/fontobene
 	url = https://github.com/LibrePCB/fontobene-fonts.git
+[submodule "libs/delaunay-triangulation"]
+	path = libs/delaunay-triangulation
+	url = https://github.com/LibrePCB/delaunay-triangulation.git
