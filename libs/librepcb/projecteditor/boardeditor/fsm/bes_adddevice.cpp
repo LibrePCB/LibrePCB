@@ -156,6 +156,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
             // set temporary position of the current device
             Q_ASSERT(!mCurrentDeviceEditCmd.isNull());
             mCurrentDeviceEditCmd->setPosition(pos, true);
+            board->triggerAirWiresRebuild();
             break;
         }
 
@@ -206,6 +207,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
                     if (sceneEvent->screenPos() == sceneEvent->buttonDownScreenPos(Qt::RightButton)) {
                         // rotate device
                         mCurrentDeviceEditCmd->rotate(Angle::deg90(), mCurrentDeviceToPlace->getPosition(), true);
+                        board->triggerAirWiresRebuild();
                         return ForceStayInState;
                     }
                     break;
@@ -290,6 +292,7 @@ void BES_AddDevice::rotateDevice(const Angle& angle) noexcept
     Q_ASSERT(mCurrentDeviceToPlace);
     Q_ASSERT(!mCurrentDeviceEditCmd.isNull());
     mCurrentDeviceEditCmd->rotate(angle, mCurrentDeviceToPlace->getPosition(), true);
+    mCurrentDeviceToPlace->getBoard().triggerAirWiresRebuild();
 }
 
 void BES_AddDevice::mirrorDevice(Qt::Orientation orientation) noexcept
@@ -300,6 +303,7 @@ void BES_AddDevice::mirrorDevice(Qt::Orientation orientation) noexcept
     try
     {
         mCurrentDeviceEditCmd->mirror(mCurrentDeviceToPlace->getPosition(), orientation, true); // can throw
+        mCurrentDeviceToPlace->getBoard().triggerAirWiresRebuild();
     }
     catch (Exception& e)
     {

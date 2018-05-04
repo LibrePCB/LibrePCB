@@ -323,6 +323,7 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept
         mViaEditCmd->setShape(mCurrentViaShape, true);
         mViaEditCmd->setSize(mCurrentViaSize, true);
         mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
+        board.triggerAirWiresRebuild();
         return true;
     }
     catch (Exception& e)

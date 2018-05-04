@@ -470,6 +470,9 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept
     mPositioningNetPoint1->setPosition(calcMiddlePointPos(mFixedNetPoint->getPosition(),
                                                           cursorPos, mCurrentWireMode));
     mPositioningNetPoint2->setPosition(cursorPos);
+
+    // Force updating airwires immediately as they are important for creating traces.
+    mPositioningNetPoint2->getBoard().triggerAirWiresRebuild();
 }
 
 void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept

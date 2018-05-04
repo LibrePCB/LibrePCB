@@ -138,6 +138,9 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept
             cmd->setDeltaToStartPos(delta, true);
         }
         mDeltaPos = delta;
+
+        // Force updating airwires immediately as they are important while moving items.
+        mBoard.triggerAirWiresRebuild();
     }
 }
 

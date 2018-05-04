@@ -234,6 +234,9 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
     Board* board = getActiveBoard();
     if (board)
     {
+        // stop airwire rebuild on every project modification (for performance reasons)
+        disconnect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
+                   board, &Board::triggerAirWiresRebuild);
         // save current view scene rect
         board->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
         // uncheck QAction
@@ -247,6 +250,10 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept
         board->showInView(*mGraphicsView);
         mGraphicsView->setVisibleSceneRect(board->restoreViewSceneRect());
         mGraphicsView->setGridProperties(board->getGridProperties());
+        // force airwire rebuild immediately and on every project modification
+        board->triggerAirWiresRebuild();
+        connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
+                board, &Board::triggerAirWiresRebuild);
         // check QAction
         QAction* action = mBoardListActions.value(index); Q_ASSERT(action);
         if (action) action->setChecked(true);
@@ -482,7 +489,10 @@ void BoardEditor::on_actionModifyDesignRules_triggered()
 void BoardEditor::on_actionRebuildPlanes_triggered()
 {
     Board* board = getActiveBoard();
-    if (board) board->rebuildAllPlanes();
+    if (board) {
+        board->rebuildAllPlanes();
+        board->forceAirWiresRebuild();
+    }
 }
 
 void BoardEditor::on_tabBar_currentChanged(int index)
