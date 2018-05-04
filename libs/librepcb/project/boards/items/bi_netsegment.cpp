@@ -129,12 +129,6 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node) :
             mNetLines.append(netline);
         }
 
-        if (mNetPoints.count() < 2) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The netsegment with the UUID \"%1\" has too few netpoints!"))
-                .arg(mUuid.toStr()));
-        }
-
         if (!areAllNetPointsConnectedTogether()) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
@@ -511,7 +505,6 @@ bool BI_NetSegment::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())                         return false;
     if (mNetSignal == nullptr)                  return false;
-    if (mNetPoints.count() < 2)                 return false;
     if (!areAllNetPointsConnectedTogether())    return false;
     return true;
 }
