@@ -190,6 +190,7 @@ void BI_Plane::addToBoard()
     mNetSignal->registerBoardPlane(*this); // can throw
     BI_Base::addToBoard(mGraphicsItem.data());
     mGraphicsItem->updateCacheAndRepaint(); // TODO: remove this
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
 void BI_Plane::removeFromBoard()
@@ -199,6 +200,7 @@ void BI_Plane::removeFromBoard()
     }
     mNetSignal->unregisterBoardPlane(*this); // can throw
     BI_Base::removeFromBoard(mGraphicsItem.data());
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
 void BI_Plane::clear() noexcept
@@ -212,6 +214,7 @@ void BI_Plane::rebuild() noexcept
     BoardPlaneFragmentsBuilder builder(*this);
     mFragments = builder.buildFragments();
     mGraphicsItem->updateCacheAndRepaint();
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
 void BI_Plane::serialize(SExpression& root) const

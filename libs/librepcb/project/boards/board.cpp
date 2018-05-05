@@ -48,6 +48,7 @@
 #include "items/bi_stroketext.h"
 #include "items/bi_hole.h"
 #include "items/bi_plane.h"
+#include "items/bi_airwire.h"
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/pkg/footprint.h>
 #include "items/bi_polygon.h"
@@ -55,6 +56,7 @@
 #include "boardfabricationoutputsettings.h"
 #include "boardusersettings.h"
 #include "boardselectionquery.h"
+#include "boardairwiresbuilder.h"
 #include "../circuit/netsignal.h"
 
 /*****************************************************************************************
@@ -155,6 +157,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
     {
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mAirWires);          mAirWires.clear();
         qDeleteAll(mHoles);             mHoles.clear();
         qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
@@ -329,6 +332,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     {
         // free the allocated memory in the reverse order of their allocation...
         qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
+        qDeleteAll(mAirWires);          mAirWires.clear();
         qDeleteAll(mHoles);             mHoles.clear();
         qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
         qDeleteAll(mPolygons);          mPolygons.clear();
@@ -353,6 +357,7 @@ Board::~Board() noexcept
     qDeleteAll(mErcMsgListUnplacedComponentInstances);    mErcMsgListUnplacedComponentInstances.clear();
 
     // delete all items
+    qDeleteAll(mAirWires);          mAirWires.clear();
     qDeleteAll(mHoles);             mHoles.clear();
     qDeleteAll(mStrokeTexts);       mStrokeTexts.clear();
     qDeleteAll(mPolygons);          mPolygons.clear();
@@ -525,6 +530,8 @@ QList<BI_Base*> Board::getAllItems() const noexcept
         items.append(text);
     foreach (BI_Hole* hole, mHoles)
         items.append(hole);
+    foreach (BI_AirWire* airWire, mAirWires)
+        items.append(airWire);
     return items;
 }
 
@@ -725,6 +732,51 @@ void Board::removeHole(BI_Hole& hole)
 }
 
 /*****************************************************************************************
+ *  AirWire Methods
+ ****************************************************************************************/
+
+void Board::triggerAirWiresRebuild() noexcept
+{
+    if (!mIsAddedToProject) {
+        return;
+    }
+
+    try {
+        foreach (NetSignal* netsignal, mScheduledNetSignalsForAirWireRebuild) {
+            // remove old airwires
+            while (BI_AirWire* airWire = mAirWires.take(netsignal)) {
+                airWire->removeFromBoard(); // can throw
+                delete airWire;
+            }
+
+            if (netsignal && netsignal->isAddedToCircuit()) {
+                // calculate new airwires
+                BoardAirWiresBuilder builder(*this, *netsignal);
+                QVector<QPair<Point, Point>> airwires = builder.buildAirWires();
+
+                // add new airwires
+                foreach (const auto& points, airwires) {
+                    QScopedPointer<BI_AirWire> airWire(
+                        new BI_AirWire(*this, *netsignal, points.first, points.second));
+                    airWire->addToBoard(); // can throw
+                    mAirWires.insertMulti(netsignal, airWire.take());
+                }
+            }
+        }
+        mScheduledNetSignalsForAirWireRebuild.clear();
+    } catch (const std::exception& e) { // std::exception because of the many std containers...
+        qCritical() << "Failed to build airwires:" << e.what();
+    }
+}
+
+void Board::forceAirWiresRebuild() noexcept
+{
+    mScheduledNetSignalsForAirWireRebuild.unite(mProject.getCircuit().getNetSignals().values().toSet());
+    mScheduledNetSignalsForAirWireRebuild.unite(mAirWires.keys().toSet());
+    triggerAirWiresRebuild();
+}
+
+/*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
 
@@ -741,6 +793,7 @@ void Board::addToProject()
         sgl.add([item](){item->removeFromBoard();});
     }
     mIsAddedToProject = true;
+    forceAirWiresRebuild();
     updateErcMessages();
     sgl.dismiss();
 }

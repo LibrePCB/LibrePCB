@@ -81,6 +81,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         int getRegisteredElementsCount() const noexcept;
         bool isUsed() const noexcept;
         bool isNameForced() const noexcept;
+        bool isAddedToCircuit() const noexcept {return mIsAddedToCircuit;}
 
         // Setters
         void setName(const QString& name, bool isAutoName);

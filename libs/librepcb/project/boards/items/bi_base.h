@@ -67,6 +67,7 @@ class BI_Base : public QObject
             StrokeText,     ///< librepcb#project#BI_StrokeText
             Hole,           ///< librepcb#project#BI_Hole
             Plane,          ///< librepcb#project#BI_Plane
+            AirWire,        ///< librepcb#project#BI_AirWire
         };
 
         // Constructors / Destructor

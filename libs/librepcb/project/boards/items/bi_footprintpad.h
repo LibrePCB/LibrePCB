@@ -103,7 +103,7 @@ class BI_FootprintPad final : public BI_Base
     private slots:
 
         void footprintAttributesChanged();
-        void componentSignalInstanceNetSignalChanged(NetSignal* netsignal);
+        void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
 
 
     private:

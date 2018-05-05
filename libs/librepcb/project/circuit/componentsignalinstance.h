@@ -117,7 +117,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
 
     signals:
-        void netSignalChanged(NetSignal* netsignal);
+        void netSignalChanged(NetSignal* from, NetSignal* to);
 
 
     private slots:
