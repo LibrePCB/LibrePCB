@@ -178,21 +178,18 @@ class Uuid final
  *  Non-Member Functions
  ****************************************************************************************/
 
-inline uint qHash(const Uuid& key, uint seed)
-{
-    return qHash(key.toStr(), seed);
-}
-
-inline QDataStream& operator<<(QDataStream& stream, const Uuid& uuid)
-{
+inline QDataStream& operator<<(QDataStream& stream, const Uuid& uuid) noexcept {
     stream << uuid.toStr();
     return stream;
 }
 
-inline QDebug operator<<(QDebug stream, const Uuid& uuid)
-{
+inline QDebug operator<<(QDebug stream, const Uuid& uuid) noexcept {
     stream << QString("Uuid(%1)").arg(uuid.toStr());
     return stream;
+}
+
+inline uint qHash(const Uuid& key, uint seed) noexcept {
+    return ::qHash(key.toStr(), seed);
 }
 
 /*****************************************************************************************

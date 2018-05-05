@@ -398,9 +398,16 @@ class Point final : public SerializableObject
         Length mY; ///< the Y coordinate
 };
 
-// Non-Member Functions
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
 QDataStream& operator<<(QDataStream& stream, const Point& point);
 QDebug operator<<(QDebug stream, const Point& point);
+
+inline uint qHash(const Point& key, uint seed = 0) noexcept {
+    return ::qHash(qMakePair(key.getX(), key.getY()), seed);
+}
 
 /*****************************************************************************************
  *  End of File

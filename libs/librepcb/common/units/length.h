@@ -547,9 +547,16 @@ class Length
 
 };
 
-// Non-Member Functions
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
 QDataStream& operator<<(QDataStream& stream, const Length& length);
 QDebug operator<<(QDebug stream, const Length& length);
+
+inline uint qHash(const Length& key, uint seed = 0) noexcept {
+    return ::qHash(key.toNm(), seed);
+}
 
 /*****************************************************************************************
  *  End of File

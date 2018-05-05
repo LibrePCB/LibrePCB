@@ -277,9 +277,16 @@ class Ratio
         qint32 mPpm;   ///< the ratio in PPM
 };
 
-// Non-Member Functions
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
 QDataStream& operator<<(QDataStream& stream, const Ratio& ratio);
 QDebug operator<<(QDebug stream, const Ratio& ratio);
+
+inline uint qHash(const Ratio& key, uint seed = 0) noexcept {
+    return ::qHash(key.toPpm(), seed);
+}
 
 /*****************************************************************************************
  *  End of File

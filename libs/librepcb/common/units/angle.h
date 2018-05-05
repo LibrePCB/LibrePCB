@@ -369,9 +369,16 @@ class Angle
         qint32 mMicrodegrees;   ///< the angle in microdegrees
 };
 
-// Non-Member Functions
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
 QDataStream& operator<<(QDataStream& stream, const Angle& angle);
 QDebug operator<<(QDebug stream, const Angle& angle);
+
+inline uint qHash(const Angle& key, uint seed = 0) noexcept {
+    return ::qHash(key.toMicroDeg(), seed);
+}
 
 /*****************************************************************************************
  *  End of File
