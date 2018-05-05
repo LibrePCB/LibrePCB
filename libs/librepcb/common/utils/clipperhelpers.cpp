@@ -120,7 +120,7 @@ ClipperLib::Path ClipperHelpers::convert(const Path& path, const Length& maxArcT
         }
     }
     // make sure all paths have the same orientation, otherwise we get strange results
-    if (ClipperLib::Orientation(p)) {
+    if (!ClipperLib::Orientation(p)) {
         ClipperLib::ReversePath(p);
     }
     return p;
