@@ -133,7 +133,7 @@ void BI_FootprintPad::addToBoard()
     if (mComponentSignalInstance) {
         mComponentSignalInstance->registerFootprintPad(*this); // can throw
     }
-    componentSignalInstanceNetSignalChanged(getCompSigInstNetSignal());
+    componentSignalInstanceNetSignalChanged(nullptr, getCompSigInstNetSignal());
     BI_Base::addToBoard(mGraphicsItem.data());
 }
 
@@ -145,7 +145,7 @@ void BI_FootprintPad::removeFromBoard()
     if (mComponentSignalInstance) {
         mComponentSignalInstance->unregisterFootprintPad(*this); // can throw
     }
-    componentSignalInstanceNetSignalChanged(nullptr);
+    componentSignalInstanceNetSignalChanged(getCompSigInstNetSignal(), nullptr);
     BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
@@ -232,15 +232,17 @@ void BI_FootprintPad::footprintAttributesChanged()
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* netsignal)
+void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to)
 {
     if (mHighlightChangedConnection) {
         disconnect(mHighlightChangedConnection);
     }
-    if (netsignal) {
-        mHighlightChangedConnection = connect(netsignal, &NetSignal::highlightedChanged,
+    if (to) {
+        mHighlightChangedConnection = connect(to, &NetSignal::highlightedChanged,
                                               [this](){mGraphicsItem->update();});
     }
+    mBoard.scheduleAirWiresRebuild(from);
+    mBoard.scheduleAirWiresRebuild(to);
 }
 
 /*****************************************************************************************

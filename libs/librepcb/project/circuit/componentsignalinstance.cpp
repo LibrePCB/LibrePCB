@@ -176,10 +176,11 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal)
                       disconnect(netsignal, &NetSignal::nameChanged,
                       this, &ComponentSignalInstance::netSignalNameChanged);});
     }
+    NetSignal* old = mNetSignal;
     mNetSignal = netsignal;
     updateErcMessages();
     sgl.dismiss();
-    emit netSignalChanged(mNetSignal);
+    emit netSignalChanged(old, mNetSignal);
 }
 
 /*****************************************************************************************

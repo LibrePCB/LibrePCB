@@ -301,6 +301,7 @@ void BI_Footprint::deviceInstanceMoved(const Point& pos)
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads) {
         pad->updatePosition();
+        mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
     }
     foreach (BI_StrokeText* text, mStrokeTexts) {
         text->updateGraphicsItems();
@@ -314,6 +315,7 @@ void BI_Footprint::deviceInstanceRotated(const Angle& rot)
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads) {
         pad->updatePosition();
+        mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
     }
 }
 
@@ -324,6 +326,7 @@ void BI_Footprint::deviceInstanceMirrored(bool mirrored)
     mGraphicsItem->updateCacheAndRepaint();
     foreach (BI_FootprintPad* pad, mPads) {
         pad->updatePosition();
+        mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
     }
 }
 

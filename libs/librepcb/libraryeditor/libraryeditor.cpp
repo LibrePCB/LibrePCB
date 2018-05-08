@@ -155,6 +155,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addLayer(GraphicsLayer::sBoardDrillsNpth);
     addLayer(GraphicsLayer::sBoardViasTht);
     addLayer(GraphicsLayer::sBoardPadsTht);
+    addLayer(GraphicsLayer::sBoardAirWires);
     addLayer(GraphicsLayer::sBoardMeasures);
     addLayer(GraphicsLayer::sBoardAlignment);
     addLayer(GraphicsLayer::sBoardDocumentation);

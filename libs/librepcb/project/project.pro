@@ -22,6 +22,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     boards/board.cpp \
+    boards/boardairwiresbuilder.cpp \
     boards/boardfabricationoutputsettings.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
@@ -55,6 +56,7 @@ SOURCES += \
     boards/cmd/cmdfootprintstroketextadd.cpp \
     boards/cmd/cmdfootprintstroketextremove.cpp \
     boards/cmd/cmdfootprintstroketextsreset.cpp \
+    boards/graphicsitems/bgi_airwire.cpp \
     boards/graphicsitems/bgi_base.cpp \
     boards/graphicsitems/bgi_footprint.cpp \
     boards/graphicsitems/bgi_footprintpad.cpp \
@@ -62,6 +64,7 @@ SOURCES += \
     boards/graphicsitems/bgi_netpoint.cpp \
     boards/graphicsitems/bgi_plane.cpp \
     boards/graphicsitems/bgi_via.cpp \
+    boards/items/bi_airwire.cpp \
     boards/items/bi_base.cpp \
     boards/items/bi_device.cpp \
     boards/items/bi_footprint.cpp \
@@ -132,6 +135,7 @@ SOURCES += \
 
 HEADERS += \
     boards/board.h \
+    boards/boardairwiresbuilder.h \
     boards/boardfabricationoutputsettings.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
@@ -165,6 +169,7 @@ HEADERS += \
     boards/cmd/cmdfootprintstroketextadd.h \
     boards/cmd/cmdfootprintstroketextremove.h \
     boards/cmd/cmdfootprintstroketextsreset.h \
+    boards/graphicsitems/bgi_airwire.h \
     boards/graphicsitems/bgi_base.h \
     boards/graphicsitems/bgi_footprint.h \
     boards/graphicsitems/bgi_footprintpad.h \
@@ -172,6 +177,7 @@ HEADERS += \
     boards/graphicsitems/bgi_netpoint.h \
     boards/graphicsitems/bgi_plane.h \
     boards/graphicsitems/bgi_via.h \
+    boards/items/bi_airwire.h \
     boards/items/bi_base.h \
     boards/items/bi_device.h \
     boards/items/bi_footprint.h \

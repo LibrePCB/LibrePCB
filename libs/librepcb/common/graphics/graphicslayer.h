@@ -86,6 +86,7 @@ class GraphicsLayer : public QObject
         static constexpr const char* sBoardDrillsNpth         = "brd_drills_npth";        ///< non-plated through hole drills
         static constexpr const char* sBoardPadsTht            = "brd_pads_tht";           ///< plated through hole pads
         static constexpr const char* sBoardViasTht            = "brd_vias_tht";           ///< plated through hole vias
+        static constexpr const char* sBoardAirWires           = "brd_airwires";           ///< air wires (unconnected)
         static constexpr const char* sBoardMeasures           = "brd_measures";           ///< measurements documentation
         static constexpr const char* sBoardAlignment          = "brd_alignment";          ///< alignment helpers in devices
         static constexpr const char* sBoardDocumentation      = "brd_documentation";      ///< for documentation purposes, e.g. text

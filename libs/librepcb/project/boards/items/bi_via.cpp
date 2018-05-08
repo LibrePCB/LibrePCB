@@ -150,6 +150,7 @@ void BI_Via::setPosition(const Point& position) noexcept
         mPosition = position;
         mGraphicsItem->setPos(mPosition.toPxQPointF());
         updateNetPoints();
+        mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
     }
 }
 
@@ -190,6 +191,7 @@ void BI_Via::addToBoard()
                                           &NetSignal::highlightedChanged,
                                           [this](){mGraphicsItem->update();});
     BI_Base::addToBoard(mGraphicsItem.data());
+    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_Via::removeFromBoard()
@@ -199,6 +201,7 @@ void BI_Via::removeFromBoard()
     }
     disconnect(mHighlightChangedConnection);
     BI_Base::removeFromBoard(mGraphicsItem.data());
+    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_Via::registerNetPoint(BI_NetPoint& netpoint)

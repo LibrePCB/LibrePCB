@@ -61,6 +61,7 @@ class BI_Polygon;
 class BI_StrokeText;
 class BI_Hole;
 class BI_Plane;
+class BI_AirWire;
 class BoardLayerStack;
 class BoardFabricationOutputSettings;
 class BoardUserSettings;
@@ -104,6 +105,7 @@ class Board final : public QObject, public AttributeProvider,
             ZValue_TextsTop,            ///< Z value for librepcb::project::BI_StrokeText items
             ZValue_Vias,                ///< Z value for librepcb::project::BI_Via items
             ZValue_Texts,               ///< Z value for librepcb::project::BI_StrokeText items
+            ZValue_AirWires,            ///< Z value for librepcb::project::BI_AirWire items
         };
 
         // Constructors / Destructor
@@ -178,6 +180,11 @@ class Board final : public QObject, public AttributeProvider,
         void addHole(BI_Hole& hole);
         void removeHole(BI_Hole& hole);
 
+        // AirWire Methods
+        void scheduleAirWiresRebuild(NetSignal* netsignal) noexcept {mScheduledNetSignalsForAirWireRebuild.insert(netsignal);}
+        void triggerAirWiresRebuild() noexcept;
+        void forceAirWiresRebuild() noexcept;
+
         // General Methods
         void addToProject();
         void removeFromProject();
@@ -239,6 +246,7 @@ class Board final : public QObject, public AttributeProvider,
         QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
         QScopedPointer<BoardUserSettings> mUserSettings;
         QRectF mViewRect;
+        QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
 
         // Attributes
         Uuid mUuid;
@@ -253,6 +261,7 @@ class Board final : public QObject, public AttributeProvider,
         QList<BI_Polygon*> mPolygons;
         QList<BI_StrokeText*> mStrokeTexts;
         QList<BI_Hole*> mHoles;
+        QMultiHash<NetSignal*, BI_AirWire*> mAirWires;
 
         // ERC messages
         QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;

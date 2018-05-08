@@ -229,6 +229,7 @@ void BI_NetPoint::setPadToAttach(BI_FootprintPad* pad)
             sgl.add([&](){pad->unregisterNetPoint(*this);});
             setPosition(pad->getPosition());
         }
+        mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
         sgl.dismiss();
     }
     mFootprintPad = pad;
@@ -259,6 +260,7 @@ void BI_NetPoint::setViaToAttach(BI_Via* via)
             sgl.add([&](){via->unregisterNetPoint(*this);});
             setPosition(via->getPosition());
         }
+        mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
         sgl.dismiss();
     }
     mVia = via;
@@ -271,6 +273,7 @@ void BI_NetPoint::setPosition(const Point& position) noexcept
         mPosition = position;
         mGraphicsItem->setPos(mPosition.toPxQPointF());
         updateLines();
+        mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
     }
 }
 
@@ -301,6 +304,7 @@ void BI_NetPoint::addToBoard()
                                           [this](){mGraphicsItem->update();});
     mErcMsgDeadNetPoint->setVisible(true);
     BI_Base::addToBoard(mGraphicsItem.data());
+    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_NetPoint::removeFromBoard()
@@ -324,6 +328,7 @@ void BI_NetPoint::removeFromBoard()
     disconnect(mHighlightChangedConnection);
     mErcMsgDeadNetPoint->setVisible(false);
     BI_Base::removeFromBoard(mGraphicsItem.data());
+    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_NetPoint::registerNetLine(BI_NetLine& netline)
