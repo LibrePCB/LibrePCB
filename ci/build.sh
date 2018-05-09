@@ -64,6 +64,31 @@ then
   cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-x86/
 fi
 
+# Build installer
+if [ "$DEPLOY_INSTALLER" = "true" ]
+then
+  if [ "${TRAVIS_OS_NAME-}" = "linux" ]
+  then
+    TARGET="linux-x86_64"
+    EXECUTABLE_EXT="run"
+  elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
+  then
+    TARGET="mac-x86_64"
+    EXECUTABLE_EXT="dmg"
+  elif [ -n "${APPVEYOR-}" ]
+  then
+    TARGET="windows-x86"
+    EXECUTABLE_EXT="exe"
+  fi
+  ./dist/installer/update_metadata.sh "$TARGET" "0.1.0"  # TODO: How to determine version number?
+  PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
+  mkdir -p $PACKAGES_DIR/librepcb.nightly.app/data/nightly
+  cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
+  cp -r ./build/install/opt/. $PACKAGES_DIR/librepcb.nightly.app/data/nightly/
+  binarycreator --online-only -c ./dist/installer/output/config/config.xml -p $PACKAGES_DIR \
+                ./artifacts/nightly_builds/librepcb-installer-nightly-$TARGET.$EXECUTABLE_EXT
+fi
+
 # Build Doxygen documentation
 if [ "${BUILD_DOXYGEN-}" = "true" ]
 then

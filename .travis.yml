@@ -13,20 +13,20 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
-      env: BUILD_DOXYGEN=true DEPLOY_APPIMAGE=false QT_BASE="trusty"
+      env: BUILD_DOXYGEN=true DEPLOY_APPIMAGE=false DEPLOY_INSTALLER=false QT_BASE="trusty"
     # Ubuntu 14.04 + Clang + Qt from PPA (https://launchpad.net/~beineri) + AppImage deployment
     - os: linux
       dist: trusty
       compiler: clang
-      env: BUILD_DOXYGEN=false DEPLOY_APPIMAGE=true QT_BASE="qt59" QT_PPA="ppa:beineri/opt-qt591-trusty"
+      env: BUILD_DOXYGEN=false DEPLOY_APPIMAGE=true DEPLOY_INSTALLER=true QT_BASE="qt59" QT_PPA="ppa:beineri/opt-qt591-trusty"
     # OS X + GCC
     - os: osx
       compiler: gcc
-      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=false
+      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=false DEPLOY_INSTALLER=false
     # OS X + Clang
     - os: osx
       compiler: clang
-      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=true
+      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=true DEPLOY_INSTALLER=true
 
 install:
   - source ./ci/install_dependencies.sh # source required because it modifies the environment
