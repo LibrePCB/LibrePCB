@@ -46,6 +46,7 @@ SOURCES += \
     cam/gerberaperturelist.cpp \
     cam/gerbergenerator.cpp \
     debug.cpp \
+    dialogs/aboutdialog.cpp \
     dialogs/boarddesignrulesdialog.cpp \
     dialogs/circlepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
@@ -144,6 +145,7 @@ HEADERS += \
     cam/gerberaperturelist.h \
     cam/gerbergenerator.h \
     debug.h \
+    dialogs/aboutdialog.h \
     dialogs/boarddesignrulesdialog.h \
     dialogs/circlepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
@@ -234,6 +236,7 @@ HEADERS += \
     widgets/statusbar.h \
 
 FORMS += \
+    dialogs/aboutdialog.ui \
     dialogs/boarddesignrulesdialog.ui \
     dialogs/circlepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \

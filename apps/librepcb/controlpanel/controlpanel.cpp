@@ -38,6 +38,7 @@
 #include <librepcb/projecteditor/projecteditor.h>
 #include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
 #include <librepcb/common/application.h>
+#include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include "../markdown/markdownconverter.h"
 #include "projectlibraryupdater/projectlibraryupdater.h"
@@ -424,14 +425,8 @@ void ControlPanel::projectEditorClosed() noexcept
 
 void ControlPanel::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About LibrePCB"), QString(tr(
-        "<h1>About LibrePCB</h1>"
-        "<p>LibrePCB is a free & open source schematic/layout-editor.</p>"
-        "<p>Version: %1 (%2)</p>"
-        "<p>Please see <a href='http://librepcb.org/'>librepcb.org</a> for more information.</p>"
-        "You can find the project on GitHub:<br>"
-        "<a href='https://github.com/LibrePCB/LibrePCB'>https://github.com/LibrePCB/LibrePCB</a>"))
-        .arg(qApp->getAppVersion().toPrettyStr(3), qApp->getGitVersion()));
+    AboutDialog* aboutDialog = new AboutDialog(this);
+    aboutDialog->exec();
 }
 
 void ControlPanel::on_actionNew_Project_triggered()
