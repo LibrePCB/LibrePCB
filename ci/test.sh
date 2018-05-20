@@ -12,5 +12,8 @@ elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
   ./build/generated/mac/qztest
   ./build/generated/mac/tests
+else
+  ./build/generated/windows/qztest.exe
+  ./build/generated/windows/tests.exe
 fi
 

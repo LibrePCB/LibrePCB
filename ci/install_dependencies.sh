@@ -36,4 +36,10 @@ then
   # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
   export COPYFILE_DISABLE=1
 
+# Install dependencies on Windows (inside MSYS2)
+elif [ -n "${APPVEYOR-}" ]
+then
+
+  pacman -Syu --noconfirm --needed openssl
+
 fi

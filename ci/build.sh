@@ -3,6 +3,14 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+# use mingw32 make on Windows
+if [ -n "${APPVEYOR-}" ]
+then
+  MAKE="mingw32-make"
+else
+  MAKE="make"
+fi
+
 # default compiler
 if [ -z "${CC-}" ]; then CC="gcc"; fi
 if [ -z "${CXX-}" ]; then CXX="g++"; fi
@@ -18,8 +26,8 @@ if [ "$CXX" = "clang++" ]; then CXXFLAGS+=" -Qunused-arguments"; fi
 # build librepcb
 mkdir build && pushd build
 qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" "QMAKE_CFLAGS=$CFLAGS" "QMAKE_CXXFLAGS=$CXXFLAGS" "PREFIX=`pwd`/install/opt"
-make -j8
-make install
+$MAKE -j8
+$MAKE install
 popd
 
 # Prepare artifacts directory
@@ -43,6 +51,17 @@ then
   then
     cp ./build/install/opt/bin/librepcb.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
   fi
+fi
+
+# Windows: Copy DLLs to output directory
+if [ -n "${APPVEYOR-}" ]
+then
+  cp -v "`cygpath -u \"$VCRT_DIR\"`"/*.dll     ./build/install/opt/bin/  # MS Visual C++ DLLs
+  cp -v /c/MinGW/bin/zlib1.dll                 ./build/install/opt/bin/  # zlib DLL
+  cp -v /c/OpenSSL-Win32/bin/*eay*.dll         ./build/install/opt/bin/  # OpenSSL DLLs
+  cp -v "`cygpath -u \"$QTDIR\"`"/bin/lib*.dll ./build/install/opt/bin/  # MinGW DLLs
+  windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe # Qt DLLs
+  cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-x86/
 fi
 
 # Build Doxygen documentation
