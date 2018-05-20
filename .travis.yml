@@ -22,28 +22,16 @@ matrix:
     # OS X + GCC
     - os: osx
       compiler: gcc
-      env: BUILD_DOXYGEN=false
+      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=false
     # OS X + Clang
     - os: osx
       compiler: clang
-      env: BUILD_DOXYGEN=false
+      env: BUILD_DOXYGEN=false DEPLOY_BUNDLE=true
 
 install:
-  - source ./dev/travis/install.sh # source required because it modifies the environment
+  - source ./ci/install_dependencies.sh # source required because it modifies the environment
 
 script:
-  - ./dev/travis/build.sh
-  - ./dev/travis/run_tests.sh
-  - ./dev/travis/update_doxygen.sh
-  - ./dev/travis/build_appimage.sh
-
-deploy:
-  provider: bintray
-  file: ./dev/travis/bintray.json
-  user: "${BINTRAY_USER}"
-  key: "${BINTRAY_API_KEY}"
-  skip_cleanup: true
-  on:
-    branch: master
-    condition: ${DEPLOY_APPIMAGE} = true
-
+  - ./ci/build.sh                 || travis_terminate 1
+  - ./ci/test.sh                  || travis_terminate 1
+  - ./ci/upload_artifacts.sh      || travis_terminate 1
