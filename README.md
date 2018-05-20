@@ -51,7 +51,8 @@ branch from GitHub.
 Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for
 details.
 
-For internal details take a look at the [automatically generated documentation (doxygen)](http://librepcb.org/LibrePCB-Doxygen/master/)
+For internal details take a look at the
+[automatically generated documentation (doxygen)](https://doxygen.librepcb.org/master/)
 
 ## Development
 
