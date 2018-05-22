@@ -30,11 +30,13 @@ macx {
 
 unix:!macx {
     # Linux/UNIX-specific configurations
-    target.path = $${PREFIX}/bin
-    share.path = $${PREFIX}
-    share.files = $${SHARE_DIR}
-    INSTALLS += target share
 }
+
+# Files to be installed by "make install"
+target.path = $${PREFIX}/bin
+share.path = $${PREFIX}
+share.files = $${SHARE_DIR}
+INSTALLS += target share
 
 # Note: The order of the libraries is very important for the linker!
 # Another order could end up in "undefined reference" errors!
