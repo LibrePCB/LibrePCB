@@ -76,12 +76,12 @@
      <x>0</x>
      <y>0</y>
      <width>611</width>
-     <height>22</height>
+     <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
@@ -93,7 +93,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -107,14 +107,14 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
     <addaction name="actionDrawLine"/>
@@ -131,7 +131,7 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
@@ -241,12 +241,12 @@
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
-    <string>About Qt</string>
+    <string>About &amp;Qt</string>
    </property>
   </action>
   <action name="actionClose">
@@ -255,7 +255,7 @@
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
-    <string>Close Library Editor</string>
+    <string>&amp;Close Library Editor</string>
    </property>
   </action>
   <action name="actionNew">
@@ -264,7 +264,7 @@
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>&amp;New</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -276,7 +276,7 @@
      <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save Element</string>
+    <string>&amp;Save Element</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -288,7 +288,7 @@
      <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>&amp;Undo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
@@ -300,7 +300,7 @@
      <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Y</string>
@@ -324,7 +324,10 @@
      <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>&amp;Zoom In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -333,7 +336,10 @@
      <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
   <action name="actionZoomAll">
@@ -342,7 +348,7 @@
      <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom All</string>
+    <string>Zoo&amp;m All</string>
    </property>
   </action>
   <action name="actionRotateCcw">
@@ -351,7 +357,7 @@
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate Counterclockwise</string>
+    <string>R&amp;otate Counterclockwise</string>
    </property>
    <property name="shortcut">
     <string>R</string>
@@ -363,7 +369,7 @@
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate Clockwise</string>
+    <string>Rotate C&amp;lockwise</string>
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
@@ -375,7 +381,7 @@
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string>&amp;Copy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -405,7 +411,7 @@
      <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
    </property>
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -420,7 +426,7 @@
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove</string>
+    <string>R&amp;emove</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -432,7 +438,7 @@
      <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
    </property>
    <property name="text">
-    <string>Select</string>
+    <string>&amp;Select</string>
    </property>
   </action>
   <action name="actionAddSymbolPin">
@@ -441,7 +447,7 @@
      <normaloff>:/img/actions/add_symbol_pin.png</normaloff>:/img/actions/add_symbol_pin.png</iconset>
    </property>
    <property name="text">
-    <string>Add Symbol Pin</string>
+    <string>Add S&amp;ymbol Pin</string>
    </property>
    <property name="shortcut">
     <string>I</string>
@@ -465,7 +471,7 @@
      <normaloff>:/img/actions/add_smt_pad.png</normaloff>:/img/actions/add_smt_pad.png</iconset>
    </property>
    <property name="text">
-    <string>Add SMT Pad</string>
+    <string>Add S&amp;MT Pad</string>
    </property>
    <property name="shortcut">
     <string>M</string>
@@ -477,7 +483,7 @@
      <normaloff>:/img/actions/draw_line.png</normaloff>:/img/actions/draw_line.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Line</string>
+    <string>&amp;Draw Line</string>
    </property>
   </action>
   <action name="actionAddText">
@@ -486,7 +492,7 @@
      <normaloff>:/img/actions/add_text.png</normaloff>:/img/actions/add_text.png</iconset>
    </property>
    <property name="text">
-    <string>Add Text</string>
+    <string>&amp;Add Text</string>
    </property>
    <property name="shortcut">
     <string>T</string>
@@ -498,7 +504,7 @@
      <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Polygon</string>
+    <string>Draw &amp;Polygon</string>
    </property>
    <property name="shortcut">
     <string>P</string>
@@ -510,7 +516,7 @@
      <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Circle/Ellipse</string>
+    <string>Draw &amp;Circle/Ellipse</string>
    </property>
    <property name="shortcut">
     <string>E</string>
@@ -522,7 +528,7 @@
      <normaloff>:/img/actions/add_hole.png</normaloff>:/img/actions/add_hole.png</iconset>
    </property>
    <property name="text">
-    <string>Add Hole (NPTH)</string>
+    <string>Add &amp;Hole (NPTH)</string>
    </property>
    <property name="shortcut">
     <string>O</string>
@@ -534,7 +540,7 @@
      <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
    </property>
    <property name="text">
-    <string>Grid</string>
+    <string>&amp;Grid</string>
    </property>
   </action>
   <action name="actionDrawRect">
@@ -543,7 +549,7 @@
      <normaloff>:/img/actions/draw_rectangle.png</normaloff>:/img/actions/draw_rectangle.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Rectangle</string>
+    <string>Draw &amp;Rectangle</string>
    </property>
   </action>
   <action name="actionUpdateLibraryDb">
@@ -552,7 +558,7 @@
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>Update Library Database</string>
+    <string>&amp;Update Library Database</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
@@ -564,7 +570,7 @@
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Element</string>
+    <string>&amp;Remove Element</string>
    </property>
   </action>
   <action name="actionAddName">

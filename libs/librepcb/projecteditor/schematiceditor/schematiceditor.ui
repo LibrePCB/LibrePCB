@@ -39,16 +39,16 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>22</height>
+     <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <widget class="QMenu" name="menuExport">
      <property name="title">
-      <string>Export</string>
+      <string>&amp;Export</string>
      </property>
      <addaction name="actionPDF_Export"/>
     </widget>
@@ -65,7 +65,7 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
@@ -73,7 +73,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -89,7 +89,7 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionGrid"/>
     <addaction name="actionLayers"/>
@@ -100,7 +100,7 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
     <addaction name="actionToolDrawWire"/>
@@ -109,7 +109,7 @@
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
-     <string>Project</string>
+     <string>Pro&amp;ject</string>
     </property>
     <addaction name="actionProjectProperties"/>
     <addaction name="actionProjectSettings"/>
@@ -255,7 +255,7 @@
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -270,7 +270,7 @@
      <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save Project</string>
+    <string>&amp;Save Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -282,7 +282,7 @@
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -290,7 +290,7 @@
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
-    <string>About Qt</string>
+    <string>About &amp;Qt</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutQtRole</enum>
@@ -302,7 +302,7 @@
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
-    <string>Print</string>
+    <string>&amp;Print</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
@@ -317,7 +317,7 @@
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
-    <string>PDF Export</string>
+    <string>&amp;PDF Export</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -347,7 +347,7 @@
      <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>&amp;Undo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
@@ -359,7 +359,7 @@
      <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Y</string>
@@ -371,7 +371,10 @@
      <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>&amp;Zoom In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoom_Out">
@@ -380,7 +383,10 @@
      <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
   <action name="actionZoom_All">
@@ -389,7 +395,7 @@
      <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom All</string>
+    <string>Zoo&amp;m All</string>
    </property>
   </action>
   <action name="actionHelp">
@@ -398,7 +404,7 @@
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
-    <string>Help</string>
+    <string>&amp;Help</string>
    </property>
    <property name="shortcut">
     <string>F1</string>
@@ -413,7 +419,7 @@
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate Counterclockwise</string>
+    <string>R&amp;otate Counterclockwise</string>
    </property>
    <property name="shortcut">
     <string>R</string>
@@ -425,7 +431,7 @@
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate Clockwise</string>
+    <string>Rotate C&amp;lockwise</string>
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
@@ -437,7 +443,7 @@
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string>&amp;Copy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -467,7 +473,7 @@
      <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
    </property>
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -482,7 +488,7 @@
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove</string>
+    <string>R&amp;emove</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -494,7 +500,7 @@
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
-    <string>Close Project</string>
+    <string>&amp;Close Project</string>
    </property>
   </action>
   <action name="actionToolSelect">
@@ -503,7 +509,7 @@
      <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
    </property>
    <property name="text">
-    <string>Select</string>
+    <string>&amp;Select</string>
    </property>
   </action>
   <action name="actionToolAddComponent">
@@ -512,7 +518,7 @@
      <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
    </property>
    <property name="text">
-    <string>Add Component</string>
+    <string>Add &amp;Component</string>
    </property>
   </action>
   <action name="actionToolDrawWire">
@@ -521,7 +527,7 @@
      <normaloff>:/img/actions/draw_wire.png</normaloff>:/img/actions/draw_wire.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Wire</string>
+    <string>&amp;Draw Wire</string>
    </property>
   </action>
   <action name="actionCommandAbort">
@@ -542,7 +548,7 @@
      <normaloff>:/img/actions/layers.png</normaloff>:/img/actions/layers.png</iconset>
    </property>
    <property name="text">
-    <string>Layers</string>
+    <string>&amp;Layers</string>
    </property>
    <property name="visible">
     <bool>false</bool>
@@ -554,12 +560,12 @@
      <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
    </property>
    <property name="text">
-    <string>Grid</string>
+    <string>&amp;Grid</string>
    </property>
   </action>
   <action name="actionEditNetclasses">
    <property name="text">
-    <string>Net Classes</string>
+    <string>&amp;Net Classes</string>
    </property>
   </action>
   <action name="actionAddComp_Resistor">
@@ -612,7 +618,7 @@
   </action>
   <action name="actionProjectProperties">
    <property name="text">
-    <string>Properties</string>
+    <string>&amp;Properties</string>
    </property>
   </action>
   <action name="actionProjectSettings">
@@ -621,7 +627,7 @@
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
-    <string>Settings</string>
+    <string>&amp;Settings</string>
    </property>
    <property name="visible">
     <bool>false</bool>
@@ -633,7 +639,7 @@
      <normaloff>:/img/actions/draw_netlabel.png</normaloff>:/img/actions/draw_netlabel.png</iconset>
    </property>
    <property name="text">
-    <string>Add Netlabel</string>
+    <string>&amp;Add Netlabel</string>
    </property>
   </action>
   <action name="actionAddComp_UnipolarCapacitor">
@@ -651,7 +657,7 @@
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
-    <string>New Schematic Page</string>
+    <string>&amp;New Schematic Page</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
