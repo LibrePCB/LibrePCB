@@ -37,6 +37,9 @@
 namespace librepcb {
 namespace project {
 
+static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+static const QTransform gIdent(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -203,6 +206,7 @@ void SI_SymbolPin::updatePosition() noexcept
     mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
     mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setTransform(mSymbol.getMirrored() ? gMirror : gIdent, false);
     mGraphicsItem->setRotation(-mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_NetLine* netline, mRegisteredNetLines) {

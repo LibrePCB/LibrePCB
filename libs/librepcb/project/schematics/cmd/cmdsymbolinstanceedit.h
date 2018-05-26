@@ -55,6 +55,8 @@ class CmdSymbolInstanceEdit final : public UndoCommand
         void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void setMirrored(bool mirrored, bool immediate) noexcept;
+        void mirror(const Point& center, bool immediate) noexcept;
 
 
     private:
@@ -81,6 +83,8 @@ class CmdSymbolInstanceEdit final : public UndoCommand
         Point mNewPos;
         Angle mOldRotation;
         Angle mNewRotation;
+        bool mOldMirrored;
+        bool mNewMirrored;
 };
 
 /*****************************************************************************************

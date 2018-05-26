@@ -41,6 +41,7 @@
 #include "../../cmd/cmdcombinenetsignals.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
 #include "../../cmd/cmdrotateselectedschematicitems.h"
+#include "../../cmd/cmdmirrorselectedschematicitems.h"
 #include "../../cmd/cmdmoveselectedschematicitems.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 
@@ -117,6 +118,9 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
             rotateSelectedItems(Angle::deg90());
+            return ForceStayInState;
+        case SEE_Base::Edit_Mirror:
+            mirrorSelectedItems();
             return ForceStayInState;
         case SEE_Base::Edit_Remove:
             removeSelectedItems();
@@ -232,6 +236,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
 
             // build the context menu
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
             QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove Symbol"));
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
@@ -240,6 +245,8 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
             QAction* action = menu.exec(mouseEvent->screenPos());
             if (action == aRotateCCW) {
                 rotateSelectedItems(Angle::deg90());
+            } else if (action == aMirror) {
+                mirrorSelectedItems();
             } else if (action == aRemoveSymbol) {
                 removeSelectedItems();
             } else if (action == aProperties) {
@@ -392,6 +399,24 @@ bool SES_Select::rotateSelectedItems(const Angle& angle) noexcept
     try
     {
         CmdRotateSelectedSchematicItems* cmd = new CmdRotateSelectedSchematicItems(*schematic, angle);
+        mUndoStack.execCmd(cmd);
+        return true;
+    }
+    catch (Exception& e)
+    {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+        return false;
+    }
+}
+
+bool SES_Select::mirrorSelectedItems() noexcept
+{
+    Schematic* schematic = mEditor.getActiveSchematic();
+    Q_ASSERT(schematic); if (!schematic) return false;
+
+    try
+    {
+        CmdMirrorSelectedSchematicItems* cmd = new CmdMirrorSelectedSchematicItems(*schematic);
         mUndoStack.execCmd(cmd);
         return true;
     }

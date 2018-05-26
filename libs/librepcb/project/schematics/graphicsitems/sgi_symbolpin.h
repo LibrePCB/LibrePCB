@@ -91,6 +91,7 @@ class SGI_SymbolPin final : public SGI_Base
         GraphicsLayer* mJunctionLayer;
         QStaticText mStaticText;
         bool mRotate180;
+        bool mMirrored;
         QRectF mBoundingRect;
         QPointF mTextOrigin;
         QRectF mTextBoundingRect;

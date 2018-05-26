@@ -37,7 +37,8 @@ namespace project {
 CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept :
     UndoCommand(tr("Edit symbol instance")), mSymbol(symbol),
     mOldPos(symbol.getPosition()), mNewPos(mOldPos),
-    mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation)
+    mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation),
+    mOldMirrored(symbol.getMirrored()), mNewMirrored(mOldMirrored)
 {
 }
 
@@ -46,6 +47,7 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
     if (!wasEverExecuted()) {
         mSymbol.setPosition(mOldPos);
         mSymbol.setRotation(mOldRotation);
+        mSymbol.setMirrored(mOldMirrored);
     }
 }
 
@@ -77,12 +79,36 @@ void CmdSymbolInstanceEdit::setRotation(const Angle& angle, bool immediate) noex
 void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
-    mNewPos.rotate(angle, center);
-    mNewRotation += angle;
+    if (mOldMirrored) {
+        mNewPos.rotate(-angle, center);
+        mNewRotation -= angle;
+    } else {
+        mNewPos.rotate(angle, center);
+        mNewRotation += angle;
+    }
     if (immediate)
     {
         mSymbol.setPosition(mNewPos);
         mSymbol.setRotation(mNewRotation);
+    }
+}
+
+void CmdSymbolInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewMirrored = mirrored;
+    if (immediate) mSymbol.setMirrored(mNewMirrored);
+}
+
+void CmdSymbolInstanceEdit::mirror(const Point& center, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewPos.mirror(Qt::Horizontal, center);
+    mNewMirrored = !mNewMirrored;
+    if (immediate)
+    {
+        mSymbol.setPosition(mNewPos);
+        mSymbol.setMirrored(mNewMirrored);
     }
 }
 
@@ -96,6 +122,7 @@ bool CmdSymbolInstanceEdit::performExecute()
 
     if (mNewPos != mOldPos)             return true;
     if (mNewRotation != mOldRotation)   return true;
+    if (mNewMirrored != mOldMirrored)   return true;
     return false;
 }
 
@@ -103,12 +130,14 @@ void CmdSymbolInstanceEdit::performUndo()
 {
     mSymbol.setPosition(mOldPos);
     mSymbol.setRotation(mOldRotation);
+    mSymbol.setMirrored(mOldMirrored);
 }
 
 void CmdSymbolInstanceEdit::performRedo()
 {
     mSymbol.setPosition(mNewPos);
     mSymbol.setRotation(mNewRotation);
+    mSymbol.setMirrored(mNewMirrored);
 }
 
 /*****************************************************************************************

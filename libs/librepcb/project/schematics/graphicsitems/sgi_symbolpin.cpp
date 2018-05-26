@@ -84,7 +84,11 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     // rotation
     Angle absAngle = mLibPin.getRotation() + mPin.getSymbol().getRotation();
     absAngle.mapTo180deg();
-    mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+    mMirrored = mPin.getSymbol().getMirrored();
+    if (!mMirrored)
+        mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+    else
+        mRotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
 
     // circle
     mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2*mRadiusPx, 2*mRadiusPx);
@@ -108,6 +112,9 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     else
         mTextBoundingRect = QRectF(mTextOrigin.x(), -mTextOrigin.y()-mStaticText.size().height(), mStaticText.size().width(), mStaticText.size().height()).normalized();
     mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
+
+    if (mMirrored)
+        mTextOrigin.setX(mRotate180 ? x : -x-mStaticText.size().width());
 
     mIsVisibleJunction = mPin.isVisibleJunction();
 
@@ -163,6 +170,10 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         {
             // draw text
             painter->save();
+            if (mMirrored) {
+                static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+                painter->setTransform(gMirror, true);
+            }
             if (mRotate180) painter->rotate(180);
             painter->setPen(QPen(layer->getColor(highlight), 0));
             painter->setFont(mFont);

@@ -68,12 +68,13 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         explicit SI_Symbol(Schematic& schematic, const SExpression& node);
         explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                            const Uuid& symbolItem, const Point& position = Point(),
-                           const Angle& rotation = Angle());
+                           const Angle& rotation = Angle(), bool mirrored = false);
         ~SI_Symbol() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Angle& getRotation() const noexcept {return mRotation;}
+        bool getMirrored() const noexcept {return mMirrored;}
         QString getName() const noexcept;
         SI_SymbolPin* getPin(const Uuid& pinUuid) const noexcept {return mPins.value(pinUuid);}
         const QHash<Uuid, SI_SymbolPin*>& getPins() const noexcept {return mPins;}
@@ -84,6 +85,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         // Setters
         void setPosition(const Point& newPos) noexcept;
         void setRotation(const Angle& newRotation) noexcept;
+        void setMirrored(bool newMirrored) noexcept;
 
         // General Methods
         void addToSchematic() override;
@@ -140,6 +142,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
         Uuid mUuid;
         Point mPosition;
         Angle mRotation;
+        bool mMirrored;
 };
 
 /*****************************************************************************************

@@ -139,7 +139,11 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
         // check rotation
         Angle absAngle = text.getRotation() + mSymbol.getRotation();
         absAngle.mapTo180deg();
-        props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+        props.mirrored = mSymbol.getMirrored();
+        if (!props.mirrored)
+            props.rotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+        else
+            props.rotate180 = (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
 
         // calculate text position
         scaledTextRect.translate(text.getPosition().toPxQPointF());
@@ -241,6 +245,11 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         // draw text or rect
         painter->save();
         painter->translate(text.getPosition().toPxQPointF());
+        if (props.mirrored) {
+            static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+            painter->translate(props.textRect.width() * props.scaleFactor, 0);
+            painter->setTransform(gMirror, true);
+        }
         painter->rotate(-text.getRotation().toDeg());
         painter->translate(-text.getPosition().toPxQPointF());
         painter->scale(props.scaleFactor, props.scaleFactor);

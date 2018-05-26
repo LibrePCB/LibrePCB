@@ -47,6 +47,7 @@ SOURCES += \
     cmd/cmdcombinenetsignals.cpp \
     cmd/cmdcombineschematicnetsegments.cpp \
     cmd/cmdflipselectedboarditems.cpp \
+    cmd/cmdmirrorselectedschematicitems.cpp \
     cmd/cmdmoveselectedboarditems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
     cmd/cmdremoveboarditems.cpp \
@@ -107,6 +108,7 @@ HEADERS += \
     cmd/cmdcombinenetsignals.h \
     cmd/cmdcombineschematicnetsegments.h \
     cmd/cmdflipselectedboarditems.h \
+    cmd/cmdmirrorselectedschematicitems.h \
     cmd/cmdmoveselectedboarditems.h \
     cmd/cmdmoveselectedschematicitems.h \
     cmd/cmdremoveboarditems.h \

@@ -39,6 +39,9 @@
 namespace librepcb {
 namespace project {
 
+static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+static const QTransform gIdent(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -47,7 +50,8 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mPosition(0, 0),
-    mRotation(0)
+    mRotation(0),
+    mMirrored(false)
 {
     if (node.tryGetChildByPath("position")) {
         mPosition = Point(node.getChildByPath("position"));
@@ -60,6 +64,12 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
     } else {
         // backward compatibility, remove this some time!
         mRotation = node.getValueByPath<Angle>("rot");
+    }
+    if (node.tryGetChildByPath("mirror")) {
+        mMirrored = node.getValueByPath<bool>("mirror");
+    } else {
+        // backward compatibility, remove this some time!
+        mMirrored = false;
     }
 
     Uuid gcUuid = node.getValueByPath<Uuid>("component");
@@ -80,9 +90,9 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
 }
 
 SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
-                     const Uuid& symbolItem, const Point& position, const Angle& rotation) :
+                     const Uuid& symbolItem, const Point& position, const Angle& rotation, bool mirrored) :
     SI_Base(schematic), mComponentInstance(&cmpInstance), mSymbVarItem(nullptr),
-    mSymbol(nullptr), mUuid(Uuid::createRandom()), mPosition(position), mRotation(rotation)
+    mSymbol(nullptr), mUuid(Uuid::createRandom()), mPosition(position), mRotation(rotation), mMirrored(mirrored)
 {
     init(symbolItem);
 }
@@ -99,6 +109,7 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid)
 
     mGraphicsItem.reset(new SGI_Symbol(*this));
     mGraphicsItem->setPos(mPosition.toPxQPointF());
+    mGraphicsItem->setTransform(mMirrored ? gMirror : gIdent, false);
     mGraphicsItem->setRotation(-mRotation.toDeg());
 
     for (const library::SymbolPin& libPin : mSymbol->getPins()) {
@@ -170,6 +181,18 @@ void SI_Symbol::setRotation(const Angle& newRotation) noexcept
     }
 }
 
+void SI_Symbol::setMirrored(bool newMirrored) noexcept
+{
+    if (newMirrored != mMirrored) {
+        mMirrored = newMirrored;
+        mGraphicsItem->setTransform(mMirrored ? gMirror : gIdent, false);
+        mGraphicsItem->updateCacheAndRepaint();
+        foreach (SI_SymbolPin* pin, mPins) {
+            pin->updatePosition();
+        }
+    }
+}
+
 /*****************************************************************************************
  *  General Methods
  ****************************************************************************************/
@@ -215,6 +238,7 @@ void SI_Symbol::serialize(SExpression& root) const
     root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
     root.appendChild(mPosition.serializeToDomElement("position"), true);
     root.appendChild("rotation", mRotation, false);
+    root.appendChild("mirror", mMirrored, false);
 }
 
 /*****************************************************************************************
@@ -223,7 +247,10 @@ void SI_Symbol::serialize(SExpression& root) const
 
 Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
 {
-    return (mPosition + relativePos).rotated(mRotation, mPosition);
+    if (mMirrored)
+        return (mPosition + relativePos).rotated(mRotation, mPosition).mirrored(Qt::Horizontal, mPosition);
+    else
+        return (mPosition + relativePos).rotated(mRotation, mPosition);
 }
 
 /*****************************************************************************************

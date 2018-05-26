@@ -17,100 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_SYMBOL_H
-#define LIBREPCB_PROJECT_SGI_SYMBOL_H
+#ifndef LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-#include "sgi_base.h"
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class Text;
-class GraphicsLayer;
-
-namespace library {
-class Symbol;
-}
-
 namespace project {
 
-class SI_Symbol;
+class Schematic;
 
+namespace editor {
 
 /*****************************************************************************************
- *  Class SGI_Symbol
+ *  Class CmdMirrorSelectedSchematicItems
  ****************************************************************************************/
 
 /**
- * @brief The SGI_Symbol class
- *
- * @author ubruhin
- * @date 2014-08-23
+ * @brief The CmdMirrorSelectedSchematicItems class
  */
-class SGI_Symbol final : public SGI_Base
+class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup
 {
     public:
 
         // Constructors / Destructor
-        explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
-        ~SGI_Symbol() noexcept;
-
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
-
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+        CmdMirrorSelectedSchematicItems(Schematic& schematic) noexcept;
+        ~CmdMirrorSelectedSchematicItems() noexcept;
 
 
     private:
 
-        // make some methods inaccessible...
-        SGI_Symbol() = delete;
-        SGI_Symbol(const SGI_Symbol& other) = delete;
-        SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
-
         // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
 
 
-        // Types
+        // Private Member Variables
 
-        struct CachedTextProperties_t {
-            QString text;
-            int fontPixelSize;
-            qreal scaleFactor;
-            bool rotate180;
-            bool mirrored;
-            int flags;
-            QRectF textRect;    // not scaled
-        };
-
-
-        // General Attributes
-        SI_Symbol& mSymbol;
-        const library::Symbol& mLibSymbol;
-        QFont mFont;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
+        // Attributes from the constructor
+        Schematic& mSchematic;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
+} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_SYMBOL_H
+#endif // LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H

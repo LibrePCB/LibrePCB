@@ -81,6 +81,7 @@ class SES_Select final : public SES_Base
                                                 Schematic* schematic) noexcept;
         bool startMovingSelectedItems(Schematic& schematic, const Point& startPos) noexcept;
         bool rotateSelectedItems(const Angle& angle) noexcept;
+        bool mirrorSelectedItems() noexcept;
         bool removeSelectedItems() noexcept;
         void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
         void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;

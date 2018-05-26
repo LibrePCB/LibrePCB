@@ -81,6 +81,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
     mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
     mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
     mUi->spbxSymbInstAngle->setValue(mSymbol.getRotation().toDeg());
+    mUi->cbxMirror->setChecked(mSymbol.getMirrored());
 
     // Symbol Library Element Attributes
     mUi->lblSymbLibUuid->setText(htmlLink.arg(mSymbol.getLibSymbol().getFilePath().toQUrl().toString(),
@@ -143,9 +144,11 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         Point pos(Length::fromMm(mUi->spbxSymbInstPosX->value()),
                   Length::fromMm(mUi->spbxSymbInstPosY->value()));
         Angle rotation = Angle::fromDeg(mUi->spbxSymbInstAngle->value());
+        bool mirrored = mUi->cbxMirror->isChecked();
         QScopedPointer<CmdSymbolInstanceEdit> cmdSym(new CmdSymbolInstanceEdit(mSymbol));
         cmdSym->setPosition(pos, false);
         cmdSym->setRotation(rotation, false);
+        cmdSym->setMirrored(mirrored, false);
         transaction.append(cmdSym.take());
 
         transaction.commit(); // can throw
