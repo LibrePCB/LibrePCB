@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+  <Name>librepcb.common</Name>
+  <DisplayName>Common Files</DisplayName>
+  <Description>Some commonly used files, for example the maintenance tool.</Description>
+  <Version>0.1.0</Version><!-- it's only a metapackage, so its version is static -->
+  <ReleaseDate>RELEASE_DATE</ReleaseDate>
+  <Script>installscript.qs</Script>
+  <ForcedInstallation>True</ForcedInstallation>
+  <SortingPriority>10</SortingPriority>
+</Package>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>LibrePCB</Name>
+  <Version>1.0.0</Version><!-- the installer version is static -->
+  <Title>LibrePCB</Title>
+  <Publisher>LibrePCB</Publisher>
+  <ProductUrl>http://librepcb.org/</ProductUrl>
+  <Logo>48x48.png</Logo>
+  <MaintenanceToolName>librepcb-maintenance</MaintenanceToolName>
+  <MaintenanceToolIniFile>librepcb-maintenance.ini</MaintenanceToolIniFile>
+  <TargetDir>DEFAULT_TARGET_DIR</TargetDir>
+  <AdminTargetDir>@ApplicationsDir@/LibrePCB</AdminTargetDir> <!-- UNIX only -->
+  <StartMenuDir>LibrePCB</StartMenuDir> <!-- Windows only -->
+  <RemoteRepositories>
+    <Repository>
+      <Url>https://download.librepcb.org/installer_packages/TARGET_NAME</Url>
+    </Repository>
+  </RemoteRepositories>
+</Installer>
