@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+  <Name>librepcb.nightly.app</Name>
+  <DisplayName>LibrePCB Nightly Build</DisplayName>
+  <Description>Latest automatically built version. Attention: These are unstable builds, DO NOT USE THEM FOR PRODUCTIVE USE!</Description>
+  <Version>APP_VERSION_NIGHTLY</Version>
+  <ReleaseDate>RELEASE_DATE</ReleaseDate>
+  <Default>true</Default>
+  <Script>installscript.qs</Script>
+  <Licenses>
+    <License name="GNU General Public License v3" file="license_gplv3.txt"/>
+  </Licenses>
+</Package>
