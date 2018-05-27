@@ -85,6 +85,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 TRANSLATIONS = \
+    ../../i18n/librepcb.ts \
     ../../i18n/librepcb_de.ts \
     ../../i18n/librepcb_de_CH.ts \
     ../../i18n/librepcb_gsw_CH.ts
