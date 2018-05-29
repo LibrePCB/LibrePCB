@@ -373,7 +373,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
 
         return true;
     }
-    catch (Exception e)
+    catch (const Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState_Idle) {
@@ -408,11 +408,11 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept
             mUndoStack.appendToCmdGroup(cmd);
             finishCommand = cmd->hasCombinedSomeItems();
         }
-        catch (UserCanceled& e)
+        catch (const UserCanceled& e)
         {
             return false;
         }
-        catch (Exception& e)
+        catch (const Exception& e)
         {
             QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
@@ -433,7 +433,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept
                 return startPositioning(board, pos, mPositioningNetPoint2);
             }
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             if (mSubState != SubState_Idle) {
@@ -458,7 +458,7 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept
         mUndoStack.abortCmdGroup(); // can throw
         return true;
     }
-    catch (Exception& e)
+    catch (const Exception& e)
     {
         if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;

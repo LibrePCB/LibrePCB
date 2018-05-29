@@ -275,7 +275,7 @@ bool BES_DrawPlane::start(Board& board, const Point& pos) noexcept
         mLastVertexPos = pos;
         makeSelectedLayerVisible();
         return true;
-    } catch (Exception e) {
+    } catch (const Exception& e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState::Idle) abort(false);
         return false;
@@ -312,7 +312,7 @@ bool BES_DrawPlane::addSegment(Board& board, const Point& pos) noexcept
         mCmdEditCurrentPlane->setOutline(newPath, true);
         mLastVertexPos = pos;
         return true;
-    } catch (Exception e) {
+    } catch (const Exception& e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState::Idle) abort(false);
         return false;
@@ -327,7 +327,7 @@ bool BES_DrawPlane::abort(bool showErrMsgBox) noexcept
         mUndoStack.abortCmdGroup(); // can throw
         mSubState = SubState::Idle;
         return true;
-    } catch (Exception& e) {
+    } catch (const Exception& e) {
         if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }
