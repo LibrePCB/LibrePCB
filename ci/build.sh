@@ -23,6 +23,12 @@ CXXFLAGS="-Werror"
 if [ "$CC" = "clang" ]; then CFLAGS+=" -Qunused-arguments"; fi
 if [ "$CXX" = "clang++" ]; then CXXFLAGS+=" -Qunused-arguments"; fi
 
+# download translation files from Transifex (only if API token is available)
+if [ -n "${TX_TOKEN-}" ]; then tx pull --source --all --no-interactive; fi
+
+# update translation source file
+lupdate -silent -no-obsolete -source-language en -target-language en ./librepcb.pro
+
 # build librepcb
 mkdir build && pushd build
 qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" "QMAKE_CFLAGS=$CFLAGS" "QMAKE_CXXFLAGS=$CXXFLAGS" "PREFIX=`pwd`/install/opt"
