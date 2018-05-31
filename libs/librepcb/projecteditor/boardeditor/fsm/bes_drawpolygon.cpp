@@ -279,7 +279,7 @@ bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept
         mLastSegmentPos = pos;
         makeSelectedLayerVisible();
         return true;
-    } catch (Exception e) {
+    } catch (const Exception& e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState::Idle) abort(false);
         return false;
@@ -316,7 +316,7 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept
         mCmdEditCurrentPolygon->setPath(newPath, true);
         mLastSegmentPos = pos;
         return true;
-    } catch (Exception e) {
+    } catch (const Exception& e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState::Idle) abort(false);
         return false;
@@ -331,7 +331,7 @@ bool BES_DrawPolygon::abort(bool showErrMsgBox) noexcept
         mUndoStack.abortCmdGroup(); // can throw
         mSubState = SubState::Idle;
         return true;
-    } catch (Exception& e) {
+    } catch (const Exception& e) {
         if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
     }

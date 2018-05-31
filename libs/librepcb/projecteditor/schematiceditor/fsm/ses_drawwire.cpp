@@ -337,7 +337,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
 
         return true;
     }
-    catch (Exception e)
+    catch (const Exception& e)
     {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         if (mSubState != SubState_Idle) {
@@ -378,11 +378,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
             mUndoStack.appendToCmdGroup(cmdGroup.take());
             finishCommand = cmdCombineItems->hasCombinedSomeItems();
         }
-        catch (UserCanceled& e)
+        catch (const UserCanceled& e)
         {
             return false;
         }
-        catch (Exception& e)
+        catch (const Exception& e)
         {
             QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             return false;
@@ -403,7 +403,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic& schematic, const Point& pos) noexc
                 return startPositioning(schematic, pos, mPositioningNetPoint2);
             }
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
             if (mSubState != SubState_Idle) {
@@ -428,7 +428,7 @@ bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept
         mUndoStack.abortCmdGroup(); // can throw
         return true;
     }
-    catch (Exception& e)
+    catch (const Exception& e)
     {
         if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         return false;
