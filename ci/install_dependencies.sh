@@ -56,6 +56,6 @@ then
 elif [ -n "${APPVEYOR-}" ]
 then
 
-  pacman -Syu --noconfirm --needed openssl
+  pacman -Sy --noconfirm --needed openssl
 
 fi
