@@ -28,3 +28,10 @@ then
   # upload archive
   curl --fail --basic -u "$UPLOAD_USER:$UPLOAD_PASS" -T "./$BASENAME.tbz2" "$UPLOAD_URL/$BASENAME.tbz2"
 fi
+
+# upload translation source file (only on master)
+if [ "${TRAVIS_EVENT_TYPE-}" = "push" -a "$IS_PULL_REQUEST" = "false" \
+     -a "$BRANCH_NAME" = "master" -a "${TX_UPLOAD-}" = "true" ]
+then
+  tx push --source --no-interactive
+fi

@@ -84,11 +84,6 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
 
-TRANSLATIONS = \
-    ../../i18n/librepcb_de.ts \
-    ../../i18n/librepcb_de_CH.ts \
-    ../../i18n/librepcb_gsw_CH.ts
-
 RESOURCES += \
     ../../img/images.qrc
 
@@ -116,7 +111,8 @@ FORMS += \
 # Custom compiler "lrelease" for qm generation
 isEmpty(QMAKE_LRELEASE): QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 
-lrelease.input = TRANSLATIONS
+TS_FILES = $$files(../../i18n/librepcb_*.ts)
+lrelease.input = TS_FILES
 lrelease.output = $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
 lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
 lrelease.CONFIG += no_link target_predeps

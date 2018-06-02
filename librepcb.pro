@@ -7,3 +7,5 @@ SUBDIRS = \
 
 apps.depends = libs
 tests.depends = libs
+
+TRANSLATIONS = ./i18n/librepcb.ts

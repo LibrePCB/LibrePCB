@@ -62,8 +62,10 @@ This project welcomes non-code contributions, too! The following types of contri
 - **Small Fixes**: Fix typos, clarify language, and generally improve the quality of the content.
 - **Documentation**: Create/improve [documentations for users](https://github.com/LibrePCB/librepcb-doc)
   or developers of LibrePCB.
-- ~~**Translations**: Add/improve [translations for LibrePCB](https://github.com/LibrePCB/LibrePCB/tree/master/i18n).~~
-  *(not yet applicable)*
+- **Translations**: Add/improve translations for LibrePCB using
+  [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
+  Follow [this guide](https://docs.transifex.com/getting-started/translators) to
+  get started.
 - **Website**: Improve our [website](http://librepcb.org) which is hosted in the repository [LibrePCB/LibrePCB.github.io](https://github.com/LibrePCB/LibrePCB.github.io).
 - **Sharing**: Speak about LibrePCB with your friends and colleagues, or write about it in the internet!
 - **Donations**: [Become a Patron](https://www.patreon.com/librepcb)
