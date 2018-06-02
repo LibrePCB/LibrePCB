@@ -24,8 +24,9 @@ Thumbs.db
 dev/doxygen/output/
 build/
 
-# Compiled Translation Files
+# Translation Files
 i18n/*.qm
+i18n/*.ts
 
 # Vim
 *.swp
