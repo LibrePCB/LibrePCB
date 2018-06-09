@@ -974,15 +974,15 @@ void Board::serialize(SExpression& root) const
     root.appendLineBreak();
     serializePointerContainer(root, mDeviceInstances, "device");
     root.appendLineBreak();
-    serializePointerContainer(root, mNetSegments, "netsegment");
+    serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
     root.appendLineBreak();
-    serializePointerContainer(root, mPlanes, "plane");
+    serializePointerContainerUuidSorted(root, mPlanes, "plane");
     root.appendLineBreak();
-    serializePointerContainer(root, mPolygons, "polygon");
+    serializePointerContainerUuidSorted(root, mPolygons, "polygon");
     root.appendLineBreak();
-    serializePointerContainer(root, mStrokeTexts, "stroke_text");
+    serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
     root.appendLineBreak();
-    serializePointerContainer(root, mHoles, "hole");
+    serializePointerContainerUuidSorted(root, mHoles, "hole");
     root.appendLineBreak();
 }
 

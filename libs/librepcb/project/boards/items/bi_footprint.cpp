@@ -221,9 +221,7 @@ void BI_Footprint::removeFromBoard()
 
 void BI_Footprint::serialize(SExpression& root) const
 {
-    foreach (const BI_StrokeText* text, mStrokeTexts) {
-        root.appendChild(text->serializeToDomElement("stroke_text"), true);
-    }
+    serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
 }
 
 /*****************************************************************************************

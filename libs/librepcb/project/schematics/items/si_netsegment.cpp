@@ -483,9 +483,9 @@ void SI_NetSegment::serialize(SExpression& root) const
 
     root.appendToken(mUuid);
     root.appendTokenChild("net", mNetSignal->getUuid(), true);
-    serializePointerContainer(root, mNetPoints, "netpoint");
-    serializePointerContainer(root, mNetLines, "netline");
-    serializePointerContainer(root, mNetLabels, "netlabel");
+    serializePointerContainerUuidSorted(root, mNetPoints, "netpoint");
+    serializePointerContainerUuidSorted(root, mNetLines, "netline");
+    serializePointerContainerUuidSorted(root, mNetLabels, "netlabel");
 }
 
 /*****************************************************************************************

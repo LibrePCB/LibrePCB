@@ -469,9 +469,9 @@ void BI_NetSegment::serialize(SExpression& root) const
 
     root.appendToken(mUuid);
     root.appendTokenChild("net", mNetSignal->getUuid(), true);
-    serializePointerContainer(root, mVias, "via");
-    serializePointerContainer(root, mNetPoints, "netpoint");
-    serializePointerContainer(root, mNetLines, "netline");
+    serializePointerContainerUuidSorted(root, mVias, "via");
+    serializePointerContainerUuidSorted(root, mNetPoints, "netpoint");
+    serializePointerContainerUuidSorted(root, mNetLines, "netline");
 }
 
 /*****************************************************************************************

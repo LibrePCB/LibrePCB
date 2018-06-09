@@ -103,6 +103,17 @@ class SerializableObject
                 root.appendChild(pointer->serializeToDomElement(itemName), true); // can throw
             }
         }
+
+        template <typename T>
+        static void serializePointerContainerUuidSorted(SExpression& root, const T& container,
+            const QString& itemName)
+        {
+            T copy = container;
+            std::sort(copy.begin(), copy.end(),
+                      [](const typename T::value_type& a, const typename T::value_type& b)
+                      {return a->getUuid() < b->getUuid();});
+            serializePointerContainer(root, copy, itemName);
+        }
 };
 
 // Make sure that the SerializableObject class does not contain any data (except the vptr).

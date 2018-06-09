@@ -496,9 +496,9 @@ void Schematic::serialize(SExpression& root) const
     root.appendStringChild("name", mName, true);
     root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
     root.appendLineBreak();
-    serializePointerContainer(root, mSymbols, "symbol");
+    serializePointerContainerUuidSorted(root, mSymbols, "symbol");
     root.appendLineBreak();
-    serializePointerContainer(root, mNetSegments, "netsegment");
+    serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
     root.appendLineBreak();
 }
 
