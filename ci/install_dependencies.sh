@@ -23,8 +23,8 @@ then
   sudo apt-get install -qq libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
 
   # python packages
-  pip install --user --upgrade "urllib3[secure]"
-  pip install --user --upgrade "transifex-client~=$TRANSIFEX_CLI_VERSION"
+  pip install --user --upgrade --upgrade-strategy only-if-needed \
+              "urllib3[secure]==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
 
   # linuxdeployqt
   sudo wget -cq "$LINUXDEPLOYQT_URL" -O /usr/local/bin/linuxdeployqt
@@ -48,7 +48,8 @@ then
   export PATH="/usr/local/opt/ccache/libexec:$PATH"
 
   # python packages
-  pip2 install --user --upgrade "transifex-client~=$TRANSIFEX_CLI_VERSION"
+  pip2 install --user --upgrade --upgrade-strategy only-if-needed \
+               "urllib3==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
   export PATH="$PATH:`python2 -m site --user-base`/bin"
 
   # Qt Installer Framework
@@ -67,6 +68,7 @@ elif [ -n "${APPVEYOR-}" ]
 then
 
   pacman -Sy --noconfirm --needed openssl
-  pip install --upgrade "transifex-client~=$TRANSIFEX_CLI_VERSION"
+  pip install --upgrade --upgrade-strategy only-if-needed \
+              "urllib3==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
 
 fi
