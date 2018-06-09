@@ -95,6 +95,7 @@ SOURCES += \
     erc/ercmsg.cpp \
     erc/ercmsglist.cpp \
     library/cmd/cmdprojectlibraryaddelement.cpp \
+    library/cmd/cmdprojectlibraryremoveelement.cpp \
     library/projectlibrary.cpp \
     metadata/cmd/cmdprojectmetadataedit.cpp \
     metadata/projectmetadata.cpp \
@@ -209,6 +210,7 @@ HEADERS += \
     erc/ercmsglist.h \
     erc/if_ercmsgprovider.h \
     library/cmd/cmdprojectlibraryaddelement.h \
+    library/cmd/cmdprojectlibraryremoveelement.h \
     library/projectlibrary.h \
     metadata/cmd/cmdprojectmetadataedit.h \
     metadata/projectmetadata.h \

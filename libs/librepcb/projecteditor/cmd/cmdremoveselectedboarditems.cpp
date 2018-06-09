@@ -41,6 +41,7 @@
 #include <librepcb/project/boards/cmd/cmdfootprintstroketextremove.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 #include "cmdremovedevicefromboard.h"
+#include "cmdremoveunusedlibraryelements.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -144,6 +145,11 @@ bool CmdRemoveSelectedBoardItems::performExecute()
     // remove holes
     foreach (BI_Hole* hole, query->getHoles()) {
         execNewChildCmd(new CmdBoardHoleRemove(*hole)); // can throw
+    }
+
+    // remove library elements which are no longer required
+    if (getChildCount() > 0) {
+        execNewChildCmd(new CmdRemoveUnusedLibraryElements(mBoard.getProject())); // can throw
     }
 
     undoScopeGuard.dismiss(); // no undo required

@@ -297,8 +297,11 @@ bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const Fi
 
     foreach (ElementType* element, elementList) {
         try {
-            if (element->getFilePath().getParentDir().getParentDir() != mLibraryPath) {
-                element->moveIntoParentDirectory(parentDir);
+            FilePath dest = parentDir.getPathTo(element->getUuid().toStr());
+            if (element->getFilePath() != dest) {
+                if (toOriginal || (!dest.isExistingDir())) {
+                    element->moveIntoParentDirectory(parentDir);
+                }
             }
             if (toOriginal && (!mSavedLibraryElements.contains(element))) {
                 // TODO:

@@ -62,6 +62,7 @@
 #include "cmdchangenetsignalofschematicnetsegment.h"
 #include "cmdremovedevicefromboard.h"
 #include "cmddetachboardnetpointfromviaorpad.h"
+#include "cmdremoveunusedlibraryelements.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -146,6 +147,11 @@ bool CmdRemoveSelectedSchematicItems::performExecute()
     // remove netsignals which are no longer required
     if (getChildCount() > 0) {
         execNewChildCmd(new CmdRemoveUnusedNetSignals(mSchematic.getProject().getCircuit())); // can throw
+    }
+
+    // remove library elements which are no longer required
+    if (getChildCount() > 0) {
+        execNewChildCmd(new CmdRemoveUnusedLibraryElements(mSchematic.getProject())); // can throw
     }
 
     undoScopeGuard.dismiss(); // no undo required

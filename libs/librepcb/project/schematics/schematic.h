@@ -132,6 +132,7 @@ class Schematic final : public QObject, public AttributeProvider,
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // Symbol Methods
+        QList<SI_Symbol*> getSymbols() const noexcept {return mSymbols;}
         SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
         void addSymbol(SI_Symbol& symbol);
         void removeSymbol(SI_Symbol& symbol);

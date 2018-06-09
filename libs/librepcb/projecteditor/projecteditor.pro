@@ -60,6 +60,7 @@ SOURCES += \
     cmd/cmdremovedevicefromboard.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
     cmd/cmdremoveselectedschematicitems.cpp \
+    cmd/cmdremoveunusedlibraryelements.cpp \
     cmd/cmdremoveunusednetsignals.cpp \
     cmd/cmdreplacedevice.cpp \
     cmd/cmdrotateselectedboarditems.cpp \
@@ -126,6 +127,7 @@ HEADERS += \
     cmd/cmdremovedevicefromboard.h \
     cmd/cmdremoveselectedboarditems.h \
     cmd/cmdremoveselectedschematicitems.h \
+    cmd/cmdremoveunusedlibraryelements.h \
     cmd/cmdremoveunusednetsignals.h \
     cmd/cmdreplacedevice.h \
     cmd/cmdrotateselectedboarditems.h \
