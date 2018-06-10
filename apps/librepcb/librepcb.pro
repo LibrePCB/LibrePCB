@@ -94,6 +94,7 @@ SOURCES += \
     firstrunwizard/firstrunwizardpage_workspacepath.cpp \
     main.cpp \
     markdown/markdownconverter.cpp \
+    projectlibraryupdater/projectlibraryupdater.cpp \
 
 HEADERS += \
     controlpanel/controlpanel.h \
@@ -101,12 +102,14 @@ HEADERS += \
     firstrunwizard/firstrunwizardpage_welcome.h \
     firstrunwizard/firstrunwizardpage_workspacepath.h \
     markdown/markdownconverter.h \
+    projectlibraryupdater/projectlibraryupdater.h \
 
 FORMS += \
     controlpanel/controlpanel.ui \
     firstrunwizard/firstrunwizard.ui \
     firstrunwizard/firstrunwizardpage_welcome.ui \
     firstrunwizard/firstrunwizardpage_workspacepath.ui \
+    projectlibraryupdater/projectlibraryupdater.ui \
 
 # Custom compiler "lrelease" for qm generation
 isEmpty(QMAKE_LRELEASE): QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease

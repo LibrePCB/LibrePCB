@@ -449,6 +449,12 @@ void BoardEditor::on_actionProjectProperties_triggered()
     dialog.exec();
 }
 
+void BoardEditor::on_actionUpdateLibrary_triggered()
+{
+    // ugly hack until we have a *real* project library updater...
+    emit mProjectEditor.openProjectLibraryUpdaterClicked(mProject.getFilepath());
+}
+
 void BoardEditor::on_actionLayerStackSetup_triggered()
 {
     Board* board = getActiveBoard();
