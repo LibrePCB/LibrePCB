@@ -89,7 +89,7 @@ class ErcMsgList final : public QObject, public SerializableObject
         // General
         Project& mProject;
 
-        // File "core/erc.lp"
+        // File "circuit/erc.lp"
         FilePath mFilepath;
         QScopedPointer<SmartSExprFile> mFile;
 

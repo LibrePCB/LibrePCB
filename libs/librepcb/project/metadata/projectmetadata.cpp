@@ -39,7 +39,7 @@ namespace project {
 
 ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
-    mFilepath(project.getPath().getPathTo("core/metadata.lp"))
+    mFilepath(project.getPath().getPathTo("project/metadata.lp"))
 {
     qDebug() << "load project metadata...";
     Q_ASSERT(!(create && (restore || readOnly)));

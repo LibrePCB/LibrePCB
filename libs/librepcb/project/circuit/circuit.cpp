@@ -44,7 +44,7 @@ namespace project {
 
 Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
-    mFilepath(project.getPath().getPathTo("core/circuit.lp")), mFile(nullptr)
+    mFilepath(project.getPath().getPathTo("circuit/circuit.lp")), mFile(nullptr)
 {
     qDebug() << "load circuit...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -371,7 +371,7 @@ bool Circuit::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/circuit.lp"
+    // Save "circuit/circuit.lp"
     try
     {
         SExpression doc(serializeToDomElement("librepcb_circuit"));

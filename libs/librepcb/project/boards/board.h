@@ -235,7 +235,7 @@ class Board final : public QObject, public AttributeProvider,
 
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
-        FilePath mFilePath; ///< the filepath of the board *.lp file (from the ctor)
+        FilePath mFilePath; ///< the filepath of the board.lp file (from the ctor)
         QScopedPointer<SmartSExprFile> mFile;
         bool mIsAddedToProject;
 

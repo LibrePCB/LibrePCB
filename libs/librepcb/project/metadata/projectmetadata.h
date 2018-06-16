@@ -178,7 +178,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
         // General
         Project& mProject; ///< a reference to the Project object (from the ctor)
 
-        // File "core/metadata.lp"
+        // File "project/metadata.lp"
         FilePath mFilepath;
         QScopedPointer<SmartSExprFile> mFile;
 

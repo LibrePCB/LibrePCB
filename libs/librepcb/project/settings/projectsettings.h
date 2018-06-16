@@ -97,7 +97,7 @@ class ProjectSettings final : public QObject, public SerializableObject
         Project& mProject; ///< a reference to the Project object (from the ctor)
         FilePath mLibraryPath; ///< the "lib" directory of the project
 
-        // File "core/settings.lp"
+        // File "project/settings.lp"
         FilePath mFilepath;
         SmartSExprFile* mFile;
 

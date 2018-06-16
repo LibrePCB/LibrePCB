@@ -75,7 +75,7 @@ class BoardUserSettings final : public QObject, public SerializableObject
         // General
         Board& mBoard;
 
-        // File "user/boards/<BOARDFILENAME>.lp"
+        // File "boards/<BOARDNAME>/settings.user.lp"
         FilePath mFilepath;
         QScopedPointer<SmartSExprFile> mFile;
 
