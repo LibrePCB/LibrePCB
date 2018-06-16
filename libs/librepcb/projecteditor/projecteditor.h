@@ -201,6 +201,7 @@ class ProjectEditor final : public QObject
     signals:
 
         void showControlPanelClicked();
+        void openProjectLibraryUpdaterClicked(const FilePath& fp);
         void projectEditorClosed();
 
 

@@ -382,6 +382,12 @@ void SchematicEditor::on_actionProjectProperties_triggered()
     dialog.exec();
 }
 
+void SchematicEditor::on_actionUpdateLibrary_triggered()
+{
+    // ugly hack until we have a *real* project library updater...
+    emit mProjectEditor.openProjectLibraryUpdaterClicked(mProject.getFilepath());
+}
+
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/

@@ -60,6 +60,8 @@ class Workspace;
 
 namespace application {
 
+class ProjectLibraryUpdater;
+
 namespace Ui {
 class ControlPanel;
 }
@@ -78,6 +80,8 @@ class ControlPanel final : public QMainWindow
 {
         Q_OBJECT
 
+        friend class ProjectLibraryUpdater; // needs access to openProject() and getOpenProject()
+
     public:
 
         // Constructors / Destructor
@@ -88,6 +92,7 @@ class ControlPanel final : public QMainWindow
     public slots:
 
         void showControlPanel() noexcept;
+        void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
 
     protected:
@@ -216,6 +221,7 @@ class ControlPanel final : public QMainWindow
         QScopedPointer<library::manager::LibraryManager> mLibraryManager;
         QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
         QHash<library::Library*, library::editor::LibraryEditor*> mOpenLibraryEditors;
+        QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
 };
 
 /*****************************************************************************************

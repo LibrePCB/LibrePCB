@@ -40,6 +40,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include "../markdown/markdownconverter.h"
+#include "projectlibraryupdater/projectlibraryupdater.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -135,6 +136,7 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 
 ControlPanel::~ControlPanel()
 {
+    mProjectLibraryUpdater.reset();
     closeAllProjects(false);
     closeAllLibraryEditors(false);
     mLibraryManager.reset();
@@ -168,6 +170,12 @@ void ControlPanel::showControlPanel() noexcept
     show();
     raise();
     activateWindow();
+}
+
+void ControlPanel::openProjectLibraryUpdater(const FilePath& project) noexcept
+{
+    mProjectLibraryUpdater.reset(new ProjectLibraryUpdater(mWorkspace, project, *this));
+    mProjectLibraryUpdater->show();
 }
 
 /*****************************************************************************************
@@ -291,6 +299,7 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
             editor = new ProjectEditor(mWorkspace, *project);
             connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
             connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
+            connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this, &ControlPanel::openProjectLibraryUpdater);
             mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
             mWorkspace.setLastRecentlyUsedProject(filepath);
         }
@@ -504,6 +513,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
     // build context menu with actions
     QMenu menu;
     enum Action {OpenProject, CloseProject, AddFavorite, RemoveFavorite, // on projects
+                 UpdateLibrary,                                          // on projects
                  NewProject, NewFolder,                                  // on folders
                  Open, Remove};                                          // on folders+files
     if (isProjectFile) {
@@ -519,6 +529,8 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         } else {
             menu.addAction(QIcon(":/img/actions/bookmark_gray.png"), tr("Add to favorites"))->setData(AddFavorite);
         }
+        menu.addSeparator();
+        menu.addAction(QIcon(":/img/actions/refresh.png"), tr("Update project library"))->setData(UpdateLibrary);
     } else {
         menu.addAction(QIcon(":/img/actions/open.png"), tr("Open"))->setData(Open);
         if (fp.isExistingFile()) {menu.setDefaultAction(menu.actions().last());}
@@ -541,6 +553,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(const QPoint& p
         case CloseProject: closeProject(fp, true); break;
         case AddFavorite: mWorkspace.addFavoriteProject(fp); break;
         case RemoveFavorite: mWorkspace.removeFavoriteProject(fp); break;
+        case UpdateLibrary: openProjectLibraryUpdater(fp); break;
         case NewProject: newProject(fp); break;
         case NewFolder: QDir(fp.toStr()).mkdir(QInputDialog::getText(this, tr("New Folder"), tr("Name:"))); break;
         case Open: QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr())); break;
@@ -597,6 +610,10 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
 
     bool isFavorite = mWorkspace.isFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
 
+    FilePath fp = FilePath(index.data(Qt::UserRole).toString());
+    if (!fp.isValid())
+        return;
+
     QMenu menu;
     QAction* action;
     if (isFavorite)
@@ -609,13 +626,17 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(const QP
         action = menu.addAction(QIcon(":/img/actions/bookmark_gray.png"),
                                            tr("Add to favorites"));
     }
+    QAction* libraryUpdaterAction = menu.addAction(QIcon(":/img/actions/refresh.png"),
+                                           tr("Update project library"));
 
-    if (menu.exec(QCursor::pos()) == action)
-    {
+    QAction* result = menu.exec(QCursor::pos());
+    if (result == action) {
         if (isFavorite)
-            mWorkspace.removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+            mWorkspace.removeFavoriteProject(fp);
         else
-            mWorkspace.addFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+            mWorkspace.addFavoriteProject(fp);
+    } else if (result == libraryUpdaterAction) {
+        openProjectLibraryUpdater(fp);
     }
 }
 
@@ -625,12 +646,22 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(const 
     if (!index.isValid())
         return;
 
+    FilePath fp = FilePath(index.data(Qt::UserRole).toString());
+    if (!fp.isValid())
+        return;
+
     QMenu menu;
     QAction* removeAction = menu.addAction(QIcon(":/img/actions/cancel.png"),
                                            tr("Remove from favorites"));
+    QAction* libraryUpdaterAction = menu.addAction(QIcon(":/img/actions/refresh.png"),
+                                           tr("Update project library"));
 
-    if (menu.exec(QCursor::pos()) == removeAction)
-        mWorkspace.removeFavoriteProject(FilePath(index.data(Qt::UserRole).toString()));
+    QAction* result = menu.exec(QCursor::pos());
+    if (result == removeAction) {
+        mWorkspace.removeFavoriteProject(fp);
+    } else if (result == libraryUpdaterAction) {
+        openProjectLibraryUpdater(fp);
+    }
 }
 
 void ControlPanel::on_actionRescanLibrary_triggered()

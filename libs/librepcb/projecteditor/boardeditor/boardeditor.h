@@ -108,6 +108,7 @@ class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
         void on_actionExportAsPdf_triggered();
         void on_actionGenerateFabricationData_triggered();
         void on_actionProjectProperties_triggered();
+        void on_actionUpdateLibrary_triggered();
         void on_actionLayerStackSetup_triggered();
         void on_actionModifyDesignRules_triggered();
         void on_actionRebuildPlanes_triggered();

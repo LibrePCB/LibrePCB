@@ -101,6 +101,7 @@ class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHan
         void on_actionAddComp_gnd_triggered();
         void on_actionAddComp_vcc_triggered();
         void on_actionProjectProperties_triggered();
+        void on_actionUpdateLibrary_triggered();
 
 
     signals:

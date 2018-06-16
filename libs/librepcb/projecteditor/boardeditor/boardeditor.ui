@@ -48,7 +48,7 @@
      <x>0</x>
      <y>0</y>
      <width>886</width>
-     <height>32</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -98,6 +98,8 @@
     </property>
     <addaction name="actionProjectProperties"/>
     <addaction name="actionProjectSettings"/>
+    <addaction name="separator"/>
+    <addaction name="actionUpdateLibrary"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -689,6 +691,15 @@
    </property>
    <property name="text">
     <string>Add &amp;Hole</string>
+   </property>
+  </action>
+  <action name="actionUpdateLibrary">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Library</string>
    </property>
   </action>
  </widget>
