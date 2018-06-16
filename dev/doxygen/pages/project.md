@@ -9,7 +9,160 @@ class librepcb::project::Project.
 
 # The File Structure of a Project {#doc_project_filestructure}
 
-TBD
+A project directory contains following files and subdirectories:
+
+    project-root/
+        ├── .librepcb-project
+        ├── <PROJECTNAME>.lpp
+        ├── README.md
+        ├── boards/
+        │   ├── boards.lp
+        │   └── <BOARDNAME>/
+        │       ├── board.lp
+        │       └── settings.user.lp
+        ├── circuit/
+        │   ├── circuit.lp
+        │   └── erc.lp
+        ├── library/
+        ├── output/
+        ├── project/
+        │   ├── metadata.lp
+        │   └── settings.lp
+        ├── resources/
+        └── schematics/
+            ├── schematics.lp
+            └── <SCHEMATICNAME>/
+                └── schematic.lp
+
+## .librepcb-project
+
+This file indicates that the directory is a LibrePCB project and also contains the file format
+version. See @ref doc_versioning for more information about LibrePCB's file format versioning system.
+
+## <PROJECTNAME\>.lpp
+
+This is the main project file which can be opened by double-clicking in the file manager.
+Because this is the only purpose of that file, it doesn't contain any information.
+
+## README.md
+
+Optional readme file in Markdown. Content will be rendered in the Control Panel.
+
+## boards/boards.lp
+
+Contains the list of all boards (in a specific order) of the project.
+
+## boards/<BOARDNAME\>/board.lp
+
+A board file containing all the package positions and traces. See librepcb::project::Board.
+
+## boards/<BOARDNAME\>/settings.user.lp
+
+User-specific settings of a board, for example which layers are visible or hidden.
+See librepcb::project::BoardUserSettings.
+
+## circuit/circuit.lp
+
+Contains the whole netlist with all net classes, net signals and connections between
+components. See librepcb::project::Circuit.
+
+## circuit/erc.lp
+
+ERC settings (e.g. which ERC messages are ignored). See librepcb::project::ErcMsgList.
+
+## library/
+
+Directory containing all the library elements used in the project. Same directory
+structure as of workspace libraries. See librepcb::project::ProjectLibrary.
+
+## output/
+
+Directory intended to store all generated output files of the project, e.g. Gerber or PDFs.
+
+## project/metadata.lp
+
+Contains project meta data. See librepcb::project::ProjectMetadata.
+
+## project/settings.lp
+
+Contains project settings. See librepcb::project::ProjectSettings.
+
+## resources/
+
+Contains various resource files needed in the project, e.g. fonts.
+
+## schematics/schematics.lp
+
+Contains the list of all schematics (in a specific order) of the project.
+
+## schematics/<SCHEMATICNAME\>/schematic.lp
+
+A schematic file containing all the symbol positions and wires. See librepcb::project::Schematic.
+
+## Example
+
+This is an example how a project could look like:
+
+    MyProject/
+        ├── .librepcb-project
+        ├── MyProject.lpp
+        ├── README.md
+        ├── boards/
+        │   ├── boards.lp
+        │   ├── MyBoard1/
+        │   │   ├── board.lp
+        │   │   └── settings.user.lp
+        │   └── MyBoard2/
+        │       ├── board.lp
+        │       └── settings.user.lp
+        ├── circuit/
+        │   ├── circuit.lp
+        │   └── erc.lp
+        ├── library/
+        │   ├── cmp/
+        │   │   ├── e995a552-12c4-413a-8258-1d6ec9a8471d/
+        │   │   │   └── component.lp
+        │   │   └── ef80cd5e-2689-47ee-8888-31d04fc99174/
+        │   │       └── component.lp
+        │   ├── dev/
+        │   │   ├── f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e/
+        │   │   │   └── device.lp
+        │   │   └── f83a5ae8-7f42-42be-9dd6-e762f4da2ec2/
+        │   │       └── device.lp
+        │   ├── pkg/
+        │   │   ├── bf77778d-eee6-4b56-ad82-d24f9c668a63/
+        │   │   │   └── package.lp
+        │   │   └── d6527201-0b43-4ec6-96e1-8dde11a38645/
+        │   │       └── package.lp
+        │   └── sym/
+        │       ├── eaa5837a-a451-40ae-8620-d21e9af42151/
+        │       │   └── symbol.lp
+        │       └── f00ab942-6980-442b-86a8-51b92de5704d/
+        │           └── symbol.lp
+        ├── output/
+        │   └── v1/
+        │       ├── MyProject_Schematics.pdf
+        │       └── gerber/
+        │           ├── MyProject_COPPER-BOTTOM.gbr
+        │           ├── MyProject_COPPER-TOP.gbr
+        │           ├── MyProject_DRILLS-PTH.drl
+        │           ├── MyProject_OUTLINES.gbr
+        │           ├── MyProject_SILKSCREEN-BOTTOM.gbr
+        │           ├── MyProject_SILKSCREEN-TOP.gbr
+        │           ├── MyProject_SOLDERMASK-BOTTOM.gbr
+        │           └── MyProject_SOLDERMASK-TOP.gbr
+        ├── project/
+        │   ├── metadata.lp
+        │   └── settings.lp
+        ├── resources/
+        │   └── fontobene/
+        │       └── newstroke.bene
+        └── schematics/
+            ├── schematics.lp
+            ├── MySchematicPage1/
+            │   └── schematic.lp
+            └── MySchematicPage2/
+                └── schematic.lp
 
 
 # Compatibility between different application versions {#doc_project_compatibility}
