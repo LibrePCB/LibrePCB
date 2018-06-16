@@ -21,13 +21,13 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "packageeditorstate_drawellipse.h"
+#include "packageeditorstate_drawcircle.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
-#include <librepcb/common/geometry/ellipse.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
+#include <librepcb/common/geometry/circle.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>

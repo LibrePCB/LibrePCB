@@ -26,11 +26,11 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/ellipsepropertiesdialog.h>
+#include <librepcb/common/dialogs/circlepropertiesdialog.h>
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
 #include "cmd/cmdmoveselectedsymbolitems.h"
 #include "cmd/cmdrotateselectedsymbolitems.h"

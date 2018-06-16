@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ELLIPSE_H
-#define LIBREPCB_ELLIPSE_H
+#ifndef LIBREPCB_CIRCLE_H
+#define LIBREPCB_CIRCLE_H
 
 /*****************************************************************************************
  *  Includes
@@ -162,4 +162,4 @@ using CmdEllipsesSwap = CmdListElementsSwap<Ellipse, EllipseListNameProvider>;
 
 } // namespace librepcb
 
-#endif // LIBREPCB_ELLIPSE_H
+#endif // LIBREPCB_CIRCLE_H

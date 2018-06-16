@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDELLIPSEEDIT_H
-#define LIBREPCB_CMDELLIPSEEDIT_H
+#ifndef LIBREPCB_CMDCIRCLEEDIT_H
+#define LIBREPCB_CMDCIRCLEEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -111,4 +111,4 @@ class CmdEllipseEdit final : public UndoCommand
 
 } // namespace librepcb
 
-#endif // LIBREPCB_CMDELLIPSEEDIT_H
+#endif // LIBREPCB_CMDCIRCLEEDIT_H

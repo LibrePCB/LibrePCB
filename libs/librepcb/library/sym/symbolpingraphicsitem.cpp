@@ -25,7 +25,7 @@
 #include "symbolpingraphicsitem.h"
 #include "symbolpin.h"
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/linegraphicsitem.h>
 #include <librepcb/common/graphics/primitivetextgraphicsitem.h>
 

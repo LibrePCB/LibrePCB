@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "gerbergenerator.h"
 #include "gerberaperturelist.h"
-#include "../geometry/ellipse.h"
+#include "../geometry/circle.h"
 #include "../geometry/path.h"
 #include "../fileio/smarttextfile.h"
 #include "../application.h"

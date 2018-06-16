@@ -26,7 +26,7 @@
 #include "footprint.h"
 #include "footprintpadgraphicsitem.h"
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 

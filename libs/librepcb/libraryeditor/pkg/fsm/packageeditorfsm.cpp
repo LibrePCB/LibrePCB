@@ -35,7 +35,7 @@
 #include "packageeditorstate_drawline.h"
 #include "packageeditorstate_drawrect.h"
 #include "packageeditorstate_drawpolygon.h"
-#include "packageeditorstate_drawellipse.h"
+#include "packageeditorstate_drawcircle.h"
 #include "packageeditorstate_drawtext.h"
 #include "packageeditorstate_addholes.h"
 

@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "primitiveellipsegraphicsitem.h"
+#include "primitivecirclegraphicsitem.h"
 #include "../toolbox.h"
 
 /*****************************************************************************************

@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/ellipse.h>
+#include <librepcb/common/geometry/circle.h>
 #include <librepcb/common/geometry/text.h>
 #include "../libraryelement.h"
 #include "symbolpin.h"

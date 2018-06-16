@@ -29,7 +29,7 @@
 #include "symboleditorstate_drawline.h"
 #include "symboleditorstate_drawrect.h"
 #include "symboleditorstate_drawpolygon.h"
-#include "symboleditorstate_drawellipse.h"
+#include "symboleditorstate_drawcircle.h"
 #include "symboleditorstate_drawtext.h"
 
 /*****************************************************************************************

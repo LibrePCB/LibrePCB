@@ -24,13 +24,13 @@
 #include "cmdrotateselectedsymbolitems.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>

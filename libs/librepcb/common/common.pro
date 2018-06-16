@@ -49,7 +49,7 @@ SOURCES += \
     cam/gerbergenerator.cpp \
     debug.cpp \
     dialogs/boarddesignrulesdialog.cpp \
-    dialogs/ellipsepropertiesdialog.cpp \
+    dialogs/circlepropertiesdialog.cpp \
     dialogs/gridsettingsdialog.cpp \
     dialogs/holepropertiesdialog.cpp \
     dialogs/polygonpropertiesdialog.cpp \
@@ -66,20 +66,20 @@ SOURCES += \
     fileio/smartversionfile.cpp \
     font/strokefont.cpp \
     font/strokefontpool.cpp \
-    geometry/cmd/cmdellipseedit.cpp \
+    geometry/circle.cpp \
+    geometry/cmd/cmdcircleedit.cpp \
     geometry/cmd/cmdholeedit.cpp \
     geometry/cmd/cmdpolygonedit.cpp \
     geometry/cmd/cmdstroketextedit.cpp \
     geometry/cmd/cmdtextedit.cpp \
-    geometry/ellipse.cpp \
     geometry/hole.cpp \
     geometry/path.cpp \
     geometry/polygon.cpp \
     geometry/stroketext.cpp \
     geometry/text.cpp \
     geometry/vertex.cpp \
+    graphics/circlegraphicsitem.cpp \
     graphics/defaultgraphicslayerprovider.cpp \
-    graphics/ellipsegraphicsitem.cpp \
     graphics/graphicslayer.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
@@ -87,7 +87,7 @@ SOURCES += \
     graphics/linegraphicsitem.cpp \
     graphics/origincrossgraphicsitem.cpp \
     graphics/polygongraphicsitem.cpp \
-    graphics/primitiveellipsegraphicsitem.cpp \
+    graphics/primitivecirclegraphicsitem.cpp \
     graphics/primitivepathgraphicsitem.cpp \
     graphics/primitivetextgraphicsitem.cpp \
     graphics/stroketextgraphicsitem.cpp \
@@ -147,7 +147,7 @@ HEADERS += \
     cam/gerbergenerator.h \
     debug.h \
     dialogs/boarddesignrulesdialog.h \
-    dialogs/ellipsepropertiesdialog.h \
+    dialogs/circlepropertiesdialog.h \
     dialogs/gridsettingsdialog.h \
     dialogs/holepropertiesdialog.h \
     dialogs/polygonpropertiesdialog.h \
@@ -170,20 +170,20 @@ HEADERS += \
     fileio/smartversionfile.h \
     font/strokefont.h \
     font/strokefontpool.h \
-    geometry/cmd/cmdellipseedit.h \
+    geometry/circle.h \
+    geometry/cmd/cmdcircleedit.h \
     geometry/cmd/cmdholeedit.h \
     geometry/cmd/cmdpolygonedit.h \
     geometry/cmd/cmdstroketextedit.h \
     geometry/cmd/cmdtextedit.h \
-    geometry/ellipse.h \
     geometry/hole.h \
     geometry/path.h \
     geometry/polygon.h \
     geometry/stroketext.h \
     geometry/text.h \
     geometry/vertex.h \
+    graphics/circlegraphicsitem.h \
     graphics/defaultgraphicslayerprovider.h \
-    graphics/ellipsegraphicsitem.h \
     graphics/graphicslayer.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
@@ -192,7 +192,7 @@ HEADERS += \
     graphics/linegraphicsitem.h \
     graphics/origincrossgraphicsitem.h \
     graphics/polygongraphicsitem.h \
-    graphics/primitiveellipsegraphicsitem.h \
+    graphics/primitivecirclegraphicsitem.h \
     graphics/primitivepathgraphicsitem.h \
     graphics/primitivetextgraphicsitem.h \
     graphics/stroketextgraphicsitem.h \
@@ -237,7 +237,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/boarddesignrulesdialog.ui \
-    dialogs/ellipsepropertiesdialog.ui \
+    dialogs/circlepropertiesdialog.ui \
     dialogs/gridsettingsdialog.ui \
     dialogs/holepropertiesdialog.ui \
     dialogs/polygonpropertiesdialog.ui \

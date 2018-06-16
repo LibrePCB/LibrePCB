@@ -22,7 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "ellipsegraphicsitem.h"
+#include "circlegraphicsitem.h"
 #include "../graphics/graphicslayer.h"
 
 /*****************************************************************************************

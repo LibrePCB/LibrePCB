@@ -24,13 +24,13 @@
 #include "cmdmoveselectedfootprintitems.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
-#define LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
+#ifndef LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H
+#define LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
@@ -103,4 +103,4 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
 
 } // namespace librepcb
 
-#endif // LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
+#endif // LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H

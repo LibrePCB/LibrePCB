@@ -21,8 +21,8 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdellipseedit.h"
-#include "../ellipse.h"
+#include "cmdcircleedit.h"
+#include "../circle.h"
 
 /*****************************************************************************************
  *  Namespace

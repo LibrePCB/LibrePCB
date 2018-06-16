@@ -33,7 +33,7 @@
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include "fsm/symboleditorfsm.h"
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 

@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWELLIPSE_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWELLIPSE_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
+#define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "symboleditorstate.h"
+#include "packageeditorstate.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,26 +40,26 @@ namespace library {
 namespace editor {
 
 /*****************************************************************************************
- *  Class SymbolEditorState_DrawEllipse
+ *  Class PackageEditorState_DrawEllipse
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorState_DrawEllipse class
+ * @brief The PackageEditorState_DrawEllipse class
  *
  * @author  ubruhin
- * @date    2017-01-02
+ * @date    2017-05-29
  */
-class SymbolEditorState_DrawEllipse final : public SymbolEditorState
+class PackageEditorState_DrawEllipse final : public PackageEditorState
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        SymbolEditorState_DrawEllipse() = delete;
-        SymbolEditorState_DrawEllipse(const SymbolEditorState_DrawEllipse& other) = delete;
-        explicit SymbolEditorState_DrawEllipse(const Context& context) noexcept;
-        ~SymbolEditorState_DrawEllipse() noexcept;
+        PackageEditorState_DrawEllipse() = delete;
+        PackageEditorState_DrawEllipse(const PackageEditorState_DrawEllipse& other) = delete;
+        explicit PackageEditorState_DrawEllipse(Context& context) noexcept;
+        ~PackageEditorState_DrawEllipse() noexcept;
 
         // General Methods
         bool entry() noexcept override;
@@ -71,7 +71,7 @@ class SymbolEditorState_DrawEllipse final : public SymbolEditorState
         bool processAbortCommand() noexcept override;
 
         // Operator Overloadings
-        SymbolEditorState_DrawEllipse& operator=(const SymbolEditorState_DrawEllipse& rhs) = delete;
+        PackageEditorState_DrawEllipse& operator=(const PackageEditorState_DrawEllipse& rhs) = delete;
 
 
     private: // Methods
@@ -107,4 +107,4 @@ class SymbolEditorState_DrawEllipse final : public SymbolEditorState
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWELLIPSE_H
+#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H

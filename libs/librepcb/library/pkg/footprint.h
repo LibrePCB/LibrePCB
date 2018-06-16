@@ -30,7 +30,7 @@
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/ellipse.h>
+#include <librepcb/common/geometry/circle.h>
 #include <librepcb/common/geometry/stroketext.h>
 #include <librepcb/common/geometry/hole.h>
 #include "footprintpad.h"

@@ -22,10 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "ellipsepropertiesdialog.h"
-#include "ui_ellipsepropertiesdialog.h"
-#include "../geometry/ellipse.h"
-#include "../geometry/cmd/cmdellipseedit.h"
+#include "circlepropertiesdialog.h"
+#include "ui_circlepropertiesdialog.h"
+#include "../geometry/circle.h"
+#include "../geometry/cmd/cmdcircleedit.h"
 #include "../graphics/graphicslayer.h"
 #include "../undostack.h"
 
