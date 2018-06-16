@@ -40,7 +40,7 @@ HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& l
     PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
 {
     setPosition(mHole.getPosition());
-    setRadius(mHole.getDiameter() / 2, mHole.getDiameter() / 2);
+    setDiameter(mHole.getDiameter());
     setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setZValue(5);
@@ -80,7 +80,7 @@ void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept
 
 void HoleGraphicsItem::holeDiameterChanged(const Length& newDiameter) noexcept
 {
-    setRadius(newDiameter / 2, newDiameter / 2);
+    setDiameter(newDiameter);
     mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
 }
 

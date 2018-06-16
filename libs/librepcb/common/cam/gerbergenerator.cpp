@@ -74,25 +74,15 @@ void GerberGenerator::drawLine(const Point& start, const Point& end, const Lengt
 
 void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept
 {
-    if (circle.getRadiusX() == circle.getRadiusY()) {
-        Length outerDia = (circle.getRadiusX() * 2) + circle.getLineWidth();
-        Length innerDia = (circle.getRadiusX() * 2) - circle.getLineWidth();
-        if (innerDia < 0) innerDia = 0;
-        flashCircle(circle.getCenter(), outerDia, innerDia);
-    } else {
-        // TODO!
-        qWarning() << "Circle was ignored in gerber output!";
-    }
+    Length outerDia = circle.getDiameter() + circle.getLineWidth();
+    Length innerDia = circle.getDiameter() - circle.getLineWidth();
+    if (innerDia < 0) innerDia = 0;
+    flashCircle(circle.getCenter(), outerDia, innerDia);
 }
 
 void GerberGenerator::drawCircleArea(const Circle& circle) noexcept
 {
-    if (circle.getRadiusX() == circle.getRadiusY()) {
-        flashCircle(circle.getCenter(), circle.getRadiusX() * 2, Length(0));
-    } else {
-        // TODO!
-        qWarning() << "Circle was ignored in gerber output!";
-    }
+    flashCircle(circle.getCenter(), circle.getDiameter(), Length(0));
 }
 
 void GerberGenerator::drawPathOutline(const Path& path, const Length& lineWidth) noexcept

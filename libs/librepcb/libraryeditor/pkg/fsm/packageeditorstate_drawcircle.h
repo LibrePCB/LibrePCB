@@ -87,7 +87,6 @@ class PackageEditorState_DrawCircle final : public PackageEditorState
 
 
     private: // Types / Data
-        Point mStartPos;
         QScopedPointer<CmdCircleEdit> mEditCmd;
         Circle* mCurrentCircle;
         CircleGraphicsItem* mCurrentGraphicsItem;

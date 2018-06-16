@@ -69,9 +69,7 @@ class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_C
         void circleIsFilledChanged(bool newIsFilled) noexcept override;
         void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
         void circleCenterChanged(const Point& newCenter) noexcept override;
-        void circleRadiusXChanged(const Length& newRadiusX) noexcept override;
-        void circleRadiusYChanged(const Length& newRadiusY) noexcept override;
-        void circleRotationChanged(const Angle& newRotation) noexcept override;
+        void circleDiameterChanged(const Length& newDiameter) noexcept override;
         void updateFillLayer() noexcept;
 
 

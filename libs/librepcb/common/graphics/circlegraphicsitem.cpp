@@ -39,8 +39,7 @@ CircleGraphicsItem::CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerPro
     PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp)
 {
     setPosition(mCircle.getCenter());
-    setRotation(mCircle.getRotation());
-    setRadius(mCircle.getRadiusX(), mCircle.getRadiusY());
+    setDiameter(mCircle.getDiameter());
     setLineWidth(mCircle.getLineWidth());
     setLineLayer(mLayerProvider.getLayer(mCircle.getLayerName()));
     updateFillLayer();
@@ -87,19 +86,9 @@ void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept
     setPosition(newCenter);
 }
 
-void CircleGraphicsItem::circleRadiusXChanged(const Length& newRadiusX) noexcept
+void CircleGraphicsItem::circleDiameterChanged(const Length& newDiameter) noexcept
 {
-    setRadiusX(newRadiusX);
-}
-
-void CircleGraphicsItem::circleRadiusYChanged(const Length& newRadiusY) noexcept
-{
-    setRadiusY(newRadiusY);
-}
-
-void CircleGraphicsItem::circleRotationChanged(const Angle& newRotation) noexcept
-{
-    setRotation(newRotation);
+    setDiameter(newDiameter);
 }
 
 void CircleGraphicsItem::updateFillLayer() noexcept

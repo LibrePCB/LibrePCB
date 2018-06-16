@@ -55,10 +55,7 @@ class PrimitiveCircleGraphicsItem : public QGraphicsItem, public IF_GraphicsLaye
 
         // Setters
         void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setRadiusX(const Length& rx) noexcept;
-        void setRadiusY(const Length& ry) noexcept;
-        void setRadius(const Length& rx, const Length& ry) noexcept;
+        void setDiameter(const Length& dia) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setLineLayer(const GraphicsLayer* layer) noexcept;
         void setFillLayer(const GraphicsLayer* layer) noexcept;

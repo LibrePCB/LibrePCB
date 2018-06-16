@@ -191,8 +191,9 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
 
         // draw circle
-        painter->drawEllipse(circle.getCenter().toPxQPointF(), circle.getRadiusX().toPx(),
-                             circle.getRadiusY().toPx());
+        painter->drawEllipse(circle.getCenter().toPxQPointF(),
+                             circle.getDiameter().toPx() / 2,
+                             circle.getDiameter().toPx() / 2);
         // TODO: rotation
     }
 

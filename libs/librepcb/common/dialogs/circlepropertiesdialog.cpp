@@ -45,8 +45,6 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoSt
         mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
     }
 
-    connect(mUi->cbxEnableHeightField, &QCheckBox::toggled,
-            mUi->spbHeight, &QDoubleSpinBox::setEnabled);
     connect(mUi->buttonBox, &QDialogButtonBox::clicked,
             this, &CirclePropertiesDialog::buttonBoxClicked);
 
@@ -55,12 +53,9 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoSt
     mUi->spbLineWidth->setValue(mCircle.getLineWidth().toMm());
     mUi->cbxFillArea->setChecked(mCircle.isFilled());
     mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
-    mUi->spbWidth->setValue(mCircle.getRadiusX().toMm() * 2);
-    mUi->spbHeight->setValue(mCircle.getRadiusY().toMm() * 2);
-    mUi->cbxEnableHeightField->setChecked(!mCircle.isRound());
+    mUi->spbDiameter->setValue(mCircle.getDiameter().toMm());
     mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
     mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
-    mUi->spbRotation->setValue(mCircle.getRotation().toDeg());
 }
 
 CirclePropertiesDialog::~CirclePropertiesDialog() noexcept
@@ -92,9 +87,7 @@ void CirclePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
 bool CirclePropertiesDialog::applyChanges() noexcept
 {
     try {
-        Length radiusX = Length::fromMm(mUi->spbWidth->value() / 2);
-        Length radiusY = mUi->spbHeight->isEnabled() ?
-                         Length::fromMm(mUi->spbHeight->value() / 2) : radiusX;
+        Length diameter = Length::fromMm(mUi->spbDiameter->value());
 
         QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
@@ -103,10 +96,8 @@ bool CirclePropertiesDialog::applyChanges() noexcept
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
         cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
-        cmd->setRadiusX(radiusX, false);
-        cmd->setRadiusY(radiusY, false);
+        cmd->setDiameter(diameter, false);
         cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-        cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());
         return true;
     } catch (const Exception& e) {

@@ -44,11 +44,9 @@ Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
 }
 
 Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
-                 bool isGrabArea, const Point& center, const Length& radiusX,
-                 const Length& radiusY, const Angle& rotation) noexcept :
+               bool isGrabArea, const Point& center, const Length& diameter) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
-    mIsGrabArea(isGrabArea), mCenter(center), mRadiusX(radiusX), mRadiusY(radiusY),
-    mRotation(rotation)
+    mIsGrabArea(isGrabArea), mCenter(center), mDiameter(diameter)
 {
 }
 
@@ -65,14 +63,14 @@ Circle::Circle(const SExpression& node)
     mIsFilled = node.getValueByPath<bool>("fill", true);
     mIsGrabArea = node.getValueByPath<bool>("grab", true);
     mCenter = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    if (node.tryGetChildByPath("size")) {
-        mRadiusX = Point(node.getChildByPath("size")).getX() / 2; // size to radius
-        mRadiusY = Point(node.getChildByPath("size")).getY() / 2; // size to radius
+    if (node.tryGetChildByPath("dia")) {
+        mDiameter = node.getValueByPath<Length>("dia", true);
+    } else if (node.tryGetChildByPath("size")) {
+        // backward compatibility, remove this some time!
+        mDiameter = Point(node.getChildByPath("size")).getX();
     } else {
         // backward compatibility, remove this some time!
-        mRadiusX = node.getValueByPath<Length>("rx", true);
-        mRadiusY = node.getValueByPath<Length>("ry", true);
+        mDiameter = node.getValueByPath<Length>("rx", true) * 2;
     }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -131,30 +129,12 @@ void Circle::setCenter(const Point& center) noexcept
     }
 }
 
-void Circle::setRadiusX(const Length& radius) noexcept
+void Circle::setDiameter(const Length& dia) noexcept
 {
-    if (radius == mRadiusX) return;
-    mRadiusX = radius;
+    if (dia == mDiameter) return;
+    mDiameter = dia;
     foreach (IF_CircleObserver* object, mObservers) {
-        object->circleRadiusXChanged(mRadiusX);
-    }
-}
-
-void Circle::setRadiusY(const Length& radius) noexcept
-{
-    if (radius == mRadiusY) return;
-    mRadiusY = radius;
-    foreach (IF_CircleObserver* object, mObservers) {
-        object->circleRadiusYChanged(mRadiusY);
-    }
-}
-
-void Circle::setRotation(const Angle& rotation) noexcept
-{
-    if (rotation == mRotation) return;
-    mRotation = rotation;
-    foreach (IF_CircleObserver* object, mObservers) {
-        object->circleRotationChanged(mRotation);
+        object->circleDiameterChanged(mDiameter);
     }
 }
 
@@ -165,20 +145,6 @@ void Circle::setRotation(const Angle& rotation) noexcept
 Circle& Circle::translate(const Point& offset) noexcept
 {
     mCenter += offset;
-    return *this;
-}
-
-Circle& Circle::rotate(const Angle& angle, const Point& center) noexcept
-{
-    mCenter.rotate(angle, center);
-    mRotation += angle;
-    return *this;
-}
-
-Circle& Circle::mirror(Qt::Orientation orientation, const Point& center) noexcept
-{
-    mCenter.mirror(orientation, center);
-    mRotation = -mRotation;
     return *this;
 }
 
@@ -202,12 +168,11 @@ void Circle::serialize(SExpression& root) const
 
     root.appendToken(mUuid);
     root.appendTokenChild("layer", mLayerName, false);
-    root.appendTokenChild("width", mLineWidth, false);
-    root.appendTokenChild("fill", mIsFilled, true);
+    root.appendTokenChild("width", mLineWidth, true);
+    root.appendTokenChild("fill", mIsFilled, false);
     root.appendTokenChild("grab", mIsGrabArea, false);
-    root.appendChild(Point(mRadiusX * 2, mRadiusY * 2).serializeToDomElement("size"), false);
+    root.appendTokenChild("dia", mDiameter, false);
     root.appendChild(mCenter.serializeToDomElement("pos"), false);
-    root.appendTokenChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************
@@ -222,9 +187,7 @@ bool Circle::operator==(const Circle& rhs) const noexcept
     if (mIsFilled != rhs.mIsFilled)         return false;
     if (mIsGrabArea != rhs.mIsGrabArea)     return false;
     if (mCenter != rhs.mCenter)             return false;
-    if (mRadiusX != rhs.mRadiusX)           return false;
-    if (mRadiusY != rhs.mRadiusY)           return false;
-    if (mRotation != rhs.mRotation)         return false;
+    if (mDiameter != rhs.mDiameter)         return false;
     return true;
 }
 
@@ -236,9 +199,7 @@ Circle& Circle::operator=(const Circle& rhs) noexcept
     mIsFilled = rhs.mIsFilled;
     mIsGrabArea = rhs.mIsGrabArea;
     mCenter = rhs.mCenter;
-    mRadiusX = rhs.mRadiusX;
-    mRadiusY = rhs.mRadiusY;
-    mRotation = rhs.mRotation;
+    mDiameter = rhs.mDiameter;
     return *this;
 }
 
@@ -251,8 +212,7 @@ bool Circle::checkAttributesValidity() const noexcept
     if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
-    if (mRadiusX <= 0)          return false;
-    if (mRadiusY <= 0)          return false;
+    if (mDiameter <= 0)         return false;
     return true;
 }
 

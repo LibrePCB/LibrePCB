@@ -39,10 +39,8 @@ CmdCircleEdit::CmdCircleEdit(Circle& circle) noexcept :
     mOldLineWidth(circle.getLineWidth()), mNewLineWidth(mOldLineWidth),
     mOldIsFilled(circle.isFilled()), mNewIsFilled(mOldIsFilled),
     mOldIsGrabArea(circle.isGrabArea()), mNewIsGrabArea(mOldIsGrabArea),
-    mOldRadiusX(circle.getRadiusX()), mNewRadiusX(mOldRadiusX),
-    mOldRadiusY(circle.getRadiusY()), mNewRadiusY(mOldRadiusY),
-    mOldCenter(circle.getCenter()), mNewCenter(mOldCenter),
-    mOldRotation(circle.getRotation()), mNewRotation(mOldRotation)
+    mOldDiameter(circle.getDiameter()), mNewDiameter(mOldDiameter),
+    mOldCenter(circle.getCenter()), mNewCenter(mOldCenter)
 {
 }
 
@@ -85,18 +83,11 @@ void CmdCircleEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept
     if (immediate) mCircle.setIsGrabArea(mNewIsGrabArea);
 }
 
-void CmdCircleEdit::setRadiusX(const Length& rx, bool immediate) noexcept
+void CmdCircleEdit::setDiameter(const Length& dia, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
-    mNewRadiusX = rx;
-    if (immediate) mCircle.setRadiusX(mNewRadiusX);
-}
-
-void CmdCircleEdit::setRadiusY(const Length& ry, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewRadiusY = ry;
-    if (immediate) mCircle.setRadiusY(mNewRadiusY);
+    mNewDiameter = dia;
+    if (immediate) mCircle.setDiameter(mNewDiameter);
 }
 
 void CmdCircleEdit::setCenter(const Point& pos, bool immediate) noexcept
@@ -113,21 +104,12 @@ void CmdCircleEdit::setDeltaToStartCenter(const Point& deltaPos, bool immediate)
     if (immediate) mCircle.setCenter(mNewCenter);
 }
 
-void CmdCircleEdit::setRotation(const Angle& angle, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewRotation = angle;
-    if (immediate) mCircle.setRotation(mNewRotation);
-}
-
 void CmdCircleEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewCenter.rotate(angle, center);
-    mNewRotation += angle;
     if (immediate) {
         mCircle.setCenter(mNewCenter);
-        mCircle.setRotation(mNewRotation);
     }
 }
 
@@ -143,10 +125,8 @@ bool CmdCircleEdit::performExecute()
     if (mNewLineWidth   != mOldLineWidth)   return true;
     if (mNewIsFilled    != mOldIsFilled)    return true;
     if (mNewIsGrabArea  != mOldIsGrabArea)  return true;
-    if (mNewRadiusX     != mOldRadiusX)     return true;
-    if (mNewRadiusY     != mOldRadiusY)     return true;
+    if (mNewDiameter    != mOldDiameter)    return true;
     if (mNewCenter      != mOldCenter)      return true;
-    if (mNewRotation    != mOldRotation)    return true;
     return false;
 }
 
@@ -156,10 +136,8 @@ void CmdCircleEdit::performUndo()
     mCircle.setLineWidth(mOldLineWidth);
     mCircle.setIsFilled(mOldIsFilled);
     mCircle.setIsGrabArea(mOldIsGrabArea);
-    mCircle.setRadiusX(mOldRadiusX);
-    mCircle.setRadiusY(mOldRadiusY);
+    mCircle.setDiameter(mOldDiameter);
     mCircle.setCenter(mOldCenter);
-    mCircle.setRotation(mOldRotation);
 }
 
 void CmdCircleEdit::performRedo()
@@ -168,10 +146,8 @@ void CmdCircleEdit::performRedo()
     mCircle.setLineWidth(mNewLineWidth);
     mCircle.setIsFilled(mNewIsFilled);
     mCircle.setIsGrabArea(mNewIsGrabArea);
-    mCircle.setRadiusX(mNewRadiusX);
-    mCircle.setRadiusY(mNewRadiusY);
+    mCircle.setDiameter(mNewDiameter);
     mCircle.setCenter(mNewCenter);
-    mCircle.setRotation(mNewRotation);
 }
 
 /*****************************************************************************************

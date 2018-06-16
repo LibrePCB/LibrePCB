@@ -60,28 +60,9 @@ void PrimitiveCircleGraphicsItem::setPosition(const Point& pos) noexcept
     QGraphicsItem::setPos(pos.toPxQPointF());
 }
 
-void PrimitiveCircleGraphicsItem::setRotation(const Angle& rot) noexcept
+void PrimitiveCircleGraphicsItem::setDiameter(const Length& dia) noexcept
 {
-    QGraphicsItem::setRotation(-rot.toDeg());
-}
-
-void PrimitiveCircleGraphicsItem::setRadiusX(const Length& rx) noexcept
-{
-    mCircleRect.setLeft(-rx.toPx());
-    mCircleRect.setWidth(2*rx.toPx());
-    updateBoundingRectAndShape();
-}
-
-void PrimitiveCircleGraphicsItem::setRadiusY(const Length& ry) noexcept
-{
-    mCircleRect.setTop(-ry.toPx());
-    mCircleRect.setHeight(2*ry.toPx());
-    updateBoundingRectAndShape();
-}
-
-void PrimitiveCircleGraphicsItem::setRadius(const Length& rx, const Length& ry) noexcept
-{
-    mCircleRect = Toolbox::boundingRectFromRadius(rx.toPx(), ry.toPx());
+    mCircleRect = Toolbox::boundingRectFromRadius(dia.toPx() / 2);
     updateBoundingRectAndShape();
 }
 

@@ -91,7 +91,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
         footprint->getCircles().append(std::make_shared<Circle>(Uuid::createRandom(),
-            layerName, lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
+            layerName, lineWidth, fill, isGrabArea, center, radius * 2));
     }
 
     foreach (const parseagle::Polygon& polygon, mPackage.getPolygons()) {

@@ -245,8 +245,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
         // draw circle
-        painter->drawEllipse(circle.getCenter().toPxQPointF(), circle.getRadiusX().toPx(),
-                             circle.getRadiusY().toPx());
+        painter->drawEllipse(circle.getCenter().toPxQPointF(),
+                             circle.getDiameter().toPx() / 2,
+                             circle.getDiameter().toPx() / 2);
         // TODO: rotation
     }
 

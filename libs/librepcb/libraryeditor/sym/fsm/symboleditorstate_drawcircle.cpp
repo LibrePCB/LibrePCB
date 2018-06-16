@@ -156,11 +156,9 @@ bool SymbolEditorState_DrawCircle::processAbortCommand() noexcept
 bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept
 {
     try {
-        mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
         mCurrentCircle = new Circle(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
-                                      mLastFill, mLastGrabArea, pos, Length(0), Length(0),
-                                      Angle::deg0());
+                                    mLastFill, mLastGrabArea, pos, Length(0));
         mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
             mContext.symbol.getCircles(), std::shared_ptr<Circle>(mCurrentCircle)));
         mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
@@ -179,16 +177,14 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept
 
 bool SymbolEditorState_DrawCircle::updateCircleDiameter(const Point& pos) noexcept
 {
-    Point center = (pos + mStartPos) / 2;
-    mEditCmd->setCenter(center, true);
-    mEditCmd->setRadiusX((pos.getX() - mStartPos.getX()).abs() / 2, true);
-    mEditCmd->setRadiusY((pos.getY() - mStartPos.getY()).abs() / 2, true);
+    Point delta = pos - mCurrentCircle->getCenter();
+    mEditCmd->setDiameter(delta.getLength() * 2, true);
     return true;
 }
 
 bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept
 {
-    if (pos == mStartPos) {
+    if (pos == mCurrentCircle->getCenter()) {
         return abortAddCircle();
     }
 

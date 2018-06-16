@@ -53,9 +53,7 @@ class IF_CircleObserver
         virtual void circleIsFilledChanged(bool newIsFilled) noexcept = 0;
         virtual void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
         virtual void circleCenterChanged(const Point& newCenter) noexcept = 0;
-        virtual void circleRadiusXChanged(const Length& newRadiusX) noexcept = 0;
-        virtual void circleRadiusYChanged(const Length& newRadiusY) noexcept = 0;
-        virtual void circleRotationChanged(const Angle& newRotation) noexcept = 0;
+        virtual void circleDiameterChanged(const Length& newDiameter) noexcept = 0;
 
     protected:
         IF_CircleObserver() noexcept {}
@@ -82,8 +80,7 @@ class Circle : public SerializableObject
         Circle(const Circle& other) noexcept;
         Circle(const Uuid& uuid, const Circle& other) noexcept;
         Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
-                bool fill, bool isGrabArea, const Point& center, const Length& radiusX,
-                const Length& radiusY, const Angle& rotation) noexcept;
+               bool fill, bool isGrabArea, const Point& center, const Length& diameter) noexcept;
         explicit Circle(const SExpression& node);
         virtual ~Circle() noexcept;
 
@@ -94,10 +91,7 @@ class Circle : public SerializableObject
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getCenter() const noexcept {return mCenter;}
-        const Length& getRadiusX() const noexcept {return mRadiusX;}
-        const Length& getRadiusY() const noexcept {return mRadiusY;}
-        const Angle& getRotation() const noexcept {return mRotation;}
-        bool isRound() const noexcept {return mRadiusX == mRadiusY;}
+        const Length& getDiameter() const noexcept {return mDiameter;}
 
         // Setters
         void setLayerName(const QString& name) noexcept;
@@ -105,14 +99,10 @@ class Circle : public SerializableObject
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
         void setCenter(const Point& center) noexcept;
-        void setRadiusX(const Length& radius) noexcept;
-        void setRadiusY(const Length& radius) noexcept;
-        void setRotation(const Angle& rotation) noexcept;
+        void setDiameter(const Length& dia) noexcept;
 
         // Transformations
         Circle& translate(const Point& offset) noexcept;
-        Circle& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-        Circle& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
 
         // General Methods
         void registerObserver(IF_CircleObserver& object) const noexcept;
@@ -138,9 +128,7 @@ class Circle : public SerializableObject
         bool mIsFilled;
         bool mIsGrabArea;
         Point mCenter;
-        Length mRadiusX; // TODO: change radius (x/y) to size (width/height)
-        Length mRadiusY; // TODO: change radius (x/y) to size (width/height)
-        Angle mRotation;
+        Length mDiameter;
 
         // Misc
         mutable QSet<IF_CircleObserver*> mObservers; ///< A list of all observer objects

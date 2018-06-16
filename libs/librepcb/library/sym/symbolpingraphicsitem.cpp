@@ -51,7 +51,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLa
     setZValue(10);
 
     // circle
-    mCircleGraphicsItem->setRadius(Length(600000), Length(600000));
+    mCircleGraphicsItem->setDiameter(Length(1200000));
     mCircleGraphicsItem->setLineLayer(lp.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
     mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 

@@ -56,11 +56,9 @@ class CmdCircleEdit final : public UndoCommand
         void setLineWidth(const Length& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setRadiusX(const Length& rx, bool immediate) noexcept;
-        void setRadiusY(const Length& ry, bool immediate) noexcept;
+        void setDiameter(const Length& dia, bool immediate) noexcept;
         void setCenter(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Operator Overloadings
@@ -95,14 +93,10 @@ class CmdCircleEdit final : public UndoCommand
         bool mNewIsFilled;
         bool mOldIsGrabArea;
         bool mNewIsGrabArea;
-        Length mOldRadiusX;
-        Length mNewRadiusX;
-        Length mOldRadiusY;
-        Length mNewRadiusY;
+        Length mOldDiameter;
+        Length mNewDiameter;
         Point mOldCenter;
         Point mNewCenter;
-        Angle mOldRotation;
-        Angle mNewRotation;
 };
 
 /*****************************************************************************************
