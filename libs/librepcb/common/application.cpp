@@ -67,6 +67,12 @@ Application::Application(int& argc, char** argv) noexcept :
 
     // determine the path to the resources directory (e.g. /usr/share/librepcb)
     mResourcesDir = executableDirPath.getPathTo("../share/librepcb");
+#if defined(Q_OS_OSX)
+    if (!mResourcesDir.isExistingDir()) {
+        // for developer builds on mac, the "share" directory is outside the *.app directory
+        mResourcesDir = executableDirPath.getPathTo("../../../../share/librepcb");
+    }
+#endif
     Q_ASSERT(mResourcesDir.isValid());
 
     // load all stroke fonts
