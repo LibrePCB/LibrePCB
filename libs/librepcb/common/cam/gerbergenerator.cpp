@@ -72,26 +72,26 @@ void GerberGenerator::drawLine(const Point& start, const Point& end, const Lengt
     linearInterpolateToPosition(end);
 }
 
-void GerberGenerator::drawEllipseOutline(const Ellipse& ellipse) noexcept
+void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept
 {
-    if (ellipse.getRadiusX() == ellipse.getRadiusY()) {
-        Length outerDia = (ellipse.getRadiusX() * 2) + ellipse.getLineWidth();
-        Length innerDia = (ellipse.getRadiusX() * 2) - ellipse.getLineWidth();
+    if (circle.getRadiusX() == circle.getRadiusY()) {
+        Length outerDia = (circle.getRadiusX() * 2) + circle.getLineWidth();
+        Length innerDia = (circle.getRadiusX() * 2) - circle.getLineWidth();
         if (innerDia < 0) innerDia = 0;
-        flashCircle(ellipse.getCenter(), outerDia, innerDia);
+        flashCircle(circle.getCenter(), outerDia, innerDia);
     } else {
         // TODO!
-        qWarning() << "Ellipse was ignored in gerber output!";
+        qWarning() << "Circle was ignored in gerber output!";
     }
 }
 
-void GerberGenerator::drawEllipseArea(const Ellipse& ellipse) noexcept
+void GerberGenerator::drawCircleArea(const Circle& circle) noexcept
 {
-    if (ellipse.getRadiusX() == ellipse.getRadiusY()) {
-        flashCircle(ellipse.getCenter(), ellipse.getRadiusX() * 2, Length(0));
+    if (circle.getRadiusX() == circle.getRadiusY()) {
+        flashCircle(circle.getCenter(), circle.getRadiusX() * 2, Length(0));
     } else {
         // TODO!
-        qWarning() << "Ellipse was ignored in gerber output!";
+        qWarning() << "Circle was ignored in gerber output!";
     }
 }
 

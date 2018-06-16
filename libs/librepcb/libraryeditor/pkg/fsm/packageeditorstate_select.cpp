@@ -95,12 +95,12 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGrap
         case SubState::IDLE: {
             // get items under cursor
             QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-            QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
+            QList<QSharedPointer<CircleGraphicsItem>> circles;
             QList<QSharedPointer<PolygonGraphicsItem>> polygons;
             QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
             QList<QSharedPointer<HoleGraphicsItem>> holes;
             int count = mContext.currentGraphicsItem->getItemsAtPosition(pos,
-                            &pads, &ellipses, &polygons, &texts, &holes);
+                            &pads, &circles, &polygons, &texts, &holes);
             if (count == 0) {
                 // start selecting
                 clearSelectionRect(true);
@@ -114,8 +114,8 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGrap
                     topMostItem = texts.first().data();
                 } else if (polygons.count() > 0) {
                     topMostItem = polygons.first().data();
-                } else if (ellipses.count() > 0) {
-                    topMostItem = ellipses.first().data();
+                } else if (circles.count() > 0) {
+                    topMostItem = circles.first().data();
                 } else if (holes.count() > 0) {
                     topMostItem = holes.first().data();
                 } else {
@@ -254,11 +254,11 @@ bool PackageEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept
 bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos) noexcept
 {
     QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
+    QList<QSharedPointer<CircleGraphicsItem>> circles;
     QList<QSharedPointer<PolygonGraphicsItem>> polygons;
     QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
     QList<QSharedPointer<HoleGraphicsItem>> holes;
-    mContext.currentGraphicsItem->getItemsAtPosition(pos, &pads, &ellipses, &polygons, &texts, &holes);
+    mContext.currentGraphicsItem->getItemsAtPosition(pos, &pads, &circles, &polygons, &texts, &holes);
 
     if (pads.count() > 0) {
         FootprintPadGraphicsItem* item = dynamic_cast<FootprintPadGraphicsItem*>(pads.first().data()); Q_ASSERT(item);
@@ -280,9 +280,9 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos
                                        &mContext.editorWidget);
         dialog.exec();
         return true;
-    } else if (ellipses.count() > 0) {
-        EllipseGraphicsItem* item = dynamic_cast<EllipseGraphicsItem*>(ellipses.first().data()); Q_ASSERT(item);
-        EllipsePropertiesDialog dialog(item->getEllipse(), mContext.undoStack,
+    } else if (circles.count() > 0) {
+        CircleGraphicsItem* item = dynamic_cast<CircleGraphicsItem*>(circles.first().data()); Q_ASSERT(item);
+        CirclePropertiesDialog dialog(item->getCircle(), mContext.undoStack,
                                        mContext.layerProvider.getBoardGeometryElementLayers(),
                                        &mContext.editorWidget);
         dialog.exec();

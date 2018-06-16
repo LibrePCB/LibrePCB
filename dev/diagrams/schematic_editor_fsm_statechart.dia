@@ -332,7 +332,7 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#draw_ellipse#</dia:string>
+        <dia:string>#draw_circle#</dia:string>
       </dia:attribute>
     </dia:object>
     <dia:object type="UML - LargePackage" version="0" id="O7">

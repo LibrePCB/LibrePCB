@@ -55,9 +55,9 @@ CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::
         mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
     }
 
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses = context.symbolGraphicsItem.getSelectedEllipses();
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        mEllipseEditCmds.append(new CmdEllipseEdit(ellipse->getEllipse()));
+    QList<QSharedPointer<CircleGraphicsItem>> circles = context.symbolGraphicsItem.getSelectedCircles();
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     }
 
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = context.symbolGraphicsItem.getSelectedPolygons();
@@ -90,7 +90,7 @@ void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
         foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
-        foreach (CmdEllipseEdit* cmd, mEllipseEditCmds) {
+        foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
             cmd->setDeltaToStartCenter(delta, true);
         }
         foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
@@ -119,8 +119,8 @@ bool CmdMoveSelectedSymbolItems::performExecute()
     while (mPinEditCmds.count() > 0) {
         appendChild(mPinEditCmds.takeLast());
     }
-    while (mEllipseEditCmds.count() > 0) {
-        appendChild(mEllipseEditCmds.takeLast());
+    while (mCircleEditCmds.count() > 0) {
+        appendChild(mCircleEditCmds.takeLast());
     }
     while (mPolygonEditCmds.count() > 0) {
         appendChild(mPolygonEditCmds.takeLast());
@@ -140,7 +140,7 @@ bool CmdMoveSelectedSymbolItems::performExecute()
 void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept
 {
     qDeleteAll(mPinEditCmds);           mPinEditCmds.clear();
-    qDeleteAll(mEllipseEditCmds);       mEllipseEditCmds.clear();
+    qDeleteAll(mCircleEditCmds);        mCircleEditCmds.clear();
     qDeleteAll(mPolygonEditCmds);       mPolygonEditCmds.clear();
     qDeleteAll(mTextEditCmds);          mTextEditCmds.clear();
 }

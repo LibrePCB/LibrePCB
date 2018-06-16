@@ -139,7 +139,7 @@ void SymbolEditorWidget::setToolsActionGroup(ExclusiveActionGroup* group) noexce
         mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, true);
-        mToolsActionGroup->setActionEnabled(Tool::DRAW_ELLIPSE, true);
+        mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, true);
         mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
         connect(mFsm.data(), &SymbolEditorFsm::toolChanged,
@@ -278,7 +278,7 @@ bool SymbolEditorWidget::toolChangeRequested(Tool newTool) noexcept
         case Tool::DRAW_LINE:       return mFsm->processStartDrawLines();
         case Tool::DRAW_RECT:       return mFsm->processStartDrawRects();
         case Tool::DRAW_POLYGON:    return mFsm->processStartDrawPolygons();
-        case Tool::DRAW_ELLIPSE:    return mFsm->processStartDrawEllipses();
+        case Tool::DRAW_CIRCLE:     return mFsm->processStartDrawCircles();
         case Tool::DRAW_TEXT:       return mFsm->processStartDrawTexts();
         default:                    return false;
     }

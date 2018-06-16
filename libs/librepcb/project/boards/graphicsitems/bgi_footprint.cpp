@@ -161,22 +161,22 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->drawPath(polygon.getPath().toQPainterPathPx());
     }
 
-    // draw all ellipses
-    for (const Ellipse& ellipse : mLibFootprint.getEllipses()) {
+    // draw all circles
+    for (const Circle& circle : mLibFootprint.getCircles()) {
         // get layer
-        layer = getLayer(ellipse.getLayerName());
+        layer = getLayer(circle.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
         // set pen
-        if (ellipse.getLineWidth() > 0)
-            painter->setPen(QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        if (circle.getLineWidth() > 0)
+            painter->setPen(QPen(layer->getColor(selected), circle.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
 
         // set brush
-        if (!ellipse.isFilled()) {
-            if (ellipse.isGrabArea())
+        if (!circle.isFilled()) {
+            if (circle.isGrabArea())
                 layer = getLayer(GraphicsLayer::sTopGrabAreas);
             else
                 layer = nullptr;
@@ -190,9 +190,9 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
             painter->setBrush(Qt::NoBrush);
         }
 
-        // draw ellipse
-        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
-                             ellipse.getRadiusY().toPx());
+        // draw circle
+        painter->drawEllipse(circle.getCenter().toPxQPointF(), circle.getRadiusX().toPx(),
+                             circle.getRadiusY().toPx());
         // TODO: rotation
     }
 

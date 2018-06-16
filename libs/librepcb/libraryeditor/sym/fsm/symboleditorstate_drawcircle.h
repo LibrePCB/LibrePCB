@@ -32,34 +32,34 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
-class EllipseGraphicsItem;
-class CmdEllipseEdit;
+class Circle;
+class CircleGraphicsItem;
+class CmdCircleEdit;
 
 namespace library {
 namespace editor {
 
 /*****************************************************************************************
- *  Class SymbolEditorState_DrawEllipse
+ *  Class SymbolEditorState_DrawCircle
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorState_DrawEllipse class
+ * @brief The SymbolEditorState_DrawCircle class
  *
  * @author  ubruhin
  * @date    2017-01-02
  */
-class SymbolEditorState_DrawEllipse final : public SymbolEditorState
+class SymbolEditorState_DrawCircle final : public SymbolEditorState
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        SymbolEditorState_DrawEllipse() = delete;
-        SymbolEditorState_DrawEllipse(const SymbolEditorState_DrawEllipse& other) = delete;
-        explicit SymbolEditorState_DrawEllipse(const Context& context) noexcept;
-        ~SymbolEditorState_DrawEllipse() noexcept;
+        SymbolEditorState_DrawCircle() = delete;
+        SymbolEditorState_DrawCircle(const SymbolEditorState_DrawCircle& other) = delete;
+        explicit SymbolEditorState_DrawCircle(const Context& context) noexcept;
+        ~SymbolEditorState_DrawCircle() noexcept;
 
         // General Methods
         bool entry() noexcept override;
@@ -71,14 +71,14 @@ class SymbolEditorState_DrawEllipse final : public SymbolEditorState
         bool processAbortCommand() noexcept override;
 
         // Operator Overloadings
-        SymbolEditorState_DrawEllipse& operator=(const SymbolEditorState_DrawEllipse& rhs) = delete;
+        SymbolEditorState_DrawCircle& operator=(const SymbolEditorState_DrawCircle& rhs) = delete;
 
 
     private: // Methods
-        bool startAddEllipse(const Point& pos) noexcept;
-        bool updateEllipseSize(const Point& pos) noexcept;
-        bool finishAddEllipse(const Point& pos) noexcept;
-        bool abortAddEllipse() noexcept;
+        bool startAddCircle(const Point& pos) noexcept;
+        bool updateCircleDiameter(const Point& pos) noexcept;
+        bool finishAddCircle(const Point& pos) noexcept;
+        bool abortAddCircle() noexcept;
 
         void layerComboBoxValueChanged(const QString& layerName) noexcept;
         void lineWidthSpinBoxValueChanged(double value) noexcept;
@@ -88,9 +88,9 @@ class SymbolEditorState_DrawEllipse final : public SymbolEditorState
 
     private: // Types / Data
         Point mStartPos;
-        QScopedPointer<CmdEllipseEdit> mEditCmd;
-        Ellipse* mCurrentEllipse;
-        EllipseGraphicsItem* mCurrentGraphicsItem;
+        QScopedPointer<CmdCircleEdit> mEditCmd;
+        Circle* mCurrentCircle;
+        CircleGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
         QString mLastLayerName;

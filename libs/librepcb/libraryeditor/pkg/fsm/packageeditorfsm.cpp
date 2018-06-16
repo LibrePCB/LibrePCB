@@ -61,7 +61,7 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept :
     mStates.insert(State::DRAW_LINE,        new PackageEditorState_DrawLine(mContext));
     mStates.insert(State::DRAW_RECT,        new PackageEditorState_DrawRect(mContext));
     mStates.insert(State::DRAW_POLYGON,     new PackageEditorState_DrawPolygon(mContext));
-    mStates.insert(State::DRAW_ELLIPSE,     new PackageEditorState_DrawEllipse(mContext));
+    mStates.insert(State::DRAW_CIRCLE,      new PackageEditorState_DrawCircle(mContext));
     mStates.insert(State::DRAW_TEXT,        new PackageEditorState_DrawText(mContext));
     mStates.insert(State::ADD_HOLES,        new PackageEditorState_AddHoles(mContext));
     enterNextState(State::SELECT);
@@ -89,7 +89,7 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept
         case State::DRAW_LINE:      return EditorWidgetBase::Tool::DRAW_LINE;
         case State::DRAW_RECT:      return EditorWidgetBase::Tool::DRAW_RECT;
         case State::DRAW_POLYGON:   return EditorWidgetBase::Tool::DRAW_POLYGON;
-        case State::DRAW_ELLIPSE:   return EditorWidgetBase::Tool::DRAW_ELLIPSE;
+        case State::DRAW_CIRCLE:    return EditorWidgetBase::Tool::DRAW_CIRCLE;
         case State::DRAW_TEXT:      return EditorWidgetBase::Tool::DRAW_TEXT;
         case State::ADD_HOLES:      return EditorWidgetBase::Tool::ADD_HOLES;
         default: Q_ASSERT(false);   return EditorWidgetBase::Tool::NONE;
@@ -261,9 +261,9 @@ bool PackageEditorFsm::processStartDrawPolygons() noexcept
     return setNextState(State::DRAW_POLYGON);
 }
 
-bool PackageEditorFsm::processStartDrawEllipses() noexcept
+bool PackageEditorFsm::processStartDrawCircles() noexcept
 {
-    return setNextState(State::DRAW_ELLIPSE);
+    return setNextState(State::DRAW_CIRCLE);
 }
 
 bool PackageEditorFsm::processStartDrawTexts() noexcept

@@ -80,7 +80,7 @@ class EditorWidgetBase : public QWidget
             DRAW_LINE,
             DRAW_RECT,
             DRAW_POLYGON,
-            DRAW_ELLIPSE,
+            DRAW_CIRCLE,
             DRAW_TEXT,
             ADD_NAMES,
             ADD_VALUES,

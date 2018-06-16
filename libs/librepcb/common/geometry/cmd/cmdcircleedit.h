@@ -32,24 +32,24 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
+class Circle;
 
 /*****************************************************************************************
- *  Class CmdEllipseEdit
+ *  Class CmdCircleEdit
  ****************************************************************************************/
 
 /**
- * @brief The CmdEllipseEdit class
+ * @brief The CmdCircleEdit class
  */
-class CmdEllipseEdit final : public UndoCommand
+class CmdCircleEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdEllipseEdit() = delete;
-        CmdEllipseEdit(const CmdEllipseEdit& other) = delete;
-        explicit CmdEllipseEdit(Ellipse& ellipse) noexcept;
-        ~CmdEllipseEdit() noexcept;
+        CmdCircleEdit() = delete;
+        CmdCircleEdit(const CmdCircleEdit& other) = delete;
+        explicit CmdCircleEdit(Circle& circle) noexcept;
+        ~CmdCircleEdit() noexcept;
 
         // Setters
         void setLayerName(const QString& name, bool immediate) noexcept;
@@ -64,7 +64,7 @@ class CmdEllipseEdit final : public UndoCommand
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Operator Overloadings
-        CmdEllipseEdit& operator=(const CmdEllipseEdit& rhs) = delete;
+        CmdCircleEdit& operator=(const CmdCircleEdit& rhs) = delete;
 
 
     private:
@@ -84,7 +84,7 @@ class CmdEllipseEdit final : public UndoCommand
         // Private Member Variables
 
         // Attributes from the constructor
-        Ellipse& mEllipse;
+        Circle& mCircle;
 
         // General Attributes
         QString mOldLayerName;

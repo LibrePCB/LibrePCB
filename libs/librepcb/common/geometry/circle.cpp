@@ -32,18 +32,18 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Ellipse::Ellipse(const Ellipse& other) noexcept
+Circle::Circle(const Circle& other) noexcept
 {
     *this = other; // use assignment operator
 }
 
-Ellipse::Ellipse(const Uuid& uuid, const Ellipse& other) noexcept :
-    Ellipse(other)
+Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
+    Circle(other)
 {
     mUuid = uuid;
 }
 
-Ellipse::Ellipse(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
+Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
                  bool isGrabArea, const Point& center, const Length& radiusX,
                  const Length& radiusY, const Angle& rotation) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
@@ -52,7 +52,7 @@ Ellipse::Ellipse(const Uuid& uuid, const QString& layerName, const Length& lineW
 {
 }
 
-Ellipse::Ellipse(const SExpression& node)
+Circle::Circle(const SExpression& node)
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
@@ -78,7 +78,7 @@ Ellipse::Ellipse(const SExpression& node)
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-Ellipse::~Ellipse() noexcept
+Circle::~Circle() noexcept
 {
 }
 
@@ -86,75 +86,75 @@ Ellipse::~Ellipse() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Ellipse::setLayerName(const QString& name) noexcept
+void Circle::setLayerName(const QString& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseLayerNameChanged(mLayerName);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleLayerNameChanged(mLayerName);
     }
 }
 
-void Ellipse::setLineWidth(const Length& width) noexcept
+void Circle::setLineWidth(const Length& width) noexcept
 {
     if (width == mLineWidth) return;
     mLineWidth = width;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseLineWidthChanged(mLineWidth);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleLineWidthChanged(mLineWidth);
     }
 }
 
-void Ellipse::setIsFilled(bool isFilled) noexcept
+void Circle::setIsFilled(bool isFilled) noexcept
 {
     if (isFilled == mIsFilled) return;
     mIsFilled = isFilled;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseIsFilledChanged(mIsFilled);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleIsFilledChanged(mIsFilled);
     }
 }
 
-void Ellipse::setIsGrabArea(bool isGrabArea) noexcept
+void Circle::setIsGrabArea(bool isGrabArea) noexcept
 {
     if (isGrabArea == mIsGrabArea) return;
     mIsGrabArea = isGrabArea;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseIsGrabAreaChanged(mIsGrabArea);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleIsGrabAreaChanged(mIsGrabArea);
     }
 }
 
-void Ellipse::setCenter(const Point& center) noexcept
+void Circle::setCenter(const Point& center) noexcept
 {
     if (center == mCenter) return;
     mCenter = center;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseCenterChanged(mCenter);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleCenterChanged(mCenter);
     }
 }
 
-void Ellipse::setRadiusX(const Length& radius) noexcept
+void Circle::setRadiusX(const Length& radius) noexcept
 {
     if (radius == mRadiusX) return;
     mRadiusX = radius;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseRadiusXChanged(mRadiusX);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleRadiusXChanged(mRadiusX);
     }
 }
 
-void Ellipse::setRadiusY(const Length& radius) noexcept
+void Circle::setRadiusY(const Length& radius) noexcept
 {
     if (radius == mRadiusY) return;
     mRadiusY = radius;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseRadiusYChanged(mRadiusY);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleRadiusYChanged(mRadiusY);
     }
 }
 
-void Ellipse::setRotation(const Angle& rotation) noexcept
+void Circle::setRotation(const Angle& rotation) noexcept
 {
     if (rotation == mRotation) return;
     mRotation = rotation;
-    foreach (IF_EllipseObserver* object, mObservers) {
-        object->ellipseRotationChanged(mRotation);
+    foreach (IF_CircleObserver* object, mObservers) {
+        object->circleRotationChanged(mRotation);
     }
 }
 
@@ -162,20 +162,20 @@ void Ellipse::setRotation(const Angle& rotation) noexcept
  *  Transformations
  ****************************************************************************************/
 
-Ellipse& Ellipse::translate(const Point& offset) noexcept
+Circle& Circle::translate(const Point& offset) noexcept
 {
     mCenter += offset;
     return *this;
 }
 
-Ellipse& Ellipse::rotate(const Angle& angle, const Point& center) noexcept
+Circle& Circle::rotate(const Angle& angle, const Point& center) noexcept
 {
     mCenter.rotate(angle, center);
     mRotation += angle;
     return *this;
 }
 
-Ellipse& Ellipse::mirror(Qt::Orientation orientation, const Point& center) noexcept
+Circle& Circle::mirror(Qt::Orientation orientation, const Point& center) noexcept
 {
     mCenter.mirror(orientation, center);
     mRotation = -mRotation;
@@ -186,17 +186,17 @@ Ellipse& Ellipse::mirror(Qt::Orientation orientation, const Point& center) noexc
  *  General Methods
  ****************************************************************************************/
 
-void Ellipse::registerObserver(IF_EllipseObserver& object) const noexcept
+void Circle::registerObserver(IF_CircleObserver& object) const noexcept
 {
     mObservers.insert(&object);
 }
 
-void Ellipse::unregisterObserver(IF_EllipseObserver& object) const noexcept
+void Circle::unregisterObserver(IF_CircleObserver& object) const noexcept
 {
     mObservers.remove(&object);
 }
 
-void Ellipse::serialize(SExpression& root) const
+void Circle::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
@@ -214,7 +214,7 @@ void Ellipse::serialize(SExpression& root) const
  *  Operator Overloadings
  ****************************************************************************************/
 
-bool Ellipse::operator==(const Ellipse& rhs) const noexcept
+bool Circle::operator==(const Circle& rhs) const noexcept
 {
     if (mUuid != rhs.mUuid)                 return false;
     if (mLayerName != rhs.mLayerName)       return false;
@@ -228,7 +228,7 @@ bool Ellipse::operator==(const Ellipse& rhs) const noexcept
     return true;
 }
 
-Ellipse& Ellipse::operator=(const Ellipse& rhs) noexcept
+Circle& Circle::operator=(const Circle& rhs) noexcept
 {
     mUuid = rhs.mUuid;
     mLayerName = rhs.mLayerName;
@@ -246,7 +246,7 @@ Ellipse& Ellipse::operator=(const Ellipse& rhs) noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool Ellipse::checkAttributesValidity() const noexcept
+bool Circle::checkAttributesValidity() const noexcept
 {
     if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;

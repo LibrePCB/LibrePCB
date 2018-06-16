@@ -52,7 +52,7 @@ class SymbolGraphicsItem;
  *    - UUID
  */
 class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
-                     private PolygonList::IF_Observer, private EllipseList::IF_Observer,
+                     private PolygonList::IF_Observer, private CircleList::IF_Observer,
                      private TextList::IF_Observer
 {
         Q_OBJECT
@@ -73,8 +73,8 @@ class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
         const SymbolPinList& getPins() const noexcept {return mPins;}
         PolygonList& getPolygons() noexcept {return mPolygons;}
         const PolygonList& getPolygons() const noexcept {return mPolygons;}
-        EllipseList& getEllipses() noexcept {return mEllipses;}
-        const EllipseList& getEllipses() const noexcept {return mEllipses;}
+        CircleList& getCircles() noexcept {return mCircles;}
+        const CircleList& getCircles() const noexcept {return mCircles;}
         TextList& getTexts() noexcept {return mTexts;}
         const TextList& getTexts() const noexcept {return mTexts;}
 
@@ -95,16 +95,16 @@ class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
                              const std::shared_ptr<SymbolPin>& ptr) noexcept override;
         void listObjectAdded(const PolygonList& list, int newIndex,
                              const std::shared_ptr<Polygon>& ptr) noexcept override;
-        void listObjectAdded(const EllipseList& list, int newIndex,
-                             const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectAdded(const CircleList& list, int newIndex,
+                             const std::shared_ptr<Circle>& ptr) noexcept override;
         void listObjectAdded(const TextList& list, int newIndex,
                              const std::shared_ptr<Text>& ptr) noexcept override;
         void listObjectRemoved(const SymbolPinList& list, int oldIndex,
                                const std::shared_ptr<SymbolPin>& ptr) noexcept override;
         void listObjectRemoved(const PolygonList& list, int oldIndex,
                                const std::shared_ptr<Polygon>& ptr) noexcept override;
-        void listObjectRemoved(const EllipseList& list, int oldIndex,
-                               const std::shared_ptr<Ellipse>& ptr) noexcept override;
+        void listObjectRemoved(const CircleList& list, int oldIndex,
+                               const std::shared_ptr<Circle>& ptr) noexcept override;
         void listObjectRemoved(const TextList& list, int oldIndex,
                                const std::shared_ptr<Text>& ptr) noexcept override;
         /// @copydoc librepcb::SerializableObject::serialize()
@@ -115,7 +115,7 @@ class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
     private: // Data
         SymbolPinList mPins;
         PolygonList mPolygons;
-        EllipseList mEllipses;
+        CircleList mCircles;
         TextList mTexts;
 
         SymbolGraphicsItem* mRegisteredGraphicsItem;

@@ -33,12 +33,12 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
+class Circle;
 class Polygon;
 class Text;
 class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
-class EllipseGraphicsItem;
+class CircleGraphicsItem;
 class TextGraphicsItem;
 
 namespace library {
@@ -69,16 +69,16 @@ class SymbolGraphicsItem final : public QGraphicsItem
 
         // Getters
         SymbolPinGraphicsItem* getPinGraphicsItem(const Uuid& pin) noexcept;
-        EllipseGraphicsItem* getEllipseGraphicsItem(const Ellipse& ellipse) noexcept;
+        CircleGraphicsItem* getCircleGraphicsItem(const Circle& circle) noexcept;
         PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
         TextGraphicsItem* getTextGraphicsItem(const Text& text) noexcept;
         int getItemsAtPosition(const Point& pos,
                                QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
-                               QList<QSharedPointer<EllipseGraphicsItem>>* ellipses,
+                               QList<QSharedPointer<CircleGraphicsItem>>* circles,
                                QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
                                QList<QSharedPointer<TextGraphicsItem>>* texts) noexcept;
         QList<QSharedPointer<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
-        QList<QSharedPointer<EllipseGraphicsItem>> getSelectedEllipses() noexcept;
+        QList<QSharedPointer<CircleGraphicsItem>> getSelectedCircles() noexcept;
         QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
         QList<QSharedPointer<TextGraphicsItem>> getSelectedTexts() noexcept;
 
@@ -89,8 +89,8 @@ class SymbolGraphicsItem final : public QGraphicsItem
         // General Methods
         void addPin(SymbolPin& pin) noexcept;
         void removePin(SymbolPin& pin) noexcept;
-        void addEllipse(Ellipse& ellipse) noexcept;
-        void removeEllipse(Ellipse& ellipse) noexcept;
+        void addCircle(Circle& circle) noexcept;
+        void removeCircle(Circle& circle) noexcept;
         void addPolygon(Polygon& polygon) noexcept;
         void removePolygon(Polygon& polygon) noexcept;
         void addText(Text& text) noexcept;
@@ -110,7 +110,7 @@ class SymbolGraphicsItem final : public QGraphicsItem
         Symbol& mSymbol;
         const IF_GraphicsLayerProvider& mLayerProvider;
         QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>> mPinGraphicsItems;
-        QHash<const Ellipse*, QSharedPointer<EllipseGraphicsItem>> mEllipseGraphicsItems;
+        QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;
         QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>> mPolygonGraphicsItems;
         QHash<const Text*, QSharedPointer<TextGraphicsItem>> mTextGraphicsItems;
 };

@@ -34,80 +34,80 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-EllipseGraphicsItem::EllipseGraphicsItem(Ellipse& ellipse, const IF_GraphicsLayerProvider& lp,
+CircleGraphicsItem::CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerProvider& lp,
                                          QGraphicsItem* parent) noexcept :
-    PrimitiveEllipseGraphicsItem(parent), mEllipse(ellipse), mLayerProvider(lp)
+    PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp)
 {
-    setPosition(mEllipse.getCenter());
-    setRotation(mEllipse.getRotation());
-    setRadius(mEllipse.getRadiusX(), mEllipse.getRadiusY());
-    setLineWidth(mEllipse.getLineWidth());
-    setLineLayer(mLayerProvider.getLayer(mEllipse.getLayerName()));
+    setPosition(mCircle.getCenter());
+    setRotation(mCircle.getRotation());
+    setRadius(mCircle.getRadiusX(), mCircle.getRadiusY());
+    setLineWidth(mCircle.getLineWidth());
+    setLineLayer(mLayerProvider.getLayer(mCircle.getLayerName()));
     updateFillLayer();
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-    // register to the ellipse to get attribute updates
-    mEllipse.registerObserver(*this);
+    // register to the circle to get attribute updates
+    mCircle.registerObserver(*this);
 }
 
-EllipseGraphicsItem::~EllipseGraphicsItem() noexcept
+CircleGraphicsItem::~CircleGraphicsItem() noexcept
 {
-    mEllipse.unregisterObserver(*this);
+    mCircle.unregisterObserver(*this);
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void EllipseGraphicsItem::ellipseLayerNameChanged(const QString& newLayerName) noexcept
+void CircleGraphicsItem::circleLayerNameChanged(const QString& newLayerName) noexcept
 {
     setLineLayer(mLayerProvider.getLayer(newLayerName));
     updateFillLayer(); // required if the area is filled with the line layer
 }
 
-void EllipseGraphicsItem::ellipseLineWidthChanged(const Length& newLineWidth) noexcept
+void CircleGraphicsItem::circleLineWidthChanged(const Length& newLineWidth) noexcept
 {
     setLineWidth(newLineWidth);
 }
 
-void EllipseGraphicsItem::ellipseIsFilledChanged(bool newIsFilled) noexcept
+void CircleGraphicsItem::circleIsFilledChanged(bool newIsFilled) noexcept
 {
     Q_UNUSED(newIsFilled);
     updateFillLayer();
 }
 
-void EllipseGraphicsItem::ellipseIsGrabAreaChanged(bool newIsGrabArea) noexcept
+void CircleGraphicsItem::circleIsGrabAreaChanged(bool newIsGrabArea) noexcept
 {
     Q_UNUSED(newIsGrabArea);
     updateFillLayer();
 }
 
-void EllipseGraphicsItem::ellipseCenterChanged(const Point& newCenter) noexcept
+void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept
 {
     setPosition(newCenter);
 }
 
-void EllipseGraphicsItem::ellipseRadiusXChanged(const Length& newRadiusX) noexcept
+void CircleGraphicsItem::circleRadiusXChanged(const Length& newRadiusX) noexcept
 {
     setRadiusX(newRadiusX);
 }
 
-void EllipseGraphicsItem::ellipseRadiusYChanged(const Length& newRadiusY) noexcept
+void CircleGraphicsItem::circleRadiusYChanged(const Length& newRadiusY) noexcept
 {
     setRadiusY(newRadiusY);
 }
 
-void EllipseGraphicsItem::ellipseRotationChanged(const Angle& newRotation) noexcept
+void CircleGraphicsItem::circleRotationChanged(const Angle& newRotation) noexcept
 {
     setRotation(newRotation);
 }
 
-void EllipseGraphicsItem::updateFillLayer() noexcept
+void CircleGraphicsItem::updateFillLayer() noexcept
 {
-    if (mEllipse.isFilled()) {
-        setFillLayer(mLayerProvider.getLayer(mEllipse.getLayerName()));
-    } else if (mEllipse.isGrabArea()) {
-        setFillLayer(mLayerProvider.getGrabAreaLayer(mEllipse.getLayerName()));
+    if (mCircle.isFilled()) {
+        setFillLayer(mLayerProvider.getLayer(mCircle.getLayerName()));
+    } else if (mCircle.isGrabArea()) {
+        setFillLayer(mLayerProvider.getGrabAreaLayer(mCircle.getLayerName()));
     } else {
         setFillLayer(nullptr);
     }

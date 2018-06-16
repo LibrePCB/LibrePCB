@@ -34,7 +34,7 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
+class Circle;
 class Path;
 class GerberApertureList;
 
@@ -75,8 +75,8 @@ class GerberGenerator final
         // Plot Methods
         void setLayerPolarity(LayerPolarity p) noexcept;
         void drawLine(const Point& start, const Point& end, const Length& width) noexcept;
-        void drawEllipseOutline(const Ellipse& ellipse) noexcept;
-        void drawEllipseArea(const Ellipse& ellipse) noexcept;
+        void drawCircleOutline(const Circle& circle) noexcept;
+        void drawCircleArea(const Circle& circle) noexcept;
         void drawPathOutline(const Path& path, const Length& lineWidth) noexcept;
         void drawPathArea(const Path& path) noexcept;
         void flashCircle(const Point& pos, const Length& dia, const Length& hole) noexcept;

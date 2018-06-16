@@ -96,7 +96,6 @@
         <file>places/file.png</file>
         <file>empty.png</file>
         <file>actions/draw_circle.png</file>
-        <file>actions/draw_ellipse.png</file>
         <file>actions/draw_polygon.png</file>
         <file>actions/draw_rectangle.png</file>
         <file>actions/draw_netlabel.png</file>

@@ -46,7 +46,7 @@ class IF_GraphicsLayerProvider;
  * @author ubruhin
  * @date 2017-05-30
  */
-class HoleGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_HoleObserver
+class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_HoleObserver
 {
     public:
 

@@ -63,9 +63,9 @@ bool CmdRemoveSelectedFootprintItems::performExecute()
         appendChild(new CmdFootprintPadRemove(mContext.currentFootprint->getPads(), &pad->getPad()));
     }
 
-    // remove ellipses
-    foreach (const auto& ellipse, mContext.currentGraphicsItem->getSelectedEllipses()) {
-        appendChild(new CmdEllipseRemove(mContext.currentFootprint->getEllipses(), &ellipse->getEllipse()));
+    // remove circles
+    foreach (const auto& circle, mContext.currentGraphicsItem->getSelectedCircles()) {
+        appendChild(new CmdCircleRemove(mContext.currentFootprint->getCircles(), &circle->getCircle()));
     }
 
     // remove polygons

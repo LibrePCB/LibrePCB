@@ -225,28 +225,28 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         painter->drawPath(polygon.getPath().toQPainterPathPx());
     }
 
-    // draw all ellipses
-    for (const Ellipse& ellipse : mSymbol.getEllipses()) {
+    // draw all circles
+    for (const Circle& circle : mSymbol.getCircles()) {
         // set colors
-        layer = mLayerProvider.getLayer(ellipse.getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(circle.getLayerName()); if (!layer) continue;
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), ellipse.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), circle.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
-        if (ellipse.isFilled())
-            layer = mLayerProvider.getLayer(ellipse.getLayerName());
-        else if (ellipse.isGrabArea())
+        if (circle.isFilled())
+            layer = mLayerProvider.getLayer(circle.getLayerName());
+        else if (circle.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
             layer = nullptr;
         painter->setBrush(layer ? QBrush(layer->getColor(selected), Qt::SolidPattern) : Qt::NoBrush);
 
-        // draw ellipse
-        painter->drawEllipse(ellipse.getCenter().toPxQPointF(), ellipse.getRadiusX().toPx(),
-                             ellipse.getRadiusY().toPx());
+        // draw circle
+        painter->drawEllipse(circle.getCenter().toPxQPointF(), circle.getRadiusX().toPx(),
+                             circle.getRadiusY().toPx());
         // TODO: rotation
     }
 

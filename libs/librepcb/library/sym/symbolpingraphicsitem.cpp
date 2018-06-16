@@ -42,7 +42,7 @@ namespace library {
 SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLayerProvider& lp,
                                              QGraphicsItem* parent) noexcept :
     QGraphicsItem(parent), mPin(pin),
-    mCircleGraphicsItem(new PrimitiveEllipseGraphicsItem(this)),
+    mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this))
 {

@@ -136,7 +136,7 @@ class NewElementWizardContext final : public QObject
         // symbol
         SymbolPinList mSymbolPins;
         PolygonList mSymbolPolygons;
-        EllipseList mSymbolEllipses;
+        CircleList mSymbolCircles;
         TextList mSymbolTexts;
 
         // package

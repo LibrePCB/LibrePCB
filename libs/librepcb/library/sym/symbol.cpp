@@ -40,19 +40,19 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mPins(this), mPolygons(this), mEllipses(this), mTexts(this),
+    mPins(this), mPolygons(this), mCircles(this), mTexts(this),
     mRegisteredGraphicsItem(nullptr)
 {
 }
 
 Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mPins(this), mPolygons(this), mEllipses(this), mTexts(this),
+    mPins(this), mPolygons(this), mCircles(this), mTexts(this),
     mRegisteredGraphicsItem(nullptr)
 {
     mPins.loadFromDomElement(mLoadingFileDocument); // can throw
     mPolygons.loadFromDomElement(mLoadingFileDocument); // can throw
-    mEllipses.loadFromDomElement(mLoadingFileDocument); // can throw
+    mCircles.loadFromDomElement(mLoadingFileDocument); // can throw
     mTexts.loadFromDomElement(mLoadingFileDocument); // can throw
 
     cleanupAfterLoadingElementFromFile();
@@ -99,12 +99,12 @@ void Symbol::listObjectAdded(const PolygonList& list, int newIndex,
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPolygon(*ptr);
 }
 
-void Symbol::listObjectAdded(const EllipseList& list, int newIndex,
-                             const std::shared_ptr<Ellipse>& ptr) noexcept
+void Symbol::listObjectAdded(const CircleList& list, int newIndex,
+                             const std::shared_ptr<Circle>& ptr) noexcept
 {
     Q_UNUSED(newIndex);
-    Q_ASSERT(&list == &mEllipses);
-    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addEllipse(*ptr);
+    Q_ASSERT(&list == &mCircles);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addCircle(*ptr);
 }
 
 void Symbol::listObjectAdded(const TextList& list, int newIndex,
@@ -131,12 +131,12 @@ void Symbol::listObjectRemoved(const PolygonList& list, int oldIndex,
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePolygon(*ptr);
 }
 
-void Symbol::listObjectRemoved(const EllipseList& list, int oldIndex,
-                               const std::shared_ptr<Ellipse>& ptr) noexcept
+void Symbol::listObjectRemoved(const CircleList& list, int oldIndex,
+                               const std::shared_ptr<Circle>& ptr) noexcept
 {
     Q_UNUSED(oldIndex);
-    Q_ASSERT(&list == &mEllipses);
-    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeEllipse(*ptr);
+    Q_ASSERT(&list == &mCircles);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeCircle(*ptr);
 }
 
 void Symbol::listObjectRemoved(const TextList& list, int oldIndex,
@@ -152,7 +152,7 @@ void Symbol::serialize(SExpression& root) const
     LibraryElement::serialize(root);
     mPins.serialize(root);
     mPolygons.serialize(root);
-    mEllipses.serialize(root);
+    mCircles.serialize(root);
     mTexts.serialize(root);
 }
 

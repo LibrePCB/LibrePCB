@@ -34,7 +34,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-PrimitiveEllipseGraphicsItem::PrimitiveEllipseGraphicsItem(QGraphicsItem* parent) noexcept :
+PrimitiveCircleGraphicsItem::PrimitiveCircleGraphicsItem(QGraphicsItem* parent) noexcept :
     QGraphicsItem(parent), mLineLayer(nullptr), mFillLayer(nullptr)
 {
     mPen.setWidthF(0);
@@ -44,7 +44,7 @@ PrimitiveEllipseGraphicsItem::PrimitiveEllipseGraphicsItem(QGraphicsItem* parent
     updateVisibility();
 }
 
-PrimitiveEllipseGraphicsItem::~PrimitiveEllipseGraphicsItem() noexcept
+PrimitiveCircleGraphicsItem::~PrimitiveCircleGraphicsItem() noexcept
 {
     // unregister from graphics layers
     setLineLayer(nullptr);
@@ -55,44 +55,44 @@ PrimitiveEllipseGraphicsItem::~PrimitiveEllipseGraphicsItem() noexcept
  *  Setters
  ****************************************************************************************/
 
-void PrimitiveEllipseGraphicsItem::setPosition(const Point& pos) noexcept
+void PrimitiveCircleGraphicsItem::setPosition(const Point& pos) noexcept
 {
     QGraphicsItem::setPos(pos.toPxQPointF());
 }
 
-void PrimitiveEllipseGraphicsItem::setRotation(const Angle& rot) noexcept
+void PrimitiveCircleGraphicsItem::setRotation(const Angle& rot) noexcept
 {
     QGraphicsItem::setRotation(-rot.toDeg());
 }
 
-void PrimitiveEllipseGraphicsItem::setRadiusX(const Length& rx) noexcept
+void PrimitiveCircleGraphicsItem::setRadiusX(const Length& rx) noexcept
 {
-    mEllipseRect.setLeft(-rx.toPx());
-    mEllipseRect.setWidth(2*rx.toPx());
+    mCircleRect.setLeft(-rx.toPx());
+    mCircleRect.setWidth(2*rx.toPx());
     updateBoundingRectAndShape();
 }
 
-void PrimitiveEllipseGraphicsItem::setRadiusY(const Length& ry) noexcept
+void PrimitiveCircleGraphicsItem::setRadiusY(const Length& ry) noexcept
 {
-    mEllipseRect.setTop(-ry.toPx());
-    mEllipseRect.setHeight(2*ry.toPx());
+    mCircleRect.setTop(-ry.toPx());
+    mCircleRect.setHeight(2*ry.toPx());
     updateBoundingRectAndShape();
 }
 
-void PrimitiveEllipseGraphicsItem::setRadius(const Length& rx, const Length& ry) noexcept
+void PrimitiveCircleGraphicsItem::setRadius(const Length& rx, const Length& ry) noexcept
 {
-    mEllipseRect = Toolbox::boundingRectFromRadius(rx.toPx(), ry.toPx());
+    mCircleRect = Toolbox::boundingRectFromRadius(rx.toPx(), ry.toPx());
     updateBoundingRectAndShape();
 }
 
-void PrimitiveEllipseGraphicsItem::setLineWidth(const Length& width) noexcept
+void PrimitiveCircleGraphicsItem::setLineWidth(const Length& width) noexcept
 {
     mPen.setWidthF(width.toPx());
     mPenHighlighted.setWidthF(width.toPx());
     updateBoundingRectAndShape();
 }
 
-void PrimitiveEllipseGraphicsItem::setLineLayer(const GraphicsLayer* layer) noexcept
+void PrimitiveCircleGraphicsItem::setLineLayer(const GraphicsLayer* layer) noexcept
 {
     if (mLineLayer) {
         mLineLayer->unregisterObserver(*this);
@@ -106,7 +106,7 @@ void PrimitiveEllipseGraphicsItem::setLineLayer(const GraphicsLayer* layer) noex
     updateBoundingRectAndShape(); // grab area may have changed
 }
 
-void PrimitiveEllipseGraphicsItem::setFillLayer(const GraphicsLayer* layer) noexcept
+void PrimitiveCircleGraphicsItem::setFillLayer(const GraphicsLayer* layer) noexcept
 {
     if (mFillLayer) {
         mFillLayer->unregisterObserver(*this);
@@ -124,7 +124,7 @@ void PrimitiveEllipseGraphicsItem::setFillLayer(const GraphicsLayer* layer) noex
  *  Inherited from IF_LayerObserver
  ****************************************************************************************/
 
-void PrimitiveEllipseGraphicsItem::layerColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
+void PrimitiveCircleGraphicsItem::layerColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
 {
     Q_UNUSED(layer);
     Q_UNUSED(newColor);
@@ -132,7 +132,7 @@ void PrimitiveEllipseGraphicsItem::layerColorChanged(const GraphicsLayer& layer,
     updateVisibility();
 }
 
-void PrimitiveEllipseGraphicsItem::layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
+void PrimitiveCircleGraphicsItem::layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept
 {
     Q_UNUSED(layer);
     Q_UNUSED(newColor);
@@ -140,7 +140,7 @@ void PrimitiveEllipseGraphicsItem::layerHighlightColorChanged(const GraphicsLaye
     updateVisibility();
 }
 
-void PrimitiveEllipseGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept
+void PrimitiveCircleGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept
 {
     Q_UNUSED(layer);
     Q_UNUSED(newVisible);
@@ -148,7 +148,7 @@ void PrimitiveEllipseGraphicsItem::layerVisibleChanged(const GraphicsLayer& laye
     updateVisibility();
 }
 
-void PrimitiveEllipseGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
+void PrimitiveCircleGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept
 {
     Q_UNUSED(layer);
     Q_UNUSED(newEnabled);
@@ -156,7 +156,7 @@ void PrimitiveEllipseGraphicsItem::layerEnabledChanged(const GraphicsLayer& laye
     updateVisibility();
 }
 
-void PrimitiveEllipseGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
+void PrimitiveCircleGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept
 {
     if (&layer == mLineLayer) {
         setLineLayer(nullptr);
@@ -171,7 +171,7 @@ void PrimitiveEllipseGraphicsItem::layerDestroyed(const GraphicsLayer& layer) no
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-void PrimitiveEllipseGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
+void PrimitiveCircleGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
 {
     Q_UNUSED(widget);
     if (option->state.testFlag(QStyle::State_Selected)) {
@@ -181,14 +181,14 @@ void PrimitiveEllipseGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         painter->setPen(mPen);
         painter->setBrush(mBrush);
     }
-    painter->drawEllipse(mEllipseRect);
+    painter->drawEllipse(mCircleRect);
 }
 
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
-void PrimitiveEllipseGraphicsItem::updateColors() noexcept
+void PrimitiveCircleGraphicsItem::updateColors() noexcept
 {
     if (mLineLayer && mLineLayer->isVisible()) {
         mPen.setStyle(Qt::SolidLine);
@@ -212,17 +212,17 @@ void PrimitiveEllipseGraphicsItem::updateColors() noexcept
     update();
 }
 
-void PrimitiveEllipseGraphicsItem::updateBoundingRectAndShape() noexcept
+void PrimitiveCircleGraphicsItem::updateBoundingRectAndShape() noexcept
 {
     prepareGeometryChange();
-    mBoundingRect = Toolbox::adjustedBoundingRect(mEllipseRect, mPen.widthF() / 2);
+    mBoundingRect = Toolbox::adjustedBoundingRect(mCircleRect, mPen.widthF() / 2);
     QPainterPath p;
-    p.addEllipse(mEllipseRect);
+    p.addEllipse(mCircleRect);
     mShape = Toolbox::shapeFromPath(p, mPen, mBrush, Length(200000));
     update();
 }
 
-void PrimitiveEllipseGraphicsItem::updateVisibility() noexcept
+void PrimitiveCircleGraphicsItem::updateVisibility() noexcept
 {
     setVisible((mPen.style() != Qt::NoPen) || (mBrush.style() != Qt::NoBrush));
 }

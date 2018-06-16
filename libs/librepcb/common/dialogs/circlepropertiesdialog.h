@@ -32,35 +32,35 @@
 namespace librepcb {
 
 class UndoStack;
-class Ellipse;
+class Circle;
 class GraphicsLayer;
 
 namespace Ui {
-class EllipsePropertiesDialog;
+class CirclePropertiesDialog;
 }
 
 /*****************************************************************************************
- *  Class EllipsePropertiesDialog
+ *  Class CirclePropertiesDialog
  ****************************************************************************************/
 
 /**
- * @brief The EllipsePropertiesDialog class
+ * @brief The CirclePropertiesDialog class
  */
-class EllipsePropertiesDialog final : public QDialog
+class CirclePropertiesDialog final : public QDialog
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        EllipsePropertiesDialog() = delete;
-        EllipsePropertiesDialog(const EllipsePropertiesDialog& other) = delete;
-        EllipsePropertiesDialog(Ellipse& ellipse, UndoStack& undoStack,
+        CirclePropertiesDialog() = delete;
+        CirclePropertiesDialog(const CirclePropertiesDialog& other) = delete;
+        CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
                                 QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
-        ~EllipsePropertiesDialog() noexcept;
+        ~CirclePropertiesDialog() noexcept;
 
         // Operator Overloadings
-        EllipsePropertiesDialog& operator=(const EllipsePropertiesDialog& rhs) = delete;
+        CirclePropertiesDialog& operator=(const CirclePropertiesDialog& rhs) = delete;
 
 
     private: // GUI Events
@@ -72,9 +72,9 @@ class EllipsePropertiesDialog final : public QDialog
 
 
     private: // Data
-        Ellipse& mEllipse;
+        Circle& mCircle;
         UndoStack& mUndoStack;
-        QScopedPointer<Ui::EllipsePropertiesDialog> mUi;
+        QScopedPointer<Ui::CirclePropertiesDialog> mUi;
 };
 
 /*****************************************************************************************

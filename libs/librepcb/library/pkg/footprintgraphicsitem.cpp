@@ -49,8 +49,8 @@ FootprintGraphicsItem::FootprintGraphicsItem(Footprint& fpt, const IF_GraphicsLa
     for (Polygon& polygon : mFootprint.getPolygons()) {
         addPolygon(polygon);
     }
-    for (Ellipse& ellipse : mFootprint.getEllipses()) {
-        addEllipse(ellipse);
+    for (Circle& circle : mFootprint.getCircles()) {
+        addCircle(circle);
     }
     for (StrokeText& text : mFootprint.getStrokeTexts()) {
         addStrokeText(text);
@@ -77,9 +77,9 @@ FootprintPadGraphicsItem* FootprintGraphicsItem::getPadGraphicsItem(const Footpr
     return mPadGraphicsItems.value(&pin).data();
 }
 
-EllipseGraphicsItem* FootprintGraphicsItem::getEllipseGraphicsItem(const Ellipse& ellipse) noexcept
+CircleGraphicsItem* FootprintGraphicsItem::getCircleGraphicsItem(const Circle& circle) noexcept
 {
-    return mEllipseGraphicsItems.value(&ellipse).data();
+    return mCircleGraphicsItems.value(&circle).data();
 }
 
 PolygonGraphicsItem* FootprintGraphicsItem::getPolygonGraphicsItem(const Polygon& polygon) noexcept
@@ -99,7 +99,7 @@ HoleGraphicsItem* FootprintGraphicsItem::getHoleGraphicsItem(const Hole& hole) n
 
 int FootprintGraphicsItem::getItemsAtPosition(const Point& pos,
     QList<QSharedPointer<FootprintPadGraphicsItem> >* pads,
-    QList<QSharedPointer<EllipseGraphicsItem> >* ellipses,
+    QList<QSharedPointer<CircleGraphicsItem> >* circles,
     QList<QSharedPointer<PolygonGraphicsItem> >* polygons,
     QList<QSharedPointer<StrokeTextGraphicsItem> >* texts,
     QList<QSharedPointer<HoleGraphicsItem> >* holes) noexcept
@@ -114,11 +114,11 @@ int FootprintGraphicsItem::getItemsAtPosition(const Point& pos,
             }
         }
     }
-    if (ellipses) {
-        foreach (const QSharedPointer<EllipseGraphicsItem>& item, mEllipseGraphicsItems) {
+    if (circles) {
+        foreach (const QSharedPointer<CircleGraphicsItem>& item, mCircleGraphicsItems) {
             QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
             if (item->shape().contains(mappedPos)) {
-                ellipses->append(item);
+                circles->append(item);
                 ++count;
             }
         }
@@ -164,15 +164,15 @@ QList<QSharedPointer<FootprintPadGraphicsItem> > FootprintGraphicsItem::getSelec
     return pins;
 }
 
-QList<QSharedPointer<EllipseGraphicsItem> > FootprintGraphicsItem::getSelectedEllipses() noexcept
+QList<QSharedPointer<CircleGraphicsItem> > FootprintGraphicsItem::getSelectedCircles() noexcept
 {
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
-    foreach (const QSharedPointer<EllipseGraphicsItem>& item, mEllipseGraphicsItems) {
+    QList<QSharedPointer<CircleGraphicsItem>> circles;
+    foreach (const QSharedPointer<CircleGraphicsItem>& item, mCircleGraphicsItems) {
         if (item->isSelected()) {
-            ellipses.append(item);
+            circles.append(item);
         }
     }
-    return ellipses;
+    return circles;
 }
 
 QList<QSharedPointer<PolygonGraphicsItem> > FootprintGraphicsItem::getSelectedPolygons() noexcept
@@ -236,17 +236,17 @@ void FootprintGraphicsItem::removePad(FootprintPad& pad) noexcept
     mPadGraphicsItems.remove(&pad); // this deletes the graphics item
 }
 
-void FootprintGraphicsItem::addEllipse(Ellipse& ellipse) noexcept
+void FootprintGraphicsItem::addCircle(Circle& circle) noexcept
 {
-    Q_ASSERT(!mEllipseGraphicsItems.contains(&ellipse));
-    QSharedPointer<EllipseGraphicsItem> item(new EllipseGraphicsItem(ellipse, mLayerProvider, this));
-    mEllipseGraphicsItems.insert(&ellipse, item);
+    Q_ASSERT(!mCircleGraphicsItems.contains(&circle));
+    QSharedPointer<CircleGraphicsItem> item(new CircleGraphicsItem(circle, mLayerProvider, this));
+    mCircleGraphicsItems.insert(&circle, item);
 }
 
-void FootprintGraphicsItem::removeEllipse(Ellipse& ellipse) noexcept
+void FootprintGraphicsItem::removeCircle(Circle& circle) noexcept
 {
-    Q_ASSERT(mEllipseGraphicsItems.contains(&ellipse));
-    mEllipseGraphicsItems.remove(&ellipse); // this deletes the graphics item
+    Q_ASSERT(mCircleGraphicsItems.contains(&circle));
+    mCircleGraphicsItems.remove(&circle); // this deletes the graphics item
 }
 
 void FootprintGraphicsItem::addPolygon(Polygon& polygon) noexcept
@@ -295,7 +295,7 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept
         QPainterPath mappedPath = mapToItem(item.data(), path);
         item->setSelected(item->shape().intersects(mappedPath));
     }
-    foreach (const QSharedPointer<EllipseGraphicsItem>& item, mEllipseGraphicsItems) {
+    foreach (const QSharedPointer<CircleGraphicsItem>& item, mCircleGraphicsItems) {
         QPainterPath mappedPath = mapToItem(item.data(), path);
         item->setSelected(item->shape().intersects(mappedPath));
     }

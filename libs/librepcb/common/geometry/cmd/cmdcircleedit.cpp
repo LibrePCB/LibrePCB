@@ -33,20 +33,20 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdEllipseEdit::CmdEllipseEdit(Ellipse& ellipse) noexcept :
-    UndoCommand(tr("Edit ellipse")), mEllipse(ellipse),
-    mOldLayerName(ellipse.getLayerName()), mNewLayerName(mOldLayerName),
-    mOldLineWidth(ellipse.getLineWidth()), mNewLineWidth(mOldLineWidth),
-    mOldIsFilled(ellipse.isFilled()), mNewIsFilled(mOldIsFilled),
-    mOldIsGrabArea(ellipse.isGrabArea()), mNewIsGrabArea(mOldIsGrabArea),
-    mOldRadiusX(ellipse.getRadiusX()), mNewRadiusX(mOldRadiusX),
-    mOldRadiusY(ellipse.getRadiusY()), mNewRadiusY(mOldRadiusY),
-    mOldCenter(ellipse.getCenter()), mNewCenter(mOldCenter),
-    mOldRotation(ellipse.getRotation()), mNewRotation(mOldRotation)
+CmdCircleEdit::CmdCircleEdit(Circle& circle) noexcept :
+    UndoCommand(tr("Edit circle")), mCircle(circle),
+    mOldLayerName(circle.getLayerName()), mNewLayerName(mOldLayerName),
+    mOldLineWidth(circle.getLineWidth()), mNewLineWidth(mOldLineWidth),
+    mOldIsFilled(circle.isFilled()), mNewIsFilled(mOldIsFilled),
+    mOldIsGrabArea(circle.isGrabArea()), mNewIsGrabArea(mOldIsGrabArea),
+    mOldRadiusX(circle.getRadiusX()), mNewRadiusX(mOldRadiusX),
+    mOldRadiusY(circle.getRadiusY()), mNewRadiusY(mOldRadiusY),
+    mOldCenter(circle.getCenter()), mNewCenter(mOldCenter),
+    mOldRotation(circle.getRotation()), mNewRotation(mOldRotation)
 {
 }
 
-CmdEllipseEdit::~CmdEllipseEdit() noexcept
+CmdCircleEdit::~CmdCircleEdit() noexcept
 {
     if (!wasEverExecuted()) {
         performUndo(); // discard possible executed immediate changes
@@ -57,77 +57,77 @@ CmdEllipseEdit::~CmdEllipseEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdEllipseEdit::setLayerName(const QString& name, bool immediate) noexcept
+void CmdCircleEdit::setLayerName(const QString& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = name;
-    if (immediate) mEllipse.setLayerName(mNewLayerName);
+    if (immediate) mCircle.setLayerName(mNewLayerName);
 }
 
-void CmdEllipseEdit::setLineWidth(const Length& width, bool immediate) noexcept
+void CmdCircleEdit::setLineWidth(const Length& width, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLineWidth = width;
-    if (immediate) mEllipse.setLineWidth(mNewLineWidth);
+    if (immediate) mCircle.setLineWidth(mNewLineWidth);
 }
 
-void CmdEllipseEdit::setIsFilled(bool filled, bool immediate) noexcept
+void CmdCircleEdit::setIsFilled(bool filled, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewIsFilled = filled;
-    if (immediate) mEllipse.setIsFilled(mNewIsFilled);
+    if (immediate) mCircle.setIsFilled(mNewIsFilled);
 }
 
-void CmdEllipseEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept
+void CmdCircleEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewIsGrabArea = grabArea;
-    if (immediate) mEllipse.setIsGrabArea(mNewIsGrabArea);
+    if (immediate) mCircle.setIsGrabArea(mNewIsGrabArea);
 }
 
-void CmdEllipseEdit::setRadiusX(const Length& rx, bool immediate) noexcept
+void CmdCircleEdit::setRadiusX(const Length& rx, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewRadiusX = rx;
-    if (immediate) mEllipse.setRadiusX(mNewRadiusX);
+    if (immediate) mCircle.setRadiusX(mNewRadiusX);
 }
 
-void CmdEllipseEdit::setRadiusY(const Length& ry, bool immediate) noexcept
+void CmdCircleEdit::setRadiusY(const Length& ry, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewRadiusY = ry;
-    if (immediate) mEllipse.setRadiusY(mNewRadiusY);
+    if (immediate) mCircle.setRadiusY(mNewRadiusY);
 }
 
-void CmdEllipseEdit::setCenter(const Point& pos, bool immediate) noexcept
+void CmdCircleEdit::setCenter(const Point& pos, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewCenter = pos;
-    if (immediate) mEllipse.setCenter(mNewCenter);
+    if (immediate) mCircle.setCenter(mNewCenter);
 }
 
-void CmdEllipseEdit::setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept
+void CmdCircleEdit::setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewCenter = mOldCenter + deltaPos;
-    if (immediate) mEllipse.setCenter(mNewCenter);
+    if (immediate) mCircle.setCenter(mNewCenter);
 }
 
-void CmdEllipseEdit::setRotation(const Angle& angle, bool immediate) noexcept
+void CmdCircleEdit::setRotation(const Angle& angle, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewRotation = angle;
-    if (immediate) mEllipse.setRotation(mNewRotation);
+    if (immediate) mCircle.setRotation(mNewRotation);
 }
 
-void CmdEllipseEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+void CmdCircleEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewCenter.rotate(angle, center);
     mNewRotation += angle;
     if (immediate) {
-        mEllipse.setCenter(mNewCenter);
-        mEllipse.setRotation(mNewRotation);
+        mCircle.setCenter(mNewCenter);
+        mCircle.setRotation(mNewRotation);
     }
 }
 
@@ -135,7 +135,7 @@ void CmdEllipseEdit::rotate(const Angle& angle, const Point& center, bool immedi
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdEllipseEdit::performExecute()
+bool CmdCircleEdit::performExecute()
 {
     performRedo(); // can throw
 
@@ -150,28 +150,28 @@ bool CmdEllipseEdit::performExecute()
     return false;
 }
 
-void CmdEllipseEdit::performUndo()
+void CmdCircleEdit::performUndo()
 {
-    mEllipse.setLayerName(mOldLayerName);
-    mEllipse.setLineWidth(mOldLineWidth);
-    mEllipse.setIsFilled(mOldIsFilled);
-    mEllipse.setIsGrabArea(mOldIsGrabArea);
-    mEllipse.setRadiusX(mOldRadiusX);
-    mEllipse.setRadiusY(mOldRadiusY);
-    mEllipse.setCenter(mOldCenter);
-    mEllipse.setRotation(mOldRotation);
+    mCircle.setLayerName(mOldLayerName);
+    mCircle.setLineWidth(mOldLineWidth);
+    mCircle.setIsFilled(mOldIsFilled);
+    mCircle.setIsGrabArea(mOldIsGrabArea);
+    mCircle.setRadiusX(mOldRadiusX);
+    mCircle.setRadiusY(mOldRadiusY);
+    mCircle.setCenter(mOldCenter);
+    mCircle.setRotation(mOldRotation);
 }
 
-void CmdEllipseEdit::performRedo()
+void CmdCircleEdit::performRedo()
 {
-    mEllipse.setLayerName(mNewLayerName);
-    mEllipse.setLineWidth(mNewLineWidth);
-    mEllipse.setIsFilled(mNewIsFilled);
-    mEllipse.setIsGrabArea(mNewIsGrabArea);
-    mEllipse.setRadiusX(mNewRadiusX);
-    mEllipse.setRadiusY(mNewRadiusY);
-    mEllipse.setCenter(mNewCenter);
-    mEllipse.setRotation(mNewRotation);
+    mCircle.setLayerName(mNewLayerName);
+    mCircle.setLineWidth(mNewLineWidth);
+    mCircle.setIsFilled(mNewIsFilled);
+    mCircle.setIsGrabArea(mNewIsGrabArea);
+    mCircle.setRadiusX(mNewRadiusX);
+    mCircle.setRadiusY(mNewRadiusY);
+    mCircle.setCenter(mNewCenter);
+    mCircle.setRotation(mNewRotation);
 }
 
 /*****************************************************************************************

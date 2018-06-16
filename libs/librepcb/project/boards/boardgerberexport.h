@@ -34,7 +34,7 @@
 namespace librepcb {
 
 class Polygon;
-class Ellipse;
+class Circle;
 class ExcellonGenerator;
 class GerberGenerator;
 

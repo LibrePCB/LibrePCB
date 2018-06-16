@@ -34,24 +34,24 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class PrimitiveEllipseGraphicsItem
+ *  Class PrimitiveCircleGraphicsItem
  ****************************************************************************************/
 
 /**
- * @brief The PrimitiveEllipseGraphicsItem class
+ * @brief The PrimitiveCircleGraphicsItem class
  *
  * @author ubruhin
  * @date 2017-05-28
  */
-class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerObserver
+class PrimitiveCircleGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerObserver
 {
     public:
 
         // Constructors / Destructor
-        //PrimitiveEllipseGraphicsItem() = delete;
-        PrimitiveEllipseGraphicsItem(const PrimitiveEllipseGraphicsItem& other) = delete;
-        explicit PrimitiveEllipseGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-        virtual ~PrimitiveEllipseGraphicsItem() noexcept;
+        //PrimitiveCircleGraphicsItem() = delete;
+        PrimitiveCircleGraphicsItem(const PrimitiveCircleGraphicsItem& other) = delete;
+        explicit PrimitiveCircleGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
+        virtual ~PrimitiveCircleGraphicsItem() noexcept;
 
         // Setters
         void setPosition(const Point& pos) noexcept;
@@ -76,7 +76,7 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
         virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
         // Operator Overloadings
-        PrimitiveEllipseGraphicsItem& operator=(const PrimitiveEllipseGraphicsItem& rhs) = delete;
+        PrimitiveCircleGraphicsItem& operator=(const PrimitiveCircleGraphicsItem& rhs) = delete;
 
 
     private: // Methods
@@ -92,7 +92,7 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
         QPen mPenHighlighted;
         QBrush mBrush;
         QBrush mBrushHighlighted;
-        QRectF mEllipseRect;
+        QRectF mCircleRect;
         QRectF mBoundingRect;
         QPainterPath mShape;
 };
