@@ -140,9 +140,9 @@ void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept
         mUi->prgProgress->setVisible(true);
 
         // read ZIP metadata from JSON
-        QUrl url = QUrl(mJsonObject.value("zip_url").toString());
-        qint64 zipSize = mJsonObject.value("zip_size").toInt(-1);
-        QByteArray zipSha256 = mJsonObject.value("zip_sha256").toString().toUtf8();
+        QUrl url = QUrl(mJsonObject.value("download_url").toString());
+        qint64 zipSize = mJsonObject.value("download_size").toInt(-1);
+        QByteArray zipSha256 = mJsonObject.value("download_sha256").toString().toUtf8();
 
         // determine destination directory
         QString libDirName = mUuid.toStr() % ".lplib";

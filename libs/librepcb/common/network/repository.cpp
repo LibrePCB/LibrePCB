@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "repository.h"
 #include "network/networkrequest.h"
+#include "../application.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -73,7 +74,8 @@ bool Repository::setUrl(const QUrl& url) noexcept
 
 void Repository::requestLibraryList() const noexcept
 {
-    requestLibraryList(QUrl(mUrl.toString() % "/api/v1/libraries"));
+    QString path = "/api/v1/libraries/v" % qApp->getFileFormatVersion().toStr();
+    requestLibraryList(QUrl(mUrl.toString() % path));
 }
 
 void Repository::serialize(SExpression& root) const
