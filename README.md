@@ -36,7 +36,7 @@ breaking changes can occur), you should not yet use LibrePCB productively!*
 
 **Please read our [user manual](https://docs.librepcb.org/) to see how you can
 install and use LibrePCB.**
-The [Getting Started](https://docs.librepcb.org/getting_started/) guide
+The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
 gives you a quick introduction to LibrePCB.
 
 In addition to the installation methods described in the user manual, Arch
