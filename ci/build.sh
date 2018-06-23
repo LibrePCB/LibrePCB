@@ -52,10 +52,14 @@ fi
 # Mac: Build application bundle
 if [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
-  macdeployqt "./build/install/opt/bin/librepcb.app" -dmg
+  # replace "bin" and "share" directories with the single librepcb.app directory
+  mv "./build/install/opt/bin/librepcb.app" "./build/install/opt/librepcb.app"
+  mv "./build/install/opt/share" "./build/install/opt/librepcb.app/Contents/share"
+  rmdir "./build/install/opt/bin"
+  macdeployqt "./build/install/opt/librepcb.app" -dmg
   if [ "${DEPLOY_BUNDLE-}" = "true" ]
   then
-    cp ./build/install/opt/bin/librepcb.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
+    mv ./build/install/opt/librepcb.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
   fi
 fi
 
