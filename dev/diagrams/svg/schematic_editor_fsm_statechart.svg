@@ -48,7 +48,7 @@
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1140" width="200" height="80"/>
     <rect style="fill: #ffffff" x="740" y="1120" width="96.4" height="20"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="740" y="1120" width="96.4" height="20"/>
-    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1135">draw_ellipse</text>
+    <text xml:space="preserve" font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="742" y="1135">draw_circle</text>
   </g>
   <g>
     <rect style="fill: #ffffff" x="740" y="1260" width="200" height="80"/>

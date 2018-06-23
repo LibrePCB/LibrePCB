@@ -33,7 +33,7 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
-class PrimitiveEllipseGraphicsItem;
+class PrimitiveCircleGraphicsItem;
 class LineGraphicsItem;
 class PrimitiveTextGraphicsItem;
 
@@ -87,7 +87,7 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
 
     private: // Data
         SymbolPin& mPin;
-        QScopedPointer<PrimitiveEllipseGraphicsItem> mCircleGraphicsItem;
+        QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
         QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
         QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 };

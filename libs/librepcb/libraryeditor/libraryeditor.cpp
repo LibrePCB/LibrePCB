@@ -119,7 +119,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_LINE, mUi->actionDrawLine);
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_RECT, mUi->actionDrawRect);
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_POLYGON, mUi->actionDrawPolygon);
-    mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_ELLIPSE, mUi->actionDrawEllipse);
+    mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_CIRCLE, mUi->actionDrawCircle);
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::ADD_NAMES, mUi->actionAddName);
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::ADD_VALUES, mUi->actionAddValue);
     mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_TEXT, mUi->actionAddText);

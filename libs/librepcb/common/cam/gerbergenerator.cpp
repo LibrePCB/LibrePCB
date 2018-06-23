@@ -23,7 +23,7 @@
 #include <QtCore>
 #include "gerbergenerator.h"
 #include "gerberaperturelist.h"
-#include "../geometry/ellipse.h"
+#include "../geometry/circle.h"
 #include "../geometry/path.h"
 #include "../fileio/smarttextfile.h"
 #include "../application.h"
@@ -72,27 +72,17 @@ void GerberGenerator::drawLine(const Point& start, const Point& end, const Lengt
     linearInterpolateToPosition(end);
 }
 
-void GerberGenerator::drawEllipseOutline(const Ellipse& ellipse) noexcept
+void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept
 {
-    if (ellipse.getRadiusX() == ellipse.getRadiusY()) {
-        Length outerDia = (ellipse.getRadiusX() * 2) + ellipse.getLineWidth();
-        Length innerDia = (ellipse.getRadiusX() * 2) - ellipse.getLineWidth();
-        if (innerDia < 0) innerDia = 0;
-        flashCircle(ellipse.getCenter(), outerDia, innerDia);
-    } else {
-        // TODO!
-        qWarning() << "Ellipse was ignored in gerber output!";
-    }
+    Length outerDia = circle.getDiameter() + circle.getLineWidth();
+    Length innerDia = circle.getDiameter() - circle.getLineWidth();
+    if (innerDia < 0) innerDia = 0;
+    flashCircle(circle.getCenter(), outerDia, innerDia);
 }
 
-void GerberGenerator::drawEllipseArea(const Ellipse& ellipse) noexcept
+void GerberGenerator::drawCircleArea(const Circle& circle) noexcept
 {
-    if (ellipse.getRadiusX() == ellipse.getRadiusY()) {
-        flashCircle(ellipse.getCenter(), ellipse.getRadiusX() * 2, Length(0));
-    } else {
-        // TODO!
-        qWarning() << "Ellipse was ignored in gerber output!";
-    }
+    flashCircle(circle.getCenter(), circle.getDiameter(), Length(0));
 }
 
 void GerberGenerator::drawPathOutline(const Path& path, const Length& lineWidth) noexcept

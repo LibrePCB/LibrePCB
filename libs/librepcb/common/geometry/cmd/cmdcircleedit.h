@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDELLIPSEEDIT_H
-#define LIBREPCB_CMDELLIPSEEDIT_H
+#ifndef LIBREPCB_CMDCIRCLEEDIT_H
+#define LIBREPCB_CMDCIRCLEEDIT_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,39 +32,37 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
+class Circle;
 
 /*****************************************************************************************
- *  Class CmdEllipseEdit
+ *  Class CmdCircleEdit
  ****************************************************************************************/
 
 /**
- * @brief The CmdEllipseEdit class
+ * @brief The CmdCircleEdit class
  */
-class CmdEllipseEdit final : public UndoCommand
+class CmdCircleEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdEllipseEdit() = delete;
-        CmdEllipseEdit(const CmdEllipseEdit& other) = delete;
-        explicit CmdEllipseEdit(Ellipse& ellipse) noexcept;
-        ~CmdEllipseEdit() noexcept;
+        CmdCircleEdit() = delete;
+        CmdCircleEdit(const CmdCircleEdit& other) = delete;
+        explicit CmdCircleEdit(Circle& circle) noexcept;
+        ~CmdCircleEdit() noexcept;
 
         // Setters
         void setLayerName(const QString& name, bool immediate) noexcept;
         void setLineWidth(const Length& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setRadiusX(const Length& rx, bool immediate) noexcept;
-        void setRadiusY(const Length& ry, bool immediate) noexcept;
+        void setDiameter(const Length& dia, bool immediate) noexcept;
         void setCenter(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Operator Overloadings
-        CmdEllipseEdit& operator=(const CmdEllipseEdit& rhs) = delete;
+        CmdCircleEdit& operator=(const CmdCircleEdit& rhs) = delete;
 
 
     private:
@@ -84,7 +82,7 @@ class CmdEllipseEdit final : public UndoCommand
         // Private Member Variables
 
         // Attributes from the constructor
-        Ellipse& mEllipse;
+        Circle& mCircle;
 
         // General Attributes
         QString mOldLayerName;
@@ -95,14 +93,10 @@ class CmdEllipseEdit final : public UndoCommand
         bool mNewIsFilled;
         bool mOldIsGrabArea;
         bool mNewIsGrabArea;
-        Length mOldRadiusX;
-        Length mNewRadiusX;
-        Length mOldRadiusY;
-        Length mNewRadiusY;
+        Length mOldDiameter;
+        Length mNewDiameter;
         Point mOldCenter;
         Point mNewCenter;
-        Angle mOldRotation;
-        Angle mNewRotation;
 };
 
 /*****************************************************************************************
@@ -111,4 +105,4 @@ class CmdEllipseEdit final : public UndoCommand
 
 } // namespace librepcb
 
-#endif // LIBREPCB_CMDELLIPSEEDIT_H
+#endif // LIBREPCB_CMDCIRCLEEDIT_H

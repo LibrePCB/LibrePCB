@@ -37,10 +37,10 @@ namespace librepcb {
 
 HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept :
-    PrimitiveEllipseGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
+    PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
 {
     setPosition(mHole.getPosition());
-    setRadius(mHole.getDiameter() / 2, mHole.getDiameter() / 2);
+    setDiameter(mHole.getDiameter());
     setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setZValue(5);
@@ -66,7 +66,7 @@ HoleGraphicsItem::~HoleGraphicsItem() noexcept
 
 QPainterPath HoleGraphicsItem::shape() const noexcept
 {
-    return PrimitiveEllipseGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
+    return PrimitiveCircleGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
 }
 
 /*****************************************************************************************
@@ -80,7 +80,7 @@ void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept
 
 void HoleGraphicsItem::holeDiameterChanged(const Length& newDiameter) noexcept
 {
-    setRadius(newDiameter / 2, newDiameter / 2);
+    setDiameter(newDiameter);
     mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
 }
 

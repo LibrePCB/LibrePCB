@@ -342,7 +342,7 @@
     <rect style="fill: #ffffd2" x="770" y="560" width="225.6" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="770" y="560" width="225.6" height="44"/>
     <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="882.8" y="576">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="882.8" y="595">SymbolEllipse</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="882.8" y="595">SymbolCircle</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="718.275,553.172 718.275,582 770,582 "/>
@@ -384,7 +384,7 @@
     <rect style="fill: #ffffd2" x="1550" y="760" width="225.6" height="44"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1550" y="760" width="225.6" height="44"/>
     <text xml:space="preserve" font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1662.8" y="776">&lt;&lt;IF_XmlSerializableObject&gt;&gt;</text>
-    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1662.8" y="795">FootprintEllipse</text>
+    <text xml:space="preserve" font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1662.8" y="795">FootprintCircle</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1502.8,749.172 1502.8,782 1550,782 "/>

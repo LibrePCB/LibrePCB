@@ -17,67 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ELLIPSEGRAPHICSITEM_H
-#define LIBREPCB_ELLIPSEGRAPHICSITEM_H
+#ifndef LIBREPCB_CIRCLEPROPERTIESDIALOG_H
+#define LIBREPCB_CIRCLEPROPERTIESDIALOG_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "primitiveellipsegraphicsitem.h"
-#include "../geometry/ellipse.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
+class UndoStack;
+class Circle;
+class GraphicsLayer;
+
+namespace Ui {
+class CirclePropertiesDialog;
+}
 
 /*****************************************************************************************
- *  Class EllipseGraphicsItem
+ *  Class CirclePropertiesDialog
  ****************************************************************************************/
 
 /**
- * @brief The EllipseGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
+ * @brief The CirclePropertiesDialog class
  */
-class EllipseGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF_EllipseObserver
+class CirclePropertiesDialog final : public QDialog
 {
+        Q_OBJECT
+
     public:
 
         // Constructors / Destructor
-        EllipseGraphicsItem() = delete;
-        EllipseGraphicsItem(const EllipseGraphicsItem& other) = delete;
-        EllipseGraphicsItem(Ellipse& ellipse, const IF_GraphicsLayerProvider& lp,
-                            QGraphicsItem* parent = nullptr) noexcept;
-        ~EllipseGraphicsItem() noexcept;
-
-        // Getters
-        Ellipse& getEllipse() noexcept {return mEllipse;}
+        CirclePropertiesDialog() = delete;
+        CirclePropertiesDialog(const CirclePropertiesDialog& other) = delete;
+        CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
+                                QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
+        ~CirclePropertiesDialog() noexcept;
 
         // Operator Overloadings
-        EllipseGraphicsItem& operator=(const EllipseGraphicsItem& rhs) = delete;
+        CirclePropertiesDialog& operator=(const CirclePropertiesDialog& rhs) = delete;
 
+
+    private: // GUI Events
+        void buttonBoxClicked(QAbstractButton* button) noexcept;
 
     private: // Methods
-        void ellipseLayerNameChanged(const QString& newLayerName) noexcept override;
-        void ellipseLineWidthChanged(const Length& newLineWidth) noexcept override;
-        void ellipseIsFilledChanged(bool newIsFilled) noexcept override;
-        void ellipseIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-        void ellipseCenterChanged(const Point& newCenter) noexcept override;
-        void ellipseRadiusXChanged(const Length& newRadiusX) noexcept override;
-        void ellipseRadiusYChanged(const Length& newRadiusY) noexcept override;
-        void ellipseRotationChanged(const Angle& newRotation) noexcept override;
-        void updateFillLayer() noexcept;
+        bool applyChanges() noexcept;
+        void selectLayerNameInCombobox(const QString& name) noexcept;
 
 
     private: // Data
-        Ellipse& mEllipse;
-        const IF_GraphicsLayerProvider& mLayerProvider;
+        Circle& mCircle;
+        UndoStack& mUndoStack;
+        QScopedPointer<Ui::CirclePropertiesDialog> mUi;
 };
 
 /*****************************************************************************************
@@ -86,4 +83,4 @@ class EllipseGraphicsItem final : public PrimitiveEllipseGraphicsItem, public IF
 
 } // namespace librepcb
 
-#endif // LIBREPCB_ELLIPSEGRAPHICSITEM_H
+#endif // LIBREPCB_CIRCLEPROPERTIESDIALOG_H

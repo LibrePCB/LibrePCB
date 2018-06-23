@@ -144,7 +144,7 @@ void PackageEditorWidget::setToolsActionGroup(ExclusiveActionGroup* group) noexc
         mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, true);
-        mToolsActionGroup->setActionEnabled(Tool::DRAW_ELLIPSE, true);
+        mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, true);
         mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, true);
         mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, true);
         mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
@@ -285,7 +285,7 @@ bool PackageEditorWidget::toolChangeRequested(Tool newTool) noexcept
         case Tool::DRAW_LINE:       return mFsm->processStartDrawLines();
         case Tool::DRAW_RECT:       return mFsm->processStartDrawRects();
         case Tool::DRAW_POLYGON:    return mFsm->processStartDrawPolygons();
-        case Tool::DRAW_ELLIPSE:    return mFsm->processStartDrawEllipses();
+        case Tool::DRAW_CIRCLE:     return mFsm->processStartDrawCircles();
         case Tool::DRAW_TEXT:       return mFsm->processStartDrawTexts();
         case Tool::ADD_HOLES:       return mFsm->processStartAddingHoles();
         default:                    return false;

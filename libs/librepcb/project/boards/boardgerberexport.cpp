@@ -425,18 +425,17 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
         }
     }
 
-    // draw ellipses
-    for (const Ellipse& ellipse : footprint.getLibFootprint().getEllipses().sortedByUuid()) {
+    // draw circles
+    for (const Circle& circle : footprint.getLibFootprint().getCircles().sortedByUuid()) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
-        if (layer == ellipse.getLayerName()) {
-            Ellipse e = ellipse;
-            e.rotate(footprint.getRotation());
-            if (footprint.getIsMirrored()) e.mirror(Qt::Horizontal);
+        if (layer == circle.getLayerName()) {
+            Circle e = circle;
+            if (footprint.getIsMirrored()) e.setCenter(e.getCenter().mirrored(Qt::Horizontal));
             e.translate(footprint.getPosition());
             e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
-            gen.drawEllipseOutline(e);
+            gen.drawCircleOutline(e);
             if (e.isFilled()) {
-                gen.drawEllipseArea(e);
+                gen.drawCircleArea(e);
             }
         }
     }

@@ -24,13 +24,13 @@
 #include "cmdmoveselectedfootprintitems.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
@@ -58,9 +58,9 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
         mPadEditCmds.append(new CmdFootprintPadEdit(pad->getPad()));
     }
 
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses = context.currentGraphicsItem->getSelectedEllipses();
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        mEllipseEditCmds.append(new CmdEllipseEdit(ellipse->getEllipse()));
+    QList<QSharedPointer<CircleGraphicsItem>> circles = context.currentGraphicsItem->getSelectedCircles();
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     }
 
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = context.currentGraphicsItem->getSelectedPolygons();
@@ -98,7 +98,7 @@ void CmdMoveSelectedFootprintItems::setCurrentPosition(const Point& pos) noexcep
         foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
             cmd->setDeltaToStartPos(delta, true);
         }
-        foreach (CmdEllipseEdit* cmd, mEllipseEditCmds) {
+        foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
             cmd->setDeltaToStartCenter(delta, true);
         }
         foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
@@ -130,8 +130,8 @@ bool CmdMoveSelectedFootprintItems::performExecute()
     while (mPadEditCmds.count() > 0) {
         appendChild(mPadEditCmds.takeLast());
     }
-    while (mEllipseEditCmds.count() > 0) {
-        appendChild(mEllipseEditCmds.takeLast());
+    while (mCircleEditCmds.count() > 0) {
+        appendChild(mCircleEditCmds.takeLast());
     }
     while (mPolygonEditCmds.count() > 0) {
         appendChild(mPolygonEditCmds.takeLast());
@@ -154,7 +154,7 @@ bool CmdMoveSelectedFootprintItems::performExecute()
 void CmdMoveSelectedFootprintItems::deleteAllCommands() noexcept
 {
     qDeleteAll(mPadEditCmds);           mPadEditCmds.clear();
-    qDeleteAll(mEllipseEditCmds);       mEllipseEditCmds.clear();
+    qDeleteAll(mCircleEditCmds);        mCircleEditCmds.clear();
     qDeleteAll(mPolygonEditCmds);       mPolygonEditCmds.clear();
     qDeleteAll(mTextEditCmds);          mTextEditCmds.clear();
     qDeleteAll(mHoleEditCmds);          mHoleEditCmds.clear();

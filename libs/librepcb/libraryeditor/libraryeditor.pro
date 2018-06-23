@@ -63,7 +63,7 @@ SOURCES += \
     pkg/fsm/packageeditorstate_addnames.cpp \
     pkg/fsm/packageeditorstate_addpads.cpp \
     pkg/fsm/packageeditorstate_addvalues.cpp \
-    pkg/fsm/packageeditorstate_drawellipse.cpp \
+    pkg/fsm/packageeditorstate_drawcircle.cpp \
     pkg/fsm/packageeditorstate_drawline.cpp \
     pkg/fsm/packageeditorstate_drawpolygon.cpp \
     pkg/fsm/packageeditorstate_drawpolygonbase.cpp \
@@ -86,7 +86,7 @@ SOURCES += \
     sym/fsm/symboleditorstate_addnames.cpp \
     sym/fsm/symboleditorstate_addpins.cpp \
     sym/fsm/symboleditorstate_addvalues.cpp \
-    sym/fsm/symboleditorstate_drawellipse.cpp \
+    sym/fsm/symboleditorstate_drawcircle.cpp \
     sym/fsm/symboleditorstate_drawline.cpp \
     sym/fsm/symboleditorstate_drawpolygon.cpp \
     sym/fsm/symboleditorstate_drawpolygonbase.cpp \
@@ -140,7 +140,7 @@ HEADERS += \
     pkg/fsm/packageeditorstate_addnames.h \
     pkg/fsm/packageeditorstate_addpads.h \
     pkg/fsm/packageeditorstate_addvalues.h \
-    pkg/fsm/packageeditorstate_drawellipse.h \
+    pkg/fsm/packageeditorstate_drawcircle.h \
     pkg/fsm/packageeditorstate_drawline.h \
     pkg/fsm/packageeditorstate_drawpolygon.h \
     pkg/fsm/packageeditorstate_drawpolygonbase.h \
@@ -163,7 +163,7 @@ HEADERS += \
     sym/fsm/symboleditorstate_addnames.h \
     sym/fsm/symboleditorstate_addpins.h \
     sym/fsm/symboleditorstate_addvalues.h \
-    sym/fsm/symboleditorstate_drawellipse.h \
+    sym/fsm/symboleditorstate_drawcircle.h \
     sym/fsm/symboleditorstate_drawline.h \
     sym/fsm/symboleditorstate_drawpolygon.h \
     sym/fsm/symboleditorstate_drawpolygonbase.h \

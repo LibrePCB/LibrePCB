@@ -24,13 +24,13 @@
 #include "cmdrotateselectedsymbolitems.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
@@ -64,10 +64,10 @@ bool CmdRotateSelectedSymbolItems::performExecute()
 {
     // get all selected items
     QList<QSharedPointer<SymbolPinGraphicsItem>> pins = mContext.symbolGraphicsItem.getSelectedPins();
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses = mContext.symbolGraphicsItem.getSelectedEllipses();
+    QList<QSharedPointer<CircleGraphicsItem>> circles = mContext.symbolGraphicsItem.getSelectedCircles();
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = mContext.symbolGraphicsItem.getSelectedPolygons();
     QList<QSharedPointer<TextGraphicsItem>> texts = mContext.symbolGraphicsItem.getSelectedTexts();
-    int count = pins.count() + ellipses.count() + polygons.count() + texts.count();
+    int count = pins.count() + circles.count() + polygons.count() + texts.count();
 
     // no items selected --> nothing to do here
     if (count <= 0) {
@@ -79,8 +79,8 @@ bool CmdRotateSelectedSymbolItems::performExecute()
     foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
         center += pin->getPin().getPosition();
     }
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        center += ellipse->getEllipse().getCenter();
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        center += circle->getCircle().getCenter();
     }
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
         --count; // polygon itself does not count
@@ -101,8 +101,8 @@ bool CmdRotateSelectedSymbolItems::performExecute()
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        CmdEllipseEdit* cmd = new CmdEllipseEdit(ellipse->getEllipse());
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        CmdCircleEdit* cmd = new CmdCircleEdit(circle->getCircle());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }

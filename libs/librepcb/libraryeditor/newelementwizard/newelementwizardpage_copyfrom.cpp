@@ -83,7 +83,7 @@ bool NewElementWizardPage_CopyFrom::validatePage() noexcept
             const Symbol* symbol = dynamic_cast<Symbol*>(mSelectedElement.data()); Q_ASSERT(symbol);
             mContext.mSymbolPins = symbol->getPins();
             mContext.mSymbolPolygons = symbol->getPolygons();
-            mContext.mSymbolEllipses = symbol->getEllipses();
+            mContext.mSymbolCircles = symbol->getCircles();
             mContext.mSymbolTexts = symbol->getTexts();
             break;
         }

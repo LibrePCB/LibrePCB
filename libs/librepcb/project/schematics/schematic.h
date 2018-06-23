@@ -73,7 +73,7 @@ class SchematicSelectionQuery;
  *  - symbol:           #project#SI_Symbol      + #project#SGI_Symbol
  *      - symbol pin:   #project#SI_SymbolPin   + #project#SGI_SymbolPin
  *  - polygon:          TODO
- *  - ellipse:          TODO
+ *  - circle:           TODO
  *  - text:             TODO
  */
 class Schematic final : public QObject, public AttributeProvider,

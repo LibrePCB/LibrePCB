@@ -21,16 +21,16 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate_drawellipse.h"
+#include "symboleditorstate_drawcircle.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/geometry/ellipse.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/circle.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include "../symboleditorwidget.h"
 
 /*****************************************************************************************
@@ -44,17 +44,17 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolEditorState_DrawEllipse::SymbolEditorState_DrawEllipse(const Context& context) noexcept :
-    SymbolEditorState(context), mCurrentEllipse(nullptr), mCurrentGraphicsItem(nullptr),
+SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(const Context& context) noexcept :
+    SymbolEditorState(context), mCurrentCircle(nullptr), mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sSymbolOutlines), mLastLineWidth(250000), mLastFill(false),
     mLastGrabArea(true)
 {
 }
 
-SymbolEditorState_DrawEllipse::~SymbolEditorState_DrawEllipse() noexcept
+SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept
 {
     Q_ASSERT(mEditCmd.isNull());
-    Q_ASSERT(mCurrentEllipse == nullptr);
+    Q_ASSERT(mCurrentCircle == nullptr);
     Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
@@ -62,7 +62,7 @@ SymbolEditorState_DrawEllipse::~SymbolEditorState_DrawEllipse() noexcept
  *  General Methods
  ****************************************************************************************/
 
-bool SymbolEditorState_DrawEllipse::entry() noexcept
+bool SymbolEditorState_DrawCircle::entry() noexcept
 {
     mContext.graphicsScene.setSelectionArea(QPainterPath()); // clear selection
     mContext.graphicsView.setCursor(Qt::CrossCursor);
@@ -73,7 +73,7 @@ bool SymbolEditorState_DrawEllipse::entry() noexcept
     layerComboBox->setLayers(mContext.layerProvider.getSchematicGeometryElementLayers());
     layerComboBox->setCurrentLayer(mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
-            this, &SymbolEditorState_DrawEllipse::layerComboBoxValueChanged);
+            this, &SymbolEditorState_DrawCircle::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
     mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
@@ -85,27 +85,27 @@ bool SymbolEditorState_DrawEllipse::entry() noexcept
     lineWidthSpinBox->setValue(mLastLineWidth.toMm());
     connect(lineWidthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &SymbolEditorState_DrawEllipse::lineWidthSpinBoxValueChanged);
+            this, &SymbolEditorState_DrawCircle::lineWidthSpinBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(lineWidthSpinBox));
 
     std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
     fillCheckBox->setChecked(mLastFill);
     connect(fillCheckBox.get(), &QCheckBox::toggled,
-            this, &SymbolEditorState_DrawEllipse::fillCheckBoxCheckedChanged);
+            this, &SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(fillCheckBox));
 
     std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
     grabAreaCheckBox->setChecked(mLastGrabArea);
     connect(grabAreaCheckBox.get(), &QCheckBox::toggled,
-            this, &SymbolEditorState_DrawEllipse::grabAreaCheckBoxCheckedChanged);
+            this, &SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
 
     return true;
 }
 
-bool SymbolEditorState_DrawEllipse::exit() noexcept
+bool SymbolEditorState_DrawCircle::exit() noexcept
 {
-    if (mCurrentEllipse && (!abortAddEllipse())) {
+    if (mCurrentCircle && (!abortAddCircle())) {
         return false;
     }
 
@@ -120,30 +120,30 @@ bool SymbolEditorState_DrawEllipse::exit() noexcept
  *  Event Handlers
  ****************************************************************************************/
 
-bool SymbolEditorState_DrawEllipse::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
+bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
-    if (mCurrentEllipse) {
+    if (mCurrentCircle) {
         Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
-        return updateEllipseSize(currentPos);
+        return updateCircleDiameter(currentPos);
     } else {
         return true;
     }
 }
 
-bool SymbolEditorState_DrawEllipse::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
+bool SymbolEditorState_DrawCircle::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
     Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
-    if (mCurrentEllipse) {
-        return finishAddEllipse(currentPos);
+    if (mCurrentCircle) {
+        return finishAddCircle(currentPos);
     } else {
-        return startAddEllipse(currentPos);
+        return startAddCircle(currentPos);
     }
 }
 
-bool SymbolEditorState_DrawEllipse::processAbortCommand() noexcept
+bool SymbolEditorState_DrawCircle::processAbortCommand() noexcept
 {
-    if (mCurrentEllipse) {
-        return abortAddEllipse();
+    if (mCurrentCircle) {
+        return abortAddCircle();
     } else {
         return false;
     }
@@ -153,50 +153,46 @@ bool SymbolEditorState_DrawEllipse::processAbortCommand() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-bool SymbolEditorState_DrawEllipse::startAddEllipse(const Point& pos) noexcept
+bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept
 {
     try {
-        mStartPos = pos;
-        mContext.undoStack.beginCmdGroup(tr("Add symbol ellipse"));
-        mCurrentEllipse = new Ellipse(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
-                                      mLastFill, mLastGrabArea, pos, Length(0), Length(0),
-                                      Angle::deg0());
-        mContext.undoStack.appendToCmdGroup(new CmdEllipseInsert(
-            mContext.symbol.getEllipses(), std::shared_ptr<Ellipse>(mCurrentEllipse)));
-        mEditCmd.reset(new CmdEllipseEdit(*mCurrentEllipse));
-        mCurrentGraphicsItem = mContext.symbolGraphicsItem.getEllipseGraphicsItem(*mCurrentEllipse);
+        mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
+        mCurrentCircle = new Circle(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
+                                    mLastFill, mLastGrabArea, pos, Length(0));
+        mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
+            mContext.symbol.getCircles(), std::shared_ptr<Circle>(mCurrentCircle)));
+        mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
+        mCurrentGraphicsItem = mContext.symbolGraphicsItem.getCircleGraphicsItem(*mCurrentCircle);
         Q_ASSERT(mCurrentGraphicsItem);
         mCurrentGraphicsItem->setSelected(true);
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
         mCurrentGraphicsItem = nullptr;
-        mCurrentEllipse = nullptr;
+        mCurrentCircle = nullptr;
         mEditCmd.reset();
         return false;
     }
 }
 
-bool SymbolEditorState_DrawEllipse::updateEllipseSize(const Point& pos) noexcept
+bool SymbolEditorState_DrawCircle::updateCircleDiameter(const Point& pos) noexcept
 {
-    Point center = (pos + mStartPos) / 2;
-    mEditCmd->setCenter(center, true);
-    mEditCmd->setRadiusX((pos.getX() - mStartPos.getX()).abs() / 2, true);
-    mEditCmd->setRadiusY((pos.getY() - mStartPos.getY()).abs() / 2, true);
+    Point delta = pos - mCurrentCircle->getCenter();
+    mEditCmd->setDiameter(delta.getLength() * 2, true);
     return true;
 }
 
-bool SymbolEditorState_DrawEllipse::finishAddEllipse(const Point& pos) noexcept
+bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept
 {
-    if (pos == mStartPos) {
-        return abortAddEllipse();
+    if (pos == mCurrentCircle->getCenter()) {
+        return abortAddCircle();
     }
 
     try {
-        updateEllipseSize(pos);
+        updateCircleDiameter(pos);
         mCurrentGraphicsItem->setSelected(false);
         mCurrentGraphicsItem = nullptr;
-        mCurrentEllipse = nullptr;
+        mCurrentCircle = nullptr;
         mContext.undoStack.appendToCmdGroup(mEditCmd.take());
         mContext.undoStack.commitCmdGroup();
         return true;
@@ -206,12 +202,12 @@ bool SymbolEditorState_DrawEllipse::finishAddEllipse(const Point& pos) noexcept
     }
 }
 
-bool SymbolEditorState_DrawEllipse::abortAddEllipse() noexcept
+bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept
 {
     try {
         mCurrentGraphicsItem->setSelected(false);
         mCurrentGraphicsItem = nullptr;
-        mCurrentEllipse = nullptr;
+        mCurrentCircle = nullptr;
         mEditCmd.reset();
         mContext.undoStack.abortCmdGroup();
         return true;
@@ -221,7 +217,7 @@ bool SymbolEditorState_DrawEllipse::abortAddEllipse() noexcept
     }
 }
 
-void SymbolEditorState_DrawEllipse::layerComboBoxValueChanged(const QString& layerName) noexcept
+void SymbolEditorState_DrawCircle::layerComboBoxValueChanged(const QString& layerName) noexcept
 {
     if (layerName.isEmpty()) {
         return;
@@ -232,7 +228,7 @@ void SymbolEditorState_DrawEllipse::layerComboBoxValueChanged(const QString& lay
     }
 }
 
-void SymbolEditorState_DrawEllipse::lineWidthSpinBoxValueChanged(double value) noexcept
+void SymbolEditorState_DrawCircle::lineWidthSpinBoxValueChanged(double value) noexcept
 {
     mLastLineWidth = Length::fromMm(value);
     if (mEditCmd) {
@@ -240,7 +236,7 @@ void SymbolEditorState_DrawEllipse::lineWidthSpinBoxValueChanged(double value) n
     }
 }
 
-void SymbolEditorState_DrawEllipse::fillCheckBoxCheckedChanged(bool checked) noexcept
+void SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged(bool checked) noexcept
 {
     mLastFill = checked;
     if (mEditCmd) {
@@ -248,7 +244,7 @@ void SymbolEditorState_DrawEllipse::fillCheckBoxCheckedChanged(bool checked) noe
     }
 }
 
-void SymbolEditorState_DrawEllipse::grabAreaCheckBoxCheckedChanged(bool checked) noexcept
+void SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged(bool checked) noexcept
 {
     mLastGrabArea = checked;
     if (mEditCmd) {

@@ -73,7 +73,7 @@ class SymbolEditorFsm final : public QObject
             DRAW_LINE,
             DRAW_RECT,
             DRAW_POLYGON,
-            DRAW_ELLIPSE,
+            DRAW_CIRCLE,
             DRAW_TEXT
         };
 
@@ -120,7 +120,7 @@ class SymbolEditorFsm final : public QObject
         bool processStartDrawLines() noexcept;
         bool processStartDrawRects() noexcept;
         bool processStartDrawPolygons() noexcept;
-        bool processStartDrawEllipses() noexcept;
+        bool processStartDrawCircles() noexcept;
         bool processStartDrawTexts() noexcept;
 
         // Operator Overloadings

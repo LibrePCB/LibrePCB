@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
-#define LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
+#ifndef LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H
+#define LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
@@ -34,31 +34,28 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Class PrimitiveEllipseGraphicsItem
+ *  Class PrimitiveCircleGraphicsItem
  ****************************************************************************************/
 
 /**
- * @brief The PrimitiveEllipseGraphicsItem class
+ * @brief The PrimitiveCircleGraphicsItem class
  *
  * @author ubruhin
  * @date 2017-05-28
  */
-class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerObserver
+class PrimitiveCircleGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerObserver
 {
     public:
 
         // Constructors / Destructor
-        //PrimitiveEllipseGraphicsItem() = delete;
-        PrimitiveEllipseGraphicsItem(const PrimitiveEllipseGraphicsItem& other) = delete;
-        explicit PrimitiveEllipseGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-        virtual ~PrimitiveEllipseGraphicsItem() noexcept;
+        //PrimitiveCircleGraphicsItem() = delete;
+        PrimitiveCircleGraphicsItem(const PrimitiveCircleGraphicsItem& other) = delete;
+        explicit PrimitiveCircleGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
+        virtual ~PrimitiveCircleGraphicsItem() noexcept;
 
         // Setters
         void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setRadiusX(const Length& rx) noexcept;
-        void setRadiusY(const Length& ry) noexcept;
-        void setRadius(const Length& rx, const Length& ry) noexcept;
+        void setDiameter(const Length& dia) noexcept;
         void setLineWidth(const Length& width) noexcept;
         void setLineLayer(const GraphicsLayer* layer) noexcept;
         void setFillLayer(const GraphicsLayer* layer) noexcept;
@@ -76,7 +73,7 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
         virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
         // Operator Overloadings
-        PrimitiveEllipseGraphicsItem& operator=(const PrimitiveEllipseGraphicsItem& rhs) = delete;
+        PrimitiveCircleGraphicsItem& operator=(const PrimitiveCircleGraphicsItem& rhs) = delete;
 
 
     private: // Methods
@@ -92,7 +89,7 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
         QPen mPenHighlighted;
         QBrush mBrush;
         QBrush mBrushHighlighted;
-        QRectF mEllipseRect;
+        QRectF mCircleRect;
         QRectF mBoundingRect;
         QPainterPath mShape;
 };
@@ -103,4 +100,4 @@ class PrimitiveEllipseGraphicsItem : public QGraphicsItem, public IF_GraphicsLay
 
 } // namespace librepcb
 
-#endif // LIBREPCB_PRIMITIVEELLIPSEGRAPHICSITEM_H
+#endif // LIBREPCB_PRIMITIVECIRCLEGRAPHICSITEM_H

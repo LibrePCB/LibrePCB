@@ -86,8 +86,8 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
         Length lineWidth = Length::fromMm(circle.getWidth());
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
-        symbol->getEllipses().append(std::make_shared<Ellipse>(Uuid::createRandom(),
-            layerName, lineWidth, fill, isGrabArea, center, radius, radius, Angle::deg0()));
+        symbol->getCircles().append(std::make_shared<Circle>(Uuid::createRandom(),
+            layerName, lineWidth, fill, isGrabArea, center, radius * 2));
     }
 
     foreach (const parseagle::Polygon& polygon, mSymbol.getPolygons()) {

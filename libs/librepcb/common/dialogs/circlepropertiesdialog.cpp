@@ -22,10 +22,10 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "ellipsepropertiesdialog.h"
-#include "ui_ellipsepropertiesdialog.h"
-#include "../geometry/ellipse.h"
-#include "../geometry/cmd/cmdellipseedit.h"
+#include "circlepropertiesdialog.h"
+#include "ui_circlepropertiesdialog.h"
+#include "../geometry/circle.h"
+#include "../geometry/cmd/cmdcircleedit.h"
 #include "../graphics/graphicslayer.h"
 #include "../undostack.h"
 
@@ -34,10 +34,10 @@
  ****************************************************************************************/
 namespace librepcb {
 
-EllipsePropertiesDialog::EllipsePropertiesDialog(Ellipse& ellipse, UndoStack& undoStack,
+CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
         QList<GraphicsLayer*> layers, QWidget* parent) noexcept :
-    QDialog(parent), mEllipse(ellipse), mUndoStack(undoStack),
-    mUi(new Ui::EllipsePropertiesDialog)
+    QDialog(parent), mCircle(circle), mUndoStack(undoStack),
+    mUi(new Ui::CirclePropertiesDialog)
 {
     mUi->setupUi(this);
 
@@ -45,25 +45,20 @@ EllipsePropertiesDialog::EllipsePropertiesDialog(Ellipse& ellipse, UndoStack& un
         mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
     }
 
-    connect(mUi->cbxEnableHeightField, &QCheckBox::toggled,
-            mUi->spbHeight, &QDoubleSpinBox::setEnabled);
     connect(mUi->buttonBox, &QDialogButtonBox::clicked,
-            this, &EllipsePropertiesDialog::buttonBoxClicked);
+            this, &CirclePropertiesDialog::buttonBoxClicked);
 
-    // load ellipse attributes
-    selectLayerNameInCombobox(mEllipse.getLayerName());
-    mUi->spbLineWidth->setValue(mEllipse.getLineWidth().toMm());
-    mUi->cbxFillArea->setChecked(mEllipse.isFilled());
-    mUi->cbxIsGrabArea->setChecked(mEllipse.isGrabArea());
-    mUi->spbWidth->setValue(mEllipse.getRadiusX().toMm() * 2);
-    mUi->spbHeight->setValue(mEllipse.getRadiusY().toMm() * 2);
-    mUi->cbxEnableHeightField->setChecked(!mEllipse.isRound());
-    mUi->spbPosX->setValue(mEllipse.getCenter().getX().toMm());
-    mUi->spbPosY->setValue(mEllipse.getCenter().getY().toMm());
-    mUi->spbRotation->setValue(mEllipse.getRotation().toDeg());
+    // load circle attributes
+    selectLayerNameInCombobox(mCircle.getLayerName());
+    mUi->spbLineWidth->setValue(mCircle.getLineWidth().toMm());
+    mUi->cbxFillArea->setChecked(mCircle.isFilled());
+    mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
+    mUi->spbDiameter->setValue(mCircle.getDiameter().toMm());
+    mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
+    mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
 }
 
-EllipsePropertiesDialog::~EllipsePropertiesDialog() noexcept
+CirclePropertiesDialog::~CirclePropertiesDialog() noexcept
 {
 }
 
@@ -71,7 +66,7 @@ EllipsePropertiesDialog::~EllipsePropertiesDialog() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void EllipsePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
+void CirclePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
 {
     switch (mUi->buttonBox->buttonRole(button)) {
         case QDialogButtonBox::ApplyRole:
@@ -89,24 +84,20 @@ void EllipsePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
     }
 }
 
-bool EllipsePropertiesDialog::applyChanges() noexcept
+bool CirclePropertiesDialog::applyChanges() noexcept
 {
     try {
-        Length radiusX = Length::fromMm(mUi->spbWidth->value() / 2);
-        Length radiusY = mUi->spbHeight->isEnabled() ?
-                         Length::fromMm(mUi->spbHeight->value() / 2) : radiusX;
+        Length diameter = Length::fromMm(mUi->spbDiameter->value());
 
-        QScopedPointer<CmdEllipseEdit> cmd(new CmdEllipseEdit(mEllipse));
+        QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
             cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
         }
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
         cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
-        cmd->setRadiusX(radiusX, false);
-        cmd->setRadiusY(radiusY, false);
+        cmd->setDiameter(diameter, false);
         cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-        cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());
         return true;
     } catch (const Exception& e) {
@@ -115,7 +106,7 @@ bool EllipsePropertiesDialog::applyChanges() noexcept
     }
 }
 
-void EllipsePropertiesDialog::selectLayerNameInCombobox(const QString& name) noexcept
+void CirclePropertiesDialog::selectLayerNameInCombobox(const QString& name) noexcept
 {
     mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }

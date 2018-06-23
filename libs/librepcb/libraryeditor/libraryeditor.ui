@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>611</width>
-     <height>32</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -120,7 +120,7 @@
     <addaction name="actionDrawLine"/>
     <addaction name="actionDrawRect"/>
     <addaction name="actionDrawPolygon"/>
-    <addaction name="actionDrawEllipse"/>
+    <addaction name="actionDrawCircle"/>
     <addaction name="actionAddText"/>
     <addaction name="separator"/>
     <addaction name="actionAddSymbolPin"/>
@@ -224,7 +224,7 @@
    <addaction name="actionDrawLine"/>
    <addaction name="actionDrawRect"/>
    <addaction name="actionDrawPolygon"/>
-   <addaction name="actionDrawEllipse"/>
+   <addaction name="actionDrawCircle"/>
    <addaction name="actionAddName"/>
    <addaction name="actionAddValue"/>
    <addaction name="actionAddText"/>
@@ -510,16 +510,19 @@
     <string>P</string>
    </property>
   </action>
-  <action name="actionDrawEllipse">
+  <action name="actionDrawCircle">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
-     <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
+     <normaloff>:/img/actions/draw_circle.png</normaloff>:/img/actions/draw_circle.png</iconset>
    </property>
    <property name="text">
-    <string>Draw &amp;Circle/Ellipse</string>
+    <string>Draw &amp;Circle</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw Circle</string>
    </property>
    <property name="shortcut">
-    <string>E</string>
+    <string>C</string>
    </property>
   </action>
   <action name="actionAddHole">

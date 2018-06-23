@@ -25,7 +25,7 @@
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 
@@ -60,9 +60,9 @@ bool CmdRemoveSelectedSymbolItems::performExecute()
         appendChild(new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getPin()));
     }
 
-    // remove ellipses
-    foreach (const auto& ellipse, mContext.symbolGraphicsItem.getSelectedEllipses()) {
-        appendChild(new CmdEllipseRemove(mContext.symbol.getEllipses(), &ellipse->getEllipse()));
+    // remove circles
+    foreach (const auto& circle, mContext.symbolGraphicsItem.getSelectedCircles()) {
+        appendChild(new CmdCircleRemove(mContext.symbol.getCircles(), &circle->getCircle()));
     }
 
     // remove polygons

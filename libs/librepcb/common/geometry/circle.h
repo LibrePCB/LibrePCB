@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ELLIPSE_H
-#define LIBREPCB_ELLIPSE_H
+#ifndef LIBREPCB_CIRCLE_H
+#define LIBREPCB_CIRCLE_H
 
 /*****************************************************************************************
  *  Includes
@@ -36,56 +36,53 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Interface IF_EllipseObserver
+ *  Interface IF_CircleObserver
  ****************************************************************************************/
 
 /**
- * @brief The IF_EllipseObserver class
+ * @brief The IF_CircleObserver class
  *
  * @author ubruhin
  * @date 2017-01-01
  */
-class IF_EllipseObserver
+class IF_CircleObserver
 {
     public:
-        virtual void ellipseLayerNameChanged(const QString& newLayerName) noexcept = 0;
-        virtual void ellipseLineWidthChanged(const Length& newLineWidth) noexcept = 0;
-        virtual void ellipseIsFilledChanged(bool newIsFilled) noexcept = 0;
-        virtual void ellipseIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
-        virtual void ellipseCenterChanged(const Point& newCenter) noexcept = 0;
-        virtual void ellipseRadiusXChanged(const Length& newRadiusX) noexcept = 0;
-        virtual void ellipseRadiusYChanged(const Length& newRadiusY) noexcept = 0;
-        virtual void ellipseRotationChanged(const Angle& newRotation) noexcept = 0;
+        virtual void circleLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void circleLineWidthChanged(const Length& newLineWidth) noexcept = 0;
+        virtual void circleIsFilledChanged(bool newIsFilled) noexcept = 0;
+        virtual void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
+        virtual void circleCenterChanged(const Point& newCenter) noexcept = 0;
+        virtual void circleDiameterChanged(const Length& newDiameter) noexcept = 0;
 
     protected:
-        IF_EllipseObserver() noexcept {}
-        explicit IF_EllipseObserver(const IF_EllipseObserver& other) = delete;
-        virtual ~IF_EllipseObserver() noexcept {}
-        IF_EllipseObserver& operator=(const IF_EllipseObserver& rhs) = delete;
+        IF_CircleObserver() noexcept {}
+        explicit IF_CircleObserver(const IF_CircleObserver& other) = delete;
+        virtual ~IF_CircleObserver() noexcept {}
+        IF_CircleObserver& operator=(const IF_CircleObserver& rhs) = delete;
 };
 
 /*****************************************************************************************
- *  Class Ellipse
+ *  Class Circle
  ****************************************************************************************/
 
 /**
- * @brief The Ellipse class
+ * @brief The Circle class
  */
-class Ellipse : public SerializableObject
+class Circle : public SerializableObject
 {
-        Q_DECLARE_TR_FUNCTIONS(Ellipse)
+        Q_DECLARE_TR_FUNCTIONS(Circle)
 
     public:
 
         // Constructors / Destructor
-        Ellipse() = delete;
-        Ellipse(const Ellipse& other) noexcept;
-        Ellipse(const Uuid& uuid, const Ellipse& other) noexcept;
-        Ellipse(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
-                bool fill, bool isGrabArea, const Point& center, const Length& radiusX,
-                const Length& radiusY, const Angle& rotation) noexcept;
-        explicit Ellipse(const SExpression& node);
-        virtual ~Ellipse() noexcept;
+        Circle() = delete;
+        Circle(const Circle& other) noexcept;
+        Circle(const Uuid& uuid, const Circle& other) noexcept;
+        Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+               bool fill, bool isGrabArea, const Point& center, const Length& diameter) noexcept;
+        explicit Circle(const SExpression& node);
+        virtual ~Circle() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
@@ -94,10 +91,7 @@ class Ellipse : public SerializableObject
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getCenter() const noexcept {return mCenter;}
-        const Length& getRadiusX() const noexcept {return mRadiusX;}
-        const Length& getRadiusY() const noexcept {return mRadiusY;}
-        const Angle& getRotation() const noexcept {return mRotation;}
-        bool isRound() const noexcept {return mRadiusX == mRadiusY;}
+        const Length& getDiameter() const noexcept {return mDiameter;}
 
         // Setters
         void setLayerName(const QString& name) noexcept;
@@ -105,26 +99,22 @@ class Ellipse : public SerializableObject
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
         void setCenter(const Point& center) noexcept;
-        void setRadiusX(const Length& radius) noexcept;
-        void setRadiusY(const Length& radius) noexcept;
-        void setRotation(const Angle& rotation) noexcept;
+        void setDiameter(const Length& dia) noexcept;
 
         // Transformations
-        Ellipse& translate(const Point& offset) noexcept;
-        Ellipse& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-        Ellipse& mirror(Qt::Orientation orientation, const Point& center = Point(0, 0)) noexcept;
+        Circle& translate(const Point& offset) noexcept;
 
         // General Methods
-        void registerObserver(IF_EllipseObserver& object) const noexcept;
-        void unregisterObserver(IF_EllipseObserver& object) const noexcept;
+        void registerObserver(IF_CircleObserver& object) const noexcept;
+        void unregisterObserver(IF_CircleObserver& object) const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
 
         // Operator Overloadings
-        bool operator==(const Ellipse& rhs) const noexcept;
-        bool operator!=(const Ellipse& rhs) const noexcept {return !(*this == rhs);}
-        Ellipse& operator=(const Ellipse& rhs) noexcept;
+        bool operator==(const Circle& rhs) const noexcept;
+        bool operator!=(const Circle& rhs) const noexcept {return !(*this == rhs);}
+        Circle& operator=(const Circle& rhs) noexcept;
 
 
     private: // Methods
@@ -138,23 +128,21 @@ class Ellipse : public SerializableObject
         bool mIsFilled;
         bool mIsGrabArea;
         Point mCenter;
-        Length mRadiusX; // TODO: change radius (x/y) to size (width/height)
-        Length mRadiusY; // TODO: change radius (x/y) to size (width/height)
-        Angle mRotation;
+        Length mDiameter;
 
         // Misc
-        mutable QSet<IF_EllipseObserver*> mObservers; ///< A list of all observer objects
+        mutable QSet<IF_CircleObserver*> mObservers; ///< A list of all observer objects
 };
 
 /*****************************************************************************************
- *  Class EllipseList
+ *  Class CircleList
  ****************************************************************************************/
 
-struct EllipseListNameProvider {static constexpr const char* tagname = "ellipse";};
-using EllipseList = SerializableObjectList<Ellipse, EllipseListNameProvider>;
-using CmdEllipseInsert = CmdListElementInsert<Ellipse, EllipseListNameProvider>;
-using CmdEllipseRemove = CmdListElementRemove<Ellipse, EllipseListNameProvider>;
-using CmdEllipsesSwap = CmdListElementsSwap<Ellipse, EllipseListNameProvider>;
+struct CircleListNameProvider {static constexpr const char* tagname = "circle";};
+using CircleList = SerializableObjectList<Circle, CircleListNameProvider>;
+using CmdCircleInsert = CmdListElementInsert<Circle, CircleListNameProvider>;
+using CmdCircleRemove = CmdListElementRemove<Circle, CircleListNameProvider>;
+using CmdCirclesSwap = CmdListElementsSwap<Circle, CircleListNameProvider>;
 
 /*****************************************************************************************
  *  End of File
@@ -162,4 +150,4 @@ using CmdEllipsesSwap = CmdListElementsSwap<Ellipse, EllipseListNameProvider>;
 
 } // namespace librepcb
 
-#endif // LIBREPCB_ELLIPSE_H
+#endif // LIBREPCB_CIRCLE_H

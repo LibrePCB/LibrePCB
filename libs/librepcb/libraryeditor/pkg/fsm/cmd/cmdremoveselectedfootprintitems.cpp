@@ -25,7 +25,7 @@
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
@@ -63,9 +63,9 @@ bool CmdRemoveSelectedFootprintItems::performExecute()
         appendChild(new CmdFootprintPadRemove(mContext.currentFootprint->getPads(), &pad->getPad()));
     }
 
-    // remove ellipses
-    foreach (const auto& ellipse, mContext.currentGraphicsItem->getSelectedEllipses()) {
-        appendChild(new CmdEllipseRemove(mContext.currentFootprint->getEllipses(), &ellipse->getEllipse()));
+    // remove circles
+    foreach (const auto& circle, mContext.currentGraphicsItem->getSelectedCircles()) {
+        appendChild(new CmdCircleRemove(mContext.currentFootprint->getCircles(), &circle->getCircle()));
     }
 
     // remove polygons

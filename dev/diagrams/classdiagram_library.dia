@@ -4768,7 +4768,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#SymbolEllipse#</dia:string>
+        <dia:string>#SymbolCircle#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject#</dia:string>
@@ -5309,7 +5309,7 @@
         <dia:real val="2.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#FootprintEllipse#</dia:string>
+        <dia:string>#FootprintCircle#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>#IF_XmlSerializableObject#</dia:string>

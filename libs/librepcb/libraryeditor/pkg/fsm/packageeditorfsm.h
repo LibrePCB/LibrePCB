@@ -76,7 +76,7 @@ class PackageEditorFsm final : public QObject
             DRAW_LINE,
             DRAW_RECT,
             DRAW_POLYGON,
-            DRAW_ELLIPSE,
+            DRAW_CIRCLE,
             DRAW_TEXT,
             ADD_HOLES,
         };
@@ -127,7 +127,7 @@ class PackageEditorFsm final : public QObject
         bool processStartDrawLines() noexcept;
         bool processStartDrawRects() noexcept;
         bool processStartDrawPolygons() noexcept;
-        bool processStartDrawEllipses() noexcept;
+        bool processStartDrawCircles() noexcept;
         bool processStartDrawTexts() noexcept;
         bool processStartAddingHoles() noexcept;
 

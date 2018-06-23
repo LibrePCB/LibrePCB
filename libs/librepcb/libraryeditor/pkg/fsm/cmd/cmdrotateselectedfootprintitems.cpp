@@ -24,14 +24,14 @@
 #include "cmdrotateselectedfootprintitems.h"
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
-#include <librepcb/common/geometry/cmd/cmdellipseedit.h>
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
@@ -67,11 +67,11 @@ bool CmdRotateSelectedFootprintItems::performExecute()
 {
     // get all selected items
     QList<QSharedPointer<FootprintPadGraphicsItem>> pads = mContext.currentGraphicsItem->getSelectedPads();
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses = mContext.currentGraphicsItem->getSelectedEllipses();
+    QList<QSharedPointer<CircleGraphicsItem>> circles = mContext.currentGraphicsItem->getSelectedCircles();
     QList<QSharedPointer<PolygonGraphicsItem>> polygons = mContext.currentGraphicsItem->getSelectedPolygons();
     QList<QSharedPointer<StrokeTextGraphicsItem>> texts = mContext.currentGraphicsItem->getSelectedStrokeTexts();
     QList<QSharedPointer<HoleGraphicsItem>> holes = mContext.currentGraphicsItem->getSelectedHoles();
-    int count = pads.count() + ellipses.count() + polygons.count() + texts.count();
+    int count = pads.count() + circles.count() + polygons.count() + texts.count();
 
     // no items selected --> nothing to do here
     if (count <= 0) {
@@ -83,8 +83,8 @@ bool CmdRotateSelectedFootprintItems::performExecute()
     foreach (const QSharedPointer<FootprintPadGraphicsItem>& pad, pads) {Q_ASSERT(pad);
         center += pad->getPad().getPosition();
     }
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        center += ellipse->getEllipse().getCenter();
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        center += circle->getCircle().getCenter();
     }
     foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
         --count; // polygon itself does not count
@@ -108,8 +108,8 @@ bool CmdRotateSelectedFootprintItems::performExecute()
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
-    foreach (const QSharedPointer<EllipseGraphicsItem>& ellipse, ellipses) {Q_ASSERT(ellipse);
-        CmdEllipseEdit* cmd = new CmdEllipseEdit(ellipse->getEllipse());
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
+        CmdCircleEdit* cmd = new CmdCircleEdit(circle->getCircle());
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWELLIPSE_H
-#define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWELLIPSE_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
+#define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,34 +32,34 @@
  ****************************************************************************************/
 namespace librepcb {
 
-class Ellipse;
-class EllipseGraphicsItem;
-class CmdEllipseEdit;
+class Circle;
+class CircleGraphicsItem;
+class CmdCircleEdit;
 
 namespace library {
 namespace editor {
 
 /*****************************************************************************************
- *  Class PackageEditorState_DrawEllipse
+ *  Class PackageEditorState_DrawCircle
  ****************************************************************************************/
 
 /**
- * @brief The PackageEditorState_DrawEllipse class
+ * @brief The PackageEditorState_DrawCircle class
  *
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawEllipse final : public PackageEditorState
+class PackageEditorState_DrawCircle final : public PackageEditorState
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        PackageEditorState_DrawEllipse() = delete;
-        PackageEditorState_DrawEllipse(const PackageEditorState_DrawEllipse& other) = delete;
-        explicit PackageEditorState_DrawEllipse(Context& context) noexcept;
-        ~PackageEditorState_DrawEllipse() noexcept;
+        PackageEditorState_DrawCircle() = delete;
+        PackageEditorState_DrawCircle(const PackageEditorState_DrawCircle& other) = delete;
+        explicit PackageEditorState_DrawCircle(Context& context) noexcept;
+        ~PackageEditorState_DrawCircle() noexcept;
 
         // General Methods
         bool entry() noexcept override;
@@ -71,14 +71,14 @@ class PackageEditorState_DrawEllipse final : public PackageEditorState
         bool processAbortCommand() noexcept override;
 
         // Operator Overloadings
-        PackageEditorState_DrawEllipse& operator=(const PackageEditorState_DrawEllipse& rhs) = delete;
+        PackageEditorState_DrawCircle& operator=(const PackageEditorState_DrawCircle& rhs) = delete;
 
 
     private: // Methods
-        bool startAddEllipse(const Point& pos) noexcept;
-        bool updateEllipseSize(const Point& pos) noexcept;
-        bool finishAddEllipse(const Point& pos) noexcept;
-        bool abortAddEllipse() noexcept;
+        bool startAddCircle(const Point& pos) noexcept;
+        bool updateCircleDiameter(const Point& pos) noexcept;
+        bool finishAddCircle(const Point& pos) noexcept;
+        bool abortAddCircle() noexcept;
 
         void layerComboBoxValueChanged(const QString& layerName) noexcept;
         void lineWidthSpinBoxValueChanged(double value) noexcept;
@@ -87,10 +87,9 @@ class PackageEditorState_DrawEllipse final : public PackageEditorState
 
 
     private: // Types / Data
-        Point mStartPos;
-        QScopedPointer<CmdEllipseEdit> mEditCmd;
-        Ellipse* mCurrentEllipse;
-        EllipseGraphicsItem* mCurrentGraphicsItem;
+        QScopedPointer<CmdCircleEdit> mEditCmd;
+        Circle* mCurrentCircle;
+        CircleGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
         QString mLastLayerName;
@@ -107,4 +106,4 @@ class PackageEditorState_DrawEllipse final : public PackageEditorState
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWELLIPSE_H
+#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H

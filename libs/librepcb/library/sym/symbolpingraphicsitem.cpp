@@ -25,7 +25,7 @@
 #include "symbolpingraphicsitem.h"
 #include "symbolpin.h"
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/linegraphicsitem.h>
 #include <librepcb/common/graphics/primitivetextgraphicsitem.h>
 
@@ -42,7 +42,7 @@ namespace library {
 SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLayerProvider& lp,
                                              QGraphicsItem* parent) noexcept :
     QGraphicsItem(parent), mPin(pin),
-    mCircleGraphicsItem(new PrimitiveEllipseGraphicsItem(this)),
+    mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this))
 {
@@ -51,7 +51,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLa
     setZValue(10);
 
     // circle
-    mCircleGraphicsItem->setRadius(Length(600000), Length(600000));
+    mCircleGraphicsItem->setDiameter(Length(1200000));
     mCircleGraphicsItem->setLineLayer(lp.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
     mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 

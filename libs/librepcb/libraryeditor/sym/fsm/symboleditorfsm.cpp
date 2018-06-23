@@ -29,7 +29,7 @@
 #include "symboleditorstate_drawline.h"
 #include "symboleditorstate_drawrect.h"
 #include "symboleditorstate_drawpolygon.h"
-#include "symboleditorstate_drawellipse.h"
+#include "symboleditorstate_drawcircle.h"
 #include "symboleditorstate_drawtext.h"
 
 /*****************************************************************************************
@@ -53,7 +53,7 @@ SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept :
     mStates.insert(State::DRAW_LINE,        new SymbolEditorState_DrawLine(context));
     mStates.insert(State::DRAW_RECT,        new SymbolEditorState_DrawRect(context));
     mStates.insert(State::DRAW_POLYGON,     new SymbolEditorState_DrawPolygon(context));
-    mStates.insert(State::DRAW_ELLIPSE,     new SymbolEditorState_DrawEllipse(context));
+    mStates.insert(State::DRAW_CIRCLE,      new SymbolEditorState_DrawCircle(context));
     mStates.insert(State::DRAW_TEXT,        new SymbolEditorState_DrawText(context));
     enterNextState(State::SELECT);
 }
@@ -79,7 +79,7 @@ EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept
         case State::DRAW_LINE:      return EditorWidgetBase::Tool::DRAW_LINE;
         case State::DRAW_RECT:      return EditorWidgetBase::Tool::DRAW_RECT;
         case State::DRAW_POLYGON:   return EditorWidgetBase::Tool::DRAW_POLYGON;
-        case State::DRAW_ELLIPSE:   return EditorWidgetBase::Tool::DRAW_ELLIPSE;
+        case State::DRAW_CIRCLE:    return EditorWidgetBase::Tool::DRAW_CIRCLE;
         case State::DRAW_TEXT:      return EditorWidgetBase::Tool::DRAW_TEXT;
         default: Q_ASSERT(false);   return EditorWidgetBase::Tool::NONE;
     }
@@ -205,9 +205,9 @@ bool SymbolEditorFsm::processStartDrawPolygons() noexcept
     return setNextState(State::DRAW_POLYGON);
 }
 
-bool SymbolEditorFsm::processStartDrawEllipses() noexcept
+bool SymbolEditorFsm::processStartDrawCircles() noexcept
 {
-    return setNextState(State::DRAW_ELLIPSE);
+    return setNextState(State::DRAW_CIRCLE);
 }
 
 bool SymbolEditorFsm::processStartDrawTexts() noexcept

@@ -76,7 +76,7 @@ void NewElementWizardContext::reset() noexcept
     // symbol
     mSymbolPins.clear();
     mSymbolPolygons.clear();
-    mSymbolEllipses.clear();
+    mSymbolCircles.clear();
     mSymbolTexts.clear();
 
     // package
@@ -126,7 +126,7 @@ void NewElementWizardContext::createLibraryElement()
             element.setCategories(categories);
             element.getPins() = mSymbolPins;
             element.getPolygons() = mSymbolPolygons;
-            element.getEllipses() = mSymbolEllipses;
+            element.getCircles() = mSymbolCircles;
             element.getTexts() = mSymbolTexts;
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<Symbol>());
             mOutputDirectory = element.getFilePath();

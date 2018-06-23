@@ -26,11 +26,11 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/common/graphics/ellipsegraphicsitem.h>
+#include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/ellipsepropertiesdialog.h>
+#include <librepcb/common/dialogs/circlepropertiesdialog.h>
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
 #include "cmd/cmdmoveselectedsymbolitems.h"
 #include "cmd/cmdrotateselectedsymbolitems.h"
@@ -93,10 +93,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGraph
         case SubState::IDLE: {
             // get items under cursor
             QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-            QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
+            QList<QSharedPointer<CircleGraphicsItem>> circles;
             QList<QSharedPointer<PolygonGraphicsItem>> polygons;
             QList<QSharedPointer<TextGraphicsItem>> texts;
-            int count = mContext.symbolGraphicsItem.getItemsAtPosition(pos, &pins, &ellipses,
+            int count = mContext.symbolGraphicsItem.getItemsAtPosition(pos, &pins, &circles,
                                                                        &polygons, &texts);
             if (count == 0) {
                 // start selecting
@@ -111,8 +111,8 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGraph
                     topMostItem = texts.first().data();
                 } else if (polygons.count() > 0) {
                     topMostItem = polygons.first().data();
-                } else if (ellipses.count() > 0) {
-                    topMostItem = ellipses.first().data();
+                } else if (circles.count() > 0) {
+                    topMostItem = circles.first().data();
                 } else {
                     Q_ASSERT(false);
                 }
@@ -249,10 +249,10 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept
 bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos) noexcept
 {
     QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-    QList<QSharedPointer<EllipseGraphicsItem>> ellipses;
+    QList<QSharedPointer<CircleGraphicsItem>> circles;
     QList<QSharedPointer<PolygonGraphicsItem>> polygons;
     QList<QSharedPointer<TextGraphicsItem>> texts;
-    mContext.symbolGraphicsItem.getItemsAtPosition(pos, &pins, &ellipses, &polygons, &texts);
+    mContext.symbolGraphicsItem.getItemsAtPosition(pos, &pins, &circles, &polygons, &texts);
 
     if (pins.count() > 0) {
         SymbolPinGraphicsItem* item = dynamic_cast<SymbolPinGraphicsItem*>(pins.first().data()); Q_ASSERT(item);
@@ -273,9 +273,9 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(const Point& pos)
                                        &mContext.editorWidget);
         dialog.exec();
         return true;
-    } else if (ellipses.count() > 0) {
-        EllipseGraphicsItem* item = dynamic_cast<EllipseGraphicsItem*>(ellipses.first().data()); Q_ASSERT(item);
-        EllipsePropertiesDialog dialog(item->getEllipse(), mContext.undoStack,
+    } else if (circles.count() > 0) {
+        CircleGraphicsItem* item = dynamic_cast<CircleGraphicsItem*>(circles.first().data()); Q_ASSERT(item);
+        CirclePropertiesDialog dialog(item->getCircle(), mContext.undoStack,
                                        mContext.layerProvider.getSchematicGeometryElementLayers(),
                                        &mContext.editorWidget);
         dialog.exec();
