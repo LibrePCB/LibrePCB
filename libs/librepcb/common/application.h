@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QApplication>
+#include <QFont>
 #include "version.h"
 #include "fileio/filepath.h"
 
@@ -73,6 +74,8 @@ class Application final : public QApplication
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
         const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
         FilePath getResourcesFilePath(const QString& filepath) const noexcept;
+        const QFont& getDefaultSansSerifFont() const noexcept {return mSansSerifFont;}
+        const QFont& getDefaultMonospaceFont() const noexcept {return mMonospaceFont;}
         const StrokeFontPool& getStrokeFonts() const noexcept {return *mStrokeFontPool;}
         QString getDefaultStrokeFontName() const noexcept {return "newstroke.bene";}
         const StrokeFont& getDefaultStrokeFont() const noexcept;
@@ -93,6 +96,8 @@ class Application final : public QApplication
         Version mFileFormatVersion;
         FilePath mResourcesDir;
         QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all application stroke fonts
+        QFont mSansSerifFont;
+        QFont mMonospaceFont;
 };
 
 /*****************************************************************************************
