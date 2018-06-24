@@ -32,6 +32,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
+#include <librepcb/common/application.h>
 #include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/cmp/component.h>
 #include "../../settings/projectsettings.h"
@@ -55,9 +56,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(5);
 
     mRadiusPx = Length(600000).toPx();
@@ -172,10 +171,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     if ((layer->isVisible()) && (netsignal))
     {
         // draw net signal name
-        QFont font;
-        font.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-        font.setStyleHint(QFont::TypeWriter);
-        font.setFamily("Monospace");
+        QFont font = qApp->getDefaultMonospaceFont();
         font.setPixelSize(3);
         painter->setFont(font);
         painter->setPen(QPen(layer->getColor(highlight), 0));

@@ -29,6 +29,7 @@
 #include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/componentinstance.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/cmp/component.h>
@@ -48,9 +49,7 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept :
 {
     setZValue(Schematic::ZValue_Symbols);
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
+    mFont = qApp->getDefaultSansSerifFont();
 
     updateCacheAndRepaint();
 }

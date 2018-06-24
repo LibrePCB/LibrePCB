@@ -26,6 +26,7 @@
 #include "footprintpadpreviewgraphicsitem.h"
 #include "packagepad.h"
 #include "footprintpad.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 
 /*****************************************************************************************
@@ -42,9 +43,7 @@ FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_Graphi
         const PackagePad* pkgPad) noexcept :
     QGraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
 {
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Helvetica");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(2);
 
     if (mPackagePad)

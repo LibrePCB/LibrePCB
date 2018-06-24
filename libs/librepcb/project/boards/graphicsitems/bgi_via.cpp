@@ -29,6 +29,7 @@
 #include "../../project.h"
 #include "../boardlayerstack.h"
 #include "../../circuit/netsignal.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/boarddesignrules.h>
 
 /*****************************************************************************************
@@ -47,9 +48,7 @@ BGI_Via::BGI_Via(BI_Via& via) noexcept :
 {
     setZValue(Board::ZValue_Vias);
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Helvetica");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(1);
 
     updateCacheAndRepaint();

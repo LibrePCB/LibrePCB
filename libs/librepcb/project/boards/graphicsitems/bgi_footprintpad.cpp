@@ -28,6 +28,7 @@
 #include "../items/bi_footprint.h"
 #include "../board.h"
 #include "../../project.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/library/pkg/footprint.h>
 #include "../../settings/projectsettings.h"
@@ -53,9 +54,7 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept :
 {
     setToolTip(mPad.getDisplayText());
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Helvetica");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(1);
 
     updateCacheAndRepaint();
