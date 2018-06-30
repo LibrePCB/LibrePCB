@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "networkrequestbase.h"
 #include "networkaccessmanager.h"
+#include "../application.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -40,8 +41,11 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept :
     Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
 
     // set initial HTTP header fields
-    mRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(
-                       qApp->applicationName(), qApp->applicationVersion()));
+    QString userAgent = QString("LibrePCB/%1").arg(qApp->getAppVersion().toStr());
+    mRequest.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+    mRequest.setRawHeader("X-LibrePCB-AppVersion", qApp->getAppVersion().toStr().toUtf8());
+    mRequest.setRawHeader("X-LibrePCB-AppVersionGit", qApp->getGitVersion().toUtf8());
+    mRequest.setRawHeader("X-LibrePCB-FileFormatVersion", qApp->getFileFormatVersion().toStr().toUtf8());
 
     // create queued connection to let executeRequest() execute in download thread
     connect(this, &NetworkRequestBase::startRequested,
