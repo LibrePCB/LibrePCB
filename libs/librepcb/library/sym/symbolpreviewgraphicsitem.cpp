@@ -25,6 +25,7 @@
 #include <QPrinter>
 #include "symbolpreviewgraphicsitem.h"
 #include "symbol.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include "symbolpinpreviewgraphicsitem.h"
@@ -50,9 +51,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
     QGraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
+    mFont = qApp->getDefaultSansSerifFont();
 
     try {
         if (mComponent) {

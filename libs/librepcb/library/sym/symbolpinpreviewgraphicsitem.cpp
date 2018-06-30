@@ -26,6 +26,7 @@
 #include "symbolpinpreviewgraphicsitem.h"
 #include "symbolpin.h"
 #include "../cmp/component.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 
 /*****************************************************************************************
@@ -59,9 +60,7 @@ SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_GraphicsLaye
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(5);
 
     mRadiusPx = Length(600000).toPx();

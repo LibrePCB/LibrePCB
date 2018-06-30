@@ -28,3 +28,6 @@
 [submodule "libs/delaunay-triangulation"]
 	path = libs/delaunay-triangulation
 	url = https://github.com/LibrePCB/delaunay-triangulation.git
+[submodule "share/librepcb/fonts"]
+	path = share/librepcb/fonts
+	url = https://github.com/LibrePCB/librepcb-fonts.git

@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "primitivetextgraphicsitem.h"
+#include "../application.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -37,9 +38,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(QGraphicsItem* parent) noex
     QGraphicsItem(parent), mLayer(nullptr), mAlignment(HAlign::left(), VAlign::bottom()),
     mTextFlags(0)
 {
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::SansSerif);
-    mFont.setFamily("Nimbus Sans L");
+    mFont = qApp->getDefaultSansSerifFont();
     mFont.setPixelSize(1);
 
     updateBoundingRectAndShape();
@@ -86,23 +85,17 @@ void PrimitiveTextGraphicsItem::setAlignment(const Alignment& align) noexcept
 
 void PrimitiveTextGraphicsItem::setFont(Font font) noexcept
 {
+    int size = mFont.pixelSize(); // memorize size
     switch (font) {
-        case Font::SansSerif: {
-            mFont.setStyleHint(QFont::SansSerif);
-            mFont.setFamily("Nimbus Sans L");
-            break;
-        }
-        case Font::Monospace: {
-            mFont.setStyleHint(QFont::TypeWriter);
-            mFont.setFamily("Monospace");
-            break;
-        }
+        case Font::SansSerif: mFont = qApp->getDefaultSansSerifFont(); break;
+        case Font::Monospace: mFont = qApp->getDefaultMonospaceFont(); break;
         default: {
             Q_ASSERT(false);
             qCritical() << "Unknown font:" << static_cast<int>(font);
             break;
         }
     }
+    mFont.setPixelSize(size);
     updateBoundingRectAndShape();
 }
 

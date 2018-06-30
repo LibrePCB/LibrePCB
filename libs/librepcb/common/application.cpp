@@ -75,6 +75,28 @@ Application::Application(int& argc, char** argv) noexcept :
 #endif
     Q_ASSERT(mResourcesDir.isValid());
 
+    // load all bundled TrueType/OpenType fonts
+    QDir fontsDir(getResourcesFilePath("fonts").toStr());
+    fontsDir.setFilter(QDir::Files);
+    fontsDir.setNameFilters({"*.ttf", "*.otf"});
+    foreach (const QFileInfo& info, fontsDir.entryInfoList()) {
+        QString fp = info.absoluteFilePath();
+        int id = QFontDatabase::addApplicationFont(fp);
+        if (id < 0) {
+            qCritical() << "Failed to load font" << fp;
+        }
+    }
+
+    // set default sans serif font
+    mSansSerifFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    mSansSerifFont.setStyleHint(QFont::SansSerif);
+    mSansSerifFont.setFamily("Noto Sans");
+
+    // set default monospace font
+    mMonospaceFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    mMonospaceFont.setStyleHint(QFont::TypeWriter);
+    mMonospaceFont.setFamily("Noto Sans Mono");
+
     // load all stroke fonts
     mStrokeFontPool.reset(new StrokeFontPool(getResourcesFilePath("fontobene")));
     getDefaultStrokeFont(); // ensure that the default font is available (aborts if not)

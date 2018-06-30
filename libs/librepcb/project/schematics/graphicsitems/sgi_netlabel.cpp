@@ -30,6 +30,7 @@
 #include "../schematiclayerprovider.h"
 #include "../../project.h"
 #include "../../circuit/netsignal.h"
+#include <librepcb/common/application.h>
 #include <librepcb/common/graphics/linegraphicsitem.h>
 
 /*****************************************************************************************
@@ -52,9 +53,7 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel) noexcept :
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
-    mFont.setStyleStrategy(QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-    mFont.setStyleHint(QFont::TypeWriter);
-    mFont.setFamily("Monospace");
+    mFont = qApp->getDefaultMonospaceFont();
     mFont.setPixelSize(4);
 
     if (sOriginCrossLines.isEmpty())
@@ -89,7 +88,7 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept
     mStaticText.setText(mNetLabel.getNetSignalOfNetSegment().getName());
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -mStaticText.size().width() : 0);
-    mTextOrigin.setY(mRotate180 ? 0 : -0.5-mStaticText.size().height());
+    mTextOrigin.setY(mRotate180 ? 0 : -mStaticText.size().height());
     mStaticText.prepare(QTransform().rotate(mRotate180 ? 180 : 0)
                               .translate(mTextOrigin.x(), mTextOrigin.y()), mFont);
 
