@@ -38,7 +38,7 @@ namespace project {
 
 ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
-    mFilepath(project.getPath().getPathTo("core/settings.lp")), mFile(nullptr)
+    mFilepath(project.getPath().getPathTo("project/settings.lp")), mFile(nullptr)
 {
     qDebug() << "load settings...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -107,7 +107,7 @@ bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/settings.lp"
+    // Save "project/settings.lp"
     try
     {
         SExpression doc(serializeToDomElement("librepcb_project_settings"));

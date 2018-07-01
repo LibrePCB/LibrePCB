@@ -170,6 +170,64 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
         }
 
+        // migrate project directory structure
+        // backward compatibility - remove this some time!
+        bool filesMoved = false;
+        if (!create) {
+            QHash<FilePath, FilePath> filesToMove;
+            filesToMove.insert(mPath.getPathTo("core/boards.lp"),
+                               mPath.getPathTo("boards/boards.lp"));
+            filesToMove.insert(mPath.getPathTo("core/schematics.lp"),
+                               mPath.getPathTo("schematics/schematics.lp"));
+            filesToMove.insert(mPath.getPathTo("core/circuit.lp"),
+                               mPath.getPathTo("circuit/circuit.lp"));
+            filesToMove.insert(mPath.getPathTo("core/erc.lp"),
+                               mPath.getPathTo("circuit/erc.lp"));
+            filesToMove.insert(mPath.getPathTo("core/metadata.lp"),
+                               mPath.getPathTo("project/metadata.lp"));
+            filesToMove.insert(mPath.getPathTo("core/settings.lp"),
+                               mPath.getPathTo("project/settings.lp"));
+            foreach (const FilePath& fp, FileUtils::getFilesInDirectory(mPath.getPathTo("boards"))) {
+                if (fp.getFilename() != "boards.lp") {
+                    filesToMove.insert(fp,
+                        mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp"));
+                    filesToMove.insert(mPath.getPathTo("user/boards/" % fp.getFilename()),
+                        mPath.getPathTo("boards/" % fp.getBasename() % "/settings.user.lp"));
+                }
+            }
+            foreach (const FilePath& fp, FileUtils::getFilesInDirectory(mPath.getPathTo("schematics"))) {
+                if (fp.getFilename() != "schematics.lp") {
+                    filesToMove.insert(fp,
+                        mPath.getPathTo("schematics/" % fp.getBasename() % "/schematic.lp"));
+                }
+            }
+            foreach (const FilePath& src, filesToMove.keys()) {
+                FilePath dst = filesToMove.value(src);
+                if (src.isExistingFile() && !dst.isExistingFile()) {
+                    FileUtils::makePath(dst.getParentDir());
+                    FileUtils::copyFile(src, dst);
+                    filesMoved = true;
+                }
+            }
+            if (filesMoved) {
+                FilePath src = qApp->getResourcesDir().getPathTo("project/gitignore_template");
+                FilePath dst = mPath.getPathTo(".gitignore");
+                try {FileUtils::removeFile(dst);} catch (...) {}
+                try {FileUtils::copyFile(src, dst);} catch (...) {}
+                foreach (const FilePath& src, filesToMove.keys()) {
+                    if (src.isExistingFile()) {
+                        try {FileUtils::removeFile(src);} catch (...) {}
+                    }
+                    if (src.getParentDir().isEmptyDir()) {
+                        try {FileUtils::removeDirRecursively(src.getParentDir());} catch (...) {}
+                    }
+                }
+                if (mPath.getPathTo("user").isEmptyDir()) {
+                    try {FileUtils::removeDirRecursively(mPath.getPathTo("user"));} catch (...) {}
+                }
+            }
+        }
+
         // try to create/open the project file
         if (create) {
             mProjectFile.reset(SmartTextFile::create(mFilepath));
@@ -203,7 +261,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
         // Load all schematics
-        FilePath schematicsFilepath = mPath.getPathTo("core/schematics.lp");
+        FilePath schematicsFilepath = mPath.getPathTo("schematics/schematics.lp");
         if (create) {
             mSchematicsFile.reset(SmartSExprFile::create(schematicsFilepath));
         } else {
@@ -211,6 +269,10 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             SExpression schRoot = mSchematicsFile->parseFileAndBuildDomTree();
             foreach (const SExpression& node, schRoot.getChildren("schematic")) {
                 FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
+                if (fp.getFilename() != "schematic.lp") {
+                    // backward compatibility - remove this some time!
+                    fp = mPath.getPathTo("schematics/" % fp.getBasename() % "/schematic.lp");
+                }
                 Schematic* schematic = new Schematic(*this, fp, mIsRestored, mIsReadOnly);
                 addSchematic(*schematic);
             }
@@ -218,7 +280,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         }
 
         // Load all boards
-        FilePath boardsFilepath = mPath.getPathTo("core/boards.lp");
+        FilePath boardsFilepath = mPath.getPathTo("boards/boards.lp");
         if (create) {
             mBoardsFile.reset(SmartSExprFile::create(boardsFilepath));
         } else {
@@ -226,6 +288,10 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             SExpression brdRoot = mBoardsFile->parseFileAndBuildDomTree();
             foreach (const SExpression& node, brdRoot.getChildren("board")) {
                 FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
+                if (fp.getFilename() != "board.lp") {
+                    // backward compatibility - remove this some time!
+                    fp = mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp");
+                }
                 Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
                 addBoard(*board);
             }
@@ -237,7 +303,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         // So we can now restore the ignore state of each ERC message from the file.
         mErcMsgList->restoreIgnoreState(); // can throw
 
-        if (create) save(true); // write all files to harddisc
+        if (create || filesMoved) save(true); // write all files to harddisc
     }
     catch (...)
     {
@@ -301,12 +367,12 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
 
 Schematic* Project::createSchematic(const QString& name)
 {
-    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (basename.isEmpty()) {
+    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid schematic name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("schematics/" % basename % ".lp");
+    FilePath filepath = mPath.getPathTo("schematics/" % dirname % "/schematic.lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The schematic exists already: \"%1\"")).arg(filepath.toNative()));
@@ -419,12 +485,12 @@ Board* Project::getBoardByName(const QString& name) const noexcept
 
 Board* Project::createBoard(const QString& name)
 {
-    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (basename.isEmpty()) {
+    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("boards/" % basename % ".lp");
+    FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
@@ -434,12 +500,12 @@ Board* Project::createBoard(const QString& name)
 
 Board* Project::createBoard(const Board& other, const QString& name)
 {
-    QString basename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (basename.isEmpty()) {
+    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid board name: \"%1\"")).arg(name));
     }
-    FilePath filepath = mPath.getPathTo("boards/" % basename % ".lp");
+    FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
     if (filepath.isExistingFile()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The board exists already: \"%1\"")).arg(filepath.toNative()));
@@ -630,7 +696,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         errors.append(e.getMsg());
     }
 
-    // Save core/schematics.lp
+    // Save schematics/schematics.lp
     try {
         SExpression root = SExpression::createList("librepcb_schematics");
         foreach (Schematic* schematic, mSchematics) {
@@ -642,7 +708,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
         errors.append(e.getMsg());
     }
 
-    // Save core/boards.lp
+    // Save boards/boards.lp
     try {
         SExpression root = SExpression::createList("librepcb_boards");
         foreach (Board* board, mBoards) {

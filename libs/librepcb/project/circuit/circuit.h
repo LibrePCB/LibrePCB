@@ -58,7 +58,7 @@ class ComponentInstance;
  * Each #project#Project object contains exactly one #Circuit object which contains the
  * whole electrical components and connections. They are created with the schematic editor
  * and used by the board editor. The whole circuit is saved in the file "circuit.lp" in
- * the project's "core" directory.
+ * the project's "circuit" directory.
  *
  * Each #Circuit object contains:
  *  - All net classes (project#NetClass objects)
@@ -138,7 +138,7 @@ class Circuit final : public QObject, public SerializableObject
         // General
         Project& mProject; ///< A reference to the Project object (from the ctor)
 
-        // File "core/circuit.lp"
+        // File "circuit/circuit.lp"
         FilePath mFilepath;
         SmartSExprFile* mFile;
 

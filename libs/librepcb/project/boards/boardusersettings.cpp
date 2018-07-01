@@ -48,8 +48,7 @@ BoardUserSettings::BoardUserSettings(Board& board, const BoardUserSettings& othe
 BoardUserSettings::BoardUserSettings(Board& board, bool restore, bool readOnly, bool create) :
     QObject(&board), mBoard(board)
 {
-    QString relpath = QString("user/boards/%1").arg(mBoard.getFilePath().getFilename());
-    mFilepath = mBoard.getProject().getPath().getPathTo(relpath);
+    mFilepath = mBoard.getFilePath().getParentDir().getPathTo("settings.user.lp");
 
     if (create || (!mFilepath.isExistingFile())) {
         mFile.reset(SmartSExprFile::create(mFilepath));

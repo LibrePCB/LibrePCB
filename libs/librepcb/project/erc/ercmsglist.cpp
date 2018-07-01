@@ -40,7 +40,7 @@ namespace project {
 
 ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) :
     QObject(&project), mProject(project),
-    mFilepath(project.getPath().getPathTo("core/erc.lp")), mFile(nullptr)
+    mFilepath(project.getPath().getPathTo("circuit/erc.lp")), mFile(nullptr)
 {
     // try to create/open the file "erc.lp"
     if (create) {
@@ -112,7 +112,7 @@ bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save "core/erc.lp"
+    // Save "circuit/erc.lp"
     try
     {
         SExpression doc(serializeToDomElement("librepcb_erc"));
