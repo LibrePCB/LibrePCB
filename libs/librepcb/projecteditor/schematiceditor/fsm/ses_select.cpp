@@ -388,6 +388,19 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(SEE_Base* event
             break;
         } // case QEvent::GraphicsSceneMouseMove
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+        case QEvent::GraphicsSceneMouseDoubleClick: {
+            QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(mouseEvent); if (!mouseEvent) break;
+            Schematic* schematic = mEditor.getActiveSchematic();
+            Q_ASSERT(schematic); if (!schematic) break;
+            // abort moving and handle double click
+            mSelectedItemsMoveCommand.reset();
+            mSubState = SubState_Idle;
+            return proccessIdleSceneDoubleClick(mouseEvent, schematic);
+        }
+#endif
+
         default: {
             // Always accept graphics scene events, even if we do not react on some of the events!
             // This will give us the full control over the graphics scene. Otherwise, the graphics

@@ -515,6 +515,19 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(BEE_Base* event
             break;
         } // case QEvent::GraphicsSceneMouseMove
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+        case QEvent::GraphicsSceneMouseDoubleClick: {
+            QGraphicsSceneMouseEvent* mouseEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
+            Q_ASSERT(mouseEvent); if (!mouseEvent) break;
+            Board* board = mEditor.getActiveBoard();
+            Q_ASSERT(board); if (!board) break;
+            // abort moving and handle double click
+            mSelectedItemsMoveCommand.reset();
+            mSubState = SubState_Idle;
+            return proccessIdleSceneDoubleClick(mouseEvent, board);
+        }
+#endif
+
         default:
         {
             // Always accept graphics scene events, even if we do not react on some of the events!

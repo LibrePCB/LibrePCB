@@ -168,6 +168,14 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(QGrap
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(QGraphicsSceneMouseEvent& e) noexcept
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    // abort moving and handle double click
+    if (mState == SubState::MOVING) {
+        mCmdMoveSelectedItems.reset();
+        mState = SubState::IDLE;
+    }
+#endif
+
     if (mState == SubState::IDLE) {
         return openPropertiesDialogOfItemAtPos(Point::fromPx(e.scenePos()));
     } else {
