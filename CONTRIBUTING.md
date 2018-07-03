@@ -43,7 +43,7 @@ Fixes #62
 ```
 - Make sure you have added the necessary tests for your changes.
 - Run all tests to ensure nothing else was accidentally broken.
-  - This is done by running the binary `./generated/unix|mac|windows/tests`
+  - This is done by running the binary `./build/output/tests`
 - If you like, feel free to add yourself to the
   [AUTHORS.md](https://github.com/LibrePCB/LibrePCB/blob/master/AUTHORS.md) file.
 

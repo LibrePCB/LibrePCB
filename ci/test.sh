@@ -6,14 +6,14 @@ set -eufv -o pipefail
 # run tests
 if [ "${TRAVIS_OS_NAME-}" = "linux" ]
 then
-  xvfb-run -a ./build/generated/unix/qztest
-  xvfb-run -a ./build/generated/unix/tests
+  xvfb-run -a ./build/output/qztest
+  xvfb-run -a ./build/output/tests
 elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
-  ./build/generated/mac/qztest
-  ./build/generated/mac/tests
+  ./build/output/qztest
+  ./build/output/tests
 else
-  ./build/generated/windows/qztest.exe
-  ./build/generated/windows/tests.exe
+  ./build/output/qztest.exe
+  ./build/output/tests.exe
 fi
 
