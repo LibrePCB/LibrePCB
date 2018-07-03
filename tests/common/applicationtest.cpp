@@ -71,9 +71,9 @@ TEST(ApplicationTest, testGetResourcesDir)
     EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
     EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
 
-    // as the tests can't be installed, the resources must be located in the "generated" dir
-    FilePath generatedDir = qApp->getResourcesDir().getParentDir().getParentDir();
-    EXPECT_TRUE(FilePath(qApp->applicationFilePath()).isLocatedInDir(generatedDir));
+    // as the tests can't be installed, the resources must be located in the repository root
+    FilePath repoRoot = qApp->getResourcesDir().getParentDir().getParentDir();
+    EXPECT_TRUE(repoRoot.getPathTo("librepcb.pro").isExistingFile());
 }
 
 TEST(ApplicationTest, testGetResourcesFilePath)

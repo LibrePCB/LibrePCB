@@ -12,8 +12,9 @@ macx:DESTDIR = $${GENERATED_DIR}/mac
 unix:!macx:DESTDIR = $${GENERATED_DIR}/unix
 win32:DESTDIR = $${GENERATED_DIR}/windows
 
-# set destination path to share directory
-SHARE_DIR = $$shadowed($$absolute_path($${GENERATED_DIR}/share, $$_PRO_FILE_PWD_))
+# determine absolute path to important directories
+OUTPUT_DIR_ABS = $$shadowed($$absolute_path($${GENERATED_DIR}, $${_PRO_FILE_PWD_}))
+SHARE_DIR_ABS = $$absolute_path("share", $${PWD})
 
 # use separate folders for different types of files
 OBJECTS_DIR = obj

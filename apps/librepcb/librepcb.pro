@@ -35,7 +35,7 @@ unix:!macx {
 # Files to be installed by "make install"
 target.path = $${PREFIX}/bin
 share.path = $${PREFIX}
-share.files = $${SHARE_DIR}
+share.files = $${SHARE_DIR_ABS}
 INSTALLS += target share
 
 # Note: The order of the libraries is very important for the linker!
@@ -116,14 +116,7 @@ isEmpty(QMAKE_LRELEASE): QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 
 TS_FILES = $$files(../../i18n/librepcb_*.ts)
 lrelease.input = TS_FILES
-lrelease.output = $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
-lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.output = $$SHARE_DIR_ABS/librepcb/i18n/${QMAKE_FILE_BASE}.qm
+lrelease.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$SHARE_DIR_ABS/librepcb/i18n/${QMAKE_FILE_BASE}.qm
 lrelease.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += lrelease
-
-# Copy resource files to output directory
-copydata.commands = $(COPY_DIR) "\"$$system_path($${PWD}/../../share/.)\"" "\"$$system_path($${SHARE_DIR})\""
-first.depends = $(first) copydata
-export(first.depends)
-export(copydata.commands)
-QMAKE_EXTRA_TARGETS += first copydata
