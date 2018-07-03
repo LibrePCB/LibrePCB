@@ -80,6 +80,15 @@ Application::Application(int& argc, char** argv) noexcept :
         mResourcesDir = executableFilePath.getParentDir().getPathTo("../share/librepcb");
     }
 
+    // warn if runtime resource files are not found
+    if (!getResourcesFilePath("README.md").isExistingFile()) {
+        qCritical() << "Could not find resource files! Probably packaging went wrong?!";
+        qCritical() << "Expected resources location:" << mResourcesDir.toNative();
+        qCritical() << "Executable location:        " << executableFilePath.toNative();
+        qCritical() << "Build output directory:     " << buildOutputDirPath.toNative();
+        qCritical() << "Is developer build:         " << runningFromBuildOutput;
+    }
+
     // load all bundled TrueType/OpenType fonts
     QDir fontsDir(getResourcesFilePath("fonts").toStr());
     fontsDir.setFilter(QDir::Files);

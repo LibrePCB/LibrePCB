@@ -88,7 +88,7 @@ TEST(ApplicationTest, testGetResourcesFilePath)
 TEST(ApplicationTest, testExistenceOfResourceFiles)
 {
     EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
-    EXPECT_TRUE(qApp->getResourcesFilePath(".librepcb-resources").isExistingFile());
+    EXPECT_TRUE(qApp->getResourcesFilePath("README.md").isExistingFile());
 }
 
 /*****************************************************************************************
