@@ -46,12 +46,19 @@ PadSignalMapEditorWidget::PadSignalMapEditorWidget(QWidget* parent) noexcept :
     mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     mTable->setSelectionMode(QAbstractItemView::SingleSelection);
     mTable->setColumnCount(_COLUMN_COUNT);
+    mTable->setHorizontalHeaderItem(COLUMN_UUID,     new QTableWidgetItem(tr("UUID")));
     mTable->setHorizontalHeaderItem(COLUMN_PAD,     new QTableWidgetItem(tr("Pad Name")));
     mTable->setHorizontalHeaderItem(COLUMN_SIGNAL,  new QTableWidgetItem(tr("Component Signal")));
+    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_UUID,     QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_PAD,     QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_SIGNAL,  QHeaderView::Stretch);
     mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     mTable->verticalHeader()->setMinimumSectionSize(20);
+    mTable->verticalHeader()->setVisible(false);
+    mSortAsc = true;
+    QHeaderView *header = mTable->horizontalHeader();
+    connect(header, &QHeaderView::sectionClicked,
+            this, &PadSignalMapEditorWidget::HeaderClicked);
     connect(mTable, &QTableWidget::currentCellChanged,
             this, &PadSignalMapEditorWidget::currentCellChanged);
 
@@ -107,6 +114,18 @@ void PadSignalMapEditorWidget::setSignalList(const ComponentSignalList& list) no
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void PadSignalMapEditorWidget::HeaderClicked(int ind){
+    if(ind == 1){
+        if(mSortAsc){
+            mSortAsc = false;
+        }
+        else{
+            mSortAsc = true;
+        }
+    }
+    updateTable();
+}
 
 void PadSignalMapEditorWidget::currentCellChanged(int currentRow, int currentColumn,
                                                   int previousRow, int previousColumn) noexcept
@@ -184,7 +203,10 @@ void PadSignalMapEditorWidget::updateTable() noexcept
         mTable->hide(); mTable->show();
 
         // order by pad name
-        mTable->sortByColumn(COLUMN_PAD, Qt::AscendingOrder);
+        if(mSortAsc)
+            mTable->sortByColumn(COLUMN_PAD, Qt::AscendingOrder);
+        else
+            mTable->sortByColumn(COLUMN_PAD, Qt::DescendingOrder);
 
         // set selected row
         mTable->verticalScrollBar()->setValue(scrollbarValue);
@@ -206,7 +228,11 @@ void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
     headerItem->setFont(headerFont);
-    mTable->setVerticalHeaderItem(row, headerItem);
+    //mTable->setVerticalHeaderItem(row, headerItem);
+    headerItem->setFlags(headerItem->flags() ^ Qt::ItemIsEditable);
+    QPalette pallet = mTable->verticalHeader()->palette();
+    headerItem->setBackgroundColor(pallet.background().color());
+    mTable->setItem(row, COLUMN_UUID, headerItem);
 
     // pad
     QTableWidgetItem* padItem = new QTableWidgetItem();

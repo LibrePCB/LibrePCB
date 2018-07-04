@@ -55,7 +55,8 @@ class ComponentSymbolVariantListWidget final : public QWidget,
 
     private: // Types
         enum Column {
-            COLUMN_NAME = 0,
+            COLUMN_UUID = 0,
+            COLUMN_NAME,
             COLUMN_DESCRIPTION,
             COLUMN_NORM,
             COLUMN_SYMBOLCOUNT,
@@ -79,6 +80,7 @@ class ComponentSymbolVariantListWidget final : public QWidget,
 
 
     private: // Slots
+        void HeaderClicked(int ind);
         void currentCellChanged(int currentRow, int currentColumn,
                                 int previousRow, int previousColumn) noexcept;
         void cellDoubleClicked(int row, int column) noexcept;
@@ -122,6 +124,7 @@ class ComponentSymbolVariantListWidget final : public QWidget,
         ComponentSymbolVariantList* mVariantList;
         IF_ComponentSymbolVariantEditorProvider* mEditorProvider;
         Uuid mSelectedVariant;
+        bool mSortAsc;
 };
 
 /*****************************************************************************************

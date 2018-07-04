@@ -53,7 +53,8 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
 
     private: // Types
         enum Column {
-            COLUMN_NAME = 0,
+            COLUMN_UUID = 0,
+            COLUMN_NAME,
             COLUMN_BUTTONS,
             _COLUMN_COUNT
         };
@@ -77,6 +78,7 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
 
 
     private: // Slots
+        void HeaderClicked(int ind);
         void currentCellChanged(int currentRow, int currentColumn,
                                 int previousRow, int previousColumn) noexcept;
         void tableCellChanged(int row, int column) noexcept;
@@ -119,6 +121,7 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
         FootprintList* mFootprintList;
         UndoStack* mUndoStack;
         Uuid mSelectedFootprint;
+        bool mSortAsc;
 };
 
 /*****************************************************************************************

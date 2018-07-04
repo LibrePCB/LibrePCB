@@ -58,8 +58,9 @@ class PadSignalMapEditorWidget final : public QWidget, private DevicePadSignalMa
         Q_OBJECT
 
     private: // Types
-        enum Column {
-            COLUMN_PAD = 0,
+        enum Column {            
+            COLUMN_UUID = 0,
+            COLUMN_PAD,
             COLUMN_SIGNAL,
             _COLUMN_COUNT
         };
@@ -83,6 +84,7 @@ class PadSignalMapEditorWidget final : public QWidget, private DevicePadSignalMa
 
 
     private: // Slots
+        void HeaderClicked(int ind);
         void currentCellChanged(int currentRow, int currentColumn,
                                 int previousRow, int previousColumn) noexcept;
         void componentSignalChanged(int index) noexcept;
@@ -110,7 +112,8 @@ class PadSignalMapEditorWidget final : public QWidget, private DevicePadSignalMa
         DevicePadSignalMap* mPadSignalMap;
         PackagePadList mPads;
         ComponentSignalList mSignals;
-        Uuid mSelectedPad;
+        Uuid mSelectedPad;        
+        bool mSortAsc;
 };
 
 /*****************************************************************************************

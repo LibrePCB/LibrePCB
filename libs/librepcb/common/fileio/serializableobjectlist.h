@@ -284,20 +284,33 @@ class SerializableObjectList : public SerializableObject
         }
 
         // Convenience Methods
-        SerializableObjectList<T, P> sortedByUuid() const noexcept {
+        SerializableObjectList<T, P> sortedByUuid(bool asc) const noexcept {
             SerializableObjectList<T, P> copiedList;
             copiedList.mObjects = mObjects; // copy only the pointers, not the objects!
             qSort(copiedList.mObjects.begin(), copiedList.mObjects.end(),
-                  [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2)
-                    {return ptr1->getUuid() < ptr2->getUuid();});
+                  [&asc](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2)
+                    {
+                if(asc){
+                    return ptr1->getUuid() < ptr2->getUuid();
+                } else {
+                    return ptr1->getUuid() > ptr2->getUuid();
+                }});
+            return copiedList;
+        }
+        SerializableObjectList<T, P> sortedByName(bool asc) noexcept {
+            //qSort(copiedList.mObjects.begin(), copiedList.mObjects.end(),
+            qSort(mObjects.begin(), mObjects.end(),
+                  [this, &asc](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2)
+                    {
+                        return myComparison(ptr1->getName(), ptr2->getName(), asc);
+            });
+            SerializableObjectList<T, P> copiedList;
+            copiedList.mObjects = mObjects; // copy only the pointers, not the objects!
             return copiedList;
         }
         SerializableObjectList<T, P> sortedByName() const noexcept {
             SerializableObjectList<T, P> copiedList;
             copiedList.mObjects = mObjects; // copy only the pointers, not the objects!
-            qSort(copiedList.mObjects.begin(), copiedList.mObjects.end(),
-                  [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2)
-                    {return ptr1->getName() < ptr2->getName();});
             return copiedList;
         }
 
@@ -363,6 +376,33 @@ class SerializableObjectList : public SerializableObject
             throw RuntimeError(__FILE__, __LINE__, QString(tr("There is "
                 "no element of type \"%1\" with the name \"%2\" in the list."))
                 .arg(P::tagname).arg(name));
+        }
+        bool isNumber(QString& text, int *out) const {
+            for(int i = 0; i < text.size() - 1; i++){
+                if(text[i].isDigit())
+                    continue;
+                else
+                    return false;
+            }
+            *out = text.toInt();
+            return true;
+        }
+        bool myComparison(QString txtA, QString txtB, bool asc) const {
+//            QString txtA = ptr1->getName();
+//            QString txtB = ptr2->getName();
+            int maybeIntA = 0;
+            int maybeIntB = 0;
+            if(asc){
+                if(isNumber(txtA, &maybeIntA) && isNumber(txtB, &maybeIntB))
+                    return maybeIntA < maybeIntB;
+                else
+                    return txtA < txtB;
+            } else {
+                if(isNumber(txtA, &maybeIntA) && isNumber(txtB, &maybeIntB))
+                    return maybeIntA > maybeIntB;
+                else
+                    return txtA > txtB;
+            }
         }
 
 

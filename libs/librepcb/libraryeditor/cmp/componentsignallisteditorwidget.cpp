@@ -48,7 +48,8 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(QWidget* parent
     mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     mTable->setSelectionMode(QAbstractItemView::SingleSelection);
     mTable->setColumnCount(_COLUMN_COUNT);
-    mTable->setHorizontalHeaderItem(COLUMN_NAME,          new QTableWidgetItem(tr("Name")));
+    mTable->setHorizontalHeaderItem(COLUMN_UUID,          new QTableWidgetItem(tr("UUID")));
+    mTable->setHorizontalHeaderItem(COLUMN_NAME,          new QTableWidgetItem(tr("Pin Name")));
     //mTable->setHorizontalHeaderItem(COLUMN_ROLE,          new QTableWidgetItem(tr("Role (ERC)")));
     mTable->setHorizontalHeaderItem(COLUMN_ISREQUIRED,    new QTableWidgetItem(tr("Required")));
     //mTable->setHorizontalHeaderItem(COLUMN_ISNEGATED,     new QTableWidgetItem(tr("Negated")));
@@ -58,6 +59,7 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(QWidget* parent
     mTable->horizontalHeaderItem(COLUMN_ISREQUIRED)->setTextAlignment(Qt::AlignCenter);
     //mTable->horizontalHeaderItem(COLUMN_ISNEGATED)->setTextAlignment(Qt::AlignCenter);
     //mTable->horizontalHeaderItem(COLUMN_ISCLOCK)->setTextAlignment(Qt::AlignCenter);
+    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_UUID,          QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,          QHeaderView::Stretch);
     //mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ROLE,          QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_ISREQUIRED,    QHeaderView::ResizeToContents);
@@ -66,9 +68,13 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(QWidget* parent
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_FORCEDNETNAME, QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_BUTTONS,       QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setMinimumSectionSize(10);
-    mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    mTable->verticalHeader()->setMinimumSectionSize(20);
-    mTable->sortByColumn(COLUMN_NAME, Qt::AscendingOrder);
+//    mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+//    mTable->verticalHeader()->setMinimumSectionSize(20);
+    mTable->verticalHeader()->setVisible(false);
+    mSortAsc = true;
+    QHeaderView *header = mTable->horizontalHeader();
+    connect(header, &QHeaderView::sectionClicked,
+            this, &ComponentSignalListEditorWidget::HeaderClicked);
     connect(mTable, &QTableWidget::currentCellChanged,
             this, &ComponentSignalListEditorWidget::currentCellChanged);
     connect(mTable, &QTableWidget::cellChanged,
@@ -116,6 +122,18 @@ void ComponentSignalListEditorWidget::setReferences(UndoStack* undoStack,
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void ComponentSignalListEditorWidget::HeaderClicked(int ind){
+    if(ind == 1){
+        if(mSortAsc){
+            mSortAsc = false;
+        }
+        else{
+            mSortAsc = true;
+        }
+    }
+    updateTable();
+}
 
 void ComponentSignalListEditorWidget::currentCellChanged(int currentRow, int currentColumn,
                                                          int previousRow, int previousColumn) noexcept
@@ -248,6 +266,8 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
     mTable->clearContents();
 
     if (mSignalList) {
+        mSignalList->sortedByName(mSortAsc);
+
         int selectedRow = newSignalRow();
         mTable->setEnabled(true);
         mTable->setRowCount(mSignalList->count() + 1);
@@ -255,6 +275,7 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
         // special row for adding a new signal
         setTableRowContent(newSignalRow(), Uuid(), "", /*SignalRole::passive(),*/ false,
                            /*false, false,*/ "");
+        //std::sort(mSignalList->mObjects.begin(), mSignalList->mObjects.end());//, wayToSort);
 
         // existing signals
         for (int i = 0; i < mSignalList->count(); ++i) {
@@ -286,13 +307,23 @@ void ComponentSignalListEditorWidget::setTableRowContent(int row, const Uuid& uu
 {
     // header
     QString header = uuid.isNull() ? tr("Add new signal:") : uuid.toStr().left(13) % "...";
-    QTableWidgetItem* headerItem = new QTableWidgetItem(header);
+//    QTableWidgetItem* headerItem = new QTableWidgetItem(header);
+//    headerItem->setToolTip(uuid.toStr());
+//    QFont headerFont = headerItem->font();
+//    headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
+//    headerFont.setFamily("Monospace");
+//    headerItem->setFont(headerFont);
+//    mTable->setVerticalHeaderItem(row, headerItem);
+    QTableWidgetItem *headerItem = new QTableWidgetItem(header);
     headerItem->setToolTip(uuid.toStr());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
     headerItem->setFont(headerFont);
-    mTable->setVerticalHeaderItem(row, headerItem);
+    headerItem->setFlags(headerItem->flags() ^ Qt::ItemIsEditable);
+    QPalette pallet = mTable->verticalHeader()->palette();
+    headerItem->setBackgroundColor(pallet.background().color());
+    mTable->setItem(row, COLUMN_UUID, headerItem);
 
     // name
     mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));

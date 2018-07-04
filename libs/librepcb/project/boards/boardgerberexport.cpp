@@ -411,7 +411,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 
     // draw polygons
-    for (const Polygon& polygon : footprint.getLibFootprint().getPolygons().sortedByUuid()) {
+    for (const Polygon& polygon : footprint.getLibFootprint().getPolygons().sortedByUuid(true)) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == polygon.getLayerName()) {
             Path path = polygon.getPath();
@@ -426,7 +426,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     }
 
     // draw ellipses
-    for (const Ellipse& ellipse : footprint.getLibFootprint().getEllipses().sortedByUuid()) {
+    for (const Ellipse& ellipse : footprint.getLibFootprint().getEllipses().sortedByUuid(true)) {
         QString layer = footprint.getIsMirrored() ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
         if (layer == ellipse.getLayerName()) {
             Ellipse e = ellipse;

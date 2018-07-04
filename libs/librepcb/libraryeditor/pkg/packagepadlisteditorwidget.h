@@ -53,7 +53,8 @@ class PackagePadListEditorWidget final : public QWidget, private PackagePadList:
 
     private: // Types
         enum Column {
-            COLUMN_NAME = 0,
+            COLUMN_UUID = 0,
+            COLUMN_NAME,
             COLUMN_BUTTONS,
             _COLUMN_COUNT
         };
@@ -73,6 +74,7 @@ class PackagePadListEditorWidget final : public QWidget, private PackagePadList:
 
 
     private: // Slots
+        void HeaderClicked(int ind);
         void currentCellChanged(int currentRow, int currentColumn,
                                 int previousRow, int previousColumn) noexcept;
         void tableCellChanged(int row, int column) noexcept;
@@ -111,6 +113,7 @@ class PackagePadListEditorWidget final : public QWidget, private PackagePadList:
         PackagePadList* mPadList;
         UndoStack* mUndoStack;
         Uuid mSelectedPad;
+        bool mSortAsc;
 };
 
 /*****************************************************************************************

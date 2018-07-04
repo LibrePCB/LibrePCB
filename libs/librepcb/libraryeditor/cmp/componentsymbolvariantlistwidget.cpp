@@ -45,12 +45,14 @@ ComponentSymbolVariantListWidget::ComponentSymbolVariantListWidget(QWidget* pare
     mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     mTable->setSelectionMode(QAbstractItemView::SingleSelection);
     mTable->setColumnCount(_COLUMN_COUNT);
+    mTable->setHorizontalHeaderItem(COLUMN_UUID,        new QTableWidgetItem(tr("UUID")));
     mTable->setHorizontalHeaderItem(COLUMN_NAME,        new QTableWidgetItem(tr("Name")));
     mTable->setHorizontalHeaderItem(COLUMN_DESCRIPTION, new QTableWidgetItem(tr("Description")));
     mTable->setHorizontalHeaderItem(COLUMN_NORM,        new QTableWidgetItem(tr("Norm")));
     mTable->setHorizontalHeaderItem(COLUMN_SYMBOLCOUNT, new QTableWidgetItem(tr("Symbols")));
     mTable->setHorizontalHeaderItem(COLUMN_BUTTONS,     new QTableWidgetItem(tr("Actions")));
     mTable->horizontalHeaderItem(COLUMN_SYMBOLCOUNT)->setTextAlignment(Qt::AlignCenter);
+    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_UUID,        QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,        QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_DESCRIPTION, QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NORM,        QHeaderView::Stretch);
@@ -58,6 +60,11 @@ ComponentSymbolVariantListWidget::ComponentSymbolVariantListWidget(QWidget* pare
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_BUTTONS,     QHeaderView::ResizeToContents);
     mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     mTable->verticalHeader()->setMinimumSectionSize(20);
+    mTable->verticalHeader()->setVisible(false);
+    mSortAsc = true;
+    QHeaderView *header = mTable->horizontalHeader();
+    connect(header, &QHeaderView::sectionClicked,
+            this, &ComponentSymbolVariantListWidget::HeaderClicked);
     connect(mTable, &QTableWidget::currentCellChanged,
             this, &ComponentSymbolVariantListWidget::currentCellChanged);
     connect(mTable, &QTableWidget::cellDoubleClicked,
@@ -106,6 +113,18 @@ void ComponentSymbolVariantListWidget::setReferences(UndoStack* undoStack,
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void ComponentSymbolVariantListWidget::HeaderClicked(int ind){
+    if(ind == 1){
+        if(mSortAsc){
+            mSortAsc = false;
+        }
+        else{
+            mSortAsc = true;
+        }
+    }
+    updateTable();
+}
 
 void ComponentSymbolVariantListWidget::currentCellChanged(int currentRow, int currentColumn,
                                                           int previousRow, int previousColumn) noexcept
@@ -251,7 +270,11 @@ void ComponentSymbolVariantListWidget::setTableRowContent(int row, const Uuid& u
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
     headerItem->setFont(headerFont);
-    mTable->setVerticalHeaderItem(row, headerItem);
+    //mTable->setVerticalHeaderItem(row, headerItem);
+    headerItem->setFlags(headerItem->flags() ^ Qt::ItemIsEditable);
+    QPalette pallet = mTable->verticalHeader()->palette();
+    headerItem->setBackgroundColor(pallet.background().color());
+    mTable->setItem(row, COLUMN_UUID, headerItem);
 
     // name
     QTableWidgetItem* nameItem = new QTableWidgetItem(name);

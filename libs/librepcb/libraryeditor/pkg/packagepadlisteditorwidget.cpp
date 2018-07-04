@@ -46,14 +46,21 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
     mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     mTable->setSelectionMode(QAbstractItemView::SingleSelection);
     mTable->setColumnCount(_COLUMN_COUNT);
+    mTable->setHorizontalHeaderItem(COLUMN_UUID,    new QTableWidgetItem(tr("UUID")));
     mTable->setHorizontalHeaderItem(COLUMN_NAME,    new QTableWidgetItem(tr("Name")));
     mTable->setHorizontalHeaderItem(COLUMN_BUTTONS, new QTableWidgetItem(""));
+    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_UUID, QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,    QHeaderView::Stretch);
     mTable->horizontalHeader()->setSectionResizeMode(COLUMN_BUTTONS, QHeaderView::ResizeToContents);
     mTable->horizontalHeader()->setMinimumSectionSize(10);
     mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     mTable->verticalHeader()->setMinimumSectionSize(20);
-    mTable->sortByColumn(COLUMN_NAME, Qt::AscendingOrder);
+    //mTable->sortByColumn(COLUMN_NAME, Qt::AscendingOrder);
+    mTable->verticalHeader()->setVisible(false);
+    mSortAsc = true;
+    QHeaderView *header = mTable->horizontalHeader();
+    connect(header, &QHeaderView::sectionClicked,
+            this, &PackagePadListEditorWidget::HeaderClicked);
     connect(mTable, &QTableWidget::currentCellChanged,
             this, &PackagePadListEditorWidget::currentCellChanged);
     connect(mTable, &QTableWidget::cellChanged,
@@ -86,6 +93,18 @@ void PackagePadListEditorWidget::setReferences(PackagePadList& list, UndoStack* 
 /*****************************************************************************************
  *  Private Slots
  ****************************************************************************************/
+
+void PackagePadListEditorWidget::HeaderClicked(int ind){
+    if(ind == 1){
+        if(mSortAsc){
+            mSortAsc = false;
+        }
+        else{
+            mSortAsc = true;
+        }
+    }
+    updateTable();
+}
 
 void PackagePadListEditorWidget::currentCellChanged(int currentRow, int currentColumn,
                                                     int previousRow, int previousColumn) noexcept
@@ -139,6 +158,7 @@ void PackagePadListEditorWidget::updateTable(Uuid selected) noexcept
 
     // special row for adding a new pad
     setTableRowContent(newPadRow(), Uuid(), "");
+    mPadList->sortedByName(mSortAsc);
 
     // existing signals
     for (int i = 0; i < mPadList->count(); ++i) {
@@ -170,7 +190,11 @@ void PackagePadListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
     headerItem->setFont(headerFont);
-    mTable->setVerticalHeaderItem(row, headerItem);
+    //mTable->setVerticalHeaderItem(row, headerItem);
+    headerItem->setFlags(headerItem->flags() ^ Qt::ItemIsEditable);
+    QPalette pallet = mTable->verticalHeader()->palette();
+    headerItem->setBackgroundColor(pallet.background().color());
+    mTable->setItem(row, COLUMN_UUID, headerItem);
 
     // name
     mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
