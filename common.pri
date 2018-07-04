@@ -11,14 +11,6 @@ DESTDIR = $$relative_path($$shadowed("$$PWD/output"), $$OUT_PWD)
 OUTPUT_DIR_ABS = $$shadowed($$absolute_path($${DESTDIR}, $${_PRO_FILE_PWD_}))
 SHARE_DIR_ABS = $$absolute_path("share", $${PWD})
 
-# use separate folders for different types of files
-OBJECTS_DIR = obj
-MOC_DIR = moc
-RCC_DIR = rcc
-UI_DIR = ui
-UI_HEADERS_DIR = ui
-UI_SOURCES_DIR = ui
-
 # is qt version sufficient
 lessThan(QT_MAJOR_VERSION, 5) {
     error("Qt version $$[QT_VERSION] is too old, should be version 5.2 or newer!")

@@ -10,9 +10,6 @@ TARGET = librepcb
 # Use common project definitions
 include(../../common.pri)
 
-# Set preprocessor defines
-exists(../../.git):DEFINES += GIT_BRANCH=\\\"master\\\"
-
 QT += core widgets opengl network xml printsupport sql
 
 win32 {
