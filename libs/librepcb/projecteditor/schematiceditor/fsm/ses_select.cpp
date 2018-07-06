@@ -289,7 +289,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
 SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                               Schematic* schematic) noexcept
 {
-    if (mouseEvent->buttons() == Qt::LeftButton)
+    if (mouseEvent->button() == Qt::LeftButton)
     {
         // check if there is an element under the mouse
         QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));

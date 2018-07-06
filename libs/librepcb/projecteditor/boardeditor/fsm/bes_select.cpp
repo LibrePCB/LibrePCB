@@ -424,7 +424,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
 BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                                               Board* board) noexcept
 {
-    if (mouseEvent->buttons() == Qt::LeftButton) {
+    if (mouseEvent->button() == Qt::LeftButton) {
         // check if there is an element under the mouse
         QList<BI_Base*> items = board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
         if (items.isEmpty()) return PassToParentState;
