@@ -121,7 +121,7 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid)
     // check this process
     {
         QString processName = SystemInfo::getProcessNameByPid(qApp->applicationPid());
-        EXPECT_EQ("tests", processName) << qPrintable(processName);
+        EXPECT_EQ("librepcb-unittests", processName) << qPrintable(processName);
     }
 
     // check another running process

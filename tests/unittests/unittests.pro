@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 TEMPLATE = app
-TARGET = tests
+TARGET = librepcb-unittests
 
 # Use common project definitions
 include(../../common.pri)
