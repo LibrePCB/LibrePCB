@@ -5,23 +5,11 @@ exists(custom.pri):include(custom.pri)
 isEmpty(PREFIX):PREFIX = /usr/local
 
 # set destination path for generated files
-isEmpty(GENERATED_DIR):GENERATED_DIR = generated
+DESTDIR = $$relative_path($$shadowed("$$PWD/output"), $$OUT_PWD)
 
-# set destination path for binaries and libraries
-macx:DESTDIR = $${GENERATED_DIR}/mac
-unix:!macx:DESTDIR = $${GENERATED_DIR}/unix
-win32:DESTDIR = $${GENERATED_DIR}/windows
-
-# set destination path to share directory
-SHARE_DIR = $$shadowed($$absolute_path($${GENERATED_DIR}/share, $$_PRO_FILE_PWD_))
-
-# use separate folders for different types of files
-OBJECTS_DIR = obj
-MOC_DIR = moc
-RCC_DIR = rcc
-UI_DIR = ui
-UI_HEADERS_DIR = ui
-UI_SOURCES_DIR = ui
+# determine absolute path to important directories
+OUTPUT_DIR_ABS = $$shadowed($$absolute_path($${DESTDIR}, $${_PRO_FILE_PWD_}))
+SHARE_DIR_ABS = $$absolute_path("share", $${PWD})
 
 # is qt version sufficient
 lessThan(QT_MAJOR_VERSION, 5) {

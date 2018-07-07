@@ -134,11 +134,6 @@ static void writeLogHeader() noexcept
 
     // write resources directory path to log
     qInfo() << QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
-
-    // warn if runtime resource files are not found
-    if (!qApp->getResourcesFilePath(".librepcb-resources").isExistingFile()) {
-        qCritical() << "Could not find resource files! Maybe packaging went wrong?!";
-    }
 }
 
 /*****************************************************************************************

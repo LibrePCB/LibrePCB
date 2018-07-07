@@ -150,10 +150,12 @@ Select the run configuration `librepcb` and click on the `Run` button:
 
 #### From Command Line
 
+Execute inside the `build` directory:
+
 ```bash
-./generated/unix/librepcb                  # Unix/Linux
-open ./build/generated/mac/librepcb.app    # Mac OS X
-generated\windows\librepcb.exe             # Windows
+./output/librepcb             # Unix/Linux
+open ./output/librepcb.app    # Mac OS X
+output\librepcb.exe           # Windows
 ```
 
 ### Installation

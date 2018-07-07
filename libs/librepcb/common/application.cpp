@@ -62,18 +62,32 @@ Application::Application(int& argc, char** argv) noexcept :
                "Please correct this in the file 'librepcbcommon.pro'.");
 
     // get the directory of the currently running executable
-    FilePath executableDirPath(QApplication::applicationDirPath());
-    Q_ASSERT(executableDirPath.isValid());
+    FilePath executableFilePath(QApplication::applicationFilePath());
+    Q_ASSERT(executableFilePath.isValid());
 
     // determine the path to the resources directory (e.g. /usr/share/librepcb)
-    mResourcesDir = executableDirPath.getPathTo("../share/librepcb");
-#if defined(Q_OS_OSX)
-    if (!mResourcesDir.isExistingDir()) {
-        // for developer builds on mac, the "share" directory is outside the *.app directory
-        mResourcesDir = executableDirPath.getPathTo("../../../../share/librepcb");
+    FilePath buildOutputDirPath(BUILD_OUTPUT_DIRECTORY);
+    bool runningFromBuildOutput = executableFilePath.isLocatedInDir(buildOutputDirPath);
+    if (runningFromBuildOutput) {
+        // The executable is located inside the build output directory, so we assume this
+        // is a developer build and thus we use the "share" directory from the repository
+        // root.
+        mResourcesDir = FilePath(SHARE_DIRECTORY_SOURCE).getPathTo("librepcb");
+    } else {
+        // The executable is located outside the build output directory, so we assume this
+        // is a packaged build and thus we use the "share" directory which is bundled with
+        // the application (must be located at "../share" relative to the executable).
+        mResourcesDir = executableFilePath.getParentDir().getPathTo("../share/librepcb");
     }
-#endif
-    Q_ASSERT(mResourcesDir.isValid());
+
+    // warn if runtime resource files are not found
+    if (!getResourcesFilePath("README.md").isExistingFile()) {
+        qCritical() << "Could not find resource files! Probably packaging went wrong?!";
+        qCritical() << "Expected resources location:" << mResourcesDir.toNative();
+        qCritical() << "Executable location:        " << executableFilePath.toNative();
+        qCritical() << "Build output directory:     " << buildOutputDirPath.toNative();
+        qCritical() << "Is developer build:         " << runningFromBuildOutput;
+    }
 
     // load all bundled TrueType/OpenType fonts
     QDir fontsDir(getResourcesFilePath("fonts").toStr());

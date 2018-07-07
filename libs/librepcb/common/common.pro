@@ -7,17 +7,15 @@
 TEMPLATE = lib
 TARGET = librepcbcommon
 
-# Set the path for the generated binary
-GENERATED_DIR = ../../../generated
-
 # Use common project definitions
 include(../../../common.pri)
 
 # Set preprocessor defines
+DEFINES += BUILD_OUTPUT_DIRECTORY="\\\"$${OUTPUT_DIR_ABS}\\\""
+DEFINES += SHARE_DIRECTORY_SOURCE="\\\"$${SHARE_DIR_ABS}\\\""
 DEFINES += APP_VERSION="\\\"0.1.0\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
 DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
-#DEFINES += USE_32BIT_LENGTH_UNITS          # see units/length.h
 
 QT += core widgets xml opengl network sql
 

@@ -7,9 +7,6 @@
 TEMPLATE = lib
 TARGET = librepcblibraryeditor
 
-# Set the path for the generated binary
-GENERATED_DIR = ../../../generated
-
 # Use common project definitions
 include(../../../common.pri)
 
