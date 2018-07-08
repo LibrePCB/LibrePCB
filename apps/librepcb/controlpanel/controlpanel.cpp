@@ -105,6 +105,8 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     //        &Workspace::instance(), &Workspace::openLibraryEditor);
     connect(mUi->actionAbout_Qt, &QAction::triggered,
             qApp, &QApplication::aboutQt);
+    connect(mUi->actionAbout, &QAction::triggered,
+            qApp, &Application::about);
     connect(mUi->actionWorkspace_Settings, &QAction::triggered,
             &mWorkspace.getSettings(), &WorkspaceSettings::showSettingsDialog);
     connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
@@ -422,12 +424,6 @@ void ControlPanel::projectEditorClosed() noexcept
 /*****************************************************************************************
  *  Actions
  ****************************************************************************************/
-
-void ControlPanel::on_actionAbout_triggered()
-{
-    AboutDialog* aboutDialog = new AboutDialog(this);
-    aboutDialog->exec();
-}
 
 void ControlPanel::on_actionNew_Project_triggered()
 {

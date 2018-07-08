@@ -29,6 +29,7 @@
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
@@ -37,6 +38,7 @@
 #include "../docks/ercmsgdock.h"
 #include "fsm/ses_fsm.h"
 #include <librepcb/project/circuit/circuit.h>
+#include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
 #include <librepcb/project/settings/projectsettings.h>
@@ -88,6 +90,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor, &ProjectEditor::saveProject);
     connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
+    connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
     connect(mUi->actionAbout_Qt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(mUi->actionZoom_In, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoom_Out, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);

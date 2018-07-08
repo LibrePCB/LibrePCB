@@ -91,6 +91,9 @@ class Application final : public QApplication
         static Application* instance() noexcept;
 
 
+    public slots:
+        static void about() noexcept;
+
     private: // Data
         Version mAppVersion;
         QString mGitVersion;
