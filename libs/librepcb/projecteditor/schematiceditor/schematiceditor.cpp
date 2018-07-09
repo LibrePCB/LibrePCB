@@ -44,6 +44,7 @@
 #include <librepcb/project/settings/projectsettings.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/project/schematics/cmd/cmdschematicadd.h>
 #include "../projecteditor.h"
 
@@ -317,8 +318,8 @@ void SchematicEditor::on_actionPDF_Export_triggered()
                                .arg(projectVersion, projectName);
         FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
         QDir().mkpath(defaultFilePath.getParentDir().toStr());
-        QString filename = QFileDialog::getSaveFileName(this, tr("PDF Export"),
-                                                        defaultFilePath.toNative(), "*.pdf");
+        QString filename = FileDialog::getSaveFileName(this, tr("PDF Export"),
+                                                       defaultFilePath.toNative(), "*.pdf");
         if (filename.isEmpty()) return;
         if (!filename.endsWith(".pdf")) filename.append(".pdf");
         FilePath filepath(filename);

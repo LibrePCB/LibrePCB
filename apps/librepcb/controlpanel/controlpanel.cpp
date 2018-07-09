@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <QFileDialog>
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include <librepcb/workspace/workspace.h>
@@ -40,6 +39,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/dialogs/filedialog.h>
 #include "../markdown/markdownconverter.h"
 #include "projectlibraryupdater/projectlibraryupdater.h"
 
@@ -436,8 +436,8 @@ void ControlPanel::on_actionOpen_Project_triggered()
     QString lastOpenedFile = settings.value("controlpanel/last_open_project",
                              mWorkspace.getPath().toStr()).toString();
 
-    FilePath filepath(QFileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
-                                    tr("LibrePCB project files (%1)").arg("*.lpp")));
+    FilePath filepath(FileDialog::getOpenFileName(this, tr("Open Project"), lastOpenedFile,
+                      tr("LibrePCB project files (%1)").arg("*.lpp")));
 
     if (!filepath.isValid())
         return;
