@@ -221,6 +221,11 @@ TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads)
         QThreadPool pool;
         pool.setMaxThreadCount(8);
 
+        // remove database before every run
+        if (mTempDbFilePath.isExistingFile()) {
+            FileUtils::removeFile(mTempDbFilePath);
+        }
+
         // prepare database
         SQLiteDatabase db(mTempDbFilePath);
         db.exec("CREATE TABLE test (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)");
