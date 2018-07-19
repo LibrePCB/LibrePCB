@@ -1,5 +1,7 @@
 language: cpp
 sudo: required
+git:
+  depth: false # whole history needed to automatically generate build number!
 cache: ccache
 notifications:
   email:

@@ -18,6 +18,14 @@ APP_VERSION_SHORT="${APP_VERSION_FULL%.0}"  # remove patch version if it is zero
 COMMIT_COUNT="`git -C "$ROOT" rev-list --count HEAD`"
 DATE="`date +%Y-%m-%d`"
 
+# make sure the whole Git history is available (if not the whole history is
+# available, the generated version number is wrong!)
+if (( $COMMIT_COUNT < 1200 ))
+then
+  echo "ERROR: Too less commits found! Repository cloned with a limited depth?"
+  exit 1
+fi
+
 # OS specific parameters
 if [[ "$TARGET_NAME" == windows* ]]
 then
