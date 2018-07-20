@@ -86,7 +86,7 @@ void Device::serialize(SExpression& root) const
     root.appendTokenChild("component", mComponentUuid, true);
     root.appendTokenChild("package", mPackageUuid, true);
     mAttributes.serialize(root);
-    mPadSignalMap.serialize(root);
+    mPadSignalMap.sortedByUuid().serialize(root);
 }
 
 bool Device::checkAttributesValidity() const noexcept

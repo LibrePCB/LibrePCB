@@ -82,7 +82,7 @@ void ComponentSymbolVariantItem::serialize(SExpression& root) const
     root.appendTokenChild("rot", mSymbolRot, false);
     root.appendTokenChild("required", mIsRequired, false);
     root.appendStringChild("suffix", mSuffix, false);
-    mPinSignalMap.serialize(root);
+    mPinSignalMap.sortedByUuid().serialize(root);
 }
 
 /*****************************************************************************************
