@@ -137,15 +137,8 @@ TEST_P(UuidTest, testOperatorEquals)
     EXPECT_FALSE(uuid2 == uuid1);
     EXPECT_FALSE(uuid1 == uuid2);
     uuid2 = uuid1;
-    if (data.valid) {
-        EXPECT_TRUE(uuid2 == uuid1);
-        EXPECT_TRUE(uuid1 == uuid2);
-        EXPECT_EQ(uuid2.toStr() == uuid1.toStr(), uuid2 == uuid1);
-        EXPECT_EQ(uuid1.toStr() == uuid2.toStr(), uuid1 == uuid2);
-    } else {
-        EXPECT_FALSE(uuid2 == uuid1);
-        EXPECT_FALSE(uuid1 == uuid2);
-    }
+    EXPECT_TRUE(uuid2 == uuid1);
+    EXPECT_TRUE(uuid1 == uuid2);
 }
 
 TEST_P(UuidTest, testOperatorNotEquals)
@@ -157,15 +150,8 @@ TEST_P(UuidTest, testOperatorNotEquals)
     EXPECT_TRUE(uuid2 != uuid1);
     EXPECT_TRUE(uuid1 != uuid2);
     uuid2 = uuid1;
-    if (data.valid) {
-        EXPECT_FALSE(uuid2 != uuid1);
-        EXPECT_FALSE(uuid1 != uuid2);
-        EXPECT_EQ(uuid2.toStr() != uuid1.toStr(), uuid2 != uuid1);
-        EXPECT_EQ(uuid1.toStr() != uuid2.toStr(), uuid1 != uuid2);
-    } else {
-        EXPECT_TRUE(uuid2 != uuid1);
-        EXPECT_TRUE(uuid1 != uuid2);
-    }
+    EXPECT_FALSE(uuid2 != uuid1);
+    EXPECT_FALSE(uuid1 != uuid2);
 }
 
 TEST_P(UuidTest, testOperatorComparisons)
@@ -195,13 +181,14 @@ TEST_P(UuidTest, testOperatorComparisons)
         EXPECT_EQ(uuid2.toStr() >= uuid1.toStr(), uuid2 >= uuid1);
         EXPECT_EQ(uuid1.toStr() >= uuid2.toStr(), uuid1 >= uuid2);
     } else {
+        // uuid1 is invalid and thus considered as "smaller" than uuid2
         EXPECT_FALSE(uuid2 < uuid1);
-        EXPECT_FALSE(uuid1 < uuid2);
-        EXPECT_FALSE(uuid2 > uuid1);
+        EXPECT_TRUE(uuid1 < uuid2);
+        EXPECT_TRUE(uuid2 > uuid1);
         EXPECT_FALSE(uuid1 > uuid2);
         EXPECT_FALSE(uuid2 <= uuid1);
-        EXPECT_FALSE(uuid1 <= uuid2);
-        EXPECT_FALSE(uuid2 >= uuid1);
+        EXPECT_TRUE(uuid1 <= uuid2);
+        EXPECT_TRUE(uuid2 >= uuid1);
         EXPECT_FALSE(uuid1 >= uuid2);
     }
 }

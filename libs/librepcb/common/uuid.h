@@ -127,16 +127,15 @@ class Uuid final
          *
          * @param rhs   The other object to compare
          *
-         * @return  If at least one of both objects is invalid, false will be returned
-         *          (except #operator!=() which would return true in this case)!
+         * @return Result of comparing the UUIDs as strings
          */
-        Uuid& operator=(const Uuid& rhs) noexcept;
-        bool operator==(const Uuid& rhs) const noexcept;
-        bool operator!=(const Uuid& rhs) const noexcept;
-        bool operator<(const Uuid& rhs) const noexcept;
-        bool operator>(const Uuid& rhs) const noexcept;
-        bool operator<=(const Uuid& rhs) const noexcept;
-        bool operator>=(const Uuid& rhs) const noexcept;
+        Uuid& operator=(const Uuid& rhs) noexcept {mUuid = rhs.mUuid; return *this;}
+        bool operator==(const Uuid& rhs) const noexcept {return mUuid == rhs.mUuid;}
+        bool operator!=(const Uuid& rhs) const noexcept {return mUuid != rhs.mUuid;}
+        bool operator<(const Uuid& rhs) const noexcept {return mUuid < rhs.mUuid;}
+        bool operator>(const Uuid& rhs) const noexcept {return mUuid > rhs.mUuid;}
+        bool operator<=(const Uuid& rhs) const noexcept {return mUuid <= rhs.mUuid;}
+        bool operator>=(const Uuid& rhs) const noexcept {return mUuid >= rhs.mUuid;}
         //@}
 
 

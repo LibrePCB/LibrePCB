@@ -178,12 +178,12 @@ TEST(VersionTest, testOperatorAssign)
 
 TEST(VersionTest, testOperatorGreater)
 {
+    EXPECT_TRUE(Version("1") > Version(""));
     EXPECT_TRUE(Version("0.1") > Version("0.0.9"));
     EXPECT_TRUE(Version("5.4") > Version("0.500.0"));
     EXPECT_TRUE(Version("10.0.0.1") > Version("10"));
 
     EXPECT_FALSE(Version("") > Version(""));
-    EXPECT_FALSE(Version("1") > Version(""));
     EXPECT_FALSE(Version("") > Version("1"));
     EXPECT_FALSE(Version("10") > Version("10.0.1"));
     EXPECT_FALSE(Version("0.0.1") > Version("0.1.0"));
@@ -191,12 +191,12 @@ TEST(VersionTest, testOperatorGreater)
 
 TEST(VersionTest, testOperatorLess)
 {
+    EXPECT_TRUE(Version("") < Version("1"));
     EXPECT_TRUE(Version("0.0.9") < Version("0.1"));
     EXPECT_TRUE(Version("0.500.0") < Version("5.4"));
     EXPECT_TRUE(Version("10") < Version("10.0.0.1"));
 
     EXPECT_FALSE(Version("") < Version(""));
-    EXPECT_FALSE(Version("") < Version("1"));
     EXPECT_FALSE(Version("1") < Version(""));
     EXPECT_FALSE(Version("10.0.1") < Version("10"));
     EXPECT_FALSE(Version("0.1.0") < Version("0.0.1"));
@@ -204,14 +204,14 @@ TEST(VersionTest, testOperatorLess)
 
 TEST(VersionTest, testOperatorGreaterEqual)
 {
+    EXPECT_TRUE(Version("") >= Version(""));
+    EXPECT_TRUE(Version("1") >= Version(""));
     EXPECT_TRUE(Version("0.1") >= Version("0.0.9"));
     EXPECT_TRUE(Version("5.4") >= Version("0.500.0"));
     EXPECT_TRUE(Version("10.0.0.1") >= Version("10"));
     EXPECT_TRUE(Version("10.0.0.1") >= Version("10.0.0.1"));
     EXPECT_TRUE(Version("5.0.0.5") >= Version("5.0.0.5.0"));
 
-    EXPECT_FALSE(Version("") >= Version(""));
-    EXPECT_FALSE(Version("1") >= Version(""));
     EXPECT_FALSE(Version("") >= Version("1"));
     EXPECT_FALSE(Version("10") >= Version("10.0.1"));
     EXPECT_FALSE(Version("0.0.1") >= Version("0.1.0"));
@@ -219,14 +219,14 @@ TEST(VersionTest, testOperatorGreaterEqual)
 
 TEST(VersionTest, testOperatorLessEqual)
 {
+    EXPECT_TRUE(Version("") <= Version(""));
+    EXPECT_TRUE(Version("") <= Version("1"));
     EXPECT_TRUE(Version("0.0.9") <= Version("0.1"));
     EXPECT_TRUE(Version("0.500.0") <= Version("5.4"));
     EXPECT_TRUE(Version("10") <= Version("10.0.0.1"));
     EXPECT_TRUE(Version("10.0.0.1") <= Version("10.0.0.1"));
     EXPECT_TRUE(Version("5.0.0.5") <= Version("5.0.0.5.0"));
 
-    EXPECT_FALSE(Version("") <= Version(""));
-    EXPECT_FALSE(Version("") <= Version("1"));
     EXPECT_FALSE(Version("1") <= Version(""));
     EXPECT_FALSE(Version("10.0.1") <= Version("10"));
     EXPECT_FALSE(Version("0.1.0") <= Version("0.0.1"));
@@ -234,10 +234,10 @@ TEST(VersionTest, testOperatorLessEqual)
 
 TEST(VersionTest, testOperatorEqual)
 {
+    EXPECT_TRUE(Version("") == Version(""));
     EXPECT_TRUE(Version("10.0.0.1") == Version("10.0.0.1"));
     EXPECT_TRUE(Version("5.0.0.5") == Version("5.0.0.5.0"));
 
-    EXPECT_FALSE(Version("") == Version(""));
     EXPECT_FALSE(Version("") == Version("1"));
     EXPECT_FALSE(Version("1") == Version(""));
     EXPECT_FALSE(Version("10.0.1") == Version("10"));
@@ -246,12 +246,12 @@ TEST(VersionTest, testOperatorEqual)
 
 TEST(VersionTest, testOperatorNotEqual)
 {
-    EXPECT_TRUE(Version("") != Version(""));
     EXPECT_TRUE(Version("") != Version("1"));
     EXPECT_TRUE(Version("1") != Version(""));
     EXPECT_TRUE(Version("10.0.0.1") != Version("10.0.1"));
     EXPECT_TRUE(Version("5.0.5") != Version("0.5.0.5"));
 
+    EXPECT_FALSE(Version("") != Version(""));
     EXPECT_FALSE(Version("10.0.1") != Version("10.0.1"));
     EXPECT_FALSE(Version("0.1.0") != Version("0.001.0.0.0"));
 }

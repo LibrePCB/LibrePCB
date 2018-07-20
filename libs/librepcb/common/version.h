@@ -175,7 +175,7 @@ class Version final
 
 
         // Operator overloadings
-        Version& operator=(const Version& rhs) noexcept;
+        Version& operator=(const Version& rhs) noexcept {mNumbers = rhs.mNumbers; return *this;}
 
         //@{
         /**
@@ -183,15 +183,14 @@ class Version final
          *
          * @param rhs   The other object to compare
          *
-         * @return  If at least one of both objects is invalid, false will be returned
-         *          (except #operator!=() which would return true in this case)!
+         * @return  Result of comparing the UUIDs as comparable strings
          */
-        bool operator>(const Version& rhs) const noexcept;
-        bool operator<(const Version& rhs) const  noexcept;
-        bool operator>=(const Version& rhs) const noexcept;
-        bool operator<=(const Version& rhs) const noexcept;
-        bool operator==(const Version& rhs) const noexcept;
-        bool operator!=(const Version& rhs) const noexcept;
+        bool operator>(const Version& rhs) const noexcept {return toComparableStr() > rhs.toComparableStr();}
+        bool operator<(const Version& rhs) const  noexcept {return toComparableStr() < rhs.toComparableStr();}
+        bool operator>=(const Version& rhs) const noexcept {return toComparableStr() >= rhs.toComparableStr();}
+        bool operator<=(const Version& rhs) const noexcept {return toComparableStr() <= rhs.toComparableStr();}
+        bool operator==(const Version& rhs) const noexcept {return mNumbers == rhs.mNumbers;}
+        bool operator!=(const Version& rhs) const noexcept {return mNumbers != rhs.mNumbers;}
         //@}
 
 
@@ -217,20 +216,6 @@ class Version final
 
 
     private:
-
-        // Private Methods
-
-        /**
-         * @brief Compare method for operator overloadings
-         *
-         * @param other     The other version for the comparison
-         *
-         * @return -1:  this < other
-         *          0:  this == other (or at least one of the versions is invalid)
-         *          1:  this > other
-         */
-        int compare(const Version& other) const noexcept;
-
 
         // Attributes
 
