@@ -23,7 +23,9 @@ LIBS += \
 
 INCLUDEPATH += \
     ../../libs \
-    ../../libs/parseagle
+    ../../libs/parseagle \
+    ../../libs/type_safe/include \
+    ../../libs/type_safe/external/debug_assert \
 
 DEPENDPATH += \
     ../../libs/librepcb/eagleimport \

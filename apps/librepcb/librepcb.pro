@@ -49,8 +49,10 @@ LIBS += \
     -lquazip -lz
 
 INCLUDEPATH += \
+    ../../libs \
     ../../libs/quazip \
-    ../../libs
+    ../../libs/type_safe/include \
+    ../../libs/type_safe/external/debug_assert \
 
 DEPENDPATH += \
     ../../libs/hoedown \

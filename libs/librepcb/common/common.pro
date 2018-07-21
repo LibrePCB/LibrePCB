@@ -22,10 +22,12 @@ QT += core widgets xml opengl network sql
 CONFIG += staticlib
 
 INCLUDEPATH += \
+    ../../ \
     ../../fontobene \
     ../../quazip \
     ../../sexpresso \
-    ../../ \
+    ../../type_safe/include \
+    ../../type_safe/external/debug_assert \
 
 SOURCES += \
     alignment.cpp \

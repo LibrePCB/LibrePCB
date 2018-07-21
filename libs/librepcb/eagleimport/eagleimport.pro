@@ -16,7 +16,9 @@ CONFIG += staticlib
 
 INCLUDEPATH += \
     ../../ \
-    ../../parseagle
+    ../../parseagle \
+    ../../type_safe/include \
+    ../../type_safe/external/debug_assert \
 
 SOURCES += \
     converterdb.cpp \

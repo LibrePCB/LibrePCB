@@ -34,3 +34,6 @@
 [submodule "libs/optional"]
 	path = libs/optional
 	url = https://github.com/LibrePCB/optional.git
+[submodule "libs/type_safe"]
+	path = libs/type_safe
+	url = https://github.com/LibrePCB/type_safe.git
