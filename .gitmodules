@@ -31,3 +31,6 @@
 [submodule "share/librepcb/fonts"]
 	path = share/librepcb/fonts
 	url = https://github.com/LibrePCB/librepcb-fonts.git
+[submodule "libs/optional"]
+	path = libs/optional
+	url = https://github.com/LibrePCB/optional.git
