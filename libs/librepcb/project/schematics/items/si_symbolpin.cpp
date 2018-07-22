@@ -56,8 +56,8 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPins().get(pinUuid).get(); // can throw
     mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMap().get(pinUuid).get(); // can throw
-    Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
-    mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
+    tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
+    if (cmpSignalUuid) mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
 
     mGraphicsItem.reset(new SGI_SymbolPin(*this));
     updatePosition();

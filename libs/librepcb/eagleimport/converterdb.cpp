@@ -121,11 +121,7 @@ Uuid ConverterDb::getOrCreateUuid(const QString& cat, const QString& key1,
 
     Uuid uuid = Uuid::createRandom();
     QString value = mIniFile.value(settingsKey).toString();
-    if (!value.isEmpty()) uuid = Uuid(value); //Uuid(QString("{%1}").arg(value));
-
-    if (uuid.isNull()) {
-        throw RuntimeError(__FILE__, __LINE__, "Invalid UUID in *.ini file: " % settingsKey);
-    }
+    if (!value.isEmpty()) uuid = Uuid::fromString(value); // can throw
     mIniFile.setValue(settingsKey, uuid.toStr());
     return uuid;
 }

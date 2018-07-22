@@ -71,7 +71,7 @@ void NewElementWizardContext::reset() noexcept
     mElementKeywords.clear();
     mElementAuthor = SystemInfo::getFullUsername();
     mElementVersion = Version("0.1");
-    mElementCategoryUuid = Uuid();
+    mElementCategoryUuid = tl::nullopt;
 
     // symbol
     mSymbolPins.clear();
@@ -92,15 +92,15 @@ void NewElementWizardContext::reset() noexcept
     mComponentSymbolVariants.clear();
 
     // device
-    mDeviceComponentUuid = Uuid();
-    mDevicePackageUuid = Uuid();
+    mDeviceComponentUuid = tl::nullopt;
+    mDevicePackageUuid = tl::nullopt;
 }
 
 void NewElementWizardContext::createLibraryElement()
 {
     QSet<Uuid> categories;
-    if (!mElementCategoryUuid.isNull()) {
-        categories.insert(mElementCategoryUuid);
+    if (mElementCategoryUuid) {
+        categories.insert(*mElementCategoryUuid);
     }
 
     switch (mElementType) {
@@ -161,11 +161,12 @@ void NewElementWizardContext::createLibraryElement()
             break;
         }
         case NewElementWizardContext::ElementType::Device: {
+            if (!mDeviceComponentUuid) throw LogicError(__FILE__, __LINE__);
+            if (!mDevicePackageUuid) throw LogicError(__FILE__, __LINE__);
             Device element(Uuid::createRandom(), mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, mElementName, mElementDescription, mElementKeywords,
+                *mDeviceComponentUuid, *mDevicePackageUuid);
             element.setCategories(categories);
-            element.setComponentUuid(mDeviceComponentUuid);
-            element.setPackageUuid(mDevicePackageUuid);
             element.getPadSignalMap() = mDevicePadSignalMap;
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<Device>());
             mOutputDirectory = element.getFilePath();

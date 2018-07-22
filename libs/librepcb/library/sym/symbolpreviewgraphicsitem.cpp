@@ -46,16 +46,16 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
                                                      const Component* cmp,
-                                                     const Uuid& symbVarUuid,
-                                                     const Uuid& symbVarItemUuid) noexcept :
+                                                     const tl::optional<Uuid>& symbVarUuid,
+                                                     const tl::optional<Uuid>& symbVarItemUuid) noexcept :
     QGraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
     mFont = qApp->getDefaultSansSerifFont();
 
     try {
-        if (mComponent) {
-            mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid).get(); // can throw
+        if (mComponent && symbVarUuid && symbVarItemUuid) {
+            mSymbVarItem = mComponent->getSymbVarItem(*symbVarUuid, *symbVarItemUuid).get(); // can throw
         }
 
         updateCacheAndRepaint();
@@ -64,7 +64,9 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
             const ComponentSignal* signal = nullptr;
             const ComponentPinSignalMapItem* mapItem = nullptr;
             CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
-            if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin.getUuid()).get(); // can throw
+            if (mComponent && symbVarItemUuid && symbVarItemUuid) {
+                signal = mComponent->getSignalOfPin(*symbVarUuid, *symbVarItemUuid, pin.getUuid()).get(); // can throw
+            }
             if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMap().find(pin.getUuid()).get(); // can throw
             if (mapItem) displayType = mapItem->getDisplayType();
             SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, pin, signal, displayType);

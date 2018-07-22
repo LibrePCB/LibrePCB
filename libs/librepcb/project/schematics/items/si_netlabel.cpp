@@ -41,14 +41,11 @@ namespace project {
  ****************************************************************************************/
 
 SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node) :
-    SI_Base(segment.getSchematic()), mNetSegment(segment), mUuid(), mPosition(),
-    mRotation()
+    SI_Base(segment.getSchematic()), mNetSegment(segment),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot"))
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-
     init();
 }
 
@@ -65,8 +62,6 @@ void SI_NetLabel::init()
     mGraphicsItem.reset(new SGI_NetLabel(*this));
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SI_NetLabel::~SI_NetLabel() noexcept
@@ -139,8 +134,6 @@ void SI_NetLabel::removeFromSchematic()
 
 void SI_NetLabel::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
     root.appendChild("rot", mRotation, false);
@@ -159,16 +152,6 @@ void SI_NetLabel::setSelected(bool selected) noexcept
 {
     SI_Base::setSelected(selected);
     mGraphicsItem->update();
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool SI_NetLabel::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())                             return false;
-    return true;
 }
 
 /*****************************************************************************************

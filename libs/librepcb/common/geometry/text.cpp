@@ -32,9 +32,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Text::Text(const Text& other) noexcept
+Text::Text(const Text& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mText(other.mText),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mHeight(other.mHeight),
+    mAlign(other.mAlign)
 {
-    *this = other; // use assignment operator
 }
 
 Text::Text(const Uuid& uuid, const Text& other) noexcept :
@@ -50,28 +56,27 @@ Text::Text(const Uuid& uuid, const QString& layerName, const QString& text, cons
 {
 }
 
-Text::Text(const SExpression& node)
+Text::Text(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mText(),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot")),
+    mHeight(node.getValueByPath<Length>("height")),
+    mAlign(node.getChildByPath("align"))
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+    if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
         mText = node.getValueByPath<QString>("value", true);
     } else {
         // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
         mText = node.getChildByIndex(0).getValue<QString>(true);
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
 
     // load geometry attributes
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mHeight = node.getValueByPath<Length>("height");
     if (!(mHeight > 0)) {
         throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
-
-    // text alignment
-    mAlign = Alignment(node.getChildByPath("align"));
 
     // backward compatibility - remove this some time!
     mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
@@ -203,7 +208,6 @@ Text& Text::operator=(const Text& rhs) noexcept
 
 bool Text::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())     return false;
     if (mText.isEmpty())    return false;
     if (mHeight <= 0)       return false;
     return true;

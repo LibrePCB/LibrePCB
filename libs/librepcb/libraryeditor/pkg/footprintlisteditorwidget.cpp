@@ -77,7 +77,7 @@ void FootprintListEditorWidget::setReferences(FootprintList& list, UndoStack& st
 {
     mFootprintList = &list;
     mUndoStack = &stack;
-    mSelectedFootprint = Uuid();
+    mSelectedFootprint = tl::nullopt;
     mFootprintList->registerObserver(this);
     updateTable();
 }
@@ -99,14 +99,15 @@ void FootprintListEditorWidget::currentCellChanged(int currentRow, int currentCo
 void FootprintListEditorWidget::tableCellChanged(int row, int column) noexcept
 {
     QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
 
     if (isNewFootprintRow(row)) {
         if (column == COLUMN_NAME) {
             item->setText(cleanName(item->text()));
         }
-    } else if (isExistingFootprintRow(row)) {
+    } else if (isExistingFootprintRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            item->setText(setName(getUuidOfRow(row), cleanName(item->text())));
+            item->setText(setName(*uuid, cleanName(item->text())));
         }
     }
 }
@@ -132,19 +133,21 @@ void FootprintListEditorWidget::btnDownClicked() noexcept
 void FootprintListEditorWidget::btnCopyClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
-    if (isExistingFootprintRow(row)) {
-        copyFootprint(getUuidOfRow(row));
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingFootprintRow(row) && uuid) {
+        copyFootprint(*uuid);
     }
 }
 
 void FootprintListEditorWidget::btnAddRemoveClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewFootprintRow(row)) {
         const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
         addFootprint(cleanName(nameItem->text()));
     } else if (isExistingFootprintRow(row)) {
-        removeFootprint(getUuidOfRow(row));
+        removeFootprint(*uuid);
     }
 }
 
@@ -152,12 +155,12 @@ void FootprintListEditorWidget::btnAddRemoveClicked() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
+void FootprintListEditorWidget::updateTable(tl::optional<Uuid> selected) noexcept
 {
     mTable->blockSignals(true);
 
     // selecte the first row by default to make sure a footprint is shown in the grpahics view
-    if (selected.isNull() && !mFootprintList->isEmpty()) {
+    if (!selected && !mFootprintList->isEmpty()) {
         selected = mFootprintList->first()->getUuid();
     }
 
@@ -168,7 +171,7 @@ void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->setRowCount(mFootprintList->count() + 1);
 
     // special row for adding a new footprint
-    setTableRowContent(newFootprintRow(), Uuid(), "");
+    setTableRowContent(newFootprintRow(), tl::nullopt, "");
 
     // existing signals
     for (int i = 0; i < mFootprintList->count(); ++i) {
@@ -190,13 +193,13 @@ void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->blockSignals(false);
 }
 
-void FootprintListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
+void FootprintListEditorWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                                                     const QString& name) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new footprint:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new footprint:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -353,12 +356,12 @@ int FootprintListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexc
     return row;
 }
 
-Uuid FootprintListEditorWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> FootprintListEditorWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingFootprintRow(row)) {
         return mFootprintList->value(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 

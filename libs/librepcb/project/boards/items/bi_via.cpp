@@ -51,15 +51,14 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other) :
 }
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node) :
-    BI_Base(netsegment.getBoard()), mNetSegment(netsegment)
+    BI_Base(netsegment.getBoard()),
+    mNetSegment(netsegment),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("pos")),
+    mShape(node.getValueByPath<Shape>("shape")),
+    mSize(node.getValueByPath<Length>("size")),
+    mDrillDiameter(node.getValueByPath<Length>("drill"))
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mPosition = Point(node.getChildByPath("pos"));
-    mShape = node.getValueByPath<Shape>("shape");
-    mSize = node.getValueByPath<Length>("size");
-    mDrillDiameter = node.getValueByPath<Length>("drill");
-
     init();
 }
 
@@ -80,8 +79,6 @@ void BI_Via::init()
     // connect to the "attributes changed" signal of the board
     connect(&mBoard, &Board::attributesChanged,
             this, &BI_Via::boardAttributesChanged);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 BI_Via::~BI_Via() noexcept
@@ -225,8 +222,6 @@ void BI_Via::updateNetPoints() const noexcept
 
 void BI_Via::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
     root.appendChild("size", mSize, false);
@@ -261,12 +256,6 @@ void BI_Via::setSelected(bool selected) noexcept
 void BI_Via::boardAttributesChanged()
 {
     mGraphicsItem->updateCacheAndRepaint();
-}
-
-bool BI_Via::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())                             return false;
-    return true;
 }
 
 /*****************************************************************************************

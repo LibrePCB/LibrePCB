@@ -35,21 +35,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp,
-        const Uuid& deviceUuid, const Uuid& footprintUuid, const Point& position,
-        const Angle& rotation, bool mirror) noexcept :
-    UndoCommand(tr("Add device to board")),
-    mBoard(board), mComponentInstance(&comp), mDeviceUuid(deviceUuid),
-    mFootprintUuid(footprintUuid), mPosition(position), mRotation(rotation),
-    mMirror(mirror), mDeviceInstance(nullptr)
-{
-}
-
 CmdDeviceInstanceAdd::CmdDeviceInstanceAdd(BI_Device& device) noexcept :
-    UndoCommand(tr("Add device to board")),
-    mBoard(device.getBoard()), mComponentInstance(nullptr), mDeviceUuid(),
-    mFootprintUuid(), mPosition(), mRotation(), mMirror(),
-    mDeviceInstance(&device)
+    UndoCommand(tr("Add device to board")), mDeviceInstance(device)
 {
 }
 
@@ -63,22 +50,18 @@ CmdDeviceInstanceAdd::~CmdDeviceInstanceAdd() noexcept
 
 bool CmdDeviceInstanceAdd::performExecute()
 {
-    mDeviceInstance = new BI_Device(mBoard, *mComponentInstance, mDeviceUuid,
-                                    mFootprintUuid, mPosition, mRotation, mMirror); // can throw
-
     performRedo(); // can throw
-
     return true;
 }
 
 void CmdDeviceInstanceAdd::performUndo()
 {
-    mBoard.removeDeviceInstance(*mDeviceInstance);
+    mDeviceInstance.getBoard().removeDeviceInstance(mDeviceInstance);
 }
 
 void CmdDeviceInstanceAdd::performRedo()
 {
-    mBoard.addDeviceInstance(*mDeviceInstance);
+    mDeviceInstance.getBoard().addDeviceInstance(mDeviceInstance);
 }
 
 /*****************************************************************************************

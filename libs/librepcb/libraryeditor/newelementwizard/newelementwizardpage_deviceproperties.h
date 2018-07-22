@@ -76,8 +76,8 @@ class NewElementWizardPage_DeviceProperties final : public QWizardPage
         void edtPackageUuidTextChanged(const QString& text) noexcept;
         void btnChooseComponentClicked() noexcept;
         void btnChoosePackageClicked() noexcept;
-        void setComponent(const Uuid& uuid) noexcept;
-        void setPackage(const Uuid& uuid) noexcept;
+        void setComponent(const tl::optional<Uuid>& uuid) noexcept;
+        void setPackage(const tl::optional<Uuid>& uuid) noexcept;
         void initializePage() noexcept override;
         void cleanupPage() noexcept override;
 

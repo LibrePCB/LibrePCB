@@ -59,7 +59,7 @@ class Device final : public LibraryElement
         Device(const Device& other) = delete;
         Device(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US);
+               const QString& keywords_en_US, const Uuid& component, const Uuid& package);
         Device(const FilePath& elementDirectory, bool readOnly);
         ~Device() noexcept;
 
@@ -91,7 +91,6 @@ class Device final : public LibraryElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

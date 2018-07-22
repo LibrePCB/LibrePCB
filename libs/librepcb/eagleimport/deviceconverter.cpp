@@ -57,15 +57,12 @@ std::unique_ptr<library::Device> DeviceConverter::generate() const
     if (!mDevice.getName().isEmpty()) {
         deviceName += "_" % mDevice.getName();
     }
+    Uuid compUuid = mDb.getComponentUuid(mDeviceSet.getName());
+    Uuid pkgUuid = mDb.getPackageUuid(mDevice.getPackage());
     std::unique_ptr<library::Device> device(
         new library::Device(mDb.getDeviceUuid(mDeviceSet.getName(), mDevice.getName()),
                             Version("0.1"), "LibrePCB", deviceName,
-                            createDescription(), ""));
-
-    // set properties
-    Uuid compUuid = mDb.getComponentUuid(mDeviceSet.getName());
-    device->setComponentUuid(compUuid);
-    device->setPackageUuid(mDb.getPackageUuid(mDevice.getPackage()));
+                            createDescription(), "", compUuid, pkgUuid));
 
     // connect pads
     Uuid fptUuid = mDb.getFootprintUuid(mDevice.getPackage());

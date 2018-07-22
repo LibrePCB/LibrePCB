@@ -286,9 +286,11 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept
 
 void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept
 {
-    mLastPad.setPackagePadUuid(pad ? pad->getUuid() : Uuid());
-    if (mEditCmd) {
-        mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
+    if (pad) {
+        mLastPad.setPackagePadUuid(pad->getUuid());
+        if (mEditCmd) {
+            mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
+        }
     }
 }
 

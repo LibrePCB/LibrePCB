@@ -66,12 +66,13 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other,
 }
 
 BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
-    BI_Base(segment.getBoard()), mNetSegment(segment), mLayer(nullptr), mFootprintPad(nullptr),
+    BI_Base(segment.getBoard()), mNetSegment(segment),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mLayer(nullptr),
+    mFootprintPad(nullptr),
     mVia(nullptr)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-
     QString layerName = node.getValueByPath<QString>("layer");
     mLayer = mBoard.getLayerStack().getLayer(layerName);
     if (!mLayer) {
@@ -404,7 +405,6 @@ void BI_NetPoint::setSelected(bool selected) noexcept
 
 bool BI_NetPoint::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                             return false;
     if (isAttachedToPad() && (&mNetSegment.getNetSignal() != mFootprintPad->getCompSigInstNetSignal())) return false;
     if (isAttachedToVia() && (&mNetSegment != &mVia->getNetSegment())) return false;
     return true;

@@ -56,11 +56,11 @@ class CategoryTreeItem final
         CategoryTreeItem() = delete;
         CategoryTreeItem(const CategoryTreeItem& other) = delete;
         CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
-                         CategoryTreeItem* parent, const Uuid& uuid) noexcept;
+                         CategoryTreeItem* parent, const tl::optional<Uuid>& uuid) noexcept;
         ~CategoryTreeItem() noexcept;
 
         // Getters
-        const Uuid& getUuid()                   const noexcept {return mUuid;}
+        const tl::optional<Uuid>& getUuid()     const noexcept {return mUuid;}
         unsigned int getDepth()                 const noexcept {return mDepth;}
         int getColumnCount()                    const noexcept {return 1;}
         CategoryTreeItem* getParent()           const noexcept {return mParent;}
@@ -85,7 +85,7 @@ class CategoryTreeItem final
         // Attributes
         QStringList mLocaleOrder;
         CategoryTreeItem* mParent;
-        Uuid mUuid;
+        tl::optional<Uuid> mUuid;
         QScopedPointer<ElementType> mCategory;
         unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
         QString mExceptionMessage;

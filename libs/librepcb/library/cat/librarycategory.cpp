@@ -47,10 +47,9 @@ LibraryCategory::LibraryCategory(const QString& shortElementName,
 LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
                                  const QString& shortElementName,
                                  const QString& longElementName, bool readOnly) :
-    LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
+    LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly),
+    mParentUuid(mLoadingFileDocument.getValueByPath<tl::optional<Uuid>>("parent"))
 {
-    // read parent uuid
-    mParentUuid = mLoadingFileDocument.getValueByPath<Uuid>("parent");
 }
 
 LibraryCategory::~LibraryCategory() noexcept

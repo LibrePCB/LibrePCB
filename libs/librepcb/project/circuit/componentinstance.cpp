@@ -46,12 +46,13 @@ namespace project {
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<QString>("name", true)),
+    mValue(node.getValueByPath<QString>("value")),
+    mDefaultDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
     // read general attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mValue = node.getValueByPath<QString>("value");
     Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent) {
@@ -61,7 +62,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
     }
     Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
-    mDefaultDeviceUuid = node.getValueByPath<Uuid>("lib_device");
+
 
     // load all component attributes
     mAttributes.reset(new AttributeList(node)); // can throw
@@ -92,7 +93,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
 }
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
-        const Uuid& symbVar, const QString& name, const Uuid& defaultDevice) :
+        const Uuid& symbVar, const QString& name, const tl::optional<Uuid>& defaultDevice) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(Uuid::createRandom()), mName(name), mDefaultDeviceUuid(defaultDevice),
     mLibComponent(&cmp), mCompSymbVar(nullptr), mAttributes()
@@ -390,7 +391,6 @@ QVector<const AttributeProvider*> ComponentInstance::getAttributeProviderParents
 
 bool ComponentInstance::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())             return false;
     if (mName.isEmpty())            return false;
     if (mLibComponent == nullptr)   return false;
     if (mCompSymbVar == nullptr)    return false;

@@ -248,25 +248,25 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid
     query.bindValue(":filepath", devDir.toRelative(mWorkspace.getLibrariesPath()));
     mDb->exec(query);
 
-    Uuid uuid = query.first() ? Uuid(query.value(0).toString()) : Uuid();
-    if (uuid.isNull()) {
+    if (query.first()) {
+        Uuid uuid = Uuid::fromString(query.value(0).toString()); // can throw
+        if (pkgUuid) *pkgUuid = uuid;
+    } else {
         throw RuntimeError(__FILE__, __LINE__, QString(tr(
             "Device not found in workspace library: \"%1\"")).arg(devDir.toNative()));
     }
-
-    if (pkgUuid) *pkgUuid = uuid;
 }
 
 /*****************************************************************************************
  *  Getters: Special
  ****************************************************************************************/
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentCategoryChilds(const Uuid& parent) const
+QSet<Uuid> WorkspaceLibraryDb::getComponentCategoryChilds(const tl::optional<Uuid>& parent) const
 {
     return getCategoryChilds("component_categories", parent);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getPackageCategoryChilds(const Uuid& parent) const
+QSet<Uuid> WorkspaceLibraryDb::getPackageCategoryChilds(const tl::optional<Uuid>& parent) const
 {
     return getCategoryChilds("package_categories", parent);
 }
@@ -281,22 +281,22 @@ QList<Uuid> WorkspaceLibraryDb::getPackageCategoryParents(const Uuid& category) 
     return getCategoryParents("package_categories", category);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getSymbolsByCategory(const Uuid& category) const
+QSet<Uuid> WorkspaceLibraryDb::getSymbolsByCategory(const tl::optional<Uuid>& category) const
 {
     return getElementsByCategory("symbols", "symbol_id", category);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getPackagesByCategory(const Uuid& category) const
+QSet<Uuid> WorkspaceLibraryDb::getPackagesByCategory(const tl::optional<Uuid>& category) const
 {
     return getElementsByCategory("packages", "package_id", category);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const Uuid& category) const
+QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const tl::optional<Uuid>& category) const
 {
     return getElementsByCategory("components", "component_id", category);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getDevicesByCategory(const Uuid& category) const
+QSet<Uuid> WorkspaceLibraryDb::getDevicesByCategory(const tl::optional<Uuid>& category) const
 {
     return getElementsByCategory("devices", "device_id", category);
 }
@@ -310,12 +310,7 @@ QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) cons
 
     QSet<Uuid> elements;
     while (query.next()) {
-        Uuid uuid(query.value(0).toString());
-        if (!uuid.isNull()) {
-            elements.insert(uuid);
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
+        elements.insert(Uuid::fromString(query.value(0).toString())); // can throw
     }
     return elements;
 }
@@ -336,12 +331,7 @@ QSet<Uuid> WorkspaceLibraryDb::getComponentsBySearchKeyword(const QString& keywo
 
     QSet<Uuid> elements;
     while (query.next()) {
-        Uuid uuid(query.value(0).toString());
-        if (!uuid.isNull()) {
-            elements.insert(uuid);
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
+        elements.insert(Uuid::fromString(query.value(0).toString())); // can throw
     }
     return elements;
 }
@@ -418,40 +408,36 @@ FilePath WorkspaceLibraryDb::getLatestVersionFilePath(const QMultiMap<Version, F
         return list.last(); // highest version number
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const
+QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const tl::optional<Uuid>& categoryUuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " WHERE parent_uuid " %
-        (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toStr() % "'"));
+        (categoryUuid ? "= '" % categoryUuid->toStr() % "'" : QString("IS NULL")));
     mDb->exec(query);
 
     QSet<Uuid> elements;
     while (query.next()) {
-        Uuid uuid(query.value(0).toString());
-        if (!uuid.isNull()) {
-            elements.insert(uuid);
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
+        elements.insert(Uuid::fromString(query.value(0).toString())); // can throw
     }
     return elements;
 }
 
-QList<Uuid> WorkspaceLibraryDb::getCategoryParents(const QString& tablename, Uuid category) const
+QList<Uuid> WorkspaceLibraryDb::getCategoryParents(const QString& tablename, const Uuid& category) const
 {
+    tl::optional<Uuid> optCategory = category;
     QList<Uuid> parentUuids;
-    while (!(category = getCategoryParent(tablename, category)).isNull()) {
-        if (parentUuids.contains(category)) {
+    while ((optCategory = getCategoryParent(tablename, *optCategory))) {
+        if (parentUuids.contains(*optCategory)) {
             throw RuntimeError(__FILE__, __LINE__, QString(tr("Endless loop "
-                "in category parentship detected (%1).")).arg(category.toStr()));
+                "in category parentship detected (%1).")).arg(optCategory->toStr()));
         } else {
-            parentUuids.append(category);
+            parentUuids.append(*optCategory);
         }
     }
     return parentUuids;
 }
 
-Uuid WorkspaceLibraryDb::getCategoryParent(const QString& tablename, const Uuid& category) const
+tl::optional<Uuid> WorkspaceLibraryDb::getCategoryParent(const QString& tablename, const Uuid& category) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT parent_uuid FROM " % tablename %
@@ -462,13 +448,10 @@ Uuid WorkspaceLibraryDb::getCategoryParent(const QString& tablename, const Uuid&
 
     if (query.next()) {
         QVariant value = query.value(0);
-        Uuid uuid(value.toString());
-        if (!uuid.isNull()) {
-            return uuid;
-        } else if (value.isNull()) {
-            return Uuid();
+        if (!value.isNull()) {
+            return Uuid::fromString(value.toString()); // can throw
         } else {
-            throw LogicError(__FILE__, __LINE__);
+            return tl::nullopt;
         }
     } else {
         throw RuntimeError(__FILE__, __LINE__, QString(tr("The category "
@@ -477,23 +460,18 @@ Uuid WorkspaceLibraryDb::getCategoryParent(const QString& tablename, const Uuid&
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(const QString& tablename,
-    const QString& idrowname, const Uuid& categoryUuid) const
+    const QString& idrowname, const tl::optional<Uuid>& categoryUuid) const
 {
     QSqlQuery query = mDb->prepareQuery(
         "SELECT uuid FROM " % tablename % " LEFT JOIN " % tablename % "_cat "
         "ON " % tablename % ".id=" % tablename % "_cat." % idrowname % " "
         "WHERE category_uuid " %
-        (categoryUuid.isNull() ? QString("IS NULL") : "= '" % categoryUuid.toStr() % "'"));
+        (categoryUuid ? "= '" % categoryUuid->toStr() % "'" : QString("IS NULL")));
     mDb->exec(query);
 
     QSet<Uuid> elements;
     while (query.next()) {
-        Uuid uuid(query.value(0).toString());
-        if (!uuid.isNull()) {
-            elements.insert(uuid);
-        } else {
-            throw LogicError(__FILE__, __LINE__);
-        }
+        elements.insert(Uuid::fromString(query.value(0).toString())); // can throw
     }
     return elements;
 }

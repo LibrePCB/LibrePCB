@@ -36,32 +36,32 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept :
+    mUuid(other.mUuid),
+    mSymbolUuid(other.mSymbolUuid),
+    mSymbolPos(other.mSymbolPos),
+    mSymbolRot(other.mSymbolRot),
+    mIsRequired(other.mIsRequired),
+    mSuffix(other.mSuffix),
+    mPinSignalMap(other.mPinSignalMap)
 {
-    *this = other; // use assignment operator
 }
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
         const Uuid& symbolUuid, bool isRequired, const QString& suffix) noexcept :
     mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node) :
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
+    mSymbolPos(node.getChildByPath("pos")),
+    mSymbolRot(node.getValueByPath<Angle>("rot")),
+    mIsRequired(node.getValueByPath<bool>("required")),
+    mSuffix(node.getValueByPath<QString>("suffix")),
+    mPinSignalMap(node)
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mSymbolUuid = node.getValueByPath<Uuid>("symbol");
-    mSymbolPos = Point(node.getChildByPath("pos"));
-    mSymbolRot = node.getValueByPath<Angle>("rot");
-    mIsRequired = node.getValueByPath<bool>("required");
-    mSuffix = node.getValueByPath<QString>("suffix");
-
-    // read pin signal map
-    mPinSignalMap.loadFromDomElement(node);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
@@ -74,8 +74,6 @@ ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
 
 void ComponentSymbolVariantItem::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("symbol", mSymbolUuid, true);
     root.appendChild(mSymbolPos.serializeToDomElement("pos"), true);
@@ -109,17 +107,6 @@ ComponentSymbolVariantItem& ComponentSymbolVariantItem::operator=(const Componen
     mSuffix = rhs.mSuffix;
     mPinSignalMap = rhs.mPinSignalMap;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool ComponentSymbolVariantItem::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())                     return false;
-    if (mSymbolUuid.isNull())               return false;
-    return true;
 }
 
 /*****************************************************************************************

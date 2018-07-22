@@ -41,7 +41,7 @@ CategoryTreeModel<ElementType>::CategoryTreeModel(const WorkspaceLibraryDb& libr
                                                   const QStringList& localeOrder) noexcept :
     QAbstractItemModel(nullptr)
 {
-    mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder, nullptr, Uuid()));
+    mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder, nullptr, tl::nullopt));
 }
 
 template <typename ElementType>

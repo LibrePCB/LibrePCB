@@ -98,15 +98,16 @@ class CompSymbVarPinSignalMapEditorWidget final : public QWidget
 
 
     private: // Methods
-        void updateTable(Uuid selItem = Uuid(), Uuid selPin = Uuid()) noexcept;
+        void updateTable(tl::optional<Uuid> selItem = tl::nullopt,
+                         tl::optional<Uuid> selPin = tl::nullopt) noexcept;
         void setTableRowContent(int row, const ComponentSymbolVariantItem& item,
                                 const ComponentPinSignalMapItem& map,
                                 int itemNumber, const Symbol* symbol) noexcept;
-        void setComponentSignal(const Uuid& item, const Uuid&pin, const Uuid& signal) noexcept;
+        void setComponentSignal(const Uuid& item, const Uuid&pin, const tl::optional<Uuid>& signal) noexcept;
         void setDisplayType(const Uuid& item, const Uuid& pin, const CmpSigPinDisplayType& dt) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getItemUuidOfRow(int row) const noexcept;
-        Uuid getPinUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getItemUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getPinUuidOfRow(int row) const noexcept;
         int getTotalPinCount() const noexcept;
         const QStringList& getLocaleOrder() const noexcept;
 
@@ -116,8 +117,8 @@ class CompSymbVarPinSignalMapEditorWidget final : public QWidget
         const workspace::Workspace* mWorkspace;
         const ComponentSignalList* mSignalList;
         ComponentSymbolVariant* mSymbolVariant;
-        Uuid mSelectedItem;
-        Uuid mSelectedPin;
+        tl::optional<Uuid> mSelectedItem;
+        tl::optional<Uuid> mSelectedPin;
 };
 
 /*****************************************************************************************

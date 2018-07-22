@@ -120,7 +120,6 @@ class BI_Via final : public BI_Base, public SerializableObject
 
         void init();
         void boardAttributesChanged();
-        bool checkAttributesValidity() const noexcept;
 
 
         // General

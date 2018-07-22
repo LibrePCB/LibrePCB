@@ -103,10 +103,10 @@ class ComponentSymbolVariantItemListEditorWidget final : public QWidget
 
 
     private: // Methods
-        void updateTable(Uuid selected = Uuid()) noexcept;
-        void setTableRowContent(int row, int number, const Uuid& uuid, const Uuid& symbol,
-                                const QString& suffix, bool required, const Point& pos,
-                                const Angle& rot) noexcept;
+        void updateTable(tl::optional<Uuid> selected = tl::nullopt) noexcept;
+        void setTableRowContent(int row, int number, const tl::optional<Uuid>& uuid,
+                                const tl::optional<Uuid>& symbol, const QString& suffix,
+                                bool required, const Point& pos, const Angle& rot) noexcept;
         void addItem(const Uuid& symbol, const QString& suffix, bool required,
                      const Point& pos, const Angle& rot) noexcept;
         void removeItem(const Uuid& uuid) noexcept;
@@ -119,7 +119,7 @@ class ComponentSymbolVariantItemListEditorWidget final : public QWidget
         void setPosY(const Uuid& uuid, const Length& y) noexcept;
         void setRotation(const Uuid& uuid, const Angle& rot) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
 
         // row index <-> item index conversion methods
         int newItemRow() const noexcept {return mItems->count();}
@@ -134,7 +134,7 @@ class ComponentSymbolVariantItemListEditorWidget final : public QWidget
         const workspace::Workspace* mWorkspace;
         const IF_GraphicsLayerProvider* mLayerProvider;
         ComponentSymbolVariantItemList* mItems;
-        Uuid mSelectedItem;
+        tl::optional<Uuid> mSelectedItem;
         QLabel* mNewSymbolLabel;
         CenteredCheckBox* mNewRequiredCheckbox;
 };

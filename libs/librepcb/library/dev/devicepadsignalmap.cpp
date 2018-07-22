@@ -34,24 +34,22 @@ namespace library {
  ****************************************************************************************/
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept :
-    QObject(nullptr)
+    QObject(nullptr),
+    mPadUuid(other.mPadUuid),
+    mSignalUuid(other.mSignalUuid)
 {
-    *this = other; // use assignment operator
 }
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const Uuid& signal) noexcept :
+DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const tl::optional<Uuid>& signal) noexcept :
     QObject(nullptr), mPadUuid(pad), mSignalUuid(signal)
 {
 }
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node) :
-    QObject(nullptr)
+    QObject(nullptr),
+    mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("sig"))
 {
-    // read attributes
-    mPadUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mSignalUuid = node.getValueByPath<Uuid>("sig");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept
@@ -62,7 +60,7 @@ DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept
  *  Setters
  ****************************************************************************************/
 
-void DevicePadSignalMapItem::setSignalUuid(const Uuid& uuid) noexcept
+void DevicePadSignalMapItem::setSignalUuid(const tl::optional<Uuid>& uuid) noexcept
 {
     if (uuid == mSignalUuid) return;
     mSignalUuid = uuid;
@@ -75,8 +73,6 @@ void DevicePadSignalMapItem::setSignalUuid(const Uuid& uuid) noexcept
 
 void DevicePadSignalMapItem::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mPadUuid);
     root.appendChild("sig", mSignalUuid, false);
 }
@@ -97,16 +93,6 @@ DevicePadSignalMapItem& DevicePadSignalMapItem::operator=(const DevicePadSignalM
     mPadUuid = rhs.mPadUuid;
     setSignalUuid(rhs.mSignalUuid);
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool DevicePadSignalMapItem::checkAttributesValidity() const noexcept
-{
-    if (mPadUuid.isNull())  return false;
-    return true;
 }
 
 /*****************************************************************************************

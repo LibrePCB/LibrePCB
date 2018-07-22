@@ -66,7 +66,7 @@ class CategoryChooserDialog final : public QDialog
         ~CategoryChooserDialog() noexcept;
 
         // Getters
-        Uuid getSelectedCategoryUuid() const noexcept;
+        tl::optional<Uuid> getSelectedCategoryUuid() const noexcept;
 
         // Operator Overloadings
         CategoryChooserDialog& operator=(const CategoryChooserDialog& rhs) = delete;

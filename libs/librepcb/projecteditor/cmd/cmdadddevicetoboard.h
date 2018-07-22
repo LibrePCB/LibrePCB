@@ -46,7 +46,6 @@ namespace project {
 class Board;
 class ComponentInstance;
 class BI_Device;
-class CmdDeviceInstanceAdd;
 
 namespace editor {
 
@@ -64,12 +63,13 @@ class CmdAddDeviceToBoard final : public UndoCommandGroup
         // Constructors / Destructor
         CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
                             ComponentInstance& cmpInstance, const Uuid& deviceUuid,
-                            const Uuid& footprintUuid, const Point& position = Point(),
+                            const tl::optional<Uuid>& footprintUuid,
+                            const Point& position = Point(),
                             const Angle& rotation = Angle(), bool mirror = false) noexcept;
         ~CmdAddDeviceToBoard() noexcept;
 
         // Getters
-        BI_Device* getDeviceInstance() const noexcept;
+        BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
 
     private:
@@ -87,13 +87,13 @@ class CmdAddDeviceToBoard final : public UndoCommandGroup
         Board& mBoard;
         ComponentInstance& mComponentInstance;
         Uuid mDeviceUuid;
-        Uuid mFootprintUuid;
+        tl::optional<Uuid> mFootprintUuid;
         Point mPosition;
         Angle mRotation;
         bool mMirror;
 
         // child commands
-        CmdDeviceInstanceAdd* mCmdAddToBoard;
+        BI_Device* mDeviceInstance;
 };
 
 /*****************************************************************************************

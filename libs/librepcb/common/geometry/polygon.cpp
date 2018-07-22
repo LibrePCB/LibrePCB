@@ -33,9 +33,14 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Polygon::Polygon(const Polygon& other) noexcept
+Polygon::Polygon(const Polygon& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mLineWidth(other.mLineWidth),
+    mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea),
+    mPath(other.mPath)
 {
-    *this = other; // use assignment operator
 }
 
 Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
@@ -51,18 +56,17 @@ Polygon::Polygon(const Uuid& uuid, const QString& layerName, const Length& lineW
 {
 }
 
-Polygon::Polygon(const SExpression& node)
+Polygon::Polygon(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLineWidth(node.getValueByPath<Length>("width")),
+    mIsFilled(node.getValueByPath<bool>("fill")),
+    mIsGrabArea(node.getValueByPath<bool>("grab")),
+    mPath()
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    } else {
-        // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
-    mLineWidth = node.getValueByPath<Length>("width");
-    mIsFilled = node.getValueByPath<bool>("fill");
-    mIsGrabArea = node.getValueByPath<bool>("grab");
 
     // load vertices
     if (!node.tryGetChildByPath("pos")) {
@@ -186,7 +190,6 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept
 
 bool Polygon::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
     // TODO: check mPath?

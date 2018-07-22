@@ -330,8 +330,8 @@ void MainWindow::on_toolButton_4_clicked()
             QDir repoSubDir = repoDir.absoluteFilePath(subdir2);
             foreach (const QString& elementDir, repoSubDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
             {
-                Uuid elementUuid(elementDir);
-                if (elementUuid.isNull()) continue;
+                tl::optional<Uuid> elementUuid = Uuid::tryFromString(elementDir);
+                if (!elementUuid) continue;
 
                 QDir outDirElement = outDir.absoluteFilePath(subdir2 % "/" % elementDir);
                 if (outDirElement.exists())

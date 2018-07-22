@@ -52,12 +52,12 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit, ComponentInst
     // read attributes
     Uuid compSignalUuid = node.getChildByIndex(0).getValue<Uuid>();
     mComponentSignal = mComponentInstance.getLibComponent().getSignals().get(compSignalUuid).get(); // can throw
-    Uuid netsignalUuid = node.getValueByPath<Uuid>("net");
-    if (!netsignalUuid.isNull()) {
-        mNetSignal = mCircuit.getNetSignalByUuid(netsignalUuid);
+    tl::optional<Uuid> netsignalUuid = node.getValueByPath<tl::optional<Uuid>>("net");
+    if (netsignalUuid) {
+        mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
         if(!mNetSignal) {
             throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid.toStr()));
+                QString(tr("Invalid netsignal UUID: \"%1\"")).arg(netsignalUuid->toStr()));
         }
     }
 
@@ -257,7 +257,7 @@ void ComponentSignalInstance::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendChild(mComponentSignal->getUuid());
-    root.appendChild("net", mNetSignal ? mNetSignal->getUuid() : Uuid(), false);
+    root.appendChild("net", mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt, false);
 }
 
 /*****************************************************************************************

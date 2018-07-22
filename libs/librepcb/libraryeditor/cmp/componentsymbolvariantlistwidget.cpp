@@ -92,7 +92,7 @@ void ComponentSymbolVariantListWidget::setReferences(UndoStack* undoStack,
     mUndoStack = undoStack;
     mVariantList = variants;
     mEditorProvider = editorProvider;
-    mSelectedVariant = Uuid();
+    mSelectedVariant = tl::nullopt;
     if (mVariantList) {
         mVariantList->registerObserver(this);
         for (const ComponentSymbolVariant& variant : *mVariantList) {
@@ -121,8 +121,9 @@ void ComponentSymbolVariantListWidget::cellDoubleClicked(int row, int column) no
 {
     Q_UNUSED(column);
     if (!allReferencesValid()) return;
-    if (isExistingVariantRow(row)) {
-        editVariant(getUuidOfRow(row));
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingVariantRow(row) && uuid) {
+        editVariant(*uuid);
     }
 }
 
@@ -130,8 +131,9 @@ void ComponentSymbolVariantListWidget::btnEditClicked() noexcept
 {
     if (!allReferencesValid()) return;
     int row = getRowOfTableCellWidget(sender());
-    if (isExistingVariantRow(row)) {
-        editVariant(getUuidOfRow(row));
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingVariantRow(row) && uuid) {
+        editVariant(*uuid);
     }
 }
 
@@ -139,13 +141,14 @@ void ComponentSymbolVariantListWidget::btnAddRemoveClicked() noexcept
 {
     if (!allReferencesValid()) return;
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewVariantRow(row)) {
         const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
         const QTableWidgetItem* descItem = mTable->item(row, COLUMN_DESCRIPTION); Q_ASSERT(descItem);
         const QTableWidgetItem* normItem = mTable->item(row, COLUMN_NORM); Q_ASSERT(normItem);
         addVariant(nameItem->text().trimmed(), descItem->text().trimmed(), normItem->text().trimmed());
-    } else if (isExistingVariantRow(row)) {
-        removeVariant(getUuidOfRow(row));
+    } else if (isExistingVariantRow(row) && uuid) {
+        removeVariant(*uuid);
     }
 }
 
@@ -213,7 +216,7 @@ void ComponentSymbolVariantListWidget::updateTable() noexcept
         mTable->setRowCount(mVariantList->count() + 1);
 
         // special row for adding a new symbol variant
-        setTableRowContent(newVariantRow(), Uuid(), "", "", "", 0);
+        setTableRowContent(newVariantRow(), tl::nullopt, "", "", "", 0);
 
         // existing symbol variants
         for (int i = 0; i < mVariantList->count(); ++i) {
@@ -240,13 +243,13 @@ void ComponentSymbolVariantListWidget::updateTable() noexcept
     blockSignals(false);
 }
 
-void ComponentSymbolVariantListWidget::setTableRowContent(int row, const Uuid& uuid,
+void ComponentSymbolVariantListWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
     const QString& name, const QString& desc, const QString& norm, int symbolCount) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new variant:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new variant:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -415,12 +418,12 @@ int ComponentSymbolVariantListWidget::getRowOfTableCellWidget(QObject* obj) cons
     return row;
 }
 
-Uuid ComponentSymbolVariantListWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> ComponentSymbolVariantListWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingVariantRow(row)) {
         return mVariantList->at(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 

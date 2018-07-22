@@ -80,13 +80,13 @@ class PackagePadListEditorWidget final : public QWidget, private PackagePadList:
 
 
     private: // Methods
-        void updateTable(Uuid selected = Uuid()) noexcept;
-        void setTableRowContent(int row, const Uuid& uuid, const QString& name) noexcept;
+        void updateTable(const tl::optional<Uuid>& selected = tl::nullopt) noexcept;
+        void setTableRowContent(int row, const tl::optional<Uuid>& uuid, const QString& name) noexcept;
         void addPad(const QString& name) noexcept;
         void removePad(const Uuid& uuid) noexcept;
         QString setName(const Uuid& uuid, const QString& name) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
         void throwIfNameEmptyOrExists(const QString& name) const;
         static QString cleanName(const QString& name) noexcept;
         void executeCommand(UndoCommand* cmd);
@@ -110,7 +110,7 @@ class PackagePadListEditorWidget final : public QWidget, private PackagePadList:
         QTableWidget* mTable;
         PackagePadList* mPadList;
         UndoStack* mUndoStack;
-        Uuid mSelectedPad;
+        tl::optional<Uuid> mSelectedPad;
 };
 
 /*****************************************************************************************

@@ -63,8 +63,8 @@ NewElementWizardPage_DeviceProperties::~NewElementWizardPage_DeviceProperties() 
 
 bool NewElementWizardPage_DeviceProperties::isComplete() const noexcept
 {
-    if (mContext.mDeviceComponentUuid.isNull()) return false;
-    if (mContext.mDevicePackageUuid.isNull()) return false;
+    if (!mContext.mDeviceComponentUuid) return false;
+    if (!mContext.mDevicePackageUuid) return false;
     return true;
 }
 
@@ -79,19 +79,20 @@ int NewElementWizardPage_DeviceProperties::nextId() const noexcept
 
 void NewElementWizardPage_DeviceProperties::edtComponentUuidTextChanged(const QString& text) noexcept
 {
-    setComponent(Uuid(text.trimmed()));
+    setComponent(Uuid::tryFromString(text.trimmed()));
 }
 
 void NewElementWizardPage_DeviceProperties::edtPackageUuidTextChanged(const QString& text) noexcept
 {
-    setPackage(Uuid(text.trimmed()));
+    setPackage(Uuid::tryFromString(text.trimmed()));
 }
 
 void NewElementWizardPage_DeviceProperties::btnChooseComponentClicked() noexcept
 {
     ComponentChooserDialog dialog(mContext.getWorkspace(), &mContext.getLayerProvider(), this);
     if (dialog.exec() == QDialog::Accepted) {
-        mUi->edtComponentUuid->setText(dialog.getSelectedComponentUuid().toStr());
+        tl::optional<Uuid> uuid = dialog.getSelectedComponentUuid();
+        mUi->edtComponentUuid->setText(uuid ? uuid->toStr() : QString());
     }
 }
 
@@ -99,16 +100,17 @@ void NewElementWizardPage_DeviceProperties::btnChoosePackageClicked() noexcept
 {
     PackageChooserDialog dialog(mContext.getWorkspace(), &mContext.getLayerProvider(), this);
     if (dialog.exec() == QDialog::Accepted) {
-        mUi->edtPackageUuid->setText(dialog.getSelectedPackageUuid().toStr());
+        tl::optional<Uuid> uuid = dialog.getSelectedPackageUuid();
+        mUi->edtPackageUuid->setText(uuid ? uuid->toStr() : QString());
     }
 }
 
-void NewElementWizardPage_DeviceProperties::setComponent(const Uuid& uuid) noexcept
+void NewElementWizardPage_DeviceProperties::setComponent(const tl::optional<Uuid>& uuid) noexcept
 {
     mContext.mDeviceComponentUuid = uuid;
-    if (!uuid.isNull()) {
+    if (uuid) {
         try {
-            FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestComponent(uuid); // can throw
+            FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestComponent(*uuid); // can throw
             QString name, desc;
             mContext.getWorkspace().getLibraryDb().getElementTranslations<Component>(
                 fp, mContext.getLibLocaleOrder(), &name, &desc); // can throw
@@ -125,12 +127,12 @@ void NewElementWizardPage_DeviceProperties::setComponent(const Uuid& uuid) noexc
     completeChanged();
 }
 
-void NewElementWizardPage_DeviceProperties::setPackage(const Uuid& uuid) noexcept
+void NewElementWizardPage_DeviceProperties::setPackage(const tl::optional<Uuid>& uuid) noexcept
 {
     mContext.mDevicePackageUuid = uuid;
-    if (!uuid.isNull()) {
+    if (uuid) {
         try {
-            FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestPackage(uuid); // can throw
+            FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestPackage(*uuid); // can throw
             Package package(fp, true); // can throw
             DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
                                                package.getPads().getUuidSet());
@@ -139,7 +141,7 @@ void NewElementWizardPage_DeviceProperties::setPackage(const Uuid& uuid) noexcep
         } catch (const Exception& e) {
             mUi->lblPackageName->setText(tr("ERROR:"));
             mUi->lblPackageDescription->setText(e.getMsg());
-            mContext.mDevicePackageUuid = Uuid(); // invalid package!
+            mContext.mDevicePackageUuid = tl::nullopt; // invalid package!
         }
     } else {
         mUi->lblPackageName->setText(tr("No package selected"));
@@ -151,8 +153,10 @@ void NewElementWizardPage_DeviceProperties::setPackage(const Uuid& uuid) noexcep
 void NewElementWizardPage_DeviceProperties::initializePage() noexcept
 {
     QWizardPage::initializePage();
-    mUi->edtComponentUuid->setText(mContext.mDeviceComponentUuid.toStr());
-    mUi->edtPackageUuid->setText(mContext.mDevicePackageUuid.toStr());
+    mUi->edtComponentUuid->setText(mContext.mDeviceComponentUuid ?
+                                   mContext.mDeviceComponentUuid->toStr() : QString());
+    mUi->edtPackageUuid->setText(mContext.mDevicePackageUuid ?
+                                 mContext.mDevicePackageUuid->toStr() : QString());
     setComponent(mContext.mDeviceComponentUuid);
     setPackage(mContext.mDevicePackageUuid);
 }

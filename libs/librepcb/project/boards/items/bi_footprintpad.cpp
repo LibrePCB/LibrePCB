@@ -57,9 +57,9 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid) :
 {
     mFootprintPad = mFootprint.getLibFootprint().getPads().get(padUuid).get(); // can throw
     mPackagePad = mFootprint.getDeviceInstance().getLibPackage().getPads().get(padUuid).get(); // can throw
-    Uuid cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getPadSignalMap().get(padUuid)->getSignalUuid(); // can throw
-    mComponentSignalInstance = mFootprint.getDeviceInstance().getComponentInstance().getSignalInstance(cmpSignalUuid);
-    if (mComponentSignalInstance) {
+    tl::optional<Uuid> cmpSignalUuid = mFootprint.getDeviceInstance().getLibDevice().getPadSignalMap().get(padUuid)->getSignalUuid(); // can throw
+    if (cmpSignalUuid) {
+        mComponentSignalInstance = mFootprint.getDeviceInstance().getComponentInstance().getSignalInstance(*cmpSignalUuid);
         connect(mComponentSignalInstance, &ComponentSignalInstance::netSignalChanged,
                 this, &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
     }

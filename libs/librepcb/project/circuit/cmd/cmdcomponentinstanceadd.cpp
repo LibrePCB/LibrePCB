@@ -40,7 +40,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
-                                                 const Uuid& symbVar, const Uuid& defaultDevice) noexcept :
+        const Uuid& symbVar, const tl::optional<Uuid>& defaultDevice) noexcept :
     UndoCommand(tr("Add component")),
     mCircuit(circuit), mComponentUuid(cmp), mSymbVarUuid(symbVar),
     mDefaultDeviceUuid(defaultDevice), mComponentInstance(nullptr)

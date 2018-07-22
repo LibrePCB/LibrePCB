@@ -32,9 +32,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Hole::Hole(const Hole& other) noexcept
+Hole::Hole(const Hole& other) noexcept :
+    mUuid(other.mUuid),
+    mPosition(other.mPosition),
+    mDiameter(other.mDiameter)
 {
-    *this = other; // use assignment operator
 }
 
 Hole::Hole(const Uuid& uuid, const Hole& other) noexcept :
@@ -48,16 +50,14 @@ Hole::Hole(const Uuid& uuid, const Point& position, const Length& diameter) noex
 {
 }
 
-Hole::Hole(const SExpression& node)
+Hole::Hole(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mPosition(node.getChildByPath("pos")),
+    mDiameter(node.getValueByPath<Length>("dia"))
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    } else {
-        // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
     }
-    mPosition = Point(node.getChildByPath("pos"));
-    mDiameter = node.getValueByPath<Length>("dia");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -138,7 +138,6 @@ Hole& Hole::operator=(const Hole& rhs) noexcept
 
 bool Hole::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())          return false;
     if (mDiameter <= 0)          return false;
     return true;
 }

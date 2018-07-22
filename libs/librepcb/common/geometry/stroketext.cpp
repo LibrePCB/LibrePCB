@@ -35,9 +35,21 @@ namespace librepcb {
  ****************************************************************************************/
 
 StrokeText::StrokeText(const StrokeText& other) noexcept :
-    mAttributeProvider(nullptr), mFont(nullptr)
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mText(other.mText),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mHeight(other.mHeight),
+    mStrokeWidth(other.mStrokeWidth),
+    mLetterSpacing(other.mLetterSpacing),
+    mLineSpacing(other.mLineSpacing),
+    mAlign(other.mAlign),
+    mMirrored(other.mMirrored),
+    mAutoRotate(other.mAutoRotate),
+    mAttributeProvider(nullptr),
+    mFont(nullptr)
 {
-    *this = other; // use assignment operator
 }
 
 StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept :
@@ -59,56 +71,48 @@ StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString
 }
 
 StrokeText::StrokeText(const SExpression& node) :
-    mAttributeProvider(nullptr), mFont(nullptr)
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mText(),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot")),
+    mHeight(node.getValueByPath<Length>("height")),
+    mStrokeWidth(200000), // backward compatibility, remove this some time!
+    mLetterSpacing(), // backward compatibility, remove this some time!
+    mLineSpacing(), // backward compatibility, remove this some time!
+    mAlign(node.getChildByPath("align")),
+    mMirrored(false), // backward compatibility, remove this some time!
+    mAutoRotate(true), // backward compatibility, remove this some time!
+    mAttributeProvider(nullptr),
+    mFont(nullptr)
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+    if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
         mText = node.getValueByPath<QString>("value", true);
     } else {
         // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
         mText = node.getChildByIndex(0).getValue<QString>(true);
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
 
     // load geometry attributes
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mHeight = node.getValueByPath<Length>("height");
     if (!(mHeight > 0)) {
         throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
     if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
         mStrokeWidth = child->getValueOfFirstChild<Length>();
-    } else {
-        // backward compatibility, remove this some time!
-        mStrokeWidth = Length(200000);
     }
     if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
         mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-    } else {
-        // backward compatibility, remove this some time!
-        mLetterSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("line_spacing")) {
         mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-    } else {
-        // backward compatibility, remove this some time!
-        mLineSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("mirror")) {
         mMirrored = child->getValueOfFirstChild<bool>();
-    } else {
-        // backward compatibility, remove this some time!
-        mMirrored = false;
     }
     if (const SExpression* child = node.tryGetChildByPath("auto_rotate")) {
         mAutoRotate = child->getValueOfFirstChild<bool>();
-    } else {
-        // backward compatibility, remove this some time!
-        mAutoRotate = true;
     }
-    mAlign = Alignment(node.getChildByPath("align"));
 
     // backward compatibility, remove this some time!
     if ((node.getName() == "text") && ((mText == "#NAME") || (mText == "#VALUE"))) {
@@ -412,7 +416,6 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept
 
 bool StrokeText::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mText.isEmpty())        return false;
     if (mHeight <= 0)           return false;
     if (mStrokeWidth < 0)       return false;

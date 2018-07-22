@@ -102,7 +102,7 @@ void ComponentSignalListEditorWidget::setReferences(UndoStack* undoStack,
     }
     mUndoStack = undoStack;
     mSignalList = list;
-    mSelectedSignal = Uuid();
+    mSelectedSignal = tl::nullopt;
     if (mSignalList) {
         mSignalList->registerObserver(this);
         for (const ComponentSignal& signal : *mSignalList) {
@@ -131,6 +131,7 @@ void ComponentSignalListEditorWidget::tableCellChanged(int row, int column) noex
 {
     if (!mSignalList) return;
     QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
 
     if (isNewSignalRow(row)) {
         if (column == COLUMN_NAME) {
@@ -138,12 +139,12 @@ void ComponentSignalListEditorWidget::tableCellChanged(int row, int column) noex
         } else if (column == COLUMN_FORCEDNETNAME) {
             item->setText(cleanForcedNetName(item->text()));
         }
-    } else if (isExistingSignalRow(row)) {
+    } else if (isExistingSignalRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            setName(getUuidOfRow(row), cleanName(item->text()));
+            setName(*uuid, cleanName(item->text()));
         } else if (column == COLUMN_FORCEDNETNAME) {
             item->setText(cleanForcedNetName(item->text()));
-            setForcedNetName(getUuidOfRow(row), cleanForcedNetName(item->text()));
+            setForcedNetName(*uuid, cleanForcedNetName(item->text()));
         }
     }
 }
@@ -161,8 +162,9 @@ void ComponentSignalListEditorWidget::isRequiredChanged(bool checked) noexcept
 {
     if (!mSignalList) return;
     int row = getRowOfTableCellWidget(sender());
-    if (isExistingSignalRow(row)) {
-        setIsRequired(getUuidOfRow(row), checked);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingSignalRow(row) && uuid) {
+        setIsRequired(*uuid, checked);
     }
 }
 
@@ -188,6 +190,7 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept
 {
     if (!mSignalList) return;
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewSignalRow(row)) {
         const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
         //const SignalRoleComboBox* roleComboBox = dynamic_cast<const SignalRoleComboBox*>
@@ -204,8 +207,8 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept
                   //negatedCheckBox->isChecked(),
                   //clockCheckBox->isChecked(),
                   cleanForcedNetName(netNameItem->text()));
-    } else if (isExistingSignalRow(row)) {
-        removeSignal(getUuidOfRow(row));
+    } else if (isExistingSignalRow(row) && uuid) {
+        removeSignal(*uuid);
     }
 }
 
@@ -253,7 +256,7 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
         mTable->setRowCount(mSignalList->count() + 1);
 
         // special row for adding a new signal
-        setTableRowContent(newSignalRow(), Uuid(), "", /*SignalRole::passive(),*/ false,
+        setTableRowContent(newSignalRow(), tl::nullopt, "", /*SignalRole::passive(),*/ false,
                            /*false, false,*/ "");
 
         // existing signals
@@ -280,14 +283,14 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
     mTable->blockSignals(false);
 }
 
-void ComponentSignalListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
+void ComponentSignalListEditorWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
     const QString& name, /*const SignalRole& role,*/ bool required, /*bool negated,
     bool clock,*/ const QString& forcedNetName) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new signal:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new signal:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -501,12 +504,12 @@ int ComponentSignalListEditorWidget::getRowOfTableCellWidget(QObject* obj) const
     return row;
 }
 
-Uuid ComponentSignalListEditorWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> ComponentSignalListEditorWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingSignalRow(row)) {
         return mSignalList->at(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdaddsymboltoschematic.h"
+#include <librepcb/common/scopeguard.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
@@ -29,6 +30,7 @@
 #include <librepcb/project/project.h>
 #include <librepcb/project/library/projectlibrary.h>
 #include <librepcb/project/schematics/schematic.h>
+#include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceadd.h>
@@ -50,7 +52,7 @@ CmdAddSymbolToSchematic::CmdAddSymbolToSchematic(workspace::Workspace& workspace
     UndoCommandGroup(tr("Add symbol")),
     mWorkspace(workspace), mSchematic(schematic), mComponentInstance(cmpInstance),
     mSymbolItemUuid(symbolItem), mPosition(position), mAngle(angle),
-    mCmdAddToSchematic(nullptr)
+    mSymbolInstance(nullptr)
 {
 }
 
@@ -59,21 +61,14 @@ CmdAddSymbolToSchematic::~CmdAddSymbolToSchematic() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-SI_Symbol* CmdAddSymbolToSchematic::getSymbolInstance() const noexcept
-{
-    Q_ASSERT(mCmdAddToSchematic);
-    return mCmdAddToSchematic ? mCmdAddToSchematic->getSymbolInstance() : nullptr;
-}
-
-/*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
 bool CmdAddSymbolToSchematic::performExecute()
 {
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
+
     // get the symbol UUID
     const library::ComponentSymbolVariantItem& item = *mComponentInstance.getSymbolVariant().getSymbolItems().get(mSymbolItemUuid); // can throw
     Uuid symbolUuid = item.getSymbolUuid();
@@ -90,16 +85,18 @@ bool CmdAddSymbolToSchematic::performExecute()
         library::Symbol* sym = new library::Symbol(symFp, true);
         CmdProjectLibraryAddElement<library::Symbol>* cmdAddToLibrary =
             new CmdProjectLibraryAddElement<library::Symbol>(mSchematic.getProject().getLibrary(), *sym);
-        appendChild(cmdAddToLibrary); // can throw
+        execNewChildCmd(cmdAddToLibrary); // can throw
     }
 
-    // create child command to add a new symbol instance to the schematic
-    mCmdAddToSchematic = new CmdSymbolInstanceAdd(mSchematic, mComponentInstance,
-                                                  mSymbolItemUuid, mPosition, mAngle);
-    appendChild(mCmdAddToSchematic); // can throw
+    // create the new symbol (schematic takes ownership)
+    mSymbolInstance = new SI_Symbol(mSchematic, mComponentInstance, mSymbolItemUuid,
+                                    mPosition, mAngle); // can throw
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+    // add a new symbol instance to the schematic
+    execNewChildCmd(new CmdSymbolInstanceAdd(*mSymbolInstance)); // can throw
+
+    undoScopeGuard.dismiss(); // no undo required
+    return true;
 }
 
 /*****************************************************************************************

@@ -42,11 +42,12 @@ namespace project {
  ****************************************************************************************/
 
 NetSignal::NetSignal(Circuit& circuit, const SExpression& node) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false)
+    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<QString>("name", true)),
+    mHasAutoName(node.getValueByPath<bool>("auto")),
+    mNetClass(nullptr)
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mHasAutoName = node.getValueByPath<bool>("auto");
     Uuid netclassUuid = node.getValueByPath<Uuid>("netclass");
     mNetClass = circuit.getNetClassByUuid(netclassUuid);
     if (!mNetClass) {
@@ -253,7 +254,6 @@ void NetSignal::serialize(SExpression& root) const
 
 bool NetSignal::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mName.isEmpty())        return false;
     if (mNetClass == nullptr)   return false;
     return true;

@@ -83,12 +83,10 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
 }
 
 BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node) :
-    BI_Base(board), mUuid(), mNetSignal(nullptr)
+    BI_Base(board), mUuid(node.getChildByIndex(0).getValue<Uuid>()), mNetSignal(nullptr)
 {
     try
     {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>();
-
         Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
         mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
@@ -503,7 +501,6 @@ void BI_NetSegment::setSelected(bool selected) noexcept
 
 bool BI_NetSegment::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                         return false;
     if (mNetSignal == nullptr)                  return false;
     if (!areAllNetPointsConnectedTogether())    return false;
     return true;

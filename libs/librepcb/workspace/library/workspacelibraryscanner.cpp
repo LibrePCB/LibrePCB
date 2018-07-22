@@ -199,7 +199,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
             query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibrariesPath()));
             query.bindValue(":uuid",        element.getUuid().toStr());
             query.bindValue(":version",     element.getVersion().toStr());
-            query.bindValue(":parent_uuid", element.getParentUuid().isNull() ? QVariant(QVariant::String) : element.getParentUuid().toStr());
+            query.bindValue(":parent_uuid", element.getParentUuid() ? element.getParentUuid()->toStr() : QVariant(QVariant::String));
             int id = db.insert(query);
             foreach (const QString& locale, element.getAllAvailableLocales()) {
                 QSqlQuery query = db.prepareQuery(
@@ -252,7 +252,6 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<Fil
                 db.insert(query);
             }
             foreach (const Uuid& categoryUuid, element.getCategories()) {
-                Q_ASSERT(!categoryUuid.isNull());
                 QSqlQuery query = db.prepareQuery(
                     "INSERT INTO " % table % "_cat "
                     "(" % idColumn % ", category_uuid) VALUES "
@@ -301,7 +300,6 @@ int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase& db, const QList<File
                 db.insert(query);
             }
             foreach (const Uuid& categoryUuid, element.getCategories()) {
-                Q_ASSERT(!categoryUuid.isNull());
                 QSqlQuery query = db.prepareQuery(
                     "INSERT INTO " % table % "_cat "
                     "(" % idColumn % ", category_uuid) VALUES "

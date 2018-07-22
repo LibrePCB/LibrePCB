@@ -43,7 +43,7 @@ namespace editor {
 
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(workspace::Workspace& workspace,
         Project& project, const Uuid& component, const Uuid& symbolVariant,
-        const Uuid& defaultDevice) noexcept :
+        const tl::optional<Uuid>& defaultDevice) noexcept :
     UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace), mProject(project),
     mComponentUuid(component), mSymbVarUuid(symbolVariant),

@@ -52,7 +52,7 @@ namespace project {
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName):
     QObject(&project), AttributeProvider(), mProject(project), mFilePath(filepath),
-    mIsAddedToProject(false)
+    mIsAddedToProject(false), mUuid(Uuid::createRandom())
 {
     try
     {
@@ -64,7 +64,6 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             mFile.reset(SmartSExprFile::create(mFilePath));
 
             // set attributes
-            mUuid = Uuid::createRandom();
             mName = newName;
 
             // load default grid properties
@@ -483,7 +482,6 @@ void Schematic::updateIcon() noexcept
 
 bool Schematic::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())     return false;
     if (mName.isEmpty())    return false;
     return true;
 }

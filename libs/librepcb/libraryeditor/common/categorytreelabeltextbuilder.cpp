@@ -74,14 +74,15 @@ void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(const QString& erro
  ****************************************************************************************/
 
 template <typename ElementType>
-bool CategoryTreeLabelTextBuilder<ElementType>::updateText(const Uuid& category, const QString& lastLine) noexcept
+bool CategoryTreeLabelTextBuilder<ElementType>::updateText(const tl::optional<Uuid>& category,
+                                                           const QString& lastLine) noexcept
 {
     try {
         QList<Uuid> uuids;
-        if (!category.isNull()) {
-            uuids.append(category);
-            uuids.append(getCategoryParents(category)); // can throw
-            if (!mEndlessRecursionUuid.isNull() && uuids.contains(mEndlessRecursionUuid)) {
+        if (category) {
+            uuids.append(*category);
+            uuids.append(getCategoryParents(*category)); // can throw
+            if (mEndlessRecursionUuid && uuids.contains(*mEndlessRecursionUuid)) {
                 throw RuntimeError(__FILE__, __LINE__, tr("Endless recursion detected!"));
             }
         }

@@ -38,11 +38,10 @@ namespace project {
  ****************************************************************************************/
 
 NetClass::NetClass(Circuit& circuit, const SExpression& node) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false)
+    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<QString>("name", true))
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -142,7 +141,6 @@ void NetClass::serialize(SExpression& root) const
 
 bool NetClass::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())     return false;
     if (mName.isEmpty())    return false;
     return true;
 }

@@ -96,10 +96,6 @@ class ComponentSymbolVariantItem final : public SerializableObject
         ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
         Uuid mSymbolUuid;

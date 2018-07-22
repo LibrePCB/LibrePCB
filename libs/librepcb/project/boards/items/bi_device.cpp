@@ -136,11 +136,11 @@ void BI_Device::init()
 {
     // check pad-signal-map
     for (const library::DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
-        Uuid signalUuid = item.getSignalUuid();
-        if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid))) {
+        tl::optional<Uuid> signalUuid = item.getSignalUuid();
+        if ((signalUuid) && (!mCompInstance->getSignalInstance(*signalUuid))) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
-                .arg(signalUuid.toStr(), mLibDevice->getUuid().toStr()));
+                .arg(signalUuid->toStr(), mLibDevice->getUuid().toStr()));
         }
     }
 

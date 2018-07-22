@@ -112,7 +112,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept
 {
     try {
         QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
-        Uuid pkgPad = Uuid(mUi->cbxPackagePad->currentData().toString());
+        Uuid pkgPad = Uuid::fromString(mUi->cbxPackagePad->currentData().toString()); // can throw
         cmd->setPackagePadUuid(pkgPad, false);
         if (mUi->rbtnBoardSideTop->isChecked()) {
             cmd->setBoardSide(FootprintPad::BoardSide::TOP, false);

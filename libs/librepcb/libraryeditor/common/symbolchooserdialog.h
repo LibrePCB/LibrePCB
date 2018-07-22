@@ -76,7 +76,7 @@ class SymbolChooserDialog final : public QDialog
         ~SymbolChooserDialog() noexcept;
 
         // Getters
-        Uuid getSelectedSymbolUuid() const noexcept;
+        tl::optional<Uuid> getSelectedSymbolUuid() const noexcept;
         QString getSelectedSymbolNameTr() const noexcept;
         QString getSelectedSymbolDescriptionTr() const noexcept;
 
@@ -90,7 +90,7 @@ class SymbolChooserDialog final : public QDialog
         void listSymbols_currentItemChanged(QListWidgetItem* current,
                                             QListWidgetItem* previous) noexcept;
         void listSymbols_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const Uuid& uuid) noexcept;
+        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
         void setSelectedSymbol(const FilePath& fp) noexcept;
         void accept() noexcept override;
         const QStringList& localeOrder() const noexcept;
@@ -102,7 +102,7 @@ class SymbolChooserDialog final : public QDialog
         QScopedPointer<Ui::SymbolChooserDialog> mUi;
         QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
         QScopedPointer<GraphicsScene> mPreviewScene;
-        Uuid mSelectedCategoryUuid;
+        tl::optional<Uuid> mSelectedCategoryUuid;
         QScopedPointer<Symbol> mSelectedSymbol;
         QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
 };

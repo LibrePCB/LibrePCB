@@ -37,19 +37,8 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(Schematic& schematic,
-        ComponentInstance& cmpInstance, const Uuid& symbolItem, const Point& position,
-        const Angle& angle) noexcept :
-    UndoCommand(tr("Add symbol instance")),
-    mSchematic(schematic), mComponentInstance(&cmpInstance), mSymbolItemUuid(symbolItem),
-    mPosition(position), mAngle(angle), mSymbolInstance(nullptr)
-{
-}
-
 CmdSymbolInstanceAdd::CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept :
-    UndoCommand(tr("Add symbol instance")),
-    mSchematic(symbol.getSchematic()), mComponentInstance(nullptr), mSymbolItemUuid(),
-    mPosition(), mAngle(), mSymbolInstance(&symbol)
+    UndoCommand(tr("Add symbol instance")), mSymbolInstance(symbol)
 {
 }
 
@@ -63,25 +52,18 @@ CmdSymbolInstanceAdd::~CmdSymbolInstanceAdd() noexcept
 
 bool CmdSymbolInstanceAdd::performExecute()
 {
-    if (!mSymbolInstance) {
-        // create new symbol instance
-        mSymbolInstance = new SI_Symbol(mSchematic, *mComponentInstance, mSymbolItemUuid,
-                                        mPosition, mAngle); // can throw
-    }
-
     performRedo(); // can throw
-
     return true;
 }
 
 void CmdSymbolInstanceAdd::performUndo()
 {
-    mSchematic.removeSymbol(*mSymbolInstance); // can throw
+    mSymbolInstance.getSchematic().removeSymbol(mSymbolInstance); // can throw
 }
 
 void CmdSymbolInstanceAdd::performRedo()
 {
-    mSchematic.addSymbol(*mSymbolInstance); // can throw
+    mSymbolInstance.getSchematic().addSymbol(mSymbolInstance); // can throw
 }
 
 /*****************************************************************************************

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdadddevicetoboard.h"
+#include <librepcb/common/scopeguard.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/device.h>
@@ -32,6 +33,7 @@
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
+#include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceadd.h>
 
 /*****************************************************************************************
@@ -46,13 +48,14 @@ namespace editor {
  ****************************************************************************************/
 
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
-        ComponentInstance& cmpInstance, const Uuid& deviceUuid, const Uuid& footprintUuid,
-        const Point& position, const Angle& rotation, bool mirror) noexcept :
+        ComponentInstance& cmpInstance, const Uuid& deviceUuid,
+        const tl::optional<Uuid>& footprintUuid, const Point& position,
+        const Angle& rotation, bool mirror) noexcept :
     UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace), mBoard(board), mComponentInstance(cmpInstance),
     mDeviceUuid(deviceUuid), mFootprintUuid(footprintUuid), mPosition(position),
     mRotation(rotation), mMirror(mirror),
-    mCmdAddToBoard(nullptr)
+    mDeviceInstance(nullptr)
 {
 }
 
@@ -61,21 +64,14 @@ CmdAddDeviceToBoard::~CmdAddDeviceToBoard() noexcept
 }
 
 /*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-BI_Device* CmdAddDeviceToBoard::getDeviceInstance() const noexcept
-{
-    Q_ASSERT(mCmdAddToBoard);
-    return mCmdAddToBoard ? mCmdAddToBoard->getDeviceInstance() : nullptr;
-}
-
-/*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
 bool CmdAddDeviceToBoard::performExecute()
 {
+    // if an error occurs, undo all already executed child commands
+    auto undoScopeGuard = scopeGuard([&](){performUndo();});
+
     // if there is no such device in the project's library, copy it from the
     // workspace library to the project's library
     library::Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
@@ -89,7 +85,7 @@ bool CmdAddDeviceToBoard::performExecute()
         dev = new library::Device(devFp, true);
         CmdProjectLibraryAddElement<library::Device>* cmdAddToLibrary =
             new CmdProjectLibraryAddElement<library::Device>(mBoard.getProject().getLibrary(), *dev);
-        appendChild(cmdAddToLibrary); // can throw
+        execNewChildCmd(cmdAddToLibrary); // can throw
     }
     Q_ASSERT(dev);
 
@@ -107,22 +103,28 @@ bool CmdAddDeviceToBoard::performExecute()
         pkg = new library::Package(pkgFp, true);
         CmdProjectLibraryAddElement<library::Package>* cmdAddToLibrary =
             new CmdProjectLibraryAddElement<library::Package>(mBoard.getProject().getLibrary(), *pkg);
-        appendChild(cmdAddToLibrary); // can throw
+        execNewChildCmd(cmdAddToLibrary); // can throw
     }
     Q_ASSERT(pkg);
 
     // TODO: remove this!
-    if (mFootprintUuid.isNull() && pkg->getFootprints().count() > 0) {
+    if (!mFootprintUuid && pkg->getFootprints().count() > 0) {
         mFootprintUuid = pkg->getFootprints().first()->getUuid();
     }
+    if (!mFootprintUuid) {
+        throw RuntimeError(__FILE__, __LINE__,QString(
+            tr("Package does not have any footprints: %1")).arg(pkg->getUuid().toStr()));
+    }
 
-    // create child command to add a new device instance to the board
-    mCmdAddToBoard = new CmdDeviceInstanceAdd(mBoard, mComponentInstance, mDeviceUuid,
-                                              mFootprintUuid, mPosition, mRotation, mMirror);
-    appendChild(mCmdAddToBoard); // can throw
+    // create new device (ownership by board)
+    mDeviceInstance = new BI_Device(mBoard, mComponentInstance, mDeviceUuid,
+                                    *mFootprintUuid, mPosition, mRotation, mMirror); // can throw
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+    // add a new device instance to the board
+    execNewChildCmd(new CmdDeviceInstanceAdd(*mDeviceInstance)); // can throw
+
+    undoScopeGuard.dismiss(); // no undo required
+    return true;
 }
 
 /*****************************************************************************************

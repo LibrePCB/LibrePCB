@@ -44,21 +44,18 @@ ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept
     QObject(nullptr), mUuid(uuid), mName(name), mRole(SignalRole::passive()),
     mForcedNetName(), mIsRequired(false), mIsNegated(false), mIsClock(false)
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
 ComponentSignal::ComponentSignal(const SExpression& node) :
-    QObject(nullptr)
+    QObject(nullptr),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<QString>("name", true)),
+    mRole(node.getValueByPath<SignalRole>("role")),
+    mForcedNetName(node.getValueByPath<QString>("forced_net")),
+    mIsRequired(node.getValueByPath<bool>("required")),
+    mIsNegated(node.getValueByPath<bool>("negated")),
+    mIsClock(node.getValueByPath<bool>("clock"))
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mRole = node.getValueByPath<SignalRole>("role");
-    mForcedNetName = node.getValueByPath<QString>("forced_net");
-    mIsRequired = node.getValueByPath<bool>("required");
-    mIsNegated = node.getValueByPath<bool>("negated");
-    mIsClock = node.getValueByPath<bool>("clock");
-
     // backward compatibility - remove this some time!
     mForcedNetName.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mForcedNetName.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
@@ -176,7 +173,6 @@ ComponentSignal& ComponentSignal::operator=(const ComponentSignal& rhs) noexcept
 
 bool ComponentSignal::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())     return false;
     if (mName.isEmpty())    return false;
     return true;
 }

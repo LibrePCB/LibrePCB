@@ -73,7 +73,6 @@ class LibraryElement : public LibraryBaseElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         virtual void serialize(SExpression& root) const override;
-        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes
         QSet<Uuid> mCategories;

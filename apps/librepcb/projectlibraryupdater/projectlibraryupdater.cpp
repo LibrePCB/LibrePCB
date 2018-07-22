@@ -167,8 +167,9 @@ void ProjectLibraryUpdater::updateElements(const QString& type,
     FilePath dir = mProjectFilePath.getParentDir().getPathTo("library").getPathTo(type);
     QDir::Filters filters = QDir::Dirs | QDir::NoDotAndDotDot;
     foreach (const QFileInfo& info, QDir(dir.toStr()).entryInfoList(filters)) {
+        tl::optional<Uuid> uuid = Uuid::tryFromString(info.baseName());
         FilePath dst(info.absoluteFilePath());
-        FilePath src = (mWorkspace.getLibraryDb().*getter)(Uuid(info.baseName()));
+        FilePath src = uuid ? (mWorkspace.getLibraryDb().*getter)(*uuid) : FilePath();
         if (src.isValid() && !dst.isEmptyDir()) {
             log(QString(tr("Update %1...")).arg(prettyPath(dst)));
             FileUtils::removeDirRecursively(dst);

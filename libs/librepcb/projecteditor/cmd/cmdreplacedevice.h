@@ -56,7 +56,7 @@ class CmdReplaceDevice final : public UndoCommandGroup
 
         // Constructors / Destructor
         CmdReplaceDevice(workspace::Workspace& workspace, Board& board, BI_Device& device,
-                         const Uuid& newDeviceUuid, const Uuid& newFootprintUuid) noexcept;
+                         const Uuid& newDeviceUuid, const tl::optional<Uuid>& newFootprintUuid) noexcept;
         ~CmdReplaceDevice() noexcept;
 
 
@@ -75,7 +75,7 @@ class CmdReplaceDevice final : public UndoCommandGroup
         Board& mBoard;
         BI_Device& mDeviceInstance;
         Uuid mNewDeviceUuid;
-        Uuid mNewFootprintUuid;
+        tl::optional<Uuid> mNewFootprintUuid;
 };
 
 /*****************************************************************************************

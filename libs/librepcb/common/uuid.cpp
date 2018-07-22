@@ -21,6 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <QRegularExpressionValidator>
 #include "uuid.h"
 
 /*****************************************************************************************
@@ -29,33 +30,51 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-bool Uuid::setUuid(const QString& uuid) noexcept
-{
-    mUuid = QString(); // make UUID invalid
-    QString lowercaseUuid = uuid.toLower();
-    if (lowercaseUuid.length() != 36)       return false; // do NOT accept '{' and '}'
-    QUuid quuid(lowercaseUuid);
-    if (quuid.isNull())                     return false;
-    if (quuid.variant() != QUuid::DCE)      return false;
-    if (quuid.version() != QUuid::Random)   return false;
-    mUuid = lowercaseUuid;
-    return true;
-}
-
-/*****************************************************************************************
  *  Static Methods
  ****************************************************************************************/
 
+bool Uuid::isValid(const QString& str) noexcept
+{
+    // check format of string (only accept EXACT matches!)
+    QRegularExpression re("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+    QRegularExpressionMatch match = re.match(str, 0, QRegularExpression::PartialPreferCompleteMatch);
+    if (!match.hasMatch()) return false;
+
+    // check type of uuid
+    QUuid quuid(str);
+    if (quuid.isNull())                     return false;
+    if (quuid.variant() != QUuid::DCE)      return false;
+    if (quuid.version() != QUuid::Random)   return false;
+    return true;
+}
+
 Uuid Uuid::createRandom() noexcept
 {
-    Uuid uuid(QUuid::createUuid().toString().remove("{").remove("}"));
-    if (uuid.isNull()) {
-        qCritical() << "Could not generate a valid random UUID!";
+    QString str = QUuid::createUuid().toString().remove("{").remove("}").toLower();
+    if (isValid(str)) {
+        return Uuid(str);
+    } else {
+        qFatal("Not able to generate valid random UUID!"); // calls abort()!
     }
-    return uuid;
+}
+
+Uuid Uuid::fromString(const QString& str)
+{
+    if (isValid(str)) {
+        return Uuid(str);
+    } else {
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString(tr("String is not a valid UUID: \"%1\"")).arg(str));
+    }
+}
+
+tl::optional<Uuid> Uuid::tryFromString(const QString& str) noexcept
+{
+    if (isValid(str)) {
+        return Uuid(str);
+    } else {
+        return tl::nullopt;
+    }
 }
 
 /*****************************************************************************************

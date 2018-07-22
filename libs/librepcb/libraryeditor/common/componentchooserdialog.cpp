@@ -63,12 +63,12 @@ ComponentChooserDialog::ComponentChooserDialog(const workspace::Workspace& ws,
     connect(mUi->listComponents, &QListWidget::itemDoubleClicked,
             this, &ComponentChooserDialog::listComponents_itemDoubleClicked);
 
-    setSelectedComponent(Uuid());
+    setSelectedComponent(tl::nullopt);
 }
 
 ComponentChooserDialog::~ComponentChooserDialog() noexcept
 {
-    setSelectedComponent(Uuid());
+    setSelectedComponent(tl::nullopt);
 }
 
 /*****************************************************************************************
@@ -79,7 +79,7 @@ void ComponentChooserDialog::treeCategories_currentItemChanged(const QModelIndex
                                                             const QModelIndex& previous) noexcept
 {
     Q_UNUSED(previous);
-    setSelectedCategory(Uuid(current.data(Qt::UserRole).toString()));
+    setSelectedCategory(Uuid::tryFromString(current.data(Qt::UserRole).toString()));
 }
 
 void ComponentChooserDialog::listComponents_currentItemChanged(QListWidgetItem* current,
@@ -87,25 +87,25 @@ void ComponentChooserDialog::listComponents_currentItemChanged(QListWidgetItem* 
 {
     Q_UNUSED(previous);
     if (current) {
-        setSelectedComponent(Uuid(current->data(Qt::UserRole).toString()));
+        setSelectedComponent(Uuid::tryFromString(current->data(Qt::UserRole).toString()));
     } else {
-        setSelectedComponent(Uuid());
+        setSelectedComponent(tl::nullopt);
     }
 }
 
 void ComponentChooserDialog::listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept
 {
     if (item) {
-        setSelectedComponent(Uuid(item->data(Qt::UserRole).toString()));
+        setSelectedComponent(Uuid::tryFromString(item->data(Qt::UserRole).toString()));
         accept();
     }
 }
 
-void ComponentChooserDialog::setSelectedCategory(const Uuid& uuid) noexcept
+void ComponentChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept
 {
-    if ((uuid == mSelectedCategoryUuid) && (!uuid.isNull())) return;
+    if (uuid && (uuid == mSelectedCategoryUuid)) return;
 
-    setSelectedComponent(Uuid());
+    setSelectedComponent(tl::nullopt);
     mUi->listComponents->clear();
 
     mSelectedCategoryUuid = uuid;
@@ -129,16 +129,16 @@ void ComponentChooserDialog::setSelectedCategory(const Uuid& uuid) noexcept
     }
 }
 
-void ComponentChooserDialog::setSelectedComponent(const Uuid& uuid) noexcept
+void ComponentChooserDialog::setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept
 {
     QString uuidStr = "00000000-0000-0000-0000-000000000000";
     QString name, desc;
     mSelectedComponentUuid = uuid;
 
-    if (!uuid.isNull()) {
+    if (uuid) {
         try {
-            uuidStr = uuid.toStr();
-            mComponentFilePath = mWorkspace.getLibraryDb().getLatestComponent(uuid); // can throw
+            uuidStr = uuid->toStr();
+            mComponentFilePath = mWorkspace.getLibraryDb().getLatestComponent(*uuid); // can throw
 
             mWorkspace.getLibraryDb().getElementTranslations<Component>(
                 mComponentFilePath, localeOrder(), &name, &desc); // can throw
@@ -191,7 +191,7 @@ void ComponentChooserDialog::updatePreview() noexcept
 
 void ComponentChooserDialog::accept() noexcept
 {
-    if (mSelectedComponentUuid.isNull()) {
+    if (!mSelectedComponentUuid) {
         QMessageBox::information(this, tr("Invalid Selection"), tr("Please select a component."));
         return;
     }

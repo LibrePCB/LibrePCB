@@ -39,7 +39,8 @@ namespace project {
 
 ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
-    mFilepath(project.getPath().getPathTo("project/metadata.lp"))
+    mFilepath(project.getPath().getPathTo("project/metadata.lp")),
+    mUuid(Uuid::createRandom())
 {
     qDebug() << "load project metadata...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -47,7 +48,6 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
     if (create) {
         mFile.reset(SmartSExprFile::create(mFilepath));
 
-        mUuid = Uuid::createRandom();
         mName = mProject.getFilepath().getCompleteBasename();
         mAuthor = SystemInfo::getFullUsername();
         mVersion = "v1";
@@ -56,11 +56,8 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
         mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
         SExpression root = mFile->parseFileAndBuildDomTree();
 
-        if (root.getChildByIndex(0).isString()) {
+        if (root.getChildByIndex(0).isString()) { // backward compatibility, remove this some time!
             mUuid = root.getChildByIndex(0).getValue<Uuid>();
-        } else {
-            // backward compatibility, remove this some time!
-            mUuid = Uuid::createRandom();
         }
         mName = root.getValueByPath<QString>("name");
         mAuthor = root.getValueByPath<QString>("author");

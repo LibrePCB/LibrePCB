@@ -131,7 +131,7 @@ class NewElementWizardContext final : public QObject
         QString mElementKeywords;
         QString mElementAuthor;
         Version mElementVersion;
-        Uuid mElementCategoryUuid;
+        tl::optional<Uuid> mElementCategoryUuid;
 
         // symbol
         SymbolPinList mSymbolPins;
@@ -152,8 +152,8 @@ class NewElementWizardContext final : public QObject
         ComponentSymbolVariantList mComponentSymbolVariants;
 
         // device
-        Uuid mDeviceComponentUuid;
-        Uuid mDevicePackageUuid;
+        tl::optional<Uuid> mDeviceComponentUuid;
+        tl::optional<Uuid> mDevicePackageUuid;
         DevicePadSignalMap mDevicePadSignalMap;
 };
 

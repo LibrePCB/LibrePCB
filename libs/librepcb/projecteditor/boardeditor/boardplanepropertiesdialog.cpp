@@ -123,7 +123,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept
         QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane, true));
 
         // net signal
-        Uuid netSignalUuid(mUi->cbxNetSignal->currentData().toString());
+        Uuid netSignalUuid = Uuid::fromString(mUi->cbxNetSignal->currentData().toString()); // can throw
         NetSignal* netsignal = mPlane.getCircuit().getNetSignalByUuid(netSignalUuid);
         if (netsignal) {
             cmd->setNetSignal(*netsignal);

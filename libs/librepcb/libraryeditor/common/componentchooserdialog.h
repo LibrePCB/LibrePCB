@@ -78,7 +78,7 @@ class ComponentChooserDialog final : public QDialog
         ~ComponentChooserDialog() noexcept;
 
         // Getters
-        const Uuid& getSelectedComponentUuid() const noexcept {return mSelectedComponentUuid;}
+        const tl::optional<Uuid>& getSelectedComponentUuid() const noexcept {return mSelectedComponentUuid;}
 
         // Operator Overloadings
         ComponentChooserDialog& operator=(const ComponentChooserDialog& rhs) = delete;
@@ -90,8 +90,8 @@ class ComponentChooserDialog final : public QDialog
         void listComponents_currentItemChanged(QListWidgetItem* current,
                                                QListWidgetItem* previous) noexcept;
         void listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const Uuid& uuid) noexcept;
-        void setSelectedComponent(const Uuid& uuid) noexcept;
+        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+        void setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept;
         void updatePreview() noexcept;
         void accept() noexcept override;
         const QStringList& localeOrder() const noexcept;
@@ -102,8 +102,8 @@ class ComponentChooserDialog final : public QDialog
         const IF_GraphicsLayerProvider* mLayerProvider;
         QScopedPointer<Ui::ComponentChooserDialog> mUi;
         QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        Uuid mSelectedCategoryUuid;
-        Uuid mSelectedComponentUuid;
+        tl::optional<Uuid> mSelectedCategoryUuid;
+        tl::optional<Uuid> mSelectedComponentUuid;
 
         // preview
         FilePath mComponentFilePath;

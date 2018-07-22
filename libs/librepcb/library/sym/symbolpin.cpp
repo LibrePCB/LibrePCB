@@ -35,9 +35,13 @@ namespace library {
  ****************************************************************************************/
 
 SymbolPin::SymbolPin(const SymbolPin& other) noexcept :
+    mUuid(other.mUuid),
+    mName(other.mName),
+    mPosition(other.mPosition),
+    mLength(other.mLength),
+    mRotation(other.mRotation),
     mRegisteredGraphicsItem(nullptr)
 {
-    *this = other; // use assignment operator
 }
 
 SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
@@ -45,21 +49,18 @@ SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& positio
     mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation),
     mRegisteredGraphicsItem(nullptr)
 {
-    Q_ASSERT(!mUuid.isNull());
     Q_ASSERT(!mName.isEmpty());
     Q_ASSERT(mLength >= 0);
 }
 
 SymbolPin::SymbolPin(const SExpression& node) :
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<QString>("name", true)),
+    mPosition(node.getChildByPath("pos")),
+    mLength(node.getValueByPath<Length>("length")),
+    mRotation(node.getValueByPath<Angle>("rot")),
     mRegisteredGraphicsItem(nullptr)
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mLength = node.getValueByPath<Length>("length");
-
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -155,7 +156,6 @@ SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept
 
 bool SymbolPin::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())     return false;
     if (mLength < 0)        return false;
     if (mName.isEmpty())    return false;
     return true;

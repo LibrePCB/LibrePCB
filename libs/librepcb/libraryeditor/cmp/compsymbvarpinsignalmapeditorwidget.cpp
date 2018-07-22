@@ -86,8 +86,8 @@ void CompSymbVarPinSignalMapEditorWidget::setVariant(const workspace::Workspace&
     mWorkspace = &ws;
     mSignalList = &sigs;
     mSymbolVariant = &variant;
-    mSelectedItem = Uuid();
-    mSelectedPin = Uuid();
+    mSelectedItem = tl::nullopt;
+    mSelectedPin = tl::nullopt;
     updateTable();
 }
 
@@ -109,18 +109,22 @@ void CompSymbVarPinSignalMapEditorWidget::componentSignalChanged(int index) noex
 {
     QComboBox* cbx = dynamic_cast<QComboBox*>(sender()); Q_ASSERT(cbx);
     int row = getRowOfTableCellWidget(sender());
-    Uuid item = getItemUuidOfRow(row);
-    Uuid pin = getPinUuidOfRow(row);
-    Uuid signal(cbx->itemData(index, Qt::UserRole).toString());
-    setComponentSignal(item, pin, signal);
+    tl::optional<Uuid> item = getItemUuidOfRow(row);
+    tl::optional<Uuid> pin = getPinUuidOfRow(row);
+    tl::optional<Uuid> signal = Uuid::tryFromString(cbx->itemData(index, Qt::UserRole).toString());
+    if (item && pin) {
+        setComponentSignal(*item, *pin, signal);
+    }
 }
 
 void CompSymbVarPinSignalMapEditorWidget::displayTypeChanged(const CmpSigPinDisplayType& dt) noexcept
 {
     int row = getRowOfTableCellWidget(sender());
-    Uuid item = getItemUuidOfRow(row);
-    Uuid pin = getPinUuidOfRow(row);
-    setDisplayType(item, pin, dt);
+    tl::optional<Uuid> item = getItemUuidOfRow(row);
+    tl::optional<Uuid> pin = getPinUuidOfRow(row);
+    if (item && pin) {
+        setDisplayType(*item, *pin, dt);
+    }
 }
 
 void CompSymbVarPinSignalMapEditorWidget::btnAutoAssignSignalsClicked() noexcept
@@ -132,7 +136,7 @@ void CompSymbVarPinSignalMapEditorWidget::btnAutoAssignSignalsClicked() noexcept
             for (ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
                 QString pinName = symbol.getPins().get(map.getPinUuid())->getName();
                 std::shared_ptr<const ComponentSignal> signal = mSignalList->find(pinName);
-                map.setSignalUuid(signal ? signal->getUuid() : Uuid());
+                map.setSignalUuid(signal ? tl::make_optional(signal->getUuid()) : tl::nullopt);
             }
         }
     } catch (const Exception& e) {
@@ -146,7 +150,8 @@ void CompSymbVarPinSignalMapEditorWidget::btnAutoAssignSignalsClicked() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void CompSymbVarPinSignalMapEditorWidget::updateTable(Uuid selItem, Uuid selPin) noexcept
+void CompSymbVarPinSignalMapEditorWidget::updateTable(tl::optional<Uuid> selItem,
+                                                      tl::optional<Uuid> selPin) noexcept
 {
     blockSignals(true);
 
@@ -221,7 +226,8 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
     for (const ComponentSignal& sig : *mSignalList) {
         signalComboBox->addItem(sig.getName(), sig.getUuid().toStr());
     }
-    int currentIndex = signalComboBox->findData(map.getSignalUuid().toStr(), Qt::UserRole);
+    tl::optional<Uuid> currentSignal = map.getSignalUuid();
+    int currentIndex = currentSignal ? signalComboBox->findData(currentSignal->toStr(), Qt::UserRole) : -1;
     signalComboBox->setCurrentIndex(currentIndex > 0 ? currentIndex : 0);
     connect(signalComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &CompSymbVarPinSignalMapEditorWidget::componentSignalChanged);
@@ -243,7 +249,7 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
 }
 
 void CompSymbVarPinSignalMapEditorWidget::setComponentSignal(const Uuid& item,
-    const Uuid& pin, const Uuid& signal) noexcept
+    const Uuid& pin, const tl::optional<Uuid>& signal) noexcept
 {
     ComponentSymbolVariantItem& i = *mSymbolVariant->getSymbolItems().get(item);
     ComponentPinSignalMapItem& m =* i.getPinSignalMap().get(pin);
@@ -270,16 +276,16 @@ int CompSymbVarPinSignalMapEditorWidget::getRowOfTableCellWidget(QObject* obj) c
     return row;
 }
 
-Uuid CompSymbVarPinSignalMapEditorWidget::getItemUuidOfRow(int row) const noexcept
+tl::optional<Uuid> CompSymbVarPinSignalMapEditorWidget::getItemUuidOfRow(int row) const noexcept
 {
     QTableWidgetItem* item = mTable->item(row, COLUMN_SYMBOL);
-    return Uuid(item ? item->data(Qt::UserRole).toString() : QString());
+    return item ? Uuid::tryFromString(item->data(Qt::UserRole).toString()) : tl::nullopt;
 }
 
-Uuid CompSymbVarPinSignalMapEditorWidget::getPinUuidOfRow(int row) const noexcept
+tl::optional<Uuid> CompSymbVarPinSignalMapEditorWidget::getPinUuidOfRow(int row) const noexcept
 {
     QTableWidgetItem* item = mTable->item(row, COLUMN_PIN);
-    return Uuid(item ? item->data(Qt::UserRole).toString() : QString());
+    return item ? Uuid::tryFromString(item->data(Qt::UserRole).toString()) : tl::nullopt;
 }
 
 int CompSymbVarPinSignalMapEditorWidget::getTotalPinCount() const noexcept

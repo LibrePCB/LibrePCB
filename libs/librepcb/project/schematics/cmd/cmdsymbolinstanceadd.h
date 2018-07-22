@@ -50,19 +50,11 @@ class CmdSymbolInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdSymbolInstanceAdd(Schematic& schematic, ComponentInstance& cmpInstance,
-                             const Uuid& symbolItem, const Point& position = Point(),
-                             const Angle& angle = Angle()) noexcept;
         explicit CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept;
         ~CmdSymbolInstanceAdd() noexcept;
 
-        // Getters
-        SI_Symbol* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
-
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
@@ -74,17 +66,8 @@ class CmdSymbolInstanceAdd final : public UndoCommand
         void performRedo() override;
 
 
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Schematic& mSchematic;
-        ComponentInstance* mComponentInstance;
-        Uuid mSymbolItemUuid;
-        Point mPosition;
-        Angle mAngle;
-
-        /// @brief The created symbol instance
-        SI_Symbol* mSymbolInstance;
+    private: // Data
+        SI_Symbol& mSymbolInstance;
 };
 
 /*****************************************************************************************

@@ -380,7 +380,7 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(bool checked) noexcept
             QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
             auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
                                mUi->lstRepoLibs->itemWidget(item));
-            if (widget && (libs.contains(widget->getUuid()))) {
+            if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
                 widget->setChecked(true);
             }
         }
@@ -391,8 +391,8 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(bool checked) noexcept
             QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
             auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
                                mUi->lstRepoLibs->itemWidget(item));
-            if (widget && widget->isChecked()) {
-                libs.insert(widget->getUuid());
+            if (widget && widget->isChecked() && widget->getUuid()) {
+                libs.insert(*widget->getUuid());
             }
         }
         for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {

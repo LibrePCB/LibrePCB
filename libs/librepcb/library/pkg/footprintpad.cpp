@@ -36,9 +36,16 @@ namespace library {
  ****************************************************************************************/
 
 FootprintPad::FootprintPad(const FootprintPad& other) noexcept :
+    mPackagePadUuid(other.mPackagePadUuid),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mShape(other.mShape),
+    mWidth(other.mWidth),
+    mHeight(other.mHeight),
+    mDrillDiameter(other.mDrillDiameter),
+    mBoardSide(other.mBoardSide),
     mRegisteredGraphicsItem(nullptr)
 {
-    *this = other; // use assignment operator
 }
 
 FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
@@ -51,18 +58,16 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& r
 }
 
 FootprintPad::FootprintPad(const SExpression& node) :
+    mPackagePadUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot")),
+    mShape(node.getValueByPath<Shape>("shape")),
+    mWidth(Point(node.getChildByPath("size")).getX()),
+    mHeight(Point(node.getChildByPath("size")).getY()),
+    mDrillDiameter(node.getValueByPath<Length>("drill")),
+    mBoardSide(node.getValueByPath<BoardSide>("side")),
     mRegisteredGraphicsItem(nullptr)
 {
-    // read attributes
-    mPackagePadUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mBoardSide = node.getValueByPath<BoardSide>("side");
-    mShape = node.getValueByPath<Shape>("shape");
-    mDrillDiameter = node.getValueByPath<Length>("drill");
-    mWidth = Point(node.getChildByPath("size")).getX();
-    mHeight = Point(node.getChildByPath("size")).getY();
-
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -235,7 +240,6 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept
 
 bool FootprintPad::checkAttributesValidity() const noexcept
 {
-    if (mPackagePadUuid.isNull())                             return false;
     if (mWidth <= 0)                                return false;
     if (mHeight <= 0)                               return false;
     if (mDrillDiameter < 0)                         return false;

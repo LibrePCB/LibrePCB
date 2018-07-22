@@ -98,7 +98,7 @@ class ComponentSignalListEditorWidget final : public QWidget,
 
     private: // Methods
         void updateTable() noexcept;
-        void setTableRowContent(int row, const Uuid& uuid, const QString& name,
+        void setTableRowContent(int row, const tl::optional<Uuid>& uuid, const QString& name,
                                 /*const SignalRole& role,*/ bool required, /*bool negated,
                                 bool clock,*/ const QString& forcedNetName) noexcept;
         void addSignal(const QString& name, /*const SignalRole& role,*/ bool required,
@@ -111,7 +111,7 @@ class ComponentSignalListEditorWidget final : public QWidget,
         //void setIsClock(const Uuid& uuid, bool clock) noexcept;
         void setForcedNetName(const Uuid& uuid, const QString& netname) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
         void throwIfNameEmptyOrExists(const QString& name) const;
         static QString cleanName(const QString& name) noexcept;
         static QString cleanForcedNetName(const QString& name) noexcept;
@@ -128,7 +128,7 @@ class ComponentSignalListEditorWidget final : public QWidget,
         QTableWidget* mTable;
         UndoStack* mUndoStack;
         ComponentSignalList* mSignalList;
-        Uuid mSelectedSignal;
+        tl::optional<Uuid> mSelectedSignal;
 };
 
 /*****************************************************************************************

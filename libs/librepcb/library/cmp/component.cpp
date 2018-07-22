@@ -73,17 +73,23 @@ Component::~Component() noexcept
 std::shared_ptr<ComponentSignal> Component::getSignalOfPin(
     const Uuid& symbVar, const Uuid& item, const Uuid& pin)
 {
-    Uuid sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
-    if (sig.isNull()) return std::shared_ptr<ComponentSignal>(nullptr);
-    return mSignals.get(sig); // can throw
+    tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
+    if (sig) {
+        return mSignals.get(*sig); // can throw
+    } else {
+         return std::shared_ptr<ComponentSignal>(nullptr);
+    }
 }
 
 std::shared_ptr<const ComponentSignal> Component::getSignalOfPin(const Uuid& symbVar,
     const Uuid& item, const Uuid& pin) const
 {
-    Uuid sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
-    if (sig.isNull()) return std::shared_ptr<const ComponentSignal>(nullptr);
-    return mSignals.get(sig); // can throw
+    tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
+    if (sig) {
+        return mSignals.get(*sig); // can throw
+    } else {
+         return std::shared_ptr<const ComponentSignal>(nullptr);
+    }
 }
 
 std::shared_ptr<ComponentSymbolVariantItem> Component::getSymbVarItem(
@@ -120,8 +126,8 @@ bool Component::checkAttributesValidity() const noexcept
     for (const ComponentSymbolVariant& var : mSymbolVariants) {
         for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
             for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                if (!map.getSignalUuid().isNull()) {
-                    if (!mSignals.contains(map.getSignalUuid()))    return false;
+                if (map.getSignalUuid()) {
+                    if (!mSignals.contains(*map.getSignalUuid()))    return false;
                 }
             }
         }

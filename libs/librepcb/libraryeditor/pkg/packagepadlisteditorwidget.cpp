@@ -78,7 +78,7 @@ void PackagePadListEditorWidget::setReferences(PackagePadList& list, UndoStack* 
     if (mPadList) mPadList->unregisterObserver(this);
     mPadList = &list;
     mUndoStack = stack;
-    mSelectedPad = Uuid();
+    mSelectedPad = tl::nullopt;
     mPadList->registerObserver(this);
     updateTable();
 }
@@ -99,14 +99,15 @@ void PackagePadListEditorWidget::currentCellChanged(int currentRow, int currentC
 void PackagePadListEditorWidget::tableCellChanged(int row, int column) noexcept
 {
     QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
 
     if (isNewPadRow(row)) {
         if (column == COLUMN_NAME) {
             item->setText(cleanName(item->text()));
         }
-    } else if (isExistingPadRow(row)) {
+    } else if (isExistingPadRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            item->setText(setName(getUuidOfRow(row), cleanName(item->text())));
+            item->setText(setName(*uuid, cleanName(item->text())));
         }
     }
 }
@@ -114,12 +115,13 @@ void PackagePadListEditorWidget::tableCellChanged(int row, int column) noexcept
 void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewPadRow(row)) {
         const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
         QString name = cleanName(nameItem->text());
         addPad(!name.isEmpty() ? name : getNextPadNameProposal());
-    } else if (isExistingPadRow(row)) {
-        removePad(getUuidOfRow(row));
+    } else if (isExistingPadRow(row) && uuid) {
+        removePad(*uuid);
     }
 }
 
@@ -127,7 +129,7 @@ void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void PackagePadListEditorWidget::updateTable(Uuid selected) noexcept
+void PackagePadListEditorWidget::updateTable(const tl::optional<Uuid>& selected) noexcept
 {
     mTable->blockSignals(true);
 
@@ -138,7 +140,7 @@ void PackagePadListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->setRowCount(mPadList->count() + 1);
 
     // special row for adding a new pad
-    setTableRowContent(newPadRow(), Uuid(), "");
+    setTableRowContent(newPadRow(), tl::nullopt, "");
 
     // existing signals
     for (int i = 0; i < mPadList->count(); ++i) {
@@ -159,13 +161,13 @@ void PackagePadListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->blockSignals(false);
 }
 
-void PackagePadListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
+void PackagePadListEditorWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                                                     const QString& name) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new pad:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new pad:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -245,12 +247,12 @@ int PackagePadListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noex
     return row;
 }
 
-Uuid PackagePadListEditorWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> PackagePadListEditorWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingPadRow(row)) {
         return mPadList->value(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 

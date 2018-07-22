@@ -77,7 +77,7 @@ class CategoryListEditorWidgetBase : public QWidget
 
 
     protected:
-        virtual Uuid chooseCategoryWithDialog() noexcept = 0;
+        virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept = 0;
         virtual FilePath getLatestCategory(const Uuid& category) const = 0;
         virtual QList<Uuid> getCategoryParents(const Uuid& category) const = 0;
         virtual QString getCategoryName(const FilePath& fp) const = 0;
@@ -86,9 +86,9 @@ class CategoryListEditorWidgetBase : public QWidget
     private:
         void btnAddClicked() noexcept;
         void btnRemoveClicked() noexcept;
-        void addItem(const Uuid& category) noexcept;
-        void addItem(const Uuid& category, const QStringList& lines) noexcept;
-        void addItem(const Uuid& category, const QString& text) noexcept;
+        void addItem(const tl::optional<Uuid>& category) noexcept;
+        void addItem(const tl::optional<Uuid>& category, const QStringList& lines) noexcept;
+        void addItem(const tl::optional<Uuid>& category, const QString& text) noexcept;
 
     signals:
         void categoryAdded(const Uuid& category);
@@ -127,7 +127,7 @@ class CategoryListEditorWidget final : public CategoryListEditorWidgetBase
 
 
     private:
-        Uuid chooseCategoryWithDialog() noexcept override;
+        tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
         FilePath getLatestCategory(const Uuid& category) const override;
         QList<Uuid> getCategoryParents(const Uuid& category) const override;
         QString getCategoryName(const FilePath& fp) const override;

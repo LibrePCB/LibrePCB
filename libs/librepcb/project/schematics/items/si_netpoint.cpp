@@ -46,11 +46,10 @@ namespace project {
  ****************************************************************************************/
 
 SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node) :
-    SI_Base(segment.getSchematic()), mNetSegment(segment), mSymbolPin(nullptr)
+    SI_Base(segment.getSchematic()), mNetSegment(segment),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mSymbolPin(nullptr)
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-
     const SExpression* symNode = node.tryGetChildByPath("sym");
     const SExpression* pinNode = node.tryGetChildByPath("pin");
     const SExpression* posNode = node.tryGetChildByPath("pos");
@@ -289,7 +288,6 @@ void SI_NetPoint::setSelected(bool selected) noexcept
 
 bool SI_NetPoint::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                             return false;
     if (isAttachedToPin() && (&mNetSegment.getNetSignal() != mSymbolPin->getCompSigInstNetSignal())) return false;
     return true;
 }

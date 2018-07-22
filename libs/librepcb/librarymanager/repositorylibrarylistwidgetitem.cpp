@@ -50,7 +50,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Work
     connect(mUi->cbxDownload, &QCheckBox::toggled,
             this, &RepositoryLibraryListWidgetItem::checkedChanged);
 
-    mUuid = Uuid(mJsonObject.value("uuid").toString());
+    mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
     mVersion = Version(mJsonObject.value("version").toString());
     mIsRecommended = mJsonObject.value("recommended").toBool();
     QString name = mJsonObject.value("name").toObject().value("default").toString();
@@ -58,9 +58,9 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Work
     QString author = mJsonObject.value("author").toString();
     QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
     foreach (const QJsonValue& value, mJsonObject.value("dependencies").toArray()) {
-        Uuid uuid(value.toString());
-        if (!uuid.isNull()) {
-            mDependencies.insert(uuid);
+        tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
+        if (uuid) {
+            mDependencies.insert(*uuid);
         } else {
             qWarning() << "Invalid dependency UUID:" << value.toString();
         }
@@ -107,35 +107,42 @@ void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept
 
 void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept
 {
-    Version installedVersion = mWorkspace.getVersionOfLibrary(mUuid, true, true);
-    if (installedVersion.isValid()) {
-        mUi->lblInstalledVersion->setText(QString(tr("Installed: v%1"))
-                                          .arg(installedVersion.toStr()));
-        mUi->lblInstalledVersion->setVisible(true);
-        if (installedVersion < mVersion) {
-            mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-            mUi->cbxDownload->setText(tr("Update"));
-            mUi->cbxDownload->setVisible(true);
+    if (mUuid) {
+        Version installedVersion = mWorkspace.getVersionOfLibrary(*mUuid, true, true);
+        if (installedVersion.isValid()) {
+            mUi->lblInstalledVersion->setText(QString(tr("Installed: v%1"))
+                                              .arg(installedVersion.toStr()));
+            mUi->lblInstalledVersion->setVisible(true);
+            if (installedVersion < mVersion) {
+                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+                mUi->cbxDownload->setText(tr("Update"));
+                mUi->cbxDownload->setVisible(true);
+            } else {
+                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
+                mUi->cbxDownload->setVisible(false);
+            }
         } else {
-            mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
-            mUi->cbxDownload->setVisible(false);
+            if (mIsRecommended) {
+                mUi->lblInstalledVersion->setText(tr("Recommended"));
+                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
+                mUi->lblInstalledVersion->setVisible(true);
+            } else {
+                mUi->lblInstalledVersion->setVisible(false);
+            }
+            mUi->cbxDownload->setText(tr("Install"));
+            mUi->cbxDownload->setVisible(true);
         }
     } else {
-        if (mIsRecommended) {
-            mUi->lblInstalledVersion->setText(tr("Recommended"));
-            mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
-            mUi->lblInstalledVersion->setVisible(true);
-        } else {
-            mUi->lblInstalledVersion->setVisible(false);
-        }
-        mUi->cbxDownload->setText(tr("Install"));
-        mUi->cbxDownload->setVisible(true);
+        mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+        mUi->lblInstalledVersion->setVisible(true);
+        mUi->cbxDownload->setVisible(false);
     }
 }
 
 void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept
 {
-    if (mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() && (!mLibraryDownload)) {
+    if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() && (!mLibraryDownload)) {
         mUi->cbxDownload->setVisible(false);
         mUi->prgProgress->setVisible(true);
 
@@ -145,7 +152,7 @@ void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept
         QByteArray zipSha256 = mJsonObject.value("download_sha256").toString().toUtf8();
 
         // determine destination directory
-        QString libDirName = mUuid.toStr() % ".lplib";
+        QString libDirName = mUuid->toStr() % ".lplib";
         FilePath destDir = mWorkspace.getLibrariesPath().getPathTo("remote/" % libDirName);
 
         // start download

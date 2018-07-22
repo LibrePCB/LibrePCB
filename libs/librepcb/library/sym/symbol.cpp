@@ -169,7 +169,7 @@ bool Symbol::checkAttributesValidity() const noexcept
     for (const SymbolPin& pin : mPins) {
         Uuid uuid = pin.getUuid();
         QString name = pin.getName();
-        if (uuid.isNull() || uuids.contains(uuid) || names.contains(name)) {
+        if (uuids.contains(uuid) || names.contains(name)) {
             return false;
         } else {
             uuids.append(uuid);

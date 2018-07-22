@@ -267,10 +267,10 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             QMenu* aChangeDeviceMenu = menu.addMenu(tr("Change Device"));
             aChangeDeviceMenu->setEnabled(devicesList.count() > 0);
             foreach (const Uuid& deviceUuid, devicesList) {
-                Uuid pkgUuid;
                 QString devName, pkgName;
                 FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);
                 mWorkspace.getLibraryDb().getElementTranslations<library::Device>(devFp, localeOrder, &devName);
+                Uuid pkgUuid = Uuid::createRandom(); // only for initialization, will be overwritten
                 mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
                 FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
                 mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
@@ -316,9 +316,9 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
                 }
             } else if (!action->data().toUuid().isNull()) {
                 try {
-                    Uuid uuid(action->data().toString());
+                    Uuid uuid = Uuid::fromString(action->data().toString()); // can throw
                     Uuid deviceUuid = devInst.getLibDevice().getUuid();
-                    Uuid footprintUuid = Uuid(); // TODO
+                    tl::optional<Uuid> footprintUuid;
                     if (devInst.getLibPackage().getFootprints().contains(uuid)) {
                         // change footprint
                         footprintUuid = uuid;

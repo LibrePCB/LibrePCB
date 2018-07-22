@@ -71,15 +71,6 @@ void LibraryElement::serialize(SExpression& root) const
     }
 }
 
-bool LibraryElement::checkAttributesValidity() const noexcept
-{
-    if (!LibraryBaseElement::checkAttributesValidity()) return false;
-    foreach (const Uuid& uuid, mCategories) {
-        if (uuid.isNull()) return false;
-    }
-    return true;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

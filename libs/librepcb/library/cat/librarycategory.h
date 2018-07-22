@@ -58,10 +58,10 @@ class LibraryCategory : public LibraryBaseElement
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes
-        const Uuid& getParentUuid() const noexcept {return mParentUuid;}
+        const tl::optional<Uuid>& getParentUuid() const noexcept {return mParentUuid;}
 
         // Setters: Attributes
-        void setParentUuid(const Uuid& parentUuid) noexcept {mParentUuid = parentUuid;}
+        void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept {mParentUuid = parentUuid;}
 
         // Operator Overloadings
         LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
@@ -76,7 +76,7 @@ class LibraryCategory : public LibraryBaseElement
         virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
-        Uuid mParentUuid;
+        tl::optional<Uuid> mParentUuid;
 };
 
 /*****************************************************************************************

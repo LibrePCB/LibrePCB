@@ -32,9 +32,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circle::Circle(const Circle& other) noexcept
+Circle::Circle(const Circle& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mLineWidth(other.mLineWidth),
+    mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea),
+    mCenter(other.mCenter),
+    mDiameter(other.mDiameter)
 {
-    *this = other; // use assignment operator
 }
 
 Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
@@ -50,19 +56,18 @@ Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWid
 {
 }
 
-Circle::Circle(const SExpression& node)
+Circle::Circle(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLineWidth(node.getValueByPath<Length>("width")),
+    mIsFilled(node.getValueByPath<bool>("fill")),
+    mIsGrabArea(node.getValueByPath<bool>("grab")),
+    mCenter(node.getChildByPath("pos")),
+    mDiameter(0)
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    } else {
-        // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
-    mLineWidth = node.getValueByPath<Length>("width");
-    mIsFilled = node.getValueByPath<bool>("fill");
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-    mCenter = Point(node.getChildByPath("pos"));
     if (node.tryGetChildByPath("dia")) {
         mDiameter = node.getValueByPath<Length>("dia");
     } else if (node.tryGetChildByPath("size")) {
@@ -209,7 +214,6 @@ Circle& Circle::operator=(const Circle& rhs) noexcept
 
 bool Circle::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mLayerName.isEmpty())   return false;
     if (mLineWidth < 0)         return false;
     if (mDiameter <= 0)         return false;

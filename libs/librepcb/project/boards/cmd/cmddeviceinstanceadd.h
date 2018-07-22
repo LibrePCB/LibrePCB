@@ -55,19 +55,11 @@ class CmdDeviceInstanceAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdDeviceInstanceAdd(Board& board, ComponentInstance& comp, const Uuid& deviceUuid,
-                             const Uuid& footprintUuid, const Point& position = Point(),
-                             const Angle& rotation = Angle(), bool mirror = false) noexcept;
         explicit CmdDeviceInstanceAdd(BI_Device& device) noexcept;
         ~CmdDeviceInstanceAdd() noexcept;
 
-        // Getters
-        BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
-
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
@@ -79,19 +71,8 @@ class CmdDeviceInstanceAdd final : public UndoCommand
         void performRedo() override;
 
 
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Board& mBoard;
-        ComponentInstance* mComponentInstance;
-        Uuid mDeviceUuid;
-        Uuid mFootprintUuid;
-        Point mPosition;
-        Angle mRotation;
-        bool mMirror;
-
-        /// @brief The created device instance
-        BI_Device* mDeviceInstance;
+    private: // Data
+        BI_Device& mDeviceInstance;
 };
 
 /*****************************************************************************************

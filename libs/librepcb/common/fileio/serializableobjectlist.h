@@ -139,14 +139,21 @@ class SerializableObjectList : public SerializableObject
         // Getters
         bool isEmpty() const noexcept {return mObjects.empty();}
         int count() const noexcept {return mObjects.count();}
-        QVector<Uuid> getUuids() const noexcept {
-            QVector<Uuid> uuids;
+        std::vector<Uuid> getUuids() const noexcept {
+            std::vector<Uuid> uuids;
             uuids.reserve(mObjects.count());
-            foreach (const std::shared_ptr<T>& obj, mObjects) { uuids.append(obj->getUuid()); }
+            foreach (const std::shared_ptr<T>& obj, mObjects) {
+                uuids.push_back(obj->getUuid());
+            }
             return uuids;
         }
         QSet<Uuid> getUuidSet() const noexcept {
-            return getUuids().toList().toSet();
+            QSet<Uuid> uuids;
+            uuids.reserve(mObjects.count());
+            foreach (const std::shared_ptr<T>& obj, mObjects) {
+                uuids.insert(obj->getUuid());
+            }
+            return uuids;
         }
 
         // Element Query

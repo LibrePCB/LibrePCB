@@ -74,9 +74,9 @@ SymbolChooserDialog::~SymbolChooserDialog() noexcept
  *  Getters
  ****************************************************************************************/
 
-Uuid SymbolChooserDialog::getSelectedSymbolUuid() const noexcept
+tl::optional<Uuid> SymbolChooserDialog::getSelectedSymbolUuid() const noexcept
 {
-    return mSelectedSymbol ? mSelectedSymbol->getUuid() : Uuid();
+    return mSelectedSymbol ? tl::make_optional(mSelectedSymbol->getUuid()) : tl::nullopt;
 }
 
 QString SymbolChooserDialog::getSelectedSymbolNameTr() const noexcept
@@ -97,7 +97,7 @@ void SymbolChooserDialog::treeCategories_currentItemChanged(const QModelIndex& c
                                                             const QModelIndex& previous) noexcept
 {
     Q_UNUSED(previous);
-    setSelectedCategory(Uuid(current.data(Qt::UserRole).toString()));
+    setSelectedCategory(Uuid::tryFromString(current.data(Qt::UserRole).toString()));
 }
 
 void SymbolChooserDialog::listSymbols_currentItemChanged(QListWidgetItem* current,
@@ -119,30 +119,33 @@ void SymbolChooserDialog::listSymbols_itemDoubleClicked(QListWidgetItem* item) n
     }
 }
 
-void SymbolChooserDialog::setSelectedCategory(const Uuid& uuid) noexcept
+void SymbolChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept
 {
-    if ((uuid == mSelectedCategoryUuid) && (!uuid.isNull())) return;
+    if (uuid && (uuid == mSelectedCategoryUuid)) return;
 
     setSelectedSymbol(FilePath());
     mUi->listSymbols->clear();
 
     mSelectedCategoryUuid = uuid;
-    try {
-        QSet<Uuid> symbols = mWorkspace.getLibraryDb().getSymbolsByCategory(uuid); // can throw
-        foreach (const Uuid& symbolUuid, symbols) {
-            try {
-                QString symName;
-                FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid); // can throw
-                mWorkspace.getLibraryDb().getElementTranslations<Symbol>(symFp, localeOrder(), &symName); // can throw
-                QListWidgetItem* item = new QListWidgetItem(symName);
-                item->setData(Qt::UserRole, symFp.toStr());
-                mUi->listSymbols->addItem(item);
-            } catch (const Exception& e) {
-                continue; // should we do something here?
+
+    if (uuid) {
+        try {
+            QSet<Uuid> symbols = mWorkspace.getLibraryDb().getSymbolsByCategory(*uuid); // can throw
+            foreach (const Uuid& symbolUuid, symbols) {
+                try {
+                    QString symName;
+                    FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid); // can throw
+                    mWorkspace.getLibraryDb().getElementTranslations<Symbol>(symFp, localeOrder(), &symName); // can throw
+                    QListWidgetItem* item = new QListWidgetItem(symName);
+                    item->setData(Qt::UserRole, symFp.toStr());
+                    mUi->listSymbols->addItem(item);
+                } catch (const Exception& e) {
+                    continue; // should we do something here?
+                }
             }
+        } catch (const Exception& e) {
+            QMessageBox::critical(this, tr("Could not load symbols"), e.getMsg());
         }
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not load symbols"), e.getMsg());
     }
 }
 

@@ -63,7 +63,7 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(const Context& cont
     mUi->edtKeywords->setText(mCategory->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mCategory->getAuthor());
     mUi->edtVersion->setText(mCategory->getVersion().toStr());
-    mUi->edtParent->setText(mCategory->getParentUuid().toStr());
+    mUi->edtParent->setText(mCategory->getParentUuid() ? mCategory->getParentUuid()->toStr() : QString());
     mUi->cbxDeprecated->setChecked(mCategory->isDeprecated());
 
     connect(mUi->edtName, &QLineEdit::textChanged, this, &QWidget::setWindowTitle);
@@ -96,11 +96,10 @@ bool ComponentCategoryEditorWidget::save() noexcept
             throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
         }
         QString parentUuidStr = mUi->edtParent->text().trimmed();
-        Uuid parentUuid(parentUuidStr);
-        if (parentUuid.isNull() && !parentUuidStr.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The parent UUID is invalid."));
+        tl::optional<Uuid> parentUuid;
+        if (!parentUuidStr.isEmpty()) {
+            parentUuid = Uuid::fromString(parentUuidStr); // can throw
         }
-
         mCategory->setName("", name);
         mCategory->setDescription("", mUi->edtDescription->toPlainText().trimmed());
         mCategory->setKeywords("", mUi->edtKeywords->text().trimmed());
@@ -124,7 +123,8 @@ void ComponentCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept
 {
     ComponentCategoryChooserDialog dialog(mContext.workspace);
     if (dialog.exec()) {
-        mUi->edtParent->setText(dialog.getSelectedCategoryUuid().toStr());
+        tl::optional<Uuid> uuid = dialog.getSelectedCategoryUuid();
+        mUi->edtParent->setText(uuid ? uuid->toStr() : QString());
     }
 }
 
@@ -144,8 +144,8 @@ void ComponentCategoryEditorWidget::edtParentTextChanged(const QString& text) no
     textBuilder.setHighlightLastLine(true);
 
     QString trimmed = text.trimmed();
-    Uuid parentUuid(trimmed);
-    if ((trimmed.length() > 0) && parentUuid.isNull()) {
+    tl::optional<Uuid> parentUuid = Uuid::tryFromString(trimmed);
+    if ((trimmed.length() > 0) && !parentUuid) {
         textBuilder.setErrorText(tr("Invalid UUID!"));
     } else {
         textBuilder.updateText(parentUuid, mUi->edtName->text());

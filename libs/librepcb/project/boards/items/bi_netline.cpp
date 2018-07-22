@@ -50,12 +50,13 @@ BI_NetLine::BI_NetLine(const BI_NetLine& other, BI_NetPoint& startPoint, BI_NetP
 }
 
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node) :
-    BI_Base(segment.getBoard()), mPosition(), mUuid(),
-    mStartPoint(nullptr), mEndPoint(nullptr), mWidth()
+    BI_Base(segment.getBoard()),
+    mPosition(),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mStartPoint(nullptr),
+    mEndPoint(nullptr),
+    mWidth(node.getValueByPath<Length>("width"))
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mWidth = node.getValueByPath<Length>("width");
-
     Uuid spUuid = node.getValueByPath<Uuid>("p1");
     mStartPoint = segment.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
@@ -273,7 +274,6 @@ void BI_NetLine::setSelected(bool selected) noexcept
 
 bool BI_NetLine::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mStartPoint == nullptr) return false;
     if (mEndPoint == nullptr)   return false;
     if (mWidth < 0)             return false;

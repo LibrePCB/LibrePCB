@@ -97,7 +97,7 @@ void ComponentSymbolVariantItemListEditorWidget::setVariant(const workspace::Wor
     mWorkspace = &ws;
     mLayerProvider = &layerProvider;
     mItems = &items;
-    mSelectedItem = Uuid();
+    mSelectedItem = tl::nullopt;
     updateTable();
 }
 
@@ -117,19 +117,20 @@ void ComponentSymbolVariantItemListEditorWidget::currentCellChanged(int currentR
 void ComponentSymbolVariantItemListEditorWidget::tableCellChanged(int row, int column) noexcept
 {
     QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
 
     switch (column) {
         case COLUMN_SUFFIX: {
             item->setText(item->text().trimmed().toUpper());
-            if (isExistingItemRow(row)) {
-                setSuffix(getUuidOfRow(row), item->text());
+            if (isExistingItemRow(row) && uuid) {
+                setSuffix(*uuid, item->text());
             }
             break;
         }
         case COLUMN_POS_X: {
-            if (isExistingItemRow(row)) {
+            if (isExistingItemRow(row) && uuid) {
                 try {
-                    setPosX(getUuidOfRow(row), Length::fromMm(item->text().trimmed()));
+                    setPosX(*uuid, Length::fromMm(item->text().trimmed()));
                 } catch (const Exception& e) {
                     QMessageBox::warning(this, tr("Error"), e.getMsg());
                 }
@@ -137,9 +138,9 @@ void ComponentSymbolVariantItemListEditorWidget::tableCellChanged(int row, int c
             break;
         }
         case COLUMN_POS_Y: {
-            if (isExistingItemRow(row)) {
+            if (isExistingItemRow(row) && uuid) {
                 try {
-                    setPosY(getUuidOfRow(row), Length::fromMm(item->text().trimmed()));
+                    setPosY(*uuid, Length::fromMm(item->text().trimmed()));
                 } catch (const Exception& e) {
                     QMessageBox::warning(this, tr("Error"), e.getMsg());
                 }
@@ -147,9 +148,9 @@ void ComponentSymbolVariantItemListEditorWidget::tableCellChanged(int row, int c
             break;
         }
         case COLUMN_ROTATION: {
-            if (isExistingItemRow(row)) {
+            if (isExistingItemRow(row) && uuid) {
                 try {
-                    setRotation(getUuidOfRow(row), Angle::fromDeg(item->text().trimmed()));
+                    setRotation(*uuid, Angle::fromDeg(item->text().trimmed()));
                 } catch (const Exception& e) {
                     QMessageBox::warning(this, tr("Error"), e.getMsg());
                 }
@@ -165,21 +166,24 @@ void ComponentSymbolVariantItemListEditorWidget::tableCellChanged(int row, int c
 void ComponentSymbolVariantItemListEditorWidget::isRequiredChanged(bool checked) noexcept
 {
     int row = getRowOfTableCellWidget(sender());
-    if (isExistingItemRow(row)) {
-        setIsRequired(getUuidOfRow(row), checked);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingItemRow(row) && uuid) {
+        setIsRequired(*uuid, checked);
     }
 }
 
 void ComponentSymbolVariantItemListEditorWidget::btnChooseSymbolClicked() noexcept
 {
     SymbolChooserDialog dialog(*mWorkspace, *mLayerProvider, this);
-    if ((dialog.exec() == QDialog::Accepted) && (!dialog.getSelectedSymbolUuid().isNull())) {
+    tl::optional<Uuid> symbolUuid = dialog.getSelectedSymbolUuid();
+    if ((dialog.exec() == QDialog::Accepted) && symbolUuid) {
         int row = getRowOfTableCellWidget(sender());
+        tl::optional<Uuid> uuid = getUuidOfRow(row);
         if (isNewItemRow(row)) {
             mNewSymbolLabel->setText(dialog.getSelectedSymbolNameTr());
-            mNewSymbolLabel->setToolTip(dialog.getSelectedSymbolUuid().toStr());
-        } else if (isExistingItemRow(row)) {
-            setSymbolUuid(getUuidOfRow(row), dialog.getSelectedSymbolUuid());
+            mNewSymbolLabel->setToolTip(symbolUuid->toStr());
+        } else if (isExistingItemRow(row) && uuid) {
+            setSymbolUuid(*uuid, *symbolUuid);
         }
     }
 }
@@ -187,13 +191,14 @@ void ComponentSymbolVariantItemListEditorWidget::btnChooseSymbolClicked() noexce
 void ComponentSymbolVariantItemListEditorWidget::btnAddRemoveClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewItemRow(row)) {
         try {
             const QTableWidgetItem* suffixItem = mTable->item(row, COLUMN_SUFFIX); Q_ASSERT(suffixItem);
             const QTableWidgetItem* posXItem = mTable->item(row, COLUMN_POS_X); Q_ASSERT(posXItem);
             const QTableWidgetItem* posYItem = mTable->item(row, COLUMN_POS_Y); Q_ASSERT(posYItem);
             const QTableWidgetItem* rotItem = mTable->item(row, COLUMN_ROTATION); Q_ASSERT(rotItem);
-            Uuid symbolUuid(mNewSymbolLabel->toolTip());
+            Uuid symbolUuid = Uuid::fromString(mNewSymbolLabel->toolTip()); // can throw
             Point pos(Length::fromMm(posXItem->text()), Length::fromMm(posYItem->text()));
             Angle rot(Angle::fromDeg(rotItem->text()));
             addItem(symbolUuid, suffixItem->text().trimmed(),
@@ -201,8 +206,8 @@ void ComponentSymbolVariantItemListEditorWidget::btnAddRemoveClicked() noexcept
         } catch (const Exception& e) {
             QMessageBox::warning(this, tr("Error"), e.getMsg());
         }
-    } else if (isExistingItemRow(row)) {
-        removeItem(getUuidOfRow(row));
+    } else if (isExistingItemRow(row) && uuid) {
+        removeItem(*uuid);
     }
 }
 
@@ -228,12 +233,12 @@ void ComponentSymbolVariantItemListEditorWidget::btnDownClicked() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void ComponentSymbolVariantItemListEditorWidget::updateTable(Uuid selected) noexcept
+void ComponentSymbolVariantItemListEditorWidget::updateTable(tl::optional<Uuid> selected) noexcept
 {
     blockSignals(true);
 
     // memorize content of new item row
-    Uuid newSymbolUuid(mNewSymbolLabel ? mNewSymbolLabel->toolTip() : QString());
+    tl::optional<Uuid> newSymbolUuid = Uuid::tryFromString(mNewSymbolLabel ? mNewSymbolLabel->toolTip() : QString());
     bool newRequired = mNewRequiredCheckbox ? mNewRequiredCheckbox->isChecked() : true;
     Point newPosition;
     Angle newRotation;
@@ -247,7 +252,7 @@ void ComponentSymbolVariantItemListEditorWidget::updateTable(Uuid selected) noex
     mTable->setRowCount(mItems->count() + 1);
 
     // special row for adding a new item
-    setTableRowContent(newItemRow(), mItems->count() + 1, Uuid(), newSymbolUuid, "",
+    setTableRowContent(newItemRow(), mItems->count() + 1, tl::nullopt, newSymbolUuid, "",
                        newRequired, newPosition, newRotation);
 
     // existing signals
@@ -272,13 +277,13 @@ void ComponentSymbolVariantItemListEditorWidget::updateTable(Uuid selected) noex
 }
 
 void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(int row, int number,
-    const Uuid& uuid, const Uuid& symbol, const QString& suffix, bool required,
-    const Point& pos, const Angle& rot) noexcept
+    const tl::optional<Uuid>& uuid, const tl::optional<Uuid>& symbol, const QString& suffix,
+    bool required, const Point& pos, const Angle& rot) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new symbol:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new symbol:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -300,16 +305,16 @@ void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(int row, int
     symbolColumnLayout->setSpacing(0);
     QLabel* symbolLabel = new QLabel(this);
     symbolLabel->setIndent(5);
-    if (!symbol.isNull()) {
+    if (symbol) {
         try {
             QString symName;
             const QStringList lo = mWorkspace->getSettings().getLibLocaleOrder().getLocaleOrder();
-            FilePath symFp = mWorkspace->getLibraryDb().getLatestSymbol(symbol); // can throw
+            FilePath symFp = mWorkspace->getLibraryDb().getLatestSymbol(*symbol); // can throw
             mWorkspace->getLibraryDb().getElementTranslations<Symbol>(symFp, lo, &symName); // can throw
             symbolLabel->setText(symName);
-            symbolLabel->setToolTip(symbol.toStr());
+            symbolLabel->setToolTip(symbol->toStr());
         } catch (const Exception& e) {
-            symbolLabel->setText(symbol.toStr());
+            symbolLabel->setText(symbol->toStr());
             symbolLabel->setToolTip(e.getMsg());
             symbolLabel->setStyleSheet("color: red;");
         }
@@ -406,9 +411,6 @@ void ComponentSymbolVariantItemListEditorWidget::addItem(const Uuid& symbol,
     const QString& suffix, bool required, const Point& pos, const Angle& rot) noexcept
 {
     try {
-        if (symbol.isNull()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("Invalid symbol."));
-        }
         FilePath fp = mWorkspace->getLibraryDb().getLatestSymbol(symbol); // can throw
         Symbol sym(fp, true); // can throw
         std::shared_ptr<ComponentSymbolVariantItem> item(
@@ -510,12 +512,12 @@ int ComponentSymbolVariantItemListEditorWidget::getRowOfTableCellWidget(QObject*
     return row;
 }
 
-Uuid ComponentSymbolVariantItemListEditorWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> ComponentSymbolVariantItemListEditorWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingItemRow(row)) {
         return mItems->value(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 
