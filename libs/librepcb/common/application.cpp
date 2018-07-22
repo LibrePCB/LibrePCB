@@ -53,6 +53,11 @@ Application::Application(int& argc, char** argv) noexcept :
         qWarning() << "Could not determine Git version. Check if Git is added to the PATH.";
     }
 
+    // set build timestamp
+    QDate buildDate = QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
+    QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
+    mBuildDate = QDateTime(buildDate, buildTime);
+
     // set and verify file format version
     mFileFormatVersion = Version(FILE_FORMAT_VERSION);
     Q_ASSERT(mFileFormatVersion.isValid());
