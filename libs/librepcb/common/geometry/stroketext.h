@@ -65,13 +65,6 @@ class StrokeTextSpacing final
         // General Methods
         bool isAuto() const noexcept {return mAuto;}
         const Ratio& getRatio() const noexcept {return mRatio;}
-        QString serializeToString() const noexcept {
-            if (mAuto) {
-                return "auto";
-            } else {
-                return mRatio.serializeToString();
-            }
-        }
 
         // Operator Overloadings
         bool operator==(const StrokeTextSpacing& rhs) const noexcept {
@@ -85,20 +78,34 @@ class StrokeTextSpacing final
             return *this;
         }
 
-        // Static Methods
-        static StrokeTextSpacing deserializeFromString(const QString& str) {
-            if (str == "auto") {
-                return StrokeTextSpacing();
-            } else {
-                return StrokeTextSpacing(Ratio::deserializeFromString(str)); // can throw
-            }
-        }
-
 
     private: // Data
         bool mAuto;
         Ratio mRatio;
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const StrokeTextSpacing& obj) {
+    if (obj.isAuto()) {
+        return SExpression::createToken("auto");
+    } else {
+        return serializeToSExpression(obj.getRatio());
+    }
+}
+
+template <>
+inline StrokeTextSpacing deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if (str == "auto") {
+        return StrokeTextSpacing();
+    } else {
+        return StrokeTextSpacing(deserializeFromSExpression<Ratio>(sexpr, throwIfEmpty)); // can throw
+    }
+}
 
 /*****************************************************************************************
  *  Interface IF_StrokeTextObserver

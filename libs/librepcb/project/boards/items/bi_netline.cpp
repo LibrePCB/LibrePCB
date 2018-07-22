@@ -53,10 +53,10 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node) :
     BI_Base(segment.getBoard()), mPosition(), mUuid(),
     mStartPoint(nullptr), mEndPoint(nullptr), mWidth()
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
-    mWidth = node.getValueByPath<Length>("width", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
+    mWidth = node.getValueByPath<Length>("width");
 
-    Uuid spUuid = node.getValueByPath<Uuid>("p1", true);
+    Uuid spUuid = node.getValueByPath<Uuid>("p1");
     mStartPoint = segment.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -64,7 +64,7 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node) :
             .arg(spUuid.toStr()));
     }
 
-    Uuid epUuid = node.getValueByPath<Uuid>("p2", true);
+    Uuid epUuid = node.getValueByPath<Uuid>("p2");
     mEndPoint = segment.getNetPointByUuid(epUuid);
     if(!mEndPoint) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -241,10 +241,10 @@ void BI_NetLine::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("width", mWidth, false);
-    root.appendTokenChild("p1", mStartPoint->getUuid(), true);
-    root.appendTokenChild("p2", mEndPoint->getUuid(), true);
+    root.appendChild(mUuid);
+    root.appendChild("width", mWidth, false);
+    root.appendChild("p1", mStartPoint->getUuid(), true);
+    root.appendChild("p2", mEndPoint->getUuid(), true);
 }
 
 /*****************************************************************************************

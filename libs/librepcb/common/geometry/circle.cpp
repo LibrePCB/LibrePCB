@@ -53,24 +53,24 @@ Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWid
 Circle::Circle(const SExpression& node)
 {
     if (node.getChildByIndex(0).isString()) {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+        mUuid = node.getChildByIndex(0).getValue<Uuid>();
     } else {
         // backward compatibility, remove this some time!
         mUuid = Uuid::createRandom();
     }
     mLayerName = node.getValueByPath<QString>("layer", true);
-    mLineWidth = node.getValueByPath<Length>("width", true);
-    mIsFilled = node.getValueByPath<bool>("fill", true);
-    mIsGrabArea = node.getValueByPath<bool>("grab", true);
+    mLineWidth = node.getValueByPath<Length>("width");
+    mIsFilled = node.getValueByPath<bool>("fill");
+    mIsGrabArea = node.getValueByPath<bool>("grab");
     mCenter = Point(node.getChildByPath("pos"));
     if (node.tryGetChildByPath("dia")) {
-        mDiameter = node.getValueByPath<Length>("dia", true);
+        mDiameter = node.getValueByPath<Length>("dia");
     } else if (node.tryGetChildByPath("size")) {
         // backward compatibility, remove this some time!
         mDiameter = Point(node.getChildByPath("size")).getX();
     } else {
         // backward compatibility, remove this some time!
-        mDiameter = node.getValueByPath<Length>("rx", true) * 2;
+        mDiameter = node.getValueByPath<Length>("rx") * 2;
     }
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -166,12 +166,12 @@ void Circle::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("layer", mLayerName, false);
-    root.appendTokenChild("width", mLineWidth, true);
-    root.appendTokenChild("fill", mIsFilled, false);
-    root.appendTokenChild("grab", mIsGrabArea, false);
-    root.appendTokenChild("dia", mDiameter, false);
+    root.appendChild(mUuid);
+    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("width", mLineWidth, true);
+    root.appendChild("fill", mIsFilled, false);
+    root.appendChild("grab", mIsGrabArea, false);
+    root.appendChild("dia", mDiameter, false);
     root.appendChild(mCenter.serializeToDomElement("pos"), false);
 }
 

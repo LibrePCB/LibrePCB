@@ -49,19 +49,19 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
     // read general attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mName = node.getValueByPath<QString>("name", true);
-    mValue = node.getValueByPath<QString>("value", false);
-    Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component", true);
+    mValue = node.getValueByPath<QString>("value");
+    Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component with the UUID \"%1\" does not exist in the "
             "project's library!")).arg(cmpUuid.toStr()));
     }
-    Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant", true);
+    Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
-    mDefaultDeviceUuid = node.getValueByPath<Uuid>("lib_device", true);
+    mDefaultDeviceUuid = node.getValueByPath<Uuid>("lib_device");
 
     // load all component attributes
     mAttributes.reset(new AttributeList(node)); // can throw
@@ -340,12 +340,12 @@ void ComponentInstance::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("lib_component", mLibComponent->getUuid(), true);
-    root.appendTokenChild("lib_variant", mCompSymbVar->getUuid(), true);
-    root.appendTokenChild("lib_device", mDefaultDeviceUuid, true);
-    root.appendStringChild("name", mName, true);
-    root.appendStringChild("value", mValue, false);
+    root.appendChild(mUuid);
+    root.appendChild("lib_component", mLibComponent->getUuid(), true);
+    root.appendChild("lib_variant", mCompSymbVar->getUuid(), true);
+    root.appendChild("lib_device", mDefaultDeviceUuid, true);
+    root.appendChild("name", mName, true);
+    root.appendChild("value", mValue, false);
     mAttributes->serialize(root);
     serializePointerContainer(root, mSignals, "sig");
 }

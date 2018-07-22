@@ -268,7 +268,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             mSchematicsFile.reset(new SmartSExprFile(schematicsFilepath, mIsRestored, mIsReadOnly));
             SExpression schRoot = mSchematicsFile->parseFileAndBuildDomTree();
             foreach (const SExpression& node, schRoot.getChildren("schematic")) {
-                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
+                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
                 if (fp.getFilename() != "schematic.lp") {
                     // backward compatibility - remove this some time!
                     fp = mPath.getPathTo("schematics/" % fp.getBasename() % "/schematic.lp");
@@ -287,7 +287,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
             mBoardsFile.reset(new SmartSExprFile(boardsFilepath, mIsRestored, mIsReadOnly));
             SExpression brdRoot = mBoardsFile->parseFileAndBuildDomTree();
             foreach (const SExpression& node, brdRoot.getChildren("board")) {
-                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>(true));
+                FilePath fp = FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
                 if (fp.getFilename() != "board.lp") {
                     // backward compatibility - remove this some time!
                     fp = mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp");
@@ -700,7 +700,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     try {
         SExpression root = SExpression::createList("librepcb_schematics");
         foreach (Schematic* schematic, mSchematics) {
-            root.appendStringChild("schematic", schematic->getFilePath().toRelative(mPath), true);
+            root.appendChild("schematic", schematic->getFilePath().toRelative(mPath), true);
         }
         mSchematicsFile->save(root, toOriginal); // can throw
     } catch (const Exception& e) {
@@ -712,7 +712,7 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept
     try {
         SExpression root = SExpression::createList("librepcb_boards");
         foreach (Board* board, mBoards) {
-            root.appendStringChild("board", board->getFilePath().toRelative(mPath), true);
+            root.appendChild("board", board->getFilePath().toRelative(mPath), true);
         }
         mBoardsFile->save(root, toOriginal); // can throw
     } catch (const Exception& e) {

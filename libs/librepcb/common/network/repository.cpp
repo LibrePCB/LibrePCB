@@ -82,7 +82,7 @@ void Repository::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendString(mUrl);
+    root.appendChild(mUrl);
 }
 
 /*****************************************************************************************

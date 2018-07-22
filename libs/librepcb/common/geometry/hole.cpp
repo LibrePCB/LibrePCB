@@ -51,13 +51,13 @@ Hole::Hole(const Uuid& uuid, const Point& position, const Length& diameter) noex
 Hole::Hole(const SExpression& node)
 {
     if (node.getChildByIndex(0).isString()) {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+        mUuid = node.getChildByIndex(0).getValue<Uuid>();
     } else {
         // backward compatibility, remove this some time!
         mUuid = Uuid::createRandom();
     }
     mPosition = Point(node.getChildByPath("pos"));
-    mDiameter = node.getValueByPath<Length>("dia", true);
+    mDiameter = node.getValueByPath<Length>("dia");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -107,8 +107,8 @@ void Hole::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("dia", mDiameter, false);
+    root.appendChild(mUuid);
+    root.appendChild("dia", mDiameter, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), false);
 }
 

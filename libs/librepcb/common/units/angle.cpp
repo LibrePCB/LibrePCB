@@ -123,20 +123,6 @@ qint32 Angle::degStringToMicrodeg(const QString& degrees)
     return angle;
 }
 
-// Non-Member Functions
-
-QDataStream& operator<<(QDataStream& stream, const Angle& angle)
-{
-    stream << angle.toDeg();
-    return stream;
-}
-
-QDebug operator<<(QDebug stream, const Angle& angle)
-{
-    stream << QString("Angle(%1°)").arg(angle.toDeg());
-    return stream;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

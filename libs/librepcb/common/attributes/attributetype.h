@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -101,6 +101,15 @@ class AttributeType
         QList<const AttributeUnit*> mAvailableUnits;
         const AttributeUnit* mDefaultUnit;
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const AttributeType& obj) {
+    return SExpression::createToken(obj.getName());
+}
 
 /*****************************************************************************************
  *  End of File

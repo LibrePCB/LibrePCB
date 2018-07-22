@@ -74,18 +74,34 @@ class GridProperties final : public SerializableObject
         GridProperties& operator=(const GridProperties& rhs) noexcept;
 
 
-    private:
-
-        // Private Static Methods
-        static Type_t stringToType(const QString& type);
-        static QString typeToString(Type_t type);
-
-
-        // Attributes
+    private: // Data
         Type_t mType;
         Length mInterval;
         LengthUnit mUnit;
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
+    switch (obj) {
+        case GridProperties::Type_t::Off:   return SExpression::createToken("off");
+        case GridProperties::Type_t::Lines: return SExpression::createToken("lines");
+        case GridProperties::Type_t::Dots:  return SExpression::createToken("dots");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline GridProperties::Type_t deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == "off")     return GridProperties::Type_t::Off;
+    else if (str == "lines")   return GridProperties::Type_t::Lines;
+    else if (str == "dots")    return GridProperties::Type_t::Dots;
+    else throw RuntimeError(__FILE__, __LINE__, QString(GridProperties::tr("Unknown grid type: \"%1\"")).arg(str));
+}
 
 /*****************************************************************************************
  *  End of File

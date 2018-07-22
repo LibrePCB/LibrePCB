@@ -47,10 +47,10 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
 {
     // read attributes
-    mPinUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mPinUuid = node.getChildByIndex(0).getValue<Uuid>();
     mDisplayType = CmpSigPinDisplayType::fromString(
-                       node.getValueByPath<QString>("disp", true));
-    mSignalUuid = node.getValueByPath<Uuid>("sig", false);
+                       node.getValueByPath<QString>("disp"));
+    mSignalUuid = node.getValueByPath<Uuid>("sig");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -67,9 +67,9 @@ void ComponentPinSignalMapItem::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mPinUuid);
-    root.appendTokenChild("sig", mSignalUuid, false);
-    root.appendTokenChild("disp", mDisplayType.toString(), false);
+    root.appendChild(mPinUuid);
+    root.appendChild("sig", mSignalUuid, false);
+    root.appendChild("disp", mDisplayType, false);
 }
 
 /*****************************************************************************************

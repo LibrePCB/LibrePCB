@@ -47,13 +47,13 @@ class MinimalSerializableObjectMock final : public SerializableObject
         MinimalSerializableObjectMock(const QString& value) :
             mValue(value) {}
         MinimalSerializableObjectMock(const SExpression& root) :
-            mValue(root.getValueOfFirstChild<QString>(false)) {}
+            mValue(root.getValueOfFirstChild<QString>()) {}
         MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
         MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) = delete;
         ~MinimalSerializableObjectMock() {}
 
         void serialize(SExpression& root) const override {
-            root.appendStringChild("value", mValue, true);
+            root.appendChild("value", mValue, true);
         }
 
         bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
@@ -78,16 +78,16 @@ class SerializableObjectMock final : public SerializableObject
         SerializableObjectMock(const Uuid& uuid, const QString& name) :
             mUuid(uuid), mName(name) {}
         SerializableObjectMock(const SExpression& root) :
-            mUuid(root.getValueOfFirstChild<Uuid>(true)),
-            mName(root.getValueByPath<QString>("name", false)) {}
+            mUuid(root.getValueOfFirstChild<Uuid>()),
+            mName(root.getValueByPath<QString>("name")) {}
         ~SerializableObjectMock() {}
 
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
 
         void serialize(SExpression& root) const override {
-            root.appendString(mUuid);
-            root.appendStringChild("name", mName, true);
+            root.appendChild(mUuid);
+            root.appendChild("name", mName, true);
         }
 
         bool operator==(const SerializableObjectMock& rhs) const noexcept {

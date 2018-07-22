@@ -40,7 +40,7 @@ WSI_AppLocale::WSI_AppLocale(const SExpression& node) :
     mAppLocale(), mAppLocaleTmp(mAppLocale)
 {
     if (const SExpression* child = node.tryGetChildByPath("application_locale")) {
-        mAppLocale = child->getValueOfFirstChild<QString>(false);
+        mAppLocale = child->getValueOfFirstChild<QString>();
         mAppLocaleTmp = mAppLocale;
     }
 
@@ -141,7 +141,7 @@ void WSI_AppLocale::updateComboBoxIndex() noexcept
 
 void WSI_AppLocale::serialize(SExpression& root) const
 {
-    root.appendStringChild("application_locale", mAppLocale, true);
+    root.appendChild("application_locale", mAppLocale, true);
 }
 
 /*****************************************************************************************

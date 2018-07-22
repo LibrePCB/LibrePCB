@@ -39,9 +39,9 @@ GridProperties::GridProperties() noexcept :
 
 GridProperties::GridProperties(const SExpression& node)
 {
-    mType = stringToType(node.getValueByPath<QString>("type", true));
-    mInterval = node.getValueByPath<Length>("interval", true);
-    mUnit = node.getValueByPath<LengthUnit>("unit", true);
+    mType = node.getValueByPath<Type_t>("type");
+    mInterval = node.getValueByPath<Length>("interval");
+    mUnit = node.getValueByPath<LengthUnit>("unit");
 }
 
 GridProperties::GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept :
@@ -64,9 +64,9 @@ GridProperties::~GridProperties() noexcept
 
 void GridProperties::serialize(SExpression& root) const
 {
-    root.appendTokenChild("type", typeToString(mType), false);
-    root.appendTokenChild("interval", mInterval, false);
-    root.appendTokenChild("unit", mUnit, false);
+    root.appendChild("type", mType, false);
+    root.appendChild("interval", mInterval, false);
+    root.appendChild("unit", mUnit, false);
 }
 
 /*****************************************************************************************
@@ -79,29 +79,6 @@ GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept
     mInterval = rhs.mInterval;
     mUnit = rhs.mUnit;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Static Methods
- ****************************************************************************************/
-
-GridProperties::Type_t GridProperties::stringToType(const QString& type)
-{
-    if (type == "off")          return Type_t::Off;
-    else if (type == "lines")   return Type_t::Lines;
-    else if (type == "dots")    return Type_t::Dots;
-    else throw RuntimeError(__FILE__, __LINE__, QString(tr("Unknown grid type: \"%1\"")).arg(type));
-}
-
-QString GridProperties::typeToString(Type_t type)
-{
-    switch (type)
-    {
-        case Type_t::Off:   return "off";
-        case Type_t::Lines: return "lines";
-        case Type_t::Dots:  return "dots";
-        default: throw LogicError(__FILE__, __LINE__);
-    }
 }
 
 /*****************************************************************************************

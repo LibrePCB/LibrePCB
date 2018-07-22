@@ -39,7 +39,7 @@ WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const SExpression& node) :
 {
     if (const SExpression* child = node.tryGetChildByPath("library_locale_order")) {
         foreach (const SExpression& childchild, child->getChildren()) {
-            mList.append(QLocale(childchild.getValueOfFirstChild<QString>(false)).name()); // can throw
+            mList.append(QLocale(childchild.getValueOfFirstChild<QString>()).name()); // can throw
         }
     } else {
         foreach (const QString& localeStr, QLocale::system().uiLanguages()) {
@@ -191,7 +191,7 @@ void WSI_LibraryLocaleOrder::serialize(SExpression& root) const
 {
     SExpression& child = root.appendList("library_locale_order", true);
     foreach (const QString& locale, mList) {
-        child.appendStringChild("locale", locale, true);
+        child.appendChild("locale", locale, true);
     }
 }
 

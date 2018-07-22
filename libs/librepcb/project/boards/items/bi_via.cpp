@@ -54,21 +54,11 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node) :
     BI_Base(netsegment.getBoard()), mNetSegment(netsegment)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mPosition = Point(node.getChildByPath("pos"));
-    QString shapeStr = node.getValueByPath<QString>("shape", true);
-    if (shapeStr == "round") {
-        mShape = Shape::Round;
-    } else if (shapeStr == "square") {
-        mShape = Shape::Square;
-    } else if (shapeStr == "octagon") {
-        mShape = Shape::Octagon;
-    } else {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid via shape: \"%1\"")).arg(shapeStr));
-    }
-    mSize = node.getValueByPath<Length>("size", true);
-    mDrillDiameter = node.getValueByPath<Length>("drill", true);
+    mShape = node.getValueByPath<Shape>("shape");
+    mSize = node.getValueByPath<Length>("size");
+    mDrillDiameter = node.getValueByPath<Length>("drill");
 
     init();
 }
@@ -237,16 +227,11 @@ void BI_Via::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
+    root.appendChild(mUuid);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("size", mSize, false);
-    root.appendTokenChild("drill", mDrillDiameter, false);
-    switch (mShape) {
-        case Shape::Round:      root.appendTokenChild<QString>("shape", "round", false); break;
-        case Shape::Square:     root.appendTokenChild<QString>("shape", "square", false); break;
-        case Shape::Octagon:    root.appendTokenChild<QString>("shape", "octagon", false); break;
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+    root.appendChild("size", mSize, false);
+    root.appendChild("drill", mDrillDiameter, false);
+    root.appendChild("shape", mShape, false);
 }
 
 /*****************************************************************************************

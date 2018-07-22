@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -63,6 +63,15 @@ class AttributeUnit final
         QString mName;          ///< to convert from/to string, e.g. "millivolt"
         QString mSymbolTr;      ///< e.g. "mV"
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const AttributeUnit& obj) {
+    return SExpression::createToken(obj.getName());
+}
 
 /*****************************************************************************************
  *  End of File

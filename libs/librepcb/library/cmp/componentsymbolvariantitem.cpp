@@ -51,12 +51,12 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
-    mSymbolUuid = node.getValueByPath<Uuid>("symbol", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
+    mSymbolUuid = node.getValueByPath<Uuid>("symbol");
     mSymbolPos = Point(node.getChildByPath("pos"));
-    mSymbolRot = node.getValueByPath<Angle>("rot", true);
-    mIsRequired = node.getValueByPath<bool>("required", true);
-    mSuffix = node.getValueByPath<QString>("suffix", false);
+    mSymbolRot = node.getValueByPath<Angle>("rot");
+    mIsRequired = node.getValueByPath<bool>("required");
+    mSuffix = node.getValueByPath<QString>("suffix");
 
     // read pin signal map
     mPinSignalMap.loadFromDomElement(node);
@@ -76,12 +76,12 @@ void ComponentSymbolVariantItem::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("symbol", mSymbolUuid, true);
+    root.appendChild(mUuid);
+    root.appendChild("symbol", mSymbolUuid, true);
     root.appendChild(mSymbolPos.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mSymbolRot, false);
-    root.appendTokenChild("required", mIsRequired, false);
-    root.appendStringChild("suffix", mSuffix, false);
+    root.appendChild("rot", mSymbolRot, false);
+    root.appendChild("required", mIsRequired, false);
+    root.appendChild("suffix", mSuffix, false);
     mPinSignalMap.sortedByUuid().serialize(root);
 }
 

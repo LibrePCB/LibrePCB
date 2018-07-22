@@ -49,9 +49,9 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node) :
 {
     try
     {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+        mUuid = node.getChildByIndex(0).getValue<Uuid>();
 
-        Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
+        Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
             throw RuntimeError(__FILE__, __LINE__,
@@ -481,8 +481,8 @@ void SI_NetSegment::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("net", mNetSignal->getUuid(), true);
+    root.appendChild(mUuid);
+    root.appendChild("net", mNetSignal->getUuid(), true);
     serializePointerContainerUuidSorted(root, mNetPoints, "netpoint");
     serializePointerContainerUuidSorted(root, mNetLines, "netline");
     serializePointerContainerUuidSorted(root, mNetLabels, "netlabel");

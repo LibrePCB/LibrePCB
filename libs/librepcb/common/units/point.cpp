@@ -36,8 +36,8 @@ namespace librepcb {
 Point::Point(const SExpression& node)
 {
     try {
-        mX = node.getChildByIndex(0).getValue<Length>(true);
-        mY = node.getChildByIndex(1).getValue<Length>(true);
+        mX = node.getChildByIndex(0).getValue<Length>();
+        mY = node.getChildByIndex(1).getValue<Length>();
     } catch (const Exception& e) {
         throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                              QString(), e.getMsg());
@@ -135,8 +135,8 @@ Point& Point::mirror(Qt::Orientation orientation, const Point& center) noexcept
 
 void Point::serialize(SExpression& root) const
 {
-    root.appendToken(mX);
-    root.appendToken(mY);
+    root.appendChild(mX);
+    root.appendChild(mY);
 }
 
 // Static Methods

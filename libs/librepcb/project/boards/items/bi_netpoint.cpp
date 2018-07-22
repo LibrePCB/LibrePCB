@@ -70,9 +70,9 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
     mVia(nullptr)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
 
-    QString layerName = node.getValueByPath<QString>("layer", true);
+    QString layerName = node.getValueByPath<QString>("layer");
     mLayer = mBoard.getLayerStack().getLayer(layerName);
     if (!mLayer) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -86,7 +86,7 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
     const SExpression* posNode = node.tryGetChildByPath("pos");
 
     if (viaNode && (!devNode) && (!padNode) && (!posNode)) {
-        Uuid viaUuid = viaNode->getValueOfFirstChild<Uuid>(true);
+        Uuid viaUuid = viaNode->getValueOfFirstChild<Uuid>();
         mVia = mNetSegment.getViaByUuid(viaUuid);
         if (!mVia) {
             throw RuntimeError(__FILE__, __LINE__,
@@ -94,13 +94,13 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
         }
         mPosition = mVia->getPosition();
     } else if (devNode && padNode && (!viaNode) && (!posNode)) {
-        Uuid componentUuid = devNode->getValueOfFirstChild<Uuid>(true);
+        Uuid componentUuid = devNode->getValueOfFirstChild<Uuid>();
         BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(componentUuid);
         if (!device) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Invalid component UUID: \"%1\"")).arg(componentUuid.toStr()));
         }
-        Uuid padUuid = padNode->getValueOfFirstChild<Uuid>(true);
+        Uuid padUuid = padNode->getValueOfFirstChild<Uuid>();
         mFootprintPad = device->getFootprint().getPad(padUuid);
         if (!mFootprintPad) {
             throw RuntimeError(__FILE__, __LINE__,
@@ -366,13 +366,13 @@ void BI_NetPoint::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("layer", mLayer->getName(), false);
+    root.appendChild(mUuid);
+    root.appendChild("layer", SExpression::createToken(mLayer->getName()), false);
     if (isAttachedToPad()) {
-        root.appendTokenChild("dev", mFootprintPad->getFootprint().getComponentInstanceUuid(), true);
-        root.appendTokenChild("pad", mFootprintPad->getLibPadUuid(), false);
+        root.appendChild("dev", mFootprintPad->getFootprint().getComponentInstanceUuid(), true);
+        root.appendChild("pad", mFootprintPad->getLibPadUuid(), false);
     } else if (isAttachedToVia()) {
-        root.appendTokenChild("via", mVia->getUuid(), true);
+        root.appendChild("via", mVia->getUuid(), true);
     } else {
         root.appendChild(mPosition.serializeToDomElement("pos"), true);
     }

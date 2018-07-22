@@ -130,10 +130,10 @@ void ProjectSettings::serialize(SExpression& root) const
 {
     SExpression& locale_order = root.appendList("library_locale_order", true);
     foreach (const QString& locale, mLocaleOrder)
-        locale_order.appendStringChild("locale", locale, true);
+        locale_order.appendChild("locale", locale, true);
     SExpression& norm_order = root.appendList("library_norm_order", true);
     foreach (const QString& norm, mNormOrder)
-        norm_order.appendStringChild("norm", norm, true);
+        norm_order.appendChild("norm", norm, true);
 }
 
 /*****************************************************************************************

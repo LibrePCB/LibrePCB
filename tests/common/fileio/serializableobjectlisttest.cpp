@@ -124,9 +124,9 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor)
 TEST_F(SerializableObjectListTest, testDomElementConstructor)
 {
     SExpression e = SExpression::createList("list");
-    e.appendStringChild("test", mMocks[0]->mUuid, true).appendStringChild<QString>("name", "foo", true);
-    e.appendStringChild("test", mMocks[1]->mUuid, true).appendStringChild<QString>("name", "bar", true);
-    e.appendStringChild("none", mMocks[2]->mUuid, true).appendStringChild<QString>("name", "bar", true);
+    e.appendChild("test", mMocks[0]->mUuid, true).appendChild<QString>("name", "foo", true);
+    e.appendChild("test", mMocks[1]->mUuid, true).appendChild<QString>("name", "bar", true);
+    e.appendChild("none", mMocks[2]->mUuid, true).appendChild<QString>("name", "bar", true);
     List l(e);
     EXPECT_EQ(2, l.count());
     EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
@@ -292,8 +292,8 @@ TEST_F(SerializableObjectListTest, testSerialize)
     e.removeLineBreaks(); // we are not interested in line breaks...
     EXPECT_EQ(3,                e.getChildren().count());
     EXPECT_EQ("test",           e.getChildren()[0].getName());
-    EXPECT_EQ(mMocks[1]->mUuid, e.getChildren()[1].getValueOfFirstChild<Uuid>(false));
-    EXPECT_EQ(mMocks[2]->mName, e.getChildren()[2].getValueByPath<QString>("name", false));
+    EXPECT_EQ(mMocks[1]->mUuid, e.getChildren()[1].getValueOfFirstChild<Uuid>());
+    EXPECT_EQ(mMocks[2]->mName, e.getChildren()[2].getValueByPath<QString>("name"));
 }
 
 TEST_F(SerializableObjectListTest, testOperatorEqual)

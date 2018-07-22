@@ -45,7 +45,7 @@ PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
 
 PackagePad::PackagePad(const SExpression& node)
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mName = node.getValueByPath<QString>("name", true);
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
@@ -72,8 +72,8 @@ void PackagePad::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendStringChild("name", mName, false);
+    root.appendChild(mUuid);
+    root.appendChild("name", mName, false);
 }
 
 /*****************************************************************************************

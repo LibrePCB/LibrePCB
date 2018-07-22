@@ -51,7 +51,7 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
 {
     // read category UUIDs
     foreach (const SExpression& node, mLoadingFileDocument.getChildren("category")) {
-        mCategories.insert(node.getValueOfFirstChild<Uuid>(true));
+        mCategories.insert(node.getValueOfFirstChild<Uuid>());
     }
 }
 
@@ -67,7 +67,7 @@ void LibraryElement::serialize(SExpression& root) const
 {
     LibraryBaseElement::serialize(root);
     foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
-        root.appendTokenChild("category", uuid, true);
+        root.appendChild("category", uuid, true);
     }
 }
 

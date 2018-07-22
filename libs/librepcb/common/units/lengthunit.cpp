@@ -36,7 +36,7 @@ namespace librepcb {
 
 // General Methods
 
-QString LengthUnit::serializeToString() const noexcept
+QString LengthUnit::toStr() const noexcept
 {
     switch (mUnit)
     {
@@ -193,45 +193,12 @@ LengthUnit LengthUnit::fromIndex(int index)
     return LengthUnit(static_cast<LengthUnit_t>(index));
 }
 
-LengthUnit LengthUnit::deserializeFromString(const QString& str)
-{
-    if (str == "millimeters")
-        return LengthUnit(LengthUnit_t::Millimeters);
-    else if (str == "micrometers")
-        return LengthUnit(LengthUnit_t::Micrometers);
-    else if (str == "nanometers")
-        return LengthUnit(LengthUnit_t::Nanometers);
-    else if (str == "inches")
-        return LengthUnit(LengthUnit_t::Inches);
-    else if (str == "mils")
-        return LengthUnit(LengthUnit_t::Mils);
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid length unit: \"%1\"")).arg(str));
-    }
-}
-
 QList<LengthUnit> LengthUnit::getAllUnits() noexcept
 {
     QList<LengthUnit> list;
     for (int i = 0; i < static_cast<int>(LengthUnit_t::_COUNT); i++)
         list.append(LengthUnit(static_cast<LengthUnit_t>(i)));
     return list;
-}
-
-// Non-Member Functions
-
-QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit)
-{
-    stream << unit.serializeToString();
-    return stream;
-}
-
-QDebug operator<<(QDebug stream, const LengthUnit& unit)
-{
-    stream << QString("LengthUnit(%1)").arg(unit.serializeToString());
-    return stream;
 }
 
 /*****************************************************************************************

@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "exceptions.h"
+#include "fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -151,13 +151,6 @@ class Version final
          */
         QString toComparableStr() const noexcept;
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString serializeToString() const noexcept {return toStr();}
-
 
         // Setters
 
@@ -194,27 +187,6 @@ class Version final
         //@}
 
 
-        // Static Methods
-
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static Version deserializeFromString(const QString& str) {
-            Version version(str);
-            if ((!version.isValid()) && (!str.isEmpty())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                                   QString(tr("Invalid version number: \"%1\"")).arg(str));
-            }
-            return version;
-        }
-
-
     private:
 
         // Attributes
@@ -227,6 +199,26 @@ class Version final
          */
         QList<int> mNumbers;
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const Version& obj) {
+    return SExpression::createString(obj.toStr());
+}
+
+template <>
+inline Version deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    Version version(str);
+    if ((!version.isValid()) && (!str.isEmpty())) {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(Version::tr("Invalid version number: \"%1\"")).arg(str));
+    }
+    return version;
+}
 
 /*****************************************************************************************
  *  End of File

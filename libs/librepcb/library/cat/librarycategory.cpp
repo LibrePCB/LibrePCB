@@ -50,7 +50,7 @@ LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
     LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly)
 {
     // read parent uuid
-    mParentUuid = mLoadingFileDocument.getValueByPath<Uuid>("parent", false);
+    mParentUuid = mLoadingFileDocument.getValueByPath<Uuid>("parent");
 }
 
 LibraryCategory::~LibraryCategory() noexcept
@@ -64,7 +64,7 @@ LibraryCategory::~LibraryCategory() noexcept
 void LibraryCategory::serialize(SExpression& root) const
 {
     LibraryBaseElement::serialize(root);
-    root.appendTokenChild("parent", mParentUuid, true);
+    root.appendChild("parent", mParentUuid, true);
 }
 
 bool LibraryCategory::checkAttributesValidity() const noexcept

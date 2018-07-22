@@ -52,7 +52,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node) :
 {
     addAllLayers();
 
-    setInnerLayerCount(node.getValueByPath<uint>("inner", true));
+    setInnerLayerCount(node.getValueByPath<uint>("inner"));
 
     connect(&mBoard, &Board::attributesChanged,
             this, &BoardLayerStack::boardAttributesChanged,
@@ -132,7 +132,7 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept
 
 void BoardLayerStack::serialize(SExpression& root) const
 {
-    root.appendTokenChild("inner", mInnerLayerCount, false);
+    root.appendChild("inner", mInnerLayerCount, false);
 }
 
 /*****************************************************************************************

@@ -54,27 +54,19 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other) :
 BI_Plane::BI_Plane(Board& board, const SExpression& node) :
     BI_Base(board)
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mLayerName = node.getValueByPath<QString>("layer", true);
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net", true);
+    Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
     mNetSignal = mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if(!mNetSignal) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Invalid net signal UUID: \"%1\"")).arg(netSignalUuid.toStr()));
     }
-    mMinWidth = node.getValueByPath<Length>("min_width", true);
-    mMinClearance = node.getValueByPath<Length>("min_clearance", true);
-    mKeepOrphans = node.getValueByPath<bool>("keep_orphans", true);
-    mPriority = node.getValueByPath<int>("priority", true);
-    if (node.getValueByPath<QString>("connect_style", true) == "none") {
-        mConnectStyle = ConnectStyle::None;
-    //} else if (node.getValueByPath<QString>("connect_style", true) == "thermal") {
-    //    mConnectStyle = ConnectStyle::Thermal;
-    } else if (node.getValueByPath<QString>("connect_style", true) == "solid") {
-        mConnectStyle = ConnectStyle::Solid;
-    } else {
-        throw RuntimeError(__FILE__, __LINE__, tr("Unknown plane connect style."));
-    }
+    mMinWidth = node.getValueByPath<Length>("min_width");
+    mMinClearance = node.getValueByPath<Length>("min_clearance");
+    mKeepOrphans = node.getValueByPath<bool>("keep_orphans");
+    mPriority = node.getValueByPath<int>("priority");
+    mConnectStyle = node.getValueByPath<ConnectStyle>("connect_style");
     //mThermalGapWidth = node.getValueByPath<Length>("thermal_gap_width", true);
     //mThermalSpokeWidth = node.getValueByPath<Length>("thermal_spoke_width", true);
     mOutline = Path(node);
@@ -219,23 +211,16 @@ void BI_Plane::rebuild() noexcept
 
 void BI_Plane::serialize(SExpression& root) const
 {
-    root.appendToken(mUuid);
-    root.appendTokenChild("layer", mLayerName, false);
-    root.appendTokenChild("net", mNetSignal->getUuid(), true);
-    root.appendTokenChild("priority", mPriority, false);
-    root.appendTokenChild("min_width", mMinWidth, true);
-    root.appendTokenChild("min_clearance", mMinClearance, false);
-    root.appendTokenChild("keep_orphans", mKeepOrphans, false);
-    QString connectStyle;
-    switch (mConnectStyle) {
-        case ConnectStyle::None:    connectStyle = "none";      break;
-        //case ConnectStyle::Thermal: connectStyle = "thermal";   break;
-        case ConnectStyle::Solid:   connectStyle = "solid";     break;
-        default: throw LogicError(__FILE__, __LINE__);
-    }
-    root.appendTokenChild("connect_style", connectStyle, true);
-    //root.appendTokenChild("thermal_gap_width", mThermalGapWidth, false);
-    //root.appendTokenChild("thermal_spoke_width", mThermalSpokeWidth, false);
+    root.appendChild(mUuid);
+    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("net", mNetSignal->getUuid(), true);
+    root.appendChild("priority", mPriority, false);
+    root.appendChild("min_width", mMinWidth, true);
+    root.appendChild("min_clearance", mMinClearance, false);
+    root.appendChild("keep_orphans", mKeepOrphans, false);
+    root.appendChild("connect_style", mConnectStyle, true);
+    //root.appendChild("thermal_gap_width", mThermalGapWidth, false);
+    //root.appendChild("thermal_spoke_width", mThermalSpokeWidth, false);
     mOutline.serialize(root);
 }
 

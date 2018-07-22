@@ -61,8 +61,8 @@ StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString
 StrokeText::StrokeText(const SExpression& node) :
     mAttributeProvider(nullptr), mFont(nullptr)
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>(false)).isNull()) {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>();
         mText = node.getValueByPath<QString>("value", true);
     } else {
         // backward compatibility, remove this some time!
@@ -73,37 +73,37 @@ StrokeText::StrokeText(const SExpression& node) :
 
     // load geometry attributes
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    mHeight = node.getValueByPath<Length>("height", true);
+    mRotation = node.getValueByPath<Angle>("rot");
+    mHeight = node.getValueByPath<Length>("height");
     if (!(mHeight > 0)) {
         throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
     if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
-        mStrokeWidth = child->getValueOfFirstChild<Length>(true);
+        mStrokeWidth = child->getValueOfFirstChild<Length>();
     } else {
         // backward compatibility, remove this some time!
         mStrokeWidth = Length(200000);
     }
     if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
-        mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>(true);
+        mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
     } else {
         // backward compatibility, remove this some time!
         mLetterSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("line_spacing")) {
-        mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>(true);
+        mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
     } else {
         // backward compatibility, remove this some time!
         mLineSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("mirror")) {
-        mMirrored = child->getValueOfFirstChild<bool>(true);
+        mMirrored = child->getValueOfFirstChild<bool>();
     } else {
         // backward compatibility, remove this some time!
         mMirrored = false;
     }
     if (const SExpression* child = node.tryGetChildByPath("auto_rotate")) {
-        mAutoRotate = child->getValueOfFirstChild<bool>(true);
+        mAutoRotate = child->getValueOfFirstChild<bool>();
     } else {
         // backward compatibility, remove this some time!
         mAutoRotate = true;
@@ -354,18 +354,18 @@ void StrokeText::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("layer", mLayerName, false);
-    root.appendTokenChild("height", mHeight, true);
-    root.appendTokenChild("stroke_width", mStrokeWidth, false);
-    root.appendTokenChild("letter_spacing", mLetterSpacing, false);
-    root.appendTokenChild("line_spacing", mLineSpacing, false);
+    root.appendChild(mUuid);
+    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("height", mHeight, true);
+    root.appendChild("stroke_width", mStrokeWidth, false);
+    root.appendChild("letter_spacing", mLetterSpacing, false);
+    root.appendChild("line_spacing", mLineSpacing, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
     root.appendChild(mPosition.serializeToDomElement("pos"), false);
-    root.appendTokenChild("rot", mRotation, false);
-    root.appendTokenChild("auto_rotate", mAutoRotate, false);
-    root.appendTokenChild("mirror", mMirrored, true);
-    root.appendStringChild("value", mText, false);
+    root.appendChild("rot", mRotation, false);
+    root.appendChild("auto_rotate", mAutoRotate, false);
+    root.appendChild("mirror", mMirrored, true);
+    root.appendChild("value", mText, false);
 }
 
 /*****************************************************************************************

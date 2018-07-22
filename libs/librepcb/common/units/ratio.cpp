@@ -77,20 +77,6 @@ qint32 Ratio::normalizedStringToPpm(const QString& normalized)
     return ratio;
 }
 
-// Non-Member Functions
-
-QDataStream& operator<<(QDataStream& stream, const Ratio& ratio)
-{
-    stream << ratio.toNormalizedString();
-    return stream;
-}
-
-QDebug operator<<(QDebug stream, const Ratio& ratio)
-{
-    stream << QString("Ratio(%1%%°)").arg(ratio.toPercent());
-    return stream;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

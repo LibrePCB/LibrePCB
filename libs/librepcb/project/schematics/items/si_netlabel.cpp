@@ -45,9 +45,9 @@ SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node) :
     mRotation()
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
+    mRotation = node.getValueByPath<Angle>("rot");
 
     init();
 }
@@ -141,9 +141,9 @@ void SI_NetLabel::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
+    root.appendChild(mUuid);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
+    root.appendChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************

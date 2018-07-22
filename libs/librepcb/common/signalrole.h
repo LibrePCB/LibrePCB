@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "exceptions.h"
+#include "fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -60,7 +60,7 @@ class SignalRole final
          *
          * @return This object as a string
          */
-        QString serializeToString() const noexcept {return mRole;}
+        QString toStr() const noexcept {return mRole;}
 
         /**
          * @brief Get the name of the SignalRole (human readable and translated)
@@ -77,17 +77,6 @@ class SignalRole final
 
 
         // Static Methods
-
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static const SignalRole& deserializeFromString(const QString& str);
 
         /**
          * @brief Get a list of all available signal roles
@@ -141,6 +130,27 @@ class SignalRole final
         QString mRole;  ///< used for serialization (DO NOT MODIFY VALUES!)
         QString mName;  ///< human readable (translated)
 };
+
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const SignalRole& obj) {
+    return SExpression::createToken(obj.toStr());
+}
+
+template <>
+inline SignalRole deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    foreach (const SignalRole& role, SignalRole::getAllRoles()) {
+        if (role.toStr() == str) {
+            return role;
+        }
+    }
+    throw RuntimeError(__FILE__, __LINE__, QString(
+        SignalRole::tr("Invalid signal role: \"%1\"")).arg(str));
+}
 
 /*****************************************************************************************
  *  End of File

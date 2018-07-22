@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -132,10 +132,20 @@ class CmpSigPinDisplayType final
 };
 
 /*****************************************************************************************
- *  End of File
+ *  Non-Member Functions
  ****************************************************************************************/
 
 } // namespace library
+
+template <>
+inline SExpression serializeToSExpression(const library::CmpSigPinDisplayType& obj) {
+    return SExpression::createToken(obj.toString());
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
 } // namespace librepcb
 
 #endif // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H

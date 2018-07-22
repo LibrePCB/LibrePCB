@@ -59,7 +59,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node) :
     mLibFootprint(nullptr), mAttributes()
 {
     // get component instance
-    Uuid compInstUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    Uuid compInstUuid = node.getChildByIndex(0).getValue<Uuid>();
     mCompInstance = mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
     if (!mCompInstance) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -67,14 +67,14 @@ BI_Device::BI_Device(Board& board, const SExpression& node) :
             .arg(compInstUuid.toStr()));
     }
     // get device and footprint uuid
-    Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device", true);
-    Uuid footprintUuid = node.getValueByPath<Uuid>("lib_footprint", true);
+    Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device");
+    Uuid footprintUuid = node.getValueByPath<Uuid>("lib_footprint");
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // get position, rotation and mirrored
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    mIsMirrored = node.getValueByPath<bool>("mirror", true);
+    mRotation = node.getValueByPath<Angle>("rot");
+    mIsMirrored = node.getValueByPath<bool>("mirror");
 
     // load attributes
     mAttributes.loadFromDomElement(node); // can throw
@@ -230,12 +230,12 @@ void BI_Device::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mCompInstance->getUuid());
-    root.appendTokenChild("lib_device", mLibDevice->getUuid(), true);
-    root.appendTokenChild("lib_footprint", mLibFootprint->getUuid(), true);
+    root.appendChild(mCompInstance->getUuid());
+    root.appendChild("lib_device", mLibDevice->getUuid(), true);
+    root.appendChild("lib_footprint", mLibFootprint->getUuid(), true);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
-    root.appendTokenChild("mirror", mIsMirrored, false);
+    root.appendChild("rot", mRotation, false);
+    root.appendChild("mirror", mIsMirrored, false);
     mAttributes.serialize(root);
     mFootprint->serialize(root);
 }

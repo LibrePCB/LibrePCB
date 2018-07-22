@@ -49,11 +49,9 @@ class HAlign final
 
         HAlign() noexcept : mAlign(Qt::AlignLeft) {}
         HAlign(const HAlign& other) noexcept : mAlign(other.mAlign) {}
-        QString serializeToString() const noexcept;
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         HAlign& mirror() noexcept;
         HAlign mirrored() const noexcept {return HAlign(*this).mirror();}
-        static HAlign deserializeFromString(const QString& str);
         static HAlign left() noexcept {return HAlign(Qt::AlignLeft);}
         static HAlign center() noexcept {return HAlign(Qt::AlignHCenter);}
         static HAlign right() noexcept {return HAlign(Qt::AlignRight);}
@@ -67,6 +65,32 @@ class HAlign final
 
         Qt::AlignmentFlag mAlign;
 };
+
+/*****************************************************************************************
+ *  HAlign Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const HAlign& obj) {
+    switch (obj.toQtAlignFlag()) {
+        case Qt::AlignLeft:         return SExpression::createToken("left");
+        case Qt::AlignHCenter:      return SExpression::createToken("center");
+        case Qt::AlignRight:        return SExpression::createToken("right");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline HAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == "left")    return HAlign::left();
+    else if (str == "center")  return HAlign::center();
+    else if (str == "right")   return HAlign::right();
+    else {
+        throw RuntimeError(__FILE__, __LINE__, QString(
+            HAlign::tr("Invalid horizontal alignment: \"%1\"")).arg(str));
+    }
+}
 
 /*****************************************************************************************
  *  Class VAlign
@@ -86,11 +110,9 @@ class VAlign final
 
         VAlign() noexcept : mAlign(Qt::AlignTop) {}
         VAlign(const VAlign& other) noexcept : mAlign(other.mAlign) {}
-        QString serializeToString() const noexcept;
         Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
         VAlign& mirror() noexcept;
         VAlign mirrored() const noexcept {return VAlign(*this).mirror();}
-        static VAlign deserializeFromString(const QString& str);
         static VAlign top() noexcept {return VAlign(Qt::AlignTop);}
         static VAlign center() noexcept {return VAlign(Qt::AlignVCenter);}
         static VAlign bottom() noexcept {return VAlign(Qt::AlignBottom);}
@@ -104,6 +126,32 @@ class VAlign final
 
         Qt::AlignmentFlag mAlign;
 };
+
+/*****************************************************************************************
+ *  VAlign Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const VAlign& obj) {
+    switch (obj.toQtAlignFlag()) {
+        case Qt::AlignTop:          return SExpression::createToken("top");
+        case Qt::AlignVCenter:      return SExpression::createToken("center");
+        case Qt::AlignBottom:       return SExpression::createToken("bottom");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline VAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == "top")     return VAlign::top();
+    else if (str == "center")  return VAlign::center();
+    else if (str == "bottom")  return VAlign::bottom();
+    else {
+        throw RuntimeError(__FILE__, __LINE__, QString(
+            VAlign::tr("Invalid vertical alignment: \"%1\"")).arg(str));
+    }
+}
 
 /*****************************************************************************************
  *  Class Alignment

@@ -101,15 +101,15 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // read attributes
     if (mLoadingFileDocument.getChildByIndex(0).isString()) {
-        mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>(true);
+        mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
     } else {
         // backward compatibility, remove this some time!
-        mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid", true);
+        mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid");
     }
-    mVersion = mLoadingFileDocument.getValueByPath<Version>("version", true);
-    mAuthor = mLoadingFileDocument.getValueByPath<QString>("author", false);
-    mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created", true);
-    mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated", true);
+    mVersion = mLoadingFileDocument.getValueByPath<Version>("version");
+    mAuthor = mLoadingFileDocument.getValueByPath<QString>("author");
+    mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created");
+    mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
 
     // read names, descriptions and keywords in all available languages
     mNames.loadFromDomElement(mLoadingFileDocument);
@@ -253,14 +253,14 @@ void LibraryBaseElement::serialize(SExpression& root) const
             tr("The library element cannot be saved because it is not valid."));
     }
 
-    root.appendToken(mUuid);
+    root.appendChild(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mKeywords.serialize(root);
-    root.appendStringChild("author", mAuthor, true);
-    root.appendStringChild("version", mVersion, true);
-    root.appendTokenChild("created", mCreated, true);
-    root.appendTokenChild("deprecated", mIsDeprecated, true);
+    root.appendChild("author", mAuthor, true);
+    root.appendChild("version", mVersion, true);
+    root.appendChild("created", mCreated, true);
+    root.appendChild("deprecated", mIsDeprecated, true);
 }
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept

@@ -38,7 +38,7 @@ WSI_Appearance::WSI_Appearance(const SExpression& node) :
     WSI_Base(), mUseOpenGl(false)
 {
     if (const SExpression* child = node.tryGetChildByPath("use_opengl")) {
-        mUseOpenGl = child->getValueOfFirstChild<bool>(true);
+        mUseOpenGl = child->getValueOfFirstChild<bool>();
     }
 
     // create widgets
@@ -81,7 +81,7 @@ void WSI_Appearance::revert() noexcept
 
 void WSI_Appearance::serialize(SExpression& root) const
 {
-    root.appendTokenChild("use_opengl", mUseOpenGlCheckBox->isChecked(), true);
+    root.appendChild("use_opengl", mUseOpenGlCheckBox->isChecked(), true);
 }
 
 /*****************************************************************************************

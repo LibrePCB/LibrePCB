@@ -44,33 +44,6 @@ HAlign& HAlign::mirror() noexcept
     return *this;
 }
 
-QString HAlign::serializeToString() const noexcept
-{
-    switch (mAlign)
-    {
-        case Qt::AlignLeft:         return QString("left");
-        case Qt::AlignHCenter:      return QString("center");
-        case Qt::AlignRight:        return QString("right");
-        default: Q_ASSERT(false);   return QString();
-    }
-}
-
-
-HAlign HAlign::deserializeFromString(const QString& align)
-{
-    if (align == "left")
-        return HAlign(Qt::AlignLeft);
-    else if (align == "center")
-        return HAlign(Qt::AlignHCenter);
-    else if (align == "right")
-        return HAlign(Qt::AlignRight);
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__,
-                           QString(tr("Invalid horizontal alignment: \"%1\"")).arg(align));
-    }
-}
-
 /*****************************************************************************************
  *  Class VAlign
  ****************************************************************************************/
@@ -87,32 +60,6 @@ VAlign& VAlign::mirror() noexcept
     return *this;
 }
 
-QString VAlign::serializeToString() const noexcept
-{
-    switch (mAlign)
-    {
-        case Qt::AlignTop:          return QString("top");
-        case Qt::AlignVCenter:      return QString("center");
-        case Qt::AlignBottom:       return QString("bottom");
-        default: Q_ASSERT(false);   return QString();
-    }
-}
-
-VAlign VAlign::deserializeFromString(const QString& align)
-{
-    if (align == "top")
-        return VAlign(Qt::AlignTop);
-    else if (align == "center")
-        return VAlign(Qt::AlignVCenter);
-    else if (align == "bottom")
-        return VAlign(Qt::AlignBottom);
-    else
-    {
-        throw RuntimeError(__FILE__, __LINE__,
-                           QString(tr("Invalid vertical alignment: \"%1\"")).arg(align));
-    }
-}
-
 /*****************************************************************************************
  *  Class VAlign
  ****************************************************************************************/
@@ -120,8 +67,8 @@ VAlign VAlign::deserializeFromString(const QString& align)
 Alignment::Alignment(const SExpression& node)
 {
     try {
-        mH = node.getChildByIndex(0).getValue<HAlign>(true);
-        mV = node.getChildByIndex(1).getValue<VAlign>(true);
+        mH = node.getChildByIndex(0).getValue<HAlign>();
+        mV = node.getChildByIndex(1).getValue<VAlign>();
     } catch (const Exception& e) {
         throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                              QString(), e.getMsg());
@@ -149,8 +96,8 @@ Alignment& Alignment::mirrorV() noexcept
 
 void Alignment::serialize(SExpression& root) const
 {
-    root.appendToken(mH);
-    root.appendToken(mV);
+    root.appendChild(mH);
+    root.appendChild(mV);
 }
 
 /*****************************************************************************************

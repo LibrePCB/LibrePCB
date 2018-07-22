@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -155,13 +155,6 @@ class Ratio
          */
         QString toNormalizedString() const noexcept;
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString serializeToString() const noexcept {return toNormalizedString();}
-
 
         // Static Methods
 
@@ -200,19 +193,6 @@ class Ratio
          * @throw Exception     If the argument is invalid, an Exception will be thrown
          */
         static Ratio fromNormalized(const QString& normalized);
-
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static Ratio deserializeFromString(const QString& str) {
-            return fromNormalized(str);
-        }
 
 
         // Static Methods to create often used ratios
@@ -281,8 +261,26 @@ class Ratio
  *  Non-Member Functions
  ****************************************************************************************/
 
-QDataStream& operator<<(QDataStream& stream, const Ratio& ratio);
-QDebug operator<<(QDebug stream, const Ratio& ratio);
+template <>
+inline SExpression serializeToSExpression(const Ratio& obj) {
+    return SExpression::createToken(obj.toNormalizedString());
+}
+
+template <>
+inline Ratio deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return Ratio::fromNormalized(str);
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const Ratio& ratio) {
+    stream << ratio.toNormalizedString();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const Ratio& ratio) {
+    stream << QString("Ratio(%1%%°)").arg(ratio.toPercent());
+    return stream;
+}
 
 inline uint qHash(const Ratio& key, uint seed = 0) noexcept {
     return ::qHash(key.toPpm(), seed);

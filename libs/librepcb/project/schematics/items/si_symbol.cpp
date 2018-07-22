@@ -46,8 +46,8 @@ namespace project {
 SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr)
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
-    Uuid gcUuid = node.getValueByPath<Uuid>("component", true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
+    Uuid gcUuid = node.getValueByPath<Uuid>("component");
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -55,13 +55,13 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
             .arg(gcUuid.toStr()));
     }
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
+    mRotation = node.getValueByPath<Angle>("rot");
     Uuid symbVarItemUuid;
     if (node.tryGetChildByPath("lib_gate")) {
-        symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate", true);
+        symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
     } else {
         // backward compatibility, remove this some time!
-        symbVarItemUuid = node.getValueByPath<Uuid>("lib_item", true);
+        symbVarItemUuid = node.getValueByPath<Uuid>("lib_item");
     }
     init(symbVarItemUuid);
 }
@@ -193,11 +193,11 @@ void SI_Symbol::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("component", mComponentInstance->getUuid(), true);
-    root.appendTokenChild("lib_gate", mSymbVarItem->getUuid(), true);
+    root.appendChild(mUuid);
+    root.appendChild("component", mComponentInstance->getUuid(), true);
+    root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
+    root.appendChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************

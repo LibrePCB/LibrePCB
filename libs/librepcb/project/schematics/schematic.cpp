@@ -78,10 +78,10 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
             // the schematic seems to be ready to open, so we will create all needed objects
 
             if (root.getChildByIndex(0).isString()) {
-                mUuid = root.getChildByIndex(0).getValue<Uuid>(true);
+                mUuid = root.getChildByIndex(0).getValue<Uuid>();
             } else {
                 // backward compatibility, remove this some time!
-                mUuid = root.getValueByPath<Uuid>("uuid", true);
+                mUuid = root.getValueByPath<Uuid>("uuid");
             }
             mName = root.getValueByPath<QString>("name", true);
 
@@ -492,8 +492,8 @@ void Schematic::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendStringChild("name", mName, true);
+    root.appendChild(mUuid);
+    root.appendChild("name", mName, true);
     root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
     root.appendLineBreak();
     serializePointerContainerUuidSorted(root, mSymbols, "symbol");

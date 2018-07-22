@@ -47,48 +47,48 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
 {
     // general attributes
     mName = node.getValueByPath<QString>("name", true);
-    mDescription = node.getValueByPath<QString>("description", false);
+    mDescription = node.getValueByPath<QString>("description");
     // stop mask
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_ratio")) {
-        mStopMaskClearanceRatio = e->getValueOfFirstChild<Ratio>(true);
+        mStopMaskClearanceRatio = e->getValueOfFirstChild<Ratio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_min")) {
-        mStopMaskClearanceMin = e->getValueOfFirstChild<Length>(true);
+        mStopMaskClearanceMin = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_max")) {
-        mStopMaskClearanceMax = e->getValueOfFirstChild<Length>(true);
+        mStopMaskClearanceMax = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("stopmask_max_via_diameter")) {
-        mStopMaskMaxViaDrillDiameter = e->getValueOfFirstChild<Length>(true);
+        mStopMaskMaxViaDrillDiameter = e->getValueOfFirstChild<Length>();
     }
     // cream mask
     if (const SExpression* e = node.tryGetChildByPath("creammask_clearance_ratio")) {
-        mCreamMaskClearanceRatio = e->getValueOfFirstChild<Ratio>(true);
+        mCreamMaskClearanceRatio = e->getValueOfFirstChild<Ratio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("creammask_clearance_min")) {
-        mCreamMaskClearanceMin = e->getValueOfFirstChild<Length>(true);
+        mCreamMaskClearanceMin = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("creammask_clearance_max")) {
-        mCreamMaskClearanceMax = e->getValueOfFirstChild<Length>(true);
+        mCreamMaskClearanceMax = e->getValueOfFirstChild<Length>();
     }
     // restring
     if (const SExpression* e = node.tryGetChildByPath("restring_pad_ratio")) {
-        mRestringPadRatio = e->getValueOfFirstChild<Ratio>(true);
+        mRestringPadRatio = e->getValueOfFirstChild<Ratio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_pad_min")) {
-        mRestringPadMin = e->getValueOfFirstChild<Length>(true);
+        mRestringPadMin = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_pad_max")) {
-        mRestringPadMax = e->getValueOfFirstChild<Length>(true);
+        mRestringPadMax = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_via_ratio")) {
-        mRestringViaRatio = e->getValueOfFirstChild<Ratio>(true);
+        mRestringViaRatio = e->getValueOfFirstChild<Ratio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_via_min")) {
-        mRestringViaMin = e->getValueOfFirstChild<Length>(true);
+        mRestringViaMin = e->getValueOfFirstChild<Length>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_via_max")) {
-        mRestringViaMax = e->getValueOfFirstChild<Length>(true);
+        mRestringViaMax = e->getValueOfFirstChild<Length>();
     }
 }
 
@@ -128,24 +128,24 @@ void BoardDesignRules::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     // general attributes
-    root.appendStringChild("name",                               mName, true);
-    root.appendStringChild("description",                        mDescription, true);
+    root.appendChild("name",                                mName, true);
+    root.appendChild("description",                         mDescription, true);
     // stop mask
-    root.appendTokenChild("stopmask_clearance_ratio",            mStopMaskClearanceRatio, true);
-    root.appendTokenChild("stopmask_clearance_min",              mStopMaskClearanceMin, true);
-    root.appendTokenChild("stopmask_clearance_max",              mStopMaskClearanceMax, true);
-    root.appendTokenChild("stopmask_max_via_drill_diameter",     mStopMaskMaxViaDrillDiameter, true);
+    root.appendChild("stopmask_clearance_ratio",            mStopMaskClearanceRatio, true);
+    root.appendChild("stopmask_clearance_min",              mStopMaskClearanceMin, true);
+    root.appendChild("stopmask_clearance_max",              mStopMaskClearanceMax, true);
+    root.appendChild("stopmask_max_via_drill_diameter",     mStopMaskMaxViaDrillDiameter, true);
     // cream mask
-    root.appendTokenChild("creammask_clearance_ratio",           mCreamMaskClearanceRatio, true);
-    root.appendTokenChild("creammask_clearance_min",             mCreamMaskClearanceMin, true);
-    root.appendTokenChild("creammask_clearance_max",             mCreamMaskClearanceMax, true);
+    root.appendChild("creammask_clearance_ratio",           mCreamMaskClearanceRatio, true);
+    root.appendChild("creammask_clearance_min",             mCreamMaskClearanceMin, true);
+    root.appendChild("creammask_clearance_max",             mCreamMaskClearanceMax, true);
     // restring
-    root.appendTokenChild("restring_pad_ratio",                  mRestringPadRatio, true);
-    root.appendTokenChild("restring_pad_min",                    mRestringPadMin, true);
-    root.appendTokenChild("restring_pad_max",                    mRestringPadMax, true);
-    root.appendTokenChild("restring_via_ratio",                  mRestringViaRatio, true);
-    root.appendTokenChild("restring_via_min",                    mRestringViaMin, true);
-    root.appendTokenChild("restring_via_max",                    mRestringViaMax, true);
+    root.appendChild("restring_pad_ratio",                  mRestringPadRatio, true);
+    root.appendChild("restring_pad_min",                    mRestringPadMin, true);
+    root.appendChild("restring_pad_max",                    mRestringPadMax, true);
+    root.appendChild("restring_via_ratio",                  mRestringViaRatio, true);
+    root.appendChild("restring_via_min",                    mRestringViaMin, true);
+    root.appendChild("restring_via_max",                    mRestringViaMax, true);
 }
 
 /*****************************************************************************************

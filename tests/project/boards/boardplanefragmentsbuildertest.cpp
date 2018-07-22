@@ -77,7 +77,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments)
     SExpression actualSexpr = SExpression::createList("actual");
     foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
         SExpression child = SExpression::createList("plane");
-        child.appendToken(uuid.toStr());
+        child.appendChild(uuid);
         foreach (const Path& fragment, actualPlaneFragments[uuid]) {
             child.appendChild(fragment.serializeToDomElement("fragment"), true);
         }
@@ -90,7 +90,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments)
     SExpression expectedSexpr = SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
     QMap<Uuid, QSet<Path>> expectedPlaneFragments;
     foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
-        Uuid uuid = child.getValueOfFirstChild<Uuid>(true);
+        Uuid uuid = child.getValueOfFirstChild<Uuid>();
         foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
             expectedPlaneFragments[uuid].insert(Path(fragmentChild));
         }

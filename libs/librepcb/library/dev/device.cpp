@@ -46,8 +46,8 @@ Device::Device(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
 {
     // load attributes
-    mComponentUuid = mLoadingFileDocument.getValueByPath<Uuid>("component", true);
-    mPackageUuid = mLoadingFileDocument.getValueByPath<Uuid>("package", true);
+    mComponentUuid = mLoadingFileDocument.getValueByPath<Uuid>("component");
+    mPackageUuid = mLoadingFileDocument.getValueByPath<Uuid>("package");
     mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
     mPadSignalMap.loadFromDomElement(mLoadingFileDocument);
 
@@ -83,8 +83,8 @@ void Device::setPackageUuid(const Uuid& uuid) noexcept
 void Device::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
-    root.appendTokenChild("component", mComponentUuid, true);
-    root.appendTokenChild("package", mPackageUuid, true);
+    root.appendChild("component", mComponentUuid, true);
+    root.appendChild("package", mPackageUuid, true);
     mAttributes.serialize(root);
     mPadSignalMap.sortedByUuid().serialize(root);
 }

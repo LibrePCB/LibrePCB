@@ -140,10 +140,35 @@ class BI_Via final : public BI_Base, public SerializableObject
 };
 
 /*****************************************************************************************
- *  End of File
+ *  Non-Member Functions
  ****************************************************************************************/
 
 } // namespace project
+
+template <>
+inline SExpression serializeToSExpression(const project::BI_Via::Shape& obj) {
+    switch (obj) {
+        case project::BI_Via::Shape::Round:     return SExpression::createToken("round");
+        case project::BI_Via::Shape::Square:    return SExpression::createToken("square");
+        case project::BI_Via::Shape::Octagon:   return SExpression::createToken("octagon");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline project::BI_Via::Shape deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == "round")    return project::BI_Via::Shape::Round;
+    else if (str == "square")   return project::BI_Via::Shape::Square;
+    else if (str == "octagon")  return project::BI_Via::Shape::Octagon;
+    else throw RuntimeError(__FILE__, __LINE__,
+        QString(project::BI_Via::tr("Unknown via shape: \"%1\"")).arg(str));
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
 } // namespace librepcb
 
 #endif // LIBREPCB_PROJECT_BI_VIA_H

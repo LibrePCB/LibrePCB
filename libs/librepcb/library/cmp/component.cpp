@@ -48,9 +48,9 @@ Component::Component(const FilePath& elementDirectory, bool readOnly) :
     mSchematicOnly(false), mDefaultValue()
 {
     // Load all properties
-    mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only", true);
+    mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");
     mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
-    mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value", false);
+    mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value");
     mPrefixes.loadFromDomElement(mLoadingFileDocument);
     mSignals.loadFromDomElement(mLoadingFileDocument);
     mSymbolVariants.loadFromDomElement(mLoadingFileDocument);
@@ -105,8 +105,8 @@ std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
 void Component::serialize(SExpression& root) const
 {
     LibraryElement::serialize(root);
-    root.appendTokenChild("schematic_only", mSchematicOnly, true);
-    root.appendStringChild("default_value", mDefaultValue, true);
+    root.appendChild("schematic_only", mSchematicOnly, true);
+    root.appendChild("default_value", mDefaultValue, true);
     mPrefixes.serialize(root);
     mAttributes.serialize(root);
     mSignals.serialize(root);

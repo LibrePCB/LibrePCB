@@ -36,7 +36,7 @@ Vertex::Vertex(const SExpression& node)
 {
     try {
         mPos = Point(node.getChildByPath("pos"));
-        mAngle = node.getValueByPath<Angle>("angle", true);
+        mAngle = node.getValueByPath<Angle>("angle");
     } catch (const Exception& e) {
         throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                              QString(), e.getMsg());
@@ -50,7 +50,7 @@ Vertex::Vertex(const SExpression& node)
 void Vertex::serialize(SExpression& root) const
 {
     root.appendChild(mPos.serializeToDomElement("pos"), false);
-    root.appendTokenChild("angle", mAngle, false);
+    root.appendChild("angle", mAngle, false);
 }
 
 /*****************************************************************************************

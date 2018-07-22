@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "exceptions.h"
+#include "fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -99,13 +99,6 @@ class Uuid final
          */
         QString toStr() const noexcept {return mUuid;}
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString serializeToString() const noexcept {return isNull() ? "null" : toStr();}
-
 
         // Setters
 
@@ -142,24 +135,6 @@ class Uuid final
         // Static Methods
 
         /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static Uuid deserializeFromString(const QString& str) {
-            Uuid uuid(str);
-            if (uuid.isNull() && (!str.isEmpty()) && (str != "null")) {
-                throw RuntimeError(__FILE__, __LINE__,
-                                   QString(tr("Invalid UUID: \"%1\"")).arg(str));
-            }
-            return uuid;
-        }
-
-        /**
          * @brief Create a new random UUID
          *
          * @return The new UUID
@@ -176,6 +151,22 @@ class Uuid final
 /*****************************************************************************************
  *  Non-Member Functions
  ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const Uuid& obj) {
+    return SExpression::createToken(obj.isNull() ? "null" : obj.toStr());
+}
+
+template <>
+inline Uuid deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    Uuid uuid(str);
+    if (uuid.isNull() && (str != "null")) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString(Uuid::tr("Invalid UUID: \"%1\"")).arg(str));
+    }
+    return uuid;
+}
 
 inline QDataStream& operator<<(QDataStream& stream, const Uuid& uuid) noexcept {
     stream << uuid.toStr();

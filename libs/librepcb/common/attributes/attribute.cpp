@@ -43,9 +43,9 @@ Attribute::Attribute(const SExpression& node) :
     mKey(), mType(nullptr), mValue(), mUnit(nullptr)
 {
     mKey = node.getChildByIndex(0).getValue<QString>(true);
-    mType = &AttributeType::fromString(node.getValueByPath<QString>("type", true));
-    mUnit = mType->getUnitFromString(node.getValueByPath<QString>("unit", false));
-    mValue = node.getValueByPath<QString>("value", false);
+    mType = &AttributeType::fromString(node.getValueByPath<QString>("type"));
+    mUnit = mType->getUnitFromString(node.getValueByPath<QString>("unit"));
+    mValue = node.getValueByPath<QString>("value");
 
     // backward compatibility - remove this some time!
     mValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
@@ -106,10 +106,14 @@ void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value
 void Attribute::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-    root.appendString(mKey);
-    root.appendTokenChild("type", mType->getName(), false);
-    root.appendTokenChild("unit", mUnit ? mUnit->getName() : "none", false);
-    root.appendStringChild("value", mValue, false);
+    root.appendChild(mKey);
+    root.appendChild("type", *mType, false);
+    if (mUnit) {
+        root.appendChild("unit", *mUnit, false);
+    } else {
+        root.appendChild("unit", SExpression::createToken("none"), false);
+    }
+    root.appendChild("value", mValue, false);
 }
 
 /*****************************************************************************************

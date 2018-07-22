@@ -39,7 +39,7 @@ WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const SExpression& node
     mInterval(600), mIntervalTmp(mInterval)
 {
     if (const SExpression* child = node.tryGetChildByPath("project_autosave_interval")) {
-        mInterval = child->getValueOfFirstChild<uint>(true);
+        mInterval = child->getValueOfFirstChild<uint>();
     }
 
     if (mInterval % 60 != 0) {
@@ -100,7 +100,7 @@ void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
 
 void WSI_ProjectAutosaveInterval::serialize(SExpression& root) const
 {
-    root.appendTokenChild("project_autosave_interval", mInterval, true);
+    root.appendChild("project_autosave_interval", mInterval, true);
 }
 
 /*****************************************************************************************

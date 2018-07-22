@@ -105,12 +105,6 @@ class FootprintPad final : public SerializableObject
         bool operator!=(const FootprintPad& rhs) const noexcept {return !(*this == rhs);}
         FootprintPad& operator=(const FootprintPad& rhs) noexcept;
 
-        // Static Methods
-        static Shape stringToShape(const QString& shape);
-        static QString shapeToString(Shape shape) noexcept;
-        static BoardSide stringToBoardSide(const QString& side);
-        static QString boardSideToString(BoardSide side) noexcept;
-
 
     protected: // Data
         Uuid mPackagePadUuid;
@@ -135,10 +129,53 @@ using CmdFootprintPadRemove = CmdListElementRemove<FootprintPad, FootprintPadLis
 using CmdFootprintPadsSwap = CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider>;
 
 /*****************************************************************************************
- *  End of File
+ *  Non-Member Functions
  ****************************************************************************************/
 
 } // namespace library
+
+template <>
+inline SExpression serializeToSExpression(const library::FootprintPad::BoardSide& obj) {
+    switch (obj) {
+        case library::FootprintPad::BoardSide::TOP:    return SExpression::createToken("top");
+        case library::FootprintPad::BoardSide::BOTTOM: return SExpression::createToken("bottom");
+        case library::FootprintPad::BoardSide::THT:    return SExpression::createToken("tht");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline library::FootprintPad::BoardSide deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == QLatin1String("top"))      return library::FootprintPad::BoardSide::TOP;
+    else if (str == QLatin1String("bottom"))   return library::FootprintPad::BoardSide::BOTTOM;
+    else if (str == QLatin1String("tht"))      return library::FootprintPad::BoardSide::THT;
+    else throw RuntimeError(__FILE__, __LINE__, str);
+}
+
+template <>
+inline SExpression serializeToSExpression(const library::FootprintPad::Shape& obj) {
+    switch (obj) {
+        case library::FootprintPad::Shape::ROUND:   return SExpression::createToken("round");
+        case library::FootprintPad::Shape::RECT:    return SExpression::createToken("rect");
+        case library::FootprintPad::Shape::OCTAGON: return SExpression::createToken("octagon");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline library::FootprintPad::Shape deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == QLatin1String("round"))   return library::FootprintPad::Shape::ROUND;
+    else if (str == QLatin1String("rect"))    return library::FootprintPad::Shape::RECT;
+    else if (str == QLatin1String("octagon")) return library::FootprintPad::Shape::OCTAGON;
+    else throw RuntimeError(__FILE__, __LINE__, str);
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
 } // namespace librepcb
 
 #endif // LIBREPCB_LIBRARY_FOOTPRINTPAD_H

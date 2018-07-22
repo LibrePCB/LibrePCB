@@ -57,7 +57,7 @@ Footprint::Footprint(const SExpression& node) :
     mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mNames.loadFromDomElement(node);
     mDescriptions.loadFromDomElement(node);
 
@@ -109,7 +109,7 @@ void Footprint::unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept
 
 void Footprint::serialize(SExpression& root) const
 {
-    root.appendToken(mUuid);
+    root.appendChild(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mPads.serialize(root);

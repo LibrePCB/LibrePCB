@@ -53,9 +53,9 @@ GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
     for (const SExpression& child : node.getChildren("layer")) {
         QString name = child.getChildByIndex(0).getValue<QString>(true);
         if (GraphicsLayer* layer = mLayers.getLayer(name)) {
-            layer->setColor(child.getValueByPath<QColor>("color", true));
-            layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl", true));
-            layer->setVisible(child.getValueByPath<bool>("visible", true));
+            layer->setColor(child.getValueByPath<QColor>("color"));
+            layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl"));
+            layer->setVisible(child.getValueByPath<bool>("visible"));
         }
     }
 }
@@ -72,10 +72,10 @@ void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const
 {
     for (const GraphicsLayer* layer : mLayers.getAllLayers()) { Q_ASSERT(layer);
         SExpression& child = root.appendList("layer", true);
-        child.appendToken(layer->getName());
-        child.appendStringChild("color",    layer->getColor(false), false);
-        child.appendStringChild("color_hl", layer->getColor(true), false);
-        child.appendTokenChild("visible",  layer->getVisible(), false);
+        child.appendChild(SExpression::createToken(layer->getName()));
+        child.appendChild("color",    layer->getColor(false), false);
+        child.appendChild("color_hl", layer->getColor(true), false);
+        child.appendChild("visible",  layer->getVisible(), false);
     }
 }
 

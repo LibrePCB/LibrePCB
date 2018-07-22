@@ -146,10 +146,35 @@ class BI_Plane final : public BI_Base, public SerializableObject
 };
 
 /*****************************************************************************************
- *  End of File
+ *  Non-Member Functions
  ****************************************************************************************/
 
 } // namespace project
+
+template <>
+inline SExpression serializeToSExpression(const project::BI_Plane::ConnectStyle& obj) {
+    switch (obj) {
+        case project::BI_Plane::ConnectStyle::None:     return SExpression::createToken("none");
+        //case project::BI_Plane::ConnectStyle::Thermal:  return SExpression::createToken("thermal");
+        case project::BI_Plane::ConnectStyle::Solid:    return SExpression::createToken("solid");
+        default: throw LogicError(__FILE__, __LINE__);
+    }
+}
+
+template <>
+inline project::BI_Plane::ConnectStyle deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if      (str == "none")     return project::BI_Plane::ConnectStyle::None;
+    //else if (str == "thermal")  return project::BI_Plane::ConnectStyle::Thermal;
+    else if (str == "solid")    return project::BI_Plane::ConnectStyle::Solid;
+    else throw RuntimeError(__FILE__, __LINE__,
+        QString(project::BI_Plane::tr("Unknown plane connect style: \"%1\"")).arg(str));
+}
+
+/*****************************************************************************************
+ *  End of File
+ ****************************************************************************************/
+
 } // namespace librepcb
 
 #endif // LIBREPCB_PROJECT_BI_PLANE_H

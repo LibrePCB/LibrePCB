@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -260,13 +260,6 @@ class Length
          */
         qreal toPx() const noexcept {return mNanometers * sPixelsPerNm;}
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString serializeToString() const noexcept {return toMmString();}
-
 
         // General Methods
 
@@ -438,19 +431,6 @@ class Length
          */
         static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
 
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static Length deserializeFromString(const QString& str) {
-            return fromMm(str); // can throw
-        }
-
 
         // Operators
         Length& operator=(const Length& rhs)        {mNanometers = rhs.mNanometers; return *this;}
@@ -550,6 +530,17 @@ class Length
 /*****************************************************************************************
  *  Non-Member Functions
  ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const Length& obj) {
+    return SExpression::createToken(obj.toMmString());
+}
+
+template <>
+inline Length deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return Length::fromMm(str);
+}
 
 QDataStream& operator<<(QDataStream& stream, const Length& length);
 QDebug operator<<(QDebug stream, const Length& length);

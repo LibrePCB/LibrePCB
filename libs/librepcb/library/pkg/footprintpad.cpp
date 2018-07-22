@@ -54,12 +54,12 @@ FootprintPad::FootprintPad(const SExpression& node) :
     mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mPackagePadUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mPackagePadUuid = node.getChildByIndex(0).getValue<Uuid>();
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    mBoardSide = stringToBoardSide(node.getValueByPath<QString>("side", true));
-    mShape = stringToShape(node.getValueByPath<QString>("shape", true));
-    mDrillDiameter = node.getValueByPath<Length>("drill", true);
+    mRotation = node.getValueByPath<Angle>("rot");
+    mBoardSide = node.getValueByPath<BoardSide>("side");
+    mShape = node.getValueByPath<Shape>("shape");
+    mDrillDiameter = node.getValueByPath<Length>("drill");
     mWidth = Point(node.getChildByPath("size")).getX();
     mHeight = Point(node.getChildByPath("size")).getY();
 
@@ -190,13 +190,13 @@ void FootprintPad::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mPackagePadUuid);
-    root.appendTokenChild("side", boardSideToString(mBoardSide), false);
-    root.appendTokenChild("shape", shapeToString(mShape), false);
+    root.appendChild(mPackagePadUuid);
+    root.appendChild("side", mBoardSide, false);
+    root.appendChild("shape", mShape, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
+    root.appendChild("rot", mRotation, false);
     root.appendChild(Point(mWidth, mHeight).serializeToDomElement("size"), false);
-    root.appendTokenChild("drill", mDrillDiameter, false);
+    root.appendChild("drill", mDrillDiameter, false);
 }
 
 /*****************************************************************************************
@@ -240,48 +240,6 @@ bool FootprintPad::checkAttributesValidity() const noexcept
     if (mHeight <= 0)                               return false;
     if (mDrillDiameter < 0)                         return false;
     return true;
-}
-
-/*****************************************************************************************
- *  Static Methods
- ****************************************************************************************/
-
-FootprintPad::Shape FootprintPad::stringToShape(const QString& shape)
-{
-    if      (shape == QLatin1String("round"))   return Shape::ROUND;
-    else if (shape == QLatin1String("rect"))    return Shape::RECT;
-    else if (shape == QLatin1String("octagon")) return Shape::OCTAGON;
-    else throw RuntimeError(__FILE__, __LINE__, shape);
-}
-
-QString FootprintPad::shapeToString(Shape shape) noexcept
-{
-    switch (shape)
-    {
-        case Shape::ROUND:    return QString("round");
-        case Shape::RECT:     return QString("rect");
-        case Shape::OCTAGON:  return QString("octagon");
-        default: Q_ASSERT(false); return QString();
-    }
-}
-
-FootprintPad::BoardSide FootprintPad::stringToBoardSide(const QString& side)
-{
-    if      (side == QLatin1String("top"))      return BoardSide::TOP;
-    else if (side == QLatin1String("bottom"))   return BoardSide::BOTTOM;
-    else if (side == QLatin1String("tht"))      return BoardSide::THT;
-    else throw RuntimeError(__FILE__, __LINE__, side);
-}
-
-QString FootprintPad::boardSideToString(BoardSide side) noexcept
-{
-    switch (side)
-    {
-        case BoardSide::TOP:    return QString("top");
-        case BoardSide::BOTTOM: return QString("bottom");
-        case BoardSide::THT:    return QString("tht");
-        default: Q_ASSERT(false); return QString();
-    }
 }
 
 /*****************************************************************************************

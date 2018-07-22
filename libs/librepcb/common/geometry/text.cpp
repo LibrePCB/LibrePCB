@@ -52,8 +52,8 @@ Text::Text(const Uuid& uuid, const QString& layerName, const QString& text, cons
 
 Text::Text(const SExpression& node)
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>(false)).isNull()) {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+        mUuid = node.getChildByIndex(0).getValue<Uuid>();
         mText = node.getValueByPath<QString>("value", true);
     } else {
         // backward compatibility, remove this some time!
@@ -64,8 +64,8 @@ Text::Text(const SExpression& node)
 
     // load geometry attributes
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    mHeight = node.getValueByPath<Length>("height", true);
+    mRotation = node.getValueByPath<Angle>("rot");
+    mHeight = node.getValueByPath<Length>("height");
     if (!(mHeight > 0)) {
         throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
@@ -160,13 +160,13 @@ void Text::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendTokenChild("layer", mLayerName, false);
-    root.appendStringChild("value", mText, false);
+    root.appendChild(mUuid);
+    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("value", mText, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
-    root.appendTokenChild("height", mHeight, false);
+    root.appendChild("height", mHeight, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), false);
-    root.appendTokenChild("rot", mRotation, false);
+    root.appendChild("rot", mRotation, false);
 }
 
 /*****************************************************************************************

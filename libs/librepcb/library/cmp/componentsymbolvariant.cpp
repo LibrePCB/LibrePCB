@@ -54,8 +54,8 @@ ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node) :
     QObject(nullptr), mSymbolItems(this)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
-    mNorm = node.getValueByPath<QString>("norm", false);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
+    mNorm = node.getValueByPath<QString>("norm");
     mNames.loadFromDomElement(node);
     mDescriptions.loadFromDomElement(node);
 
@@ -120,8 +120,8 @@ void ComponentSymbolVariant::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendStringChild("norm", mNorm, false);
+    root.appendChild(mUuid);
+    root.appendChild("norm", mNorm, false);
     mNames.serialize(root);
     mDescriptions.serialize(root);
     mSymbolItems.serialize(root);

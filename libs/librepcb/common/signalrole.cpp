@@ -66,17 +66,6 @@ SignalRole& SignalRole::operator=(const SignalRole& rhs) noexcept
  *  Static Methods
  ****************************************************************************************/
 
-const SignalRole& SignalRole::deserializeFromString(const QString& str)
-{
-    foreach (const SignalRole& role, getAllRoles()) {
-        if (role.serializeToString() == str) {
-            return role;
-        }
-    }
-    throw RuntimeError(__FILE__, __LINE__,
-        QString(tr("Invalid signal role: \"%1\"")).arg(str));
-}
-
 const QList<SignalRole>& SignalRole::getAllRoles() noexcept
 {
     static QList<SignalRole> list{

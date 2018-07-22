@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -189,13 +189,6 @@ class Angle
          */
         qreal toRad() const noexcept {return (qreal)mMicrodegrees * (qreal)M_PI / 180e6;}
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString serializeToString() const noexcept {return toDegString();}
-
 
         // General Methods
 
@@ -292,19 +285,6 @@ class Angle
          */
         static Angle fromRad(qreal radians) noexcept;
 
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static Angle deserializeFromString(const QString& str) {
-            return fromDeg(str); // can throw
-        }
-
 
         // Static Methods to create often used angles
         static Angle deg0()   noexcept {return Angle(        0);}   ///<   0 degrees
@@ -373,8 +353,26 @@ class Angle
  *  Non-Member Functions
  ****************************************************************************************/
 
-QDataStream& operator<<(QDataStream& stream, const Angle& angle);
-QDebug operator<<(QDebug stream, const Angle& angle);
+template <>
+inline SExpression serializeToSExpression(const Angle& obj) {
+    return SExpression::createToken(obj.toDegString());
+}
+
+template <>
+inline Angle deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return Angle::fromDeg(str); // can throw
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const Angle& angle) {
+    stream << angle.toDeg();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const Angle& angle) {
+    stream << QString("Angle(%1°)").arg(angle.toDeg());
+    return stream;
+}
 
 inline uint qHash(const Angle& key, uint seed = 0) noexcept {
     return ::qHash(key.toMicroDeg(), seed);

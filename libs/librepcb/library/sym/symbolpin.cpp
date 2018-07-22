@@ -54,11 +54,11 @@ SymbolPin::SymbolPin(const SExpression& node) :
     mRegisteredGraphicsItem(nullptr)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>(true);
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     mName = node.getValueByPath<QString>("name", true);
     mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot", true);
-    mLength = node.getValueByPath<Length>("length", true);
+    mRotation = node.getValueByPath<Angle>("rot");
+    mLength = node.getValueByPath<Length>("length");
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -118,11 +118,11 @@ void SymbolPin::serialize(SExpression& root) const
 {
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-    root.appendToken(mUuid);
-    root.appendStringChild("name", mName, false);
+    root.appendChild(mUuid);
+    root.appendChild("name", mName, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendTokenChild("rot", mRotation, false);
-    root.appendTokenChild("length", mLength, false);
+    root.appendChild("rot", mRotation, false);
+    root.appendChild("length", mLength, false);
 }
 
 /*****************************************************************************************

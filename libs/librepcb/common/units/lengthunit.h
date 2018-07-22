@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../exceptions.h"
+#include "../fileio/sexpression.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -135,7 +135,7 @@ class LengthUnit final
          *
          * @return This object as a string
          */
-        QString serializeToString() const noexcept;
+        QString toStr() const noexcept;
 
         /**
          * @brief Convert the length unit to a localized string
@@ -228,18 +228,7 @@ class LengthUnit final
          *
          * @see #getIndex(), #getAllUnits()
          */
-        static LengthUnit fromIndex(int index);
-
-        /**
-         * @brief Deserialize object from a string
-         *
-         * @param str           Input string
-         *
-         * @return The created element
-         *
-         * @throws Exception if the string was invalid
-         */
-        static LengthUnit deserializeFromString(const QString& str);
+        static LengthUnit fromIndex(int index);;
 
         /**
          * @brief Get all available length units
@@ -286,9 +275,43 @@ class LengthUnit final
         LengthUnit_t mUnit;
 };
 
-// Non-Member Functions
-QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit);
-QDebug operator<<(QDebug stream, const LengthUnit& unit);
+/*****************************************************************************************
+ *  Non-Member Functions
+ ****************************************************************************************/
+
+template <>
+inline SExpression serializeToSExpression(const LengthUnit& obj) {
+    return SExpression::createToken(obj.toStr());
+}
+
+template <>
+inline LengthUnit deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    if (str == "millimeters")
+        return LengthUnit::millimeters();
+    else if (str == "micrometers")
+        return LengthUnit::micrometers();
+    else if (str == "nanometers")
+        return LengthUnit::nanometers();
+    else if (str == "inches")
+        return LengthUnit::inches();
+    else if (str == "mils")
+        return LengthUnit::mils();
+    else {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
+    }
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {
+    stream << unit.toStr();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const LengthUnit& unit) {
+    stream << QString("LengthUnit(%1)").arg(unit.toStr());
+    return stream;
+}
 
 /*****************************************************************************************
  *  End of File
