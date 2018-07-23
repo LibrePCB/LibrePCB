@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "application.h"
 #include "exceptions.h"
+#include "dialogs/aboutdialog.h"
 #include "font/strokefontpool.h"
 #include "units/all_length_units.h"
 
@@ -52,6 +53,11 @@ Application::Application(int& argc, char** argv) noexcept :
     if (mGitVersion.isEmpty()) {
         qWarning() << "Could not determine Git version. Check if Git is added to the PATH.";
     }
+
+    // set build timestamp
+    QDate buildDate = QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
+    QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
+    mBuildDate = QDateTime(buildDate, buildTime);
 
     // set and verify file format version
     mFileFormatVersion = Version(FILE_FORMAT_VERSION);
@@ -164,6 +170,17 @@ Application* Application::instance() noexcept
     Application* app = dynamic_cast<Application*>(QCoreApplication::instance());
     Q_ASSERT(app);
     return app;
+}
+
+/*****************************************************************************************
+ *  Slots
+ ****************************************************************************************/
+
+void Application::about() noexcept
+{
+    QWidget* parent = QApplication::activeWindow();
+    AboutDialog aboutDialog(parent);
+    aboutDialog.exec();
 }
 
 /*****************************************************************************************

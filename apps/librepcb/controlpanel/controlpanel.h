@@ -107,7 +107,6 @@ class ControlPanel final : public QMainWindow
         void projectEditorClosed() noexcept;
 
         // Actions
-        void on_actionAbout_triggered();
         void on_actionNew_Project_triggered();
         void on_actionOpen_Project_triggered();
         void on_actionOpen_Library_Manager_triggered();

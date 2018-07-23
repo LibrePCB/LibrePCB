@@ -50,7 +50,7 @@ class StrokeFontPool;
  ****************************************************************************************/
 
 /**
- * @brief The Application class extends the QApplication with the exception-save method
+ * @brief The Application class extends the QApplication with the exception-safe method
  *        #notify()
  *
  * @author ubruhin
@@ -71,6 +71,7 @@ class Application final : public QApplication
         // Getters
         const Version& getAppVersion() const noexcept {return mAppVersion;}
         const QString& getGitVersion() const noexcept {return mGitVersion;}
+        const QDateTime& getBuildDate() const noexcept {return mBuildDate;}
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
         const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
         FilePath getResourcesFilePath(const QString& filepath) const noexcept;
@@ -90,9 +91,13 @@ class Application final : public QApplication
         static Application* instance() noexcept;
 
 
+    public slots:
+        static void about() noexcept;
+
     private: // Data
         Version mAppVersion;
         QString mGitVersion;
+        QDateTime mBuildDate;
         Version mFileFormatVersion;
         FilePath mResourcesDir;
         QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all application stroke fonts

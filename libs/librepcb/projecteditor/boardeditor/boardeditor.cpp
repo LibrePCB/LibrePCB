@@ -28,12 +28,14 @@
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>
+#include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include <librepcb/common/dialogs/boarddesignrulesdialog.h>
 #include "../dialogs/projectpropertieseditordialog.h"
@@ -110,6 +112,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project) :
     // connect some actions which are created with the Qt Designer
     connect(mUi->actionProjectSave, &QAction::triggered, &mProjectEditor, &ProjectEditor::saveProject);
     connect(mUi->actionQuit, &QAction::triggered, this, &BoardEditor::close);
+    connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
     connect(mUi->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(mUi->actionZoomIn, &QAction::triggered, mGraphicsView, &GraphicsView::zoomIn);
     connect(mUi->actionZoomOut, &QAction::triggered, mGraphicsView, &GraphicsView::zoomOut);

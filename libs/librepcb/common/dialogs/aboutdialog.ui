@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::AboutDialog</class>
+ <widget class="QDialog" name="librepcb::AboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>440</width>
+    <height>438</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About LibrePCB</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="logo">
+       <property name="minimumSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../../img/images.qrc">:/img/app/librepcb.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="heading">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>About LibrePCB</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="textVersion">
+     <property name="text">
+      <string notr="true">TEXT_VERSION</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tabGeneral">
+        <attribute name="title">
+         <string>General</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <layout class="QVBoxLayout" name="tabGeneralLayout">
+           <item>
+            <widget class="QLabel" name="textIntro">
+             <property name="text">
+              <string>LibrePCB is a free &amp;amp; open source schematic/layout-editor. It is mainly developed by Urban Bruhin, with &lt;a href=&quot;https://github.com/LibrePCB/LibrePCB/graphs/contributors&quot;&gt;over a dozen other contributors&lt;/a&gt;!</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="headerLinks">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string notr="true">Links</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textLinks">
+             <property name="text">
+              <string notr="true">TEXT_LINKS</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="headerLicense">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string notr="true">License</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textLicense">
+             <property name="text">
+              <string>LibrePCB is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text &lt;a href=&quot;https://github.com/LibrePCB/LibrePCB/blob/master/LICENSE.txt&quot;&gt;in our source code&lt;/a&gt;.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="spacerGeneral">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabContributing">
+        <attribute name="title">
+         <string>Contributing</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <layout class="QVBoxLayout" name="tabContributingLayout">
+           <item>
+            <widget class="QLabel" name="textContributingIntro">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;LibrePCB is a community project, and therefore it relies on contributions! There are different ways you can contribute:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="headerContributeFinancially">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Donate</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textContributeFinancially">
+             <property name="text">
+              <string notr="true">TEXT_CONTRIBUTE_FINANCIALLY</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="headerContributeCode">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Contribute Code</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textContributeCode">
+             <property name="text">
+              <string>TEXT_CONTRIBUTE_CODE</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="headerContributeShare">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Spread The Word</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textContributeShare">
+             <property name="text">
+              <string>Speak about LibrePCB with your friends and colleagues, or write about it in the internet! Write a blogpost, or create a video tutorial. We're happy if more people can get to know LibrePCB.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="spacerContributing">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
+ <connections/>
+</ui>
