@@ -57,8 +57,8 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node) :
     mLayerName(node.getValueByPath<QString>("layer", true)),
     mNetSignal(nullptr),
     mOutline(),
-    mMinWidth(node.getValueByPath<Length>("min_width")),
-    mMinClearance(node.getValueByPath<Length>("min_clearance")),
+    mMinWidth(node.getValueByPath<UnsignedLength>("min_width")),
+    mMinClearance(node.getValueByPath<UnsignedLength>("min_clearance")),
     mKeepOrphans(node.getValueByPath<bool>("keep_orphans")),
     mPriority(node.getValueByPath<int>("priority")),
     mConnectStyle(node.getValueByPath<ConnectStyle>("connect_style"))
@@ -137,14 +137,14 @@ void BI_Plane::setNetSignal(NetSignal& netsignal)
     }
 }
 
-void BI_Plane::setMinWidth(const Length& minWidth) noexcept
+void BI_Plane::setMinWidth(const UnsignedLength& minWidth) noexcept
 {
     if (minWidth != mMinWidth) {
         mMinWidth = minWidth;
     }
 }
 
-void BI_Plane::setMinClearance(const Length& minClearance) noexcept
+void BI_Plane::setMinClearance(const UnsignedLength& minClearance) noexcept
 {
     if (minClearance != mMinClearance) {
         mMinClearance = minClearance;

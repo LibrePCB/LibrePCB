@@ -127,7 +127,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(const std::shared_ptr<Footp
     } else {
         mContext.currentGraphicsItem.reset();
         mSelectFootprintGraphicsItem.reset(new PrimitiveTextGraphicsItem());
-        mSelectFootprintGraphicsItem->setHeight(Length::fromMm(5));
+        mSelectFootprintGraphicsItem->setHeight(PositiveLength(Length::fromMm(5)));
         mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
         mSelectFootprintGraphicsItem->setLayer(
             mContext.layerProvider.getLayer(GraphicsLayer::sBoardOutlines));

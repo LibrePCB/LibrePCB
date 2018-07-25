@@ -69,7 +69,7 @@ class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_Hol
 
     private: // Methods
         void holePositionChanged(const Point& newPos) noexcept override;
-        void holeDiameterChanged(const Length& newDiameter) noexcept override;
+        void holeDiameterChanged(const PositiveLength& newDiameter) noexcept override;
         QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
 
 

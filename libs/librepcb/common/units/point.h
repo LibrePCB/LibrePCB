@@ -280,7 +280,7 @@ class Point final : public SerializableObject
          *
          * @see Length#mappedToGrid(), Point#mapToGrid()
          */
-        Point mappedToGrid(const Length& gridInterval) const noexcept;
+        Point mappedToGrid(const PositiveLength& gridInterval) const noexcept;
 
         /**
          * @brief Map this Point object to a specific grid interval
@@ -291,7 +291,7 @@ class Point final : public SerializableObject
          *
          * @see Length#mapToGrid(), Point#mappedToGrid()
          */
-        Point& mapToGrid(const Length& gridInterval) noexcept;
+        Point& mapToGrid(const PositiveLength& gridInterval) noexcept;
 
         /**
          * @brief Get the point rotated by a specific angle with respect to a specific center
@@ -356,22 +356,22 @@ class Point final : public SerializableObject
         // Static Functions
 
         /// @see Length::fromMm(qreal, const Length&)
-        static Point fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval = Length(0));
-        static Point fromMm(const QPointF& millimeters,             const Length& gridInterval = Length(0));
+        static Point fromMm(qreal millimetersX, qreal millimetersY);
+        static Point fromMm(const QPointF& millimeters);
 
         /// @see Length::fromInch()
-        static Point fromInch(qreal inchesX, qreal inchesY,         const Length& gridInterval = Length(0));
-        static Point fromInch(const QPointF& inches,                const Length& gridInterval = Length(0));
+        static Point fromInch(qreal inchesX, qreal inchesY);
+        static Point fromInch(const QPointF& inches);
 
         /// @see Length::fromMil()
-        static Point fromMil(qreal milsX, qreal milsY,              const Length& gridInterval = Length(0));
-        static Point fromMil(const QPointF& mils,                   const Length& gridInterval = Length(0));
+        static Point fromMil(qreal milsX, qreal milsY);
+        static Point fromMil(const QPointF& mils);
 
         /// @see Length::fromPx()
         /// @note These methods are useful to read the position of a QGraphics* object.
         ///       For this purpose, these methods will invert the Y-coordinate.
-        static Point fromPx(qreal pixelsX, qreal pixelsY,           const Length& gridInterval = Length(0));
-        static Point fromPx(const QPointF& pixels,                  const Length& gridInterval = Length(0));
+        static Point fromPx(qreal pixelsX, qreal pixelsY);
+        static Point fromPx(const QPointF& pixels);
 
         // Operators
         Point&  operator=(const Point& rhs)        {mX = rhs.mX;  mY = rhs.mY;  return *this;}

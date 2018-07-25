@@ -42,7 +42,7 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack, QWi
             this, &HolePropertiesDialog::on_buttonBox_clicked);
 
     // load text attributes
-    mUi->spbDiameter->setValue(mHole.getDiameter().toMm());
+    mUi->spbDiameter->setValue(mHole.getDiameter()->toMm());
     mUi->spbPosX->setValue(mHole.getPosition().getX().toMm());
     mUi->spbPosY->setValue(mHole.getPosition().getY().toMm());
 }
@@ -77,7 +77,7 @@ bool HolePropertiesDialog::applyChanges() noexcept
 {
     try {
         QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(mHole));
-        cmd->setDiameter(Length::fromMm(mUi->spbDiameter->value()), false);
+        cmd->setDiameter(PositiveLength(Length::fromMm(mUi->spbDiameter->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         mUndoStack.execCmd(cmd.take());
         return true;

@@ -50,7 +50,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
 
     // load polygon attributes
     selectLayerNameInCombobox(mPolygon.getLayerName());
-    mUi->spbLineWidth->setValue(mPolygon.getLineWidth().toMm());
+    mUi->spbLineWidth->setValue(mPolygon.getLineWidth()->toMm());
     mUi->cbxFillArea->setChecked(mPolygon.isFilled());
     mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
 
@@ -93,7 +93,7 @@ bool PolygonPropertiesDialog::applyChanges() noexcept
         }
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-        cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
+        cmd->setLineWidth(UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())), false); // can throw
         cmd->setPath(mUi->pathEditorWidget->getPath(), false); // can throw
         mUndoStack.execCmd(cmd.take());
         return true;

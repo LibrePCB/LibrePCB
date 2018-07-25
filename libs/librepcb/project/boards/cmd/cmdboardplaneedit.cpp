@@ -93,13 +93,13 @@ void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept
     mNewNetSignal = &netsignal;
 }
 
-void CmdBoardPlaneEdit::setMinWidth(const Length& minWidth) noexcept
+void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewMinWidth = minWidth;
 }
 
-void CmdBoardPlaneEdit::setMinClearance(const Length& minClearance) noexcept
+void CmdBoardPlaneEdit::setMinClearance(const UnsignedLength& minClearance) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewMinClearance = minClearance;

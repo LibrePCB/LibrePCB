@@ -101,7 +101,7 @@ class PackageEditorState_DrawPolygonBase : public PackageEditorState
 
         // parameter memory
         QString mLastLayerName;
-        Length mLastLineWidth;
+        UnsignedLength mLastLineWidth;
         Angle mLastAngle;
         bool mLastFill;
         bool mLastGrabArea;

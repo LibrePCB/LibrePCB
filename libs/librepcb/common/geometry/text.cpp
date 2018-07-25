@@ -49,8 +49,9 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept :
     mUuid = uuid;
 }
 
-Text::Text(const Uuid& uuid, const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
-           const Length& height, const Alignment& align) noexcept :
+Text::Text(const Uuid& uuid, const QString& layerName, const QString& text,
+           const Point& pos, const Angle& rotation, const PositiveLength& height,
+           const Alignment& align) noexcept :
     mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
     mHeight(height), mAlign(align)
 {
@@ -62,7 +63,7 @@ Text::Text(const SExpression& node) :
     mText(),
     mPosition(node.getChildByPath("pos")),
     mRotation(node.getValueByPath<Angle>("rot")),
-    mHeight(node.getValueByPath<Length>("height")),
+    mHeight(node.getValueByPath<PositiveLength>("height")),
     mAlign(node.getChildByPath("align"))
 {
     if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
@@ -71,11 +72,6 @@ Text::Text(const SExpression& node) :
     } else {
         // backward compatibility, remove this some time!
         mText = node.getChildByIndex(0).getValue<QString>(true);
-    }
-
-    // load geometry attributes
-    if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
     }
 
     // backward compatibility - remove this some time!
@@ -129,7 +125,7 @@ void Text::setRotation(const Angle& rotation) noexcept
     }
 }
 
-void Text::setHeight(const Length& height) noexcept
+void Text::setHeight(const PositiveLength& height) noexcept
 {
     if (height == mHeight) return;
     mHeight = height;
@@ -209,7 +205,6 @@ Text& Text::operator=(const Text& rhs) noexcept
 bool Text::checkAttributesValidity() const noexcept
 {
     if (mText.isEmpty())    return false;
-    if (mHeight <= 0)       return false;
     return true;
 }
 

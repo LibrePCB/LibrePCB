@@ -57,7 +57,8 @@ BI_Via* CmdBoardNetSegmentAddElements::addVia(BI_Via& via)
 }
 
 BI_Via* CmdBoardNetSegmentAddElements::addVia(const Point& position, BI_Via::Shape shape,
-                                              const Length& size, const Length& drillDiameter)
+                                              const PositiveLength& size,
+                                              const PositiveLength& drillDiameter)
 {
     BI_Via* via = new BI_Via(mNetSegment, position, shape, size, drillDiameter);
     return addVia(*via);
@@ -97,7 +98,7 @@ BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLine& netline)
 
 BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetPoint& startPoint,
                                                       BI_NetPoint& endPoint,
-                                                      const Length& width)
+                                                      const PositiveLength& width)
 {
     BI_NetLine* netline = new BI_NetLine(startPoint, endPoint, width); // can throw
     return addNetLine(*netline);

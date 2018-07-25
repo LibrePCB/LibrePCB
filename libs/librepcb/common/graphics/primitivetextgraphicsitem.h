@@ -63,7 +63,7 @@ class PrimitiveTextGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerO
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
         void setText(const QString& text) noexcept;
-        void setHeight(const Length& height) noexcept;
+        void setHeight(const PositiveLength& height) noexcept;
         void setAlignment(const Alignment& align) noexcept;
         void setFont(Font font) noexcept;
         void setLayer(const GraphicsLayer* layer) noexcept;

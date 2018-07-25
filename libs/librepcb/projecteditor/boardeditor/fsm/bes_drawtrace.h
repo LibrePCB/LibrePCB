@@ -108,7 +108,7 @@ class BES_DrawTrace final : public BES_Base
         SubState mSubState; ///< the current substate
         WireMode mCurrentWireMode; ///< the current wire mode
         QString mCurrentLayerName; ///< the current board layer name
-        Length mCurrentWidth; ///< the current wire width
+        PositiveLength mCurrentWidth; ///< the current wire width
         BI_NetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
         BI_NetLine* mPositioningNetLine1; ///< line between fixed point and p1
         BI_NetPoint* mPositioningNetPoint1; ///< the first netpoint to place

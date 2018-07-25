@@ -39,7 +39,7 @@ CircleGraphicsItem::CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerPro
     PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp)
 {
     setPosition(mCircle.getCenter());
-    setDiameter(mCircle.getDiameter());
+    setDiameter(positiveToUnsigned(mCircle.getDiameter()));
     setLineWidth(mCircle.getLineWidth());
     setLineLayer(mLayerProvider.getLayer(mCircle.getLayerName()));
     updateFillLayer();
@@ -64,7 +64,7 @@ void CircleGraphicsItem::circleLayerNameChanged(const QString& newLayerName) noe
     updateFillLayer(); // required if the area is filled with the line layer
 }
 
-void CircleGraphicsItem::circleLineWidthChanged(const Length& newLineWidth) noexcept
+void CircleGraphicsItem::circleLineWidthChanged(const UnsignedLength& newLineWidth) noexcept
 {
     setLineWidth(newLineWidth);
 }
@@ -86,9 +86,9 @@ void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept
     setPosition(newCenter);
 }
 
-void CircleGraphicsItem::circleDiameterChanged(const Length& newDiameter) noexcept
+void CircleGraphicsItem::circleDiameterChanged(const PositiveLength& newDiameter) noexcept
 {
-    setDiameter(newDiameter);
+    setDiameter(positiveToUnsigned(newDiameter));
 }
 
 void CircleGraphicsItem::updateFillLayer() noexcept

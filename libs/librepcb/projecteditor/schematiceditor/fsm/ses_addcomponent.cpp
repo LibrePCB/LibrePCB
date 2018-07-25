@@ -184,7 +184,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             // set temporary position of the current symbol
             Q_ASSERT(mCurrentSymbolEditCommand);
             mCurrentSymbolEditCommand->setPosition(pos, true);
@@ -196,7 +196,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:

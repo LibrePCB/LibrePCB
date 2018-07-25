@@ -53,7 +53,7 @@ GridSettingsDialog::GridSettingsDialog(const GridProperties& grid, QWidget* pare
     mUi->cbxUnits->setCurrentIndex(mCurrentGrid.getUnit().getIndex());
 
     // update spinbox value
-    mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
+    mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(*mCurrentGrid.getInterval()));
 
     // connect UI signal with slots
     connect(mUi->rbtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(rbtnGroupClicked(int)));
@@ -84,7 +84,9 @@ void GridSettingsDialog::rbtnGroupClicked(int id)
 
 void GridSettingsDialog::spbxIntervalChanged(double value)
 {
-    mCurrentGrid.setInterval(mCurrentGrid.getUnit().convertFromUnit(value));
+    Length interval = mCurrentGrid.getUnit().convertFromUnit(value);
+    if (interval < 1) return; // must be positive!
+    mCurrentGrid.setInterval(PositiveLength(interval));
     updateInternalRepresentation();
     emit gridPropertiesChanged(mCurrentGrid);
 }
@@ -94,7 +96,7 @@ void GridSettingsDialog::cbxUnitsChanged(int index)
     try
     {
         mCurrentGrid.setUnit(LengthUnit::fromIndex(index));
-        mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
+        mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(*mCurrentGrid.getInterval()));
         updateInternalRepresentation();
         emit gridPropertiesChanged(mCurrentGrid);
     }
@@ -132,7 +134,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
             mUi->spbxInterval->blockSignals(true);
             mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.getType()))->setChecked(true);
             mUi->cbxUnits->setCurrentIndex(mCurrentGrid.getUnit().getIndex());
-            mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(mCurrentGrid.getInterval()));
+            mUi->spbxInterval->setValue(mCurrentGrid.getUnit().convertToUnit(*mCurrentGrid.getInterval()));
             mUi->rbtnGroup->blockSignals(false);
             mUi->cbxUnits->blockSignals(false);
             mUi->spbxInterval->blockSignals(false);
@@ -156,7 +158,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button)
 void GridSettingsDialog::updateInternalRepresentation() noexcept
 {
     QLocale locale; // this loads the application's default locale (defined in WSI_AppLocale)
-    mUi->lblIntervalNm->setText(QString("%1 nm").arg(locale.toString(mCurrentGrid.getInterval().toNm())));
+    mUi->lblIntervalNm->setText(QString("%1 nm").arg(locale.toString(mCurrentGrid.getInterval()->toNm())));
 }
 
 /*****************************************************************************************

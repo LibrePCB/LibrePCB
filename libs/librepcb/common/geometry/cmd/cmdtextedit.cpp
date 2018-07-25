@@ -69,7 +69,7 @@ void CmdTextEdit::setText(const QString& text, bool immediate) noexcept
     if (immediate) mText.setText(mNewText);
 }
 
-void CmdTextEdit::setHeight(const Length& height, bool immediate) noexcept
+void CmdTextEdit::setHeight(const PositiveLength& height, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewHeight = height;

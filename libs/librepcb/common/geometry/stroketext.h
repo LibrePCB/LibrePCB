@@ -121,8 +121,8 @@ class IF_StrokeTextObserver
         virtual void strokeTextTextChanged(const QString& newText) noexcept = 0;
         virtual void strokeTextPositionChanged(const Point& newPos) noexcept = 0;
         virtual void strokeTextRotationChanged(const Angle& newRot) noexcept = 0;
-        virtual void strokeTextHeightChanged(const Length& newHeight) noexcept = 0;
-        virtual void strokeTextStrokeWidthChanged(const Length& newWidth) noexcept = 0;
+        virtual void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept = 0;
+        virtual void strokeTextStrokeWidthChanged(const UnsignedLength& newWidth) noexcept = 0;
         virtual void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept = 0;
         virtual void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept = 0;
         virtual void strokeTextAlignChanged(const Alignment& newAlign) noexcept = 0;
@@ -155,8 +155,8 @@ class StrokeText final : public SerializableObject
         StrokeText(const StrokeText& other) noexcept;
         StrokeText(const Uuid& uuid, const StrokeText& other) noexcept;
         StrokeText(const Uuid& uuid, const QString& layerName, const QString& text,
-                   const Point& pos, const Angle& rotation, const Length& height,
-                   const Length& strokeWidth, const StrokeTextSpacing& letterSpacing,
+                   const Point& pos, const Angle& rotation, const PositiveLength& height,
+                   const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
                    const StrokeTextSpacing& lineSpacing, const Alignment& align,
                    bool mirrored, bool autoRotate) noexcept;
         explicit StrokeText(const SExpression& node);
@@ -167,8 +167,8 @@ class StrokeText final : public SerializableObject
         const QString& getLayerName() const noexcept {return mLayerName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
-        const Length& getHeight() const noexcept {return mHeight;}
-        const Length& getStrokeWidth() const noexcept {return mStrokeWidth;}
+        const PositiveLength& getHeight() const noexcept {return mHeight;}
+        const UnsignedLength& getStrokeWidth() const noexcept {return mStrokeWidth;}
         const StrokeTextSpacing& getLetterSpacing() const noexcept {return mLetterSpacing;}
         const StrokeTextSpacing& getLineSpacing() const noexcept {return mLineSpacing;}
         const Alignment& getAlign() const noexcept {return mAlign;}
@@ -185,8 +185,8 @@ class StrokeText final : public SerializableObject
         void setText(const QString& text) noexcept;
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rotation) noexcept;
-        void setHeight(const Length& height) noexcept;
-        void setStrokeWidth(const Length& strokeWidth) noexcept;
+        void setHeight(const PositiveLength& height) noexcept;
+        void setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
         void setLetterSpacing(const StrokeTextSpacing& spacing) noexcept;
         void setLineSpacing(const StrokeTextSpacing& spacing) noexcept;
         void setAlign(const Alignment& align) noexcept;
@@ -220,8 +220,8 @@ class StrokeText final : public SerializableObject
         QString mText;
         Point mPosition;
         Angle mRotation;
-        Length mHeight;
-        Length mStrokeWidth;
+        PositiveLength mHeight;
+        UnsignedLength mStrokeWidth;
         StrokeTextSpacing mLetterSpacing;
         StrokeTextSpacing mLineSpacing;
         Alignment mAlign;

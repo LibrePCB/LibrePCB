@@ -104,8 +104,8 @@ class BI_StrokeText final : public BI_Base, public SerializableObject,
         void strokeTextTextChanged(const QString& newText) noexcept override {Q_UNUSED(newText);}
         void strokeTextPositionChanged(const Point& newPos) noexcept override {Q_UNUSED(newPos); updateGraphicsItems();}
         void strokeTextRotationChanged(const Angle& newRot) noexcept override {Q_UNUSED(newRot);}
-        void strokeTextHeightChanged(const Length& newHeight) noexcept override {Q_UNUSED(newHeight);}
-        void strokeTextStrokeWidthChanged(const Length& newStrokeWidth) noexcept override {Q_UNUSED(newStrokeWidth);}
+        void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept override {Q_UNUSED(newHeight);}
+        void strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept override {Q_UNUSED(newStrokeWidth);}
         void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept override {Q_UNUSED(spacing);}
         void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept override {Q_UNUSED(spacing);}
         void strokeTextAlignChanged(const Alignment& newAlign) noexcept override {Q_UNUSED(newAlign);}

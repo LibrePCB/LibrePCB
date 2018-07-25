@@ -94,7 +94,7 @@ class BES_DrawPolygon final : public BES_Base
         // State
         SubState mSubState;
         QString mCurrentLayerName;
-        Length mCurrentWidth;
+        UnsignedLength mCurrentWidth;
         bool mCurrentIsFilled;
         BI_Polygon* mCurrentPolygon;
         CmdPolygonEdit* mCmdEditCurrentPolygon;

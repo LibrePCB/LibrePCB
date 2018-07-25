@@ -59,7 +59,7 @@ class SymbolPin final : public SerializableObject
         SymbolPin() = delete;
         SymbolPin(const SymbolPin& other) noexcept;
         SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                  const Length& length, const Angle& rotation) noexcept;
+                  const UnsignedLength& length, const Angle& rotation) noexcept;
         explicit SymbolPin(const SExpression& node);
         ~SymbolPin() noexcept;
 
@@ -67,12 +67,12 @@ class SymbolPin final : public SerializableObject
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getName() const noexcept {return mName;}
         const Point& getPosition() const noexcept {return mPosition;}
-        const Length& getLength() const noexcept {return mLength;}
+        const UnsignedLength& getLength() const noexcept {return mLength;}
         const Angle& getRotation() const noexcept {return mRotation;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
-        void setLength(const Length& length) noexcept;
+        void setLength(const UnsignedLength& length) noexcept;
         void setRotation(const Angle& rotation) noexcept;
         void setName(const QString& name) noexcept;
 
@@ -97,7 +97,7 @@ class SymbolPin final : public SerializableObject
         Uuid mUuid;
         QString mName;
         Point mPosition;
-        Length mLength;
+        UnsignedLength mLength;
         Angle mRotation;
 
         SymbolPinGraphicsItem* mRegisteredGraphicsItem;

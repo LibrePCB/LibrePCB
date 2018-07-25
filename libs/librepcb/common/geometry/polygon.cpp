@@ -49,7 +49,7 @@ Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
     mUuid = uuid;
 }
 
-Polygon::Polygon(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+Polygon::Polygon(const Uuid& uuid, const QString& layerName, const UnsignedLength& lineWidth,
                  bool fill, bool isGrabArea, const Path& path) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
     mIsGrabArea(isGrabArea), mPath(path)
@@ -59,7 +59,7 @@ Polygon::Polygon(const Uuid& uuid, const QString& layerName, const Length& lineW
 Polygon::Polygon(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
     mLayerName(node.getValueByPath<QString>("layer", true)),
-    mLineWidth(node.getValueByPath<Length>("width")),
+    mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
     mIsGrabArea(node.getValueByPath<bool>("grab")),
     mPath()
@@ -100,7 +100,7 @@ void Polygon::setLayerName(const QString& name) noexcept
     }
 }
 
-void Polygon::setLineWidth(const Length& width) noexcept
+void Polygon::setLineWidth(const UnsignedLength& width) noexcept
 {
     if (width == mLineWidth) return;
     mLineWidth = width;
@@ -191,7 +191,6 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept
 bool Polygon::checkAttributesValidity() const noexcept
 {
     if (mLayerName.isEmpty())   return false;
-    if (mLineWidth < 0)         return false;
     // TODO: check mPath?
     return true;
 }

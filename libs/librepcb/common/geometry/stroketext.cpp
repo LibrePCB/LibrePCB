@@ -59,8 +59,8 @@ StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept :
 }
 
 StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString& text,
-        const Point& pos, const Angle& rotation, const Length& height,
-        const Length& strokeWidth, const StrokeTextSpacing& letterSpacing,
+        const Point& pos, const Angle& rotation, const PositiveLength& height,
+        const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
         const StrokeTextSpacing& lineSpacing, const Alignment& align, bool mirrored,
         bool autoRotate) noexcept :
     mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
@@ -76,7 +76,7 @@ StrokeText::StrokeText(const SExpression& node) :
     mText(),
     mPosition(node.getChildByPath("pos")),
     mRotation(node.getValueByPath<Angle>("rot")),
-    mHeight(node.getValueByPath<Length>("height")),
+    mHeight(node.getValueByPath<PositiveLength>("height")),
     mStrokeWidth(200000), // backward compatibility, remove this some time!
     mLetterSpacing(), // backward compatibility, remove this some time!
     mLineSpacing(), // backward compatibility, remove this some time!
@@ -95,11 +95,8 @@ StrokeText::StrokeText(const SExpression& node) :
     }
 
     // load geometry attributes
-    if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
-    }
     if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
-        mStrokeWidth = child->getValueOfFirstChild<Length>();
+        mStrokeWidth = child->getValueOfFirstChild<UnsignedLength>();
     }
     if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
         mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
@@ -116,7 +113,7 @@ StrokeText::StrokeText(const SExpression& node) :
 
     // backward compatibility, remove this some time!
     if ((node.getName() == "text") && ((mText == "#NAME") || (mText == "#VALUE"))) {
-        mHeight = Length(1000000);
+        mHeight = PositiveLength(1000000);
     }
 
     // backward compatibility - remove this some time!
@@ -150,11 +147,11 @@ Length StrokeText::calcLetterSpacing() const noexcept
     if (mLetterSpacing.isAuto() && mFont) {
         // Use recommended letter spacing of font, but add stroke width to avoid
         // overlapped glyphs caused by thick lines.
-        return Length(mHeight.toNm() * mFont->getLetterSpacing().toNormalized()) + mStrokeWidth;
+        return Length(mHeight->toNm() * mFont->getLetterSpacing().toNormalized()) + mStrokeWidth;
     } else {
         // Use given letter spacing without additional factor or stroke width offset. Also
         // don't use recommended letter spacing of font.
-        return Length(mHeight.toNm() * mLetterSpacing.getRatio().toNormalized());
+        return Length(mHeight->toNm() * mLetterSpacing.getRatio().toNormalized());
     }
 }
 
@@ -163,11 +160,11 @@ Length StrokeText::calcLineSpacing() const noexcept
     if (mLineSpacing.isAuto() && mFont) {
         // Use recommended line spacing of font, but add stroke width to avoid
         // overlapped glyphs caused by thick lines.
-        return Length(mHeight.toNm() * mFont->getLineSpacing().toNormalized()) + mStrokeWidth;
+        return Length(mHeight->toNm() * mFont->getLineSpacing().toNormalized()) + mStrokeWidth;
     } else {
         // Use given line spacing without additional factor or stroke width offset. Also
         // don't use recommended line spacing of font.
-        return Length(mHeight.toNm() * mLineSpacing.getRatio().toNormalized());
+        return Length(mHeight->toNm() * mLineSpacing.getRatio().toNormalized());
     }
 }
 
@@ -218,7 +215,7 @@ void StrokeText::setRotation(const Angle& rotation) noexcept
     }
 }
 
-void StrokeText::setHeight(const Length& height) noexcept
+void StrokeText::setHeight(const PositiveLength& height) noexcept
 {
     if (height == mHeight) return;
     mHeight = height;
@@ -228,7 +225,7 @@ void StrokeText::setHeight(const Length& height) noexcept
     updatePaths(); // because height has changed
 }
 
-void StrokeText::setStrokeWidth(const Length& strokeWidth) noexcept
+void StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept
 {
     if (strokeWidth == mStrokeWidth) return;
     mStrokeWidth = strokeWidth;
@@ -417,8 +414,6 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept
 bool StrokeText::checkAttributesValidity() const noexcept
 {
     if (mText.isEmpty())        return false;
-    if (mHeight <= 0)           return false;
-    if (mStrokeWidth < 0)       return false;
     return true;
 }
 

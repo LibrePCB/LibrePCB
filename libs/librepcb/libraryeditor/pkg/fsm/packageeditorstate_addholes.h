@@ -88,7 +88,7 @@ class PackageEditorState_AddHoles final : public PackageEditorState
         HoleGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        Length mLastDiameter;
+        PositiveLength mLastDiameter;
 };
 
 /*****************************************************************************************

@@ -91,7 +91,7 @@ class SymbolEditorState_AddPins final : public SymbolEditorState
         QLineEdit* mNameLineEdit;
 
         // parameter memory
-        Length mLastLength;
+        UnsignedLength mLastLength;
 };
 
 /*****************************************************************************************

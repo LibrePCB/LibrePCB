@@ -66,7 +66,7 @@ class BI_Polygon final : public BI_Base, public SerializableObject
         BI_Polygon(Board& board, const SExpression& node);
         BI_Polygon(Board& board, const Polygon& polygon);
         BI_Polygon(Board& board, const Uuid& uuid, const QString& layerName,
-                   const Length& lineWidth, bool fill, bool isGrabArea, const Path& path);
+                   const UnsignedLength& lineWidth, bool fill, bool isGrabArea, const Path& path);
         ~BI_Polygon() noexcept;
 
         // Getters

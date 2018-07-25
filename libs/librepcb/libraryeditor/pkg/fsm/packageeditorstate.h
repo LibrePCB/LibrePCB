@@ -80,7 +80,7 @@ class PackageEditorState : public QObject
 
 
     protected: // Methods
-        const Length& getGridInterval() const noexcept;
+        const PositiveLength& getGridInterval() const noexcept;
 
 
     protected: // Data

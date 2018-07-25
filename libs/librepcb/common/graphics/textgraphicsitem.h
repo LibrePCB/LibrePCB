@@ -68,7 +68,7 @@ class TextGraphicsItem final : public PrimitiveTextGraphicsItem, public IF_TextO
         void textTextChanged(const QString& newText) noexcept override;
         void textPositionChanged(const Point& newPos) noexcept override;
         void textRotationChanged(const Angle& newRot) noexcept override;
-        void textHeightChanged(const Length& newHeight) noexcept override;
+        void textHeightChanged(const PositiveLength& newHeight) noexcept override;
         void textAlignChanged(const Alignment& newAlign) noexcept override;
 
 

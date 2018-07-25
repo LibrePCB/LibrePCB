@@ -101,7 +101,7 @@ class SymbolEditorState_DrawPolygonBase : public SymbolEditorState
 
         // parameter memory
         QString mLastLayerName;
-        Length mLastLineWidth;
+        UnsignedLength mLastLineWidth;
         Angle mLastAngle;
         bool mLastFill;
         bool mLastGrabArea;

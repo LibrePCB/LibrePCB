@@ -54,9 +54,9 @@ class CmdFootprintPadEdit final : public UndoCommand
         void setPackagePadUuid(const Uuid& pad, bool immediate) noexcept;
         void setBoardSide(FootprintPad::BoardSide side, bool immediate) noexcept;
         void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
-        void setWidth(const Length& width, bool immediate) noexcept;
-        void setHeight(const Length& height, bool immediate) noexcept;
-        void setDrillDiameter(const Length& dia, bool immediate) noexcept;
+        void setWidth(const PositiveLength& width, bool immediate) noexcept;
+        void setHeight(const PositiveLength& height, bool immediate) noexcept;
+        void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
@@ -92,16 +92,16 @@ class CmdFootprintPadEdit final : public UndoCommand
         FootprintPad::BoardSide mNewBoardSide;
         FootprintPad::Shape mOldShape;
         FootprintPad::Shape mNewShape;
-        Length mOldWidth;
-        Length mNewWidth;
-        Length mOldHeight;
-        Length mNewHeight;
+        PositiveLength mOldWidth;
+        PositiveLength mNewWidth;
+        PositiveLength mOldHeight;
+        PositiveLength mNewHeight;
         Point mOldPos;
         Point mNewPos;
         Angle mOldRotation;
         Angle mNewRotation;
-        Length mOldDrillDiameter;
-        Length mNewDrillDiameter;
+        UnsignedLength mOldDrillDiameter;
+        UnsignedLength mNewDrillDiameter;
 };
 
 /*****************************************************************************************

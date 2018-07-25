@@ -55,7 +55,7 @@ class CmdTextEdit final : public UndoCommand
         // Setters
         void setLayerName(const QString& name, bool immediate) noexcept;
         void setText(const QString& text, bool immediate) noexcept;
-        void setHeight(const Length& height, bool immediate) noexcept;
+        void setHeight(const PositiveLength& height, bool immediate) noexcept;
         void setAlignment(const Alignment& align, bool immediate) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
@@ -94,8 +94,8 @@ class CmdTextEdit final : public UndoCommand
         Point mNewPosition;
         Angle mOldRotation;
         Angle mNewRotation;
-        Length mOldHeight;
-        Length mNewHeight;
+        PositiveLength mOldHeight;
+        PositiveLength mNewHeight;
         Alignment mOldAlign;
         Alignment mNewAlign;
 };

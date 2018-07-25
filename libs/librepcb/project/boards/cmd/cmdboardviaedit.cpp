@@ -78,14 +78,14 @@ void CmdBoardViaEdit::setShape(BI_Via::Shape shape, bool immediate) noexcept
     if (immediate) mVia.setShape(mNewShape);
 }
 
-void CmdBoardViaEdit::setSize(const Length& size, bool immediate) noexcept
+void CmdBoardViaEdit::setSize(const PositiveLength& size, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewSize = size;
     if (immediate) mVia.setSize(mNewSize);
 }
 
-void CmdBoardViaEdit::setDrillDiameter(const Length& diameter, bool immediate) noexcept
+void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewDrillDiameter = diameter;

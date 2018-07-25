@@ -110,7 +110,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     // polygons
     for (const Polygon& polygon : mFootprint.getPolygons()) {
         QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-        qreal w = polygon.getLineWidth().toPx() / 2;
+        qreal w = polygon.getLineWidth()->toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
     }
@@ -137,7 +137,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         layer = mLayerProvider.getLayer(polygon.getLayerName());
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), polygon.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
@@ -160,7 +160,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
         layer = mLayerProvider.getLayer(circle.getLayerName()); if (!layer) continue;
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), circle.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
@@ -175,8 +175,8 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
 
         // draw circle
         painter->drawEllipse(circle.getCenter().toPxQPointF(),
-                             circle.getDiameter().toPx() / 2,
-                             circle.getDiameter().toPx() / 2);
+                             circle.getDiameter()->toPx() / 2,
+                             circle.getDiameter()->toPx() / 2);
         // TODO: rotation
     }
 

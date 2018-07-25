@@ -54,7 +54,7 @@ class CmdSymbolPinEdit final : public UndoCommand
 
         // Setters
         void setName(const QString& name, bool immediate) noexcept;
-        void setLength(const Length& length, bool immediate) noexcept;
+        void setLength(const UnsignedLength& length, bool immediate) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
@@ -86,8 +86,8 @@ class CmdSymbolPinEdit final : public UndoCommand
         // General Attributes
         QString mOldName;
         QString mNewName;
-        Length mOldLength;
-        Length mNewLength;
+        UnsignedLength mOldLength;
+        UnsignedLength mNewLength;
         Point mOldPos;
         Point mNewPos;
         Angle mOldRotation;

@@ -54,7 +54,7 @@ class CmdPolygonEdit final : public UndoCommand
 
         // Setters
         void setLayerName(const QString& name, bool immediate) noexcept;
-        void setLineWidth(const Length& width, bool immediate) noexcept;
+        void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
         void setPath(const Path& path, bool immediate) noexcept;
@@ -87,8 +87,8 @@ class CmdPolygonEdit final : public UndoCommand
         // General Attributes
         QString mOldLayerName;
         QString mNewLayerName;
-        Length mOldLineWidth;
-        Length mNewLineWidth;
+        UnsignedLength mOldLineWidth;
+        UnsignedLength mNewLineWidth;
         bool mOldIsFilled;
         bool mNewIsFilled;
         bool mOldIsGrabArea;

@@ -51,17 +51,17 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLa
     setZValue(10);
 
     // circle
-    mCircleGraphicsItem->setDiameter(Length(1200000));
+    mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
     mCircleGraphicsItem->setLineLayer(lp.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
     mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
     // line
-    mLineGraphicsItem->setLineWidth(Length(158750));
+    mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
     mLineGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolOutlines));
     mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
     // text
-    mTextGraphicsItem->setHeight(Length::fromMm(qreal(2)));
+    mTextGraphicsItem->setHeight(PositiveLength(Length::fromMm(qreal(2))));
     mTextGraphicsItem->setAlignment(Alignment(HAlign::left(), VAlign::center()));
     mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
     mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -95,9 +95,9 @@ void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept
     QGraphicsItem::setRotation(-rot.toDeg());
 }
 
-void SymbolPinGraphicsItem::setLength(const Length& length) noexcept
+void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept
 {
-    mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
+    mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
     mTextGraphicsItem->setPosition(Point(length + Length(800000), Length(0)));
 }
 

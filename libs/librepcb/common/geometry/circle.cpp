@@ -49,8 +49,8 @@ Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
     mUuid = uuid;
 }
 
-Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
-               bool isGrabArea, const Point& center, const Length& diameter) noexcept :
+Circle::Circle(const Uuid& uuid, const QString& layerName, const UnsignedLength& lineWidth, bool fill,
+               bool isGrabArea, const Point& center, const PositiveLength& diameter) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
     mIsGrabArea(isGrabArea), mCenter(center), mDiameter(diameter)
 {
@@ -59,17 +59,17 @@ Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWid
 Circle::Circle(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
     mLayerName(node.getValueByPath<QString>("layer", true)),
-    mLineWidth(node.getValueByPath<Length>("width")),
+    mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
     mIsGrabArea(node.getValueByPath<bool>("grab")),
     mCenter(node.getChildByPath("pos")),
-    mDiameter(0)
+    mDiameter(1)
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
     }
     if (node.tryGetChildByPath("dia")) {
-        mDiameter = node.getValueByPath<Length>("dia");
+        mDiameter = node.getValueByPath<PositiveLength>("dia");
     } else if (node.tryGetChildByPath("size")) {
         // backward compatibility, remove this some time!
         mDiameter = Point(node.getChildByPath("size")).getX();
@@ -98,7 +98,7 @@ void Circle::setLayerName(const QString& name) noexcept
     }
 }
 
-void Circle::setLineWidth(const Length& width) noexcept
+void Circle::setLineWidth(const UnsignedLength& width) noexcept
 {
     if (width == mLineWidth) return;
     mLineWidth = width;
@@ -134,7 +134,7 @@ void Circle::setCenter(const Point& center) noexcept
     }
 }
 
-void Circle::setDiameter(const Length& dia) noexcept
+void Circle::setDiameter(const PositiveLength& dia) noexcept
 {
     if (dia == mDiameter) return;
     mDiameter = dia;
@@ -215,8 +215,6 @@ Circle& Circle::operator=(const Circle& rhs) noexcept
 bool Circle::checkAttributesValidity() const noexcept
 {
     if (mLayerName.isEmpty())   return false;
-    if (mLineWidth < 0)         return false;
-    if (mDiameter <= 0)         return false;
     return true;
 }
 

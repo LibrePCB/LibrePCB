@@ -74,15 +74,19 @@ class GerberGenerator final
 
         // Plot Methods
         void setLayerPolarity(LayerPolarity p) noexcept;
-        void drawLine(const Point& start, const Point& end, const Length& width) noexcept;
+        void drawLine(const Point& start, const Point& end, const UnsignedLength& width) noexcept;
         void drawCircleOutline(const Circle& circle) noexcept;
         void drawCircleArea(const Circle& circle) noexcept;
-        void drawPathOutline(const Path& path, const Length& lineWidth) noexcept;
+        void drawPathOutline(const Path& path, const UnsignedLength& lineWidth) noexcept;
         void drawPathArea(const Path& path) noexcept;
-        void flashCircle(const Point& pos, const Length& dia, const Length& hole) noexcept;
-        void flashRect(const Point& pos, const Length& w, const Length& h, const Angle& rot, const Length& hole) noexcept;
-        void flashObround(const Point& pos, const Length& w, const Length& h, const Angle& rot, const Length& hole) noexcept;
-        void flashRegularPolygon(const Point& pos, const Length& dia, int n, const Angle& rot, const Length& hole) noexcept;
+        void flashCircle(const Point& pos, const UnsignedLength& dia, const UnsignedLength& hole) noexcept;
+        void flashRect(const Point& pos, const UnsignedLength& w, const UnsignedLength& h,
+                       const Angle& rot, const UnsignedLength& hole) noexcept;
+        void flashObround(const Point& pos, const UnsignedLength& w,
+                          const UnsignedLength& h, const Angle& rot,
+                          const UnsignedLength& hole) noexcept;
+        void flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
+                                 const Angle& rot, const UnsignedLength& hole) noexcept;
 
         // General Methods
         void reset() noexcept;

@@ -62,7 +62,7 @@ void CmdCircleEdit::setLayerName(const QString& name, bool immediate) noexcept
     if (immediate) mCircle.setLayerName(mNewLayerName);
 }
 
-void CmdCircleEdit::setLineWidth(const Length& width, bool immediate) noexcept
+void CmdCircleEdit::setLineWidth(const UnsignedLength& width, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLineWidth = width;
@@ -83,7 +83,7 @@ void CmdCircleEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept
     if (immediate) mCircle.setIsGrabArea(mNewIsGrabArea);
 }
 
-void CmdCircleEdit::setDiameter(const Length& dia, bool immediate) noexcept
+void CmdCircleEdit::setDiameter(const PositiveLength& dia, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewDiameter = dia;

@@ -132,7 +132,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     mSizeComboBox->addItem("0.8");
     mSizeComboBox->addItem("1");
     mSizeComboBox->addItem("1.2");
-    mSizeComboBox->setCurrentIndex(mSizeComboBox->findText(QString::number(mCurrentViaSize.toMm())));
+    mSizeComboBox->setCurrentIndex(mSizeComboBox->findText(QString::number(mCurrentViaSize->toMm())));
     mEditorUi.commandToolbar->addWidget(mSizeComboBox);
     connect(mSizeComboBox, &QComboBox::currentTextChanged,
             [this](const QString& value)
@@ -153,7 +153,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     mDrillComboBox->addItem("0.4");
     mDrillComboBox->addItem("0.6");
     mDrillComboBox->addItem("0.8");
-    mDrillComboBox->setCurrentIndex(mDrillComboBox->findText(QString::number(mCurrentViaDrillDiameter.toMm())));
+    mDrillComboBox->setCurrentIndex(mDrillComboBox->findText(QString::number(mCurrentViaDrillDiameter->toMm())));
     mEditorUi.commandToolbar->addWidget(mDrillComboBox);
     connect(mDrillComboBox, &QComboBox::currentTextChanged,
             [this](const QString& value)
@@ -228,7 +228,7 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -270,7 +270,7 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateVia(*board, pos);
             return ForceStayInState;
         }

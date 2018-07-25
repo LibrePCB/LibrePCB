@@ -50,7 +50,7 @@ TextGraphicsItem::TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& l
 
     // add origin cross
     mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(Length(1000000));
+    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
     mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences)); // TODO
 
     // register to the text to get attribute updates
@@ -86,7 +86,7 @@ void TextGraphicsItem::textRotationChanged(const Angle& newRot) noexcept
     setRotation(newRot);
 }
 
-void TextGraphicsItem::textHeightChanged(const Length& newHeight) noexcept
+void TextGraphicsItem::textHeightChanged(const PositiveLength& newHeight) noexcept
 {
     setHeight(newHeight);
 }

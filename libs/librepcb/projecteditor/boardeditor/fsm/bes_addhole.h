@@ -79,7 +79,7 @@ class BES_AddHole final : public BES_Base
         bool mUndoCmdActive;
         BI_Hole* mHole;
         QScopedPointer<CmdHoleEdit> mEditCmd;
-        Length mCurrentDiameter;
+        PositiveLength mCurrentDiameter;
 
         // Widgets for the command toolbar
         QScopedPointer<QLabel> mDiameterLabel;

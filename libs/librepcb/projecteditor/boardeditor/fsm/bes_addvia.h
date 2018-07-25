@@ -78,8 +78,8 @@ class BES_AddVia final : public BES_Base
         bool mUndoCmdActive;
         BI_Via* mCurrentVia;
         BI_Via::Shape mCurrentViaShape;
-        Length mCurrentViaSize;
-        Length mCurrentViaDrillDiameter;
+        PositiveLength mCurrentViaSize;
+        PositiveLength mCurrentViaDrillDiameter;
         NetSignal* mCurrentViaNetSignal;
         QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 

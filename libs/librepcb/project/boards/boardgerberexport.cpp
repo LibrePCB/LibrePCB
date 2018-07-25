@@ -296,7 +296,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const
         foreach (const BI_FootprintPad* pad, footprint.getPads()) {
             const library::FootprintPad& libPad = pad->getLibPad();
             if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
-                gen.drill(pad->getPosition(), libPad.getDrillDiameter());
+                gen.drill(pad->getPosition(), PositiveLength(*libPad.getDrillDiameter())); // can throw
                 ++count;
             }
         }
@@ -333,7 +333,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
             if (netline->getLayer().getName() == layerName) {
                 gen.drawLine(netline->getStartPoint().getPosition(),
                              netline->getEndPoint().getPosition(),
-                             netline->getWidth());
+                             positiveToUnsigned(netline->getWidth()));
             }
         }
     }
@@ -351,7 +351,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
     foreach (const BI_Polygon* polygon, sortedByUuid(mBoard.getPolygons())) {
         Q_ASSERT(polygon);
         if (layerName == polygon->getPolygon().getLayerName()) {
-            Length lineWidth = calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName);
+            UnsignedLength lineWidth = calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName);
             gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth);
         }
     }
@@ -359,7 +359,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen, const QString& layerName
     // draw stroke texts
     foreach (const BI_StrokeText* text, sortedByUuid(mBoard.getStrokeTexts())) { Q_ASSERT(text);
         if (layerName == text->getText().getLayerName()) {
-            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            UnsignedLength lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
             foreach (Path path, text->getText().getPaths()) {
                 path.rotate(text->getText().getRotation());
                 if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
@@ -374,26 +374,26 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via, const Q
 {
     bool drawCopper = via.isOnLayer(layerName);
     bool drawStopMask = (layerName == GraphicsLayer::sTopStopMask || layerName == GraphicsLayer::sBotStopMask)
-                        && mBoard.getDesignRules().doesViaRequireStopMask(via.getDrillDiameter());
+                        && mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
     if (drawCopper || drawStopMask) {
-        Length outerDiameter = via.getSize();
+        UnsignedLength outerDiameter = positiveToUnsigned(via.getSize());
         if (drawStopMask) {
-            outerDiameter += mBoard.getDesignRules().calcStopMaskClearance(via.getSize()) * 2;
+            outerDiameter += UnsignedLength(mBoard.getDesignRules().calcStopMaskClearance(*via.getSize()) * 2);
         }
         switch (via.getShape())
         {
             case BI_Via::Shape::Round: {
-                gen.flashCircle(via.getPosition(), outerDiameter, Length(0));
+                gen.flashCircle(via.getPosition(), outerDiameter, UnsignedLength(0));
                 break;
             }
             case BI_Via::Shape::Square: {
                 gen.flashRect(via.getPosition(), outerDiameter, outerDiameter,
-                              Angle::deg0(), Length(0));
+                              Angle::deg0(), UnsignedLength(0));
                 break;
             }
             case BI_Via::Shape::Octagon: {
                 gen.flashRegularPolygon(via.getPosition(), outerDiameter, 8,
-                                        Angle::deg0(), Length(0));
+                                        Angle::deg0(), UnsignedLength(0));
                 break;
             }
             default: {
@@ -443,7 +443,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen, const BI_Footprint& 
     // draw stroke texts (from footprint instance, *NOT* from library footprint!)
     foreach (const BI_StrokeText* text, sortedByUuid(footprint.getStrokeTexts())) {
         if (layerName == text->getText().getLayerName()) {
-            Length lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
+            UnsignedLength lineWidth = calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
             foreach (Path path, text->getText().getPaths()) {
                 path.rotate(text->getText().getRotation());
                 if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
@@ -468,11 +468,11 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
 
     Angle rot = pad.getIsMirrored() ? -pad.getRotation() : pad.getRotation();
     const library::FootprintPad& libPad = pad.getLibPad();
-    Length width = libPad.getWidth();
-    Length height = libPad.getHeight();
+    Length width = *libPad.getWidth();
+    Length height = *libPad.getHeight();
     if (isOnSolderMaskTop || isOnSolderMaskBottom) {
         Length size = qMin(width, height);
-        Length clearance = mBoard.getDesignRules().calcStopMaskClearance(size);
+        UnsignedLength clearance = mBoard.getDesignRules().calcStopMaskClearance(size);
         width += clearance*2;
         height += clearance*2;
     } else if (isOnSolderPasteTop || isOnSolderPasteBottom) {
@@ -487,18 +487,21 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
         return;
     }
 
+    UnsignedLength uWidth(width);
+    UnsignedLength uHeight(height);
+
     switch (libPad.getShape())
     {
         case library::FootprintPad::Shape::ROUND: {
             if (width == height) {
-                gen.flashCircle(pad.getPosition(), width, Length(0));
+                gen.flashCircle(pad.getPosition(), uWidth, UnsignedLength(0));
             } else {
-                gen.flashObround(pad.getPosition(), width, height, rot, Length(0));
+                gen.flashObround(pad.getPosition(), uWidth, uHeight, rot, UnsignedLength(0));
             }
             break;
         }
         case library::FootprintPad::Shape::RECT: {
-            gen.flashRect(pad.getPosition(), width, height, rot, Length(0));
+            gen.flashRect(pad.getPosition(), uWidth, uHeight, rot, UnsignedLength(0));
             break;
         }
         case library::FootprintPad::Shape::OCTAGON: {
@@ -506,7 +509,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen, const BI_Footprin
                 throw LogicError(__FILE__, __LINE__,
                     tr("Sorry, non-square octagons are not yet supported."));
             }
-            gen.flashRegularPolygon(pad.getPosition(), width, 8, rot, Length(0));
+            gen.flashRegularPolygon(pad.getPosition(), uWidth, 8, rot, UnsignedLength(0));
             break;
         }
         default: {
@@ -533,10 +536,10 @@ FilePath BoardGerberExport::getOutputFilePath(const QString& suffix) const noexc
  *  Static Methods
  ****************************************************************************************/
 
-Length BoardGerberExport::calcWidthOfLayer(const Length& width, const QString& name) noexcept
+UnsignedLength BoardGerberExport::calcWidthOfLayer(const UnsignedLength& width, const QString& name) noexcept
 {
-    if ((name == GraphicsLayer::sBoardOutlines) && (width < Length(1000))) {
-        return Length(1000); // outlines should have a minimum width of 1um
+    if ((name == GraphicsLayer::sBoardOutlines) && (width < UnsignedLength(1000))) {
+        return UnsignedLength(1000); // outlines should have a minimum width of 1um
     } else {
         return width;
     }

@@ -93,7 +93,7 @@ class PackageEditorState_DrawCircle final : public PackageEditorState
 
         // parameter memory
         QString mLastLayerName;
-        Length mLastLineWidth;
+        UnsignedLength mLastLineWidth;
         bool mLastFill;
         bool mLastGrabArea;
 };

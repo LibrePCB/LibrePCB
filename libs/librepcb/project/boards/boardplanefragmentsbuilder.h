@@ -78,7 +78,7 @@ class BoardPlaneFragmentsBuilder final
          * this if you don't know exactly what you're doing (it affects all planes in
          * all existing boards)!
          */
-        static Length maxArcTolerance() noexcept {return Length(5000);}
+        static PositiveLength maxArcTolerance() noexcept {return PositiveLength(5000);}
 
 
     private: // Data

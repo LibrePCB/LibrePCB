@@ -101,7 +101,7 @@ class PackageEditorState_DrawTextBase : public PackageEditorState
         // parameter memory
         QString mLastLayerName;
         Angle mLastRotation;
-        Length mLastHeight;
+        PositiveLength mLastHeight;
         QString mLastText;
 };
 

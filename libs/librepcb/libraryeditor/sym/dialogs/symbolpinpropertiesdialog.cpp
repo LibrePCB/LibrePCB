@@ -50,7 +50,7 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin, UndoStack& 
     mUi->spbPosX->setValue(mSymbolPin.getPosition().getX().toMm());
     mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());
     mUi->spbRotation->setValue(mSymbolPin.getRotation().toDeg());
-    mUi->spbLength->setValue(mSymbolPin.getLength().toMm());
+    mUi->spbLength->setValue(mSymbolPin.getLength()->toMm());
 }
 
 SymbolPinPropertiesDialog::~SymbolPinPropertiesDialog() noexcept
@@ -89,7 +89,7 @@ bool SymbolPinPropertiesDialog::applyChanges() noexcept
         }
         QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
         cmd->setName(name, false);
-        cmd->setLength(Length::fromMm(mUi->spbLength->value()), false);
+        cmd->setLength(UnsignedLength(Length::fromMm(mUi->spbLength->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());

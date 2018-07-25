@@ -140,7 +140,7 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept
     mHeightSpinBox->setMaximum(100);
     mHeightSpinBox->setSingleStep(0.1);
     mHeightSpinBox->setDecimals(6);
-    mHeightSpinBox->setValue(mCurrentHeight.toMm());
+    mHeightSpinBox->setValue(mCurrentHeight->toMm());
     connect(mHeightSpinBox.data(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &BES_AddStrokeText::heightSpinBoxValueChanged);
@@ -209,7 +209,7 @@ BES_Base::ProcRetVal BES_AddStrokeText::processSceneEvent(BEE_Base* event) noexc
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton: {
                     fixText(pos);
@@ -232,7 +232,7 @@ BES_Base::ProcRetVal BES_AddStrokeText::processSceneEvent(BEE_Base* event) noexc
         case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateTextPosition(pos);
             return ForceStayInState;
         }
@@ -281,7 +281,7 @@ bool BES_AddStrokeText::addText(Board& board, const Point& pos) noexcept
         mUndoCmdActive = true;
         mText = new BI_StrokeText(board, StrokeText(
             Uuid::createRandom(), mCurrentLayerName, mCurrentText, pos, mCurrentRotation,
-            mCurrentHeight, Length(200000), StrokeTextSpacing(), StrokeTextSpacing(),
+            mCurrentHeight, UnsignedLength(200000), StrokeTextSpacing(), StrokeTextSpacing(),
             Alignment(HAlign::left(), VAlign::bottom()), mCurrentMirror, true));
         QScopedPointer<CmdBoardStrokeTextAdd> cmdAdd(new CmdBoardStrokeTextAdd(*mText));
         mUndoStack.appendToCmdGroup(cmdAdd.take());

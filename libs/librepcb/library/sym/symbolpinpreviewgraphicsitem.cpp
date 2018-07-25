@@ -92,7 +92,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     // line
-    QRectF lineRect = QRectF(QPointF(0, 0), Point(mPin.getLength(), 0).toPxQPointF()).normalized();
+    QRectF lineRect = QRectF(QPointF(0, 0), Point(*mPin.getLength(), 0).toPxQPointF()).normalized();
     lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
     mBoundingRect = mBoundingRect.united(lineRect).normalized();
 
@@ -109,7 +109,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         Q_ASSERT(false);
         mStaticText.setText("???");
     }
-    qreal x = mPin.getLength().toPx() + 4;
+    qreal x = mPin.getLength()->toPx() + 4;
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
     mTextOrigin.setY(-mStaticText.size().height()/2);
@@ -136,7 +136,7 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
-    painter->drawLine(QPointF(0, 0), Point(mPin.getLength(), 0).toPxQPointF());
+    painter->drawLine(QPointF(0, 0), Point(*mPin.getLength(), 0).toPxQPointF());
 
     // draw circle
     painter->setPen(QPen(mCircleLayer->getColor(selected), 0));

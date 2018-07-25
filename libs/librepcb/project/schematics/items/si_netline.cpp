@@ -48,7 +48,7 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node) :
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mStartPoint(nullptr),
     mEndPoint(nullptr),
-    mWidth(node.getValueByPath<Length>("width"))
+    mWidth(node.getValueByPath<UnsignedLength>("width"))
 {
     Uuid spUuid = node.getValueByPath<Uuid>("p1");
     mStartPoint = segment.getNetPointByUuid(spUuid);
@@ -70,7 +70,7 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node) :
 }
 
 SI_NetLine::SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                       const Length& width) :
+                       const UnsignedLength& width) :
     SI_Base(startPoint.getSchematic()), mPosition(), mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(width)
 {
@@ -79,11 +79,6 @@ SI_NetLine::SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
 
 void SI_NetLine::init()
 {
-    if(mWidth < 0) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid net line width: \"%1\"")).arg(mWidth.toMmString()));
-    }
-
     // check if both netpoints are in the same net segment
     if (&mStartPoint->getNetSegment() != &mEndPoint->getNetSegment()) {
         throw LogicError(__FILE__, __LINE__,
@@ -143,10 +138,9 @@ bool SI_NetLine::isAttachedToSymbol() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void SI_NetLine::setWidth(const Length& width) noexcept
+void SI_NetLine::setWidth(const UnsignedLength& width) noexcept
 {
-    Q_ASSERT(width >= 0);
-    if ((width != mWidth) && (width >= 0)) {
+    if (width != mWidth) {
         mWidth = width;
         mGraphicsItem->updateCacheAndRepaint();
     }
@@ -227,7 +221,6 @@ bool SI_NetLine::checkAttributesValidity() const noexcept
 {
     if (mStartPoint == nullptr) return false;
     if (mEndPoint == nullptr)   return false;
-    if (mWidth < 0)             return false;
     return true;
 }
 

@@ -44,7 +44,7 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(StrokeText& text,
 {
     // add origin cross
     mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(Length(1000000));
+    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
 
     // set text properties
     setPosition(mText.getPosition());
@@ -99,13 +99,13 @@ void StrokeTextGraphicsItem::strokeTextRotationChanged(const Angle& newRot) noex
     updateTransform();
 }
 
-void StrokeTextGraphicsItem::strokeTextHeightChanged(const Length& newHeight) noexcept
+void StrokeTextGraphicsItem::strokeTextHeightChanged(const PositiveLength& newHeight) noexcept
 {
     Q_UNUSED(newHeight);
     // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(const Length& newStrokeWidth) noexcept
+void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept
 {
     // only line width must be updated because strokeTextPathsChanged() will be called too
     setLineWidth(newStrokeWidth);

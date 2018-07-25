@@ -33,10 +33,10 @@ namespace librepcb {
  ****************************************************************************************/
 
 void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
-                            const Length& maxArcTolerance)
+                            const PositiveLength& maxArcTolerance)
 {
     try {
-        ClipperLib::ClipperOffset o(2.0, maxArcTolerance.toNm());
+        ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
         o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
         o.Execute(paths, offset.toNm());
     } catch (const std::exception& e) {
@@ -92,7 +92,7 @@ Point ClipperHelpers::convert(const ClipperLib::IntPoint& point) noexcept
 }
 
 ClipperLib::Paths ClipperHelpers::convert(const QVector<Path>& paths,
-                                          const Length& maxArcTolerance) noexcept
+                                          const PositiveLength& maxArcTolerance) noexcept
 {
     ClipperLib::Paths p;
     p.reserve(paths.size());
@@ -102,7 +102,8 @@ ClipperLib::Paths ClipperHelpers::convert(const QVector<Path>& paths,
     return p;
 }
 
-ClipperLib::Path ClipperHelpers::convert(const Path& path, const Length& maxArcTolerance) noexcept
+ClipperLib::Path ClipperHelpers::convert(const Path& path,
+                                         const PositiveLength& maxArcTolerance) noexcept
 {
     ClipperLib::Path p;
     for (int i = 0; i < path.getVertices().count(); ++i) {

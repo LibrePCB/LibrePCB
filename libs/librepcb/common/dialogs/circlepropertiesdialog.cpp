@@ -50,10 +50,10 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoSt
 
     // load circle attributes
     selectLayerNameInCombobox(mCircle.getLayerName());
-    mUi->spbLineWidth->setValue(mCircle.getLineWidth().toMm());
+    mUi->spbLineWidth->setValue(mCircle.getLineWidth()->toMm());
     mUi->cbxFillArea->setChecked(mCircle.isFilled());
     mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
-    mUi->spbDiameter->setValue(mCircle.getDiameter().toMm());
+    mUi->spbDiameter->setValue(mCircle.getDiameter()->toMm());
     mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
     mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
 }
@@ -87,7 +87,7 @@ void CirclePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
 bool CirclePropertiesDialog::applyChanges() noexcept
 {
     try {
-        Length diameter = Length::fromMm(mUi->spbDiameter->value());
+        PositiveLength diameter = PositiveLength(Length::fromMm(mUi->spbDiameter->value())); // can throw
 
         QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
@@ -95,7 +95,7 @@ bool CirclePropertiesDialog::applyChanges() noexcept
         }
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-        cmd->setLineWidth(Length::fromMm(mUi->spbLineWidth->value()), false);
+        cmd->setLineWidth(UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())), false); // can throw
         cmd->setDiameter(diameter, false);
         cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         mUndoStack.execCmd(cmd.take());

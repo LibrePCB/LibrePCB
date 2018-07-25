@@ -181,12 +181,12 @@ NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept
     return mNetSegment.getNetSignal();
 }
 
-Length BI_NetPoint::getMaxLineWidth() const noexcept
+UnsignedLength BI_NetPoint::getMaxLineWidth() const noexcept
 {
-    Length w = 0;
+    UnsignedLength w(0);
     foreach (BI_NetLine* line, mRegisteredLines) {
         if (line->getWidth() > w) {
-            w = line->getWidth();
+            w = positiveToUnsigned(line->getWidth());
         }
     }
     return w;

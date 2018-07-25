@@ -72,7 +72,7 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept
     // set Z value
     setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
 
-    qreal radius = mNetPoint.getMaxLineWidth().toPx() / 2;
+    qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
     mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
 
     update();

@@ -187,7 +187,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processIdleSceneEvent(BEE_Base* event) noexc
     switch (qevent->type()) {
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     start(*board, pos);
@@ -228,7 +228,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     addSegment(*board, pos);
@@ -244,7 +244,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateVertexPosition(pos);
             return ForceStayInState;
         }

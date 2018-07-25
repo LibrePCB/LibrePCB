@@ -45,7 +45,7 @@ Hole::Hole(const Uuid& uuid, const Hole& other) noexcept :
     mUuid = uuid;
 }
 
-Hole::Hole(const Uuid& uuid, const Point& position, const Length& diameter) noexcept :
+Hole::Hole(const Uuid& uuid, const Point& position, const PositiveLength& diameter) noexcept :
     mUuid(uuid), mPosition(position), mDiameter(diameter)
 {
 }
@@ -53,13 +53,11 @@ Hole::Hole(const Uuid& uuid, const Point& position, const Length& diameter) noex
 Hole::Hole(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
     mPosition(node.getChildByPath("pos")),
-    mDiameter(node.getValueByPath<Length>("dia"))
+    mDiameter(node.getValueByPath<PositiveLength>("dia"))
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Hole::~Hole() noexcept
@@ -80,7 +78,7 @@ void Hole::setPosition(const Point& position) noexcept
     }
 }
 
-void Hole::setDiameter(const Length& diameter) noexcept
+void Hole::setDiameter(const PositiveLength& diameter) noexcept
 {
     if (diameter == mDiameter) return;
     mDiameter = diameter;
@@ -105,8 +103,6 @@ void Hole::unregisterObserver(IF_HoleObserver& object) const noexcept
 
 void Hole::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("dia", mDiameter, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), false);
@@ -130,16 +126,6 @@ Hole& Hole::operator=(const Hole& rhs) noexcept
     mPosition = rhs.mPosition;
     mDiameter = rhs.mDiameter;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool Hole::checkAttributesValidity() const noexcept
-{
-    if (mDiameter <= 0)          return false;
-    return true;
 }
 
 /*****************************************************************************************

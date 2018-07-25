@@ -59,7 +59,7 @@ class ExcellonGenerator final
         const QString& toStr() const noexcept {return mOutput;}
 
         // General Methods
-        void drill(const Point& pos, const Length& dia) noexcept;
+        void drill(const Point& pos, const PositiveLength& dia) noexcept;
         void generate();
         void saveToFile(const FilePath& filepath) const;
         void reset() noexcept;

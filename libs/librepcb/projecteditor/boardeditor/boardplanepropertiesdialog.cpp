@@ -71,8 +71,8 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project& project, BI_Plan
     mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(mPlane.getLayerName()));
 
     // minimum width / clearance spinbox
-    mUi->spbMinWidth->setValue(mPlane.getMinWidth().toMm());
-    mUi->spbMinClearance->setValue(mPlane.getMinClearance().toMm());
+    mUi->spbMinWidth->setValue(mPlane.getMinWidth()->toMm());
+    mUi->spbMinClearance->setValue(mPlane.getMinClearance()->toMm());
 
     // connect style combobox
     mUi->cbxConnectStyle->addItem(tr("None"), static_cast<int>(BI_Plane::ConnectStyle::None));
@@ -137,8 +137,8 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept
         }
 
         // min width/clearance
-        cmd->setMinWidth(Length::fromMm(mUi->spbMinWidth->value()));
-        cmd->setMinClearance(Length::fromMm(mUi->spbMinClearance->value()));
+        cmd->setMinWidth(UnsignedLength(Length::fromMm(mUi->spbMinWidth->value()))); // can throw
+        cmd->setMinClearance(UnsignedLength(Length::fromMm(mUi->spbMinClearance->value()))); // can throw
 
         // connect style
         cmd->setConnectStyle(static_cast<BI_Plane::ConnectStyle>(mUi->cbxConnectStyle->currentData().toInt()));

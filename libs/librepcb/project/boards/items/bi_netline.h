@@ -61,13 +61,13 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         BI_NetLine(const BI_NetLine& other) = delete;
         BI_NetLine(const BI_NetLine& other, BI_NetPoint& startPoint, BI_NetPoint& endPoint);
         BI_NetLine(BI_NetSegment& segment, const SExpression& node);
-        BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const Length& width);
+        BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const PositiveLength& width);
         ~BI_NetLine() noexcept;
 
         // Getters
         BI_NetSegment& getNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const Length& getWidth() const noexcept {return mWidth;}
+        const PositiveLength& getWidth() const noexcept {return mWidth;}
         BI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         BI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
         BI_NetPoint* getOtherPoint(const BI_NetPoint& firstPoint) const noexcept;
@@ -80,7 +80,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
 
         // Setters
-        void setWidth(const Length& width) noexcept;
+        void setWidth(const PositiveLength& width) noexcept;
 
         // General Methods
         void addToBoard() override;
@@ -117,7 +117,7 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         Uuid mUuid;
         BI_NetPoint* mStartPoint;
         BI_NetPoint* mEndPoint;
-        Length mWidth;
+        PositiveLength mWidth;
 };
 
 /*****************************************************************************************

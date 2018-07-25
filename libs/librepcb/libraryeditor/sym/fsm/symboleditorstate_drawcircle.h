@@ -93,7 +93,7 @@ class SymbolEditorState_DrawCircle final : public SymbolEditorState
 
         // parameter memory
         QString mLastLayerName;
-        Length mLastLineWidth;
+        UnsignedLength mLastLineWidth;
         bool mLastFill;
         bool mLastGrabArea;
 };

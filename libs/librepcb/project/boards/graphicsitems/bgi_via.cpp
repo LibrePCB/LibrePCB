@@ -82,13 +82,13 @@ void BGI_Via::updateCacheAndRepaint() noexcept
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
 
     // determine stop mask clearance
-    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(mVia.getDrillDiameter());
-    Length stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(mVia.getSize());
+    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(*mVia.getDrillDiameter());
+    UnsignedLength stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
 
     // set shapes and bounding rect
     mShape = mVia.getOutline().toQPainterPathPx();
     mCopper = mVia.toQPainterPathPx();
-    mStopMask = mVia.getOutline(stopMaskClearance).toQPainterPathPx();
+    mStopMask = mVia.getOutline(*stopMaskClearance).toQPainterPathPx();
     mBoundingRect = mStopMask.boundingRect();
 
     update();

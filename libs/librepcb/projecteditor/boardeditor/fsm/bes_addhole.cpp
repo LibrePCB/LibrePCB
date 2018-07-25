@@ -92,7 +92,7 @@ bool BES_AddHole::entry(BEE_Base* event) noexcept
     mDiameterSpinBox->setMaximum(100);
     mDiameterSpinBox->setSingleStep(0.2);
     mDiameterSpinBox->setDecimals(6);
-    mDiameterSpinBox->setValue(mCurrentDiameter.toMm());
+    mDiameterSpinBox->setValue(mCurrentDiameter->toMm());
     connect(mDiameterSpinBox.data(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &BES_AddHole::diameterSpinBoxValueChanged);
@@ -143,7 +143,7 @@ BES_Base::ProcRetVal BES_AddHole::processSceneEvent(BEE_Base* event) noexcept
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton: {
                     fixHole(pos);
@@ -164,7 +164,7 @@ BES_Base::ProcRetVal BES_AddHole::processSceneEvent(BEE_Base* event) noexcept
         case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateHolePosition(pos);
             return ForceStayInState;
         }

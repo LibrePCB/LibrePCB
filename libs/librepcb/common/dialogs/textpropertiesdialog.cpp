@@ -52,7 +52,7 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
     selectLayerNameInCombobox(mText.getLayerName());
     mUi->edtText->setPlainText(mText.getText());
     mUi->alignmentSelector->setAlignment(mText.getAlign());
-    mUi->spbHeight->setValue(mText.getHeight().toMm());
+    mUi->spbHeight->setValue(mText.getHeight()->toMm());
     mUi->spbPosX->setValue(mText.getPosition().getX().toMm());
     mUi->spbPosY->setValue(mText.getPosition().getY().toMm());
     mUi->spbRotation->setValue(mText.getRotation().toDeg());
@@ -93,7 +93,7 @@ bool TextPropertiesDialog::applyChanges() noexcept
         }
         cmd->setText(mUi->edtText->toPlainText().trimmed(), false);
         cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-        cmd->setHeight(Length::fromMm(mUi->spbHeight->value()), false);
+        cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());

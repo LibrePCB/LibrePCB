@@ -63,7 +63,7 @@ void PolygonGraphicsItem::polygonLayerNameChanged(const QString& newLayerName) n
     updateFillLayer(); // required if the area is filled with the line layer
 }
 
-void PolygonGraphicsItem::polygonLineWidthChanged(const Length& newLineWidth) noexcept
+void PolygonGraphicsItem::polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept
 {
     setLineWidth(newLineWidth);
 }

@@ -74,14 +74,14 @@ void CmdStrokeTextEdit::setText(const QString& text, bool immediate) noexcept
     if (immediate) mText.setText(mNewText);
 }
 
-void CmdStrokeTextEdit::setHeight(const Length& height, bool immediate) noexcept
+void CmdStrokeTextEdit::setHeight(const PositiveLength& height, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewHeight = height;
     if (immediate) mText.setHeight(mNewHeight);
 }
 
-void CmdStrokeTextEdit::setStrokeWidth(const Length& strokeWidth, bool immediate) noexcept
+void CmdStrokeTextEdit::setStrokeWidth(const UnsignedLength& strokeWidth, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewStrokeWidth = strokeWidth;

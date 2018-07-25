@@ -61,7 +61,7 @@ void CmdSymbolPinEdit::setName(const QString& name, bool immediate) noexcept
     if (immediate) mPin.setName(mNewName);
 }
 
-void CmdSymbolPinEdit::setLength(const Length& length, bool immediate) noexcept
+void CmdSymbolPinEdit::setLength(const UnsignedLength& length, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLength = length;

@@ -45,19 +45,18 @@ SymbolPin::SymbolPin(const SymbolPin& other) noexcept :
 }
 
 SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                     const Length& length, const Angle& rotation) noexcept :
+                     const UnsignedLength& length, const Angle& rotation) noexcept :
     mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation),
     mRegisteredGraphicsItem(nullptr)
 {
     Q_ASSERT(!mName.isEmpty());
-    Q_ASSERT(mLength >= 0);
 }
 
 SymbolPin::SymbolPin(const SExpression& node) :
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<QString>("name", true)),
     mPosition(node.getChildByPath("pos")),
-    mLength(node.getValueByPath<Length>("length")),
+    mLength(node.getValueByPath<UnsignedLength>("length")),
     mRotation(node.getValueByPath<Angle>("rot")),
     mRegisteredGraphicsItem(nullptr)
 {
@@ -86,9 +85,8 @@ void SymbolPin::setPosition(const Point& pos) noexcept
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
 }
 
-void SymbolPin::setLength(const Length& length) noexcept
+void SymbolPin::setLength(const UnsignedLength& length) noexcept
 {
-    Q_ASSERT(length >= 0);
     mLength = length;
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLength(mLength);
 }
@@ -156,7 +154,6 @@ SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept
 
 bool SymbolPin::checkAttributesValidity() const noexcept
 {
-    if (mLength < 0)        return false;
     if (mName.isEmpty())    return false;
     return true;
 }

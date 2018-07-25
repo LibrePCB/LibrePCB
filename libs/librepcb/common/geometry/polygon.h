@@ -51,7 +51,7 @@ class IF_PolygonObserver
 {
     public:
         virtual void polygonLayerNameChanged(const QString& newLayerName) noexcept = 0;
-        virtual void polygonLineWidthChanged(const Length& newLineWidth) noexcept = 0;
+        virtual void polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept = 0;
         virtual void polygonIsFilledChanged(bool newIsFilled) noexcept = 0;
         virtual void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
         virtual void polygonPathChanged(const Path& newPath) noexcept = 0;
@@ -80,7 +80,7 @@ class Polygon final : public SerializableObject
         Polygon() = delete;
         Polygon(const Polygon& other) noexcept;
         Polygon(const Uuid& uuid, const Polygon& other) noexcept;
-        Polygon(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
+        Polygon(const Uuid& uuid, const QString& layerName, const UnsignedLength& lineWidth,
                 bool fill, bool isGrabArea, const Path& path) noexcept;
         explicit Polygon(const SExpression& node);
         ~Polygon() noexcept;
@@ -88,14 +88,14 @@ class Polygon final : public SerializableObject
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
         const QString& getLayerName() const noexcept {return mLayerName;}
-        const Length& getLineWidth() const noexcept {return mLineWidth;}
+        const UnsignedLength& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Path& getPath() const noexcept {return mPath;}
 
         // Setters
         void setLayerName(const QString& name) noexcept;
-        void setLineWidth(const Length& width) noexcept;
+        void setLineWidth(const UnsignedLength& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
         void setPath(const Path& path) noexcept;
@@ -120,7 +120,7 @@ class Polygon final : public SerializableObject
     private: // Data
         Uuid mUuid;
         QString mLayerName;
-        Length mLineWidth;
+        UnsignedLength mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
         Path mPath;

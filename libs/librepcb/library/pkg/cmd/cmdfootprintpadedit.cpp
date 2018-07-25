@@ -79,21 +79,21 @@ void CmdFootprintPadEdit::setShape(FootprintPad::Shape shape, bool immediate) no
     if (immediate) mPad.setShape(mNewShape);
 }
 
-void CmdFootprintPadEdit::setWidth(const Length& width, bool immediate) noexcept
+void CmdFootprintPadEdit::setWidth(const PositiveLength& width, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewWidth = width;
     if (immediate) mPad.setWidth(mNewWidth);
 }
 
-void CmdFootprintPadEdit::setHeight(const Length& height, bool immediate) noexcept
+void CmdFootprintPadEdit::setHeight(const PositiveLength& height, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewHeight = height;
     if (immediate) mPad.setHeight(mNewHeight);
 }
 
-void CmdFootprintPadEdit::setDrillDiameter(const Length& dia, bool immediate) noexcept
+void CmdFootprintPadEdit::setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewDrillDiameter = dia;

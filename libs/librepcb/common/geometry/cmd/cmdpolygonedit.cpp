@@ -61,7 +61,7 @@ void CmdPolygonEdit::setLayerName(const QString& name, bool immediate) noexcept
     if (immediate) mPolygon.setLayerName(mNewLayerName);
 }
 
-void CmdPolygonEdit::setLineWidth(const Length& width, bool immediate) noexcept
+void CmdPolygonEdit::setLineWidth(const UnsignedLength& width, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLineWidth = width;

@@ -115,7 +115,7 @@ class BoardGerberExport final : public QObject, public AttributeProvider
         FilePath getOutputFilePath(const QString& suffix) const noexcept;
 
         // Static Methods
-        static Length calcWidthOfLayer(const Length& width, const QString& name) noexcept;
+        static UnsignedLength calcWidthOfLayer(const UnsignedLength& width, const QString& name) noexcept;
         template <typename T>
         static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
             // sort a list of objects by their UUID to get reproducable gerber files

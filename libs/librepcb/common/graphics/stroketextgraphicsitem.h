@@ -71,8 +71,8 @@ class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem,
         void strokeTextTextChanged(const QString& newText) noexcept override;
         void strokeTextPositionChanged(const Point& newPos) noexcept override;
         void strokeTextRotationChanged(const Angle& newRot) noexcept override;
-        void strokeTextHeightChanged(const Length& newHeight) noexcept override;
-        void strokeTextStrokeWidthChanged(const Length& newStrokeWidth) noexcept override;
+        void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept override;
+        void strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept override;
         void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
         void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
         void strokeTextAlignChanged(const Alignment& newAlign) noexcept override;

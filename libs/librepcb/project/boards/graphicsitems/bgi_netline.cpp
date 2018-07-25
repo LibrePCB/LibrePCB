@@ -79,15 +79,15 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept
     mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
     mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
     mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
-    mBoundingRect.adjust(-mNetLine.getWidth().toPx()/2, -mNetLine.getWidth().toPx()/2,
-                         mNetLine.getWidth().toPx()/2, mNetLine.getWidth().toPx()/2);
+    mBoundingRect.adjust(-mNetLine.getWidth()->toPx()/2, -mNetLine.getWidth()->toPx()/2,
+                         mNetLine.getWidth()->toPx()/2, mNetLine.getWidth()->toPx()/2);
     mShape = QPainterPath();
     mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
     mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
     QPainterPathStroker ps;
     ps.setCapStyle(Qt::RoundCap);
-    Length width = (mNetLine.getWidth() > Length(100000) ? mNetLine.getWidth() : Length(100000));
-    ps.setWidth(width.toPx());
+    PositiveLength width = qMin(mNetLine.getWidth(), PositiveLength(100000));
+    ps.setWidth(width->toPx());
     mShape = ps.createStroke(mShape);
     update();
 }
@@ -106,7 +106,7 @@ void BGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     // draw line
     if (mLayer->isVisible())
     {
-        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
+        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(), Qt::SolidLine, Qt::RoundCap);
         painter->setPen(pen);
         painter->drawLine(mLineF);
     }

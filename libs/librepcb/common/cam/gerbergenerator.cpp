@@ -65,33 +65,34 @@ void GerberGenerator::setLayerPolarity(LayerPolarity p) noexcept
     }
 }
 
-void GerberGenerator::drawLine(const Point& start, const Point& end, const Length& width) noexcept
+void GerberGenerator::drawLine(const Point& start, const Point& end,
+                               const UnsignedLength& width) noexcept
 {
-    setCurrentAperture(mApertureList->setCircle(width, Length(0)));
+    setCurrentAperture(mApertureList->setCircle(width, UnsignedLength(0)));
     moveToPosition(start);
     linearInterpolateToPosition(end);
 }
 
 void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept
 {
-    Length outerDia = circle.getDiameter() + circle.getLineWidth();
+    PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
     Length innerDia = circle.getDiameter() - circle.getLineWidth();
     if (innerDia < 0) innerDia = 0;
-    flashCircle(circle.getCenter(), outerDia, innerDia);
+    flashCircle(circle.getCenter(), positiveToUnsigned(outerDia), UnsignedLength(innerDia));
 }
 
 void GerberGenerator::drawCircleArea(const Circle& circle) noexcept
 {
-    flashCircle(circle.getCenter(), circle.getDiameter(), Length(0));
+    flashCircle(circle.getCenter(), positiveToUnsigned(circle.getDiameter()), UnsignedLength(0));
 }
 
-void GerberGenerator::drawPathOutline(const Path& path, const Length& lineWidth) noexcept
+void GerberGenerator::drawPathOutline(const Path& path, const UnsignedLength& lineWidth) noexcept
 {
     if (path.getVertices().count() < 2) {
         qWarning() << "Invalid path was ignored in gerber output!";
         return;
     }
-    setCurrentAperture(mApertureList->setCircle(lineWidth, Length(0)));
+    setCurrentAperture(mApertureList->setCircle(lineWidth, UnsignedLength(0)));
     moveToPosition(path.getVertices().first().getPos());
     for (int i = 1; i < path.getVertices().count(); ++i) {
         const Vertex& v = path.getVertices().at(i);
@@ -124,7 +125,7 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept
         qWarning() << "Non-closed path was ignored in gerber output!";
         return;
     }
-    setCurrentAperture(mApertureList->setCircle(Length(0), Length(0)));
+    setCurrentAperture(mApertureList->setCircle(UnsignedLength(0), UnsignedLength(0)));
     setRegionModeOn();
     moveToPosition(path.getVertices().first().getPos());
     for (int i = 1; i < path.getVertices().count(); ++i) {
@@ -153,28 +154,31 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept
     setRegionModeOff();
 }
 
-void GerberGenerator::flashCircle(const Point& pos, const Length& dia, const Length& hole) noexcept
+void GerberGenerator::flashCircle(const Point& pos, const UnsignedLength& dia,
+                                  const UnsignedLength& hole) noexcept
 {
     setCurrentAperture(mApertureList->setCircle(dia, hole));
     flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRect(const Point& pos, const Length& w, const Length& h,
-                                const Angle& rot, const Length& hole) noexcept
+void GerberGenerator::flashRect(const Point& pos, const UnsignedLength& w,
+                                const UnsignedLength& h, const Angle& rot,
+                                const UnsignedLength& hole) noexcept
 {
     setCurrentAperture(mApertureList->setRect(w, h, rot, hole));
     flashAtPosition(pos);
 }
 
-void GerberGenerator::flashObround(const Point& pos, const Length& w, const Length& h,
-                                   const Angle& rot, const Length& hole) noexcept
+void GerberGenerator::flashObround(const Point& pos, const UnsignedLength& w,
+                                   const UnsignedLength& h, const Angle& rot,
+                                   const UnsignedLength& hole) noexcept
 {
     setCurrentAperture(mApertureList->setObround(w, h, rot, hole));
     flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRegularPolygon(const Point& pos, const Length& dia, int n,
-                                          const Angle& rot, const Length& hole) noexcept
+void GerberGenerator::flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
+                                          const Angle& rot, const UnsignedLength& hole) noexcept
 {
     setCurrentAperture(mApertureList->setRegularPolygon(dia, n, rot, hole));
     flashAtPosition(pos);

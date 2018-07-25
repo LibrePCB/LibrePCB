@@ -51,18 +51,19 @@ class GridProperties final : public SerializableObject
         // Constructors / Destructor
         GridProperties() noexcept;
         explicit GridProperties(const SExpression& node);
-        GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept;
+        GridProperties(Type_t type, const PositiveLength& interval,
+                       const LengthUnit& unit) noexcept;
         GridProperties(const GridProperties& other) noexcept;
         ~GridProperties() noexcept;
 
         // Getters
         Type_t getType() const noexcept {return mType;}
-        const Length& getInterval() const noexcept {return mInterval;}
+        const PositiveLength& getInterval() const noexcept {return mInterval;}
         const LengthUnit& getUnit() const noexcept {return mUnit;}
 
         // Setters
         void setType(Type_t type) noexcept {mType = type;}
-        void setInterval(const Length& interval) noexcept {mInterval = interval;}
+        void setInterval(const PositiveLength& interval) noexcept {mInterval = interval;}
         void setUnit(const LengthUnit& unit) noexcept {mUnit = unit;}
 
         // General Methods
@@ -76,7 +77,7 @@ class GridProperties final : public SerializableObject
 
     private: // Data
         Type_t mType;
-        Length mInterval;
+        PositiveLength mInterval;
         LengthUnit mUnit;
 };
 
