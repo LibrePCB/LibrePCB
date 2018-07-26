@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <type_safe/constrained_type.hpp>
 #include "../fileio/sexpression.h"
 
 /*****************************************************************************************
@@ -52,26 +53,26 @@ class Ratio
         /**
          * @brief Default Constructor
          */
-        Ratio() noexcept : Ratio(0) {}
+        constexpr Ratio() noexcept : Ratio(0) {}
 
         /**
          * @brief Copy Constructor
          *
          * @param ratio         Another Ratio object
          */
-        Ratio(const Ratio& ratio) noexcept : mPpm(ratio.mPpm) {}
+        constexpr Ratio(const Ratio& ratio) noexcept : mPpm(ratio.mPpm) {}
 
         /**
          * @brief Constructor with a ratio in PPM
          *
          * @param ppm           The ratio in PPM
          */
-        explicit Ratio(qint32 ppm) noexcept : mPpm(ppm) {}
+        constexpr explicit Ratio(qint32 ppm) noexcept : mPpm(ppm) {}
 
         /**
          * @brief Destructor
          */
-        ~Ratio() noexcept {}
+        ~Ratio() = default;
 
 
         // Setters
@@ -217,18 +218,18 @@ class Ratio
         Ratio    operator/(const Ratio& rhs) const  {return Ratio(mPpm / rhs.mPpm);}
         Ratio    operator/(qint32 rhs) const        {return Ratio(mPpm / rhs);}
         Ratio    operator%(const Ratio& rhs) const  {return Ratio(mPpm % rhs.mPpm);}
-        bool     operator>(const Ratio& rhs) const  {return mPpm > rhs.mPpm;}
-        bool     operator>(qint32 rhs) const        {return mPpm > rhs;}
-        bool     operator<(const Ratio& rhs) const  {return mPpm < rhs.mPpm;}
-        bool     operator<(qint32 rhs) const        {return mPpm < rhs;}
-        bool     operator>=(const Ratio& rhs) const {return mPpm >= rhs.mPpm;}
-        bool     operator>=(qint32 rhs) const       {return mPpm >= rhs;}
-        bool     operator<=(const Ratio& rhs) const {return mPpm <= rhs.mPpm;}
-        bool     operator<=(qint32 rhs) const       {return mPpm <= rhs;}
-        bool     operator==(const Ratio& rhs) const {return mPpm == rhs.mPpm;}
-        bool     operator==(qint32 rhs) const       {return mPpm == rhs;}
-        bool     operator!=(const Ratio& rhs) const {return mPpm != rhs.mPpm;}
-        bool     operator!=(qint32 rhs) const       {return mPpm != rhs;}
+        constexpr bool operator>(const Ratio& rhs) const  {return mPpm > rhs.mPpm;}
+        constexpr bool operator>(qint32 rhs) const        {return mPpm > rhs;}
+        constexpr bool operator<(const Ratio& rhs) const  {return mPpm < rhs.mPpm;}
+        constexpr bool operator<(qint32 rhs) const        {return mPpm < rhs;}
+        constexpr bool operator>=(const Ratio& rhs) const {return mPpm >= rhs.mPpm;}
+        constexpr bool operator>=(qint32 rhs) const       {return mPpm >= rhs;}
+        constexpr bool operator<=(const Ratio& rhs) const {return mPpm <= rhs.mPpm;}
+        constexpr bool operator<=(qint32 rhs) const       {return mPpm <= rhs;}
+        constexpr bool operator==(const Ratio& rhs) const {return mPpm == rhs.mPpm;}
+        constexpr bool operator==(qint32 rhs) const       {return mPpm == rhs;}
+        constexpr bool operator!=(const Ratio& rhs) const {return mPpm != rhs.mPpm;}
+        constexpr bool operator!=(qint32 rhs) const       {return mPpm != rhs;}
         explicit operator bool() const              {return mPpm != 0;}
 
 
@@ -284,6 +285,60 @@ inline QDebug operator<<(QDebug stream, const Ratio& ratio) {
 
 inline uint qHash(const Ratio& key, uint seed = 0) noexcept {
     return ::qHash(key.toPpm(), seed);
+}
+
+/*****************************************************************************************
+ *  Class UnsignedRatio
+ ****************************************************************************************/
+
+struct UnsignedRatioVerifier {
+    template <typename Value, typename Predicate>
+    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
+        return p(val) ? std::forward<Value>(val) : (
+            throw RuntimeError(__FILE__, __LINE__, Ratio::tr("Value must be >= 0!")),
+            std::forward<Value>(val));
+    }
+};
+
+struct UnsignedRatioConstraint {
+    constexpr bool operator()(const Ratio& r) const noexcept {
+        return r >= 0;
+    }
+};
+
+/**
+ * UnsignedRatio is a wrapper around a librepcb::Ratio object which is guaranteed to
+ * always contain an unsigned (i.e. >= 0) value.
+ *
+ * The constructor throws an exception if constructed from a librepcb::Ratio object with
+ * a negative value!
+ */
+using UnsignedRatio = type_safe::constrained_type<Ratio, UnsignedRatioConstraint,
+                                                  UnsignedRatioVerifier>;
+
+template <>
+inline SExpression serializeToSExpression(const UnsignedRatio& obj) {
+    return SExpression::createToken(obj->toNormalizedString());
+}
+
+template <>
+inline UnsignedRatio deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return UnsignedRatio(Ratio::fromNormalized(str));
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const UnsignedRatio& ratio) {
+    stream << ratio->toNormalizedString();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const UnsignedRatio& ratio) {
+    stream << QString("UnsignedRatio(%1%%)").arg(ratio->toPercent());
+    return stream;
+}
+
+inline uint qHash(const UnsignedRatio& key, uint seed = 0) noexcept {
+    return ::qHash(key->toPpm(), seed);
 }
 
 /*****************************************************************************************
