@@ -81,19 +81,19 @@ void BoardDesignRulesDialog::updateWidgets() noexcept
     mUi->edtName->setText(mDesignRules.getName());
     mUi->txtDescription->setPlainText(mDesignRules.getDescription());
     // stop mask
-    mUi->spbxStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio().toPercent());
+    mUi->spbxStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio()->toPercent());
     mUi->spbxStopMaskClrMin->setValue(mDesignRules.getStopMaskClearanceMin()->toMm());
     mUi->spbxStopMaskClrMax->setValue(mDesignRules.getStopMaskClearanceMax()->toMm());
     mUi->spbxStopMaskMaxViaDia->setValue(mDesignRules.getStopMaskMaxViaDiameter()->toMm());
     // cream mask
-    mUi->spbxCreamMaskClrRatio->setValue(mDesignRules.getCreamMaskClearanceRatio().toPercent());
+    mUi->spbxCreamMaskClrRatio->setValue(mDesignRules.getCreamMaskClearanceRatio()->toPercent());
     mUi->spbxCreamMaskClrMin->setValue(mDesignRules.getCreamMaskClearanceMin()->toMm());
     mUi->spbxCreamMaskClrMax->setValue(mDesignRules.getCreamMaskClearanceMax()->toMm());
     // restring
-    mUi->spbxRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio().toPercent());
+    mUi->spbxRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio()->toPercent());
     mUi->spbxRestringPadsMin->setValue(mDesignRules.getRestringPadMin()->toMm());
     mUi->spbxRestringPadsMax->setValue(mDesignRules.getRestringPadMax()->toMm());
-    mUi->spbxRestringViasRatio->setValue(mDesignRules.getRestringViaRatio().toPercent());
+    mUi->spbxRestringViasRatio->setValue(mDesignRules.getRestringViaRatio()->toPercent());
     mUi->spbxRestringViasMin->setValue(mDesignRules.getRestringViaMin()->toMm());
     mUi->spbxRestringViasMax->setValue(mDesignRules.getRestringViaMax()->toMm());
 }
@@ -105,19 +105,19 @@ void BoardDesignRulesDialog::applyRules() noexcept
         mDesignRules.setName(mUi->edtName->text());
         mDesignRules.setDescription(mUi->txtDescription->toPlainText());
         // stop mask
-        mDesignRules.setStopMaskClearanceRatio(Ratio::fromPercent(mUi->spbxStopMaskClrRatio->value()));
+        mDesignRules.setStopMaskClearanceRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxStopMaskClrRatio->value()))); // can throw
         mDesignRules.setStopMaskClearanceMin(UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMin->value()))); // can throw
         mDesignRules.setStopMaskClearanceMax(UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMax->value()))); // can throw
         mDesignRules.setStopMaskMaxViaDiameter(UnsignedLength(Length::fromMm(mUi->spbxStopMaskMaxViaDia->value()))); // can throw
         // cream mask
-        mDesignRules.setCreamMaskClearanceRatio(Ratio::fromPercent(mUi->spbxCreamMaskClrRatio->value()));
+        mDesignRules.setCreamMaskClearanceRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxCreamMaskClrRatio->value()))); // can throw
         mDesignRules.setCreamMaskClearanceMin(UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMin->value()))); // can throw
         mDesignRules.setCreamMaskClearanceMax(UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMax->value()))); // can throw
         // restring
-        mDesignRules.setRestringPadRatio(Ratio::fromPercent(mUi->spbxRestringPadsRatio->value()));
+        mDesignRules.setRestringPadRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxRestringPadsRatio->value()))); // can throw
         mDesignRules.setRestringPadMin(UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMin->value()))); // can throw
         mDesignRules.setRestringPadMax(UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMax->value()))); // can throw
-        mDesignRules.setRestringViaRatio(Ratio::fromPercent(mUi->spbxRestringViasRatio->value()));
+        mDesignRules.setRestringViaRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxRestringViasRatio->value()))); // can throw
         mDesignRules.setRestringViaMin(UnsignedLength(Length::fromMm(mUi->spbxRestringViasMin->value()))); // can throw
         mDesignRules.setRestringViaMax(UnsignedLength(Length::fromMm(mUi->spbxRestringViasMax->value()))); // can throw
     } catch (const Exception& e) {

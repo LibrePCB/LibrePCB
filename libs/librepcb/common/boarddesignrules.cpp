@@ -37,21 +37,21 @@ BoardDesignRules::BoardDesignRules() noexcept :
     mName(tr("LibrePCB Default Design Rules")),
     mDescription(),
     // stop mask
-    mStopMaskClearanceRatio(0),            // 0%
-    mStopMaskClearanceMin(100000),         // 0.1mm
-    mStopMaskClearanceMax(100000),         // 0.1mm
-    mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
+    mStopMaskClearanceRatio(Ratio::percent0()),       // 0%
+    mStopMaskClearanceMin(100000),                    // 0.1mm
+    mStopMaskClearanceMax(100000),                    // 0.1mm
+    mStopMaskMaxViaDrillDiameter(500000),             // 0.5mm
     // cream mask
-    mCreamMaskClearanceRatio(100000),      // 10%
-    mCreamMaskClearanceMin(0),             // 0.0mm
-    mCreamMaskClearanceMax(1000000),       // 1.0mm
+    mCreamMaskClearanceRatio(Ratio::percent100()/10), // 10%
+    mCreamMaskClearanceMin(0),                        // 0.0mm
+    mCreamMaskClearanceMax(1000000),                  // 1.0mm
     // restring
-    mRestringPadRatio(250000),             // 25%
-    mRestringPadMin(250000),               // 0.25mm
-    mRestringPadMax(2000000),              // 2.0mm
-    mRestringViaRatio(250000),             // 25%
-    mRestringViaMin(200000),               // 0.2mm
-    mRestringViaMax(2000000)               // 2.0mm
+    mRestringPadRatio(Ratio::percent100()/4),         // 25%
+    mRestringPadMin(250000),                          // 0.25mm
+    mRestringPadMax(2000000),                         // 2.0mm
+    mRestringViaRatio(Ratio::percent100()/4),         // 25%
+    mRestringViaMin(200000),                          // 0.2mm
+    mRestringViaMax(2000000)                          // 2.0mm
 {
 }
 
@@ -69,7 +69,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
     mDescription = node.getValueByPath<QString>("description");
     // stop mask
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_ratio")) {
-        mStopMaskClearanceRatio = e->getValueOfFirstChild<Ratio>();
+        mStopMaskClearanceRatio = e->getValueOfFirstChild<UnsignedRatio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_min")) {
         mStopMaskClearanceMin = e->getValueOfFirstChild<UnsignedLength>();
@@ -82,7 +82,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
     }
     // cream mask
     if (const SExpression* e = node.tryGetChildByPath("creammask_clearance_ratio")) {
-        mCreamMaskClearanceRatio = e->getValueOfFirstChild<Ratio>();
+        mCreamMaskClearanceRatio = e->getValueOfFirstChild<UnsignedRatio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("creammask_clearance_min")) {
         mCreamMaskClearanceMin = e->getValueOfFirstChild<UnsignedLength>();
@@ -92,7 +92,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
     }
     // restring
     if (const SExpression* e = node.tryGetChildByPath("restring_pad_ratio")) {
-        mRestringPadRatio = e->getValueOfFirstChild<Ratio>();
+        mRestringPadRatio = e->getValueOfFirstChild<UnsignedRatio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_pad_min")) {
         mRestringPadMin = e->getValueOfFirstChild<UnsignedLength>();
@@ -101,7 +101,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
         mRestringPadMax = e->getValueOfFirstChild<UnsignedLength>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_via_ratio")) {
-        mRestringViaRatio = e->getValueOfFirstChild<Ratio>();
+        mRestringViaRatio = e->getValueOfFirstChild<UnsignedRatio>();
     }
     if (const SExpression* e = node.tryGetChildByPath("restring_via_min")) {
         mRestringViaMin = e->getValueOfFirstChild<UnsignedLength>();
@@ -161,28 +161,28 @@ bool BoardDesignRules::doesViaRequireStopMask(const Length& drillDia) const noex
 UnsignedLength BoardDesignRules::calcStopMaskClearance(const Length& padSize) const noexcept
 {
     return UnsignedLength(qBound(*mStopMaskClearanceMin,
-                                 padSize.scaled(mStopMaskClearanceRatio.toNormalized()),
+                                 padSize.scaled(mStopMaskClearanceRatio->toNormalized()),
                                  *mStopMaskClearanceMax));
 }
 
 UnsignedLength BoardDesignRules::calcCreamMaskClearance(const Length& padSize) const noexcept
 {
     return UnsignedLength(qBound(*mCreamMaskClearanceMin,
-                                 padSize.scaled(mCreamMaskClearanceRatio.toNormalized()),
+                                 padSize.scaled(mCreamMaskClearanceRatio->toNormalized()),
                                  *mCreamMaskClearanceMax));
 }
 
 UnsignedLength BoardDesignRules::calcPadRestring(const Length& drillDia) const noexcept
 {
     return UnsignedLength(qBound(*mRestringPadMin,
-                                 drillDia.scaled(mRestringPadRatio.toNormalized()),
+                                 drillDia.scaled(mRestringPadRatio->toNormalized()),
                                  *mRestringPadMax));
 }
 
 UnsignedLength BoardDesignRules::calcViaRestring(const Length& drillDia) const noexcept
 {
     return UnsignedLength(qBound(*mRestringViaMin,
-                                 drillDia.scaled(mRestringViaRatio.toNormalized()),
+                                 drillDia.scaled(mRestringViaRatio->toNormalized()),
                                  *mRestringViaMax));
 }
 
@@ -223,15 +223,11 @@ bool BoardDesignRules::checkAttributesValidity() const noexcept
     // general attributes
     if (mName.isEmpty())                                    return false;
     // stop mask
-    if (mStopMaskClearanceRatio < 0)                        return false;
     if (mStopMaskClearanceMax < mStopMaskClearanceMin)      return false;
     // cream mask
-    if (mCreamMaskClearanceRatio < 0)                       return false;
     if (mCreamMaskClearanceMax < mCreamMaskClearanceMin)    return false;
     // restring
-    if (mRestringPadRatio < 0)                              return false;
     if (mRestringPadMax < mRestringPadMin)                  return false;
-    if (mRestringViaRatio < 0)                              return false;
     if (mRestringViaMax < mRestringViaMin)                  return false;
     return true;
 }
