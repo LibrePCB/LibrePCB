@@ -117,10 +117,7 @@ bool ComponentEditorWidget::save() noexcept
         if (name.isEmpty()) {
             throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
         }
-        Version version(mUi->edtVersion->text().trimmed());
-        if (!version.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
-        }
+        Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mComponent->setName("", name);
         mComponent->setDescription("", mUi->edtDescription->toPlainText().trimmed());

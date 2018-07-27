@@ -29,29 +29,6 @@
 namespace librepcb {
 
 /*****************************************************************************************
- *  Constructors / Destructor
- ****************************************************************************************/
-
-Version::Version() noexcept
-{
-}
-
-Version::Version(const QString& version) noexcept
-{
-    setVersion(version);
-}
-
-Version::Version(const Version& other) noexcept :
-    mNumbers(other.mNumbers)
-{
-
-}
-
-Version::~Version() noexcept
-{
-}
-
-/*****************************************************************************************
  *  Getters
  ****************************************************************************************/
 
@@ -78,16 +55,12 @@ QString Version::toPrettyStr(int minSegCount, int maxSegCount) const noexcept
 {
     Q_ASSERT(maxSegCount >= minSegCount);
 
-    if (isValid()) {
-        QString str;
-        for (int i = 0; i < qMin(qMax(mNumbers.count(), minSegCount), maxSegCount); i++) {
-            if (i > 0) str.append(".");
-            str.append(QString::number((i < mNumbers.count()) ? mNumbers.at(i) : 0));
-        }
-        return str;
-    } else {
-        return QString();
+    QString str;
+    for (int i = 0; i < qMin(qMax(mNumbers.count(), minSegCount), maxSegCount); i++) {
+        if (i > 0) str.append(".");
+        str.append(QString::number((i < mNumbers.count()) ? mNumbers.at(i) : 0));
     }
+    return str;
 }
 
 QString Version::toComparableStr() const noexcept
@@ -107,36 +80,49 @@ QString Version::toComparableStr() const noexcept
 }
 
 /*****************************************************************************************
- *  Setters
+ *  Static Methods
  ****************************************************************************************/
 
-bool Version::setVersion(const QString& version) noexcept
+bool Version::isValid(const QString& str) noexcept
 {
-    mNumbers.clear();
-    QStringList numbers = version.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
-    foreach (const QString& numberStr, numbers)
-    {
+    tl::optional<Version> version = tryFromString(str);
+    return version.has_value();
+}
+
+Version Version::fromString(const QString& str)
+{
+    tl::optional<Version> version = tryFromString(str);
+    if (version) {
+        return *version;
+    } else {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(Version::tr("Invalid version number: \"%1\"")).arg(str));
+    }
+}
+
+tl::optional<Version> Version::tryFromString(const QString& str) noexcept
+{
+    QVector<uint> numbers;
+    // split and convert to integer
+    QStringList splitted = str.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
+    foreach (const QString& numberStr, splitted) {
         bool ok = false;
-        int number = numberStr.toInt(&ok);
-        if ((ok) && (number >= 0) && (number <= 99999))
-            mNumbers.append(number);
-        else
-            return mNumbers.clear(), false; // version invalid => clear number list and abort
+        uint number = numberStr.toUInt(&ok);
+        if ((!ok) || (number > 99999)) {
+            return tl::nullopt;
+        }
+        numbers.append(number);
     }
     // remove trailing zeros
-    for (int i = mNumbers.count()-1; i > 0; i--)
-    {
-        if (mNumbers.at(i) != 0) break;
-        mNumbers.removeAt(i);
+    for (int i = numbers.count()-1; i > 0; i--) {
+        if (numbers.at(i) != 0) break;
+        numbers.removeAt(i);
     }
     // check number count
-    if (mNumbers.count() > 10)
-    {
-        // version invalid --> clear number list and abort
-        mNumbers.clear();
-        return false;
+    if (numbers.empty() || (numbers.count() > 10)) {
+        return tl::nullopt;
     }
-    return (mNumbers.count() > 0);
+    return Version(numbers);
 }
 
 /*****************************************************************************************

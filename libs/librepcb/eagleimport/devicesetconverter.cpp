@@ -54,7 +54,7 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
     // create  component
     std::unique_ptr<library::Component> component(
         new library::Component(mDb.getComponentUuid(mDeviceSet.getName()),
-                               Version("0.1"), "LibrePCB", mDeviceSet.getName(),
+                               Version::fromString("0.1"), "LibrePCB", mDeviceSet.getName(),
                                createDescription(), ""));
 
     // properties

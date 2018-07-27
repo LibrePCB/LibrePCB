@@ -123,7 +123,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
         QString mLongElementName; ///< e.g. "library", "component_category", "symbol"
 
         // Members required for loading elements from file
-        Version mLoadingElementFileVersion;
         SExpression mLoadingFileDocument;
 
         // General Library Element Attributes

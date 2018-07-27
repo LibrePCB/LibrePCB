@@ -388,10 +388,10 @@ QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(
 
     QMultiMap<Version, FilePath> elements;
     while (query.next()) {
-        Version version(query.value(0).toString());
+        Version version = Version::fromString(query.value(0).toString()); // can throw
         FilePath filepath(FilePath::fromRelative(mWorkspace.getLibrariesPath(),
                                                  query.value(1).toString()));
-        if (version.isValid() && filepath.isValid()) {
+        if (filepath.isValid()) {
             elements.insert(version, filepath);
         } else {
             throw LogicError(__FILE__, __LINE__);

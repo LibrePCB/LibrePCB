@@ -57,7 +57,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
         new library::Footprint(mDb.getFootprintUuid(mPackage.getName()), "default", ""));
 
     std::unique_ptr<library::Package> package(
-        new library::Package(mDb.getPackageUuid(mPackage.getName()), Version("0.1"),
+        new library::Package(mDb.getPackageUuid(mPackage.getName()), Version::fromString("0.1"),
                              "LibrePCB", mPackage.getName(), createDescription(), ""));
 
     foreach (const parseagle::Wire& wire, mPackage.getWires()) {

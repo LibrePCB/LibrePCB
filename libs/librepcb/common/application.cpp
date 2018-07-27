@@ -37,35 +37,32 @@ namespace librepcb {
  ****************************************************************************************/
 
 Application::Application(int& argc, char** argv) noexcept :
-    QApplication(argc, argv)
+    QApplication(argc, argv),
+    mAppVersion(Version::fromString(APP_VERSION)),
+    mGitVersion(GIT_VERSION),
+    mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION))
 {
     // register meta types
     qRegisterMetaType<FilePath>();
     qRegisterMetaType<Point>();
 
     // set application version
-    mAppVersion = Version(APP_VERSION);
     QApplication::setApplicationVersion(mAppVersion.toPrettyStr(2));
-    Q_ASSERT(mAppVersion.isValid());
-
-    // set "git describe" version
-    mGitVersion = QString(GIT_VERSION);
-    if (mGitVersion.isEmpty()) {
-        qWarning() << "Could not determine Git version. Check if Git is added to the PATH.";
-    }
 
     // set build timestamp
     QDate buildDate = QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
     QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
     mBuildDate = QDateTime(buildDate, buildTime);
 
-    // set and verify file format version
-    mFileFormatVersion = Version(FILE_FORMAT_VERSION);
-    Q_ASSERT(mFileFormatVersion.isValid());
-    Q_ASSERT_X(mFileFormatVersion.isPrefixOf(mAppVersion),
-               "Application::Application()",
-               "The file format version is not a prefix of the application version. "
-               "Please correct this in the file 'librepcbcommon.pro'.");
+    // check "git describe" version
+    if (mGitVersion.isEmpty()) {
+        qWarning() << "Git revision not compiled into the executable!";
+    }
+
+    // check file format version
+    if (!mFileFormatVersion.isPrefixOf(mAppVersion)) {
+        qFatal("The file format version is not a prefix of the application version!");
+    }
 
     // get the directory of the currently running executable
     FilePath executableFilePath(QApplication::applicationFilePath());

@@ -84,8 +84,8 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
                 QString(tr("The file \"%1\" does not exist.")).arg(mFilepath.toNative()));
         }
         // check the project's file format version
-        Version version = getProjectFileFormatVersion(mPath);
-        if ((!version.isValid()) || (version != qApp->getFileFormatVersion())) {
+        Version version = getProjectFileFormatVersion(mPath); // can throw
+        if (version > qApp->getFileFormatVersion()) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("This project was created with a newer application version.\n"
                            "You need at least LibrePCB %1 to open it.\n\n%2"))

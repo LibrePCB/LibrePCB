@@ -51,7 +51,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Work
             this, &RepositoryLibraryListWidgetItem::checkedChanged);
 
     mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
-    mVersion = Version(mJsonObject.value("version").toString());
+    mVersion = Version::tryFromString(mJsonObject.value("version").toString());
     mIsRecommended = mJsonObject.value("recommended").toBool();
     QString name = mJsonObject.value("name").toObject().value("default").toString();
     QString desc = mJsonObject.value("description").toObject().value("default").toString();
@@ -66,7 +66,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Work
         }
     }
 
-    mUi->lblName->setText(QString("%1 v%2").arg(name, mVersion.toStr()));
+    mUi->lblName->setText(QString("%1 v%2").arg(name, mVersion ? mVersion->toStr() : QString()));
     mUi->lblDescription->setText(desc);
     mUi->lblAuthor->setText(QString("Author: %1").arg(author));
 
@@ -108,10 +108,10 @@ void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept
 void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept
 {
     if (mUuid) {
-        Version installedVersion = mWorkspace.getVersionOfLibrary(*mUuid, true, true);
-        if (installedVersion.isValid()) {
+        tl::optional<Version> installedVersion = mWorkspace.getVersionOfLibrary(*mUuid, true, true);
+        if (installedVersion) {
             mUi->lblInstalledVersion->setText(QString(tr("Installed: v%1"))
-                                              .arg(installedVersion.toStr()));
+                                              .arg(installedVersion->toStr()));
             mUi->lblInstalledVersion->setVisible(true);
             if (installedVersion < mVersion) {
                 mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");

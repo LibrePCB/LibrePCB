@@ -53,7 +53,7 @@ SymbolConverter::~SymbolConverter() noexcept
 std::unique_ptr<library::Symbol> SymbolConverter::generate() const
 {
     std::unique_ptr<library::Symbol> symbol(
-        new library::Symbol(mDb.getSymbolUuid(mSymbol.getName()), Version("0.1"),
+        new library::Symbol(mDb.getSymbolUuid(mSymbol.getName()), Version::fromString("0.1"),
                             "LibrePCB", mSymbol.getName(), createDescription(), ""));
 
     foreach (const parseagle::Wire& wire, mSymbol.getWires()) {

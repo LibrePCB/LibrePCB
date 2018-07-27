@@ -66,8 +66,7 @@ class SmartVersionFile final : public SmartFile
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) :
-            SmartVersionFile(filepath, restore, readOnly, false, Version()) {}
+        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly);
 
         /**
          * @copydoc SmartFile#~SmartFile()
@@ -137,18 +136,16 @@ class SmartVersionFile final : public SmartFile
         // Protected Methods
 
         /**
-         * @brief Constructor to create or open a version file
+         * @brief Constructor to create a new version file
          *
          * @param filepath      See SmartFile#SmartFile()
-         * @param restore       See SmartFile#SmartFile()
-         * @param readOnly      See SmartFile#SmartFile()
-         * @param create        See SmartFile#SmartFile()
-         * @param newVersion    If "create == true", this is the new version of the file
+         * @param newVersion    The new version of the file
          *
          * @throw Exception See SmartFile#SmartFile()
          */
-        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
-                         bool create, const Version& newVersion);
+        SmartVersionFile(const FilePath& filepath, const Version& newVersion);
+
+        static Version readVersionFromFile(const FilePath& filepath);
 
 
         // General Attributes

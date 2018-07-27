@@ -103,7 +103,7 @@ class RepositoryLibraryListWidgetItem final : public QWidget
         workspace::Workspace& mWorkspace;
         QJsonObject mJsonObject;
         tl::optional<Uuid> mUuid;
-        Version mVersion;
+        tl::optional<Version> mVersion;
         bool mIsRecommended;
         QSet<Uuid> mDependencies;
         QScopedPointer<Ui::RepositoryLibraryListWidgetItem> mUi;

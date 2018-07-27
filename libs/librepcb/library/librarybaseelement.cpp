@@ -65,7 +65,8 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     QObject(nullptr), mDirectory(elementDirectory),mDirectoryIsTemporary(false),
     mOpenedReadOnly(readOnly), mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName),
-    mUuid(Uuid::createRandom()) // just for initialization, will be overwritten
+    mUuid(Uuid::createRandom()), // just for initialization, will be overwritten
+    mVersion(Version::fromString("0.1")) // just for initialization, will be overwritten
 {
     // determine the filepath to the version file
     FilePath versionFilePath = mDirectory.getPathTo(".librepcb-" % mShortElementName);
@@ -87,12 +88,11 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // read version number from version file
     SmartVersionFile versionFile(versionFilePath, false, true);
-    mLoadingElementFileVersion = versionFile.getVersion();
-    if (mLoadingElementFileVersion != qApp->getAppVersion()) {
+    if (versionFile.getVersion() > qApp->getAppVersion()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The library element %1 was created with a newer application "
                        "version. You need at least LibrePCB version %2 to open it."))
-            .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toPrettyStr(3)));
+            .arg(mDirectory.toNative()).arg(versionFile.getVersion().toPrettyStr(3)));
     }
 
     // open main file
@@ -266,7 +266,6 @@ void LibraryBaseElement::serialize(SExpression& root) const
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept
 {
-    if (!mVersion.isValid())                return false;
     if (mNames.getDefaultValue().isEmpty()) return false;
     return true;
 }

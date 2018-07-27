@@ -141,7 +141,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
     QString desc = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDescription, false);
     QString author = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
     QString versionStr = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-    Version version(versionStr);
+    tl::optional<Version> version = Version::tryFromString(versionStr);
     QString urlStr = mUi->edtLocalUrl->text().trimmed();
     QUrl url = QUrl::fromUserInput(urlStr);
     bool useCc0License = mUi->cbxLocalCc0License->isChecked();
@@ -160,7 +160,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
         QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter an author."));
         return;
     }
-    if (!version.isValid()) {
+    if (!version) {
         QMessageBox::critical(this, tr("Invalid Input"), tr("The specified version number is not valid."));
         return;
     }
@@ -179,7 +179,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
 
     try {
         // create the new library
-        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), version, author,
+        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version, author,
                                                 name, desc, QString("")));
         lib->setUrl(url);
         lib->setIconFilePath(qApp->getResourcesDir().getPathTo("library/default_image.png"));

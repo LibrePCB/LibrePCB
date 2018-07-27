@@ -61,7 +61,7 @@ std::unique_ptr<library::Device> DeviceConverter::generate() const
     Uuid pkgUuid = mDb.getPackageUuid(mDevice.getPackage());
     std::unique_ptr<library::Device> device(
         new library::Device(mDb.getDeviceUuid(mDeviceSet.getName(), mDevice.getName()),
-                            Version("0.1"), "LibrePCB", deviceName,
+                            Version::fromString("0.1"), "LibrePCB", deviceName,
                             createDescription(), "", compUuid, pkgUuid));
 
     // connect pads

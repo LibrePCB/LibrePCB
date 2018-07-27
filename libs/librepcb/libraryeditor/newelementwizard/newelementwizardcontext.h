@@ -130,7 +130,7 @@ class NewElementWizardContext final : public QObject
         QString mElementDescription;
         QString mElementKeywords;
         QString mElementAuthor;
-        Version mElementVersion;
+        tl::optional<Version> mElementVersion;
         tl::optional<Uuid> mElementCategoryUuid;
 
         // symbol

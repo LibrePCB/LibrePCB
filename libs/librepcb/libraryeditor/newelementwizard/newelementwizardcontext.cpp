@@ -70,7 +70,7 @@ void NewElementWizardContext::reset() noexcept
     mElementDescription.clear();
     mElementKeywords.clear();
     mElementAuthor = SystemInfo::getFullUsername();
-    mElementVersion = Version("0.1");
+    mElementVersion = Version::fromString("0.1");
     mElementCategoryUuid = tl::nullopt;
 
     // symbol
@@ -103,9 +103,11 @@ void NewElementWizardContext::createLibraryElement()
         categories.insert(*mElementCategoryUuid);
     }
 
+    if (!mElementVersion) throw LogicError(__FILE__, __LINE__);
+
     switch (mElementType) {
         case NewElementWizardContext::ElementType::ComponentCategory: {
-            ComponentCategory element(Uuid::createRandom(), mElementVersion,
+            ComponentCategory element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords);
             element.setParentUuid(mElementCategoryUuid);
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<ComponentCategory>());
@@ -113,7 +115,7 @@ void NewElementWizardContext::createLibraryElement()
             break;
         }
         case NewElementWizardContext::ElementType::PackageCategory: {
-            PackageCategory element(Uuid::createRandom(), mElementVersion,
+            PackageCategory element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords);
             element.setParentUuid(mElementCategoryUuid);
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<PackageCategory>());
@@ -121,7 +123,7 @@ void NewElementWizardContext::createLibraryElement()
             break;
         }
         case NewElementWizardContext::ElementType::Symbol: {
-            Symbol element(Uuid::createRandom(), mElementVersion,
+            Symbol element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.getPins() = mSymbolPins;
@@ -133,7 +135,7 @@ void NewElementWizardContext::createLibraryElement()
             break;
         }
         case NewElementWizardContext::ElementType::Package: {
-            Package element(Uuid::createRandom(), mElementVersion,
+            Package element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.getPads() = mPackagePads;
@@ -147,7 +149,7 @@ void NewElementWizardContext::createLibraryElement()
             break;
         }
         case NewElementWizardContext::ElementType::Component: {
-            Component element(Uuid::createRandom(), mElementVersion,
+            Component element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.setIsSchematicOnly(mComponentSchematicOnly);
@@ -163,7 +165,7 @@ void NewElementWizardContext::createLibraryElement()
         case NewElementWizardContext::ElementType::Device: {
             if (!mDeviceComponentUuid) throw LogicError(__FILE__, __LINE__);
             if (!mDevicePackageUuid) throw LogicError(__FILE__, __LINE__);
-            Device element(Uuid::createRandom(), mElementVersion,
+            Device element(Uuid::createRandom(), *mElementVersion,
                 mElementAuthor, mElementName, mElementDescription, mElementKeywords,
                 *mDeviceComponentUuid, *mDevicePackageUuid);
             element.setCategories(categories);

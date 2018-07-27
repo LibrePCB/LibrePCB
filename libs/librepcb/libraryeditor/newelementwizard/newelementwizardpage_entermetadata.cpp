@@ -69,7 +69,7 @@ NewElementWizardPage_EnterMetadata::~NewElementWizardPage_EnterMetadata() noexce
 bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept
 {
     if (mContext.mElementName.trimmed().isEmpty()) return false;
-    if (!mContext.mElementVersion.isValid()) return false;
+    if (!mContext.mElementVersion) return false;
     QString category = mUi->edtCategory->text().trimmed();
     if (!mContext.mElementCategoryUuid && !category.isEmpty()) return false;
     return true;
@@ -119,7 +119,7 @@ void NewElementWizardPage_EnterMetadata::edtAuthorTextChanged(const QString& tex
 
 void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(const QString& text) noexcept
 {
-    mContext.mElementVersion = Version(text.trimmed());
+    mContext.mElementVersion = Version::tryFromString(text.trimmed());
     emit completeChanged();
 }
 
@@ -199,7 +199,8 @@ void NewElementWizardPage_EnterMetadata::initializePage() noexcept
     mUi->edtDescription->setPlainText(mContext.mElementDescription);
     mUi->edtKeywords->setText(mContext.mElementKeywords);
     mUi->edtAuthor->setText(mContext.mElementAuthor);
-    mUi->edtVersion->setText(mContext.mElementVersion.toStr());
+    mUi->edtVersion->setText(mContext.mElementVersion ?
+                             mContext.mElementVersion->toStr() : QString());
     mUi->edtCategory->setText(mContext.mElementCategoryUuid ?
                               mContext.mElementCategoryUuid->toStr() : QString());
     updateCategoryTreeLabel();
