@@ -73,6 +73,7 @@ class SymbolEditorState_DrawTextBase : public SymbolEditorState
         // Event Handlers
         bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
         bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
+        bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept override;
         bool processRotateCw() noexcept override;
         bool processRotateCcw() noexcept override;
 

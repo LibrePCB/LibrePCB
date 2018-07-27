@@ -140,6 +140,12 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(QGrap
     }
 }
 
+bool SymbolEditorState_AddPins::processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept
+{
+    Q_UNUSED(e);
+    return processRotateCcw();
+}
+
 bool SymbolEditorState_AddPins::processRotateCw() noexcept
 {
     mEditCmd->rotate(-Angle::deg90(), mCurrentPin->getPosition(), true);
