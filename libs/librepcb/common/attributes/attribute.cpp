@@ -40,12 +40,16 @@ Attribute::Attribute(const Attribute& other) noexcept :
 }
 
 Attribute::Attribute(const SExpression& node) :
-    mKey(), mType(nullptr), mValue(), mUnit(nullptr)
+    mKey("UNKNOWN"), // backward compatibility - remove this some time!
+    mType(&AttributeType::fromString(node.getValueByPath<QString>("type"))),
+    mValue(node.getValueByPath<QString>("value")),
+    mUnit(mType->getUnitFromString(node.getValueByPath<QString>("unit")))
 {
-    mKey = node.getChildByIndex(0).getValue<QString>(true);
-    mType = &AttributeType::fromString(node.getValueByPath<QString>("type"));
-    mUnit = mType->getUnitFromString(node.getValueByPath<QString>("unit"));
-    mValue = node.getValueByPath<QString>("value");
+    // backward compatibility - remove this some time!
+    QString key = node.getChildByIndex(0).getValue<QString>(true);
+    key.replace(".", "_");
+    key.replace("-", "_");
+    mKey = key.toUpper();
 
     // backward compatibility - remove this some time!
     mValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
@@ -54,7 +58,7 @@ Attribute::Attribute(const SExpression& node) :
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-Attribute::Attribute(const QString& key, const AttributeType& type, const QString& value,
+Attribute::Attribute(const AttributeKey& key, const AttributeType& type, const QString& value,
                      const AttributeUnit* unit) :
     mKey(key), mType(&type), mValue(value), mUnit(unit)
 {
@@ -77,15 +81,6 @@ QString Attribute::getValueTr(bool showUnit) const noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void Attribute::setKey(const QString& key)
-{
-    if (key.trimmed().isEmpty()) {
-        qDebug() << key;
-        throw RuntimeError(__FILE__, __LINE__, tr("The key must not be empty!"));
-    }
-    mKey = key;
-}
 
 void Attribute::setTypeValueUnit(const AttributeType& type, const QString& value,
                                  const AttributeUnit* unit)
@@ -135,7 +130,6 @@ bool Attribute::operator==(const Attribute& rhs) const noexcept
 
 bool Attribute::checkAttributesValidity() const noexcept
 {
-    if (mKey.trimmed().isEmpty())           return false;
     if (!mType->isUnitAvailable(mUnit))     return false;
     if (!mType->isValueValid(mValue))       return false;
     return true;

@@ -102,12 +102,12 @@ class AttributeListEditorWidget final : public QWidget
         void removeAttribute(int index) noexcept;
         void moveAttributeUp(int index) noexcept;
         void moveAttributeDown(int index) noexcept;
-        QString setKey(int index, const QString& key) noexcept;
+        AttributeKey setKey(int index, const QString& key) noexcept;
         void setType(int index, const AttributeType& type) noexcept;
         QString setValue(int index, const QString& value) noexcept;
         void setUnit(int index, const AttributeUnit* unit) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        void throwIfKeyEmptyOrExists(const QString& key) const;
+        AttributeKey convertStringToKeyOrThrow(const QString& key) const;
         void throwIfValueInvalid(const AttributeType& type, const QString& value) const;
         static QString cleanKey(const QString& key) noexcept;
 

@@ -108,7 +108,7 @@ void AttributeListEditorWidget::tableCellChanged(int row, int column) noexcept
         }
     } else if (isExistingAttributeRow(row)) {
         if (column == COLUMN_KEY) {
-            item->setText(setKey(rowToIndex(row), cleanKey(item->text())));
+            item->setText(*setKey(rowToIndex(row), cleanKey(item->text())));
         } else if (column == COLUMN_VALUE) {
             item->setText(setValue(rowToIndex(row), item->text().trimmed()));
         }
@@ -194,7 +194,7 @@ void AttributeListEditorWidget::updateTable(const Attribute* selected) noexcept
     // existing attributes
     for (int i = 0; i < mAttributeList.count(); ++i) {
         std::shared_ptr<const Attribute> attr = mAttributeList.at(i);
-        setTableRowContent(indexToRow(i), attr->getKey(), attr->getType(),
+        setTableRowContent(indexToRow(i), *attr->getKey(), attr->getType(),
                            attr->getValueTr(false), attr->getUnit());
         if (attr.get() == selected) {
             selectedRow = indexToRow(i);
@@ -312,9 +312,9 @@ void AttributeListEditorWidget::addAttribute(const QString& key, const Attribute
                                              const QString& value, const AttributeUnit* unit) noexcept
 {
     try {
-        throwIfKeyEmptyOrExists(key);
+        AttributeKey attrKey = convertStringToKeyOrThrow(key); // can throw
         throwIfValueInvalid(type, value);
-        mAttributeList.append(std::make_shared<Attribute>(key, type, value, unit)); // can throw
+        mAttributeList.append(std::make_shared<Attribute>(attrKey, type, value, unit)); // can throw
         updateTable();
         emit edited(mAttributeList);
     } catch (const Exception& e) {
@@ -346,7 +346,7 @@ void AttributeListEditorWidget::moveAttributeDown(int index) noexcept
     emit edited(mAttributeList);
 }
 
-QString AttributeListEditorWidget::setKey(int index, const QString& key) noexcept
+AttributeKey AttributeListEditorWidget::setKey(int index, const QString& key) noexcept
 {
     Attribute& attr = *mAttributeList[index];
     if (attr.getKey() == key) {
@@ -354,10 +354,10 @@ QString AttributeListEditorWidget::setKey(int index, const QString& key) noexcep
     }
 
     try {
-        throwIfKeyEmptyOrExists(key);
-        attr.setKey(key);
+        AttributeKey attrKey = convertStringToKeyOrThrow(key); // can throw
+        attr.setKey(attrKey);
         emit edited(mAttributeList);
-        return key;
+        return attrKey;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Invalid key"), e.getMsg());
         return attr.getKey();
@@ -434,7 +434,7 @@ int AttributeListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexc
     return row;
 }
 
-void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) const
+AttributeKey AttributeListEditorWidget::convertStringToKeyOrThrow(const QString& key) const
 {
     if (key.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -444,6 +444,7 @@ void AttributeListEditorWidget::throwIfKeyEmptyOrExists(const QString& key) cons
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already an attribute with the key \"%1\".")).arg(key));
     }
+    return AttributeKey(key); // can throw
 }
 
 void AttributeListEditorWidget::throwIfValueInvalid(const AttributeType& type,
@@ -458,7 +459,8 @@ void AttributeListEditorWidget::throwIfValueInvalid(const AttributeType& type,
 QString AttributeListEditorWidget::cleanKey(const QString& key) noexcept
 {
     // TODO: it's ugly to use a method from FilePath...
-    return FilePath::cleanFileName(key, FilePath::ReplaceSpaces | FilePath::ToUpperCase);
+    QString str = FilePath::cleanFileName(key, FilePath::ReplaceSpaces | FilePath::ToUpperCase);
+    return str.replace(QRegularExpression("[^_0-9A-Z]"), "_");
 }
 
 /*****************************************************************************************
