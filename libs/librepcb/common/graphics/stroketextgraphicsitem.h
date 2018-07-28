@@ -67,7 +67,7 @@ class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem,
 
 
     private: // Methods
-        void strokeTextLayerNameChanged(const QString& newLayerName) noexcept override;
+        void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
         void strokeTextTextChanged(const QString& newText) noexcept override;
         void strokeTextPositionChanged(const Point& newPos) noexcept override;
         void strokeTextRotationChanged(const Angle& newRot) noexcept override;
@@ -79,7 +79,7 @@ class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem,
         void strokeTextMirroredChanged(bool mirrored) noexcept override;
         void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override;
         void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override;
-        void updateLayer(const QString& layerName) noexcept;
+        void updateLayer(const GraphicsLayerName& layerName) noexcept;
         void updateTransform() noexcept;
         QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
 

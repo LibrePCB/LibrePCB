@@ -49,7 +49,7 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept :
     mUuid = uuid;
 }
 
-Text::Text(const Uuid& uuid, const QString& layerName, const QString& text,
+Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
            const Point& pos, const Angle& rotation, const PositiveLength& height,
            const Alignment& align) noexcept :
     mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
@@ -59,7 +59,7 @@ Text::Text(const Uuid& uuid, const QString& layerName, const QString& text,
 
 Text::Text(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
-    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mText(),
     mPosition(node.getChildByPath("pos")),
     mRotation(node.getValueByPath<Angle>("rot")),
@@ -89,7 +89,7 @@ Text::~Text() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Text::setLayerName(const QString& name) noexcept
+void Text::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -162,7 +162,7 @@ void Text::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("value", mText, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
     root.appendChild("height", mHeight, false);

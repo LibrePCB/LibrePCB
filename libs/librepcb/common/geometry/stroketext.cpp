@@ -58,7 +58,7 @@ StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept :
     mUuid = uuid;
 }
 
-StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString& text,
+StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
         const Point& pos, const Angle& rotation, const PositiveLength& height,
         const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
         const StrokeTextSpacing& lineSpacing, const Alignment& align, bool mirrored,
@@ -72,7 +72,7 @@ StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString
 
 StrokeText::StrokeText(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
-    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mText(),
     mPosition(node.getChildByPath("pos")),
     mRotation(node.getValueByPath<Angle>("rot")),
@@ -172,7 +172,7 @@ Length StrokeText::calcLineSpacing() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void StrokeText::setLayerName(const QString& name) noexcept
+void StrokeText::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -356,7 +356,7 @@ void StrokeText::serialize(SExpression& root) const
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("height", mHeight, true);
     root.appendChild("stroke_width", mStrokeWidth, false);
     root.appendChild("letter_spacing", mLetterSpacing, false);

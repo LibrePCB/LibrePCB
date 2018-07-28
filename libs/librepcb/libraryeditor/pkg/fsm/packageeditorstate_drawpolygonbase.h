@@ -26,6 +26,7 @@
 #include <memory>
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "packageeditorstate.h"
 
 /*****************************************************************************************
@@ -100,7 +101,7 @@ class PackageEditorState_DrawPolygonBase : public PackageEditorState
         PolygonGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        QString mLastLayerName;
+        GraphicsLayerName mLastLayerName;
         UnsignedLength mLastLineWidth;
         Angle mLastAngle;
         bool mLastFill;

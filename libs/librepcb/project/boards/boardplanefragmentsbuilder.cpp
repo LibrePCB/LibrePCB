@@ -145,7 +145,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
                       ClipperLib::ptClip, true);
         }
         foreach (const BI_FootprintPad* pad, device->getFootprint().getPads()) {
-            if (!pad->isOnLayer(mPlane.getLayerName())) continue;
+            if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
             if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
                 ClipperLib::Path path = ClipperHelpers::convert(pad->getSceneOutline(),
                                                                 maxArcTolerance());

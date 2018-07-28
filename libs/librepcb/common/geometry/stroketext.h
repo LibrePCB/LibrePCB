@@ -29,6 +29,7 @@
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../geometry/path.h"
+#include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
 #include "../alignment.h"
 
@@ -117,7 +118,7 @@ inline StrokeTextSpacing deserializeFromSExpression(const SExpression& sexpr, bo
 class IF_StrokeTextObserver
 {
     public:
-        virtual void strokeTextLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept = 0;
         virtual void strokeTextTextChanged(const QString& newText) noexcept = 0;
         virtual void strokeTextPositionChanged(const Point& newPos) noexcept = 0;
         virtual void strokeTextRotationChanged(const Angle& newRot) noexcept = 0;
@@ -154,7 +155,7 @@ class StrokeText final : public SerializableObject
         StrokeText() = delete;
         StrokeText(const StrokeText& other) noexcept;
         StrokeText(const Uuid& uuid, const StrokeText& other) noexcept;
-        StrokeText(const Uuid& uuid, const QString& layerName, const QString& text,
+        StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
                    const Point& pos, const Angle& rotation, const PositiveLength& height,
                    const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
                    const StrokeTextSpacing& lineSpacing, const Alignment& align,
@@ -164,7 +165,7 @@ class StrokeText final : public SerializableObject
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getLayerName() const noexcept {return mLayerName;}
+        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
         const PositiveLength& getHeight() const noexcept {return mHeight;}
@@ -181,7 +182,7 @@ class StrokeText final : public SerializableObject
         Length calcLineSpacing() const noexcept;
 
         // Setters
-        void setLayerName(const QString& name) noexcept;
+        void setLayerName(const GraphicsLayerName& name) noexcept;
         void setText(const QString& text) noexcept;
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rotation) noexcept;
@@ -216,7 +217,7 @@ class StrokeText final : public SerializableObject
 
     private: // Data
         Uuid mUuid;
-        QString mLayerName;
+        GraphicsLayerName mLayerName;
         QString mText;
         Point mPosition;
         Angle mRotation;

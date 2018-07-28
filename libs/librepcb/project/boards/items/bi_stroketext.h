@@ -100,7 +100,7 @@ class BI_StrokeText final : public BI_Base, public SerializableObject,
     private: // Methods
         void init();
         void updatePaths() noexcept;
-        void strokeTextLayerNameChanged(const QString& newLayerName) noexcept override {Q_UNUSED(newLayerName); updateGraphicsItems();}
+        void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override {Q_UNUSED(newLayerName); updateGraphicsItems();}
         void strokeTextTextChanged(const QString& newText) noexcept override {Q_UNUSED(newText);}
         void strokeTextPositionChanged(const Point& newPos) noexcept override {Q_UNUSED(newPos); updateGraphicsItems();}
         void strokeTextRotationChanged(const Angle& newRot) noexcept override {Q_UNUSED(newRot);}

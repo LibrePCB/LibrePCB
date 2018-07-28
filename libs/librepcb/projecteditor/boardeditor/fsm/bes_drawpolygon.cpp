@@ -97,7 +97,7 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
     if (mEditor.getActiveBoard()) {
         mLayerComboBox->setLayers(mEditor.getActiveBoard()->getLayerStack().getAllowedPolygonLayers());
     }
-    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+    mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
     mEditorUi.commandToolbar->addWidget(mLayerComboBox);
     connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged,
             this, &BES_DrawPolygon::layerComboBoxLayerChanged);
@@ -376,7 +376,7 @@ void BES_DrawPolygon::makeSelectedLayerVisible() noexcept
 {
     if (mCurrentPolygon) {
         Board& board = mCurrentPolygon->getBoard();
-        GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
+        GraphicsLayer* layer = board.getLayerStack().getLayer(*mCurrentLayerName);
         if (layer && layer->isEnabled()) layer->setVisible(true);
     }
 }

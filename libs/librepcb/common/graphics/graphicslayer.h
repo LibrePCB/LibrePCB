@@ -26,6 +26,7 @@
 #include <memory>
 #include <QtCore>
 #include <QtWidgets>
+#include "graphicslayername.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations

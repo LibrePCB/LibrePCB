@@ -205,8 +205,10 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
             mUserSettings.reset(new BoardUserSettings(*this, restore, readOnly, create));
 
             // add 160x100mm board outline (Eurocard size)
-            Polygon polygon(Uuid::createRandom(), GraphicsLayer::sBoardOutlines, UnsignedLength(0),
-                false, false, Path::rect(Point(0, 0), Point(160000000, 100000000)));
+            Polygon polygon(Uuid::createRandom(),
+                            GraphicsLayerName(GraphicsLayer::sBoardOutlines),
+                            UnsignedLength(0), false, false,
+                            Path::rect(Point(0, 0), Point(160000000, 100000000)));
             mPolygons.append(new BI_Polygon(*this, polygon));
         }
         else
@@ -422,7 +424,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept
         }
         foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
             if (text->isSelectable() && text->getGrabAreaScenePx().contains(scenePosPx)) {
-                if (GraphicsLayer::isTopLayer(text->getText().getLayerName())) {
+                if (GraphicsLayer::isTopLayer(*text->getText().getLayerName())) {
                     list.prepend(text);
                 } else {
                     list.append(text);

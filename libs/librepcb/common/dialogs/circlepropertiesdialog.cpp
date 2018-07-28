@@ -49,7 +49,7 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoSt
             this, &CirclePropertiesDialog::buttonBoxClicked);
 
     // load circle attributes
-    selectLayerNameInCombobox(mCircle.getLayerName());
+    selectLayerNameInCombobox(*mCircle.getLayerName());
     mUi->spbLineWidth->setValue(mCircle.getLineWidth()->toMm());
     mUi->cbxFillArea->setChecked(mCircle.isFilled());
     mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
@@ -91,7 +91,7 @@ bool CirclePropertiesDialog::applyChanges() noexcept
 
         QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);

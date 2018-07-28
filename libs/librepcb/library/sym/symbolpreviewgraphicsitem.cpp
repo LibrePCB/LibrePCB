@@ -207,7 +207,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw all polygons
     for (const Polygon& polygon : mSymbol.getPolygons()) {
         // set colors
-        layer = mLayerProvider.getLayer(polygon.getLayerName());
+        layer = mLayerProvider.getLayer(*polygon.getLayerName());
         if (layer) {
             pen = QPen(layer->getColor(selected), polygon.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
@@ -215,7 +215,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
             painter->setPen(Qt::NoPen);
         }
         if (polygon.isFilled())
-            layer = mLayerProvider.getLayer(polygon.getLayerName());
+            layer = mLayerProvider.getLayer(*polygon.getLayerName());
         else if (polygon.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -229,7 +229,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw all circles
     for (const Circle& circle : mSymbol.getCircles()) {
         // set colors
-        layer = mLayerProvider.getLayer(circle.getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(*circle.getLayerName()); if (!layer) continue;
         if (layer)
         {
             pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -238,7 +238,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
         else
             painter->setPen(Qt::NoPen);
         if (circle.isFilled())
-            layer = mLayerProvider.getLayer(circle.getLayerName());
+            layer = mLayerProvider.getLayer(*circle.getLayerName());
         else if (circle.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -255,7 +255,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw all texts
     for (const Text& text : mSymbol.getTexts()) {
         // get layer
-        layer = mLayerProvider.getLayer(text.getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(*text.getLayerName()); if (!layer) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(&text);

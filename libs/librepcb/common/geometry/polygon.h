@@ -29,6 +29,7 @@
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
 #include "path.h"
 
@@ -50,7 +51,7 @@ namespace librepcb {
 class IF_PolygonObserver
 {
     public:
-        virtual void polygonLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void polygonLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept = 0;
         virtual void polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept = 0;
         virtual void polygonIsFilledChanged(bool newIsFilled) noexcept = 0;
         virtual void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
@@ -80,21 +81,22 @@ class Polygon final : public SerializableObject
         Polygon() = delete;
         Polygon(const Polygon& other) noexcept;
         Polygon(const Uuid& uuid, const Polygon& other) noexcept;
-        Polygon(const Uuid& uuid, const QString& layerName, const UnsignedLength& lineWidth,
-                bool fill, bool isGrabArea, const Path& path) noexcept;
+        Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
+                const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
+                const Path& path) noexcept;
         explicit Polygon(const SExpression& node);
         ~Polygon() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getLayerName() const noexcept {return mLayerName;}
+        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
         const UnsignedLength& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Path& getPath() const noexcept {return mPath;}
 
         // Setters
-        void setLayerName(const QString& name) noexcept;
+        void setLayerName(const GraphicsLayerName& name) noexcept;
         void setLineWidth(const UnsignedLength& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
@@ -113,13 +115,9 @@ class Polygon final : public SerializableObject
         Polygon& operator=(const Polygon& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
-        QString mLayerName;
+        GraphicsLayerName mLayerName;
         UnsignedLength mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;

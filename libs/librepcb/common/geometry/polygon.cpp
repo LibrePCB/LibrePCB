@@ -49,8 +49,9 @@ Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
     mUuid = uuid;
 }
 
-Polygon::Polygon(const Uuid& uuid, const QString& layerName, const UnsignedLength& lineWidth,
-                 bool fill, bool isGrabArea, const Path& path) noexcept :
+Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
+                 const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
+                 const Path& path) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
     mIsGrabArea(isGrabArea), mPath(path)
 {
@@ -58,7 +59,7 @@ Polygon::Polygon(const Uuid& uuid, const QString& layerName, const UnsignedLengt
 
 Polygon::Polygon(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
-    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
     mIsGrabArea(node.getValueByPath<bool>("grab")),
@@ -79,8 +80,6 @@ Polygon::Polygon(const SExpression& node) :
             mPath.addVertex(Point(child.getChildByPath("pos")));
         }
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Polygon::~Polygon() noexcept
@@ -91,7 +90,7 @@ Polygon::~Polygon() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Polygon::setLayerName(const QString& name) noexcept
+void Polygon::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -152,10 +151,8 @@ void Polygon::unregisterObserver(IF_PolygonObserver& object) const noexcept
 
 void Polygon::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("width", mLineWidth, true);
     root.appendChild("fill", mIsFilled, false);
     root.appendChild("grab", mIsGrabArea, false);
@@ -186,13 +183,6 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept
     mIsGrabArea = rhs.mIsGrabArea;
     mPath = rhs.mPath;
     return *this;
-}
-
-bool Polygon::checkAttributesValidity() const noexcept
-{
-    if (mLayerName.isEmpty())   return false;
-    // TODO: check mPath?
-    return true;
 }
 
 /*****************************************************************************************

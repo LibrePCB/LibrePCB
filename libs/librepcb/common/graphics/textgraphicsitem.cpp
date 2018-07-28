@@ -44,7 +44,7 @@ TextGraphicsItem::TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& l
     setText(mText.getText());
     setHeight(mText.getHeight());
     setAlignment(mText.getAlign());
-    setLayer(mLayerProvider.getLayer(mText.getLayerName()));
+    setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setZValue(5);
 
@@ -66,9 +66,9 @@ TextGraphicsItem::~TextGraphicsItem() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void TextGraphicsItem::textLayerNameChanged(const QString& newLayerName) noexcept
+void TextGraphicsItem::textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
 {
-    setLayer(mLayerProvider.getLayer(newLayerName));
+    setLayer(mLayerProvider.getLayer(*newLayerName));
 }
 
 void TextGraphicsItem::textTextChanged(const QString& newText) noexcept

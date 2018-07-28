@@ -77,7 +77,7 @@ QPainterPath StrokeTextGraphicsItem::shape() const noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void StrokeTextGraphicsItem::strokeTextLayerNameChanged(const QString& newLayerName) noexcept
+void StrokeTextGraphicsItem::strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
 {
     updateLayer(newLayerName);
 }
@@ -146,9 +146,9 @@ void StrokeTextGraphicsItem::strokeTextPathsChanged(const QVector<Path>& paths) 
     setPath(Path::toQPainterPathPx(paths));
 }
 
-void StrokeTextGraphicsItem::updateLayer(const QString& layerName) noexcept
+void StrokeTextGraphicsItem::updateLayer(const GraphicsLayerName& layerName) noexcept
 {
-    const GraphicsLayer* layer = mLayerProvider.getLayer(layerName);
+    const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
     setLineLayer(layer);
     mOriginCrossGraphicsItem->setLayer(layer);
 }

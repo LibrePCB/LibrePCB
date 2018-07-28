@@ -40,7 +40,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
 {
     setPath(mPolygon.getPath().toQPainterPathPx());
     setLineWidth(mPolygon.getLineWidth());
-    setLineLayer(mLayerProvider.getLayer(mPolygon.getLayerName()));
+    setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
     updateFillLayer();
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 
@@ -57,9 +57,9 @@ PolygonGraphicsItem::~PolygonGraphicsItem() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void PolygonGraphicsItem::polygonLayerNameChanged(const QString& newLayerName) noexcept
+void PolygonGraphicsItem::polygonLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
 {
-    setLineLayer(mLayerProvider.getLayer(newLayerName));
+    setLineLayer(mLayerProvider.getLayer(*newLayerName));
     updateFillLayer(); // required if the area is filled with the line layer
 }
 
@@ -88,9 +88,9 @@ void PolygonGraphicsItem::polygonPathChanged(const Path& newPath) noexcept
 void PolygonGraphicsItem::updateFillLayer() noexcept
 {
     if (mPolygon.isFilled()) {
-        setFillLayer(mLayerProvider.getLayer(mPolygon.getLayerName()));
+        setFillLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
     } else if (mPolygon.isGrabArea()) {
-        setFillLayer(mLayerProvider.getGrabAreaLayer(mPolygon.getLayerName()));
+        setFillLayer(mLayerProvider.getGrabAreaLayer(*mPolygon.getLayerName()));
     } else {
         setFillLayer(nullptr);
     }

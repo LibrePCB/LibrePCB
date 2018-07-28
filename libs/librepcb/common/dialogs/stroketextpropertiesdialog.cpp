@@ -54,7 +54,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(StrokeText& text, UndoSta
             mUi->spbxLineSpacingRatio, &QDoubleSpinBox::setDisabled);
 
     // load text attributes
-    selectLayerNameInCombobox(mText.getLayerName());
+    selectLayerNameInCombobox(*mText.getLayerName());
     mUi->edtText->setPlainText(mText.getText());
     mUi->alignmentSelector->setAlignment(mText.getAlign());
     mUi->spbHeight->setValue(mText.getHeight()->toMm());
@@ -119,7 +119,7 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept
     try {
         QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(mText));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setText(mUi->edtText->toPlainText(), false);
         cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);

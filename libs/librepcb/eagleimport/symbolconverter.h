@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <memory>
 #include <QtCore>
+#include <librepcb/common/graphics/graphicslayername.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -70,7 +71,7 @@ class SymbolConverter final
 
     private:
         QString createDescription() const noexcept;
-        static QString convertSchematicLayer(int eagleLayerId);
+        static GraphicsLayerName convertSchematicLayer(int eagleLayerId);
 
         const parseagle::Symbol& mSymbol;
         ConverterDb& mDb;

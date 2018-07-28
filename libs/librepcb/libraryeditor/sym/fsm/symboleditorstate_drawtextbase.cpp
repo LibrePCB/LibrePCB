@@ -47,7 +47,8 @@ namespace editor {
 SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(const Context& context,
                                                                Mode mode) noexcept :
     SymbolEditorState(context), mMode(mode), mCurrentText(nullptr),
-    mCurrentGraphicsItem(nullptr), mLastHeight(1)
+    mCurrentGraphicsItem(nullptr),
+    mLastLayerName(GraphicsLayer::sSymbolNames), mLastHeight(1)
 {
     resetToDefaultParameters();
 }
@@ -73,7 +74,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept
         mContext.commandToolBar.addLabel(tr("Layer:"));
         std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
         layerComboBox->setLayers(mContext.layerProvider.getSchematicGeometryElementLayers());
-        layerComboBox->setCurrentLayer(mLastLayerName);
+        layerComboBox->setCurrentLayer(*mLastLayerName);
         connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
                 this, &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
         mContext.commandToolBar.addWidget(std::move(layerComboBox));

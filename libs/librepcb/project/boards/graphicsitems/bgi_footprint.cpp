@@ -93,7 +93,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept
 
     // polygons
     for (const Polygon& polygon : mLibFootprint.getPolygons()) {
-        layer = getLayer(polygon.getLayerName());
+        layer = getLayer(*polygon.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -131,7 +131,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     // draw all polygons
     for (const Polygon& polygon : mLibFootprint.getPolygons()) {
         // get layer
-        layer = getLayer(polygon.getLayerName());
+        layer = getLayer(*polygon.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 
@@ -164,7 +164,7 @@ void BGI_Footprint::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     // draw all circles
     for (const Circle& circle : mLibFootprint.getCircles()) {
         // get layer
-        layer = getLayer(circle.getLayerName());
+        layer = getLayer(*circle.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 

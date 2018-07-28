@@ -70,7 +70,7 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         Point p4(xValues.values().last(), yValues.values().first());
 
         // create the new polygon
-        QString layerName = lines.first()->getLayerName();
+        GraphicsLayerName layerName = lines.first()->getLayerName();
         UnsignedLength lineWidth = lines.first()->getLineWidth();
         Path rectPath({Vertex(p1), Vertex(p2), Vertex(p3), Vertex(p4), Vertex(p1)});
         mLibraryElement.getPolygons().append(std::make_shared<Polygon>(

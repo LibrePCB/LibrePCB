@@ -57,7 +57,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
                             "LibrePCB", mSymbol.getName(), createDescription(), ""));
 
     foreach (const parseagle::Wire& wire, mSymbol.getWires()) {
-        QString layerName = convertSchematicLayer(wire.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(wire.getLayer());
         bool fill = false;
         bool isGrabArea = true;
         UnsignedLength lineWidth(Length::fromMm(wire.getWidth())); // can throw
@@ -69,7 +69,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Rectangle& rect, mSymbol.getRectangles()) {
-        QString layerName = convertSchematicLayer(rect.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(rect.getLayer());
         bool fill = true;
         bool isGrabArea = true;
         UnsignedLength lineWidth(0);
@@ -80,7 +80,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Circle& circle, mSymbol.getCircles()) {
-        QString layerName = convertSchematicLayer(circle.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(circle.getLayer());
         PositiveLength diameter(Length::fromMm(circle.getRadius()) * 2); // can throw
         Point center = Point::fromMm(circle.getPosition().x, circle.getPosition().y);
         UnsignedLength lineWidth(Length::fromMm(circle.getWidth())); // can throw
@@ -91,7 +91,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Polygon& polygon, mSymbol.getPolygons()) {
-        QString layerName = convertSchematicLayer(polygon.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(polygon.getLayer());
         bool fill = false;
         bool isGrabArea = true;
         UnsignedLength lineWidth(Length::fromMm(polygon.getWidth())); // can throw
@@ -108,7 +108,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Text& text, mSymbol.getTexts()) {
-        QString layerName = convertSchematicLayer(text.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(text.getLayer());
         QString textStr = text.getValue();
         if (textStr.startsWith(">")) {
             textStr = "{{" + textStr.mid(1) + "}}";
@@ -152,14 +152,14 @@ QString SymbolConverter::createDescription() const noexcept
     return desc.trimmed();
 }
 
-QString SymbolConverter::convertSchematicLayer(int eagleLayerId)
+GraphicsLayerName SymbolConverter::convertSchematicLayer(int eagleLayerId)
 {
     switch (eagleLayerId) {
-        case 93: return GraphicsLayer::sSymbolPinNames;
-        case 94: return GraphicsLayer::sSymbolOutlines;
-        case 95: return GraphicsLayer::sSymbolNames;
-        case 96: return GraphicsLayer::sSymbolValues;
-        case 99: return GraphicsLayer::sSchematicReferences; // ???
+        case 93: return GraphicsLayerName(GraphicsLayer::sSymbolPinNames);
+        case 94: return GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+        case 95: return GraphicsLayerName(GraphicsLayer::sSymbolNames);
+        case 96: return GraphicsLayerName(GraphicsLayer::sSymbolValues);
+        case 99: return GraphicsLayerName(GraphicsLayer::sSchematicReferences); // ???
         default: throw Exception(__FILE__, __LINE__, QString("Invalid schematic layer: %1").arg(eagleLayerId));
     }
 }

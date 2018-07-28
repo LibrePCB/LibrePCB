@@ -73,7 +73,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept
     mContext.commandToolBar.addLabel(tr("Layer:"));
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
     layerComboBox->setLayers(mContext.layerProvider.getBoardGeometryElementLayers());
-    layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->setCurrentLayer(*mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));

@@ -64,7 +64,7 @@ class PolygonGraphicsItem final : public PrimitivePathGraphicsItem, public IF_Po
 
 
     private: // Methods
-        void polygonLayerNameChanged(const QString& newLayerName) noexcept override;
+        void polygonLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
         void polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept override;
         void polygonIsFilledChanged(bool newIsFilled) noexcept override;
         void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept override;

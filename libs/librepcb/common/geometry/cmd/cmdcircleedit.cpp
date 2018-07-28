@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdcircleedit.h"
-#include "../circle.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,7 +54,7 @@ CmdCircleEdit::~CmdCircleEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdCircleEdit::setLayerName(const QString& name, bool immediate) noexcept
+void CmdCircleEdit::setLayerName(const GraphicsLayerName& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = name;

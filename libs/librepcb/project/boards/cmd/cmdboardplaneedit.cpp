@@ -80,7 +80,7 @@ void CmdBoardPlaneEdit::setOutline(const Path& outline, bool immediate) noexcept
     if (immediate) mPlane.setOutline(mNewOutline);
 }
 
-void CmdBoardPlaneEdit::setLayerName(const QString& layerName, bool immediate) noexcept
+void CmdBoardPlaneEdit::setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = layerName;

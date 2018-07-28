@@ -149,14 +149,14 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // draw all polygons
     for (const Polygon& polygon : mLibSymbol.getPolygons()) {
         // set colors
-        layer = getLayer(polygon.getLayerName());
+        layer = getLayer(*polygon.getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), polygon.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
         if (polygon.isFilled())
-            layer = getLayer(polygon.getLayerName());
+            layer = getLayer(*polygon.getLayerName());
         else if (polygon.isGrabArea())
             layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -171,14 +171,14 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // draw all circles
     for (const Circle& circle : mLibSymbol.getCircles()) {
         // set colors
-        layer = getLayer(circle.getLayerName());
+        layer = getLayer(*circle.getLayerName());
         if (layer) {if (!layer->isVisible()) layer = nullptr;}
         if (layer)
             painter->setPen(QPen(layer->getColor(selected), circle.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         else
             painter->setPen(Qt::NoPen);
         if (circle.isFilled())
-            layer = getLayer(circle.getLayerName());
+            layer = getLayer(*circle.getLayerName());
         else if (circle.isGrabArea())
             layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -196,7 +196,7 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // draw all texts
     for (const Text& text : mLibSymbol.getTexts()) {
         // get layer
-        layer = getLayer(text.getLayerName());
+        layer = getLayer(*text.getLayerName());
         if (!layer) continue;
         if (!layer->isVisible()) continue;
 

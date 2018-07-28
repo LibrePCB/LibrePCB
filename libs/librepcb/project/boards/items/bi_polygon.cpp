@@ -60,7 +60,7 @@ BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon) :
     init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const Uuid& uuid, const QString& layerName,
+BI_Polygon::BI_Polygon(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
                        const UnsignedLength& lineWidth, bool fill,
                        bool isGrabArea, const Path& path) :
     BI_Base(board)
@@ -125,7 +125,7 @@ const Uuid& BI_Polygon::getUuid() const noexcept
 
 bool BI_Polygon::isSelectable() const noexcept
 {
-    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(mPolygon->getLayerName());
+    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(*mPolygon->getLayerName());
     return layer && layer->isVisible();
 }
 

@@ -64,7 +64,7 @@ class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_C
 
 
     private: // Methods
-        void circleLayerNameChanged(const QString& newLayerName) noexcept override;
+        void circleLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
         void circleLineWidthChanged(const UnsignedLength& newLineWidth) noexcept override;
         void circleIsFilledChanged(bool newIsFilled) noexcept override;
         void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept override;

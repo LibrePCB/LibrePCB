@@ -75,7 +75,7 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node) :
     init();
 }
 
-BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const QString& layerName,
+BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
                    NetSignal& netsignal, const Path& outline) :
     BI_Base(board), mUuid(uuid), mLayerName(layerName), mNetSignal(&netsignal),
     mOutline(outline), mMinWidth(200000), mMinClearance(300000), mKeepOrphans(false),
@@ -113,7 +113,7 @@ void BI_Plane::setOutline(const Path& outline) noexcept
     }
 }
 
-void BI_Plane::setLayerName(const QString& layerName) noexcept
+void BI_Plane::setLayerName(const GraphicsLayerName& layerName) noexcept
 {
     if (layerName != mLayerName) {
         mLayerName = layerName;
@@ -214,7 +214,7 @@ void BI_Plane::rebuild() noexcept
 void BI_Plane::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("net", mNetSignal->getUuid(), true);
     root.appendChild("priority", mPriority, false);
     root.appendChild("min_width", mMinWidth, true);

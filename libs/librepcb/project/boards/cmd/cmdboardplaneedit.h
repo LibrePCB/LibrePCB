@@ -55,7 +55,7 @@ class CmdBoardPlaneEdit final : public UndoCommand
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
         void setOutline(const Path& outline, bool immediate) noexcept;
-        void setLayerName(const QString& layerName, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept;
         void setNetSignal(NetSignal& netsignal) noexcept;
         void setMinWidth(const UnsignedLength& minWidth) noexcept;
         void setMinClearance(const UnsignedLength& minClearance) noexcept;
@@ -87,8 +87,8 @@ class CmdBoardPlaneEdit final : public UndoCommand
         // General Attributes
         Path mOldOutline;
         Path mNewOutline;
-        QString mOldLayerName;
-        QString mNewLayerName;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
         NetSignal* mOldNetSignal;
         NetSignal* mNewNetSignal;
         UnsignedLength mOldMinWidth;

@@ -49,7 +49,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
             this, &PolygonPropertiesDialog::buttonBoxClicked);
 
     // load polygon attributes
-    selectLayerNameInCombobox(mPolygon.getLayerName());
+    selectLayerNameInCombobox(*mPolygon.getLayerName());
     mUi->spbLineWidth->setValue(mPolygon.getLineWidth()->toMm());
     mUi->cbxFillArea->setChecked(mPolygon.isFilled());
     mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
@@ -89,7 +89,7 @@ bool PolygonPropertiesDialog::applyChanges() noexcept
     try {
         QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(mPolygon));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
         cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);

@@ -64,7 +64,7 @@ class TextGraphicsItem final : public PrimitiveTextGraphicsItem, public IF_TextO
 
 
     private: // Methods
-        void textLayerNameChanged(const QString& newLayerName) noexcept override;
+        void textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
         void textTextChanged(const QString& newText) noexcept override;
         void textPositionChanged(const Point& newPos) noexcept override;
         void textRotationChanged(const Angle& newRot) noexcept override;

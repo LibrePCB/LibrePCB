@@ -68,7 +68,7 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project& project, BI_Plan
             mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
         }
     }
-    mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(mPlane.getLayerName()));
+    mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(*mPlane.getLayerName()));
 
     // minimum width / clearance spinbox
     mUi->spbMinWidth->setValue(mPlane.getMinWidth()->toMm());
@@ -133,7 +133,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept
 
         // layer
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
 
         // min width/clearance

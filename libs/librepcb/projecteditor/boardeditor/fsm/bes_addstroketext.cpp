@@ -105,7 +105,7 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept
     if (mEditor.getActiveBoard()) {
         mLayerComboBox->setLayers(mEditor.getActiveBoard()->getLayerStack().getBoardGeometryElementLayers());
     }
-    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+    mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
     mEditorUi.commandToolbar->addWidget(mLayerComboBox.data());
     connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &BES_AddStrokeText::layerComboBoxLayerChanged);
@@ -265,7 +265,7 @@ BES_Base::ProcRetVal BES_AddStrokeText::processFlipEvent(Qt::Orientation orienta
         mEditCmd->mirror(mText->getPosition(), orientation, true);
 
         // update toolbar widgets
-        mLayerComboBox->setCurrentLayer(mText->getText().getLayerName());
+        mLayerComboBox->setCurrentLayer(*mText->getText().getLayerName());
         mMirrorCheckBox->setChecked(mText->getText().getMirrored());
     }
 
@@ -364,7 +364,7 @@ void BES_AddStrokeText::makeSelectedLayerVisible() noexcept
 {
     Board* board = mEditor.getActiveBoard();
     if (board) {
-        GraphicsLayer* layer = board->getLayerStack().getLayer(mCurrentLayerName);
+        GraphicsLayer* layer = board->getLayerStack().getLayer(*mCurrentLayerName);
         if (layer && layer->isEnabled()) layer->setVisible(true);
     }
 }

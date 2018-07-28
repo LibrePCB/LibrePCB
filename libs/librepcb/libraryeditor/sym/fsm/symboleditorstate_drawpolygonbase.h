@@ -26,6 +26,7 @@
 #include <memory>
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "symboleditorstate.h"
 
 /*****************************************************************************************
@@ -100,7 +101,7 @@ class SymbolEditorState_DrawPolygonBase : public SymbolEditorState
         PolygonGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        QString mLastLayerName;
+        GraphicsLayerName mLastLayerName;
         UnsignedLength mLastLineWidth;
         Angle mLastAngle;
         bool mLastFill;

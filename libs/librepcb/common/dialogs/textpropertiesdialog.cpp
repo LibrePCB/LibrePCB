@@ -49,7 +49,7 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
             this, &TextPropertiesDialog::on_buttonBox_clicked);
 
     // load text attributes
-    selectLayerNameInCombobox(mText.getLayerName());
+    selectLayerNameInCombobox(*mText.getLayerName());
     mUi->edtText->setPlainText(mText.getText());
     mUi->alignmentSelector->setAlignment(mText.getAlign());
     mUi->spbHeight->setValue(mText.getHeight()->toMm());
@@ -89,7 +89,7 @@ bool TextPropertiesDialog::applyChanges() noexcept
     try {
         QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(mText));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setText(mUi->edtText->toPlainText().trimmed(), false);
         cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
