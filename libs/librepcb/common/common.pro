@@ -188,6 +188,7 @@ HEADERS += \
     graphics/circlegraphicsitem.h \
     graphics/defaultgraphicslayerprovider.h \
     graphics/graphicslayer.h \
+    graphics/graphicslayername.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
     graphics/holegraphicsitem.h \
