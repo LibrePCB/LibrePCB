@@ -132,6 +132,7 @@ HEADERS += \
     alignment.h \
     application.h \
     attributes/attribute.h \
+    attributes/attributekey.h \
     attributes/attributeprovider.h \
     attributes/attributesubstitutor.h \
     attributes/attributetype.h \
