@@ -106,20 +106,24 @@ void BoardDesignRulesDialog::applyRules() noexcept
         mDesignRules.setDescription(mUi->txtDescription->toPlainText());
         // stop mask
         mDesignRules.setStopMaskClearanceRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxStopMaskClrRatio->value()))); // can throw
-        mDesignRules.setStopMaskClearanceMin(UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMin->value()))); // can throw
-        mDesignRules.setStopMaskClearanceMax(UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMax->value()))); // can throw
+        mDesignRules.setStopMaskClearanceBounds(
+            UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMin->value())),
+            UnsignedLength(Length::fromMm(mUi->spbxStopMaskClrMax->value()))); // can throw
         mDesignRules.setStopMaskMaxViaDiameter(UnsignedLength(Length::fromMm(mUi->spbxStopMaskMaxViaDia->value()))); // can throw
         // cream mask
         mDesignRules.setCreamMaskClearanceRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxCreamMaskClrRatio->value()))); // can throw
-        mDesignRules.setCreamMaskClearanceMin(UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMin->value()))); // can throw
-        mDesignRules.setCreamMaskClearanceMax(UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMax->value()))); // can throw
+        mDesignRules.setCreamMaskClearanceBounds(
+            UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMin->value())),
+            UnsignedLength(Length::fromMm(mUi->spbxCreamMaskClrMax->value()))); // can throw
         // restring
         mDesignRules.setRestringPadRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxRestringPadsRatio->value()))); // can throw
-        mDesignRules.setRestringPadMin(UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMin->value()))); // can throw
-        mDesignRules.setRestringPadMax(UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMax->value()))); // can throw
+        mDesignRules.setRestringPadBounds(
+            UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMin->value())),
+            UnsignedLength(Length::fromMm(mUi->spbxRestringPadsMax->value()))); // can throw
         mDesignRules.setRestringViaRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxRestringViasRatio->value()))); // can throw
-        mDesignRules.setRestringViaMin(UnsignedLength(Length::fromMm(mUi->spbxRestringViasMin->value()))); // can throw
-        mDesignRules.setRestringViaMax(UnsignedLength(Length::fromMm(mUi->spbxRestringViasMax->value()))); // can throw
+        mDesignRules.setRestringViaBounds(
+            UnsignedLength(Length::fromMm(mUi->spbxRestringViasMin->value())),
+            UnsignedLength(Length::fromMm(mUi->spbxRestringViasMax->value()))); // can throw
     } catch (const Exception& e) {
         QMessageBox::warning(this, tr("Could not apply settings"), e.getMsg());
     }

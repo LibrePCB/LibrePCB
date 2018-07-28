@@ -86,22 +86,18 @@ class BoardDesignRules final : public SerializableObject
 
         // Setters: Stop Mask
         void setStopMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {mStopMaskClearanceRatio = ratio;}
-        void setStopMaskClearanceMin(const UnsignedLength& min) noexcept {mStopMaskClearanceMin = min;}
-        void setStopMaskClearanceMax(const UnsignedLength& max) noexcept {mStopMaskClearanceMax = max;}
+        void setStopMaskClearanceBounds(const UnsignedLength& min, const UnsignedLength& max);
         void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {mStopMaskMaxViaDrillDiameter = dia;}
 
         // Setters: Clear Mask
         void setCreamMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {mCreamMaskClearanceRatio = ratio;}
-        void setCreamMaskClearanceMin(const UnsignedLength& min) noexcept {mCreamMaskClearanceMin = min;}
-        void setCreamMaskClearanceMax(const UnsignedLength& max) noexcept {mCreamMaskClearanceMax = max;}
+        void setCreamMaskClearanceBounds(const UnsignedLength& min, const UnsignedLength& max);
 
         // Setters: Restring
         void setRestringPadRatio(const UnsignedRatio& ratio) noexcept {mRestringPadRatio = ratio;}
-        void setRestringPadMin(const UnsignedLength& min) noexcept {mRestringPadMin = min;}
-        void setRestringPadMax(const UnsignedLength& max) noexcept {mRestringPadMax = max;}
+        void setRestringPadBounds(const UnsignedLength& min, const UnsignedLength& max);
         void setRestringViaRatio(const UnsignedRatio& ratio) noexcept {mRestringViaRatio = ratio;}
-        void setRestringViaMin(const UnsignedLength& min) noexcept {mRestringViaMin = min;}
-        void setRestringViaMax(const UnsignedLength& max) noexcept {mRestringViaMax = max;}
+        void setRestringViaBounds(const UnsignedLength& min, const UnsignedLength& max);
 
         // General Methods
         void restoreDefaults() noexcept;
@@ -121,8 +117,6 @@ class BoardDesignRules final : public SerializableObject
 
 
     private:
-        bool checkAttributesValidity() const noexcept;
-
 
         // General Attributes
         ElementName mName;

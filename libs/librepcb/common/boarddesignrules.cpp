@@ -109,10 +109,69 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
     if (const SExpression* e = node.tryGetChildByPath("restring_via_max")) {
         mRestringViaMax = e->getValueOfFirstChild<UnsignedLength>();
     }
+
+    // force validating properties, throw exception on error
+    try {
+        setStopMaskClearanceBounds(mStopMaskClearanceMin, mStopMaskClearanceMax);
+        setCreamMaskClearanceBounds(mCreamMaskClearanceMin, mCreamMaskClearanceMax);
+        setRestringPadBounds(mRestringPadMin, mRestringPadMax);
+        setRestringViaBounds(mRestringViaMin, mRestringViaMax);
+    } catch (const Exception& e) {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(tr("Invalid design rules: %1")).arg(e.getMsg()));
+    }
 }
 
 BoardDesignRules::~BoardDesignRules() noexcept
 {
+}
+
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
+
+void BoardDesignRules::setStopMaskClearanceBounds(const UnsignedLength& min,
+                                                  const UnsignedLength& max)
+{
+    if (max >= min) {
+        mStopMaskClearanceMin = min;
+        mStopMaskClearanceMax = max;
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, tr("Stop mask clearance: MAX must be >= MIN"));
+    }
+}
+
+void BoardDesignRules::setCreamMaskClearanceBounds(const UnsignedLength& min,
+                                                   const UnsignedLength& max)
+{
+    if (max >= min) {
+        mCreamMaskClearanceMin = min;
+        mCreamMaskClearanceMax = max;
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, tr("Cream mask clearance: MAX must be >= MIN"));
+    }
+}
+
+void BoardDesignRules::setRestringPadBounds(const UnsignedLength& min,
+                                            const UnsignedLength& max)
+{
+    if (max >= min) {
+        mRestringPadMin = min;
+        mRestringPadMax = max;
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, tr("Restring pads: MAX must be >= MIN"));
+    }
+}
+
+void BoardDesignRules::setRestringViaBounds(const UnsignedLength& min,
+                                            const UnsignedLength& max)
+{
+    if (max >= min) {
+        mRestringViaMin = min;
+        mRestringViaMax = max;
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, tr("Restring vias: MAX must be >= MIN"));
+    }
 }
 
 /*****************************************************************************************
@@ -126,8 +185,6 @@ void BoardDesignRules::restoreDefaults() noexcept
 
 void BoardDesignRules::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     // general attributes
     root.appendChild("name",                                mName, true);
     root.appendChild("description",                         mDescription, true);
@@ -212,22 +269,6 @@ BoardDesignRules& BoardDesignRules::operator=(const BoardDesignRules& rhs) noexc
     mRestringViaMin                 = rhs.mRestringViaMin;
     mRestringViaMax                 = rhs.mRestringViaMax;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool BoardDesignRules::checkAttributesValidity() const noexcept
-{
-    // stop mask
-    if (mStopMaskClearanceMax < mStopMaskClearanceMin)      return false;
-    // cream mask
-    if (mCreamMaskClearanceMax < mCreamMaskClearanceMin)    return false;
-    // restring
-    if (mRestringPadMax < mRestringPadMin)                  return false;
-    if (mRestringViaMax < mRestringViaMin)                  return false;
-    return true;
 }
 
 /*****************************************************************************************
