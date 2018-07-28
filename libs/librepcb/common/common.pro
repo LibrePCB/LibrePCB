@@ -156,6 +156,7 @@ HEADERS += \
     dialogs/polygonpropertiesdialog.h \
     dialogs/stroketextpropertiesdialog.h \
     dialogs/textpropertiesdialog.h \
+    elementname.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
