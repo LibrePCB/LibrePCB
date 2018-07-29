@@ -147,6 +147,7 @@ HEADERS += \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
     cam/gerbergenerator.h \
+    circuitidentifier.h \
     debug.h \
     dialogs/aboutdialog.h \
     dialogs/boarddesignrulesdialog.h \
