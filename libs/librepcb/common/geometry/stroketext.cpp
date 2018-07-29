@@ -88,10 +88,10 @@ StrokeText::StrokeText(const SExpression& node) :
 {
     if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-        mText = node.getValueByPath<QString>("value", true);
+        mText = node.getValueByPath<QString>("value");
     } else {
         // backward compatibility, remove this some time!
-        mText = node.getChildByIndex(0).getValue<QString>(true);
+        mText = node.getChildByIndex(0).getValue<QString>();
     }
 
     // load geometry attributes
@@ -119,8 +119,6 @@ StrokeText::StrokeText(const SExpression& node) :
     // backward compatibility - remove this some time!
     mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 StrokeText::~StrokeText() noexcept
@@ -353,8 +351,6 @@ void StrokeText::unregisterObserver(IF_StrokeTextObserver& object) const noexcep
 
 void StrokeText::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("layer", mLayerName, false);
     root.appendChild("height", mHeight, true);
@@ -405,16 +401,6 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept
     mMirrored = rhs.mMirrored;
     mAutoRotate = rhs.mAutoRotate;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool StrokeText::checkAttributesValidity() const noexcept
-{
-    if (mText.isEmpty())        return false;
-    return true;
 }
 
 /*****************************************************************************************

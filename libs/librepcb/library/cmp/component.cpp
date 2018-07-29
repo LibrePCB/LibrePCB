@@ -119,21 +119,6 @@ void Component::serialize(SExpression& root) const
     mSymbolVariants.serialize(root);
 }
 
-bool Component::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())                 return false;
-    for (const ComponentSymbolVariant& var : mSymbolVariants) {
-        for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
-            for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                if (map.getSignalUuid()) {
-                    if (!mSignals.contains(*map.getSignalUuid()))    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

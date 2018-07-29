@@ -68,17 +68,15 @@ Text::Text(const SExpression& node) :
 {
     if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-        mText = node.getValueByPath<QString>("value", true);
+        mText = node.getValueByPath<QString>("value");
     } else {
         // backward compatibility, remove this some time!
-        mText = node.getChildByIndex(0).getValue<QString>(true);
+        mText = node.getChildByIndex(0).getValue<QString>();
     }
 
     // backward compatibility - remove this some time!
     mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Text::~Text() noexcept
@@ -159,8 +157,6 @@ void Text::unregisterObserver(IF_TextObserver& object) const noexcept
 
 void Text::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("layer", mLayerName, false);
     root.appendChild("value", mText, false);
@@ -196,16 +192,6 @@ Text& Text::operator=(const Text& rhs) noexcept
     mHeight = rhs.mHeight;
     mAlign = rhs.mAlign;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool Text::checkAttributesValidity() const noexcept
-{
-    if (mText.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

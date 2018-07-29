@@ -111,7 +111,6 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         /// @copydoc librepcb::SerializableObject::serialize()
         virtual void serialize(SExpression& root) const override;
-        virtual bool checkAttributesValidity() const noexcept;
 
 
         // General Attributes

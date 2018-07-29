@@ -161,25 +161,6 @@ void Symbol::serialize(SExpression& root) const
     mTexts.serialize(root);
 }
 
-bool Symbol::checkAttributesValidity() const noexcept
-{
-    // symbol pin uuids and names must be unique
-    QList<Uuid> uuids;
-    QList<QString> names;
-    for (const SymbolPin& pin : mPins) {
-        Uuid uuid = pin.getUuid();
-        QString name = pin.getName();
-        if (uuids.contains(uuid) || names.contains(name)) {
-            return false;
-        } else {
-            uuids.append(uuid);
-            names.append(name);
-        }
-    }
-
-    return true;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/

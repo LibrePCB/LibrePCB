@@ -251,11 +251,6 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
 
 void LibraryBaseElement::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) {
-        throw LogicError(__FILE__, __LINE__,
-            tr("The library element cannot be saved because it is not valid."));
-    }
-
     root.appendChild(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
@@ -264,11 +259,6 @@ void LibraryBaseElement::serialize(SExpression& root) const
     root.appendChild("version", mVersion, true);
     root.appendChild("created", mCreated, true);
     root.appendChild("deprecated", mIsDeprecated, true);
-}
-
-bool LibraryBaseElement::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************

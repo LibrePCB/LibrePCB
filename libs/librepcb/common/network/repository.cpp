@@ -47,7 +47,7 @@ Repository::Repository(const QUrl& url) noexcept :
 Repository::Repository(const SExpression& node) :
     QObject(nullptr), mUrl()
 {
-    mUrl = node.getChildByIndex(0).getValue<QUrl>(true); // can throw
+    mUrl = node.getChildByIndex(0).getValue<QUrl>(); // can throw
 }
 
 Repository::~Repository() noexcept
@@ -80,8 +80,6 @@ void Repository::requestLibraryList() const noexcept
 
 void Repository::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUrl);
 }
 
@@ -125,12 +123,6 @@ void Repository::requestedDataReceived(const QByteArray& data) noexcept
         return;
     }
     emit libraryListReceived(reposVal.toArray());
-}
-
-bool Repository::checkAttributesValidity() const noexcept
-{
-    if (!mUrl.isValid()) return false;
-    return true;
 }
 
 /*****************************************************************************************

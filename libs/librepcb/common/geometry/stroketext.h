@@ -211,10 +211,6 @@ class StrokeText final : public SerializableObject
         StrokeText& operator=(const StrokeText& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
         GraphicsLayerName mLayerName;

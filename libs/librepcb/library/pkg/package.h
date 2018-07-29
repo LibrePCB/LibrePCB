@@ -85,7 +85,6 @@ class Package final : public LibraryElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

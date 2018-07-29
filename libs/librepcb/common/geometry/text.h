@@ -117,10 +117,6 @@ class Text final : public SerializableObject
         Text& operator=(const Text& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
         GraphicsLayerName mLayerName;

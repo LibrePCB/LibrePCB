@@ -109,7 +109,6 @@ class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
                                const std::shared_ptr<Text>& ptr) noexcept override;
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

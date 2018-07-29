@@ -81,7 +81,6 @@ class Repository final : public QObject, public SerializableObject
 
         void requestLibraryList(const QUrl& url) const noexcept;
         void requestedDataReceived(const QByteArray& data) noexcept;
-        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

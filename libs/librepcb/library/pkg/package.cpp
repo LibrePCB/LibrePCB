@@ -66,12 +66,6 @@ void Package::serialize(SExpression& root) const
     mFootprints.serialize(root);
 }
 
-bool Package::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())             return false;
-    return true;
-}
-
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
