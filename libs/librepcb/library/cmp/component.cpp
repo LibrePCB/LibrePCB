@@ -39,13 +39,13 @@ Component::Component(const Uuid& uuid, const Version& version, const QString& au
                      const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mSchematicOnly(false), mDefaultValue(), mPrefixes("")
+    mSchematicOnly(false), mDefaultValue(), mPrefixes(ComponentPrefix(""))
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mSchematicOnly(false), mDefaultValue(), mPrefixes("")
+    mSchematicOnly(false), mDefaultValue(), mPrefixes(ComponentPrefix(""))
 {
     // Load all properties
     mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");

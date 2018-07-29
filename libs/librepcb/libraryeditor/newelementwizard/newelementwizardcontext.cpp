@@ -40,7 +40,7 @@ namespace editor {
 NewElementWizardContext::NewElementWizardContext(const workspace::Workspace& ws,
         const Library& lib, const IF_GraphicsLayerProvider& lp, QObject* parent) noexcept :
     QObject(parent), mWorkspace(ws), mLibrary(lib), mLayerProvider(lp),
-    mElementType(ElementType::None), mComponentPrefixes("")
+    mElementType(ElementType::None), mComponentPrefixes(ComponentPrefix(""))
 {
     reset();
 }
@@ -87,7 +87,7 @@ void NewElementWizardContext::reset() noexcept
     mComponentSchematicOnly = false;
     mComponentAttributes.clear();
     mComponentDefaultValue.clear();
-    mComponentPrefixes = NormDependentPrefixMap("");
+    mComponentPrefixes = NormDependentPrefixMap(ComponentPrefix(""));
     mComponentSignals.clear();
     mComponentSymbolVariants.clear();
 

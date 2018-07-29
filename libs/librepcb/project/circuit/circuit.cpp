@@ -288,12 +288,12 @@ void Circuit::setHighlightedNetSignal(NetSignal* signal) noexcept
  *  ComponentInstance Methods
  ****************************************************************************************/
 
-QString Circuit::generateAutoComponentInstanceName(const QString& cmpPrefix) const noexcept
+QString Circuit::generateAutoComponentInstanceName(const library::ComponentPrefix& cmpPrefix) const noexcept
 {
     QString name;
     int i = 1;
     do {
-        name = QString("%1%2").arg(cmpPrefix.isEmpty() ? "?" : cmpPrefix).arg(i++);
+        name = QString("%1%2").arg(cmpPrefix->isEmpty() ? "?" : *cmpPrefix).arg(i++);
     } while (getComponentInstanceByName(name));
     return name;
 }

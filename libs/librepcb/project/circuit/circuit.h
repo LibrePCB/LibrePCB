@@ -29,6 +29,7 @@
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/library/cmp/componentprefix.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -104,7 +105,7 @@ class Circuit final : public QObject, public SerializableObject
         void setHighlightedNetSignal(NetSignal* signal) noexcept;
 
         // ComponentInstance Methods
-        QString generateAutoComponentInstanceName(const QString& cmpPrefix) const noexcept;
+        QString generateAutoComponentInstanceName(const library::ComponentPrefix& cmpPrefix) const noexcept;
         const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;

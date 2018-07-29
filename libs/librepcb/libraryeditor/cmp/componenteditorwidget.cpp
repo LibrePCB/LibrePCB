@@ -68,7 +68,7 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context, const FileP
     mCategoriesEditorWidget->setUuids(mComponent->getCategories());
     mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
     mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
-    mUi->edtPrefix->setText(mComponent->getPrefixes().getDefaultValue());
+    mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
     mUi->edtDefaultValue->setPlainText(mComponent->getDefaultValue());
     mUi->signalEditorWidget->setReferences(mUndoStack.data(), &mComponent->getSignals());
     mUi->symbolVariantsEditorWidget->setReferences(mUndoStack.data(), &mComponent->getSymbolVariants(), this);
@@ -115,6 +115,7 @@ bool ComponentEditorWidget::save() noexcept
     try {
         ElementName name(mUi->edtName->text().trimmed()); // can throw
         Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
+        ComponentPrefix prefix(mUi->edtPrefix->text().trimmed()); // can throw
 
         mComponent->setName("", name);
         mComponent->setDescription("", mUi->edtDescription->toPlainText().trimmed());
@@ -123,7 +124,7 @@ bool ComponentEditorWidget::save() noexcept
         mComponent->setVersion(version);
         mComponent->setCategories(mCategoriesEditorWidget->getUuids());
         mComponent->setDeprecated(mUi->cbxDeprecated->isChecked());
-        mComponent->getPrefixes().setDefaultValue(mUi->edtPrefix->text().trimmed());
+        mComponent->getPrefixes().setDefaultValue(prefix);
         mComponent->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
         mComponent->getAttributes() = mUi->attributesEditorWidget->getAttributeList();
         mComponent->save();

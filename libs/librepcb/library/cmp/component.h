@@ -29,6 +29,7 @@
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
+#include "componentprefix.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -41,7 +42,7 @@ namespace library {
  ****************************************************************************************/
 
 struct NormDependentPrefixMapPolicy {
-    typedef QString ValueType;
+    typedef ComponentPrefix ValueType;
     static constexpr const char* tagname = "prefix";
     static constexpr const char* keyname = "norm";
 };
