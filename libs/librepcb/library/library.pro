@@ -66,6 +66,7 @@ HEADERS += \
     cmp/cmpsigpindisplaytype.h \
     cmp/component.h \
     cmp/componentpinsignalmap.h \
+    cmp/componentprefix.h \
     cmp/componentsignal.h \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
