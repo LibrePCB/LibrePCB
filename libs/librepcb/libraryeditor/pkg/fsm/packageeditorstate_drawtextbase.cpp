@@ -148,6 +148,11 @@ bool PackageEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed
     return startAddText(currentPos);
 }
 
+bool PackageEditorState_DrawTextBase::processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent &e)  noexcept
+{
+    Q_UNUSED(e);
+    return processRotateCcw();
+}
 bool PackageEditorState_DrawTextBase::processRotateCw() noexcept
 {
     if (mCurrentText) {

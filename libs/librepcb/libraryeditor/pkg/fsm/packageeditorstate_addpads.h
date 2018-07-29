@@ -73,6 +73,7 @@ class PackageEditorState_AddPads : public PackageEditorState
         // Event Handlers
         virtual bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
         virtual bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
+        virtual bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent &e) noexcept override;
         virtual bool processRotateCw() noexcept override;
         virtual bool processRotateCcw() noexcept override;
 

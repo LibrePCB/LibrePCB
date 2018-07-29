@@ -190,6 +190,12 @@ bool PackageEditorState_AddPads::processGraphicsSceneLeftMouseButtonPressed(QGra
     return startAddPad(currentPos);
 }
 
+bool PackageEditorState_AddPads::processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent &e) noexcept
+{
+    Q_UNUSED(e);
+    return processRotateCcw();
+}
+
 bool PackageEditorState_AddPads::processRotateCw() noexcept
 {
     if (mCurrentPad) {

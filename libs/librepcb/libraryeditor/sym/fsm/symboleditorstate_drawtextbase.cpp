@@ -150,6 +150,12 @@ bool SymbolEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed(
     return startAddText(currentPos);
 }
 
+bool SymbolEditorState_DrawTextBase::processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept
+{
+    Q_UNUSED(e);
+    return processRotateCcw();
+}
+
 bool SymbolEditorState_DrawTextBase::processRotateCw() noexcept
 {
     if (mCurrentText) {
