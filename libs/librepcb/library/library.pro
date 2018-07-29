@@ -70,6 +70,7 @@ HEADERS += \
     cmp/componentsignal.h \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
+    cmp/componentsymbolvariantitemsuffix.h \
     dev/cmd/cmddeviceedit.h \
     dev/cmd/cmddevicepadsignalmapitemedit.h \
     dev/device.h \
