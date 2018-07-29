@@ -44,7 +44,7 @@ SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(const IF_GraphicsLaye
     QGraphicsItem(), mPin(pin), mComponentSignal(compSignal), mDisplayType(displayType),
     mDrawBoundingRect(false)
 {
-    setToolTip(mPin.getName());
+    setToolTip(*mPin.getName());
 
     if (mComponentSignal && mComponentSignal->isRequired()) {
         mCircleLayer = layerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesReq);
@@ -100,9 +100,9 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     if (mDisplayType == CmpSigPinDisplayType::none()) {
         mStaticText.setText("");
     } else if (mDisplayType == CmpSigPinDisplayType::pinName()) {
-        mStaticText.setText(mPin.getName());
+        mStaticText.setText(*mPin.getName());
     } else  if (mDisplayType == CmpSigPinDisplayType::componentSignal()) {
-        mStaticText.setText(mComponentSignal ? mComponentSignal->getName() : "");
+        mStaticText.setText(mComponentSignal ? *mComponentSignal->getName() : "");
     } else if (mDisplayType == CmpSigPinDisplayType::netSignal()) {
         mStaticText.setText(mComponentSignal ? mComponentSignal->getForcedNetName() : "");
     } else {

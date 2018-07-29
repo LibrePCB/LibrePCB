@@ -81,7 +81,7 @@ void PackagePadComboBox::setPackage(Package* package, Footprint* footprint) noex
 void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept
 {
     if (mPackage && pad) {
-        mComboBox->setCurrentIndex(mComboBox->findData(pad->getName(), Qt::UserRole));
+        mComboBox->setCurrentIndex(mComboBox->findData(*pad->getName(), Qt::UserRole));
     } else {
         mComboBox->setCurrentIndex(0);
     }
@@ -109,7 +109,7 @@ void PackagePadComboBox::updatePads() noexcept
     if (mPackage) {
         for (const PackagePad& pad : mPackage->getPads()) {
             if ((!mFootprint) || (!mFootprint->getPads().contains(pad.getUuid()))) {
-                mComboBox->addItem(pad.getName(), pad.getUuid().toStr());
+                mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
             }
         }
     }

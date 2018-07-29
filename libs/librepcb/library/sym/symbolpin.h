@@ -29,6 +29,7 @@
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/circuitidentifier.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -58,14 +59,14 @@ class SymbolPin final : public SerializableObject
         // Constructors / Destructor
         SymbolPin() = delete;
         SymbolPin(const SymbolPin& other) noexcept;
-        SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+        SymbolPin(const Uuid& uuid, const CircuitIdentifier& name, const Point& position,
                   const UnsignedLength& length, const Angle& rotation) noexcept;
         explicit SymbolPin(const SExpression& node);
         ~SymbolPin() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const CircuitIdentifier& getName() const noexcept {return mName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const UnsignedLength& getLength() const noexcept {return mLength;}
         const Angle& getRotation() const noexcept {return mRotation;}
@@ -74,7 +75,7 @@ class SymbolPin final : public SerializableObject
         void setPosition(const Point& pos) noexcept;
         void setLength(const UnsignedLength& length) noexcept;
         void setRotation(const Angle& rotation) noexcept;
-        void setName(const QString& name) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
 
         // General Methods
         void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
@@ -89,13 +90,9 @@ class SymbolPin final : public SerializableObject
         SymbolPin& operator=(const SymbolPin& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
-        QString mName;
+        CircuitIdentifier mName;
         Point mPosition;
         UnsignedLength mLength;
         Angle mRotation;

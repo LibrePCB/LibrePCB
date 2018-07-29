@@ -75,7 +75,7 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
-    setToolTip(mVia.getNetSignalOfNetSegment().getName());
+    setToolTip(*mVia.getNetSignalOfNetSegment().getName());
 
     mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
@@ -122,7 +122,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
         // draw netsignal name
         painter->setFont(mFont);
         painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, netsignal.getName());
+        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, *netsignal.getName());
     }
 
     if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {

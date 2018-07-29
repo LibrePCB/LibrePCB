@@ -90,24 +90,24 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
     QString text;
     library::CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
     if (displayType == library::CmpSigPinDisplayType::pinName()) {
-        text = mSymbolPin->getName();
+        text = *mSymbolPin->getName();
     } else  if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
         if (mComponentSignalInstance) {
-            text = mComponentSignalInstance->getCompSignal().getName();
+            text = *mComponentSignalInstance->getCompSignal().getName();
         }
     } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
         if (mComponentSignalInstance) {
             if (mComponentSignalInstance->getNetSignal()) {
-                text = mComponentSignalInstance->getNetSignal()->getName();
+                text = *mComponentSignalInstance->getNetSignal()->getName();
             }
         }
     } else if (displayType != library::CmpSigPinDisplayType::none()) {
         Q_ASSERT(false);
     }
     if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
-        text = mComponentSignalInstance->getCompSignal().getName();
+        text = *mComponentSignalInstance->getCompSignal().getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName();
+        text = *mSymbolPin->getName();
     return text;
 }
 

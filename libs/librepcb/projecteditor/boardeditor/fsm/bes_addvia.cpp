@@ -170,9 +170,9 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept
     mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
     mNetSignalComboBox->setEditable(false);
     foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
-        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
+        mNetSignalComboBox->addItem(*netsignal->getName(), netsignal->getUuid().toStr());
     mNetSignalComboBox->model()->sort(0);
-    mNetSignalComboBox->setCurrentText(mCurrentViaNetSignal ? mCurrentViaNetSignal->getName() : "");
+    mNetSignalComboBox->setCurrentText(mCurrentViaNetSignal ? *mCurrentViaNetSignal->getName() : "");
     mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
     connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
             [this](const QString& value)

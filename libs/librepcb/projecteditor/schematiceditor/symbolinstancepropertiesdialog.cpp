@@ -58,7 +58,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(Project& project,
 
     // Component Instance Attributes
     mUi->lblCompInstUuid->setText(mComponentInstance.getUuid().toStr());
-    mUi->edtCompInstName->setText(mComponentInstance.getName());
+    mUi->edtCompInstName->setText(*mComponentInstance.getName());
     mUi->edtCompInstValue->setText(mComponentInstance.getValue());
     mUi->attributeListEditorWidget->setAttributeList(mComponentInstance.getAttributes());
 
@@ -134,7 +134,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept
         // Component Instance
         QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
             new CmdComponentInstanceEdit(mProject.getCircuit(), mComponentInstance));
-        cmdCmp->setName(mUi->edtCompInstName->text().trimmed());
+        cmdCmp->setName(CircuitIdentifier(mUi->edtCompInstName->text().trimmed())); // can throw
         cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
         cmdCmp->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
         transaction.append(cmdCmp.take());

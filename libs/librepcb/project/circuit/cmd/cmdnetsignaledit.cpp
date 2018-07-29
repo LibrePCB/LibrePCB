@@ -50,7 +50,7 @@ CmdNetSignalEdit::~CmdNetSignalEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdNetSignalEdit::setName(const QString& name, bool isAutoName) noexcept
+void CmdNetSignalEdit::setName(const CircuitIdentifier& name, bool isAutoName) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

@@ -67,7 +67,7 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project& project, BI_Via& via
     mUi->spbxDrillDiameter->setValue(mVia.getDrillDiameter()->toMm());
 
     // netsignal combobox
-    mUi->lblNetSignal->setText(mVia.getNetSignalOfNetSegment().getName());
+    mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept

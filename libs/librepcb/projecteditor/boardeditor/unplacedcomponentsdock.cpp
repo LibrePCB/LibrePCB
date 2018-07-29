@@ -241,10 +241,10 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
 
             // add component to list
             int deviceCount = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
-            QString name = component->getName();
+            CircuitIdentifier name = component->getName();
             QString value = component->getValue(true).replace("\n", "|");
             ElementName compName = component->getLibComponent().getNames().value(mProject.getSettings().getLocaleOrder());
-            QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(name, value, *compName);
+            QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(*name, value, *compName);
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, component->getUuid().toStr());
         }

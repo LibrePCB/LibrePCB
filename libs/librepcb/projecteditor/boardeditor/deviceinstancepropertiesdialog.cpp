@@ -53,12 +53,12 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(Project& project,
     mUi->setupUi(this);
     connect(mUi->buttonBox, &QDialogButtonBox::clicked,
             this, &DeviceInstancePropertiesDialog::buttonBoxClicked);
-    setWindowTitle(QString(tr("Properties of %1")).arg(mDevice.getComponentInstance().getName()));
+    setWindowTitle(QString(tr("Properties of %1")).arg(*mDevice.getComponentInstance().getName()));
 
     // Component Instance Attributes
     ComponentInstance& cmp = mDevice.getComponentInstance();
     mUi->lblCompInstUuid->setText(cmp.getUuid().toStr());
-    mUi->edtCompInstName->setText(cmp.getName());
+    mUi->edtCompInstName->setText(*cmp.getName());
     mUi->edtCompInstValue->setText(cmp.getValue());
     mUi->attributeListEditorWidget->setAttributeList(cmp.getAttributes());
 
@@ -144,12 +144,12 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept
 {
     try {
         UndoStackTransaction transaction(mUndoStack, QString(
-            tr("Change properties of %1")).arg(mDevice.getComponentInstance().getName()));
+            tr("Change properties of %1")).arg(*mDevice.getComponentInstance().getName()));
 
         // Component Instance
         QScopedPointer<CmdComponentInstanceEdit> cmdCmp(new CmdComponentInstanceEdit(
             mProject.getCircuit(), mDevice.getComponentInstance()));
-        cmdCmp->setName(mUi->edtCompInstName->text().trimmed());
+        cmdCmp->setName(CircuitIdentifier(mUi->edtCompInstName->text().trimmed())); // can throw
         cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
         cmdCmp->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
         transaction.append(cmdCmp.take()); // can throw

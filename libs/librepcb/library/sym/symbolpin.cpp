@@ -44,23 +44,21 @@ SymbolPin::SymbolPin(const SymbolPin& other) noexcept :
 {
 }
 
-SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name, const Point& position,
                      const UnsignedLength& length, const Angle& rotation) noexcept :
     mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation),
     mRegisteredGraphicsItem(nullptr)
 {
-    Q_ASSERT(!mName.isEmpty());
 }
 
 SymbolPin::SymbolPin(const SExpression& node) :
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<QString>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
     mPosition(node.getChildByPath("pos")),
     mLength(node.getValueByPath<UnsignedLength>("length")),
     mRotation(node.getValueByPath<Angle>("rot")),
     mRegisteredGraphicsItem(nullptr)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SymbolPin::~SymbolPin() noexcept
@@ -72,9 +70,8 @@ SymbolPin::~SymbolPin() noexcept
  *  Setters
  ****************************************************************************************/
 
-void SymbolPin::setName(const QString& name) noexcept
+void SymbolPin::setName(const CircuitIdentifier& name) noexcept
 {
-    Q_ASSERT(!name.isEmpty());
     mName = name;
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setName(mName);
 }
@@ -115,8 +112,6 @@ void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept
 
 void SymbolPin::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
@@ -146,16 +141,6 @@ SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept
     mLength = rhs.mLength;
     mRotation = rhs.mRotation;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool SymbolPin::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

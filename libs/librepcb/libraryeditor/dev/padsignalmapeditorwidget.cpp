@@ -174,7 +174,7 @@ void PadSignalMapEditorWidget::updateTable() noexcept
         mTable->setRowCount(mPadSignalMap->count());
         for (int row = 0; row < mPads.count(); ++row) {
             const PackagePad& pad = *mPads.at(row);
-            setTableRowContent(row, pad.getUuid(), pad.getName(),
+            setTableRowContent(row, pad.getUuid(), *pad.getName(),
                 DevicePadSignalMapHelpers::tryGetSignalUuid(*mPadSignalMap, pad.getUuid()));
             if (pad.getUuid() == mSelectedPad) {
                 selectedRow = row;
@@ -224,7 +224,7 @@ void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
     signalComboBox->setFixedHeight(cbxHeight);
     signalComboBox->addItem(tr("(not connected)"));
     for (const ComponentSignal& sig : mSignals) {
-        signalComboBox->addItem(sig.getName(), sig.getUuid().toStr());
+        signalComboBox->addItem(*sig.getName(), sig.getUuid().toStr());
     }
     int currentIndex = signalUuid ? signalComboBox->findData(signalUuid->toStr(), Qt::UserRole) : -1;
     signalComboBox->setCurrentIndex(currentIndex > 0 ? currentIndex : 0);

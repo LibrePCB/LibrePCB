@@ -238,10 +238,10 @@ void Circuit::addNetSignal(NetSignal& netsignal)
             .arg(netsignal.getUuid().toStr()));
     }
     // check if there is no netsignal with the same name in the list
-    if (getNetSignalByName(netsignal.getName())) {
+    if (getNetSignalByName(*netsignal.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net signal with the name \"%1\"!"))
-            .arg(netsignal.getName()));
+            .arg(*netsignal.getName()));
     }
     // add netsignal to circuit
     netsignal.addToCircuit(); // can throw
@@ -261,7 +261,7 @@ void Circuit::removeNetSignal(NetSignal& netsignal)
     emit netSignalRemoved(netsignal);
 }
 
-void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName,
+void Circuit::setNetSignalName(NetSignal& netsignal, const CircuitIdentifier& newName,
                                bool isAutoName)
 {
     // check if the netsignal was added to the circuit
@@ -269,9 +269,9 @@ void Circuit::setNetSignalName(NetSignal& netsignal, const QString& newName,
         throw LogicError(__FILE__, __LINE__);
     }
     // check if there is no netsignal with the same name in the list
-    if (getNetSignalByName(newName)) {
+    if (getNetSignalByName(*newName)) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a net signal with the name \"%1\"!")).arg(newName));
+            QString(tr("There is already a net signal with the name \"%1\"!")).arg(*newName));
     }
     // apply the new name
     netsignal.setName(newName, isAutoName); // can throw
@@ -325,10 +325,10 @@ void Circuit::addComponentInstance(ComponentInstance& cmp)
             .arg(cmp.getUuid().toStr()));
     }
     // check if there is no component with the same name in the list
-    if (getComponentInstanceByName(cmp.getName())) {
+    if (getComponentInstanceByName(*cmp.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a component with the name \"%1\"!"))
-            .arg(cmp.getName()));
+            .arg(*cmp.getName()));
     }
     // add to circuit
     cmp.addToCircuit(); // can throw
@@ -348,16 +348,16 @@ void Circuit::removeComponentInstance(ComponentInstance& cmp)
     emit componentRemoved(cmp);
 }
 
-void Circuit::setComponentInstanceName(ComponentInstance& cmp, const QString& newName)
+void Circuit::setComponentInstanceName(ComponentInstance& cmp, const CircuitIdentifier& newName)
 {
     // check if the component instance was added to the circuit
     if (mComponentInstances.value(cmp.getUuid()) != &cmp) {
         throw LogicError(__FILE__, __LINE__);
     }
     // check if there is no component with the same name in the list
-    if ((newName != cmp.getName()) && getComponentInstanceByName(newName)) {
+    if ((newName != cmp.getName()) && getComponentInstanceByName(*newName)) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a component with the name \"%1\"!")).arg(newName));
+            QString(tr("There is already a component with the name \"%1\"!")).arg(*newName));
     }
     // apply the new name
     cmp.setName(newName); // can throw

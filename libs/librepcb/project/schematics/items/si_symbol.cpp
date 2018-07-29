@@ -122,7 +122,11 @@ SI_Symbol::~SI_Symbol() noexcept
 
 QString SI_Symbol::getName() const noexcept
 {
-    return mComponentInstance->getName() % mSymbVarItem->getSuffix();
+    if (mSymbVarItem->getSuffix()->isEmpty()) {
+        return *mComponentInstance->getName();
+    } else {
+        return mComponentInstance->getName() % "-" % mSymbVarItem->getSuffix();
+    }
 }
 
 /*****************************************************************************************

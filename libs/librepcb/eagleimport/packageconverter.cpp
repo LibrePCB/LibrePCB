@@ -137,7 +137,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
 
     foreach (const parseagle::ThtPad& pad, mPackage.getThtPads()) {
         Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
-        QString name = pad.getName();
+        CircuitIdentifier name(pad.getName()); // can throw
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
         UnsignedLength drillDiameter(Length::fromMm(pad.getDrillDiameter())); // can throw
@@ -171,7 +171,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
 
     foreach (const parseagle::SmtPad& pad, mPackage.getSmtPads()) {
         Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
-        QString name = pad.getName();
+        CircuitIdentifier name(pad.getName()); // can throw
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         GraphicsLayerName layerName = convertBoardLayer(pad.getLayer());
         library::FootprintPad::BoardSide side;

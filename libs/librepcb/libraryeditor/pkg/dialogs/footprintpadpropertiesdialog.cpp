@@ -50,7 +50,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(const Package& pkg,
     mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
     for (const PackagePad& p : pkg.getPads()) {
         if ((p.getUuid() == mPad.getUuid()) || (!fpt.getPads().contains(p.getUuid()))) {
-            mUi->cbxPackagePad->addItem(p.getName(), p.getUuid().toStr());
+            mUi->cbxPackagePad->addItem(*p.getName(), p.getUuid().toStr());
             if (mPad.getPackagePadUuid() == p.getUuid()) {
                 currentPadIndex = mUi->cbxPackagePad->count() - 1;
             }

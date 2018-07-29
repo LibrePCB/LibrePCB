@@ -305,7 +305,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (mComponent && mSymbVarItem && (key == QLatin1String("NAME"))) {
-        return mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix();
+        QString name = mComponent->getPrefixes().getDefaultValue() % "?";
+        if (!mSymbVarItem->getSuffix()->isEmpty()) name += "-" % mSymbVarItem->getSuffix();
+        return name;
     } else if (mComponent && (key == QLatin1String("NAME"))) {
         return mComponent->getPrefixes().getDefaultValue() % "?";
     } else {

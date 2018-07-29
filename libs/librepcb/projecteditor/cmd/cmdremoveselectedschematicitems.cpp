@@ -221,7 +221,7 @@ void CmdRemoveSelectedSchematicItems::splitUpNetSegment(SI_NetSegment& netsegmen
                 if (!newNetSignal) {
                     // create new netsignal
                     CmdNetSignalAdd* cmdAddNetSignal = new CmdNetSignalAdd(subsegment->getCircuit(),
-                        subsegment->getNetSignal().getNetClass(), forcedName);
+                        subsegment->getNetSignal().getNetClass(), CircuitIdentifier(forcedName)); // can throw
                     execNewChildCmd(cmdAddNetSignal); // can throw
                     newNetSignal = cmdAddNetSignal->getNetSignal(); Q_ASSERT(newNetSignal);
                 }
@@ -299,7 +299,8 @@ void CmdRemoveSelectedSchematicItems::removeNetLabel(SI_NetLabel& netlabel)
             cmd = new CmdNetSignalAdd(mSchematic.getProject().getCircuit(), netclass);
         } else if (names.values().first() != netlabel.getNetSignalOfNetSegment().getName()) {
             // create new netsignal with (first) forced name
-            cmd = new CmdNetSignalAdd(mSchematic.getProject().getCircuit(), netclass, names.values().first());
+            cmd = new CmdNetSignalAdd(mSchematic.getProject().getCircuit(), netclass,
+                                      CircuitIdentifier(names.values().first())); // can throw
         } else {
             // keep current name, as it is forced anyway
             return;

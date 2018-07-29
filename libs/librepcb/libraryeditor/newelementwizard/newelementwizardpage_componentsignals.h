@@ -73,7 +73,7 @@ class NewElementWizardPage_ComponentSignals final : public QWizardPage
 
 
     private: // Methods
-        QHash<Uuid, QString> getPinNames(const Uuid& symbol, const QString& suffix) const noexcept;
+        QHash<Uuid, CircuitIdentifier> getPinNames(const Uuid& symbol, const QString& suffix) const noexcept;
         void initializePage() noexcept override;
         void cleanupPage() noexcept override;
 

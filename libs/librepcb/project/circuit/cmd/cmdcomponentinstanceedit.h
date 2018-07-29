@@ -25,6 +25,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/attributes/attribute.h>
 
@@ -59,7 +60,7 @@ class CmdComponentInstanceEdit final : public UndoCommand
         ~CmdComponentInstanceEdit() noexcept;
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
         void setValue(const QString& value) noexcept;
         void setAttributes(const AttributeList& attributes) noexcept;
 
@@ -85,8 +86,8 @@ class CmdComponentInstanceEdit final : public UndoCommand
         ComponentInstance& mComponentInstance;
 
         // Misc
-        QString mOldName;
-        QString mNewName;
+        CircuitIdentifier mOldName;
+        CircuitIdentifier mNewName;
         QString mOldValue;
         QString mNewValue;
         AttributeList mOldAttributes;

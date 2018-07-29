@@ -57,7 +57,7 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project& project, BI_Plan
 
     // net signal combobox
     foreach (NetSignal* netsignal, mPlane.getCircuit().getNetSignals()) {
-        mUi->cbxNetSignal->addItem(netsignal->getName(), netsignal->getUuid().toStr());
+        mUi->cbxNetSignal->addItem(*netsignal->getName(), netsignal->getUuid().toStr());
     }
     mUi->cbxNetSignal->model()->sort(0);
     mUi->cbxNetSignal->setCurrentIndex(mUi->cbxNetSignal->findData(mPlane.getNetSignal().getUuid().toStr()));

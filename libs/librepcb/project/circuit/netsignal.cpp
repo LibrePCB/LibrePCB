@@ -44,7 +44,7 @@ namespace project {
 NetSignal::NetSignal(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<QString>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
     mHasAutoName(node.getValueByPath<bool>("auto")),
     mNetClass(nullptr)
 {
@@ -59,7 +59,7 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node) :
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-NetSignal::NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
+NetSignal::NetSignal(Circuit& circuit, NetClass& netclass, const CircuitIdentifier& name,
                      bool autoName) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false), mIsHighlighted(false),
     mUuid(Uuid::createRandom()), mName(name), mHasAutoName(autoName), mNetClass(&netclass)
@@ -106,14 +106,10 @@ bool NetSignal::isNameForced() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void NetSignal::setName(const QString& name, bool isAutoName)
+void NetSignal::setName(const CircuitIdentifier& name, bool isAutoName) noexcept
 {
     if ((name == mName) && (isAutoName == mHasAutoName)) {
         return;
-    }
-    if(name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The new netsignal name must not be empty!"));
     }
     mName = name;
     mHasAutoName = isAutoName;
@@ -151,7 +147,7 @@ void NetSignal::removeFromCircuit()
     if (isUsed()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The net signal \"%1\" cannot be removed because it is still in use!"))
-            .arg(mName));
+            .arg(*mName));
     }
     mNetClass->unregisterNetSignal(*this); // can throw
     mIsAddedToCircuit = false;
@@ -254,7 +250,6 @@ void NetSignal::serialize(SExpression& root) const
 
 bool NetSignal::checkAttributesValidity() const noexcept
 {
-    if (mName.isEmpty())        return false;
     if (mNetClass == nullptr)   return false;
     return true;
 }
@@ -266,7 +261,7 @@ void NetSignal::updateErcMessages() noexcept
             mErcMsgUnusedNetSignal.reset(new ErcMsg(mCircuit.getProject(), *this,
                 mUuid.toStr(), "Unused", ErcMsg::ErcMsgType_t::CircuitError, QString()));
         }
-        mErcMsgUnusedNetSignal->setMsg(QString(tr("Unused net signal: \"%1\"")).arg(mName));
+        mErcMsgUnusedNetSignal->setMsg(QString(tr("Unused net signal: \"%1\"")).arg(*mName));
         mErcMsgUnusedNetSignal->setVisible(true);
     }
     else if (mErcMsgUnusedNetSignal) {
@@ -279,7 +274,7 @@ void NetSignal::updateErcMessages() noexcept
                 mUuid.toStr(), "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning));
         }
         mErcMsgConnectedToLessThanTwoPins->setMsg(
-            QString(tr("Net signal connected to less than two pins: \"%1\"")).arg(mName));
+            QString(tr("Net signal connected to less than two pins: \"%1\"")).arg(*mName));
         mErcMsgConnectedToLessThanTwoPins->setVisible(true);
     }
     else if (mErcMsgConnectedToLessThanTwoPins) {

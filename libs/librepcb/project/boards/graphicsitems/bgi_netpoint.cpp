@@ -65,7 +65,7 @@ bool BGI_NetPoint::isSelectable() const noexcept
 
 void BGI_NetPoint::updateCacheAndRepaint() noexcept
 {
-    setToolTip(mNetPoint.getNetSignalOfNetSegment().getName());
+    setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
 
     prepareGeometryChange();
 

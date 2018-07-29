@@ -986,7 +986,7 @@ void Board::updateErcMessages() noexcept
             {
                 ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
                     component->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
-                    QString("Unplaced Component: %1 (Board: %2)").arg(component->getName(), *mName));
+                    QString("Unplaced Component: %1 (Board: %2)").arg(*component->getName(), *mName));
                 ercMsg->setVisible(true);
                 mErcMsgListUnplacedComponentInstances.insert(component->getUuid(), ercMsg);
             }

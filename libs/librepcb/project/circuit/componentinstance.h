@@ -29,6 +29,7 @@
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/attributes/attribute.h>
+#include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 
@@ -72,13 +73,13 @@ class ComponentInstance : public QObject, public AttributeProvider,
         ComponentInstance(const ComponentInstance& other) = delete;
         explicit ComponentInstance(Circuit& circuit, const SExpression& node);
         explicit ComponentInstance(Circuit& circuit, const library::Component& cmp,
-                                   const Uuid& symbVar, const QString& name,
+                                   const Uuid& symbVar, const CircuitIdentifier& name,
                                    const tl::optional<Uuid>& defaultDevice = tl::nullopt);
         ~ComponentInstance() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const CircuitIdentifier& getName() const noexcept {return mName;}
         QString getValue(bool replaceAttributes = false) const noexcept;
         const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {return mDefaultDeviceUuid;}
         const library::Component& getLibComponent() const noexcept {return *mLibComponent;}
@@ -104,13 +105,11 @@ class ComponentInstance : public QObject, public AttributeProvider,
          *          the whole circuit! This method will not check if the name is unique.
          *          The best way to do this is to call #project#Circuit#setComponentInstanceName().
          *
-         * @param name  The new name of this component in the circuit (must not be empty)
-         *
-         * @throw Exception If the new name is invalid, an exception will be thrown
-         *
+         * @param name  The new name of this component in the circuit
+         *         *
          * @undocmd{#project#CmdComponentInstanceEdit}
          */
-        void setName(const QString& name);
+        void setName(const CircuitIdentifier& name) noexcept;
 
         /**
          * @brief Set the value of this component instance in the circuit
@@ -173,7 +172,7 @@ class ComponentInstance : public QObject, public AttributeProvider,
         Uuid mUuid;
 
         /// @brief The unique name of this component instance in the circuit (e.g. "R42")
-        QString mName;
+        CircuitIdentifier mName;
 
         /// @brief The value of this component instance in the circuit (e.g. the resistance of a resistor)
         QString mValue;

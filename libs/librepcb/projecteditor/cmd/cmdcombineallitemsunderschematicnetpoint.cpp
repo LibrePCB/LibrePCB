@@ -112,14 +112,14 @@ bool CmdCombineAllItemsUnderSchematicNetPoint::performExecute()
     }
     foreach (NetSignal* netsignal, netSignalsUnderCursor) {
         if (netsignal->isNameForced()) {
-            forcedNetNames.insert(netsignal->getName());
+            forcedNetNames.insert(*netsignal->getName());
         }
     }
 
     // check forced net names
     QString nameOfResultingNetSignal;
     if (forcedNetNames.count() == 0) {
-        nameOfResultingNetSignal = mNetPoint.getNetSignalOfNetSegment().getName();
+        nameOfResultingNetSignal = *mNetPoint.getNetSignalOfNetSegment().getName();
     } else if (forcedNetNames.count() == 1) {
         nameOfResultingNetSignal = *forcedNetNames.constBegin();
     } else if (forcedNetNames.count() > 1) {
@@ -134,7 +134,7 @@ bool CmdCombineAllItemsUnderSchematicNetPoint::performExecute()
     if (!resultingNetSignal) {
         // rename current netsignal
         CmdNetSignalEdit* cmd = new CmdNetSignalEdit(mCircuit, mNetPoint.getNetSignalOfNetSegment());
-        cmd->setName(nameOfResultingNetSignal, false);
+        cmd->setName(CircuitIdentifier(nameOfResultingNetSignal), false); // can throw
         execNewChildCmd(cmd); // can throw
         resultingNetSignal = &mNetPoint.getNetSignalOfNetSegment();
     }

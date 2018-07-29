@@ -107,7 +107,7 @@ void PackagePadListEditorWidget::tableCellChanged(int row, int column) noexcept
         }
     } else if (isExistingPadRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            item->setText(setName(*uuid, cleanName(item->text())));
+            item->setText(*setName(*uuid, cleanName(item->text())));
         }
     }
 }
@@ -145,7 +145,7 @@ void PackagePadListEditorWidget::updateTable(const tl::optional<Uuid>& selected)
     // existing signals
     for (int i = 0; i < mPadList->count(); ++i) {
         const PackagePad& pad = *mPadList->at(i);
-        setTableRowContent(indexToRow(i), pad.getUuid(), pad.getName());
+        setTableRowContent(indexToRow(i), pad.getUuid(), *pad.getName());
         if (pad.getUuid() == selected) {
             selectedRow = indexToRow(i);
         }
@@ -200,9 +200,9 @@ void PackagePadListEditorWidget::setTableRowContent(int row, const tl::optional<
 void PackagePadListEditorWidget::addPad(const QString& name) noexcept
 {
     try {
-        throwIfNameEmptyOrExists(name);
+        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
         executeCommand(new CmdPackagePadInsert(*mPadList,
-            std::make_shared<PackagePad>(Uuid::createRandom(), name))); // can throw
+            std::make_shared<PackagePad>(Uuid::createRandom(), constrainedName))); // can throw
         //updateTable();
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not add pad"), e.getMsg());
@@ -220,7 +220,7 @@ void PackagePadListEditorWidget::removePad(const Uuid& uuid) noexcept
     }
 }
 
-QString PackagePadListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
+CircuitIdentifier PackagePadListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
 {
     PackagePad* pad = mPadList->find(uuid).get(); Q_ASSERT(pad);
     if (pad->getName() == name) {
@@ -228,11 +228,11 @@ QString PackagePadListEditorWidget::setName(const Uuid& uuid, const QString& nam
     }
 
     try {
-        throwIfNameEmptyOrExists(name);
+        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
         QScopedPointer<CmdPackagePadEdit> cmd(new CmdPackagePadEdit(*pad));
-        cmd->setName(name);
+        cmd->setName(constrainedName);
         executeCommand(cmd.take());
-        return name;
+        return constrainedName;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Invalid name"), e.getMsg());
         return pad->getName();
@@ -256,15 +256,13 @@ tl::optional<Uuid> PackagePadListEditorWidget::getUuidOfRow(int row) const noexc
     }
 }
 
-void PackagePadListEditorWidget::throwIfNameEmptyOrExists(const QString& name) const
+CircuitIdentifier PackagePadListEditorWidget::validateNameOrThrow(const QString& name) const
 {
-    if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-    }
     if (mPadList->contains(name)) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a pad with the name \"%1\".")).arg(name));
     }
+    return CircuitIdentifier(name); // can throw
 }
 
 QString PackagePadListEditorWidget::cleanName(const QString& name) noexcept

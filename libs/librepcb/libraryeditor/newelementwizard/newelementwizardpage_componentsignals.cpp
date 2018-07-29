@@ -71,15 +71,15 @@ int NewElementWizardPage_ComponentSignals::nextId() const noexcept
  *  Private Methods
  ****************************************************************************************/
 
-QHash<Uuid, QString> NewElementWizardPage_ComponentSignals::getPinNames(const Uuid& symbol,
-                                                                        const QString& suffix) const noexcept
+QHash<Uuid, CircuitIdentifier> NewElementWizardPage_ComponentSignals::getPinNames(
+        const Uuid& symbol, const QString& suffix) const noexcept
 {
-    QHash<Uuid, QString> names;
+    QHash<Uuid, CircuitIdentifier> names;
     try {
         FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(symbol); // can throw
         Symbol sym(fp, true); // can throw
         for (const SymbolPin& pin : sym.getPins()) {
-            names.insert(pin.getUuid(), suffix % pin.getName());
+            names.insert(pin.getUuid(), CircuitIdentifier(suffix % pin.getName())); // can throw
         }
     } catch (const Exception& e) {
         // TODO: what could we do here?
@@ -95,10 +95,14 @@ void NewElementWizardPage_ComponentSignals::initializePage() noexcept
     const ComponentSymbolVariant* variant = mContext.mComponentSymbolVariants.value(0).get();
     if (variant && mContext.mComponentSignals.count() < 1) {
         for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
-            QHash<Uuid, QString> names = getPinNames(item.getSymbolUuid(), *item.getSuffix());
+            QHash<Uuid, CircuitIdentifier> names = getPinNames(item.getSymbolUuid(),
+                                                               *item.getSuffix());
             for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
-                    Uuid::createRandom(), names.value(map.getPinUuid())));
+                auto i = names.find(map.getPinUuid());
+                if (i != names.end() && (i.key() == map.getPinUuid())) {
+                    mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
+                        Uuid::createRandom(), i.value()));
+                }
             }
         }
     }

@@ -134,8 +134,8 @@ void CompSymbVarPinSignalMapEditorWidget::btnAutoAssignSignalsClicked() noexcept
             FilePath fp = mWorkspace->getLibraryDb().getLatestSymbol(item.getSymbolUuid()); // can throw
             Symbol symbol(fp, true); // can throw
             for (ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                QString pinName = symbol.getPins().get(map.getPinUuid())->getName();
-                std::shared_ptr<const ComponentSignal> signal = mSignalList->find(pinName);
+                CircuitIdentifier pinName = symbol.getPins().get(map.getPinUuid())->getName();
+                std::shared_ptr<const ComponentSignal> signal = mSignalList->find(*pinName);
                 map.setSignalUuid(signal ? tl::make_optional(signal->getUuid()) : tl::nullopt);
             }
         }
@@ -209,7 +209,7 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
     const SymbolPin* pin = symbol ? symbol->getPins().find(map.getPinUuid()).get() : nullptr;
     QString pinName = QString::number(itemNumber) % "::";
     if (!item.getSuffix()->isEmpty()) pinName.append(item.getSuffix() % "::");
-    pinName.append(pin ? pin->getName() : "ERROR");
+    pinName.append(pin ? *pin->getName() : "ERROR");
     QTableWidgetItem* pinItem = new QTableWidgetItem(pinName);
     pinItem->setFlags(pinItem->flags() & ~Qt::ItemFlags(Qt::ItemIsEditable));
     pinItem->setData(Qt::UserRole, map.getPinUuid().toStr());
@@ -224,7 +224,7 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
     signalComboBox->setEnabled(symbol && pin ? true : false);
     signalComboBox->addItem(tr("(not connected)"));
     for (const ComponentSignal& sig : *mSignalList) {
-        signalComboBox->addItem(sig.getName(), sig.getUuid().toStr());
+        signalComboBox->addItem(*sig.getName(), sig.getUuid().toStr());
     }
     tl::optional<Uuid> currentSignal = map.getSignalUuid();
     int currentIndex = currentSignal ? signalComboBox->findData(currentSignal->toStr(), Qt::UserRole) : -1;

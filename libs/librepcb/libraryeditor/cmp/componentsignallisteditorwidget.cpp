@@ -262,7 +262,7 @@ void ComponentSignalListEditorWidget::updateTable() noexcept
         // existing signals
         for (int i = 0; i < mSignalList->count(); ++i) {
             const ComponentSignal& signal = *mSignalList->at(i);
-            setTableRowContent(indexToRow(i), signal.getUuid(), signal.getName(),
+            setTableRowContent(indexToRow(i), signal.getUuid(), *signal.getName(),
                                /*signal.getRole(),*/ signal.isRequired(), /*signal.isNegated(),
                                signal.isClock(),*/ signal.getForcedNetName());
             if (signal.getUuid() == mSelectedSignal) {
@@ -360,8 +360,9 @@ void ComponentSignalListEditorWidget::addSignal(const QString& name, /*const Sig
     bool required, /*bool negated, bool clock,*/ const QString& forcedNetName) noexcept
 {
     try {
-        throwIfNameEmptyOrExists(name);
-        std::shared_ptr<ComponentSignal> signal(new ComponentSignal(Uuid::createRandom(), name)); // can throw
+        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
+        std::shared_ptr<ComponentSignal> signal(new ComponentSignal(Uuid::createRandom(),
+                                                                    constrainedName)); // can throw
         //signal->setRole(role);
         signal->setIsRequired(required);
         //signal->setIsNegated(negated);
@@ -396,13 +397,13 @@ bool ComponentSignalListEditorWidget::setName(const Uuid& uuid, const QString& n
     try {
         ComponentSignal* signal = mSignalList->get(uuid).get(); // can throw
         if (signal->getName() == name) return true;
-        throwIfNameEmptyOrExists(name);
+        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
         if (mUndoStack) {
             QScopedPointer<CmdComponentSignalEdit> cmd(new CmdComponentSignalEdit(*signal));
-            cmd->setName(name);
+            cmd->setName(constrainedName);
             mUndoStack->execCmd(cmd.take());
         } else {
-            signal->setName(name);
+            signal->setName(constrainedName);
         }
         return true;
     } catch (const Exception& e) {
@@ -513,15 +514,13 @@ tl::optional<Uuid> ComponentSignalListEditorWidget::getUuidOfRow(int row) const 
     }
 }
 
-void ComponentSignalListEditorWidget::throwIfNameEmptyOrExists(const QString& name) const
+CircuitIdentifier ComponentSignalListEditorWidget::validateNameOrThrow(const QString& name) const
 {
-    if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-    }
     if (mSignalList->contains(name)) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a signal with the name \"%1\".")).arg(name));
     }
+    return CircuitIdentifier(name); // can throw
 }
 
 QString ComponentSignalListEditorWidget::cleanName(const QString& name) noexcept

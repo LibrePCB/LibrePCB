@@ -79,10 +79,11 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
         if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
         if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
         Uuid signalUuid = mDb.getComponentSignalUuid(component->getUuid(), gateName, pinName);
+        CircuitIdentifier signalName(pinName); // can throw
         if (!component->getSignals().contains(signalUuid)) {
             // create signal
             component->getSignals().append(std::make_shared<library::ComponentSignal>(
-                                               signalUuid, pinName));
+                                               signalUuid, signalName));
         }
     }
 

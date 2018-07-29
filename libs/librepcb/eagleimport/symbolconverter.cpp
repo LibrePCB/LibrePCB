@@ -129,10 +129,11 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
 
     foreach (const parseagle::Pin& pin, mSymbol.getPins()) {
         Uuid pinUuid = mDb.getSymbolPinUuid(symbol->getUuid(), pin.getName());
+        CircuitIdentifier pinName(pin.getName()); // can throw
         Point pos = Point::fromMm(pin.getPosition().x, pin.getPosition().y);
         UnsignedLength len(Length::fromMm(pin.getLengthInMillimeters())); // can throw
         Angle rot = Angle::fromDeg(pin.getRotation().getAngle());
-        symbol->getPins().append(std::make_shared<library::SymbolPin>(pinUuid, pin.getName(),
+        symbol->getPins().append(std::make_shared<library::SymbolPin>(pinUuid, pinName,
                                                                       pos, len, rot));
     }
 

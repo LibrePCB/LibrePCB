@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/signalrole.h>
+#include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
@@ -53,13 +54,13 @@ class ComponentSignal final : public QObject, public SerializableObject
         // Constructors / Destructor
         ComponentSignal() = delete;
         ComponentSignal(const ComponentSignal& other) noexcept;
-        ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
+        ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name) noexcept;
         explicit ComponentSignal(const SExpression& node);
         ~ComponentSignal() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const CircuitIdentifier& getName() const noexcept {return mName;}
         const SignalRole& getRole() const noexcept {return mRole;}
         const QString& getForcedNetName() const noexcept {return mForcedNetName;}
         bool isRequired() const noexcept {return mIsRequired;}
@@ -68,7 +69,7 @@ class ComponentSignal final : public QObject, public SerializableObject
         bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
         void setRole(const SignalRole& role) noexcept;
         void setForcedNetName(const QString& name) noexcept;
         void setIsRequired(bool required) noexcept;
@@ -88,7 +89,7 @@ class ComponentSignal final : public QObject, public SerializableObject
 
     signals:
         void edited();
-        void nameChanged(const QString& name);
+        void nameChanged(const CircuitIdentifier& name);
         void roleChanged(const SignalRole& role);
         void forcedNetNameChanged(const QString& name);
         void isRequiredChanged(bool required);
@@ -96,13 +97,9 @@ class ComponentSignal final : public QObject, public SerializableObject
         void isClockChanged(bool clock);
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
-        QString mName;
+        CircuitIdentifier mName;
         SignalRole mRole;
         QString mForcedNetName;
         bool mIsRequired;

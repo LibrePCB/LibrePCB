@@ -63,7 +63,7 @@ SGI_NetLine::~SGI_NetLine() noexcept
 
 void SGI_NetLine::updateCacheAndRepaint() noexcept
 {
-    setToolTip(mNetLine.getNetSignalOfNetSegment().getName());
+    setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
 
     prepareGeometryChange();
     mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
@@ -110,7 +110,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setPixelSize(3);
         painter->setFont(font);
         painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignalOfNetSegment().getName());
+        painter->drawText(mLineF.pointAt((qreal)0.5), *mNetLine.getNetSignalOfNetSegment().getName());
     }
     layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())

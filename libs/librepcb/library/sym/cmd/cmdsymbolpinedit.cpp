@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdsymbolpinedit.h"
-#include "../symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -54,7 +53,7 @@ CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdSymbolPinEdit::setName(const QString& name, bool immediate) noexcept
+void CmdSymbolPinEdit::setName(const CircuitIdentifier& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

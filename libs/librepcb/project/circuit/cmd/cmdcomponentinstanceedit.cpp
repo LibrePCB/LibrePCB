@@ -51,7 +51,7 @@ CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdComponentInstanceEdit::setName(const QString& name) noexcept
+void CmdComponentInstanceEdit::setName(const CircuitIdentifier& name) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

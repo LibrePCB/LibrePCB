@@ -91,9 +91,9 @@ QString BI_FootprintPad::getDisplayText() const noexcept
 {
     NetSignal* signal = getCompSigInstNetSignal();
     if (signal) {
-        return QString("%1:\n%2").arg(mPackagePad->getName(), signal->getName());
+        return QString("%1:\n%2").arg(*mPackagePad->getName(), *signal->getName());
     } else {
-        return mPackagePad->getName();
+        return *mPackagePad->getName();
     }
 }
 

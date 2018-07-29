@@ -112,7 +112,7 @@ class ComponentSignalListEditorWidget final : public QWidget,
         void setForcedNetName(const Uuid& uuid, const QString& netname) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
         tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-        void throwIfNameEmptyOrExists(const QString& name) const;
+        CircuitIdentifier validateNameOrThrow(const QString& name) const;
         static QString cleanName(const QString& name) noexcept;
         static QString cleanForcedNetName(const QString& name) noexcept;
 

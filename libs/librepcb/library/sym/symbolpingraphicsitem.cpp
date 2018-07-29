@@ -101,10 +101,10 @@ void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept
     mTextGraphicsItem->setPosition(Point(length + Length(800000), Length(0)));
 }
 
-void SymbolPinGraphicsItem::setName(const QString& name) noexcept
+void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept
 {
-    setToolTip(name);
-    mTextGraphicsItem->setText(name);
+    setToolTip(*name);
+    mTextGraphicsItem->setText(*name);
 }
 
 void SymbolPinGraphicsItem::setSelected(bool selected) noexcept

@@ -238,11 +238,11 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
             QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
             menu.addSeparator();
-            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(cmpInstance.getName()).arg(cmpInstance.getUnplacedSymbolsCount()));
+            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(*cmpInstance.getName()).arg(cmpInstance.getUnplacedSymbolsCount()));
             aPlaceUnplacedSymbols->setEnabled(cmpInstance.getUnplacedSymbolsCount() > 0);
             QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol->getName()));
             aRemoveSymbol->setEnabled(cmpInstance.getPlacedSymbolsCount() > 1);
-            QAction* aRemoveCmp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(cmpInstance.getName()));
+            QAction* aRemoveCmp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(*cmpInstance.getName()));
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
@@ -311,16 +311,17 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
                 NetSignal& netsignal = label->getNetSignalOfNetSegment();
                 QString name = QInputDialog::getText(&mEditor, tr("Change net of segment"),
                                                      tr("New net name:"), QLineEdit::Normal,
-                                                     netsignal.getName());
+                                                     *netsignal.getName());
                 if (!name.isNull()) {
                     try {
                         // change netsignal of netsegment
+                        CircuitIdentifier newName(name.trimmed()); // can throw
                         mUndoStack.beginCmdGroup(tr("Change netsignal of netsegment"));
                         NetSignal* newSignal = mCircuit.getNetSignalByName(name);
                         if (!newSignal) {
                             CmdNetSignalAdd* cmd = new CmdNetSignalAdd(mProject.getCircuit(),
                                                                        netsignal.getNetClass(),
-                                                                       name);
+                                                                       newName);
                             mUndoStack.appendToCmdGroup(cmd);
                             newSignal = cmd->getNetSignal();
                             Q_ASSERT(newSignal);
