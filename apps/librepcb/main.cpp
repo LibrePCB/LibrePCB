@@ -43,6 +43,7 @@ using namespace librepcb::application;
  ****************************************************************************************/
 
 static void setApplicationMetadata() noexcept;
+static void configureApplicationSettings() noexcept;
 static void writeLogHeader() noexcept;
 static void installTranslations() noexcept;
 static void init3rdPartyLibs() noexcept;
@@ -68,6 +69,9 @@ int main(int argc, char* argv[])
     // Creates the Debug object which installs the message handler. This must be done as
     // early as possible, but *after* setting application metadata (organization + name).
     Debug::instance();
+
+    // Configure the application settings format and location used by QSettings
+    configureApplicationSettings();
 
     // Write some information about the application instance to the log.
     writeLogHeader();
@@ -120,6 +124,39 @@ static void setApplicationMetadata() noexcept
 }
 
 /*****************************************************************************************
+ *  configureApplicationSettings()
+ ****************************************************************************************/
+
+static void configureApplicationSettings() noexcept
+{
+    // Migrate from old platform-dependent settings format to INI
+    // backward compatibility - remove this some time!
+    QSettings::setDefaultFormat(QSettings::NativeFormat);
+    QSettings oldSettings;
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings newSettings;
+    if (!FilePath(newSettings.fileName()).isExistingFile()) {
+        qInfo() << "Migrating old settings to" << newSettings.fileName();
+        foreach (const QString& key, oldSettings.allKeys()) {
+            newSettings.setValue(key, oldSettings.value(key));
+        }
+    }
+
+    // Make sure the INI format is used for settings on all platforms because:
+    // - Consistent storage format on all platforms
+    // - Useful for functional testing (control settings by fixtures)
+    // - Windows Registry is a mess (hard to find, edit and track changes of our settings)
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+
+    // Use different configuration directory if supplied by environment variable
+    // "LIBREPCB_CONFIG_DIR" (useful for functional testing)
+    QString customConfigDir = qgetenv("LIBREPCB_CONFIG_DIR");
+    if (!customConfigDir.isEmpty()) {
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, customConfigDir);
+    }
+}
+
+/*****************************************************************************************
  *  writeLogHeader()
  ****************************************************************************************/
 
@@ -134,6 +171,9 @@ static void writeLogHeader() noexcept
 
     // write resources directory path to log
     qInfo() << QString("Resources directory: %1").arg(qApp->getResourcesDir().toNative());
+
+    // write application settings directory to log (nice to know for users)
+    qInfo() << QString("Application settings: %1").arg(FilePath(QSettings().fileName()).toNative());
 }
 
 /*****************************************************************************************
