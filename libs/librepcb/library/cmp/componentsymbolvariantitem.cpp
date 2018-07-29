@@ -48,7 +48,8 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const ComponentSymbolVari
 }
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
-        const Uuid& symbolUuid, bool isRequired, const QString& suffix) noexcept :
+        const Uuid& symbolUuid, bool isRequired,
+        const ComponentSymbolVariantItemSuffix& suffix) noexcept :
     mUuid(uuid), mSymbolUuid(symbolUuid), mIsRequired(isRequired), mSuffix(suffix)
 {
 }
@@ -59,7 +60,7 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node) 
     mSymbolPos(node.getChildByPath("pos")),
     mSymbolRot(node.getValueByPath<Angle>("rot")),
     mIsRequired(node.getValueByPath<bool>("required")),
-    mSuffix(node.getValueByPath<QString>("suffix")),
+    mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
     mPinSignalMap(node)
 {
 }

@@ -259,7 +259,7 @@ void ComponentSymbolVariantItemListEditorWidget::updateTable(tl::optional<Uuid> 
     for (int i = 0; i < mItems->count(); ++i) {
         const ComponentSymbolVariantItem& item = *mItems->at(i);
         setTableRowContent(indexToRow(i), i + 1, item.getUuid(), item.getSymbolUuid(),
-                           item.getSuffix(), item.isRequired(), item.getSymbolPosition(),
+                           *item.getSuffix(), item.isRequired(), item.getSymbolPosition(),
                            item.getSymbolRotation());
         if (item.getUuid() == selected) {
             selectedRow = indexToRow(i);
@@ -411,10 +411,11 @@ void ComponentSymbolVariantItemListEditorWidget::addItem(const Uuid& symbol,
     const QString& suffix, bool required, const Point& pos, const Angle& rot) noexcept
 {
     try {
+        ComponentSymbolVariantItemSuffix constrainedSuffix(suffix); // can throw
         FilePath fp = mWorkspace->getLibraryDb().getLatestSymbol(symbol); // can throw
         Symbol sym(fp, true); // can throw
         std::shared_ptr<ComponentSymbolVariantItem> item(
-            new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, required, suffix));
+            new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, required, constrainedSuffix));
         item->getPinSignalMap() = ComponentPinSignalMapHelpers::create(sym.getPins().getUuidSet());
         item->setSymbolPosition(pos);
         item->setSymbolRotation(rot);
@@ -474,9 +475,13 @@ void ComponentSymbolVariantItemListEditorWidget::setIsRequired(const Uuid& uuid,
 
 void ComponentSymbolVariantItemListEditorWidget::setSuffix(const Uuid& uuid, const QString& suffix) noexcept
 {
-    Q_ASSERT(mItems->contains(uuid));
-    mItems->find(uuid)->setSuffix(suffix);
-    emit edited();
+    try {
+        Q_ASSERT(mItems->contains(uuid));
+        mItems->find(uuid)->setSuffix(ComponentSymbolVariantItemSuffix(suffix)); // can throw
+        emit edited();
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
 }
 
 void ComponentSymbolVariantItemListEditorWidget::setPosX(const Uuid& uuid, const Length& x) noexcept

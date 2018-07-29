@@ -91,12 +91,13 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
         QString gateName = gate.getName();
         QString symbolName = gate.getSymbol();
         Uuid symbolUuid = mDb.getSymbolUuid(symbolName);
+        library::ComponentSymbolVariantItemSuffix suffix((gateName == "G$1") ? "" : gateName); // can throw
 
         // create symbol variant item
         std::shared_ptr<library::ComponentSymbolVariantItem> item(
             new library::ComponentSymbolVariantItem(
                 mDb.getSymbolVariantItemUuid(component->getUuid(), gateName),
-                symbolUuid, true, (gateName == "G$1") ? "" : gateName));
+                symbolUuid, true, suffix));
 
         // connect pins
         foreach (const parseagle::Connection& connection, firstDevice.getConnections()) {

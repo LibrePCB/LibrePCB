@@ -95,7 +95,7 @@ void NewElementWizardPage_ComponentSignals::initializePage() noexcept
     const ComponentSymbolVariant* variant = mContext.mComponentSymbolVariants.value(0).get();
     if (variant && mContext.mComponentSignals.count() < 1) {
         for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
-            QHash<Uuid, QString> names = getPinNames(item.getSymbolUuid(), item.getSuffix());
+            QHash<Uuid, QString> names = getPinNames(item.getSymbolUuid(), *item.getSuffix());
             for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
                 mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
                     Uuid::createRandom(), names.value(map.getPinUuid())));

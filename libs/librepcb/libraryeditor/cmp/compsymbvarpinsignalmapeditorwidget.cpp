@@ -208,7 +208,7 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
     // pin
     const SymbolPin* pin = symbol ? symbol->getPins().find(map.getPinUuid()).get() : nullptr;
     QString pinName = QString::number(itemNumber) % "::";
-    if (!item.getSuffix().isEmpty()) pinName.append(item.getSuffix() % "::");
+    if (!item.getSuffix()->isEmpty()) pinName.append(item.getSuffix() % "::");
     pinName.append(pin ? pin->getName() : "ERROR");
     QTableWidgetItem* pinItem = new QTableWidgetItem(pinName);
     pinItem->setFlags(pinItem->flags() & ~Qt::ItemFlags(Qt::ItemIsEditable));
