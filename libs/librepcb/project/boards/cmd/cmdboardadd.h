@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
@@ -47,8 +48,8 @@ class CmdBoardAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdBoardAdd(Project& project, const QString& name) noexcept;
-        CmdBoardAdd(Project& project, const Board& boardToCopy, const QString& name) noexcept;
+        CmdBoardAdd(Project& project, const ElementName& name) noexcept;
+        CmdBoardAdd(Project& project, const Board& boardToCopy, const ElementName& name) noexcept;
         ~CmdBoardAdd() noexcept;
 
         // Getters
@@ -73,7 +74,7 @@ class CmdBoardAdd final : public UndoCommand
 
         Project& mProject;
         const Board* mBoardToCopy;
-        QString mName;
+        ElementName mName;
         Board* mBoard;
         int mPageIndex;
 };

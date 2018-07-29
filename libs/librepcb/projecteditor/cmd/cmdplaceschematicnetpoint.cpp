@@ -102,9 +102,9 @@ bool CmdPlaceSchematicNetPoint::performExecute()
 NetSignal& CmdPlaceSchematicNetPoint::createNewNetSignal()
 {
     // get or add netclass with the name "default"
-    NetClass* netclass = mCircuit.getNetClassByName("default");
+    NetClass* netclass = mCircuit.getNetClassByName(ElementName("default"));
     if (!netclass) {
-        CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, "default");
+        CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, ElementName("default"));
         execNewChildCmd(cmd); // can throw
         netclass = cmd->getNetClass();
     }

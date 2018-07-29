@@ -256,11 +256,11 @@ QString BI_Device::getUserDefinedAttributeValue(const QString& key) const noexce
 QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("DEVICE")) {
-        return mLibDevice->getNames().value(getLocaleOrder());
+        return *mLibDevice->getNames().value(getLocaleOrder());
     } else if (key == QLatin1String("PACKAGE")) {
-        return mLibPackage->getNames().value(getLocaleOrder());
+        return *mLibPackage->getNames().value(getLocaleOrder());
     } else if (key == QLatin1String("FOOTPRINT")) {
-        return mLibFootprint->getNames().value(getLocaleOrder());
+        return *mLibFootprint->getNames().value(getLocaleOrder());
     } else {
         return QString();
     }

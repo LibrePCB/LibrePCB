@@ -47,7 +47,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
     mUi(new Ui::LibraryOverviewWidget)
 {
     mUi->setupUi(this);
-    setWindowTitle(mLibrary->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mLibrary->getNames().value(getLibLocaleOrder()));
     updateIcon();
 
     // insert dependencies editor widget
@@ -58,7 +58,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
     mUi->formLayout->setWidget(row, QFormLayout::FieldRole, mDependenciesEditorWidget.data());
 
     mUi->lblUuid->setText(mLibrary->getUuid().toStr());
-    mUi->edtName->setText(mLibrary->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mLibrary->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mLibrary->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mLibrary->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mLibrary->getAuthor());
@@ -110,10 +110,7 @@ LibraryOverviewWidget::~LibraryOverviewWidget() noexcept
 bool LibraryOverviewWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
         Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mLibrary->setName("", name);

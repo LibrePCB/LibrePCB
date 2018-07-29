@@ -55,7 +55,7 @@ LibraryListEditorWidget::LibraryListEditorWidget(
     libs.append(mWorkspace.getRemoteLibraries().values());
     mUi->comboBox->addItem(tr("Enter Library UUID..."));
     foreach (const QSharedPointer<library::Library>& lib, libs) {
-        mUi->comboBox->addItem(lib->getIcon(), lib->getNames().value(localeOrder),
+        mUi->comboBox->addItem(lib->getIcon(), *lib->getNames().value(localeOrder),
                                lib->getUuid().toStr());
     }
 }
@@ -119,7 +119,7 @@ void LibraryListEditorWidget::addItem(const Uuid& library) noexcept
     libs.append(mWorkspace.getRemoteLibraries().values());
     foreach (const QSharedPointer<library::Library>& lib, libs) {
         if (lib->getUuid() == library) {
-            name = lib->getNames().value(localeOrder);
+            name = *lib->getNames().value(localeOrder);
             break;
         }
     }

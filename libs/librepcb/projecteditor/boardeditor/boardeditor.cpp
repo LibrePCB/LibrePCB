@@ -311,13 +311,13 @@ void BoardEditor::boardAdded(int newIndex)
 
     QAction* actionBefore = mBoardListActions.value(newIndex-1);
     //if (!actionBefore) actionBefore = TODO
-    QAction* newAction = new QAction(board->getName(), this);
+    QAction* newAction = new QAction(*board->getName(), this);
     newAction->setCheckable(true);
     mUi->menuBoard->insertAction(actionBefore, newAction);
     mBoardListActions.insert(newIndex, newAction);
     mBoardListActionGroup.addAction(newAction);
 
-    mUi->tabBar->insertTab(newIndex, board->getName());
+    mUi->tabBar->insertTab(newIndex, *board->getName());
 }
 
 void BoardEditor::boardRemoved(int oldIndex)
@@ -352,7 +352,7 @@ void BoardEditor::on_actionNewBoard_triggered()
 
     try
     {
-        CmdBoardAdd* cmd = new CmdBoardAdd(mProject, name);
+        CmdBoardAdd* cmd = new CmdBoardAdd(mProject, ElementName(name)); // can throw
         mProjectEditor.getUndoStack().execCmd(cmd);
         setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
     }
@@ -370,12 +370,12 @@ void BoardEditor::on_actionCopyBoard_triggered()
     bool ok = false;
     QString name = QInputDialog::getText(this, tr("Copy Board"),
                        tr("Choose a name:"), QLineEdit::Normal,
-                       QString(tr("copy_of_%1")).arg(board->getName()), &ok);
+                       QString(tr("copy_of_%1")).arg(*board->getName()), &ok);
     if (!ok) return;
 
     try
     {
-        CmdBoardAdd* cmd = new CmdBoardAdd(mProject, *board, name);
+        CmdBoardAdd* cmd = new CmdBoardAdd(mProject, *board, ElementName(name)); // can throw
         mProjectEditor.getUndoStack().execCmd(cmd);
         setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
     }
@@ -391,7 +391,7 @@ void BoardEditor::on_actionRemoveBoard_triggered()
     if (!board) return;
 
     QMessageBox::StandardButton btn = QMessageBox::question(this, tr("Remove board"),
-        QString(tr("Are you really sure to remove the board \"%1\"?")).arg(board->getName()));
+        QString(tr("Are you really sure to remove the board \"%1\"?")).arg(*board->getName()));
     if (btn != QMessageBox::Yes) return;
 
     try {

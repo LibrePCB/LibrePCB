@@ -94,10 +94,10 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
         void moveFootprintUp(int index) noexcept;
         void moveFootprintDown(int index) noexcept;
         void copyFootprint(const Uuid& uuid) noexcept;
-        QString setName(const Uuid& uuid, const QString& name) noexcept;
+        ElementName setName(const Uuid& uuid, const QString& name) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
         tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-        void throwIfNameEmptyOrExists(const QString& name) const;
+        ElementName validateNameOrThrow(const QString& name) const;
         static QString cleanName(const QString& name) noexcept;
 
         // row index <-> signal index conversion methods

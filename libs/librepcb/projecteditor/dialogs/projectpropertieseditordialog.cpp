@@ -46,7 +46,7 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(ProjectMetadata& me
 {
     mUi->setupUi(this);
 
-    mUi->edtName->setText(mMetadata.getName());
+    mUi->edtName->setText(*mMetadata.getName());
     mUi->edtAuthor->setText(mMetadata.getAuthor());
     mUi->edtVersion->setText(mMetadata.getVersion());
     mUi->lblCreatedDateTime->setText(mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
@@ -89,7 +89,7 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept
 {
     try {
         CmdProjectMetadataEdit* cmd = new CmdProjectMetadataEdit(mMetadata);
-        cmd->setName(mUi->edtName->text().trimmed());
+        cmd->setName(ElementName(mUi->edtName->text().trimmed())); // can throw
         cmd->setAuthor(mUi->edtAuthor->text().trimmed());
         cmd->setVersion(mUi->edtVersion->text().trimmed());
         cmd->setAttributes(mUi->attributeListEditorWidget->getAttributeList());

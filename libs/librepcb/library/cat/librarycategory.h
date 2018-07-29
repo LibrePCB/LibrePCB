@@ -51,7 +51,7 @@ class LibraryCategory : public LibraryBaseElement
         LibraryCategory(const LibraryCategory& other) = delete;
         LibraryCategory(const QString& shortElementName, const QString& longElementName,
                         const Uuid& uuid, const Version& version, const QString& author,
-                        const QString& name_en_US, const QString& description_en_US,
+                        const ElementName& name_en_US, const QString& description_en_US,
                         const QString& keywords_en_US );
         LibraryCategory(const FilePath& elementDirectory, const QString& shortElementName,
                         const QString& longElementName, bool readOnly);

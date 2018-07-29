@@ -35,7 +35,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicAdd::CmdSchematicAdd(Project& project, const QString& name) noexcept :
+CmdSchematicAdd::CmdSchematicAdd(Project& project, const ElementName& name) noexcept :
     UndoCommand(tr("Add schematic")),
     mProject(project), mName(name), mSchematic(nullptr), mPageIndex(-1)
 {

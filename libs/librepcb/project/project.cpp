@@ -356,7 +356,7 @@ Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-Schematic* Project::getSchematicByName(const QString& name) const noexcept
+Schematic* Project::getSchematicByName(const ElementName& name) const noexcept
 {
     foreach (Schematic* schematic, mSchematics) {
         if (schematic->getName() == name)
@@ -365,12 +365,12 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept
     return nullptr;
 }
 
-Schematic* Project::createSchematic(const QString& name)
+Schematic* Project::createSchematic(const ElementName& name)
 {
-    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    QString dirname = FilePath::cleanFileName(*name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid schematic name: \"%1\"")).arg(name));
+            QString(tr("Invalid schematic name: \"%1\"")).arg(*name));
     }
     FilePath filepath = mPath.getPathTo("schematics/" % dirname % "/schematic.lp");
     if (filepath.isExistingFile()) {
@@ -393,7 +393,7 @@ void Project::addSchematic(Schematic& schematic, int newIndex)
     if (getSchematicByName(schematic.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a schematic with the name \"%1\"!"))
-            .arg(schematic.getName()));
+            .arg(*schematic.getName()));
     }
 
     if ((newIndex < 0) || (newIndex > mSchematics.count())) {
@@ -419,7 +419,7 @@ void Project::removeSchematic(Schematic& schematic, bool deleteSchematic)
     if ((!deleteSchematic) && (!schematic.isEmpty())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There are still elements in the schematic \"%1\"!"))
-            .arg(schematic.getName()));
+            .arg(*schematic.getName()));
     }
 
     int index = getSchematicIndex(schematic);
@@ -474,7 +474,7 @@ Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-Board* Project::getBoardByName(const QString& name) const noexcept
+Board* Project::getBoardByName(const ElementName& name) const noexcept
 {
     foreach (Board* board, mBoards) {
         if (board->getName() == name)
@@ -483,12 +483,12 @@ Board* Project::getBoardByName(const QString& name) const noexcept
     return nullptr;
 }
 
-Board* Project::createBoard(const QString& name)
+Board* Project::createBoard(const ElementName& name)
 {
-    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    QString dirname = FilePath::cleanFileName(*name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid board name: \"%1\"")).arg(name));
+            QString(tr("Invalid board name: \"%1\"")).arg(*name));
     }
     FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
     if (filepath.isExistingFile()) {
@@ -498,12 +498,12 @@ Board* Project::createBoard(const QString& name)
     return Board::create(*this, filepath, name);
 }
 
-Board* Project::createBoard(const Board& other, const QString& name)
+Board* Project::createBoard(const Board& other, const ElementName& name)
 {
-    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    QString dirname = FilePath::cleanFileName(*name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
     if (dirname.isEmpty()) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid board name: \"%1\"")).arg(name));
+            QString(tr("Invalid board name: \"%1\"")).arg(*name));
     }
     FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
     if (filepath.isExistingFile()) {
@@ -526,7 +526,7 @@ void Project::addBoard(Board& board, int newIndex)
     if (getBoardByName(board.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a board with the name \"%1\"!"))
-            .arg(board.getName()));
+            .arg(*board.getName()));
     }
 
     if ((newIndex < 0) || (newIndex > mBoards.count())) {
@@ -599,7 +599,7 @@ QString Project::getUserDefinedAttributeValue(const QString& key) const noexcept
 QString Project::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("PROJECT")) {
-        return mProjectMetadata->getName();
+        return *mProjectMetadata->getName();
     } else if (key == QLatin1String("PROJECT_DIRPATH")) {
         return mPath.toNative();
     } else if (key == QLatin1String("PROJECT_BASENAME")) {

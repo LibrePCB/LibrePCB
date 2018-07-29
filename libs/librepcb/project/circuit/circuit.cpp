@@ -55,7 +55,7 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create) :
         if (create)
         {
             mFile = SmartSExprFile::create(mFilepath);
-            NetClass* netclass = new NetClass(*this, "default");
+            NetClass* netclass = new NetClass(*this, ElementName("default"));
             addNetClass(*netclass); // add a netclass with name "default"
         }
         else
@@ -126,7 +126,7 @@ NetClass* Circuit::getNetClassByUuid(const Uuid& uuid) const noexcept
     return mNetClasses.value(uuid, nullptr);
 }
 
-NetClass* Circuit::getNetClassByName(const QString& name) const noexcept
+NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept
 {
     foreach (NetClass* netclass, mNetClasses) {
         if (netclass->getName() == name) {
@@ -151,7 +151,7 @@ void Circuit::addNetClass(NetClass& netclass)
     if (getNetClassByName(netclass.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a net class with the name \"%1\"!"))
-            .arg(netclass.getName()));
+            .arg(*netclass.getName()));
     }
     // add netclass to circuit
     netclass.addToCircuit(); // can throw
@@ -171,7 +171,7 @@ void Circuit::removeNetClass(NetClass& netclass)
     emit netClassRemoved(netclass);
 }
 
-void Circuit::setNetClassName(NetClass& netclass, const QString& newName)
+void Circuit::setNetClassName(NetClass& netclass, const ElementName& newName)
 {
     // check if the netclass was added to the circuit
     if (mNetClasses.value(netclass.getUuid()) != &netclass) {
@@ -180,7 +180,7 @@ void Circuit::setNetClassName(NetClass& netclass, const QString& newName)
     // check if there is no netclass with the same name in the list
     if (getNetClassByName(newName)) {
         throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a net class with the name \"%1\"!")).arg(newName));
+            QString(tr("There is already a net class with the name \"%1\"!")).arg(*newName));
     }
     // apply the new name
     netclass.setName(newName); // can throw

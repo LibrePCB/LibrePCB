@@ -97,6 +97,8 @@ class WorkspaceLibraryScanner final : public QThread
                             const QString& table, const QString& idColumn, int libId);
         int addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
                            const QString& table, const QString& idColumn, int libId);
+        template <typename T>
+        static QVariant optionalToVariant(const T& opt) noexcept;
 
 
     private: // Data

@@ -54,11 +54,13 @@ PackageConverter::~PackageConverter() noexcept
 std::unique_ptr<library::Package> PackageConverter::generate() const
 {
     std::shared_ptr<library::Footprint> footprint(
-        new library::Footprint(mDb.getFootprintUuid(mPackage.getName()), "default", ""));
+        new library::Footprint(mDb.getFootprintUuid(mPackage.getName()),
+                               ElementName("default"), "")); // can throw
 
     std::unique_ptr<library::Package> package(
         new library::Package(mDb.getPackageUuid(mPackage.getName()), Version::fromString("0.1"),
-                             "LibrePCB", mPackage.getName(), createDescription(), ""));
+                             "LibrePCB", ElementName(mPackage.getName()),
+                             createDescription(), "")); // can throw
 
     foreach (const parseagle::Wire& wire, mPackage.getWires()) {
         GraphicsLayerName layerName = convertBoardLayer(wire.getLayer());

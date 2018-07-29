@@ -106,7 +106,7 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
             if (!mUuid)
                 return "(Without Category)";
             else if (mCategory)
-                return mCategory->getNames().value(mLocaleOrder);
+                return *mCategory->getNames().value(mLocaleOrder);
             else
                 return "(ERROR)";
 

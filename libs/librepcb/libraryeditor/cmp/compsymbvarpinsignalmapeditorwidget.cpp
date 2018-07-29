@@ -199,7 +199,7 @@ void CompSymbVarPinSignalMapEditorWidget::setTableRowContent(int row,
     int itemNumber, const Symbol* symbol) noexcept
 {
     // symbol
-    QString symbolName = symbol ? symbol->getNames().value(getLocaleOrder()) : "ERROR";
+    QString symbolName = symbol ? *symbol->getNames().value(getLocaleOrder()) : "ERROR";
     QTableWidgetItem* symbolItem = new QTableWidgetItem(symbolName);
     symbolItem->setFlags(symbolItem->flags() & ~Qt::ItemFlags(Qt::ItemIsEditable));
     symbolItem->setData(Qt::UserRole, item.getUuid().toStr());

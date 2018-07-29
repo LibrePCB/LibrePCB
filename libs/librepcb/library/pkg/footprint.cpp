@@ -49,13 +49,14 @@ Footprint::Footprint(const Footprint& other) noexcept :
 {
 }
 
-Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
+Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
                      const QString& description_en_US) :
-    mUuid(uuid), mPads(this), mPolygons(this), mCircles(this), mStrokeTexts(this), mHoles(this),
+    mUuid(uuid),
+    mNames(name_en_US),
+    mDescriptions(description_en_US),
+    mPads(this), mPolygons(this), mCircles(this), mStrokeTexts(this), mHoles(this),
     mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
-    mNames.setDefaultValue(name_en_US);
-    mDescriptions.setDefaultValue(description_en_US);
 }
 
 Footprint::Footprint(const SExpression& node) :

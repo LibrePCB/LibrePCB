@@ -280,7 +280,7 @@ void SchematicEditor::on_actionNew_Schematic_Page_triggered()
 
     try
     {
-        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
+        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, ElementName(name)); // can throw
         mProjectEditor.getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
@@ -309,7 +309,7 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 {
     try
     {
-        QString projectName = FilePath::cleanFileName(mProject.getMetadata().getName(),
+        QString projectName = FilePath::cleanFileName(*mProject.getMetadata().getName(),
                               FilePath::ReplaceSpaces | FilePath::KeepCase);
         QString projectVersion = FilePath::cleanFileName(mProject.getMetadata().getVersion(),
                                  FilePath::ReplaceSpaces | FilePath::KeepCase);

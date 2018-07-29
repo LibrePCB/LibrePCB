@@ -65,7 +65,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node) :
     BoardDesignRules() // this loads all default values!
 {
     // general attributes
-    mName = node.getValueByPath<QString>("name", true);
+    mName = node.getValueByPath<ElementName>("name");
     mDescription = node.getValueByPath<QString>("description");
     // stop mask
     if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_ratio")) {
@@ -220,8 +220,6 @@ BoardDesignRules& BoardDesignRules::operator=(const BoardDesignRules& rhs) noexc
 
 bool BoardDesignRules::checkAttributesValidity() const noexcept
 {
-    // general attributes
-    if (mName.isEmpty())                                    return false;
     // stop mask
     if (mStopMaskClearanceMax < mStopMaskClearanceMin)      return false;
     // cream mask

@@ -40,21 +40,14 @@ namespace project {
 NetClass::NetClass(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<QString>("name", true))
+    mName(node.getValueByPath<ElementName>("name"))
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-NetClass::NetClass(Circuit& circuit, const QString& name) :
+NetClass::NetClass(Circuit& circuit, const ElementName& name) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(Uuid::createRandom()), mName(name)
 {
-    if (mName.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The new netclass name must not be empty!"));
-    }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 NetClass::~NetClass() noexcept
@@ -67,14 +60,10 @@ NetClass::~NetClass() noexcept
  *  Setters
  ****************************************************************************************/
 
-void NetClass::setName(const QString& name)
+void NetClass::setName(const ElementName& name) noexcept
 {
     if (name == mName) {
         return;
-    }
-    if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The new netclass name must not be empty!"));
     }
     mName = name;
     updateErcMessages();
@@ -101,7 +90,7 @@ void NetClass::removeFromCircuit()
     if (isUsed()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The net class \"%1\" cannot be removed because it is still in use!"))
-            .arg(mName));
+            .arg(*mName));
     }
     mIsAddedToCircuit = false;
     updateErcMessages();
@@ -129,8 +118,6 @@ void NetClass::unregisterNetSignal(NetSignal& signal)
 
 void NetClass::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
 }
@@ -139,12 +126,6 @@ void NetClass::serialize(SExpression& root) const
  *  Private Methods
  ****************************************************************************************/
 
-bool NetClass::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
-}
-
 void NetClass::updateErcMessages() noexcept
 {
     if (mIsAddedToCircuit && (!isUsed())) {
@@ -152,7 +133,7 @@ void NetClass::updateErcMessages() noexcept
             mErcMsgUnusedNetClass.reset(new ErcMsg(mCircuit.getProject(), *this,
                 mUuid.toStr(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning));
         }
-        mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(mName));
+        mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(*mName));
         mErcMsgUnusedNetClass->setVisible(true);
     }
     else if (mErcMsgUnusedNetClass) {

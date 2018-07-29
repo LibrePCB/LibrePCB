@@ -54,7 +54,7 @@ class Library final : public LibraryBaseElement
         Library() = delete;
         Library(const Library& other) = delete;
         Library(const Uuid& uuid, const Version& version, const QString& author,
-                const QString& name_en_US, const QString& description_en_US,
+                const ElementName& name_en_US, const QString& description_en_US,
                 const QString& keywords_en_US);
         Library(const FilePath& libDir, bool readOnly);
         ~Library() noexcept;

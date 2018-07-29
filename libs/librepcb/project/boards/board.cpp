@@ -69,7 +69,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Board::Board(const Board& other, const FilePath& filepath, const QString& name) :
+Board::Board(const Board& other, const FilePath& filepath, const ElementName& name) :
     QObject(&other.getProject()), mProject(other.getProject()), mFilePath(filepath),
     mIsAddedToProject(false), mUuid(Uuid::createRandom()), mName(name),
     mDefaultFontFileName(other.mDefaultFontFileName)
@@ -146,8 +146,6 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
 
         connect(&mProject.getCircuit(), &Circuit::componentAdded, this, &Board::updateErcMessages);
         connect(&mProject.getCircuit(), &Circuit::componentRemoved, this, &Board::updateErcMessages);
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -174,7 +172,7 @@ Board::Board(const Board& other, const FilePath& filepath, const QString& name) 
 Board::Board(Project& project, const FilePath& filepath, bool restore,
              bool readOnly, bool create, const QString& newName) :
     QObject(&project), mProject(project), mFilePath(filepath), mIsAddedToProject(false),
-    mUuid(Uuid::createRandom())
+    mUuid(Uuid::createRandom()), mName("New Board")
 {
     try
     {
@@ -224,7 +222,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                 // backward compatibility, remove this some time!
                 mUuid = root.getValueByPath<Uuid>("uuid");
             }
-            mName = root.getValueByPath<QString>("name", true);
+            mName = root.getValueByPath<ElementName>("name");
             if (const SExpression* child = root.tryGetChildByPath("default_font")) {
                 mDefaultFontFileName = child->getValueOfFirstChild<QString>(true);
             } else {
@@ -323,8 +321,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
         connect(&mProject.getCircuit(), &Circuit::componentAdded, this, &Board::updateErcMessages);
         connect(&mProject.getCircuit(), &Circuit::componentRemoved, this, &Board::updateErcMessages);
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -924,7 +920,7 @@ std::unique_ptr<BoardSelectionQuery> Board::createSelectionQuery() const noexcep
 QString Board::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("BOARD")) {
-        return mName;
+        return *mName;
     } else {
         return QString();
     }
@@ -951,16 +947,8 @@ void Board::updateIcon() noexcept
     mIcon = QIcon(pixmap);
 }
 
-bool Board::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
-}
-
 void Board::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, true);
     root.appendChild("default_font", mDefaultFontFileName, true);
@@ -998,7 +986,7 @@ void Board::updateErcMessages() noexcept
             {
                 ErcMsg* ercMsg = new ErcMsg(mProject, *this, QString("%1/%2").arg(mUuid.toStr(),
                     component->getUuid().toStr()), "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
-                    QString("Unplaced Component: %1 (Board: %2)").arg(component->getName(), mName));
+                    QString("Unplaced Component: %1 (Board: %2)").arg(component->getName(), *mName));
                 ercMsg->setVisible(true);
                 mErcMsgListUnplacedComponentInstances.insert(component->getUuid(), ercMsg);
             }
@@ -1023,9 +1011,9 @@ void Board::updateErcMessages() noexcept
  *  Static Methods
  ****************************************************************************************/
 
-Board* Board::create(Project& project, const FilePath& filepath, const QString& name)
+Board* Board::create(Project& project, const FilePath& filepath, const ElementName& name)
 {
-    return new Board(project, filepath, false, false, true, name);
+    return new Board(project, filepath, false, false, true, *name);
 }
 
 /*****************************************************************************************

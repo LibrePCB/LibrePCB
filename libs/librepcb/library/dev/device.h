@@ -58,7 +58,7 @@ class Device final : public LibraryElement
         Device() = delete;
         Device(const Device& other) = delete;
         Device(const Uuid& uuid, const Version& version, const QString& author,
-               const QString& name_en_US, const QString& description_en_US,
+               const ElementName& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US, const Uuid& component, const Uuid& package);
         Device(const FilePath& elementDirectory, bool readOnly);
         ~Device() noexcept;

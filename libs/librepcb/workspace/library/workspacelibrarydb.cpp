@@ -360,20 +360,20 @@ void WorkspaceLibraryDb::getElementTranslations(const QString& table,
     query.bindValue(":filepath", elemDir.toRelative(mWorkspace.getLibrariesPath()));
     mDb->exec(query);
 
-    LocalizedNameMap nameMap;
-    LocalizedDescriptionMap descriptionMap;
-    LocalizedKeywordsMap keywordsMap;
+    LocalizedNameMap nameMap(ElementName("unknown"));
+    LocalizedDescriptionMap descriptionMap("unknown");
+    LocalizedKeywordsMap keywordsMap("unknown");
     while (query.next()) {
         QString locale      = query.value(0).toString();
         QString name        = query.value(1).toString();
         QString description = query.value(2).toString();;
         QString keywords    = query.value(3).toString();
-        if (!name.isNull())          nameMap.insert(locale, name);
+        if (!name.isNull())          nameMap.insert(locale, ElementName(name)); // can throw
         if (!description.isNull())   descriptionMap.insert(locale, description);
         if (!keywords.isNull())      keywordsMap.insert(locale, keywords);
     }
 
-    if (name) *name = nameMap.value(localeOrder);
+    if (name) *name = *nameMap.value(localeOrder);
     if (desc) *desc = descriptionMap.value(localeOrder);
     if (keywords) *keywords = keywordsMap.value(localeOrder);
 }

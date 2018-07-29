@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/elementname.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -51,7 +52,7 @@ class CmdNetClassEdit final : public UndoCommand
         ~CmdNetClassEdit() noexcept;
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const ElementName& name) noexcept;
 
 
     private:
@@ -75,8 +76,8 @@ class CmdNetClassEdit final : public UndoCommand
         NetClass& mNetClass;
 
         // General Attributes
-        QString mOldName;
-        QString mNewName;
+        ElementName mOldName;
+        ElementName mNewName;
 };
 
 /*****************************************************************************************

@@ -52,7 +52,7 @@ namespace project {
 Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                      bool readOnly, bool create, const QString& newName):
     QObject(&project), AttributeProvider(), mProject(project), mFilePath(filepath),
-    mIsAddedToProject(false), mUuid(Uuid::createRandom())
+    mIsAddedToProject(false), mUuid(Uuid::createRandom()), mName("New Page")
 {
     try
     {
@@ -82,7 +82,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
                 // backward compatibility, remove this some time!
                 mUuid = root.getValueByPath<Uuid>("uuid");
             }
-            mName = root.getValueByPath<QString>("name", true);
+            mName = root.getValueByPath<ElementName>("name");
 
             // Load grid properties
             mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
@@ -112,8 +112,6 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
 
         // emit the "attributesChanged" signal when the project has emited it
         connect(&mProject, &Project::attributesChanged, this, &Schematic::attributesChanged);
-
-        if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
     }
     catch (...)
     {
@@ -451,7 +449,7 @@ std::unique_ptr<SchematicSelectionQuery> Schematic::createSelectionQuery() const
 QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("SHEET")) {
-        return mName;
+        return *mName;
     } else if (key == QLatin1String("PAGE")) {
         return QString::number(mProject.getSchematicIndex(*this) + 1);
     } else {
@@ -480,16 +478,8 @@ void Schematic::updateIcon() noexcept
     mIcon = QIcon(pixmap);
 }
 
-bool Schematic::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
-}
-
 void Schematic::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, true);
     root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
@@ -505,9 +495,9 @@ void Schematic::serialize(SExpression& root) const
  ****************************************************************************************/
 
 Schematic* Schematic::create(Project& project, const FilePath& filepath,
-                             const QString& name)
+                             const ElementName& name)
 {
-    return new Schematic(project, filepath, false, false, true, name);
+    return new Schematic(project, filepath, false, false, true, *name);
 }
 
 /*****************************************************************************************

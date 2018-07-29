@@ -81,7 +81,7 @@ tl::optional<Uuid> SymbolChooserDialog::getSelectedSymbolUuid() const noexcept
 
 QString SymbolChooserDialog::getSelectedSymbolNameTr() const noexcept
 {
-    return mSelectedSymbol ? mSelectedSymbol->getNames().value(localeOrder()) : QString();
+    return mSelectedSymbol ? *mSelectedSymbol->getNames().value(localeOrder()) : QString();
 }
 
 QString SymbolChooserDialog::getSelectedSymbolDescriptionTr() const noexcept
@@ -163,7 +163,7 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept
         try {
             mSelectedSymbol.reset(new Symbol(fp, true)); // can throw
             mUi->lblSymbolUuid->setText(mSelectedSymbol->getUuid().toStr());
-            mUi->lblSymbolName->setText(mSelectedSymbol->getNames().value(localeOrder()));
+            mUi->lblSymbolName->setText(*mSelectedSymbol->getNames().value(localeOrder()));
             mUi->lblSymbolDescription->setText(mSelectedSymbol->getDescriptions().value(localeOrder()));
             mGraphicsItem.reset(new SymbolGraphicsItem(*mSelectedSymbol, mLayerProvider));
             mPreviewScene->addItem(*mGraphicsItem);

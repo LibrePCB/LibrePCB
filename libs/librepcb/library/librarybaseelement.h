@@ -57,7 +57,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
         LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
                            const QString& longElementName, const Uuid& uuid,
                            const Version& version, const QString& author,
-                           const QString& name_en_US, const QString& description_en_US,
+                           const ElementName& name_en_US, const QString& description_en_US,
                            const QString& keywords_en_US);
         LibraryBaseElement(const FilePath& elementDirectory, bool dirnameMustBeUuid,
                            const QString& shortElementName, const QString& longElementName,
@@ -83,7 +83,7 @@ class LibraryBaseElement : public QObject, public SerializableObject
         void setVersion(const Version& version) noexcept {mVersion = version;}
         void setAuthor(const QString& author) noexcept {mAuthor = author;}
         void setDeprecated(bool deprecated) noexcept {mIsDeprecated = deprecated;}
-        void setName(const QString& locale, const QString& name) noexcept {mNames.insert(locale, name);}
+        void setName(const QString& locale, const ElementName& name) noexcept {mNames.insert(locale, name);}
         void setDescription(const QString& locale, const QString& desc) noexcept {mDescriptions.insert(locale, desc);}
         void setKeywords(const QString& locale, const QString& keywords) noexcept {mKeywords.insert(locale, keywords);}
 

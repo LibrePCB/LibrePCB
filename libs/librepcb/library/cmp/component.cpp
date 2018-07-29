@@ -35,23 +35,23 @@ namespace library {
  ****************************************************************************************/
 
 Component::Component(const Uuid& uuid, const Version& version, const QString& author,
-                     const QString& name_en_US, const QString& description_en_US,
+                     const ElementName& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mSchematicOnly(false), mDefaultValue()
+    mSchematicOnly(false), mDefaultValue(), mPrefixes("")
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mSchematicOnly(false), mDefaultValue()
+    mSchematicOnly(false), mDefaultValue(), mPrefixes("")
 {
     // Load all properties
     mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");
     mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
     mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value");
-    mPrefixes.loadFromDomElement(mLoadingFileDocument);
+    mPrefixes = NormDependentPrefixMap(mLoadingFileDocument);
     mSignals.loadFromDomElement(mLoadingFileDocument);
     mSymbolVariants.loadFromDomElement(mLoadingFileDocument);
 
@@ -122,7 +122,6 @@ void Component::serialize(SExpression& root) const
 bool Component::checkAttributesValidity() const noexcept
 {
     if (!LibraryElement::checkAttributesValidity())                 return false;
-    if (!mPrefixes.contains(QString("")))                           return false;
     for (const ComponentSymbolVariant& var : mSymbolVariants) {
         for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
             for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {

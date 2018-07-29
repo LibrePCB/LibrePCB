@@ -63,7 +63,7 @@ class Symbol final : public LibraryElement, private SymbolPinList::IF_Observer,
         Symbol() = delete;
         Symbol(const Symbol& other) = delete;
         Symbol(const Uuid& uuid, const Version& version, const QString& author,
-               const QString& name_en_US, const QString& description_en_US,
+               const ElementName& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US);
         explicit Symbol(const FilePath& elementDirectory, bool readOnly);
         ~Symbol() noexcept;

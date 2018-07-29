@@ -371,7 +371,7 @@ QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const no
     } else if (key == QLatin1String("VALUE")) {
         return mValue;
     } else if (key == QLatin1String("COMPONENT")) {
-        return mLibComponent->getNames().value(getLocaleOrder());
+        return *mLibComponent->getNames().value(getLocaleOrder());
     } else {
         return QString();
     }

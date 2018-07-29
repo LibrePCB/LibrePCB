@@ -30,6 +30,7 @@
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 #include "../erc/if_ercmsgprovider.h"
@@ -111,7 +112,7 @@ class Board final : public QObject, public AttributeProvider,
         // Constructors / Destructor
         Board() = delete;
         Board(const Board& other) = delete;
-        Board(const Board& other, const FilePath& filepath, const QString& name);
+        Board(const Board& other, const FilePath& filepath, const ElementName& name);
         Board(Project& project, const FilePath& filepath, bool restore, bool readOnly) :
             Board(project, filepath, restore, readOnly, false, QString()) {}
         ~Board() noexcept;
@@ -143,7 +144,7 @@ class Board final : public QObject, public AttributeProvider,
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const ElementName& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
         const QString& getDefaultFontName() const noexcept {return mDefaultFontFileName;}
 
@@ -209,7 +210,7 @@ class Board final : public QObject, public AttributeProvider,
 
         // Static Methods
         static Board* create(Project& project, const FilePath& filepath,
-                             const QString& name);
+                             const ElementName& name);
 
 
     signals:
@@ -226,7 +227,6 @@ class Board final : public QObject, public AttributeProvider,
         Board(Project& project, const FilePath& filepath, bool restore,
               bool readOnly, bool create, const QString& newName);
         void updateIcon() noexcept;
-        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
@@ -250,7 +250,7 @@ class Board final : public QObject, public AttributeProvider,
 
         // Attributes
         Uuid mUuid;
-        QString mName;
+        ElementName mName;
         QIcon mIcon;
         QString mDefaultFontFileName;
 

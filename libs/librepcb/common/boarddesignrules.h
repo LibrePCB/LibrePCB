@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "fileio/serializableobject.h"
+#include "elementname.h"
 #include "exceptions.h"
 #include "units/all_length_units.h"
 
@@ -56,7 +57,7 @@ class BoardDesignRules final : public SerializableObject
         ~BoardDesignRules() noexcept;
 
         // Getters : General Attributes
-        const QString& getName() const noexcept {return mName;}
+        const ElementName& getName() const noexcept {return mName;}
         const QString& getDescription() const noexcept {return mDescription;}
 
         // Getters: Stop Mask
@@ -80,7 +81,7 @@ class BoardDesignRules final : public SerializableObject
 
 
         // Setters: General Attributes
-        void setName(const QString& name) noexcept {if (!name.isEmpty()) mName = name;}
+        void setName(const ElementName& name) noexcept {mName = name;}
         void setDescription(const QString& desc) noexcept {mDescription = desc;}
 
         // Setters: Stop Mask
@@ -124,7 +125,7 @@ class BoardDesignRules final : public SerializableObject
 
 
         // General Attributes
-        QString mName;
+        ElementName mName;
         QString mDescription;
 
         // Stop Mask

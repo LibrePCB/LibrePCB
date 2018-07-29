@@ -107,7 +107,7 @@ void FootprintListEditorWidget::tableCellChanged(int row, int column) noexcept
         }
     } else if (isExistingFootprintRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            item->setText(setName(*uuid, cleanName(item->text())));
+            item->setText(*setName(*uuid, cleanName(item->text())));
         }
     }
 }
@@ -176,7 +176,7 @@ void FootprintListEditorWidget::updateTable(tl::optional<Uuid> selected) noexcep
     // existing signals
     for (int i = 0; i < mFootprintList->count(); ++i) {
         const Footprint& footprint = *mFootprintList->at(i);
-        setTableRowContent(indexToRow(i), footprint.getUuid(), footprint.getNames().getDefaultValue());
+        setTableRowContent(indexToRow(i), footprint.getUuid(), *footprint.getNames().getDefaultValue());
         if (footprint.getUuid() == selected) {
             selectedRow = indexToRow(i);
         }
@@ -270,10 +270,10 @@ void FootprintListEditorWidget::setTableRowContent(int row, const tl::optional<U
 void FootprintListEditorWidget::addFootprint(const QString& name) noexcept
 {
     try {
-        throwIfNameEmptyOrExists(name);
+        ElementName elementName = validateNameOrThrow(name); // can throw
         Uuid uuid = Uuid::createRandom();
         mUndoStack->execCmd(new CmdFootprintInsert(*mFootprintList,
-            std::make_shared<Footprint>(uuid, name, ""))); // can throw
+            std::make_shared<Footprint>(uuid, elementName, ""))); // can throw
         updateTable(uuid);
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not add footprint"), e.getMsg());
@@ -314,8 +314,8 @@ void FootprintListEditorWidget::copyFootprint(const Uuid& uuid) noexcept
 {
     try {
         const Footprint* original = mFootprintList->get(uuid).get(); // can throw
-        std::shared_ptr<Footprint> copy(new Footprint(Uuid::createRandom(),
-                                        "Copy of " % original->getNames().getDefaultValue(), "")); // can throw
+        ElementName newName("Copy of " % original->getNames().getDefaultValue()); // can throw
+        std::shared_ptr<Footprint> copy(new Footprint(Uuid::createRandom(), newName, "")); // can throw
         copy->getDescriptions() = original->getDescriptions();
         copy->getPads() = original->getPads();
         copy->getPolygons() = original->getPolygons();
@@ -329,7 +329,7 @@ void FootprintListEditorWidget::copyFootprint(const Uuid& uuid) noexcept
     }
 }
 
-QString FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
+ElementName FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
 {
     Footprint* footprint = mFootprintList->find(uuid).get(); Q_ASSERT(footprint);
     if (footprint->getNames().getDefaultValue() == name) {
@@ -337,11 +337,11 @@ QString FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name
     }
 
     try {
-        throwIfNameEmptyOrExists(name);
+        ElementName elementName = validateNameOrThrow(name); // can throw
         QScopedPointer<CmdFootprintEdit> cmd(new CmdFootprintEdit(*footprint));
-        cmd->setName(name);
+        cmd->setName(elementName);
         mUndoStack->execCmd(cmd.take());
-        return name;
+        return elementName;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Invalid name"), e.getMsg());
         return footprint->getNames().getDefaultValue();
@@ -365,17 +365,15 @@ tl::optional<Uuid> FootprintListEditorWidget::getUuidOfRow(int row) const noexce
     }
 }
 
-void FootprintListEditorWidget::throwIfNameEmptyOrExists(const QString& name) const
+ElementName FootprintListEditorWidget::validateNameOrThrow(const QString& name) const
 {
-    if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-    }
     for (const Footprint& footprint : *mFootprintList) {
         if (footprint.getNames().getDefaultValue() == name) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("There is already a footprint with the name \"%1\".")).arg(name));
         }
     }
+    return ElementName(name); // can throw
 }
 
 QString FootprintListEditorWidget::cleanName(const QString& name) noexcept

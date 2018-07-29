@@ -40,7 +40,7 @@ namespace editor {
 NewElementWizardContext::NewElementWizardContext(const workspace::Workspace& ws,
         const Library& lib, const IF_GraphicsLayerProvider& lp, QObject* parent) noexcept :
     QObject(parent), mWorkspace(ws), mLibrary(lib), mLayerProvider(lp),
-    mElementType(ElementType::None)
+    mElementType(ElementType::None), mComponentPrefixes("")
 {
     reset();
 }
@@ -66,7 +66,7 @@ void NewElementWizardContext::reset() noexcept
 {
     // common
     mElementType = ElementType::None;
-    mElementName.clear();
+    mElementName = tl::nullopt;
     mElementDescription.clear();
     mElementKeywords.clear();
     mElementAuthor = SystemInfo::getFullUsername();
@@ -87,7 +87,7 @@ void NewElementWizardContext::reset() noexcept
     mComponentSchematicOnly = false;
     mComponentAttributes.clear();
     mComponentDefaultValue.clear();
-    mComponentPrefixes.clear();
+    mComponentPrefixes = NormDependentPrefixMap("");
     mComponentSignals.clear();
     mComponentSymbolVariants.clear();
 
@@ -103,12 +103,13 @@ void NewElementWizardContext::createLibraryElement()
         categories.insert(*mElementCategoryUuid);
     }
 
+    if (!mElementName) throw LogicError(__FILE__, __LINE__);
     if (!mElementVersion) throw LogicError(__FILE__, __LINE__);
 
     switch (mElementType) {
         case NewElementWizardContext::ElementType::ComponentCategory: {
             ComponentCategory element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords);
             element.setParentUuid(mElementCategoryUuid);
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<ComponentCategory>());
             mOutputDirectory = element.getFilePath();
@@ -116,7 +117,7 @@ void NewElementWizardContext::createLibraryElement()
         }
         case NewElementWizardContext::ElementType::PackageCategory: {
             PackageCategory element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords);
             element.setParentUuid(mElementCategoryUuid);
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<PackageCategory>());
             mOutputDirectory = element.getFilePath();
@@ -124,7 +125,7 @@ void NewElementWizardContext::createLibraryElement()
         }
         case NewElementWizardContext::ElementType::Symbol: {
             Symbol element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.getPins() = mSymbolPins;
             element.getPolygons() = mSymbolPolygons;
@@ -136,13 +137,14 @@ void NewElementWizardContext::createLibraryElement()
         }
         case NewElementWizardContext::ElementType::Package: {
             Package element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.getPads() = mPackagePads;
             element.getFootprints() = mPackageFootprints;
             if (element.getFootprints().isEmpty()) {
                 element.getFootprints().append(
-                    std::make_shared<Footprint>(Uuid::createRandom(), "default", ""));
+                    std::make_shared<Footprint>(Uuid::createRandom(),
+                                                ElementName("default"), ""));
             }
             element.saveIntoParentDirectory(mLibrary.getElementsDirectory<Package>());
             mOutputDirectory = element.getFilePath();
@@ -150,7 +152,7 @@ void NewElementWizardContext::createLibraryElement()
         }
         case NewElementWizardContext::ElementType::Component: {
             Component element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords);
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords);
             element.setCategories(categories);
             element.setIsSchematicOnly(mComponentSchematicOnly);
             element.getAttributes() = mComponentAttributes;
@@ -166,7 +168,7 @@ void NewElementWizardContext::createLibraryElement()
             if (!mDeviceComponentUuid) throw LogicError(__FILE__, __LINE__);
             if (!mDevicePackageUuid) throw LogicError(__FILE__, __LINE__);
             Device element(Uuid::createRandom(), *mElementVersion,
-                mElementAuthor, mElementName, mElementDescription, mElementKeywords,
+                mElementAuthor, *mElementName, mElementDescription, mElementKeywords,
                 *mDeviceComponentUuid, *mDevicePackageUuid);
             element.setCategories(categories);
             element.getPadSignalMap() = mDevicePadSignalMap;

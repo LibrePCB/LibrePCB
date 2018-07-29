@@ -41,7 +41,7 @@ namespace library {
 LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
                                        const QString& longElementName, const Uuid& uuid,
                                        const Version& version, const QString& author,
-                                       const QString& name_en_US,
+                                       const ElementName& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) :
     QObject(nullptr), mDirectory(FilePath::getRandomTempPath()),
@@ -49,13 +49,12 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName),
     mUuid(uuid), mVersion(version), mAuthor(author),
-    mCreated(QDateTime::currentDateTime()), mIsDeprecated(false)
+    mCreated(QDateTime::currentDateTime()), mIsDeprecated(false),
+    mNames(name_en_US),
+    mDescriptions(description_en_US),
+    mKeywords(keywords_en_US)
 {
     FileUtils::makePath(mDirectory); // can throw
-
-    mNames.setDefaultValue(name_en_US);
-    mDescriptions.setDefaultValue(description_en_US);
-    mKeywords.setDefaultValue(keywords_en_US);
 }
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
@@ -66,7 +65,10 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mOpenedReadOnly(readOnly), mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName),
     mUuid(Uuid::createRandom()), // just for initialization, will be overwritten
-    mVersion(Version::fromString("0.1")) // just for initialization, will be overwritten
+    mVersion(Version::fromString("0.1")), // just for initialization, will be overwritten
+    mNames(ElementName("unknown")), // just for initialization, will be overwritten
+    mDescriptions(""),
+    mKeywords("")
 {
     // determine the filepath to the version file
     FilePath versionFilePath = mDirectory.getPathTo(".librepcb-" % mShortElementName);
@@ -113,9 +115,9 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
 
     // read names, descriptions and keywords in all available languages
-    mNames.loadFromDomElement(mLoadingFileDocument);
-    mDescriptions.loadFromDomElement(mLoadingFileDocument);
-    mKeywords.loadFromDomElement(mLoadingFileDocument);
+    mNames = LocalizedNameMap(mLoadingFileDocument);
+    mDescriptions = LocalizedDescriptionMap(mLoadingFileDocument);
+    mKeywords = LocalizedKeywordsMap(mLoadingFileDocument);
 
     // check if the UUID equals to the directory basename
     if (mDirectoryNameMustBeUuid && (mUuid.toStr() != dirUuidStr)) {
@@ -266,7 +268,6 @@ void LibraryBaseElement::serialize(SExpression& root) const
 
 bool LibraryBaseElement::checkAttributesValidity() const noexcept
 {
-    if (mNames.getDefaultValue().isEmpty()) return false;
     return true;
 }
 

@@ -222,7 +222,7 @@ void ComponentSymbolVariantListWidget::updateTable() noexcept
         for (int i = 0; i < mVariantList->count(); ++i) {
             const ComponentSymbolVariant& variant = *mVariantList->at(i);
             setTableRowContent(indexToRow(i), variant.getUuid(),
-                               variant.getNames().getDefaultValue(),
+                               *variant.getNames().getDefaultValue(),
                                variant.getDescriptions().getDefaultValue(),
                                variant.getNorm(), variant.getSymbolItems().count());
             if (variant.getUuid() == mSelectedVariant) {
@@ -349,12 +349,9 @@ void ComponentSymbolVariantListWidget::addVariant(const QString& name, const QSt
     const QString& norm) noexcept
 {
     try {
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The name must not be empty.")).arg(name));
-        }
+        ElementName elementName(name); // can throw
         std::shared_ptr<ComponentSymbolVariant> variant(
-            new ComponentSymbolVariant(Uuid::createRandom(), norm, name, desc)); // can throw
+            new ComponentSymbolVariant(Uuid::createRandom(), norm, elementName, desc)); // can throw
         mUndoStack->execCmd(new CmdComponentSymbolVariantInsert(*mVariantList, variant)); // can throw
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not add symbol variant"), e.getMsg());

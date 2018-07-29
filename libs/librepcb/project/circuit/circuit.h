@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 
@@ -86,10 +87,10 @@ class Circuit final : public QObject, public SerializableObject
         // NetClass Methods
         const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
-        NetClass* getNetClassByName(const QString& name) const noexcept;
+        NetClass* getNetClassByName(const ElementName& name) const noexcept;
         void addNetClass(NetClass& netclass);
         void removeNetClass(NetClass& netclass);
-        void setNetClassName(NetClass& netclass, const QString& newName);
+        void setNetClassName(NetClass& netclass, const ElementName& newName);
 
         // NetSignal Methods
         QString generateAutoNetSignalName() const noexcept;

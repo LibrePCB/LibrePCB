@@ -54,11 +54,11 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(const Context& cont
             this, &ComponentCategoryEditorWidget::edtParentTextChanged);
 
     mCategory.reset(new ComponentCategory(fp, false)); // can throw
-    setWindowTitle(mCategory->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mCategory->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mCategory->getFilePath().toQUrl().toString(), mCategory->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mCategory->getFilePath().toNative());
-    mUi->edtName->setText(mCategory->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mCategory->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mCategory->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mCategory->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mCategory->getAuthor());
@@ -87,10 +87,7 @@ ComponentCategoryEditorWidget::~ComponentCategoryEditorWidget() noexcept
 bool ComponentCategoryEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
         Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
         QString parentUuidStr = mUi->edtParent->text().trimmed();
         tl::optional<Uuid> parentUuid;

@@ -162,7 +162,7 @@ void BI_NetPoint::init()
     mErcMsgDeadNetPoint.reset(new ErcMsg(mBoard.getProject(), *this,
         mUuid.toStr(), "Dead", ErcMsg::ErcMsgType_t::BoardError,
         QString(tr("Dead net point in board page \"%1\": %2"))
-        .arg(mBoard.getName()).arg(mUuid.toStr())));
+        .arg(*mBoard.getName()).arg(mUuid.toStr())));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }

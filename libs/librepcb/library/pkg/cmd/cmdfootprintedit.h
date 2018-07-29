@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/elementname.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -52,7 +53,7 @@ class CmdFootprintEdit final : public UndoCommand
         ~CmdFootprintEdit() noexcept;
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const ElementName& name) noexcept;
 
         // Operator Overloadings
         CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
@@ -78,8 +79,8 @@ class CmdFootprintEdit final : public UndoCommand
         Footprint& mFootprint;
 
         // General Attributes
-        QString mOldName;
-        QString mNewName;
+        ElementName mOldName;
+        ElementName mNewName;
 };
 
 /*****************************************************************************************

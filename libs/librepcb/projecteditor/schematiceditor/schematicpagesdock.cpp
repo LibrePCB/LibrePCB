@@ -97,7 +97,7 @@ void SchematicPagesDock::schematicAdded(int newIndex)
     Q_ASSERT(schematic); if (!schematic) return;
 
     QListWidgetItem* item = new QListWidgetItem();
-    item->setText(QString("%1: %2").arg(newIndex+1).arg(schematic->getName()));
+    item->setText(QString("%1: %2").arg(newIndex+1).arg(*schematic->getName()));
     item->setIcon(schematic->getIcon());
     mUi->listWidget->insertItem(newIndex, item);
 }
@@ -122,7 +122,7 @@ void SchematicPagesDock::on_btnNewSchematic_clicked()
 
     try
     {
-        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
+        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, ElementName(name)); // can throw
         mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)

@@ -180,7 +180,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
     try {
         // create the new library
         QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version, author,
-                                                name, desc, QString("")));
+                                                ElementName(name), desc, QString(""))); // can throw
         lib->setUrl(url);
         lib->setIconFilePath(qApp->getResourcesDir().getPathTo("library/default_image.png"));
         lib->saveTo(directory); // can throw

@@ -56,11 +56,11 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context, const FileP
 
     // load component
     mComponent.reset(new Component(fp, false)); // can throw
-    setWindowTitle(mComponent->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mComponent->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mComponent->getFilePath().toQUrl().toString(), mComponent->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mComponent->getFilePath().toNative());
-    mUi->edtName->setText(mComponent->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mComponent->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mComponent->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mComponent->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mComponent->getAuthor());
@@ -113,10 +113,7 @@ ComponentEditorWidget::~ComponentEditorWidget() noexcept
 bool ComponentEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
         Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mComponent->setName("", name);

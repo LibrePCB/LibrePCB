@@ -136,7 +136,7 @@ void NewElementWizardPage_DeviceProperties::setPackage(const tl::optional<Uuid>&
             Package package(fp, true); // can throw
             DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
                                                package.getPads().getUuidSet());
-            mUi->lblPackageName->setText(package.getNames().value(mContext.getLibLocaleOrder()));
+            mUi->lblPackageName->setText(*package.getNames().value(mContext.getLibLocaleOrder()));
             mUi->lblPackageDescription->setText(package.getDescriptions().value(mContext.getLibLocaleOrder()));
         } catch (const Exception& e) {
             mUi->lblPackageName->setText(tr("ERROR:"));

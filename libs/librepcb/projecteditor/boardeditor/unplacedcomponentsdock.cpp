@@ -243,8 +243,8 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             int deviceCount = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
             QString name = component->getName();
             QString value = component->getValue(true).replace("\n", "|");
-            QString compName = component->getLibComponent().getNames().value(mProject.getSettings().getLocaleOrder());
-            QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(name, value, compName);
+            ElementName compName = component->getLibComponent().getNames().value(mProject.getSettings().getLocaleOrder());
+            QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(name, value, *compName);
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, component->getUuid().toStr());
         }
@@ -280,9 +280,9 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
             FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(pkgUuid);
             const library::Package package(pkgFp, true);
 
-            QString devName = device.getNames().value(localeOrder);
-            QString pkgName = package.getNames().value(localeOrder);
-            QString text = QString("%1 [%2]").arg(devName, pkgName);
+            ElementName devName = device.getNames().value(localeOrder);
+            ElementName pkgName = package.getNames().value(localeOrder);
+            QString text = QString("%1 [%2]").arg(*devName, *pkgName);
             mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
         }
         if (mUi->cbxSelectedDevice->count() > 0) {
@@ -310,7 +310,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(const library::Device* 
             mSelectedPackage = package;
             QStringList localeOrder = mProject.getSettings().getLocaleOrder();
             for (const library::Footprint& fpt : mSelectedPackage->getFootprints()) {
-                mUi->cbxSelectedFootprint->addItem(fpt.getNames().value(localeOrder), fpt.getUuid().toStr());
+                mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder), fpt.getUuid().toStr());
             }
             if (mUi->cbxSelectedFootprint->count() > 0) {
                 tl::optional<Uuid> footprintUuid = mLastFootprintOfDevice.value(mSelectedDevice->getUuid());

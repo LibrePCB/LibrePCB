@@ -54,8 +54,9 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
     // create  component
     std::unique_ptr<library::Component> component(
         new library::Component(mDb.getComponentUuid(mDeviceSet.getName()),
-                               Version::fromString("0.1"), "LibrePCB", mDeviceSet.getName(),
-                               createDescription(), ""));
+                               Version::fromString("0.1"), "LibrePCB",
+                               ElementName(mDeviceSet.getName()),
+                               createDescription(), "")); // can throw
 
     // properties
     component->getPrefixes().setDefaultValue(mDeviceSet.getPrefix());
@@ -63,7 +64,7 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
     // symbol variant
     std::shared_ptr<library::ComponentSymbolVariant> symbolVariant(
         new library::ComponentSymbolVariant(mDb.getSymbolVariantUuid(component->getUuid()),
-                                            "", "default", ""));
+                                            "", ElementName("default"), "")); // can throw
     component->getSymbolVariants().append(symbolVariant);
 
     // signals

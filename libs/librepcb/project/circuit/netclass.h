@@ -27,6 +27,7 @@
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -58,18 +59,18 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
         NetClass() = delete;
         NetClass(const NetClass& other) = delete;
         explicit NetClass(Circuit& circuit, const SExpression& node);
-        explicit NetClass(Circuit& circuit, const QString& name);
+        explicit NetClass(Circuit& circuit, const ElementName& name);
         ~NetClass() noexcept;
 
         // Getters
         Circuit& getCircuit() const noexcept {return mCircuit;}
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const ElementName& getName() const noexcept {return mName;}
         int getNetSignalCount() const noexcept {return mRegisteredNetSignals.count();}
         bool isUsed() const noexcept {return (getNetSignalCount() > 0);}
 
         // Setters
-        void setName(const QString& name);
+        void setName(const ElementName& name) noexcept;
 
         // General Methods
         void addToCircuit();
@@ -85,7 +86,6 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
 
 
     private:
-        bool checkAttributesValidity() const noexcept;
         void updateErcMessages() noexcept;
 
 
@@ -95,7 +95,7 @@ class NetClass final : public QObject, public IF_ErcMsgProvider,
 
         // Attributes
         Uuid mUuid;
-        QString mName;
+        ElementName mName;
 
         // Registered Elements
         /// @brief all registered netsignals

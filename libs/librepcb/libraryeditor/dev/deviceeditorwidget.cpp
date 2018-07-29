@@ -73,11 +73,11 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context, const FilePath& f
     mUi->formLayout->setWidget(row, QFormLayout::FieldRole, mCategoriesEditorWidget.data());
 
     mDevice.reset(new Device(fp, false)); // can throw
-    setWindowTitle(mDevice->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mDevice->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mDevice->getFilePath().toQUrl().toString(), mDevice->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mDevice->getFilePath().toNative());
-    mUi->edtName->setText(mDevice->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mDevice->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mDevice->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mDevice->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mDevice->getAuthor());
@@ -126,10 +126,7 @@ DeviceEditorWidget::~DeviceEditorWidget() noexcept
 bool DeviceEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
         Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mDevice->setName("", name);
@@ -263,7 +260,7 @@ void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept
         }
         mComponent.reset(new Component(fp, true)); // can throw
         mUi->padSignalMapEditorWidget->setSignalList(mComponent->getSignals());
-        mUi->lblComponentName->setText(mComponent->getNames().value(getLibLocaleOrder()));
+        mUi->lblComponentName->setText(*mComponent->getNames().value(getLibLocaleOrder()));
         mUi->lblComponentName->setStyleSheet("");
         updateComponentPreview();
     } catch (const Exception& e) {
@@ -309,7 +306,7 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept
         }
         mPackage.reset(new Package(fp, true)); // can throw
         mUi->padSignalMapEditorWidget->setPadList(mPackage->getPads());
-        mUi->lblPackageName->setText(mPackage->getNames().value(getLibLocaleOrder()));
+        mUi->lblPackageName->setText(*mPackage->getNames().value(getLibLocaleOrder()));
         mUi->lblPackageName->setStyleSheet("");
         updatePackagePreview();
     } catch (const Exception& e) {

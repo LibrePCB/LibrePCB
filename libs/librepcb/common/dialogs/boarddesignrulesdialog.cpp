@@ -78,7 +78,7 @@ void BoardDesignRulesDialog::on_buttonBox_clicked(QAbstractButton *button)
 void BoardDesignRulesDialog::updateWidgets() noexcept
 {
     // general attributes
-    mUi->edtName->setText(mDesignRules.getName());
+    mUi->edtName->setText(*mDesignRules.getName());
     mUi->txtDescription->setPlainText(mDesignRules.getDescription());
     // stop mask
     mUi->spbxStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio()->toPercent());
@@ -102,7 +102,7 @@ void BoardDesignRulesDialog::applyRules() noexcept
 {
     try {
         // general attributes
-        mDesignRules.setName(mUi->edtName->text());
+        mDesignRules.setName(ElementName(mUi->edtName->text())); // can throw
         mDesignRules.setDescription(mUi->txtDescription->toPlainText());
         // stop mask
         mDesignRules.setStopMaskClearanceRatio(UnsignedRatio(Ratio::fromPercent(mUi->spbxStopMaskClrRatio->value()))); // can throw

@@ -126,7 +126,7 @@ class NewElementWizardContext final : public QObject
     public: // Data
         // common
         ElementType mElementType;
-        QString mElementName;
+        tl::optional<ElementName> mElementName;
         QString mElementDescription;
         QString mElementKeywords;
         QString mElementAuthor;

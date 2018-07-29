@@ -40,7 +40,7 @@ namespace project {
 ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, bool create) :
     QObject(nullptr), mProject(project),
     mFilepath(project.getPath().getPathTo("project/metadata.lp")),
-    mUuid(Uuid::createRandom())
+    mUuid(Uuid::createRandom()), mName("New Project")
 {
     qDebug() << "load project metadata...";
     Q_ASSERT(!(create && (restore || readOnly)));
@@ -48,7 +48,11 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
     if (create) {
         mFile.reset(SmartSExprFile::create(mFilepath));
 
-        mName = mProject.getFilepath().getCompleteBasename();
+        try {
+            mName = mProject.getFilepath().getCompleteBasename();
+        } catch (const Exception&) {
+            // fall back to default name
+        }
         mAuthor = SystemInfo::getFullUsername();
         mVersion = "v1";
         mCreated = QDateTime::currentDateTime();
@@ -59,7 +63,7 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
         if (root.getChildByIndex(0).isString()) { // backward compatibility, remove this some time!
             mUuid = root.getChildByIndex(0).getValue<Uuid>();
         }
-        mName = root.getValueByPath<QString>("name");
+        mName = root.getValueByPath<ElementName>("name");
         mAuthor = root.getValueByPath<QString>("author");
         mVersion = root.getValueByPath<QString>("version");
         mCreated = root.getValueByPath<QDateTime>("created");
@@ -67,8 +71,6 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
     }
 
     mLastModified = QDateTime::currentDateTime();
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
     qDebug() << "metadata successfully loaded!";
 }
@@ -81,7 +83,7 @@ ProjectMetadata::~ProjectMetadata() noexcept
  *  Setters
  ****************************************************************************************/
 
-void ProjectMetadata::setName(const QString& newName) noexcept
+void ProjectMetadata::setName(const ElementName& newName) noexcept
 {
     if (newName != mName) {
         mName = newName;
@@ -144,20 +146,12 @@ bool ProjectMetadata::save(bool toOriginal, QStringList& errors) noexcept
 
 void ProjectMetadata::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, true);
     root.appendChild("author", mAuthor, true);
     root.appendChild("version", mVersion, true);
     root.appendChild("created", mCreated, true);
     mAttributes.serialize(root);
-}
-
-bool ProjectMetadata::checkAttributesValidity() const noexcept
-{
-    if (mName.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

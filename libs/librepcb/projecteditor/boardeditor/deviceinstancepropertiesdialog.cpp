@@ -69,17 +69,17 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(Project& project,
     mUi->lblLibDeviceUuid->setText(htmlLink.arg(mDevice.getLibDevice().getFilePath().toQUrl().toString(),
                                                 mDevice.getLibDevice().getUuid().toStr()));
     mUi->lblLibDeviceUuid->setToolTip(mDevice.getLibDevice().getFilePath().toNative());
-    mUi->lblLibDeviceName->setText(mDevice.getLibDevice().getNames().value(localeOrder));
+    mUi->lblLibDeviceName->setText(*mDevice.getLibDevice().getNames().value(localeOrder));
     mUi->lblLibDeviceName->setToolTip(mDevice.getLibDevice().getDescriptions().value(localeOrder));
 
     mUi->lblLibPackageUuid->setText(htmlLink.arg(mDevice.getLibPackage().getFilePath().toQUrl().toString(),
                                                 mDevice.getLibPackage().getUuid().toStr()));
     mUi->lblLibPackageUuid->setToolTip(mDevice.getLibPackage().getFilePath().toNative());
-    mUi->lblLibPackageName->setText(mDevice.getLibPackage().getNames().value(localeOrder));
+    mUi->lblLibPackageName->setText(*mDevice.getLibPackage().getNames().value(localeOrder));
     mUi->lblLibPackageName->setToolTip(mDevice.getLibPackage().getDescriptions().value(localeOrder));
 
     mUi->lblLibFootprintUuid->setText(mDevice.getLibFootprint().getUuid().toStr());
-    mUi->lblLibFootprintName->setText(mDevice.getLibFootprint().getNames().value(localeOrder));
+    mUi->lblLibFootprintName->setText(*mDevice.getLibFootprint().getNames().value(localeOrder));
     mUi->lblLibFootprintName->setToolTip(mDevice.getLibFootprint().getDescriptions().value(localeOrder));
 
 

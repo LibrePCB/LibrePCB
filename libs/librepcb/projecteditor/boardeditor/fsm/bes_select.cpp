@@ -284,7 +284,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             }
             QMenu* aChangeFootprintMenu = menu.addMenu(tr("Change Footprint"));
             for (const library::Footprint& footprint : devInst.getLibPackage().getFootprints()) {
-                QAction* a = aChangeFootprintMenu->addAction(footprint.getNames().value(localeOrder));
+                QAction* a = aChangeFootprintMenu->addAction(*footprint.getNames().value(localeOrder));
                 a->setData(footprint.getUuid().toStr());
                 if (footprint.getUuid() == devInst.getFootprint().getLibFootprint().getUuid()) {
                     a->setCheckable(true);

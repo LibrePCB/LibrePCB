@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdprojectmetadataedit.h"
-#include "../projectmetadata.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -52,7 +51,7 @@ CmdProjectMetadataEdit::~CmdProjectMetadataEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdProjectMetadataEdit::setName(const QString& newName) noexcept
+void CmdProjectMetadataEdit::setName(const ElementName& newName) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = newName;

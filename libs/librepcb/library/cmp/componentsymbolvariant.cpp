@@ -45,12 +45,13 @@ ComponentSymbolVariant::ComponentSymbolVariant(const ComponentSymbolVariant& oth
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
-                                               const QString& name_en_US,
+                                               const ElementName& name_en_US,
                                                const QString& desc_en_US) noexcept :
-    QObject(nullptr), mUuid(uuid), mNorm(norm), mSymbolItems(this)
+    QObject(nullptr), mUuid(uuid), mNorm(norm),
+    mNames(name_en_US),
+    mDescriptions(desc_en_US),
+    mSymbolItems(this)
 {
-    mNames.setDefaultValue(name_en_US);
-    mDescriptions.setDefaultValue(desc_en_US);
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node) :
@@ -65,8 +66,6 @@ ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node) :
     foreach (const SExpression& node, node.getChildren("item")) {
         mSymbolItems.append(std::make_shared<ComponentSymbolVariantItem>(node)); // can throw
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSymbolVariant::~ComponentSymbolVariant() noexcept
@@ -83,16 +82,16 @@ void ComponentSymbolVariant::setNorm(const QString& norm) noexcept
     emit edited();
 }
 
-void ComponentSymbolVariant::setName(const QString& locale, const QString& name) noexcept
+void ComponentSymbolVariant::setName(const QString& locale, const ElementName& name) noexcept
 {
-    if (mNames.contains(locale) && mNames.value(locale) == name) return;
+    if (mNames.tryGet(locale) == name) return;
     mNames.insert(locale, name);
     emit edited();
 }
 
 void ComponentSymbolVariant::setDescription(const QString& locale, const QString& desc) noexcept
 {
-    if (mDescriptions.contains(locale) && mDescriptions.value(locale) == desc) return;
+    if (mDescriptions.tryGet(locale) == desc) return;
     mDescriptions.insert(locale, desc);
     emit edited();
 }
@@ -117,8 +116,6 @@ void ComponentSymbolVariant::setDescriptions(const LocalizedDescriptionMap& desc
 
 void ComponentSymbolVariant::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("norm", mNorm, false);
     mNames.serialize(root);
@@ -178,12 +175,6 @@ void ComponentSymbolVariant::listObjectRemoved(const ComponentSymbolVariantItemL
     Q_UNUSED(ptr);
     Q_ASSERT(&list == &mSymbolItems);
     emit edited();
-}
-
-bool ComponentSymbolVariant::checkAttributesValidity() const noexcept
-{
-    if (mNames.getDefaultValue().isEmpty()) return false;
-    return true;
 }
 
 /*****************************************************************************************

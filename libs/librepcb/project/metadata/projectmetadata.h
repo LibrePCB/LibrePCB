@@ -27,6 +27,7 @@
 #include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/elementname.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -70,7 +71,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
          *
          * @return The name of the project
          */
-        const QString& getName() const noexcept {return mName;}
+        const ElementName& getName() const noexcept {return mName;}
 
         /**
          * @brief Get the author of the project
@@ -116,11 +117,11 @@ class ProjectMetadata final : public QObject, public SerializableObject
         /**
          * @brief Set the name of the project
          *
-         * @param newName           The new name (should not be empty!)
+         * @param newName           The new name
          *
          * @undocmd{librepcb::project::CmdProjectMetadataEdit}
          */
-        void setName(const QString& newName) noexcept;
+        void setName(const ElementName& newName) noexcept;
 
         /**
          * @brief Set the author of the project
@@ -170,8 +171,6 @@ class ProjectMetadata final : public QObject, public SerializableObject
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
 
-        bool checkAttributesValidity() const noexcept;
-
 
     private: // Data
 
@@ -184,7 +183,7 @@ class ProjectMetadata final : public QObject, public SerializableObject
 
         // Metadata
         Uuid mUuid;                 ///< the UUID of the project
-        QString mName;              ///< the name of the project
+        ElementName mName;          ///< the name of the project
         QString mAuthor;            ///< the author of the project
         QString mVersion;           ///< the version of the project (arbitrary string)
         QDateTime mCreated;         ///< the datetime of the project creation

@@ -344,14 +344,14 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-        mUi->lblCompName->setText(cmp->getNames().value(localeOrder));
+        mUi->lblCompName->setText(*cmp->getNames().value(localeOrder));
         mUi->lblCompDescription->setText(cmp->getDescriptions().value(localeOrder));
 
         mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
         for (const library::ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
-            QString text = symbVar.getNames().value(localeOrder);
+            QString text = *symbVar.getNames().value(localeOrder);
             if (!symbVar.getNorm().isEmpty()) {text += " [" + symbVar.getNorm() + "]";}
             mUi->cbxSymbVar->addItem(text, symbVar.getUuid().toStr());
         }
@@ -403,8 +403,8 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev)
         if (pkgFp.isValid()) {
             mSelectedPackage = new library::Package(pkgFp, true);
             mUi->lblDeviceName->setText(QString("%1 [%2]").arg(
-                mSelectedDevice->getNames().value(localeOrder),
-                mSelectedPackage->getNames().value(localeOrder)));
+                *mSelectedDevice->getNames().value(localeOrder),
+                *mSelectedPackage->getNames().value(localeOrder)));
             if (mSelectedPackage->getFootprints().count() > 0) {
                 mPreviewFootprintGraphicsItem = new library::FootprintPreviewGraphicsItem(
                     *mGraphicsLayerProvider, localeOrder,

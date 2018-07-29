@@ -68,7 +68,7 @@ NewElementWizardPage_EnterMetadata::~NewElementWizardPage_EnterMetadata() noexce
 
 bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept
 {
-    if (mContext.mElementName.trimmed().isEmpty()) return false;
+    if (!mContext.mElementName) return false;
     if (!mContext.mElementVersion) return false;
     QString category = mUi->edtCategory->text().trimmed();
     if (!mContext.mElementCategoryUuid && !category.isEmpty()) return false;
@@ -98,8 +98,12 @@ int NewElementWizardPage_EnterMetadata::nextId() const noexcept
 
 void NewElementWizardPage_EnterMetadata::edtNameTextChanged(const QString& text) noexcept
 {
-    mContext.mElementName = text.trimmed();
-    emit completeChanged();
+    try {
+        mContext.mElementName = ElementName(text.trimmed()); // can throw
+        emit completeChanged();
+    } catch (const Exception& e) {
+        // invalid name
+    }
 }
 
 void NewElementWizardPage_EnterMetadata::edtDescriptionTextChanged() noexcept
@@ -195,7 +199,7 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept
 void NewElementWizardPage_EnterMetadata::initializePage() noexcept
 {
     QWizardPage::initializePage();
-    mUi->edtName->setText(mContext.mElementName);
+    mUi->edtName->setText(mContext.mElementName ? **mContext.mElementName : QString());
     mUi->edtDescription->setPlainText(mContext.mElementDescription);
     mUi->edtKeywords->setText(mContext.mElementKeywords);
     mUi->edtAuthor->setText(mContext.mElementAuthor);

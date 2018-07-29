@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/attributes/attributeprovider.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
@@ -222,7 +223,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @return A pointer to the specified schematic, or nullptr if name is invalid
          */
-        Schematic* getSchematicByName(const QString& name) const noexcept;
+        Schematic* getSchematicByName(const ElementName& name) const noexcept;
 
         /**
          * @brief Create a new schematic (page)
@@ -233,7 +234,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @throw Exception This method throws an exception on error.
          */
-        Schematic* createSchematic(const QString& name);
+        Schematic* createSchematic(const ElementName& name);
 
         /**
          * @brief Add an existing schematic to this project
@@ -314,7 +315,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @return A pointer to the specified board, or nullptr if name is invalid
          */
-        Board* getBoardByName(const QString& name) const noexcept;
+        Board* getBoardByName(const ElementName& name) const noexcept;
 
         /**
          * @brief Create a new board
@@ -325,7 +326,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @throw Exception This method throws an exception on error.
          */
-        Board* createBoard(const QString& name);
+        Board* createBoard(const ElementName& name);
 
         /**
          * @brief Create a new board as a copy of an existing board
@@ -337,7 +338,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @throw Exception This method throws an exception on error.
          */
-        Board* createBoard(const Board& other, const QString& name);
+        Board* createBoard(const Board& other, const ElementName& name);
 
         /**
          * @brief Add an existing board to this project

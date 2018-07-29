@@ -35,13 +35,13 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const QString& name) noexcept :
+CmdBoardAdd::CmdBoardAdd(Project& project, const ElementName& name) noexcept :
     UndoCommand(tr("Add board")),
     mProject(project), mBoardToCopy(nullptr), mName(name), mBoard(nullptr), mPageIndex(-1)
 {
 }
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy, const QString& name) noexcept :
+CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy, const ElementName& name) noexcept :
     UndoCommand(tr("Copy board")),
     mProject(project), mBoardToCopy(&boardToCopy), mName(name), mBoard(nullptr),
     mPageIndex(-1)
