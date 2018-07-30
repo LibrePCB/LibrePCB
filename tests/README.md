@@ -1,3 +1,6 @@
-# Unit/Integration Tests
+# LibrePCB Tests
 
-This directory contains unit/integration tests (as qmake projects) for all static libraries. Google Mock (gmock) is used as testing framework.
+This directory contains tests for LibrePCB. Purpose of subdirectories:
+
+- `data`: Data files (for example LibrePCB projects) used for the tests.
+- `unittests`: Unit/integration tests for all static libraries of LibrePCB.

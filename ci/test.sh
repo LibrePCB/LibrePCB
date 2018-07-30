@@ -3,17 +3,17 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -eufv -o pipefail
 
-# run tests
+# run unit tests
 if [ "${TRAVIS_OS_NAME-}" = "linux" ]
 then
   xvfb-run -a ./build/output/qztest
-  xvfb-run -a ./build/output/tests
+  xvfb-run -a ./build/output/librepcb-unittests
 elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
   ./build/output/qztest
-  ./build/output/tests
+  ./build/output/librepcb-unittests
 else
   ./build/output/qztest.exe
-  ./build/output/tests.exe
+  ./build/output/librepcb-unittests.exe
 fi
 
