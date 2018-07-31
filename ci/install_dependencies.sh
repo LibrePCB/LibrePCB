@@ -20,7 +20,7 @@ then
     sudo apt-get update -qq
     sudo apt-get install -qq qt5-default qttools5-dev-tools
   fi
-  sudo apt-get install -qq libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
+  sudo apt-get install -qq libc++-dev libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
 
   # python packages
   pip install --user --upgrade --upgrade-strategy only-if-needed \
