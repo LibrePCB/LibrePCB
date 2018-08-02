@@ -59,6 +59,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     mCurrentEditorWidget(nullptr), mLock(lib->getFilePath())
 {
     mUi->setupUi(this);
+    connect(mUi->actionClose, &QAction::triggered,
+            this, &LibraryEditor::close);
     connect(mUi->actionNew, &QAction::triggered,
             this, &LibraryEditor::newElementTriggered);
     connect(mUi->actionSave, &QAction::triggered,
