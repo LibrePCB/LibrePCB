@@ -53,8 +53,8 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Work
     mUuid = Uuid(mJsonObject.value("uuid").toString());
     mVersion = Version(mJsonObject.value("version").toString());
     mIsRecommended = mJsonObject.value("recommended").toBool();
-    QString name = mJsonObject.value("name").toObject().value("en_US").toString();
-    QString desc = mJsonObject.value("description").toObject().value("en_US").toString();
+    QString name = mJsonObject.value("name").toObject().value("default").toString();
+    QString desc = mJsonObject.value("description").toObject().value("default").toString();
     QString author = mJsonObject.value("author").toString();
     QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
     foreach (const QJsonValue& value, mJsonObject.value("dependencies").toArray()) {
