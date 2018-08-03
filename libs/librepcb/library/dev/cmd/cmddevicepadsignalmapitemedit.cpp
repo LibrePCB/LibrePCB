@@ -48,7 +48,7 @@ CmdDevicePadSignalMapItemEdit::~CmdDevicePadSignalMapItemEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdDevicePadSignalMapItemEdit::setSignalUuid(const Uuid& uuid) noexcept
+void CmdDevicePadSignalMapItemEdit::setSignalUuid(const tl::optional<Uuid>& uuid) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewSignalUuid = uuid;

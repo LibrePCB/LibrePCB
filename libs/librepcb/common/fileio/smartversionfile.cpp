@@ -33,24 +33,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly,
-                                   bool create, const Version& newVersion) :
-    SmartFile(filepath, restore, readOnly, create), mVersion()
+SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) :
+    SmartFile(filepath, restore, readOnly, false),
+    mVersion(readVersionFromFile(mOpenedFilePath))
 {
-    if (mIsCreated) {
-        mVersion = newVersion;
-    }
-    else {
-        // read the content of the file
-        QString content = QString(FileUtils::readFile(mOpenedFilePath));
-        QStringList lines = content.split("\n", QString::KeepEmptyParts);
-        mVersion.setVersion((lines.count() > 0) ? lines.first() : QString());
-        if (!mVersion.isValid()) {
-            qDebug() << "content:" << content;
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("Invalid version number in file \"%1\".")).arg(filepath.toNative()));
-        }
-    }
+}
+
+SmartVersionFile::SmartVersionFile(const FilePath& filepath, const Version& newVersion) :
+    SmartFile(filepath, false, false, true), mVersion(newVersion)
+{
 }
 
 SmartVersionFile::~SmartVersionFile() noexcept
@@ -63,14 +54,9 @@ SmartVersionFile::~SmartVersionFile() noexcept
 
 void SmartVersionFile::save(bool toOriginal)
 {
-    if (mVersion.isValid()) {
-        const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-        FileUtils::writeFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
-        updateMembersAfterSaving(toOriginal);
-    } else {
-        qDebug() << mVersion.toStr();
-        throw LogicError(__FILE__, __LINE__, tr("Invalid version number"));
-    }
+    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
+    FileUtils::writeFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
+    updateMembersAfterSaving(toOriginal);
 }
 
 /*****************************************************************************************
@@ -79,7 +65,21 @@ void SmartVersionFile::save(bool toOriginal)
 
 SmartVersionFile* SmartVersionFile::create(const FilePath& filepath, const Version& version)
 {
-    return new SmartVersionFile(filepath, false, false, true, version);
+    return new SmartVersionFile(filepath, version);
+}
+
+Version SmartVersionFile::readVersionFromFile(const FilePath& filepath)
+{
+    try {
+        QString content = QString(FileUtils::readFile(filepath)); // can throw
+        QStringList lines = content.split("\n", QString::KeepEmptyParts);
+        Q_ASSERT(lines.count() >= 1);
+        return Version::fromString(lines.first()); // can throw
+    } catch (const Exception& e) {
+        throw RuntimeError(__FILE__, __LINE__,
+            QString(tr("Could not read version number from \"%1\": %2"))
+            .arg(filepath.toNative(), e.getMsg()));
+    }
 }
 
 /*****************************************************************************************

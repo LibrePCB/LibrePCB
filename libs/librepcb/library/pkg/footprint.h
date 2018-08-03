@@ -67,7 +67,7 @@ class Footprint final : public SerializableObject, private FootprintPadList::IF_
         // Constructors / Destructor
         Footprint() = delete;
         Footprint(const Footprint& other) noexcept;
-        Footprint(const Uuid& uuid, const QString& name_en_US,
+        Footprint(const Uuid& uuid, const ElementName& name_en_US,
                   const QString& description_en_US);
         explicit Footprint(const SExpression& node);
         ~Footprint() noexcept;

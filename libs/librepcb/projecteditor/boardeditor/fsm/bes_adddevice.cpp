@@ -152,7 +152,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             // set temporary position of the current device
             Q_ASSERT(!mCurrentDeviceEditCmd.isNull());
             mCurrentDeviceEditCmd->setPosition(pos, true);
@@ -165,7 +165,7 @@ BES_Base::ProcRetVal BES_AddDevice::processSceneEvent(BEE_Base* event) noexcept
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:

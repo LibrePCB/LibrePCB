@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "packageeditorstate.h"
 
 /*****************************************************************************************
@@ -99,9 +100,9 @@ class PackageEditorState_DrawTextBase : public PackageEditorState
         StrokeTextGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        QString mLastLayerName;
+        GraphicsLayerName mLastLayerName;
         Angle mLastRotation;
-        Length mLastHeight;
+        PositiveLength mLastHeight;
         QString mLastText;
 };
 

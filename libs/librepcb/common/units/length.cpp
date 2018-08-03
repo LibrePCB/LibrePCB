@@ -163,22 +163,6 @@ LengthBase_t Length::mmStringToNm(const QString& millimeters)
 }
 
 /*****************************************************************************************
- *  Non-Member Functions
- ****************************************************************************************/
-
-QDataStream& operator<<(QDataStream& stream, const Length& length)
-{
-    stream << length.toMm();
-    return stream;
-}
-
-QDebug operator<<(QDebug stream, const Length& length)
-{
-    stream << QString("Length(%1mm)").arg(length.toMm());
-    return stream;
-}
-
-/*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 

@@ -108,9 +108,9 @@ bool BES_DrawPlane::entry(BEE_Base* event) noexcept
     mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
     mNetSignalComboBox->setEditable(false);
     foreach (NetSignal* netsignal, mEditor.getProject().getCircuit().getNetSignals())
-        mNetSignalComboBox->addItem(netsignal->getName(), netsignal->getUuid().toStr());
+        mNetSignalComboBox->addItem(*netsignal->getName(), netsignal->getUuid().toStr());
     mNetSignalComboBox->model()->sort(0);
-    mNetSignalComboBox->setCurrentText(mCurrentNetSignal ? mCurrentNetSignal->getName() : "");
+    mNetSignalComboBox->setCurrentText(mCurrentNetSignal ? *mCurrentNetSignal->getName() : "");
     mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
     connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
             [this](const QString& value)
@@ -132,7 +132,7 @@ bool BES_DrawPlane::entry(BEE_Base* event) noexcept
         }
         mLayerComboBox->setLayers(layers);
     }
-    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+    mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
     mEditorUi.commandToolbar->addWidget(mLayerComboBox);
     connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged,
             this, &BES_DrawPlane::layerComboBoxLayerChanged);
@@ -187,7 +187,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processIdleSceneEvent(BEE_Base* event) noexc
     switch (qevent->type()) {
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     start(*board, pos);
@@ -228,7 +228,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     addSegment(*board, pos);
@@ -244,7 +244,7 @@ BES_Base::ProcRetVal BES_DrawPlane::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateVertexPosition(pos);
             return ForceStayInState;
         }
@@ -355,7 +355,7 @@ void BES_DrawPlane::makeSelectedLayerVisible() noexcept
 {
     if (mCurrentPlane) {
         Board& board = mCurrentPlane->getBoard();
-        GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
+        GraphicsLayer* layer = board.getLayerStack().getLayer(*mCurrentLayerName);
         if (layer && layer->isEnabled()) layer->setVisible(true);
     }
 }

@@ -84,7 +84,7 @@ ControlPanel::ControlPanel(Workspace& workspace) :
 
     // decive if we have to show the warning about a newer workspace file format version
     Version actualVersion = qApp->getFileFormatVersion();
-    Version highestVersion = Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
+    tl::optional<Version> highestVersion = Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
     mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
 
     // decide if we have to show the warning about missing workspace libraries

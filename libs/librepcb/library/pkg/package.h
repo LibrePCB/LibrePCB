@@ -62,7 +62,7 @@ class Package final : public LibraryElement
         Package() = delete;
         Package(const Package& other) = delete;
         Package(const Uuid& uuid, const Version& version, const QString& author,
-                const QString& name_en_US, const QString& description_en_US,
+                const ElementName& name_en_US, const QString& description_en_US,
                 const QString& keywords_en_US);
         Package(const FilePath& elementDirectory, bool readOnly);
         ~Package() noexcept;
@@ -85,7 +85,6 @@ class Package final : public LibraryElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data

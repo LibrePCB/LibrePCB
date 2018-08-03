@@ -44,9 +44,11 @@ namespace project {
  ****************************************************************************************/
 
 SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
-    SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr)
+    SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot"))
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
     Uuid gcUuid = node.getValueByPath<Uuid>("component");
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
@@ -54,9 +56,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
             QString(tr("No component with the UUID \"%1\" found in the circuit!"))
             .arg(gcUuid.toStr()));
     }
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    Uuid symbVarItemUuid;
+    Uuid symbVarItemUuid = Uuid::createRandom(); // only initialization, will be overwritten
     if (node.tryGetChildByPath("lib_gate")) {
         symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
     } else {
@@ -122,7 +122,11 @@ SI_Symbol::~SI_Symbol() noexcept
 
 QString SI_Symbol::getName() const noexcept
 {
-    return mComponentInstance->getName() % mSymbVarItem->getSuffix();
+    if (mSymbVarItem->getSuffix()->isEmpty()) {
+        return *mComponentInstance->getName();
+    } else {
+        return mComponentInstance->getName() % "-" % mSymbVarItem->getSuffix();
+    }
 }
 
 /*****************************************************************************************
@@ -262,7 +266,6 @@ bool SI_Symbol::checkAttributesValidity() const noexcept
 {
     if (mSymbVarItem == nullptr)        return false;
     if (mSymbol == nullptr)             return false;
-    if (mUuid.isNull())                 return false;
     if (mComponentInstance == nullptr)  return false;
     return true;
 }

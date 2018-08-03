@@ -115,8 +115,8 @@ class DeviceEditorWidget final : public EditorWidgetBase
         QScopedPointer<FootprintPreviewGraphicsItem> mFootprintGraphicsItem;
 
         // broken interface detection
-        Uuid mOriginalComponentUuid;
-        Uuid mOriginalPackageUuid;
+        tl::optional<Uuid> mOriginalComponentUuid;
+        tl::optional<Uuid> mOriginalPackageUuid;
         DevicePadSignalMap mOriginalPadSignalMap;
 };
 

@@ -22,10 +22,12 @@ QT += core widgets xml opengl network sql
 CONFIG += staticlib
 
 INCLUDEPATH += \
+    ../../ \
     ../../fontobene \
     ../../quazip \
     ../../sexpresso \
-    ../../ \
+    ../../type_safe/include \
+    ../../type_safe/external/debug_assert \
 
 SOURCES += \
     alignment.cpp \
@@ -130,6 +132,7 @@ HEADERS += \
     alignment.h \
     application.h \
     attributes/attribute.h \
+    attributes/attributekey.h \
     attributes/attributeprovider.h \
     attributes/attributesubstitutor.h \
     attributes/attributetype.h \
@@ -144,6 +147,7 @@ HEADERS += \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
     cam/gerbergenerator.h \
+    circuitidentifier.h \
     debug.h \
     dialogs/aboutdialog.h \
     dialogs/boarddesignrulesdialog.h \
@@ -153,6 +157,7 @@ HEADERS += \
     dialogs/polygonpropertiesdialog.h \
     dialogs/stroketextpropertiesdialog.h \
     dialogs/textpropertiesdialog.h \
+    elementname.h \
     exceptions.h \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
@@ -185,6 +190,7 @@ HEADERS += \
     graphics/circlegraphicsitem.h \
     graphics/defaultgraphicslayerprovider.h \
     graphics/graphicslayer.h \
+    graphics/graphicslayername.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
     graphics/holegraphicsitem.h \

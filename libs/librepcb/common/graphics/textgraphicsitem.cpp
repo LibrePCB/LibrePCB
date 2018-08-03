@@ -44,13 +44,13 @@ TextGraphicsItem::TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& l
     setText(mText.getText());
     setHeight(mText.getHeight());
     setAlignment(mText.getAlign());
-    setLayer(mLayerProvider.getLayer(mText.getLayerName()));
+    setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setZValue(5);
 
     // add origin cross
     mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(Length(1000000));
+    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
     mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences)); // TODO
 
     // register to the text to get attribute updates
@@ -66,9 +66,9 @@ TextGraphicsItem::~TextGraphicsItem() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void TextGraphicsItem::textLayerNameChanged(const QString& newLayerName) noexcept
+void TextGraphicsItem::textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
 {
-    setLayer(mLayerProvider.getLayer(newLayerName));
+    setLayer(mLayerProvider.getLayer(*newLayerName));
 }
 
 void TextGraphicsItem::textTextChanged(const QString& newText) noexcept
@@ -86,7 +86,7 @@ void TextGraphicsItem::textRotationChanged(const Angle& newRot) noexcept
     setRotation(newRot);
 }
 
-void TextGraphicsItem::textHeightChanged(const Length& newHeight) noexcept
+void TextGraphicsItem::textHeightChanged(const PositiveLength& newHeight) noexcept
 {
     setHeight(newHeight);
 }

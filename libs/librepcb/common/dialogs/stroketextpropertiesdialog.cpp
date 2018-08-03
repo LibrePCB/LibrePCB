@@ -54,11 +54,11 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(StrokeText& text, UndoSta
             mUi->spbxLineSpacingRatio, &QDoubleSpinBox::setDisabled);
 
     // load text attributes
-    selectLayerNameInCombobox(mText.getLayerName());
+    selectLayerNameInCombobox(*mText.getLayerName());
     mUi->edtText->setPlainText(mText.getText());
     mUi->alignmentSelector->setAlignment(mText.getAlign());
-    mUi->spbHeight->setValue(mText.getHeight().toMm());
-    mUi->spbxStrokeWidth->setValue(mText.getStrokeWidth().toMm());
+    mUi->spbHeight->setValue(mText.getHeight()->toMm());
+    mUi->spbxStrokeWidth->setValue(mText.getStrokeWidth()->toMm());
     if (mText.getLetterSpacing().isAuto()) {
         mUi->cbxLetterSpacingAuto->setChecked(true);
         mUi->spbxLetterSpacingRatio->setEnabled(false);
@@ -119,11 +119,11 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept
     try {
         QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(mText));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setText(mUi->edtText->toPlainText(), false);
         cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-        cmd->setStrokeWidth(Length::fromMm(mUi->spbxStrokeWidth->value()), false);
+        cmd->setStrokeWidth(UnsignedLength(Length::fromMm(mUi->spbxStrokeWidth->value())), false); // can throw
         if (mUi->cbxLetterSpacingAuto->isChecked()) {
             cmd->setLetterSpacing(StrokeTextSpacing(), false);
         } else {
@@ -134,7 +134,7 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept
         } else {
             cmd->setLineSpacing(StrokeTextSpacing(Ratio::fromPercent(mUi->spbxLineSpacingRatio->value())), false);
         }
-        cmd->setHeight(Length::fromMm(mUi->spbHeight->value()), false);
+        cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         cmd->setMirrored(mUi->cbxMirrored->isChecked(), false);

@@ -69,7 +69,7 @@ SGI_NetPoint::~SGI_NetPoint() noexcept
 
 void SGI_NetPoint::updateCacheAndRepaint() noexcept
 {
-    setToolTip(mNetPoint.getNetSignalOfNetSegment().getName());
+    setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
 
     prepareGeometryChange();
     mIsVisibleJunction = mNetPoint.isVisibleJunction();

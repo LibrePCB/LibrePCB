@@ -54,7 +54,7 @@ class CmdHoleEdit final : public UndoCommand
         // Setters
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setDiameter(const Length& diameter, bool immediate) noexcept;
+        void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
 
         // Operator Overloadings
         CmdHoleEdit& operator=(const CmdHoleEdit& rhs) = delete;
@@ -82,8 +82,8 @@ class CmdHoleEdit final : public UndoCommand
         // General Attributes
         Point mOldPosition;
         Point mNewPosition;
-        Length mOldDiameter;
-        Length mNewDiameter;
+        PositiveLength mOldDiameter;
+        PositiveLength mNewDiameter;
 };
 
 /*****************************************************************************************

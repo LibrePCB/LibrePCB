@@ -161,7 +161,7 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept
     mWidthComboBox->addItem("2");
     mWidthComboBox->addItem("2.5");
     mWidthComboBox->addItem("3");
-    mWidthComboBox->setCurrentIndex(mWidthComboBox->findText(QString::number(mCurrentWidth.toMm())));
+    mWidthComboBox->setCurrentIndex(mWidthComboBox->findText(QString::number(mCurrentWidth->toMm())));
     mEditorUi.commandToolbar->addWidget(mWidthComboBox);
     connect(mWidthComboBox, &QComboBox::currentTextChanged,
             this, &BES_DrawTrace::wireWidthComboBoxTextChanged);
@@ -221,7 +221,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(BEE_Base* event) noexc
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
 
             switch (sceneEvent->button())
             {
@@ -268,7 +268,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -286,7 +286,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(BEE_Base* event
         case QEvent::GraphicsSceneMouseRelease:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::RightButton:
@@ -309,7 +309,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(BEE_Base* event
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateNetpointPositions(pos);
             return ForceStayInState;
         }

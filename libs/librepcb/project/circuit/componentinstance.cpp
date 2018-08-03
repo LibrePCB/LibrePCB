@@ -46,12 +46,13 @@ namespace project {
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mValue(node.getValueByPath<QString>("value")),
+    mDefaultDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
     mLibComponent(nullptr), mCompSymbVar(nullptr), mAttributes()
 {
     // read general attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mValue = node.getValueByPath<QString>("value");
     Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
     mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
     if (!mLibComponent) {
@@ -61,7 +62,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
     }
     Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVarUuid).get(); // can throw
-    mDefaultDeviceUuid = node.getValueByPath<Uuid>("lib_device");
+
 
     // load all component attributes
     mAttributes.reset(new AttributeList(node)); // can throw
@@ -92,15 +93,11 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
 }
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const library::Component& cmp,
-        const Uuid& symbVar, const QString& name, const Uuid& defaultDevice) :
+        const Uuid& symbVar, const CircuitIdentifier& name, const tl::optional<Uuid>& defaultDevice) :
     QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
     mUuid(Uuid::createRandom()), mName(name), mDefaultDeviceUuid(defaultDevice),
     mLibComponent(&cmp), mCompSymbVar(nullptr), mAttributes()
 {
-    if (mName.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The name of the component must not be empty."));
-    }
     mValue = cmp.getDefaultValue();
     mCompSymbVar = mLibComponent->getSymbolVariants().get(symbVar).get(); // can throw
 
@@ -205,13 +202,9 @@ bool ComponentInstance::isUsed() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void ComponentInstance::setName(const QString& name)
+void ComponentInstance::setName(const CircuitIdentifier& name) noexcept
 {
     if (name != mName) {
-        if(name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__,
-                tr("The new component name must not be empty!"));
-        }
         mName = name;
         updateErcMessages();
         emit attributesChanged();
@@ -261,7 +254,7 @@ void ComponentInstance::removeFromCircuit()
     if (isUsed()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The component \"%1\" cannot be removed because it is still in use!"))
-            .arg(mName));
+            .arg(*mName));
     }
     ScopeGuardList sgl(mSignals.count());
     foreach (ComponentSignalInstance* signal, mSignals) {
@@ -366,11 +359,11 @@ QString ComponentInstance::getUserDefinedAttributeValue(const QString& key) cons
 QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("NAME")) {
-        return mName;
+        return *mName;
     } else if (key == QLatin1String("VALUE")) {
         return mValue;
     } else if (key == QLatin1String("COMPONENT")) {
-        return mLibComponent->getNames().value(getLocaleOrder());
+        return *mLibComponent->getNames().value(getLocaleOrder());
     } else {
         return QString();
     }
@@ -390,8 +383,6 @@ QVector<const AttributeProvider*> ComponentInstance::getAttributeProviderParents
 
 bool ComponentInstance::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())             return false;
-    if (mName.isEmpty())            return false;
     if (mLibComponent == nullptr)   return false;
     if (mCompSymbVar == nullptr)    return false;
     return true;
@@ -403,10 +394,10 @@ void ComponentInstance::updateErcMessages() noexcept
     int optional = getUnplacedOptionalSymbolsCount();
     mErcMsgUnplacedRequiredSymbols->setMsg(
         QString(tr("Unplaced required symbols of component \"%1\": %2"))
-        .arg(mName).arg(required));
+        .arg(*mName).arg(required));
     mErcMsgUnplacedOptionalSymbols->setMsg(
         QString(tr("Unplaced optional symbols of component \"%1\": %2"))
-        .arg(mName).arg(optional));
+        .arg(*mName).arg(optional));
     mErcMsgUnplacedRequiredSymbols->setVisible((mIsAddedToCircuit) && (required > 0));
     mErcMsgUnplacedOptionalSymbols->setVisible((mIsAddedToCircuit) && (optional > 0));
 }

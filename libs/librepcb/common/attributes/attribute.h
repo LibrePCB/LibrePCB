@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "attributekey.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -54,20 +55,20 @@ class Attribute final : public SerializableObject
         Attribute() = delete;
         Attribute(const Attribute& other) noexcept;
         explicit Attribute(const SExpression& node);
-        Attribute(const QString& key, const AttributeType& type, const QString& value,
-                  const AttributeUnit* unit);
+        Attribute(const AttributeKey& key, const AttributeType& type,
+                  const QString& value, const AttributeUnit* unit);
         ~Attribute() noexcept;
 
         // Getters
-        const QString& getKey() const noexcept {return mKey;}
-        const QString& getName() const noexcept {return mKey;} // required for SerializableObjectList
+        const AttributeKey& getKey() const noexcept {return mKey;}
+        const QString& getName() const noexcept {return *mKey;} // required for SerializableObjectList
         const AttributeType& getType() const noexcept {return *mType;}
         const AttributeUnit* getUnit() const noexcept {return mUnit;}
         const QString& getValue() const noexcept {return mValue;}
         QString getValueTr(bool showUnit) const noexcept;
 
         // Setters
-        void setKey(const QString& key);
+        void setKey(const AttributeKey& key) noexcept {mKey = key;}
         void setTypeValueUnit(const AttributeType& type, const QString& value,
                               const AttributeUnit* unit);
 
@@ -87,7 +88,7 @@ class Attribute final : public SerializableObject
 
 
     private: // Data
-        QString mKey;
+        AttributeKey mKey;
         const AttributeType* mType;
         QString mValue;
         const AttributeUnit* mUnit;

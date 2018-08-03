@@ -51,17 +51,17 @@ class DevicePadSignalMapItem final : public QObject, public SerializableObject
         // Constructors / Destructor
         DevicePadSignalMapItem() = delete;
         DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
-        DevicePadSignalMapItem(const Uuid& pad, const Uuid& signal) noexcept;
+        DevicePadSignalMapItem(const Uuid& pad, const tl::optional<Uuid>& signal) noexcept;
         explicit DevicePadSignalMapItem(const SExpression& node);
         ~DevicePadSignalMapItem() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mPadUuid;} // used for UuidObjectMap
         const Uuid& getPadUuid() const noexcept {return mPadUuid;}
-        const Uuid& getSignalUuid() const noexcept {return mSignalUuid;}
+        const tl::optional<Uuid>& getSignalUuid() const noexcept {return mSignalUuid;}
 
         // Setters
-        void setSignalUuid(const Uuid& uuid) noexcept;
+        void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
@@ -73,16 +73,12 @@ class DevicePadSignalMapItem final : public QObject, public SerializableObject
 
 
     signals:
-        void signalUuidChanged(const Uuid& uuid);
-
-
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
+        void signalUuidChanged(const tl::optional<Uuid>& uuid);
 
 
     private: // Data
         Uuid mPadUuid;                      ///< must be valid
-        Uuid mSignalUuid;                   ///< NULL if not connected to a signal
+        tl::optional<Uuid> mSignalUuid;     ///< tl::nullopt if not connected to a signal
 };
 
 /*****************************************************************************************
@@ -104,16 +100,16 @@ class DevicePadSignalMapHelpers
     public:
         DevicePadSignalMapHelpers() = delete; // disable instantiation
 
-        static Uuid tryGetSignalUuid(const DevicePadSignalMap& map, const Uuid& pad) noexcept {
+        static tl::optional<Uuid> tryGetSignalUuid(const DevicePadSignalMap& map, const Uuid& pad) noexcept {
             std::shared_ptr<const DevicePadSignalMapItem> item = map.find(pad);
-            return item ? item->getSignalUuid() : Uuid();
+            return item ? item->getSignalUuid() : tl::nullopt;
         }
 
         static DevicePadSignalMap create(const QSet<Uuid> pads) noexcept
         {
             DevicePadSignalMap map;
             foreach (const Uuid& pad, pads) {
-                map.append(std::make_shared<DevicePadSignalMapItem>(pad, Uuid()));
+                map.append(std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt));
             }
             return map;
         }
@@ -124,18 +120,9 @@ class DevicePadSignalMapHelpers
                 map.remove(pad);
             }
             foreach (const Uuid& pad, pads - map.getUuidSet()) {
-                map.append(std::make_shared<DevicePadSignalMapItem>(pad, Uuid()));
+                map.append(std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt));
             }
             Q_ASSERT(map.getUuidSet() == pads);
-        }
-
-        static void filterSignals(DevicePadSignalMap& map, const QSet<Uuid>& sigs) noexcept
-        {
-            for (DevicePadSignalMapItem& item : map) {
-                if (!sigs.contains(item.getSignalUuid())) {
-                    item.setSignalUuid(Uuid());
-                }
-            }
         }
 };
 

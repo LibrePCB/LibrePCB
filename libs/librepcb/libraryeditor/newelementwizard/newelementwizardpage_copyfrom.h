@@ -84,11 +84,11 @@ class NewElementWizardPage_CopyFrom final : public QWizardPage
         void treeView_doubleClicked(const QModelIndex& item) noexcept;
         void listWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) noexcept;
         void listWidget_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const Uuid& uuid) noexcept;
+        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
         void setSelectedElement(const FilePath& fp) noexcept;
         void setCategoryTreeModel(QAbstractItemModel* model) noexcept;
-        FilePath getCategoryFilePath(const Uuid& category) const;
-        QSet<Uuid> getElementsByCategory(const Uuid& category) const;
+        FilePath getCategoryFilePath(const tl::optional<Uuid>& category) const;
+        QSet<Uuid> getElementsByCategory(const tl::optional<Uuid>& category) const;
         void getElementMetadata(const Uuid& uuid, FilePath& fp, QString& name) const;
         void initializePage() noexcept override;
         void cleanupPage() noexcept override;
@@ -99,7 +99,7 @@ class NewElementWizardPage_CopyFrom final : public QWizardPage
         QScopedPointer<Ui::NewElementWizardPage_CopyFrom> mUi;
         QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
         bool mIsCategoryElement;
-        Uuid mSelectedCategoryUuid;
+        tl::optional<Uuid> mSelectedCategoryUuid;
         QScopedPointer<LibraryBaseElement> mSelectedElement;
 };
 

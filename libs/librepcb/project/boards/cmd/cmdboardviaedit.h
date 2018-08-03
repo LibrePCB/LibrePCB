@@ -55,8 +55,8 @@ class CmdBoardViaEdit final : public UndoCommand
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setShape(BI_Via::Shape shape, bool immediate) noexcept;
-        void setSize(const Length& size, bool immediate) noexcept;
-        void setDrillDiameter(const Length& diameter, bool immediate) noexcept;
+        void setSize(const PositiveLength& size, bool immediate) noexcept;
+        void setDrillDiameter(const PositiveLength& diameter, bool immediate) noexcept;
 
 
     private:
@@ -83,10 +83,10 @@ class CmdBoardViaEdit final : public UndoCommand
         Point mNewPos;
         BI_Via::Shape mOldShape;
         BI_Via::Shape mNewShape;
-        Length mOldSize;
-        Length mNewSize;
-        Length mOldDrillDiameter;
-        Length mNewDrillDiameter;
+        PositiveLength mOldSize;
+        PositiveLength mNewSize;
+        PositiveLength mOldDrillDiameter;
+        PositiveLength mNewDrillDiameter;
 };
 
 /*****************************************************************************************

@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdpolygonedit.h"
-#include "../polygon.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -54,14 +53,14 @@ CmdPolygonEdit::~CmdPolygonEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdPolygonEdit::setLayerName(const QString& name, bool immediate) noexcept
+void CmdPolygonEdit::setLayerName(const GraphicsLayerName& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = name;
     if (immediate) mPolygon.setLayerName(mNewLayerName);
 }
 
-void CmdPolygonEdit::setLineWidth(const Length& width, bool immediate) noexcept
+void CmdPolygonEdit::setLineWidth(const UnsignedLength& width, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLineWidth = width;

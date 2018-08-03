@@ -46,7 +46,8 @@ namespace editor {
 
 PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(Context& context, Mode mode) noexcept :
     PackageEditorState(context), mMode(mode), mCurrentText(nullptr),
-    mCurrentGraphicsItem(nullptr)
+    mCurrentGraphicsItem(nullptr),
+    mLastLayerName(GraphicsLayer::sTopNames), mLastHeight(1)
 {
     resetToDefaultParameters();
 }
@@ -72,7 +73,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept
         mContext.commandToolBar.addLabel(tr("Layer:"));
         std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
         layerComboBox->setLayers(mContext.layerProvider.getBoardGeometryElementLayers());
-        layerComboBox->setCurrentLayer(mLastLayerName);
+        layerComboBox->setCurrentLayer(*mLastLayerName);
         connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
                 this, &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
         mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -101,7 +102,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept
     lineWidthSpinBox->setMaximum(100);
     lineWidthSpinBox->setSingleStep(0.1);
     lineWidthSpinBox->setDecimals(6);
-    lineWidthSpinBox->setValue(mLastHeight.toMm());
+    lineWidthSpinBox->setValue(mLastHeight->toMm());
     connect(lineWidthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &PackageEditorState_DrawTextBase::heightSpinBoxValueChanged);
@@ -131,7 +132,7 @@ bool PackageEditorState_DrawTextBase::exit() noexcept
 bool PackageEditorState_DrawTextBase::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentText) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         mEditCmd->setPosition(currentPos, true);
         return true;
     } else {
@@ -141,7 +142,7 @@ bool PackageEditorState_DrawTextBase::processGraphicsSceneMouseMoved(QGraphicsSc
 
 bool PackageEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentText) {
         finishAddText(currentPos);
     }
@@ -185,7 +186,7 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept
         mStartPos = pos;
         mContext.undoStack.beginCmdGroup(tr("Add footprint text"));
         mCurrentText = new StrokeText(Uuid::createRandom(), mLastLayerName, mLastText, pos,
-            mLastRotation, mLastHeight, Length(200000), StrokeTextSpacing(),
+            mLastRotation, mLastHeight, UnsignedLength(200000), StrokeTextSpacing(),
             StrokeTextSpacing(), Alignment(HAlign::left(), VAlign::bottom()), false, true);
         mContext.undoStack.appendToCmdGroup(
             new CmdStrokeTextInsert(mContext.currentFootprint->getStrokeTexts(),

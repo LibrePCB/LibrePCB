@@ -7,6 +7,7 @@ SUBDIRS = \
     hoedown \
     googletest \
     librepcb \
+    optional \
     parseagle \
     quazip \
     sexpresso
@@ -15,6 +16,7 @@ librepcb.depends = \
     clipper \
     delaunay-triangulation \
     fontobene \
+    optional \
     parseagle \
     hoedown \
     quazip \

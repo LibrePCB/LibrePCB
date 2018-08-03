@@ -98,7 +98,7 @@ TEST_F(WorkspaceTest, testOpenIncompatibleWorkspaceVersion)
     Workspace::createNewWorkspace(mWsDir);
     SmartVersionFile versionFile(mVersionFile, false, false);
     EXPECT_EQ(Workspace::FILE_FORMAT_VERSION(), versionFile.getVersion());
-    versionFile.setVersion(Version("0.0.1")); // version 0.0.1 will never exist
+    versionFile.setVersion(Version::fromString("0.0.1")); // version 0.0.1 will never exist
     versionFile.save(true);
     EXPECT_THROW(Workspace ws(mWsDir), Exception);
 }
@@ -129,9 +129,9 @@ TEST_F(WorkspaceTest, testGetFileFormatVersionsOfWorkspace)
 
 TEST_F(WorkspaceTest, testGetHighestFileFormatVersionOfWorkspace)
 {
-    EXPECT_FALSE(Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).isValid());
+    EXPECT_FALSE(Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).has_value());
     Workspace::createNewWorkspace(mWsDir);
-    EXPECT_FALSE(Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).isValid());
+    EXPECT_FALSE(Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).has_value());
     Workspace ws(mWsDir);
     EXPECT_EQ(qApp->getFileFormatVersion(),
               Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir));

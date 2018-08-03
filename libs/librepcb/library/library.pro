@@ -15,7 +15,9 @@ QT += core widgets xml sql printsupport
 CONFIG += staticlib
 
 INCLUDEPATH += \
-    ../../
+    ../../ \
+    ../../type_safe/include \
+    ../../type_safe/external/debug_assert \
 
 SOURCES += \
     cat/componentcategory.cpp \
@@ -64,9 +66,11 @@ HEADERS += \
     cmp/cmpsigpindisplaytype.h \
     cmp/component.h \
     cmp/componentpinsignalmap.h \
+    cmp/componentprefix.h \
     cmp/componentsignal.h \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
+    cmp/componentsymbolvariantitemsuffix.h \
     dev/cmd/cmddeviceedit.h \
     dev/cmd/cmddevicepadsignalmapitemedit.h \
     dev/device.h \

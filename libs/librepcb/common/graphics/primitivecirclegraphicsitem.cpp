@@ -60,16 +60,16 @@ void PrimitiveCircleGraphicsItem::setPosition(const Point& pos) noexcept
     QGraphicsItem::setPos(pos.toPxQPointF());
 }
 
-void PrimitiveCircleGraphicsItem::setDiameter(const Length& dia) noexcept
+void PrimitiveCircleGraphicsItem::setDiameter(const UnsignedLength& dia) noexcept
 {
-    mCircleRect = Toolbox::boundingRectFromRadius(dia.toPx() / 2);
+    mCircleRect = Toolbox::boundingRectFromRadius(dia->toPx() / 2);
     updateBoundingRectAndShape();
 }
 
-void PrimitiveCircleGraphicsItem::setLineWidth(const Length& width) noexcept
+void PrimitiveCircleGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept
 {
-    mPen.setWidthF(width.toPx());
-    mPenHighlighted.setWidthF(width.toPx());
+    mPen.setWidthF(width->toPx());
+    mPenHighlighted.setWidthF(width->toPx());
     updateBoundingRectAndShape();
 }
 
@@ -199,7 +199,7 @@ void PrimitiveCircleGraphicsItem::updateBoundingRectAndShape() noexcept
     mBoundingRect = Toolbox::adjustedBoundingRect(mCircleRect, mPen.widthF() / 2);
     QPainterPath p;
     p.addEllipse(mCircleRect);
-    mShape = Toolbox::shapeFromPath(p, mPen, mBrush, Length(200000));
+    mShape = Toolbox::shapeFromPath(p, mPen, mBrush, UnsignedLength(200000));
     update();
 }
 

@@ -63,14 +63,14 @@ CategoryChooserDialog<ElementType>::~CategoryChooserDialog() noexcept
  ****************************************************************************************/
 
 template <typename ElementType>
-Uuid CategoryChooserDialog<ElementType>::getSelectedCategoryUuid() const noexcept
+tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid() const noexcept
 {
     QModelIndex index = mUi->treeView->currentIndex();
     if (index.isValid() && index.internalPointer()) {
         workspace::CategoryTreeItem<ElementType>* item = mModel->getItem(index);
-        return item ? item->getUuid() : Uuid();
+        return item ? item->getUuid() : tl::nullopt;
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 

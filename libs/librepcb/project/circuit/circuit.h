@@ -26,8 +26,11 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/circuitidentifier.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/library/cmp/componentprefix.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -86,10 +89,10 @@ class Circuit final : public QObject, public SerializableObject
         // NetClass Methods
         const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {return mNetClasses;}
         NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
-        NetClass* getNetClassByName(const QString& name) const noexcept;
+        NetClass* getNetClassByName(const ElementName& name) const noexcept;
         void addNetClass(NetClass& netclass);
         void removeNetClass(NetClass& netclass);
-        void setNetClassName(NetClass& netclass, const QString& newName);
+        void setNetClassName(NetClass& netclass, const ElementName& newName);
 
         // NetSignal Methods
         QString generateAutoNetSignalName() const noexcept;
@@ -99,17 +102,18 @@ class Circuit final : public QObject, public SerializableObject
         NetSignal* getNetSignalWithMostElements() const noexcept;
         void addNetSignal(NetSignal& netsignal);
         void removeNetSignal(NetSignal& netsignal);
-        void setNetSignalName(NetSignal& netsignal, const QString& newName, bool isAutoName);
+        void setNetSignalName(NetSignal& netsignal, const CircuitIdentifier& newName,
+                              bool isAutoName);
         void setHighlightedNetSignal(NetSignal* signal) noexcept;
 
         // ComponentInstance Methods
-        QString generateAutoComponentInstanceName(const QString& cmpPrefix) const noexcept;
+        QString generateAutoComponentInstanceName(const library::ComponentPrefix& cmpPrefix) const noexcept;
         const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {return mComponentInstances;}
         ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const noexcept;
         ComponentInstance* getComponentInstanceByName(const QString& name) const noexcept;
         void addComponentInstance(ComponentInstance& cmp);
         void removeComponentInstance(ComponentInstance& cmp);
-        void setComponentInstanceName(ComponentInstance& cmp, const QString& newName);
+        void setComponentInstanceName(ComponentInstance& cmp, const CircuitIdentifier& newName);
 
         // General Methods
         bool save(bool toOriginal, QStringList& errors) noexcept;

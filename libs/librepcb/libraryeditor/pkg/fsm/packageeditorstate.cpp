@@ -49,7 +49,7 @@ PackageEditorState::~PackageEditorState() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-const Length& PackageEditorState::getGridInterval() const noexcept
+const PositiveLength& PackageEditorState::getGridInterval() const noexcept
 {
     return mContext.graphicsView.getGridProperties().getInterval();
 }

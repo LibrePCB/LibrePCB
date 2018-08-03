@@ -40,7 +40,7 @@ namespace project {
  ****************************************************************************************/
 
 CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
-                                                 const Uuid& symbVar, const Uuid& defaultDevice) noexcept :
+        const Uuid& symbVar, const tl::optional<Uuid>& defaultDevice) noexcept :
     UndoCommand(tr("Add component")),
     mCircuit(circuit), mComponentUuid(cmp), mSymbVarUuid(symbVar),
     mDefaultDeviceUuid(defaultDevice), mComponentInstance(nullptr)
@@ -65,7 +65,8 @@ bool CmdComponentInstanceAdd::performExecute()
     }
     const QStringList& normOrder = mCircuit.getProject().getSettings().getNormOrder();
     QString name = mCircuit.generateAutoComponentInstanceName(cmp->getPrefixes().value(normOrder));
-    mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid, name,
+    mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid,
+                                               CircuitIdentifier(name),
                                                mDefaultDeviceUuid); // can throw
 
     performRedo(); // can throw

@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <optional/tl/optional.hpp>
 #include "fileio/sexpression.h"
 
 /*****************************************************************************************
@@ -38,8 +39,7 @@ namespace librepcb {
 /**
  * @brief The Version class represents a version number in the format "1.42.7"
  *
- * Each #Version instance can either be valid or invalid (see #isValid()).
- * Rules for a valid version:
+ * Rules for a version number:
  *  - Minimum count of numbers: 1 (example: "15")
  *  - Maximum count of numbers: 10 (example: "31.41.5.926.5358.97.9.3.238.462")
  *  - Minimum count of digits of a number: 1
@@ -51,8 +51,9 @@ namespace librepcb {
  * Leading zeros in numbers are ignored: "002.0005" will be converted to "2.5"
  * Trailing zero numbers are ignored: "2.5.0.0" will be converted to "2.5"
  *
- * @author ubruhin
- * @date 2014-10-30
+ * @note This class guarantees that only Version objects representing a valid version
+ *       number can be created! If you need a nullable Version, use
+ *       tl::optional<librepcb::Version> instead.
  */
 class Version final
 {
@@ -63,38 +64,24 @@ class Version final
         // Constructors / Destructor
 
         /**
-         * @brief Default constructor (creates an invalid #Version object)
+         * @brief Default constructor (disabled to avoid creating invalid versions)
          */
-        Version() noexcept;
-
-        /**
-         * @brief Constructor which creates a #Version object from a version string
-         *
-         * @param version   See #setVersion()
-         */
-        explicit Version(const QString& version) noexcept;
+        Version() = delete;
 
         /**
          * @brief Copy constructor
          *
          * @param other     Another #Version object
          */
-        Version(const Version& other) noexcept;
+        Version(const Version& other) noexcept : mNumbers(other.mNumbers) {}
 
         /**
          * Destructor
          */
-        ~Version() noexcept;
+        ~Version() noexcept = default;
 
 
         // Getters
-
-        /**
-         * @brief Check if the object represents a valid version number
-         *
-         * @return true = valid, false = invalid
-         */
-        bool isValid() const noexcept {return (mNumbers.count() > 0);}
 
         /**
          * @brief Check if this version is the prefix of another version
@@ -103,8 +90,8 @@ class Version final
          *
          * @param other     Another version
          *
-         * @return  True if both versions are valid and "other" starts with the same
-         *          segments as all segments of this version. False in all other cases.
+         * @return  True if "other" starts with the same segments as all segments of this
+         *          version, otherwise false.
          */
         bool isPrefixOf(const Version& other) const noexcept;
 
@@ -113,14 +100,14 @@ class Version final
          *
          * The first item in the list is the major version number.
          *
-         * @return List of numbers (empty list = invalid version)
+         * @return Vector of numbers
          */
-        const QList<int>& getNumbers() const noexcept {return mNumbers;}
+        const QVector<uint>& getNumbers() const noexcept {return mNumbers;}
 
         /**
          * @brief Get the version as a string in the format "1.2.3"
          *
-         * @return The version as a string (empty string = invalid version)
+         * @return The version as a string
          */
         QString toStr() const noexcept;
 
@@ -134,7 +121,7 @@ class Version final
          *                      parameter, trailing segments will be omitted.
          *                      Example: "0.1.2.3.4" gets "0.1" with maxSegCount = 2
          *
-         * @return The version as a string (empty string = invalid version)
+         * @return The version as a string
          */
         QString toPrettyStr(int minSegCount, int maxSegCount = 10) const noexcept;
 
@@ -147,24 +134,9 @@ class Version final
          * This method is useful to compare versions in a database (e.g. SQLite) as you
          * only need a simple string compare.
          *
-         * @return The version as a comparable string (empty string = invalid version)
+         * @return The version as a comparable string
          */
         QString toComparableStr() const noexcept;
-
-
-        // Setters
-
-        /**
-         * @brief Set the version of the object from a string
-         *
-         * If the version string is valid, the object will be valid too. If the string
-         * does not contain a valid version, the object will be invalid.
-         *
-         * @param version   The version string in the format "1.2.3" (variable count of numbers)
-         *
-         * @return validity of the version (true = valid, false = invalid)
-         */
-        bool setVersion(const QString& version) noexcept;
 
 
         // Operator overloadings
@@ -187,17 +159,54 @@ class Version final
         //@}
 
 
-    private:
+        // Static Methods
 
-        // Attributes
+        /**
+         * @brief Check if a string is a valid version number
+         *
+         * @param str       The string to check
+         *
+         * @retval true     If str is a valid version number
+         * @retval false    If str is not a valid version number
+         */
+        static bool isValid(const QString& str) noexcept;
+
+        /**
+         * @brief Create a Version object from a string
+         *
+         * @param str       The version string in the format "1.2.3" (variable count of
+         *                  numbers)
+         *
+         * @return A valid Version object
+         *
+         * @throws Exception if the string does not contain a valid version number
+         */
+        static Version fromString(const QString& str);
+
+        /**
+         * @brief Try creating a Version object from a string, returning empty optional if
+         *        invalid
+         *
+         * @param str           Input string
+         *
+         * @retval Version      The created Version object if str was valid
+         * @retval tl::nullopt  If str was not a valid version number
+         */
+        static tl::optional<Version> tryFromString(const QString& str) noexcept;
+
+
+    private: // Methods
+        explicit Version(const QVector<uint>& numbers) noexcept : mNumbers(numbers) {}
+
+
+    private: // Data
 
         /**
          * @brief List of all version numbers of the whole version
          *
-         * number count == 0: version invalid
-         * number count >= 1: version valid
+         * Guaranteed to contain at least one item.
          */
-        QList<int> mNumbers;
+        QVector<uint> mNumbers;
 };
 
 /*****************************************************************************************
@@ -212,12 +221,7 @@ inline SExpression serializeToSExpression(const Version& obj) {
 template <>
 inline Version deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
     QString str = sexpr.getStringOrToken(throwIfEmpty);
-    Version version(str);
-    if ((!version.isValid()) && (!str.isEmpty())) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(Version::tr("Invalid version number: \"%1\"")).arg(str));
-    }
-    return version;
+    return Version::fromString(str); // can throw
 }
 
 /*****************************************************************************************

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "packageeditorstate.h"
 
 /*****************************************************************************************
@@ -92,8 +93,8 @@ class PackageEditorState_DrawCircle final : public PackageEditorState
         CircleGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        QString mLastLayerName;
-        Length mLastLineWidth;
+        GraphicsLayerName mLastLayerName;
+        UnsignedLength mLastLineWidth;
         bool mLastFill;
         bool mLastGrabArea;
 };

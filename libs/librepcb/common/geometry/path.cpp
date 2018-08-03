@@ -197,12 +197,12 @@ Path Path::line(const Point& p1, const Point& p2, const Angle& angle) noexcept
     return Path({Vertex(p1), Vertex(p2, angle)});
 }
 
-Path Path::circle(const Length& diameter) noexcept
+Path Path::circle(const PositiveLength& diameter) noexcept
 {
     return obround(diameter, diameter);
 }
 
-Path Path::obround(const Length& width, const Length& height) noexcept
+Path Path::obround(const PositiveLength& width, const PositiveLength& height) noexcept
 {
     Path p;
     Length rx = width / 2;
@@ -228,10 +228,10 @@ Path Path::obround(const Length& width, const Length& height) noexcept
     return p;
 }
 
-Path Path::obround(const Point& p1, const Point& p2, const Length& width) noexcept
+Path Path::obround(const Point& p1, const Point& p2, const PositiveLength& width) noexcept
 {
     Point diff = p2 - p1;
-    Path p = obround(diff.getLength() + width, width);
+    Path p = obround(UnsignedLength(diff.getLength()) + width, width);
     p.rotate(Angle::fromRad(qAtan2(diff.getY().toMm(), diff.getX().toMm())));
     p.translate((p1 + p2) / 2);
     return p;
@@ -248,7 +248,7 @@ Path Path::rect(const Point& p1, const Point& p2) noexcept
     return p;
 }
 
-Path Path::centeredRect(const Length& width, const Length& height) noexcept
+Path Path::centeredRect(const PositiveLength& width, const PositiveLength& height) noexcept
 {
     Path p;
     Length rx = width / 2;
@@ -261,7 +261,7 @@ Path Path::centeredRect(const Length& width, const Length& height) noexcept
     return p;
 }
 
-Path Path::octagon(const Length& width, const Length& height) noexcept
+Path Path::octagon(const PositiveLength& width, const PositiveLength& height) noexcept
 {
     Path p;
     Length rx = width / 2;
@@ -280,17 +280,17 @@ Path Path::octagon(const Length& width, const Length& height) noexcept
 }
 
 Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
-                   const Length& maxTolerance) noexcept
+                   const PositiveLength& maxTolerance) noexcept
 {
     // return straight line if radius is smaller than half of the allowed tolerance
     Length radiusAbs = Toolbox::arcRadius(p1, p2, angle).abs();
-    if (radiusAbs <= maxTolerance.abs() / 2) {
+    if (radiusAbs <= maxTolerance / 2) {
         return line(p1, p2);
     }
 
     // calculate how many lines we need to create
     qreal radiusAbsNm = static_cast<qreal>(radiusAbs.toNm());
-    qreal y = qBound(0.0, static_cast<qreal>(maxTolerance.toNm()), radiusAbsNm / 4);
+    qreal y = qBound(0.0, static_cast<qreal>(maxTolerance->toNm()), radiusAbsNm / 4);
     qreal stepsPerRad = qMin(0.5 / qAcos(1 - y / radiusAbsNm), radiusAbsNm / 2);
     int steps = qCeil(stepsPerRad * angle.abs().toRad());
 

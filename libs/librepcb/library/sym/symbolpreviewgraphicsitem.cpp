@@ -46,16 +46,16 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
                                                      const QStringList& localeOrder,
                                                      const Symbol& symbol,
                                                      const Component* cmp,
-                                                     const Uuid& symbVarUuid,
-                                                     const Uuid& symbVarItemUuid) noexcept :
+                                                     const tl::optional<Uuid>& symbVarUuid,
+                                                     const tl::optional<Uuid>& symbVarItemUuid) noexcept :
     QGraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
     mFont = qApp->getDefaultSansSerifFont();
 
     try {
-        if (mComponent) {
-            mSymbVarItem = mComponent->getSymbVarItem(symbVarUuid, symbVarItemUuid).get(); // can throw
+        if (mComponent && symbVarUuid && symbVarItemUuid) {
+            mSymbVarItem = mComponent->getSymbVarItem(*symbVarUuid, *symbVarItemUuid).get(); // can throw
         }
 
         updateCacheAndRepaint();
@@ -64,7 +64,9 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvi
             const ComponentSignal* signal = nullptr;
             const ComponentPinSignalMapItem* mapItem = nullptr;
             CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
-            if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin.getUuid()).get(); // can throw
+            if (mComponent && symbVarItemUuid && symbVarItemUuid) {
+                signal = mComponent->getSignalOfPin(*symbVarUuid, *symbVarItemUuid, pin.getUuid()).get(); // can throw
+            }
             if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMap().find(pin.getUuid()).get(); // can throw
             if (mapItem) displayType = mapItem->getDisplayType();
             SymbolPinPreviewGraphicsItem* item = new SymbolPinPreviewGraphicsItem(layerProvider, pin, signal, displayType);
@@ -116,7 +118,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
     // polygons
     for (const Polygon& polygon : mSymbol.getPolygons()) {
         QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-        qreal w = polygon.getLineWidth().toPx() / 2;
+        qreal w = polygon.getLineWidth()->toPx() / 2;
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
         if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
     }
@@ -131,9 +133,9 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept
         props.text = AttributeSubstitutor::substitute(text.getText(), this);
 
         // calculate font metrics
-        mFont.setPointSizeF(text.getHeight().toPx());
+        mFont.setPointSizeF(text.getHeight()->toPx());
         QFontMetricsF metrics(mFont);
-        props.fontSize = text.getHeight().toPx()*0.8*text.getHeight().toPx()/metrics.height();
+        props.fontSize = text.getHeight()->toPx()*0.8*text.getHeight()->toPx()/metrics.height();
         mFont.setPointSizeF(props.fontSize);
         metrics = QFontMetricsF(mFont);
         props.textRect = metrics.boundingRect(QRectF(), text.getAlign().toQtAlign() |
@@ -205,15 +207,15 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw all polygons
     for (const Polygon& polygon : mSymbol.getPolygons()) {
         // set colors
-        layer = mLayerProvider.getLayer(polygon.getLayerName());
+        layer = mLayerProvider.getLayer(*polygon.getLayerName());
         if (layer) {
-            pen = QPen(layer->getColor(selected), polygon.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), polygon.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         } else {
             painter->setPen(Qt::NoPen);
         }
         if (polygon.isFilled())
-            layer = mLayerProvider.getLayer(polygon.getLayerName());
+            layer = mLayerProvider.getLayer(*polygon.getLayerName());
         else if (polygon.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -227,16 +229,16 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
     // draw all circles
     for (const Circle& circle : mSymbol.getCircles()) {
         // set colors
-        layer = mLayerProvider.getLayer(circle.getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(*circle.getLayerName()); if (!layer) continue;
         if (layer)
         {
-            pen = QPen(layer->getColor(selected), circle.getLineWidth().toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+            pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
             painter->setPen(pen);
         }
         else
             painter->setPen(Qt::NoPen);
         if (circle.isFilled())
-            layer = mLayerProvider.getLayer(circle.getLayerName());
+            layer = mLayerProvider.getLayer(*circle.getLayerName());
         else if (circle.isGrabArea())
             layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
         else
@@ -245,15 +247,15 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 
         // draw circle
         painter->drawEllipse(circle.getCenter().toPxQPointF(),
-                             circle.getDiameter().toPx() / 2,
-                             circle.getDiameter().toPx() / 2);
+                             circle.getDiameter()->toPx() / 2,
+                             circle.getDiameter()->toPx() / 2);
         // TODO: rotation
     }
 
     // draw all texts
     for (const Text& text : mSymbol.getTexts()) {
         // get layer
-        layer = mLayerProvider.getLayer(text.getLayerName()); if (!layer) continue;
+        layer = mLayerProvider.getLayer(*text.getLayerName()); if (!layer) continue;
 
         // get cached text properties
         const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
@@ -303,7 +305,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraph
 QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (mComponent && mSymbVarItem && (key == QLatin1String("NAME"))) {
-        return mComponent->getPrefixes().getDefaultValue() % "?" % mSymbVarItem->getSuffix();
+        QString name = mComponent->getPrefixes().getDefaultValue() % "?";
+        if (!mSymbVarItem->getSuffix()->isEmpty()) name += "-" % mSymbVarItem->getSuffix();
+        return name;
     } else if (mComponent && (key == QLatin1String("NAME"))) {
         return mComponent->getPrefixes().getDefaultValue() % "?";
     } else {

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/elementname.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -47,7 +48,7 @@ class CmdNetClassAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdNetClassAdd(Circuit& circuit, const QString& name) noexcept;
+        CmdNetClassAdd(Circuit& circuit, const ElementName& name) noexcept;
         ~CmdNetClassAdd() noexcept;
 
         // Getters
@@ -71,7 +72,7 @@ class CmdNetClassAdd final : public UndoCommand
         // Private Member Variables
 
         Circuit& mCircuit;
-        QString mName;
+        ElementName mName;
         NetClass* mNetClass;
 };
 

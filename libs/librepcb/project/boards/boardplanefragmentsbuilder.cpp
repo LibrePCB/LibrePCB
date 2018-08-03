@@ -131,7 +131,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
         if (&plane->getNetSignal() == &mPlane.getNetSignal()) continue;
         ClipperLib::Paths paths = ClipperHelpers::convert(plane->getFragments(),
                                                           maxArcTolerance());
-        ClipperHelpers::offset(paths, mPlane.getMinClearance(), maxArcTolerance()); // can throw
+        ClipperHelpers::offset(paths, *mPlane.getMinClearance(), maxArcTolerance()); // can throw
         c.AddPaths(paths, ClipperLib::ptClip, true);
     }
 
@@ -139,13 +139,13 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
     foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
         for (const Hole& hole : device->getFootprint().getLibFootprint().getHoles()) {
             Point pos = device->getFootprint().mapToScene(hole.getPosition());
-            Length dia = hole.getDiameter() + mPlane.getMinClearance() * 2;
+            PositiveLength dia(hole.getDiameter() + mPlane.getMinClearance() * 2);
             Path path = Path::circle(dia).translated(pos);
             c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
                       ClipperLib::ptClip, true);
         }
         foreach (const BI_FootprintPad* pad, device->getFootprint().getPads()) {
-            if (!pad->isOnLayer(mPlane.getLayerName())) continue;
+            if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
             if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
                 ClipperLib::Path path = ClipperHelpers::convert(pad->getSceneOutline(),
                                                                 maxArcTolerance());
@@ -157,7 +157,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
 
     // subtract board holes
     for (const BI_Hole* hole : mPlane.getBoard().getHoles()) {
-        Length dia = hole->getHole().getDiameter() + mPlane.getMinClearance() * 2;
+        PositiveLength dia(hole->getHole().getDiameter() + mPlane.getMinClearance() * 2);
         Path path = Path::circle(dia).translated(hole->getHole().getPosition());
         c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
                   ClipperLib::ptClip, true);
@@ -185,7 +185,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects()
                 mConnectedNetSignalAreas.push_back(path);
             } else {
                 ClipperLib::Path path = ClipperHelpers::convert(
-                    netline->getSceneOutline(mPlane.getMinClearance()), maxArcTolerance());
+                    netline->getSceneOutline(*mPlane.getMinClearance()), maxArcTolerance());
                 c.AddPath(path, ClipperLib::ptClip, true);
             }
         }
@@ -237,7 +237,7 @@ ClipperLib::Path BoardPlaneFragmentsBuilder::createPadCutOut(const BI_FootprintP
 {
     bool differentNetSignal = (pad.getCompSigInstNetSignal() != &mPlane.getNetSignal());
     if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) || differentNetSignal) {
-        return ClipperHelpers::convert(pad.getSceneOutline(mPlane.getMinClearance()), maxArcTolerance());
+        return ClipperHelpers::convert(pad.getSceneOutline(*mPlane.getMinClearance()), maxArcTolerance());
     } else {
         return ClipperLib::Path();
     }
@@ -247,7 +247,7 @@ ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(const BI_Via& via) 
 {
     bool differentNetSignal = (&via.getNetSignalOfNetSegment() != &mPlane.getNetSignal());
     if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) || differentNetSignal) {
-        return ClipperHelpers::convert(via.getSceneOutline(mPlane.getMinClearance()), maxArcTolerance());
+        return ClipperHelpers::convert(via.getSceneOutline(*mPlane.getMinClearance()), maxArcTolerance());
     } else {
         return ClipperLib::Path();
     }

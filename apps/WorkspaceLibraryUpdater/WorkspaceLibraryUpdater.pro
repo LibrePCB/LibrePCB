@@ -22,7 +22,9 @@ LIBS += \
     -lclipper \
 
 INCLUDEPATH += \
-    ../../libs
+    ../../libs \
+    ../../libs/type_safe/include \
+    ../../libs/type_safe/external/debug_assert \
 
 DEPENDPATH += \
     ../../libs/librepcb/workspace \

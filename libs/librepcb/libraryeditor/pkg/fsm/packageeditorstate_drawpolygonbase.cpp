@@ -73,7 +73,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept
     mContext.commandToolBar.addLabel(tr("Layer:"));
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
     layerComboBox->setLayers(mContext.layerProvider.getBoardGeometryElementLayers());
-    layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->setCurrentLayer(*mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -84,7 +84,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept
     lineWidthSpinBox->setMaximum(100);
     lineWidthSpinBox->setSingleStep(0.1);
     lineWidthSpinBox->setDecimals(6);
-    lineWidthSpinBox->setValue(mLastLineWidth.toMm());
+    lineWidthSpinBox->setValue(mLastLineWidth->toMm());
     connect(lineWidthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &PackageEditorState_DrawPolygonBase::lineWidthSpinBoxValueChanged);
@@ -143,7 +143,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept
 bool PackageEditorState_DrawPolygonBase::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentPolygon) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         return updateCurrentPosition(currentPos);
     } else {
         return true;
@@ -152,7 +152,7 @@ bool PackageEditorState_DrawPolygonBase::processGraphicsSceneMouseMoved(QGraphic
 
 bool PackageEditorState_DrawPolygonBase::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentPolygon) {
         Point startPos = mCurrentPolygon->getPath().getVertices().first().getPos();
         if (currentPos == mSegmentStartPos) {

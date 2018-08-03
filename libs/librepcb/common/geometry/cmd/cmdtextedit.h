@@ -24,16 +24,13 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../text.h"
 #include "../../undocommand.h"
-#include "../../alignment.h"
-#include "../../units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class Text;
 
 /*****************************************************************************************
  *  Class CmdTextEdit
@@ -53,9 +50,9 @@ class CmdTextEdit final : public UndoCommand
         ~CmdTextEdit() noexcept;
 
         // Setters
-        void setLayerName(const QString& name, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
         void setText(const QString& text, bool immediate) noexcept;
-        void setHeight(const Length& height, bool immediate) noexcept;
+        void setHeight(const PositiveLength& height, bool immediate) noexcept;
         void setAlignment(const Alignment& align, bool immediate) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
@@ -86,16 +83,16 @@ class CmdTextEdit final : public UndoCommand
         Text& mText;
 
         // General Attributes
-        QString mOldLayerName;
-        QString mNewLayerName;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
         QString mOldText;
         QString mNewText;
         Point mOldPosition;
         Point mNewPosition;
         Angle mOldRotation;
         Angle mNewRotation;
-        Length mOldHeight;
-        Length mNewHeight;
+        PositiveLength mOldHeight;
+        PositiveLength mNewHeight;
         Alignment mOldAlign;
         Alignment mNewAlign;
 };

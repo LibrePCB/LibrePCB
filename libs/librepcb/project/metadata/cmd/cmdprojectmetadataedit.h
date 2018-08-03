@@ -25,15 +25,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/attributes/attribute.h>
+#include "../projectmetadata.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
-
-class ProjectMetadata;
 
 /*****************************************************************************************
  *  Class CmdProjectMetadataEdit
@@ -51,7 +49,7 @@ class CmdProjectMetadataEdit final : public UndoCommand
         ~CmdProjectMetadataEdit() noexcept;
 
         // Setters
-        void setName(const QString& newName) noexcept;
+        void setName(const ElementName& newName) noexcept;
         void setAuthor(const QString& newAuthor) noexcept;
         void setVersion(const QString& newVersion) noexcept;
         void setAttributes(const AttributeList& attributes) noexcept;
@@ -77,8 +75,8 @@ class CmdProjectMetadataEdit final : public UndoCommand
         ProjectMetadata& mMetadata;
 
         // Misc
-        QString mOldName;
-        QString mNewName;
+        ElementName mOldName;
+        ElementName mNewName;
         QString mOldAuthor;
         QString mNewAuthor;
         QString mOldVersion;

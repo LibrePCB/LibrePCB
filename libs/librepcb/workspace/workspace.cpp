@@ -184,19 +184,19 @@ FavoriteProjectsModel& Workspace::getFavoriteProjectsModel() const noexcept
  *  Library Management
  ****************************************************************************************/
 
-Version Workspace::getVersionOfLibrary(const Uuid& uuid, bool local, bool remote) const noexcept
+tl::optional<Version> Workspace::getVersionOfLibrary(const Uuid& uuid, bool local, bool remote) const noexcept
 {
-    Version version;
+    tl::optional<Version> version;
     if (local) {
         foreach (const auto& lib, mLocalLibraries) { Q_ASSERT(lib);
-            if ((lib->getUuid() == uuid) && ((!version.isValid()) || (version < lib->getVersion()))) {
+            if ((lib->getUuid() == uuid) && ((!version) || (version < lib->getVersion()))) {
                 version = lib->getVersion();
             }
         }
     }
     if (remote) {
         foreach (const auto& lib, mRemoteLibraries) { Q_ASSERT(lib);
-            if ((lib->getUuid() == uuid) && ((!version.isValid()) || (version < lib->getVersion()))) {
+            if ((lib->getUuid() == uuid) && ((!version) || (version < lib->getVersion()))) {
                 version = lib->getVersion();
             }
         }
@@ -288,9 +288,9 @@ QList<Version> Workspace::getFileFormatVersionsOfWorkspace(const FilePath& path)
         QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
         foreach (const QString& subdir, subdirs) {
             if (subdir.startsWith('v')) {
-                Version version(subdir.mid(1, -1));
-                if (version.isValid()) {
-                    list.append(version);
+                tl::optional<Version> version = Version::tryFromString(subdir.mid(1, -1));
+                if (version) {
+                    list.append(*version);
                 }
             }
         }
@@ -299,13 +299,13 @@ QList<Version> Workspace::getFileFormatVersionsOfWorkspace(const FilePath& path)
     return list;
 }
 
-Version Workspace::getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept
+tl::optional<Version> Workspace::getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept
 {
     QList<Version> versions = getFileFormatVersionsOfWorkspace(path);
     if (versions.count() > 0) {
         return versions.last();
     } else {
-        return Version();
+        return tl::nullopt;
     }
 }
 

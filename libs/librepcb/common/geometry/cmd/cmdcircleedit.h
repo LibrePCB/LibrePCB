@@ -24,15 +24,13 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include "../circle.h"
 #include "../../undocommand.h"
-#include "../../units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class Circle;
 
 /*****************************************************************************************
  *  Class CmdCircleEdit
@@ -52,11 +50,11 @@ class CmdCircleEdit final : public UndoCommand
         ~CmdCircleEdit() noexcept;
 
         // Setters
-        void setLayerName(const QString& name, bool immediate) noexcept;
-        void setLineWidth(const Length& width, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+        void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setDiameter(const Length& dia, bool immediate) noexcept;
+        void setDiameter(const PositiveLength& dia, bool immediate) noexcept;
         void setCenter(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
@@ -85,16 +83,16 @@ class CmdCircleEdit final : public UndoCommand
         Circle& mCircle;
 
         // General Attributes
-        QString mOldLayerName;
-        QString mNewLayerName;
-        Length mOldLineWidth;
-        Length mNewLineWidth;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
+        UnsignedLength mOldLineWidth;
+        UnsignedLength mNewLineWidth;
         bool mOldIsFilled;
         bool mNewIsFilled;
         bool mOldIsGrabArea;
         bool mNewIsGrabArea;
-        Length mOldDiameter;
-        Length mNewDiameter;
+        PositiveLength mOldDiameter;
+        PositiveLength mNewDiameter;
         Point mOldCenter;
         Point mNewCenter;
 };

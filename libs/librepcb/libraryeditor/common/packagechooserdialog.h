@@ -76,7 +76,7 @@ class PackageChooserDialog final : public QDialog
         ~PackageChooserDialog() noexcept;
 
         // Getters
-        const Uuid& getSelectedPackageUuid() const noexcept {return mSelectedPackageUuid;}
+        const tl::optional<Uuid>& getSelectedPackageUuid() const noexcept {return mSelectedPackageUuid;}
 
         // Operator Overloadings
         PackageChooserDialog& operator=(const PackageChooserDialog& rhs) = delete;
@@ -88,8 +88,8 @@ class PackageChooserDialog final : public QDialog
         void listPackages_currentItemChanged(QListWidgetItem* current,
                                              QListWidgetItem* previous) noexcept;
         void listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const Uuid& uuid) noexcept;
-        void setSelectedPackage(const Uuid& uuid) noexcept;
+        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+        void setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept;
         void updatePreview() noexcept;
         void accept() noexcept override;
         const QStringList& localeOrder() const noexcept;
@@ -100,8 +100,8 @@ class PackageChooserDialog final : public QDialog
         const IF_GraphicsLayerProvider* mLayerProvider;
         QScopedPointer<Ui::PackageChooserDialog> mUi;
         QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        Uuid mSelectedCategoryUuid;
-        Uuid mSelectedPackageUuid;
+        tl::optional<Uuid> mSelectedCategoryUuid;
+        tl::optional<Uuid> mSelectedPackageUuid;
 
         // preview
         FilePath mPackageFilePath;

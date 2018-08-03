@@ -75,7 +75,7 @@ bool NewElementWizardPage_CopyFrom::validatePage() noexcept
         if (element->getCategories().count() > 0) {
             mContext.mElementCategoryUuid = element->getCategories().values().first();
         } else {
-            mContext.mElementCategoryUuid = Uuid();
+            mContext.mElementCategoryUuid = tl::nullopt;
         }
     }
     switch (mContext.mElementType) {
@@ -135,12 +135,12 @@ void NewElementWizardPage_CopyFrom::treeView_currentItemChanged(const QModelInde
                                                                 const QModelIndex& previous) noexcept
 {
     Q_UNUSED(previous);
-    setSelectedCategory(Uuid(current.data(Qt::UserRole).toString()));
+    setSelectedCategory(Uuid::tryFromString(current.data(Qt::UserRole).toString()));
 }
 
 void NewElementWizardPage_CopyFrom::treeView_doubleClicked(const QModelIndex& item) noexcept
 {
-    setSelectedCategory(Uuid(item.data(Qt::UserRole).toString()));
+    setSelectedCategory(Uuid::tryFromString(item.data(Qt::UserRole).toString()));
     if (mIsCategoryElement) wizard()->next();
 }
 
@@ -165,9 +165,9 @@ void NewElementWizardPage_CopyFrom::listWidget_itemDoubleClicked(QListWidgetItem
     }
 }
 
-void NewElementWizardPage_CopyFrom::setSelectedCategory(const Uuid& uuid) noexcept
+void NewElementWizardPage_CopyFrom::setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept
 {
-    if ((uuid == mSelectedCategoryUuid) && (!uuid.isNull())) return;
+    if (uuid && (uuid == mSelectedCategoryUuid)) return;
 
     setSelectedElement(FilePath());
     mUi->listWidget->clear();
@@ -251,18 +251,22 @@ void NewElementWizardPage_CopyFrom::setCategoryTreeModel(QAbstractItemModel* mod
             this, &NewElementWizardPage_CopyFrom::treeView_currentItemChanged);
 }
 
-FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(const Uuid& category) const
+FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(const tl::optional<Uuid>& category) const
 {
-    switch (mContext.mElementType) {
-        case NewElementWizardContext::ElementType::ComponentCategory:
-            return mContext.getWorkspace().getLibraryDb().getLatestComponentCategory(category);
-        case NewElementWizardContext::ElementType::PackageCategory:
-            return mContext.getWorkspace().getLibraryDb().getLatestPackageCategory(category);
-        default: throw LogicError(__FILE__, __LINE__);
+    if (category) {
+        switch (mContext.mElementType) {
+            case NewElementWizardContext::ElementType::ComponentCategory:
+                return mContext.getWorkspace().getLibraryDb().getLatestComponentCategory(*category);
+            case NewElementWizardContext::ElementType::PackageCategory:
+                return mContext.getWorkspace().getLibraryDb().getLatestPackageCategory(*category);
+            default: throw LogicError(__FILE__, __LINE__);
+        }
+    } else {
+        return FilePath();
     }
 }
 
-QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(const Uuid& category) const
+QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(const tl::optional<Uuid>& category) const
 {
     switch (mContext.mElementType) {
         case NewElementWizardContext::ElementType::Symbol:

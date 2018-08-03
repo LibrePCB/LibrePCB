@@ -64,12 +64,12 @@ PackageChooserDialog::PackageChooserDialog(const workspace::Workspace& ws,
     connect(mUi->listPackages, &QListWidget::itemDoubleClicked,
             this, &PackageChooserDialog::listPackages_itemDoubleClicked);
 
-    setSelectedPackage(Uuid());
+    setSelectedPackage(tl::nullopt);
 }
 
 PackageChooserDialog::~PackageChooserDialog() noexcept
 {
-    setSelectedPackage(Uuid());
+    setSelectedPackage(tl::nullopt);
 }
 
 /*****************************************************************************************
@@ -80,7 +80,7 @@ void PackageChooserDialog::treeCategories_currentItemChanged(const QModelIndex& 
                                                             const QModelIndex& previous) noexcept
 {
     Q_UNUSED(previous);
-    setSelectedCategory(Uuid(current.data(Qt::UserRole).toString()));
+    setSelectedCategory(Uuid::tryFromString(current.data(Qt::UserRole).toString()));
 }
 
 void PackageChooserDialog::listPackages_currentItemChanged(QListWidgetItem* current,
@@ -88,58 +88,61 @@ void PackageChooserDialog::listPackages_currentItemChanged(QListWidgetItem* curr
 {
     Q_UNUSED(previous);
     if (current) {
-        setSelectedPackage(Uuid(current->data(Qt::UserRole).toString()));
+        setSelectedPackage(Uuid::tryFromString(current->data(Qt::UserRole).toString()));
     } else {
-        setSelectedPackage(Uuid());
+        setSelectedPackage(tl::nullopt);
     }
 }
 
 void PackageChooserDialog::listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept
 {
     if (item) {
-        setSelectedPackage(Uuid(item->data(Qt::UserRole).toString()));
+        setSelectedPackage(Uuid::tryFromString(item->data(Qt::UserRole).toString()));
         accept();
     }
 }
 
-void PackageChooserDialog::setSelectedCategory(const Uuid& uuid) noexcept
+void PackageChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept
 {
-    if ((uuid == mSelectedCategoryUuid) && (!uuid.isNull())) return;
+    if (uuid && (uuid == mSelectedCategoryUuid)) return;
 
-    setSelectedPackage(Uuid());
+    setSelectedPackage(tl::nullopt);
     mUi->listPackages->clear();
 
     mSelectedCategoryUuid = uuid;
-    try {
-        QSet<Uuid> packages = mWorkspace.getLibraryDb().getPackagesByCategory(uuid); // can throw
-        foreach (const Uuid& uuid, packages) {
-            try {
-                FilePath fp = mWorkspace.getLibraryDb().getLatestPackage(uuid); // can throw
-                QString name;
-                mWorkspace.getLibraryDb().getElementTranslations<Package>(fp, localeOrder(),
-                                                                          &name); // can throw
-                QListWidgetItem* item = new QListWidgetItem(name);
-                item->setData(Qt::UserRole, uuid.toStr());
-                mUi->listPackages->addItem(item);
-            } catch (const Exception& e) {
-                continue; // should we do something here?
+
+    if (uuid) {
+        try {
+            QSet<Uuid> packages = mWorkspace.getLibraryDb().getPackagesByCategory(*uuid); // can throw
+            foreach (const Uuid& uuid, packages) {
+                try {
+                    FilePath fp = mWorkspace.getLibraryDb().getLatestPackage(uuid); // can throw
+                    QString name;
+                    mWorkspace.getLibraryDb().getElementTranslations<Package>(fp, localeOrder(),
+                                                                              &name); // can throw
+                    QListWidgetItem* item = new QListWidgetItem(name);
+                    item->setData(Qt::UserRole, uuid.toStr());
+                    mUi->listPackages->addItem(item);
+                } catch (const Exception& e) {
+                    continue; // should we do something here?
+                }
             }
+        } catch (const Exception& e) {
+            QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
         }
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
     }
 }
 
-void PackageChooserDialog::setSelectedPackage(const Uuid& uuid) noexcept
+void PackageChooserDialog::setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept
 {
     QString uuidStr = "00000000-0000-0000-0000-000000000000";
     QString name, desc;
     mSelectedPackageUuid = uuid;
 
-    if (!uuid.isNull()) {
+    if (uuid) {
         try {
-            uuidStr = uuid.toStr();
-            mPackageFilePath = mWorkspace.getLibraryDb().getLatestPackage(uuid); // can throw
+            uuidStr = uuid->toStr();
+            mPackageFilePath = mWorkspace.getLibraryDb().getLatestPackage(*uuid); // can throw
             mWorkspace.getLibraryDb().getElementTranslations<Package>(
                 mPackageFilePath, localeOrder(), &name, &desc); // can throw
         } catch (const Exception& e) {
@@ -175,7 +178,7 @@ void PackageChooserDialog::updatePreview() noexcept
 
 void PackageChooserDialog::accept() noexcept
 {
-    if (mSelectedPackageUuid.isNull()) {
+    if (!mSelectedPackageUuid) {
         QMessageBox::information(this, tr("Invalid Selection"), tr("Please select a package."));
         return;
     }

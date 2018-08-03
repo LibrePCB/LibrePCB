@@ -48,7 +48,7 @@ CmdFootprintEdit::~CmdFootprintEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdFootprintEdit::setName(const QString& name) noexcept
+void CmdFootprintEdit::setName(const ElementName& name) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

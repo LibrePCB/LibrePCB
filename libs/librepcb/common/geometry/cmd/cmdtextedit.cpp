@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdtextedit.h"
-#include "../text.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -55,7 +54,7 @@ CmdTextEdit::~CmdTextEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdTextEdit::setLayerName(const QString& name, bool immediate) noexcept
+void CmdTextEdit::setLayerName(const GraphicsLayerName& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = name;
@@ -69,7 +68,7 @@ void CmdTextEdit::setText(const QString& text, bool immediate) noexcept
     if (immediate) mText.setText(mNewText);
 }
 
-void CmdTextEdit::setHeight(const Length& height, bool immediate) noexcept
+void CmdTextEdit::setHeight(const PositiveLength& height, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewHeight = height;

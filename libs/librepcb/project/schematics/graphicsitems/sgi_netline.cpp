@@ -63,21 +63,21 @@ SGI_NetLine::~SGI_NetLine() noexcept
 
 void SGI_NetLine::updateCacheAndRepaint() noexcept
 {
-    setToolTip(mNetLine.getNetSignalOfNetSegment().getName());
+    setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
 
     prepareGeometryChange();
     mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
     mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
     mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
-    mBoundingRect.adjust(-mNetLine.getWidth().toPx()/2, -mNetLine.getWidth().toPx()/2,
-                         mNetLine.getWidth().toPx()/2, mNetLine.getWidth().toPx()/2);
+    mBoundingRect.adjust(-mNetLine.getWidth()->toPx()/2, -mNetLine.getWidth()->toPx()/2,
+                         mNetLine.getWidth()->toPx()/2, mNetLine.getWidth()->toPx()/2);
     mShape = QPainterPath();
     mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
     mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
     QPainterPathStroker ps;
     ps.setCapStyle(Qt::RoundCap);
-    Length width = (mNetLine.getWidth() > Length(1270000) ? mNetLine.getWidth() : Length(1270000));
-    ps.setWidth(width.toPx());
+    UnsignedLength width = qMax(mNetLine.getWidth(), UnsignedLength(1270000));
+    ps.setWidth(width->toPx());
     mShape = ps.createStroke(mShape);
     update();
 }
@@ -96,7 +96,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
     // draw line
     if (mLayer->isVisible())
     {
-        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth().toPx(), Qt::SolidLine, Qt::RoundCap);
+        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(), Qt::SolidLine, Qt::RoundCap);
         painter->setPen(pen);
         painter->drawLine(mLineF);
     }
@@ -110,7 +110,7 @@ void SGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
         font.setPixelSize(3);
         painter->setFont(font);
         painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->drawText(mLineF.pointAt((qreal)0.5), mNetLine.getNetSignalOfNetSegment().getName());
+        painter->drawText(mLineF.pointAt((qreal)0.5), *mNetLine.getNetSignalOfNetSegment().getName());
     }
     layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
     if (layer->isVisible())

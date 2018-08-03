@@ -194,7 +194,7 @@ SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(SEE_Base* event) noexce
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
 
             switch (sceneEvent->button())
             {
@@ -241,7 +241,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
         case QEvent::GraphicsSceneMousePress:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -259,7 +259,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
         case QEvent::GraphicsSceneMouseRelease:
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::RightButton:
@@ -282,7 +282,7 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(SEE_Base* event)
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             updateNetpointPositions(pos);
             return ForceStayInState;
         }

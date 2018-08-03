@@ -70,8 +70,8 @@ void PolygonSimplifier<LibElemType>::convertLineRectsToPolygonRects(bool fillAre
         Point p4(xValues.values().last(), yValues.values().first());
 
         // create the new polygon
-        QString layerName = lines.first()->getLayerName();
-        Length lineWidth = lines.first()->getLineWidth();
+        GraphicsLayerName layerName = lines.first()->getLayerName();
+        UnsignedLength lineWidth = lines.first()->getLineWidth();
         Path rectPath({Vertex(p1), Vertex(p2), Vertex(p3), Vertex(p4), Vertex(p1)});
         mLibraryElement.getPolygons().append(std::make_shared<Polygon>(
             Uuid::createRandom(), layerName, lineWidth, fillArea, isGrabArea, rectPath));
@@ -98,7 +98,7 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
 
     // find rectangle
     Polygon* line;
-    Length width;
+    UnsignedLength width(0);
     for (int i=0; i<linePolygons.count(); i++) {
         lines.clear();
         Point p = linePolygons.at(i)->getPath().getVertices().first().getPos();
@@ -124,7 +124,7 @@ bool PolygonSimplifier<LibElemType>::findLineRectangle(QList<Polygon*>& lines) n
 
 template <typename LibElemType>
 bool PolygonSimplifier<LibElemType>::findHLine(const QList<Polygon*>& lines, Point& p,
-                                               Length* width, Polygon** line) noexcept
+                                               UnsignedLength* width, Polygon** line) noexcept
 {
     foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}
@@ -145,7 +145,7 @@ bool PolygonSimplifier<LibElemType>::findHLine(const QList<Polygon*>& lines, Poi
 
 template <typename LibElemType>
 bool PolygonSimplifier<LibElemType>::findVLine(const QList<Polygon*>& lines, Point& p,
-                                               Length* width, Polygon** line) noexcept
+                                               UnsignedLength* width, Polygon** line) noexcept
 {
     foreach (Polygon* polygon, lines) {
         if (width) {if (polygon->getLineWidth() != *width) continue;}

@@ -47,7 +47,8 @@ namespace editor {
 SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(const Context& context,
                                                                Mode mode) noexcept :
     SymbolEditorState(context), mMode(mode), mCurrentText(nullptr),
-    mCurrentGraphicsItem(nullptr)
+    mCurrentGraphicsItem(nullptr),
+    mLastLayerName(GraphicsLayer::sSymbolNames), mLastHeight(1)
 {
     resetToDefaultParameters();
 }
@@ -73,7 +74,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept
         mContext.commandToolBar.addLabel(tr("Layer:"));
         std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
         layerComboBox->setLayers(mContext.layerProvider.getSchematicGeometryElementLayers());
-        layerComboBox->setCurrentLayer(mLastLayerName);
+        layerComboBox->setCurrentLayer(*mLastLayerName);
         connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
                 this, &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
         mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -103,7 +104,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept
     lineWidthSpinBox->setMaximum(100);
     lineWidthSpinBox->setSingleStep(0.5);
     lineWidthSpinBox->setDecimals(6);
-    lineWidthSpinBox->setValue(mLastHeight.toMm());
+    lineWidthSpinBox->setValue(mLastHeight->toMm());
     connect(lineWidthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &SymbolEditorState_DrawTextBase::heightSpinBoxValueChanged);
@@ -133,7 +134,7 @@ bool SymbolEditorState_DrawTextBase::exit() noexcept
 bool SymbolEditorState_DrawTextBase::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentText) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         mEditCmd->setPosition(currentPos, true);
         return true;
     } else {
@@ -143,7 +144,7 @@ bool SymbolEditorState_DrawTextBase::processGraphicsSceneMouseMoved(QGraphicsSce
 
 bool SymbolEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentText) {
         finishAddText(currentPos);
     }

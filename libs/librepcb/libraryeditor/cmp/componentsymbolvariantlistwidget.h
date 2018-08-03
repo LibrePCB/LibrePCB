@@ -97,7 +97,7 @@ class ComponentSymbolVariantListWidget final : public QWidget,
 
     private: // Methods
         void updateTable() noexcept;
-        void setTableRowContent(int row, const Uuid& uuid, const QString& name,
+        void setTableRowContent(int row, const tl::optional<Uuid>& uuid, const QString& name,
                                 const QString& desc, const QString& norm, int symbolCount) noexcept;
         void addVariant(const QString& name, const QString& desc, const QString& norm) noexcept;
         void removeVariant(const Uuid& uuid) noexcept;
@@ -105,7 +105,7 @@ class ComponentSymbolVariantListWidget final : public QWidget,
         void moveVariantDown(int index) noexcept;
         void editVariant(const Uuid& uuid) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getUuidOfRow(int row) const noexcept;
+        tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
         bool allReferencesValid() const noexcept {return mUndoStack && mVariantList && mEditorProvider;}
 
         // row index <-> symbol variant index conversion methods
@@ -121,7 +121,7 @@ class ComponentSymbolVariantListWidget final : public QWidget,
         UndoStack* mUndoStack;
         ComponentSymbolVariantList* mVariantList;
         IF_ComponentSymbolVariantEditorProvider* mEditorProvider;
-        Uuid mSelectedVariant;
+        tl::optional<Uuid> mSelectedVariant;
 };
 
 /*****************************************************************************************

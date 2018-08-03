@@ -69,11 +69,11 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
 
     // load package
     mPackage.reset(new Package(fp, false)); // can throw
-    setWindowTitle(mPackage->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mPackage->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mPackage->getFilePath().toQUrl().toString(), mPackage->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mPackage->getFilePath().toNative());
-    mUi->edtName->setText(mPackage->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mPackage->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mPackage->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mPackage->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mPackage->getAuthor());
@@ -160,14 +160,8 @@ void PackageEditorWidget::setToolsActionGroup(ExclusiveActionGroup* group) noexc
 bool PackageEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
-        Version version(mUi->edtVersion->text().trimmed());
-        if (!version.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
+        Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mPackage->setName("", name);
         mPackage->setDescription("", mUi->edtDescription->toPlainText().trimmed());

@@ -154,7 +154,7 @@ TEST_F(ProjectTest, testSettersGetters)
     QScopedPointer<Project> project(Project::create(mProjectFile));
 
     // set properties
-    QString name = "test name 1234";
+    ElementName name("test name 1234");
     QString author = "test author 1234";
     QString version = "test version 1234";
     project->getMetadata().setName(name);

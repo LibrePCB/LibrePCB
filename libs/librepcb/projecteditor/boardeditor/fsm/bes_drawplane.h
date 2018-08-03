@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "bes_base.h"
 
 /*****************************************************************************************
@@ -96,7 +97,7 @@ class BES_DrawPlane final : public BES_Base
         // State
         SubState mSubState;
         NetSignal* mCurrentNetSignal;
-        QString mCurrentLayerName;
+        GraphicsLayerName mCurrentLayerName;
         BI_Plane* mCurrentPlane;
         CmdBoardPlaneEdit* mCmdEditCurrentPlane;
         Point mLastVertexPos;

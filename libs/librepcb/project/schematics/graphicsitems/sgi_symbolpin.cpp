@@ -51,7 +51,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
     SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
 {
     setZValue(Schematic::ZValue_Symbols);
-    setToolTip(mLibPin.getName());
+    setToolTip(*mLibPin.getName());
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -88,12 +88,12 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
     mBoundingRect = mBoundingRect.united(mShape.boundingRect());
 
     // line
-    QRectF lineRect = QRectF(QPointF(0, 0), Point(mLibPin.getLength(), 0).toPxQPointF()).normalized();
+    QRectF lineRect = QRectF(QPointF(0, 0), Point(*mLibPin.getLength(), 0).toPxQPointF()).normalized();
     lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(), Length(79375).toPx(), Length(79375).toPx());
     mBoundingRect = mBoundingRect.united(lineRect).normalized();
 
     // text
-    qreal x = mLibPin.getLength().toPx() + 4;
+    qreal x = mLibPin.getLength()->toPx() + 4;
     mStaticText.setText(mPin.getDisplayText());
     mStaticText.prepare(QTransform(), mFont);
     mTextOrigin.setX(mRotate180 ? -x-mStaticText.size().width() : x);
@@ -127,7 +127,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     if (layer->isVisible())
     {
         painter->setPen(QPen(layer->getColor(highlight), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap));
-        painter->drawLine(QPointF(0, 0), Point(mLibPin.getLength(), 0).toPxQPointF());
+        painter->drawLine(QPointF(0, 0), Point(*mLibPin.getLength(), 0).toPxQPointF());
     }
 
     // draw circle
@@ -177,7 +177,7 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->save();
         if (mRotate180) painter->rotate(180);
-        painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, netsignal->getName());
+        painter->drawText(QRectF(), Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextDontClip, *netsignal->getName());
         painter->restore();
     }
     layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);

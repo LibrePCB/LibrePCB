@@ -49,7 +49,7 @@ class IF_HoleObserver
 {
     public:
         virtual void holePositionChanged(const Point& newPos) noexcept = 0;
-        virtual void holeDiameterChanged(const Length& newDiameter) noexcept = 0;
+        virtual void holeDiameterChanged(const PositiveLength& newDiameter) noexcept = 0;
 
     protected:
         IF_HoleObserver() noexcept {}
@@ -75,18 +75,18 @@ class Hole final : public SerializableObject
         Hole() = delete;
         Hole(const Hole& other) noexcept;
         Hole(const Uuid& uuid, const Hole& other) noexcept;
-        Hole(const Uuid& uuid, const Point& position, const Length& diameter) noexcept;
+        Hole(const Uuid& uuid, const Point& position, const PositiveLength& diameter) noexcept;
         explicit Hole(const SExpression& node);
         ~Hole() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
         const Point& getPosition() const noexcept {return mPosition;}
-        const Length& getDiameter() const noexcept {return mDiameter;}
+        const PositiveLength& getDiameter() const noexcept {return mDiameter;}
 
         // Setters
         void setPosition(const Point& position) noexcept;
-        void setDiameter(const Length& diameter) noexcept;
+        void setDiameter(const PositiveLength& diameter) noexcept;
 
         // General Methods
         void registerObserver(IF_HoleObserver& object) const noexcept;
@@ -101,14 +101,10 @@ class Hole final : public SerializableObject
         Hole& operator=(const Hole& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
         Point mPosition;
-        Length mDiameter;
+        PositiveLength mDiameter;
 
         // Misc
         mutable QSet<IF_HoleObserver*> mObservers; ///< A list of all observer objects

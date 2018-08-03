@@ -56,7 +56,7 @@ class OriginCrossGraphicsItem final : public QGraphicsItem, public IF_GraphicsLa
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
-        void setSize(const Length& size) noexcept;
+        void setSize(const UnsignedLength& size) noexcept;
         void setLayer(const GraphicsLayer* layer) noexcept;
 
         // Inherited from IF_LayerObserver
@@ -83,7 +83,7 @@ class OriginCrossGraphicsItem final : public QGraphicsItem, public IF_GraphicsLa
         const GraphicsLayer* mLayer;
         QPen mPen;
         QPen mPenHighlighted;
-        Length mSize;
+        UnsignedLength mSize;
         QLineF mLineH;
         QLineF mLineV;
         QRectF mBoundingRect;

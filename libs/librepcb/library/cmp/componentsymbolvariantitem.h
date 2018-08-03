@@ -31,6 +31,7 @@
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include "componentpinsignalmap.h"
+#include "componentsymbolvariantitemsuffix.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -64,7 +65,8 @@ class ComponentSymbolVariantItem final : public SerializableObject
         ComponentSymbolVariantItem() = delete;
         ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept;
         ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
-                                   bool isRequired, const QString& suffix) noexcept;
+                                   bool isRequired,
+                                   const ComponentSymbolVariantItemSuffix& suffix) noexcept;
         explicit ComponentSymbolVariantItem(const SExpression& node);
         ~ComponentSymbolVariantItem() noexcept;
 
@@ -74,14 +76,14 @@ class ComponentSymbolVariantItem final : public SerializableObject
         const Point& getSymbolPosition() const noexcept {return mSymbolPos;}
         const Angle& getSymbolRotation() const noexcept {return mSymbolRot;}
         bool isRequired() const noexcept {return mIsRequired;}
-        const QString& getSuffix() const noexcept {return mSuffix;}
+        const ComponentSymbolVariantItemSuffix& getSuffix() const noexcept {return mSuffix;}
 
         // Setters: Attributes
         void setSymbolUuid(const Uuid& uuid) noexcept {mSymbolUuid = uuid;}
         void setSymbolPosition(const Point& pos) noexcept {mSymbolPos = pos;}
         void setSymbolRotation(const Angle& rot) noexcept {mSymbolRot = rot;}
         void setIsRequired(bool required) noexcept {mIsRequired = required;}
-        void setSuffix(const QString& suffix) noexcept {mSuffix = suffix;}
+        void setSuffix(const ComponentSymbolVariantItemSuffix& suffix) noexcept {mSuffix = suffix;}
 
         // Pin-Signal-Map Methods
         ComponentPinSignalMap& getPinSignalMap() noexcept {return mPinSignalMap;}
@@ -96,17 +98,13 @@ class ComponentSymbolVariantItem final : public SerializableObject
         ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
         Uuid mSymbolUuid;
         Point mSymbolPos;
         Angle mSymbolRot;
         bool mIsRequired;
-        QString mSuffix;
+        ComponentSymbolVariantItemSuffix mSuffix;
         ComponentPinSignalMap mPinSignalMap;
 };
 

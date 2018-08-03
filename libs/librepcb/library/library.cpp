@@ -44,7 +44,7 @@ namespace library {
  ****************************************************************************************/
 
 Library::Library(const Uuid& uuid, const Version& version, const QString& author,
-                 const QString& name_en_US, const QString& description_en_US,
+                 const ElementName& name_en_US, const QString& description_en_US,
                  const QString& keywords_en_US) :
     LibraryBaseElement(false, getShortElementName(), getLongElementName(), uuid, version,
                        author, name_en_US, description_en_US, keywords_en_US)
@@ -136,7 +136,7 @@ void Library::setIconFilePath(const FilePath& png) noexcept
 
 void Library::addDependency(const Uuid& uuid) noexcept
 {
-    if ((!uuid.isNull()) && (!mDependencies.contains(uuid))) {
+    if (!mDependencies.contains(uuid)) {
         mDependencies.insert(uuid);
     } else {
         qWarning() << "Invalid or duplicate library dependency:" << uuid.toStr();
@@ -145,7 +145,7 @@ void Library::addDependency(const Uuid& uuid) noexcept
 
 void Library::removeDependency(const Uuid& uuid) noexcept
 {
-    if ((!uuid.isNull()) && (mDependencies.contains(uuid))) {
+    if (mDependencies.contains(uuid)) {
         mDependencies.remove(uuid);
     } else {
         qWarning() << "Invalid library dependency:" << uuid.toStr();
@@ -207,15 +207,6 @@ void Library::serialize(SExpression& root) const
     foreach (const Uuid& uuid, Toolbox::sortedQSet(mDependencies)) {
         root.appendChild("dependency", uuid, true);
     }
-}
-
-bool Library::checkAttributesValidity() const noexcept
-{
-    if (!LibraryBaseElement::checkAttributesValidity()) return false;
-    foreach (const Uuid& uuid, mDependencies) {
-        if (uuid.isNull()) return false;
-    }
-    return true;
 }
 
 /*****************************************************************************************

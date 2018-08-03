@@ -57,7 +57,7 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project& project, BI_Plan
 
     // net signal combobox
     foreach (NetSignal* netsignal, mPlane.getCircuit().getNetSignals()) {
-        mUi->cbxNetSignal->addItem(netsignal->getName(), netsignal->getUuid().toStr());
+        mUi->cbxNetSignal->addItem(*netsignal->getName(), netsignal->getUuid().toStr());
     }
     mUi->cbxNetSignal->model()->sort(0);
     mUi->cbxNetSignal->setCurrentIndex(mUi->cbxNetSignal->findData(mPlane.getNetSignal().getUuid().toStr()));
@@ -68,11 +68,11 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project& project, BI_Plan
             mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
         }
     }
-    mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(mPlane.getLayerName()));
+    mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(*mPlane.getLayerName()));
 
     // minimum width / clearance spinbox
-    mUi->spbMinWidth->setValue(mPlane.getMinWidth().toMm());
-    mUi->spbMinClearance->setValue(mPlane.getMinClearance().toMm());
+    mUi->spbMinWidth->setValue(mPlane.getMinWidth()->toMm());
+    mUi->spbMinClearance->setValue(mPlane.getMinClearance()->toMm());
 
     // connect style combobox
     mUi->cbxConnectStyle->addItem(tr("None"), static_cast<int>(BI_Plane::ConnectStyle::None));
@@ -123,7 +123,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept
         QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane, true));
 
         // net signal
-        Uuid netSignalUuid(mUi->cbxNetSignal->currentData().toString());
+        Uuid netSignalUuid = Uuid::fromString(mUi->cbxNetSignal->currentData().toString()); // can throw
         NetSignal* netsignal = mPlane.getCircuit().getNetSignalByUuid(netSignalUuid);
         if (netsignal) {
             cmd->setNetSignal(*netsignal);
@@ -133,12 +133,12 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept
 
         // layer
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
 
         // min width/clearance
-        cmd->setMinWidth(Length::fromMm(mUi->spbMinWidth->value()));
-        cmd->setMinClearance(Length::fromMm(mUi->spbMinClearance->value()));
+        cmd->setMinWidth(UnsignedLength(Length::fromMm(mUi->spbMinWidth->value()))); // can throw
+        cmd->setMinClearance(UnsignedLength(Length::fromMm(mUi->spbMinClearance->value()))); // can throw
 
         // connect style
         cmd->setConnectStyle(static_cast<BI_Plane::ConnectStyle>(mUi->cbxConnectStyle->currentData().toInt()));

@@ -32,9 +32,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Text::Text(const Text& other) noexcept
+Text::Text(const Text& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mText(other.mText),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mHeight(other.mHeight),
+    mAlign(other.mAlign)
 {
-    *this = other; // use assignment operator
 }
 
 Text::Text(const Uuid& uuid, const Text& other) noexcept :
@@ -43,41 +49,34 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept :
     mUuid = uuid;
 }
 
-Text::Text(const Uuid& uuid, const QString& layerName, const QString& text, const Point& pos, const Angle& rotation,
-           const Length& height, const Alignment& align) noexcept :
+Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
+           const Point& pos, const Angle& rotation, const PositiveLength& height,
+           const Alignment& align) noexcept :
     mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
     mHeight(height), mAlign(align)
 {
 }
 
-Text::Text(const SExpression& node)
+Text::Text(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mText(),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot")),
+    mHeight(node.getValueByPath<PositiveLength>("height")),
+    mAlign(node.getChildByPath("align"))
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+    if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-        mText = node.getValueByPath<QString>("value", true);
+        mText = node.getValueByPath<QString>("value");
     } else {
         // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
-        mText = node.getChildByIndex(0).getValue<QString>(true);
+        mText = node.getChildByIndex(0).getValue<QString>();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
-
-    // load geometry attributes
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mHeight = node.getValueByPath<Length>("height");
-    if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
-    }
-
-    // text alignment
-    mAlign = Alignment(node.getChildByPath("align"));
 
     // backward compatibility - remove this some time!
     mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Text::~Text() noexcept
@@ -88,7 +87,7 @@ Text::~Text() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Text::setLayerName(const QString& name) noexcept
+void Text::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -124,7 +123,7 @@ void Text::setRotation(const Angle& rotation) noexcept
     }
 }
 
-void Text::setHeight(const Length& height) noexcept
+void Text::setHeight(const PositiveLength& height) noexcept
 {
     if (height == mHeight) return;
     mHeight = height;
@@ -158,10 +157,8 @@ void Text::unregisterObserver(IF_TextObserver& object) const noexcept
 
 void Text::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("value", mText, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
     root.appendChild("height", mHeight, false);
@@ -195,18 +192,6 @@ Text& Text::operator=(const Text& rhs) noexcept
     mHeight = rhs.mHeight;
     mAlign = rhs.mAlign;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool Text::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())     return false;
-    if (mText.isEmpty())    return false;
-    if (mHeight <= 0)       return false;
-    return true;
 }
 
 /*****************************************************************************************

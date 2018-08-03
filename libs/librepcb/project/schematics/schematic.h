@@ -31,6 +31,7 @@
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -128,7 +129,7 @@ class Schematic final : public QObject, public AttributeProvider,
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const ElementName& getName() const noexcept {return mName;}
         const QIcon& getIcon() const noexcept {return mIcon;}
 
         // Symbol Methods
@@ -168,7 +169,7 @@ class Schematic final : public QObject, public AttributeProvider,
 
         // Static Methods
         static Schematic* create(Project& project, const FilePath& filepath,
-                                 const QString& name);
+                                 const ElementName& name);
 
 
     signals:
@@ -182,7 +183,6 @@ class Schematic final : public QObject, public AttributeProvider,
         Schematic(Project& project, const FilePath& filepath, bool restore,
                   bool readOnly, bool create, const QString& newName);
         void updateIcon() noexcept;
-        bool checkAttributesValidity() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
@@ -200,7 +200,7 @@ class Schematic final : public QObject, public AttributeProvider,
 
         // Attributes
         Uuid mUuid;
-        QString mName;
+        ElementName mName;
         QIcon mIcon;
 
         QList<SI_Symbol*> mSymbols;

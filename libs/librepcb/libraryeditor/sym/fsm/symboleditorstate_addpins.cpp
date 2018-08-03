@@ -80,7 +80,7 @@ bool SymbolEditorState_AddPins::entry() noexcept
     lengthSpinBox->setMaximum(100);
     lengthSpinBox->setSingleStep(1.27);
     lengthSpinBox->setDecimals(6);
-    lengthSpinBox->setValue(mLastLength.toMm());
+    lengthSpinBox->setValue(mLastLength->toMm());
     connect(lengthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &SymbolEditorState_AddPins::lengthSpinBoxValueChanged);
@@ -117,14 +117,14 @@ bool SymbolEditorState_AddPins::exit() noexcept
 
 bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     mEditCmd->setPosition(currentPos, true);
     return true;
 }
 
 bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     mEditCmd->setPosition(currentPos, true);
     Angle currentRot = mCurrentPin->getRotation();
     try {
@@ -167,8 +167,9 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos, const Angle& rot) n
     try {
         mNameLineEdit->setText(determineNextPinName());
         mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
-        mCurrentPin = new SymbolPin(Uuid::createRandom(), mNameLineEdit->text(),
-                                    pos, mLastLength, rot);
+        mCurrentPin = new SymbolPin(Uuid::createRandom(),
+                                    CircuitIdentifier(mNameLineEdit->text()),
+                                    pos, mLastLength, rot); // can throw
 
         mContext.undoStack.appendToCmdGroup(new CmdSymbolPinInsert(
             mContext.symbol.getPins(), std::shared_ptr<SymbolPin>(mCurrentPin)));
@@ -189,7 +190,11 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos, const Angle& rot) n
 void SymbolEditorState_AddPins::nameLineEditTextChanged(const QString& text) noexcept
 {
     if (mEditCmd && (!text.trimmed().isEmpty())) {
-        mEditCmd->setName(text.trimmed(), true);
+        try {
+            mEditCmd->setName(CircuitIdentifier(text.trimmed()), true); // can throw
+        } catch (const Exception&) {
+            // invalid name
+        }
     }
 }
 

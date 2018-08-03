@@ -62,8 +62,8 @@ class SymbolPreviewGraphicsItem final : public QGraphicsItem, public AttributePr
                                            const QStringList& localeOrder,
                                            const Symbol& symbol,
                                            const Component* cmp = nullptr,
-                                           const Uuid& symbVarUuid = Uuid(),
-                                           const Uuid& symbVarItemUuid = Uuid()) noexcept;
+                                           const tl::optional<Uuid>& symbVarUuid = tl::nullopt,
+                                           const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
         ~SymbolPreviewGraphicsItem() noexcept;
 
         // Setters

@@ -136,11 +136,11 @@ void BI_Device::init()
 {
     // check pad-signal-map
     for (const library::DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
-        Uuid signalUuid = item.getSignalUuid();
-        if ((!signalUuid.isNull()) && (!mCompInstance->getSignalInstance(signalUuid))) {
+        tl::optional<Uuid> signalUuid = item.getSignalUuid();
+        if ((signalUuid) && (!mCompInstance->getSignalInstance(*signalUuid))) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("Unknown signal \"%1\" found in device \"%2\""))
-                .arg(signalUuid.toStr(), mLibDevice->getUuid().toStr()));
+                .arg(signalUuid->toStr(), mLibDevice->getUuid().toStr()));
         }
     }
 
@@ -256,11 +256,11 @@ QString BI_Device::getUserDefinedAttributeValue(const QString& key) const noexce
 QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept
 {
     if (key == QLatin1String("DEVICE")) {
-        return mLibDevice->getNames().value(getLocaleOrder());
+        return *mLibDevice->getNames().value(getLocaleOrder());
     } else if (key == QLatin1String("PACKAGE")) {
-        return mLibPackage->getNames().value(getLocaleOrder());
+        return *mLibPackage->getNames().value(getLocaleOrder());
     } else if (key == QLatin1String("FOOTPRINT")) {
-        return mLibFootprint->getNames().value(getLocaleOrder());
+        return *mLibFootprint->getNames().value(getLocaleOrder());
     } else {
         return QString();
     }

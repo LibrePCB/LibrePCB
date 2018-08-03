@@ -67,7 +67,7 @@ class BI_Via final : public BI_Base, public SerializableObject
         BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
         BI_Via(BI_NetSegment& netsegment, const SExpression& node);
         BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
-               const Length& size, const Length& drillDiameter);
+               const PositiveLength& size, const PositiveLength& drillDiameter);
         ~BI_Via() noexcept;
 
         // Getters
@@ -75,8 +75,8 @@ class BI_Via final : public BI_Base, public SerializableObject
         NetSignal& getNetSignalOfNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
         Shape getShape() const noexcept {return mShape;}
-        const Length& getDrillDiameter() const noexcept {return mDrillDiameter;}
-        const Length& getSize() const noexcept {return mSize;}
+        const PositiveLength& getDrillDiameter() const noexcept {return mDrillDiameter;}
+        const PositiveLength& getSize() const noexcept {return mSize;}
         const QMap<QString, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
         BI_NetPoint* getNetPointOfLayer(const QString& layerName) const noexcept {return mRegisteredNetPoints.value(layerName, nullptr);}
         bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
@@ -89,8 +89,8 @@ class BI_Via final : public BI_Base, public SerializableObject
         // Setters
         void setPosition(const Point& position) noexcept;
         void setShape(Shape shape) noexcept;
-        void setSize(const Length& size) noexcept;
-        void setDrillDiameter(const Length& diameter) noexcept;
+        void setSize(const PositiveLength& size) noexcept;
+        void setDrillDiameter(const PositiveLength& diameter) noexcept;
 
         // General Methods
         void addToBoard() override;
@@ -120,7 +120,6 @@ class BI_Via final : public BI_Base, public SerializableObject
 
         void init();
         void boardAttributesChanged();
-        bool checkAttributesValidity() const noexcept;
 
 
         // General
@@ -132,8 +131,8 @@ class BI_Via final : public BI_Base, public SerializableObject
         Uuid mUuid;
         Point mPosition;
         Shape mShape;
-        Length mSize;
-        Length mDrillDiameter;
+        PositiveLength mSize;
+        PositiveLength mDrillDiameter;
 
         // Registered Elements
         QMap<QString, BI_NetPoint*> mRegisteredNetPoints;   ///< key: layer name

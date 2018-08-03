@@ -15,7 +15,9 @@ QT += core widgets xml sql printsupport
 CONFIG += staticlib
 
 INCLUDEPATH += \
-    ../../
+    ../../ \
+    ../../type_safe/include \
+    ../../type_safe/external/debug_assert \
 
 SOURCES += \
     cmp/cmpsigpindisplaytypecombobox.cpp \

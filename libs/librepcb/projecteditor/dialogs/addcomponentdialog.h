@@ -87,9 +87,9 @@ class AddComponentDialog final : public QDialog
         ~AddComponentDialog() noexcept;
 
         // Getters
-        Uuid getSelectedComponentUuid() const noexcept;
-        Uuid getSelectedSymbVarUuid() const noexcept;
-        Uuid getSelectedDeviceUuid() const noexcept;
+        tl::optional<Uuid> getSelectedComponentUuid() const noexcept;
+        tl::optional<Uuid> getSelectedSymbVarUuid() const noexcept;
+        tl::optional<Uuid> getSelectedDeviceUuid() const noexcept;
 
 
     private slots:
@@ -106,7 +106,7 @@ class AddComponentDialog final : public QDialog
 
         // Private Methods
         void searchComponents(const QString& input);
-        void setSelectedCategory(const Uuid& categoryUuid);
+        void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
         void setSelectedComponent(const library::Component* cmp);
         void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
         void setSelectedDevice(const library::Device* dev);
@@ -124,7 +124,7 @@ class AddComponentDialog final : public QDialog
 
 
         // Attributes
-        Uuid mSelectedCategoryUuid;
+        tl::optional<Uuid> mSelectedCategoryUuid;
         const library::Component* mSelectedComponent;
         const library::ComponentSymbolVariant* mSelectedSymbVar;
         const library::Device* mSelectedDevice;

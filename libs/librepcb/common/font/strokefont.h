@@ -63,16 +63,16 @@ class StrokeFont final : public QObject
         Ratio getLineSpacing() const noexcept;
 
         // General Methods
-        QVector<Path> stroke(const QString& text, const Length& height,
+        QVector<Path> stroke(const QString& text, const PositiveLength& height,
                              const Length& letterSpacing, const Length& lineSpacing,
                              const Alignment& align, Point& bottomLeft, Point& topRight) const noexcept;
         QVector<QPair<QVector<Path>, Length>> strokeLines(const QString& text,
-                                                          const Length& height,
+                                                          const PositiveLength& height,
                                                           const Length& letterSpacing,
                                                           Length& width) const noexcept;
-        QVector<Path> strokeLine(const QString& text, const Length& height,
+        QVector<Path> strokeLine(const QString& text, const PositiveLength& height,
                                  const Length& letterSpacing, Length& width) const noexcept;
-        QVector<Path> strokeGlyph(const QChar& glyph, const Length& height,
+        QVector<Path> strokeGlyph(const QChar& glyph, const PositiveLength& height,
                                   Length& spacing) const noexcept;
 
         // Operator Overloadings
@@ -83,10 +83,10 @@ class StrokeFont final : public QObject
         void fontLoaded() noexcept;
         const fontobene::GlyphListAccessor& accessor() const noexcept;
         static QVector<Path> polylines2paths(const QVector<fontobene::Polyline>& polylines,
-                                             const Length& height) noexcept;
-        static Path polyline2path(const fontobene::Polyline& p, const Length& height) noexcept;
-        static Vertex convertVertex(const fontobene::Vertex& v, const Length& height) noexcept;
-        Length convertLength(const Length& height, qreal length) const noexcept;
+                                             const PositiveLength& height) noexcept;
+        static Path polyline2path(const fontobene::Polyline& p, const PositiveLength& height) noexcept;
+        static Vertex convertVertex(const fontobene::Vertex& v, const PositiveLength& height) noexcept;
+        Length convertLength(const PositiveLength& height, qreal length) const noexcept;
         static void computeBoundingRect(const QVector<Path>& paths,
                                         Point& bottomLeft, Point& topRight) noexcept;
 

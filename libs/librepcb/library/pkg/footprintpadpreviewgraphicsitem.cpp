@@ -47,7 +47,7 @@ FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_Graphi
     mFont.setPixelSize(2);
 
     if (mPackagePad)
-        setToolTip(mPackagePad->getName());
+        setToolTip(*mPackagePad->getName());
 
     mLayer = layerProvider.getLayer(mFootprintPad.getLayerName());
     Q_ASSERT(mLayer);
@@ -94,7 +94,7 @@ void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptio
         color.setAlpha(255);
         painter->setPen(color);
         painter->setFont(mFont);
-        painter->drawText(mBoundingRect, Qt::AlignCenter, mPackagePad->getName());
+        painter->drawText(mBoundingRect, Qt::AlignCenter, *mPackagePad->getName());
     }
 
 #ifdef QT_DEBUG

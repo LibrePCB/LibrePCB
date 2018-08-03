@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/circuitidentifier.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -51,7 +52,7 @@ class CmdNetSignalEdit final : public UndoCommand
         ~CmdNetSignalEdit() noexcept;
 
         // Setters
-        void setName(const QString& name, bool isAutoName) noexcept;
+        void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
 
 
     private:
@@ -75,8 +76,8 @@ class CmdNetSignalEdit final : public UndoCommand
         NetSignal& mNetSignal;
 
         // General Attributes
-        QString mOldName;
-        QString mNewName;
+        CircuitIdentifier mOldName;
+        CircuitIdentifier mNewName;
         bool mOldIsAutoName;
         bool mNewIsAutoName;
 };

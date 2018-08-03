@@ -58,7 +58,7 @@ class ComponentPinSignalMapItem final : public SerializableObject
         // Constructors / Destructor
         ComponentPinSignalMapItem() = delete;
         ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
-        ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
+        ComponentPinSignalMapItem(const Uuid& pin, const tl::optional<Uuid>& signal,
                                   const CmpSigPinDisplayType& displayType) noexcept;
         explicit ComponentPinSignalMapItem(const SExpression& node);
         ~ComponentPinSignalMapItem() noexcept;
@@ -66,11 +66,11 @@ class ComponentPinSignalMapItem final : public SerializableObject
         // Getters
         const Uuid& getUuid() const noexcept {return mPinUuid;} // used for UuidObjectMap
         const Uuid& getPinUuid() const noexcept {return mPinUuid;}
-        const Uuid& getSignalUuid() const noexcept {return mSignalUuid;}
+        const tl::optional<Uuid>& getSignalUuid() const noexcept {return mSignalUuid;}
         const CmpSigPinDisplayType& getDisplayType() const noexcept {return mDisplayType;}
 
         // Setters
-        void setSignalUuid(const Uuid& uuid) noexcept {mSignalUuid = uuid;}
+        void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept {mSignalUuid = uuid;}
         void setDisplayType(const CmpSigPinDisplayType& type) noexcept {mDisplayType = type;}
 
         /// @copydoc librepcb::SerializableObject::serialize()
@@ -82,13 +82,9 @@ class ComponentPinSignalMapItem final : public SerializableObject
         ComponentPinSignalMapItem& operator=(const ComponentPinSignalMapItem& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mPinUuid;                      ///< must be valid
-        Uuid mSignalUuid;                   ///< NULL if not connected to a signal
+        tl::optional<Uuid> mSignalUuid;     ///< tl::nullopt if not connected to a signal
         CmpSigPinDisplayType mDisplayType;
 };
 
@@ -116,7 +112,7 @@ class ComponentPinSignalMapHelpers
         {
             ComponentPinSignalMap map;
             foreach (const Uuid& pin, pins) {
-                map.append(std::make_shared<ComponentPinSignalMapItem>(pin, Uuid(), display));
+                map.append(std::make_shared<ComponentPinSignalMapItem>(pin, tl::nullopt, display));
             }
             return map;
         }

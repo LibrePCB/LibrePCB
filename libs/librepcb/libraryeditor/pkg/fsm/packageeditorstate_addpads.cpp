@@ -49,15 +49,15 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context, PadType
     PackageEditorState(context), mPadType(type), mCurrentPad(nullptr),
     mCurrentGraphicsItem(nullptr), mPackagePadComboBox(nullptr),
     mLastPad(Uuid::createRandom(), Point(0, 0), Angle::deg0(), FootprintPad::Shape::ROUND,
-             Length(2540000), Length(1270000), Length(800000),
+             PositiveLength(2540000), PositiveLength(1270000), UnsignedLength(800000),
              FootprintPad::BoardSide::THT)
 {
     if (mPadType == PadType::SMT) {
         mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);
         mLastPad.setShape(FootprintPad::Shape::RECT);
-        mLastPad.setDrillDiameter(Length(0));
-        mLastPad.setWidth(Length(1270000));
-        mLastPad.setHeight(Length(635000));
+        mLastPad.setDrillDiameter(UnsignedLength(0));
+        mLastPad.setWidth(PositiveLength(1270000));
+        mLastPad.setHeight(PositiveLength(635000));
     }
 }
 
@@ -114,7 +114,7 @@ bool PackageEditorState_AddPads::entry() noexcept
     widthSpinBox->setMaximum(999);
     widthSpinBox->setSingleStep(0.1);
     widthSpinBox->setDecimals(6);
-    widthSpinBox->setValue(mLastPad.getWidth().toMm());
+    widthSpinBox->setValue(mLastPad.getWidth()->toMm());
     connect(widthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &PackageEditorState_AddPads::widthSpinBoxValueChanged);
@@ -127,7 +127,7 @@ bool PackageEditorState_AddPads::entry() noexcept
     heightSpinBox->setMaximum(999);
     heightSpinBox->setSingleStep(0.1);
     heightSpinBox->setDecimals(6);
-    heightSpinBox->setValue(mLastPad.getHeight().toMm());
+    heightSpinBox->setValue(mLastPad.getHeight()->toMm());
     connect(heightSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &PackageEditorState_AddPads::heightSpinBoxValueChanged);
@@ -141,7 +141,7 @@ bool PackageEditorState_AddPads::entry() noexcept
         drillDiameterSpinBox->setMaximum(100);
         drillDiameterSpinBox->setSingleStep(0.2);
         drillDiameterSpinBox->setDecimals(6);
-        drillDiameterSpinBox->setValue(mLastPad.getDrillDiameter().toMm());
+        drillDiameterSpinBox->setValue(mLastPad.getDrillDiameter()->toMm());
         connect(drillDiameterSpinBox.get(),
                 static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this, &PackageEditorState_AddPads::drillDiameterSpinBoxValueChanged);
@@ -173,7 +173,7 @@ bool PackageEditorState_AddPads::exit() noexcept
 bool PackageEditorState_AddPads::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentPad) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         mEditCmd->setPosition(currentPos, true);
         return true;
     } else {
@@ -183,7 +183,7 @@ bool PackageEditorState_AddPads::processGraphicsSceneMouseMoved(QGraphicsSceneMo
 
 bool PackageEditorState_AddPads::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentPad) {
         finishAddPad(currentPos);
     }
@@ -286,9 +286,11 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept
 
 void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept
 {
-    mLastPad.setPackagePadUuid(pad ? pad->getUuid() : Uuid());
-    if (mEditCmd) {
-        mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
+    if (pad) {
+        mLastPad.setPackagePadUuid(pad->getUuid());
+        if (mEditCmd) {
+            mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
+        }
     }
 }
 
@@ -310,7 +312,9 @@ void PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged(FootprintPad::
 
 void PackageEditorState_AddPads::widthSpinBoxValueChanged(double value) noexcept
 {
-    mLastPad.setWidth(Length::fromMm(value));
+    Length width = Length::fromMm(value);
+    if (width <= 0) return;
+    mLastPad.setWidth(PositiveLength(width));
     if (mEditCmd) {
         mEditCmd->setWidth(mLastPad.getWidth(), true);
     }
@@ -318,7 +322,9 @@ void PackageEditorState_AddPads::widthSpinBoxValueChanged(double value) noexcept
 
 void PackageEditorState_AddPads::heightSpinBoxValueChanged(double value) noexcept
 {
-    mLastPad.setHeight(Length::fromMm(value));
+    Length height = Length::fromMm(value);
+    if (height <= 0) return;
+    mLastPad.setHeight(PositiveLength(height));
     if (mEditCmd) {
         mEditCmd->setHeight(mLastPad.getHeight(), true);
     }
@@ -326,7 +332,9 @@ void PackageEditorState_AddPads::heightSpinBoxValueChanged(double value) noexcep
 
 void PackageEditorState_AddPads::drillDiameterSpinBoxValueChanged(double value) noexcept
 {
-    mLastPad.setDrillDiameter(Length::fromMm(value));
+    Length diameter = Length::fromMm(value);
+    if (diameter < 0) return;
+    mLastPad.setDrillDiameter(UnsignedLength(diameter));
     if (mEditCmd) {
         mEditCmd->setDrillDiameter(mLastPad.getDrillDiameter(), true);
     }

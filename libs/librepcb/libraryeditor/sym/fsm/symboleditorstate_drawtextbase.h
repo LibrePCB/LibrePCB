@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/alignment.h>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "symboleditorstate.h"
 
 /*****************************************************************************************
@@ -101,9 +102,9 @@ class SymbolEditorState_DrawTextBase : public SymbolEditorState
         TextGraphicsItem* mCurrentGraphicsItem;
 
         // parameter memory
-        QString mLastLayerName;
+        GraphicsLayerName mLastLayerName;
         Angle mLastRotation;
-        Length mLastHeight;
+        PositiveLength mLastHeight;
         QString mLastText;
 };
 

@@ -75,7 +75,8 @@ class SES_AddComponent final : public SES_Base
 
         // Private Methods
         ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        void startAddingComponent(const Uuid& cmp = Uuid(), const Uuid& symbVar = Uuid());
+        void startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
+                                  const tl::optional<Uuid>& symbVar = tl::nullopt);
         bool abortCommand(bool showErrMsgBox) noexcept;
 
 

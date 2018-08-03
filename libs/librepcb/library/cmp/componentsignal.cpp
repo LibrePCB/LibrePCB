@@ -40,30 +40,25 @@ ComponentSignal::ComponentSignal(const ComponentSignal& other) noexcept :
 {
 }
 
-ComponentSignal::ComponentSignal(const Uuid& uuid, const QString& name) noexcept :
+ComponentSignal::ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name) noexcept :
     QObject(nullptr), mUuid(uuid), mName(name), mRole(SignalRole::passive()),
     mForcedNetName(), mIsRequired(false), mIsNegated(false), mIsClock(false)
 {
-    Q_ASSERT(mUuid.isNull() == false);
 }
 
 ComponentSignal::ComponentSignal(const SExpression& node) :
-    QObject(nullptr)
+    QObject(nullptr),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mRole(node.getValueByPath<SignalRole>("role")),
+    mForcedNetName(node.getValueByPath<QString>("forced_net")),
+    mIsRequired(node.getValueByPath<bool>("required")),
+    mIsNegated(node.getValueByPath<bool>("negated")),
+    mIsClock(node.getValueByPath<bool>("clock"))
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mRole = node.getValueByPath<SignalRole>("role");
-    mForcedNetName = node.getValueByPath<QString>("forced_net");
-    mIsRequired = node.getValueByPath<bool>("required");
-    mIsNegated = node.getValueByPath<bool>("negated");
-    mIsClock = node.getValueByPath<bool>("clock");
-
     // backward compatibility - remove this some time!
     mForcedNetName.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mForcedNetName.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSignal::~ComponentSignal() noexcept
@@ -74,7 +69,7 @@ ComponentSignal::~ComponentSignal() noexcept
  *  Setters
  ****************************************************************************************/
 
-void ComponentSignal::setName(const QString& name) noexcept
+void ComponentSignal::setName(const CircuitIdentifier& name) noexcept
 {
     if (name == mName) return;
     mName = name;
@@ -128,8 +123,6 @@ void ComponentSignal::setIsClock(bool clock) noexcept
 
 void ComponentSignal::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
     root.appendChild("role", mRole, false);
@@ -168,17 +161,6 @@ ComponentSignal& ComponentSignal::operator=(const ComponentSignal& rhs) noexcept
     setIsNegated(rhs.mIsNegated);
     setIsClock(rhs.mIsClock);
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool ComponentSignal::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())     return false;
-    if (mName.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

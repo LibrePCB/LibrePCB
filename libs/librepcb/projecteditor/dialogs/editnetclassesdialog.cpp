@@ -59,7 +59,7 @@ EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit, UndoStack& undoStac
     foreach (NetClass* netclass, mCircuit.getNetClasses())
     {
         QTableWidgetItem* uuid = new QTableWidgetItem(netclass->getUuid().toStr());
-        QTableWidgetItem* name = new QTableWidgetItem(netclass->getName());
+        QTableWidgetItem* name = new QTableWidgetItem(*netclass->getName());
         uuid->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
         name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(netclass)));
         mUi->tableWidget->setVerticalHeaderItem(row, uuid);
@@ -103,14 +103,14 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
             try
             {
                 auto cmd = new CmdNetClassEdit(mCircuit, *netclass);
-                cmd->setName(item->text());
+                cmd->setName(ElementName(item->text().trimmed())); // can throw
                 mUndoStack.appendToCmdGroup(cmd);
             }
             catch (Exception& e)
             {
                 QMessageBox::critical(this, tr("Could not change netclass name"), e.getMsg());
             }
-            item->setText(netclass->getName());
+            item->setText(*netclass->getName());
             break;
         }
 
@@ -121,19 +121,19 @@ void EditNetClassesDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
 
 void EditNetClassesDialog::on_btnAdd_clicked()
 {
-    QString name = QInputDialog::getText(this, tr("Add Net Class"), tr("Name:"));
     try
     {
+        ElementName name(QInputDialog::getText(this, tr("Add Net Class"), tr("Name:")).trimmed()); // can throw
         CmdNetClassAdd* cmd = new CmdNetClassAdd(mCircuit, name);
         mUndoStack.appendToCmdGroup(cmd);
 
         int row = mUi->tableWidget->rowCount();
         mUi->tableWidget->insertRow(row);
-        QTableWidgetItem* uuid = new QTableWidgetItem(cmd->getNetClass()->getUuid().toStr());
-        QTableWidgetItem* name = new QTableWidgetItem(cmd->getNetClass()->getName());
-        name->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(cmd->getNetClass())));
-        mUi->tableWidget->setVerticalHeaderItem(row, uuid);
-        mUi->tableWidget->setItem(row, 0, name);
+        QTableWidgetItem* uuidItem = new QTableWidgetItem(cmd->getNetClass()->getUuid().toStr());
+        QTableWidgetItem* nameItem = new QTableWidgetItem(*cmd->getNetClass()->getName());
+        nameItem->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(cmd->getNetClass())));
+        mUi->tableWidget->setVerticalHeaderItem(row, uuidItem);
+        mUi->tableWidget->setItem(row, 0, nameItem);
     }
     catch (Exception& e)
     {

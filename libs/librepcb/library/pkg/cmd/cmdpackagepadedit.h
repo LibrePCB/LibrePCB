@@ -25,14 +25,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
+#include "../packagepad.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-
-class PackagePad;
 
 /*****************************************************************************************
  *  Class CmdPackagePadEdit
@@ -52,7 +51,7 @@ class CmdPackagePadEdit final : public UndoCommand
         ~CmdPackagePadEdit() noexcept;
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
 
         // Operator Overloadings
         CmdPackagePadEdit& operator=(const CmdPackagePadEdit& rhs) = delete;
@@ -78,8 +77,8 @@ class CmdPackagePadEdit final : public UndoCommand
         PackagePad& mPad;
 
         // General Attributes
-        QString mOldName;
-        QString mNewName;
+        CircuitIdentifier mOldName;
+        CircuitIdentifier mNewName;
 };
 
 /*****************************************************************************************

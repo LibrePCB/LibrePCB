@@ -87,7 +87,7 @@ class BI_NetPoint final : public BI_Base, public SerializableObject,
         BI_Via* getVia() const noexcept {return mVia;}
         const QList<BI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}
         bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
-        Length getMaxLineWidth() const noexcept;
+        UnsignedLength getMaxLineWidth() const noexcept;
         bool isSelectable() const noexcept override;
 
         // Setters

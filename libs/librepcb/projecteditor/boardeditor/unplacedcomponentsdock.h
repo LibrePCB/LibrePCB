@@ -107,11 +107,13 @@ class UnplacedComponentsDock final : public QDockWidget
         void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
         void setSelectedDeviceAndPackage(const library::Device* device,
                                          const library::Package* package) noexcept;
-        void setSelectedFootprintUuid(const Uuid& uuid) noexcept;
+        void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
         void beginUndoCmdGroup() noexcept;
-        void addNextDeviceToCmdGroup(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
+        void addNextDeviceToCmdGroup(ComponentInstance& cmp, const Uuid& deviceUuid,
+                                     const tl::optional<Uuid>& footprintUuid) noexcept;
         void commitUndoCmdGroup() noexcept;
-        void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid) noexcept;
+        void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid,
+                               Uuid footprintUuid) noexcept;
 
 
         // General
@@ -124,7 +126,7 @@ class UnplacedComponentsDock final : public QDockWidget
         ComponentInstance* mSelectedComponent;
         const library::Device* mSelectedDevice;
         const library::Package* mSelectedPackage;
-        Uuid mSelectedFootprintUuid;
+        tl::optional<Uuid> mSelectedFootprintUuid;
         QMetaObject::Connection mCircuitConnection1;
         QMetaObject::Connection mCircuitConnection2;
         QMetaObject::Connection mBoardConnection1;
@@ -132,7 +134,7 @@ class UnplacedComponentsDock final : public QDockWidget
         Point mNextPosition;
         bool mDisableListUpdate;
         QHash<Uuid, Uuid> mLastDeviceOfComponent;
-        QHash<Uuid, Uuid> mLastFootprintOfDevice;
+        QHash<Uuid, tl::optional<Uuid>> mLastFootprintOfDevice;
         QScopedPointer<UndoCommandGroup> mCurrentUndoCmdGroup;
 };
 

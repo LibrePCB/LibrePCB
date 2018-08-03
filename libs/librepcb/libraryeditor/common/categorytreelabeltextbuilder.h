@@ -73,7 +73,7 @@ class CategoryTreeLabelTextBuilder final
         void setErrorText(const QString& error) noexcept;
 
         // General Methods
-        bool updateText(const Uuid& category, const QString& lastLine = QString()) noexcept;
+        bool updateText(const tl::optional<Uuid>& category, const QString& lastLine = QString()) noexcept;
 
         // Operator Overloadings
         CategoryTreeLabelTextBuilder& operator=(const CategoryTreeLabelTextBuilder& rhs) = delete;
@@ -93,7 +93,7 @@ class CategoryTreeLabelTextBuilder final
         const QStringList& mLocaleOrder;
         QLabel& mLabel;
         bool mHighlightLastLine;
-        Uuid mEndlessRecursionUuid;
+        tl::optional<Uuid> mEndlessRecursionUuid;
         bool mOneLine;
 };
 

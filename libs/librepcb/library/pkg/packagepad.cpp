@@ -38,17 +38,15 @@ PackagePad::PackagePad(const PackagePad& other) noexcept :
 {
 }
 
-PackagePad::PackagePad(const Uuid& uuid, const QString& name) noexcept :
+PackagePad::PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept :
     mUuid(uuid), mName(name)
 {
 }
 
-PackagePad::PackagePad(const SExpression& node)
+PackagePad::PackagePad(const SExpression& node) :
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true))
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 PackagePad::~PackagePad() noexcept
@@ -59,7 +57,7 @@ PackagePad::~PackagePad() noexcept
  *  Setters
  ****************************************************************************************/
 
-void PackagePad::setName(const QString& name) noexcept
+void PackagePad::setName(const CircuitIdentifier& name) noexcept
 {
     mName = name;
 }
@@ -70,8 +68,6 @@ void PackagePad::setName(const QString& name) noexcept
 
 void PackagePad::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
 }
@@ -92,17 +88,6 @@ PackagePad& PackagePad::operator=(const PackagePad& rhs) noexcept
     mUuid = rhs.mUuid;
     mName = rhs.mName;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool PackagePad::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())     return false;
-    if (mName.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

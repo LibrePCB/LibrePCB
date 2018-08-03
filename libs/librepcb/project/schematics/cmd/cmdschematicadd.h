@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/elementname.h>
 #include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
@@ -47,7 +48,7 @@ class CmdSchematicAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdSchematicAdd(Project& project, const QString& name) noexcept;
+        CmdSchematicAdd(Project& project, const ElementName& name) noexcept;
         ~CmdSchematicAdd() noexcept;
 
         // Getters
@@ -71,7 +72,7 @@ class CmdSchematicAdd final : public UndoCommand
         // Private Member Variables
 
         Project& mProject;
-        QString mName;
+        ElementName mName;
         Schematic* mSchematic;
         int mPageIndex;
 };

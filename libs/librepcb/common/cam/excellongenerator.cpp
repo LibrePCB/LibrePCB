@@ -47,9 +47,9 @@ ExcellonGenerator::~ExcellonGenerator() noexcept
  *  General Methods
  ****************************************************************************************/
 
-void ExcellonGenerator::drill(const Point& pos, const Length& dia) noexcept
+void ExcellonGenerator::drill(const Point& pos, const PositiveLength& dia) noexcept
 {
-    mDrillList.insert(dia, pos);
+    mDrillList.insert(*dia, pos);
 }
 
 void ExcellonGenerator::generate()

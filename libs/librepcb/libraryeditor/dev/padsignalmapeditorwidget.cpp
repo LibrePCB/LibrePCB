@@ -120,10 +120,11 @@ void PadSignalMapEditorWidget::currentCellChanged(int currentRow, int currentCol
 void PadSignalMapEditorWidget::componentSignalChanged(int index) noexcept
 {
     QComboBox* cbx = dynamic_cast<QComboBox*>(sender()); Q_ASSERT(cbx);
-    Uuid pad = getPadUuidOfTableCellWidget(sender());
-    if (pad.isNull()) return;
-    Uuid signal(cbx->itemData(index, Qt::UserRole).toString());
-    if (mUndoStack && mPadSignalMap) setComponentSignal(pad, signal);
+    tl::optional<Uuid> pad = getPadUuidOfTableCellWidget(sender());
+    if (pad) {
+        tl::optional<Uuid> signal = Uuid::tryFromString(cbx->itemData(index, Qt::UserRole).toString());
+        if (mUndoStack && mPadSignalMap) setComponentSignal(*pad, signal);
+    }
 }
 
 /*****************************************************************************************
@@ -173,7 +174,7 @@ void PadSignalMapEditorWidget::updateTable() noexcept
         mTable->setRowCount(mPadSignalMap->count());
         for (int row = 0; row < mPads.count(); ++row) {
             const PackagePad& pad = *mPads.at(row);
-            setTableRowContent(row, pad.getUuid(), pad.getName(),
+            setTableRowContent(row, pad.getUuid(), *pad.getName(),
                 DevicePadSignalMapHelpers::tryGetSignalUuid(*mPadSignalMap, pad.getUuid()));
             if (pad.getUuid() == mSelectedPad) {
                 selectedRow = row;
@@ -198,7 +199,7 @@ void PadSignalMapEditorWidget::updateTable() noexcept
 }
 
 void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
-    const QString& padName, const Uuid& signalUuid) noexcept
+    const QString& padName, const tl::optional<Uuid>& signalUuid) noexcept
 {
     // header
     QTableWidgetItem* headerItem = new QTableWidgetItem(padUuid.toStr());
@@ -223,9 +224,9 @@ void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
     signalComboBox->setFixedHeight(cbxHeight);
     signalComboBox->addItem(tr("(not connected)"));
     for (const ComponentSignal& sig : mSignals) {
-        signalComboBox->addItem(sig.getName(), sig.getUuid().toStr());
+        signalComboBox->addItem(*sig.getName(), sig.getUuid().toStr());
     }
-    int currentIndex = signalComboBox->findData(signalUuid.toStr(), Qt::UserRole);
+    int currentIndex = signalUuid ? signalComboBox->findData(signalUuid->toStr(), Qt::UserRole) : -1;
     signalComboBox->setCurrentIndex(currentIndex > 0 ? currentIndex : 0);
     connect(signalComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &PadSignalMapEditorWidget::componentSignalChanged);
@@ -235,7 +236,7 @@ void PadSignalMapEditorWidget::setTableRowContent(int row, const Uuid& padUuid,
     mTable->verticalHeader()->resizeSection(row, cbxHeight);
 }
 
-void PadSignalMapEditorWidget::setComponentSignal(const Uuid& pad, const Uuid& signal) noexcept
+void PadSignalMapEditorWidget::setComponentSignal(const Uuid& pad, const tl::optional<Uuid>& signal) noexcept
 {
     try {
         DevicePadSignalMapItem& item = *mPadSignalMap->get(pad); // can throw
@@ -248,15 +249,15 @@ void PadSignalMapEditorWidget::setComponentSignal(const Uuid& pad, const Uuid& s
     }
 }
 
-Uuid PadSignalMapEditorWidget::getPadUuidOfTableCellWidget(QObject* obj) const noexcept
+tl::optional<Uuid> PadSignalMapEditorWidget::getPadUuidOfTableCellWidget(QObject* obj) const noexcept
 {
-    return Uuid(obj->property("pad").toString());
+    return Uuid::tryFromString(obj->property("pad").toString());
 }
 
-Uuid PadSignalMapEditorWidget::getPadUuidOfRow(int row) const noexcept
+tl::optional<Uuid> PadSignalMapEditorWidget::getPadUuidOfRow(int row) const noexcept
 {
     QTableWidgetItem* item = mTable->item(row, COLUMN_PAD);
-    return Uuid(item ? item->data(Qt::UserRole).toString() : QString());
+    return item ? Uuid::tryFromString(item->data(Qt::UserRole).toString()) : tl::nullopt;
 }
 
 /*****************************************************************************************

@@ -32,9 +32,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Circle::Circle(const Circle& other) noexcept
+Circle::Circle(const Circle& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mLineWidth(other.mLineWidth),
+    mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea),
+    mCenter(other.mCenter),
+    mDiameter(other.mDiameter)
 {
-    *this = other; // use assignment operator
 }
 
 Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
@@ -43,28 +49,27 @@ Circle::Circle(const Uuid& uuid, const Circle& other) noexcept :
     mUuid = uuid;
 }
 
-Circle::Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth, bool fill,
-               bool isGrabArea, const Point& center, const Length& diameter) noexcept :
+Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName, const UnsignedLength& lineWidth, bool fill,
+               bool isGrabArea, const Point& center, const PositiveLength& diameter) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
     mIsGrabArea(isGrabArea), mCenter(center), mDiameter(diameter)
 {
 }
 
-Circle::Circle(const SExpression& node)
+Circle::Circle(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mLineWidth(node.getValueByPath<UnsignedLength>("width")),
+    mIsFilled(node.getValueByPath<bool>("fill")),
+    mIsGrabArea(node.getValueByPath<bool>("grab")),
+    mCenter(node.getChildByPath("pos")),
+    mDiameter(1)
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    } else {
-        // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
-    mLineWidth = node.getValueByPath<Length>("width");
-    mIsFilled = node.getValueByPath<bool>("fill");
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-    mCenter = Point(node.getChildByPath("pos"));
     if (node.tryGetChildByPath("dia")) {
-        mDiameter = node.getValueByPath<Length>("dia");
+        mDiameter = node.getValueByPath<PositiveLength>("dia");
     } else if (node.tryGetChildByPath("size")) {
         // backward compatibility, remove this some time!
         mDiameter = Point(node.getChildByPath("size")).getX();
@@ -72,8 +77,6 @@ Circle::Circle(const SExpression& node)
         // backward compatibility, remove this some time!
         mDiameter = node.getValueByPath<Length>("rx") * 2;
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Circle::~Circle() noexcept
@@ -84,7 +87,7 @@ Circle::~Circle() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Circle::setLayerName(const QString& name) noexcept
+void Circle::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -93,7 +96,7 @@ void Circle::setLayerName(const QString& name) noexcept
     }
 }
 
-void Circle::setLineWidth(const Length& width) noexcept
+void Circle::setLineWidth(const UnsignedLength& width) noexcept
 {
     if (width == mLineWidth) return;
     mLineWidth = width;
@@ -129,7 +132,7 @@ void Circle::setCenter(const Point& center) noexcept
     }
 }
 
-void Circle::setDiameter(const Length& dia) noexcept
+void Circle::setDiameter(const PositiveLength& dia) noexcept
 {
     if (dia == mDiameter) return;
     mDiameter = dia;
@@ -164,10 +167,8 @@ void Circle::unregisterObserver(IF_CircleObserver& object) const noexcept
 
 void Circle::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("width", mLineWidth, true);
     root.appendChild("fill", mIsFilled, false);
     root.appendChild("grab", mIsGrabArea, false);
@@ -201,19 +202,6 @@ Circle& Circle::operator=(const Circle& rhs) noexcept
     mCenter = rhs.mCenter;
     mDiameter = rhs.mDiameter;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool Circle::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())         return false;
-    if (mLayerName.isEmpty())   return false;
-    if (mLineWidth < 0)         return false;
-    if (mDiameter <= 0)         return false;
-    return true;
 }
 
 /*****************************************************************************************

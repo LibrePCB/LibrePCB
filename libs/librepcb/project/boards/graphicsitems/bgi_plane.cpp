@@ -68,9 +68,9 @@ void BGI_Plane::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
-    setZValue(getZValueOfCopperLayer(mPlane.getLayerName()));
+    setZValue(getZValueOfCopperLayer(*mPlane.getLayerName()));
 
-    mLayer = getLayer(mPlane.getLayerName());
+    mLayer = getLayer(*mPlane.getLayerName());
 
     // set shape and bounding rect
     mOutline = mPlane.getOutline().toQPainterPathPx(true); // always return a closed path

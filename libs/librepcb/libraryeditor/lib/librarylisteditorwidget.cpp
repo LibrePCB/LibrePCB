@@ -55,7 +55,7 @@ LibraryListEditorWidget::LibraryListEditorWidget(
     libs.append(mWorkspace.getRemoteLibraries().values());
     mUi->comboBox->addItem(tr("Enter Library UUID..."));
     foreach (const QSharedPointer<library::Library>& lib, libs) {
-        mUi->comboBox->addItem(lib->getIcon(), lib->getNames().value(localeOrder),
+        mUi->comboBox->addItem(lib->getIcon(), *lib->getNames().value(localeOrder),
                                lib->getUuid().toStr());
     }
 }
@@ -83,28 +83,28 @@ void LibraryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept
 
 void LibraryListEditorWidget::btnAddClicked() noexcept
 {
-    Uuid uuid(mUi->comboBox->currentText().trimmed());
-    if (uuid.isNull()) {
-        uuid.setUuid(mUi->comboBox->currentData(Qt::UserRole).toString());
+    tl::optional<Uuid> uuid = Uuid::tryFromString(mUi->comboBox->currentText().trimmed());
+    if (!uuid) {
+        uuid = Uuid::tryFromString(mUi->comboBox->currentData(Qt::UserRole).toString());
     }
-    if (uuid.isNull()) {
+    if (!uuid) {
         QMessageBox::warning(this, tr("Error"), tr("Invalid UUID"));
         return;
     }
-    if (!mUuids.contains(uuid)) {
-        mUuids.insert(uuid);
-        addItem(uuid);
-        emit libraryAdded(uuid);
+    if (uuid && !mUuids.contains(*uuid)) {
+        mUuids.insert(*uuid);
+        addItem(*uuid);
+        emit libraryAdded(*uuid);
     }
 }
 
 void LibraryListEditorWidget::btnRemoveClicked() noexcept
 {
     QListWidgetItem* item = mUi->listWidget->currentItem();
-    if (item) {
-        Uuid uuid(item->data(Qt::UserRole).toString());
-        mUuids.remove(uuid);
-        emit libraryRemoved(uuid);
+    tl::optional<Uuid> uuid = item ? Uuid::tryFromString(item->data(Qt::UserRole).toString()) : tl::nullopt;
+    if (item && uuid) {
+        mUuids.remove(*uuid);
+        emit libraryRemoved(*uuid);
         delete item;
     }
 }
@@ -119,7 +119,7 @@ void LibraryListEditorWidget::addItem(const Uuid& library) noexcept
     libs.append(mWorkspace.getRemoteLibraries().values());
     foreach (const QSharedPointer<library::Library>& lib, libs) {
         if (lib->getUuid() == library) {
-            name = lib->getNames().value(localeOrder);
+            name = *lib->getNames().value(localeOrder);
             break;
         }
     }

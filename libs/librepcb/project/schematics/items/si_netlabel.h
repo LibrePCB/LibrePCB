@@ -90,7 +90,6 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
     private:
 
         void init();
-        bool checkAttributesValidity() const noexcept;
 
 
         // General

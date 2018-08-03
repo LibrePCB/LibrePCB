@@ -24,16 +24,13 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "../path.h"
+#include "../polygon.h"
 #include "../../undocommand.h"
-#include "../../units/all_length_units.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class Polygon;
 
 /*****************************************************************************************
  *  Class CmdPolygonEdit
@@ -53,8 +50,8 @@ class CmdPolygonEdit final : public UndoCommand
         ~CmdPolygonEdit() noexcept;
 
         // Setters
-        void setLayerName(const QString& name, bool immediate) noexcept;
-        void setLineWidth(const Length& width, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+        void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
         void setIsFilled(bool filled, bool immediate) noexcept;
         void setIsGrabArea(bool grabArea, bool immediate) noexcept;
         void setPath(const Path& path, bool immediate) noexcept;
@@ -85,10 +82,10 @@ class CmdPolygonEdit final : public UndoCommand
         Polygon& mPolygon;
 
         // General Attributes
-        QString mOldLayerName;
-        QString mNewLayerName;
-        Length mOldLineWidth;
-        Length mNewLineWidth;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
+        UnsignedLength mOldLineWidth;
+        UnsignedLength mNewLineWidth;
         bool mOldIsFilled;
         bool mNewIsFilled;
         bool mOldIsGrabArea;

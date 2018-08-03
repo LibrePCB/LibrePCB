@@ -26,6 +26,7 @@
 #include <QtCore>
 #include "bi_base.h"
 #include <librepcb/common/uuid.h>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include <librepcb/common/fileio/serializableobject.h>
 
 /*****************************************************************************************
@@ -65,8 +66,8 @@ class BI_Polygon final : public BI_Base, public SerializableObject
         BI_Polygon(Board& board, const BI_Polygon& other);
         BI_Polygon(Board& board, const SExpression& node);
         BI_Polygon(Board& board, const Polygon& polygon);
-        BI_Polygon(Board& board, const Uuid& uuid, const QString& layerName,
-                   const Length& lineWidth, bool fill, bool isGrabArea, const Path& path);
+        BI_Polygon(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
+                   const UnsignedLength& lineWidth, bool fill, bool isGrabArea, const Path& path);
         ~BI_Polygon() noexcept;
 
         // Getters

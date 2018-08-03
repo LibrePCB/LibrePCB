@@ -53,7 +53,7 @@ class CmdDevicePadSignalMapItemEdit final : public UndoCommand
         ~CmdDevicePadSignalMapItemEdit() noexcept;
 
         // Setters
-        void setSignalUuid(const Uuid& uuid) noexcept;
+        void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
         // Operator Overloadings
         CmdDevicePadSignalMapItemEdit& operator=(const CmdDevicePadSignalMapItemEdit& rhs) = delete;
@@ -74,8 +74,8 @@ class CmdDevicePadSignalMapItemEdit final : public UndoCommand
     private: // Data
         DevicePadSignalMapItem& mItem;
 
-        Uuid mOldSignalUuid;
-        Uuid mNewSignalUuid;
+        tl::optional<Uuid> mOldSignalUuid;
+        tl::optional<Uuid> mNewSignalUuid;
 };
 
 /*****************************************************************************************

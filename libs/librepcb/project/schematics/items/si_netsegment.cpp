@@ -45,12 +45,12 @@ namespace project {
  ****************************************************************************************/
 
 SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node) :
-    SI_Base(schematic), mUuid(), mNetSignal(nullptr)
+    SI_Base(schematic),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mNetSignal(nullptr)
 {
     try
     {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>();
-
         Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
         mNetSignal = mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
         if(!mNetSignal) {
@@ -517,7 +517,6 @@ void SI_NetSegment::setSelected(bool selected) noexcept
 
 bool SI_NetSegment::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                         return false;
     if (mNetSignal == nullptr)                  return false;
     if (mNetPoints.count() < 2)                 return false;
     if (!areAllNetPointsConnectedTogether())    return false;

@@ -59,6 +59,18 @@ WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept
  *  Private Methods
  ****************************************************************************************/
 
+template <>
+QVariant WorkspaceLibraryScanner::optionalToVariant(const tl::optional<QString>& opt) noexcept
+{
+    return opt ? *opt : QVariant();
+}
+
+template <>
+QVariant WorkspaceLibraryScanner::optionalToVariant(const tl::optional<ElementName>& opt) noexcept
+{
+    return opt ? **opt : QVariant();
+}
+
 void WorkspaceLibraryScanner::run() noexcept
 {
     try {
@@ -174,9 +186,9 @@ int WorkspaceLibraryScanner::addLibraryToDb(SQLiteDatabase& db,
             "(:element_id, :locale, :name, :description, :keywords)");
         query.bindValue(":element_id",  id);
         query.bindValue(":locale",      locale);
-        query.bindValue(":name",        lib->getNames().value(locale));
-        query.bindValue(":description", lib->getDescriptions().value(locale));
-        query.bindValue(":keywords",    lib->getKeywords().value(locale));
+        query.bindValue(":name",        optionalToVariant(lib->getNames().tryGet(locale)));
+        query.bindValue(":description", optionalToVariant(lib->getDescriptions().tryGet(locale)));
+        query.bindValue(":keywords",    optionalToVariant(lib->getKeywords().tryGet(locale)));
         db.insert(query);
     }
     return id;
@@ -199,7 +211,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
             query.bindValue(":filepath",    filepath.toRelative(mWorkspace.getLibrariesPath()));
             query.bindValue(":uuid",        element.getUuid().toStr());
             query.bindValue(":version",     element.getVersion().toStr());
-            query.bindValue(":parent_uuid", element.getParentUuid().isNull() ? QVariant(QVariant::String) : element.getParentUuid().toStr());
+            query.bindValue(":parent_uuid", element.getParentUuid() ? element.getParentUuid()->toStr() : QVariant(QVariant::String));
             int id = db.insert(query);
             foreach (const QString& locale, element.getAllAvailableLocales()) {
                 QSqlQuery query = db.prepareQuery(
@@ -208,9 +220,9 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase& db, const QList<F
                     "(:element_id, :locale, :name, :description, :keywords)");
                 query.bindValue(":element_id",  id);
                 query.bindValue(":locale",      locale);
-                query.bindValue(":name",        element.getNames().value(locale));
-                query.bindValue(":description", element.getDescriptions().value(locale));
-                query.bindValue(":keywords",    element.getKeywords().value(locale));
+                query.bindValue(":name",        optionalToVariant(element.getNames().tryGet(locale)));
+                query.bindValue(":description", optionalToVariant(element.getDescriptions().tryGet(locale)));
+                query.bindValue(":keywords",    optionalToVariant(element.getKeywords().tryGet(locale)));
                 db.insert(query);
             }
             count++;
@@ -246,13 +258,12 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase& db, const QList<Fil
                     "(:element_id, :locale, :name, :description, :keywords)");
                 query.bindValue(":element_id",  id);
                 query.bindValue(":locale",      locale);
-                query.bindValue(":name",        element.getNames().value(locale));
-                query.bindValue(":description", element.getDescriptions().value(locale));
-                query.bindValue(":keywords",    element.getKeywords().value(locale));
+                query.bindValue(":name",        optionalToVariant(element.getNames().tryGet(locale)));
+                query.bindValue(":description", optionalToVariant(element.getDescriptions().tryGet(locale)));
+                query.bindValue(":keywords",    optionalToVariant(element.getKeywords().tryGet(locale)));
                 db.insert(query);
             }
             foreach (const Uuid& categoryUuid, element.getCategories()) {
-                Q_ASSERT(!categoryUuid.isNull());
                 QSqlQuery query = db.prepareQuery(
                     "INSERT INTO " % table % "_cat "
                     "(" % idColumn % ", category_uuid) VALUES "
@@ -295,13 +306,12 @@ int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase& db, const QList<File
                     "(:element_id, :locale, :name, :description, :keywords)");
                 query.bindValue(":element_id",  id);
                 query.bindValue(":locale",      locale);
-                query.bindValue(":name",        element.getNames().value(locale));
-                query.bindValue(":description", element.getDescriptions().value(locale));
-                query.bindValue(":keywords",    element.getKeywords().value(locale));
+                query.bindValue(":name",        optionalToVariant(element.getNames().tryGet(locale)));
+                query.bindValue(":description", optionalToVariant(element.getDescriptions().tryGet(locale)));
+                query.bindValue(":keywords",    optionalToVariant(element.getKeywords().tryGet(locale)));
                 db.insert(query);
             }
             foreach (const Uuid& categoryUuid, element.getCategories()) {
-                Q_ASSERT(!categoryUuid.isNull());
                 QSqlQuery query = db.prepareQuery(
                     "INSERT INTO " % table % "_cat "
                     "(" % idColumn % ", category_uuid) VALUES "

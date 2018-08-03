@@ -24,7 +24,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <optional/tl/optional.hpp>
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/circuitidentifier.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -49,7 +51,8 @@ class CmdNetSignalAdd final : public UndoCommand
 
         // Constructors / Destructor
         CmdNetSignalAdd(Circuit& circuit, NetClass& netclass) noexcept;
-        CmdNetSignalAdd(Circuit& circuit, NetClass& netclass, const QString& name) noexcept;
+        CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
+                        const CircuitIdentifier& name) noexcept;
         ~CmdNetSignalAdd() noexcept;
 
         // Getters
@@ -75,7 +78,7 @@ class CmdNetSignalAdd final : public UndoCommand
         Circuit& mCircuit;
         NetClass& mNetClass;
         bool mIsAutoName;
-        QString mName;
+        tl::optional<CircuitIdentifier> mName;
         NetSignal* mNetSignal;
 };
 

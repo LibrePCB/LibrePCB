@@ -66,12 +66,13 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other,
 }
 
 BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
-    BI_Base(segment.getBoard()), mNetSegment(segment), mLayer(nullptr), mFootprintPad(nullptr),
+    BI_Base(segment.getBoard()), mNetSegment(segment),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mLayer(nullptr),
+    mFootprintPad(nullptr),
     mVia(nullptr)
 {
     // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-
     QString layerName = node.getValueByPath<QString>("layer");
     mLayer = mBoard.getLayerStack().getLayer(layerName);
     if (!mLayer) {
@@ -161,7 +162,7 @@ void BI_NetPoint::init()
     mErcMsgDeadNetPoint.reset(new ErcMsg(mBoard.getProject(), *this,
         mUuid.toStr(), "Dead", ErcMsg::ErcMsgType_t::BoardError,
         QString(tr("Dead net point in board page \"%1\": %2"))
-        .arg(mBoard.getName()).arg(mUuid.toStr())));
+        .arg(*mBoard.getName()).arg(mUuid.toStr())));
 
     if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
@@ -180,12 +181,12 @@ NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept
     return mNetSegment.getNetSignal();
 }
 
-Length BI_NetPoint::getMaxLineWidth() const noexcept
+UnsignedLength BI_NetPoint::getMaxLineWidth() const noexcept
 {
-    Length w = 0;
+    UnsignedLength w(0);
     foreach (BI_NetLine* line, mRegisteredLines) {
         if (line->getWidth() > w) {
-            w = line->getWidth();
+            w = positiveToUnsigned(line->getWidth());
         }
     }
     return w;
@@ -404,7 +405,6 @@ void BI_NetPoint::setSelected(bool selected) noexcept
 
 bool BI_NetPoint::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())                             return false;
     if (isAttachedToPad() && (&mNetSegment.getNetSignal() != mFootprintPad->getCompSigInstNetSignal())) return false;
     if (isAttachedToVia() && (&mNetSegment != &mVia->getNetSegment())) return false;
     return true;

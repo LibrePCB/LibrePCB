@@ -65,14 +65,14 @@ bool BGI_NetPoint::isSelectable() const noexcept
 
 void BGI_NetPoint::updateCacheAndRepaint() noexcept
 {
-    setToolTip(mNetPoint.getNetSignalOfNetSegment().getName());
+    setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
 
     prepareGeometryChange();
 
     // set Z value
     setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
 
-    qreal radius = mNetPoint.getMaxLineWidth().toPx() / 2;
+    qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
     mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
 
     update();

@@ -49,7 +49,7 @@ CmdNetClassEdit::~CmdNetClassEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdNetClassEdit::setName(const QString& name) noexcept
+void CmdNetClassEdit::setName(const ElementName& name) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

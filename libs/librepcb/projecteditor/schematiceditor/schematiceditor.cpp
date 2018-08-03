@@ -280,7 +280,7 @@ void SchematicEditor::on_actionNew_Schematic_Page_triggered()
 
     try
     {
-        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, name);
+        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, ElementName(name)); // can throw
         mProjectEditor.getUndoStack().execCmd(cmd);
     }
     catch (Exception& e)
@@ -309,7 +309,7 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 {
     try
     {
-        QString projectName = FilePath::cleanFileName(mProject.getMetadata().getName(),
+        QString projectName = FilePath::cleanFileName(*mProject.getMetadata().getName(),
                               FilePath::ReplaceSpaces | FilePath::KeepCase);
         QString projectVersion = FilePath::cleanFileName(mProject.getMetadata().getVersion(),
                                  FilePath::ReplaceSpaces | FilePath::KeepCase);
@@ -332,48 +332,48 @@ void SchematicEditor::on_actionPDF_Export_triggered()
 
 void SchematicEditor::on_actionAddComp_Resistor_triggered()
 {
-    Uuid componentUuid = Uuid("ef80cd5e-2689-47ee-8888-31d04fc99174");
-    Uuid symbVarUuid = Uuid("a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
+    Uuid componentUuid = Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174");
+    Uuid symbVarUuid = Uuid::fromString("a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }
 
 void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered()
 {
-    Uuid componentUuid = Uuid("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
-    Uuid symbVarUuid = Uuid("8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
+    Uuid componentUuid = Uuid::fromString("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
+    Uuid symbVarUuid = Uuid::fromString("8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }
 
 void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered()
 {
-    Uuid componentUuid = Uuid("c54375c5-7149-4ded-95c5-7462f7301ee7");
-    Uuid symbVarUuid = Uuid("5412add2-af9c-44b8-876d-a0fb7c201897");
+    Uuid componentUuid = Uuid::fromString("c54375c5-7149-4ded-95c5-7462f7301ee7");
+    Uuid symbVarUuid = Uuid::fromString("5412add2-af9c-44b8-876d-a0fb7c201897");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }
 
 void SchematicEditor::on_actionAddComp_Inductor_triggered()
 {
-    Uuid componentUuid = Uuid("506bd124-6062-400e-9078-b38bd7e1aaee");
-    Uuid symbVarUuid = Uuid("62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
+    Uuid componentUuid = Uuid::fromString("506bd124-6062-400e-9078-b38bd7e1aaee");
+    Uuid symbVarUuid = Uuid::fromString("62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }
 
 void SchematicEditor::on_actionAddComp_gnd_triggered()
 {
-    Uuid componentUuid = Uuid("8076f6be-bfab-4fc1-9772-5d54465dd7e1");
-    Uuid symbVarUuid = Uuid("f09ad258-595b-4ee9-a1fc-910804a203ae");
+    Uuid componentUuid = Uuid::fromString("8076f6be-bfab-4fc1-9772-5d54465dd7e1");
+    Uuid symbVarUuid = Uuid::fromString("f09ad258-595b-4ee9-a1fc-910804a203ae");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }
 
 void SchematicEditor::on_actionAddComp_vcc_triggered()
 {
-    Uuid componentUuid = Uuid("58c3c6cd-11eb-4557-aa3f-d3e05874afde");
-    Uuid symbVarUuid = Uuid("afb86b45-68ec-47b6-8d96-153d73567228");
+    Uuid componentUuid = Uuid::fromString("58c3c6cd-11eb-4557-aa3f-d3e05874afde");
+    Uuid symbVarUuid = Uuid::fromString("afb86b45-68ec-47b6-8d96-153d73567228");
     SEE_StartAddComponent* addEvent = new SEE_StartAddComponent(componentUuid, symbVarUuid);
     mFsm->processEvent(addEvent, true);
 }

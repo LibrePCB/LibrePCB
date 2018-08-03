@@ -108,9 +108,9 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept
     }
 
     // determine stop/cream mask clearance
-    Length size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
-    Length stopMaskClearance = mPad.getBoard().getDesignRules().calcStopMaskClearance(size);
-    Length creamMaskClearance = -mPad.getBoard().getDesignRules().calcCreamMaskClearance(size);
+    PositiveLength size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
+    Length stopMaskClearance = *mPad.getBoard().getDesignRules().calcStopMaskClearance(*size);
+    Length creamMaskClearance = -mPad.getBoard().getDesignRules().calcCreamMaskClearance(*size);
 
     // set shapes and bounding rect
     mShape = mLibPad.getOutline().toQPainterPathPx();

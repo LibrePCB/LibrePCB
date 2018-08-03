@@ -50,7 +50,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(const Package& pkg,
     mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
     for (const PackagePad& p : pkg.getPads()) {
         if ((p.getUuid() == mPad.getUuid()) || (!fpt.getPads().contains(p.getUuid()))) {
-            mUi->cbxPackagePad->addItem(p.getName(), p.getUuid().toStr());
+            mUi->cbxPackagePad->addItem(*p.getName(), p.getUuid().toStr());
             if (mPad.getPackagePadUuid() == p.getUuid()) {
                 currentPadIndex = mUi->cbxPackagePad->count() - 1;
             }
@@ -69,9 +69,9 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(const Package& pkg,
         case FootprintPad::Shape::OCTAGON:  mUi->rbtnShapeOctagon->setChecked(true); break;
         default: Q_ASSERT(false); break;
     }
-    mUi->spbWidth->setValue(mPad.getWidth().toMm());
-    mUi->spbHeight->setValue(mPad.getHeight().toMm());
-    mUi->spbDrillDiameter->setValue(mPad.getDrillDiameter().toMm());
+    mUi->spbWidth->setValue(mPad.getWidth()->toMm());
+    mUi->spbHeight->setValue(mPad.getHeight()->toMm());
+    mUi->spbDrillDiameter->setValue(mPad.getDrillDiameter()->toMm());
     mUi->spbPosX->setValue(mPad.getPosition().getX().toMm());
     mUi->spbPosY->setValue(mPad.getPosition().getY().toMm());
     mUi->spbRotation->setValue(mPad.getRotation().toDeg());
@@ -112,7 +112,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept
 {
     try {
         QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
-        Uuid pkgPad = Uuid(mUi->cbxPackagePad->currentData().toString());
+        Uuid pkgPad = Uuid::fromString(mUi->cbxPackagePad->currentData().toString()); // can throw
         cmd->setPackagePadUuid(pkgPad, false);
         if (mUi->rbtnBoardSideTop->isChecked()) {
             cmd->setBoardSide(FootprintPad::BoardSide::TOP, false);
@@ -132,9 +132,9 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept
         } else {
             Q_ASSERT(false);
         }
-        cmd->setWidth(Length::fromMm(mUi->spbWidth->value()), false);
-        cmd->setHeight(Length::fromMm(mUi->spbHeight->value()), false);
-        cmd->setDrillDiameter(Length::fromMm(mUi->spbDrillDiameter->value()), false);
+        cmd->setWidth(PositiveLength(Length::fromMm(mUi->spbWidth->value())), false); // can throw
+        cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())), false); // can throw
+        cmd->setDrillDiameter(UnsignedLength(Length::fromMm(mUi->spbDrillDiameter->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());

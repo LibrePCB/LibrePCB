@@ -61,7 +61,7 @@ class SerializableObjectListTest : public ::testing::Test
 
     private:
         void appendMock(const char* uuid, const char* name) {
-            mMocks.append(std::make_shared<Mock>(Uuid(uuid), name));
+            mMocks.append(std::make_shared<Mock>(Uuid::fromString(uuid), name));
         }
 };
 
@@ -138,7 +138,7 @@ TEST_F(SerializableObjectListTest, testDomElementConstructor)
 TEST_F(SerializableObjectListTest, testGetUuids)
 {
     List l{mMocks[0], mMocks[1], mMocks[2], mMocks[2]};
-    QVector<Uuid> vector{mMocks[0]->mUuid, mMocks[1]->mUuid, mMocks[2]->mUuid, mMocks[2]->mUuid};
+    std::vector<Uuid> vector{mMocks[0]->mUuid, mMocks[1]->mUuid, mMocks[2]->mUuid, mMocks[2]->mUuid};
     QSet<Uuid> set{mMocks[0]->mUuid, mMocks[1]->mUuid, mMocks[2]->mUuid};
     EXPECT_EQ(vector, l.getUuids());
     EXPECT_EQ(set, l.getUuidSet());
@@ -173,7 +173,7 @@ TEST_F(SerializableObjectListTest, testContainsUuid)
 {
     List l{mMocks[0], mMocks[1], mMocks[2]};
     EXPECT_TRUE(l.contains(mMocks[1]->mUuid));
-    EXPECT_FALSE(l.contains(Uuid()));
+    EXPECT_FALSE(l.contains(Uuid::createRandom()));
 }
 
 TEST_F(SerializableObjectListTest, testContainsName)

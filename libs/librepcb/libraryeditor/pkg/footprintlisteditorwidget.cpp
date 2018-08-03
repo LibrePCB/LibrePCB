@@ -77,7 +77,7 @@ void FootprintListEditorWidget::setReferences(FootprintList& list, UndoStack& st
 {
     mFootprintList = &list;
     mUndoStack = &stack;
-    mSelectedFootprint = Uuid();
+    mSelectedFootprint = tl::nullopt;
     mFootprintList->registerObserver(this);
     updateTable();
 }
@@ -99,14 +99,15 @@ void FootprintListEditorWidget::currentCellChanged(int currentRow, int currentCo
 void FootprintListEditorWidget::tableCellChanged(int row, int column) noexcept
 {
     QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
 
     if (isNewFootprintRow(row)) {
         if (column == COLUMN_NAME) {
             item->setText(cleanName(item->text()));
         }
-    } else if (isExistingFootprintRow(row)) {
+    } else if (isExistingFootprintRow(row) && uuid) {
         if (column == COLUMN_NAME) {
-            item->setText(setName(getUuidOfRow(row), cleanName(item->text())));
+            item->setText(*setName(*uuid, cleanName(item->text())));
         }
     }
 }
@@ -132,19 +133,21 @@ void FootprintListEditorWidget::btnDownClicked() noexcept
 void FootprintListEditorWidget::btnCopyClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
-    if (isExistingFootprintRow(row)) {
-        copyFootprint(getUuidOfRow(row));
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
+    if (isExistingFootprintRow(row) && uuid) {
+        copyFootprint(*uuid);
     }
 }
 
 void FootprintListEditorWidget::btnAddRemoveClicked() noexcept
 {
     int row = getRowOfTableCellWidget(sender());
+    tl::optional<Uuid> uuid = getUuidOfRow(row);
     if (isNewFootprintRow(row)) {
         const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
         addFootprint(cleanName(nameItem->text()));
     } else if (isExistingFootprintRow(row)) {
-        removeFootprint(getUuidOfRow(row));
+        removeFootprint(*uuid);
     }
 }
 
@@ -152,12 +155,12 @@ void FootprintListEditorWidget::btnAddRemoveClicked() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
+void FootprintListEditorWidget::updateTable(tl::optional<Uuid> selected) noexcept
 {
     mTable->blockSignals(true);
 
     // selecte the first row by default to make sure a footprint is shown in the grpahics view
-    if (selected.isNull() && !mFootprintList->isEmpty()) {
+    if (!selected && !mFootprintList->isEmpty()) {
         selected = mFootprintList->first()->getUuid();
     }
 
@@ -168,12 +171,12 @@ void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->setRowCount(mFootprintList->count() + 1);
 
     // special row for adding a new footprint
-    setTableRowContent(newFootprintRow(), Uuid(), "");
+    setTableRowContent(newFootprintRow(), tl::nullopt, "");
 
     // existing signals
     for (int i = 0; i < mFootprintList->count(); ++i) {
         const Footprint& footprint = *mFootprintList->at(i);
-        setTableRowContent(indexToRow(i), footprint.getUuid(), footprint.getNames().getDefaultValue());
+        setTableRowContent(indexToRow(i), footprint.getUuid(), *footprint.getNames().getDefaultValue());
         if (footprint.getUuid() == selected) {
             selectedRow = indexToRow(i);
         }
@@ -190,13 +193,13 @@ void FootprintListEditorWidget::updateTable(Uuid selected) noexcept
     mTable->blockSignals(false);
 }
 
-void FootprintListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
+void FootprintListEditorWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                                                     const QString& name) noexcept
 {
     // header
-    QString header = uuid.isNull() ? tr("Add new footprint:") : uuid.toStr().left(13) % "...";
+    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new footprint:");
     QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid.toStr());
+    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
     QFont headerFont = headerItem->font();
     headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
     headerFont.setFamily("Monospace");
@@ -267,10 +270,10 @@ void FootprintListEditorWidget::setTableRowContent(int row, const Uuid& uuid,
 void FootprintListEditorWidget::addFootprint(const QString& name) noexcept
 {
     try {
-        throwIfNameEmptyOrExists(name);
+        ElementName elementName = validateNameOrThrow(name); // can throw
         Uuid uuid = Uuid::createRandom();
         mUndoStack->execCmd(new CmdFootprintInsert(*mFootprintList,
-            std::make_shared<Footprint>(uuid, name, ""))); // can throw
+            std::make_shared<Footprint>(uuid, elementName, ""))); // can throw
         updateTable(uuid);
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not add footprint"), e.getMsg());
@@ -311,8 +314,8 @@ void FootprintListEditorWidget::copyFootprint(const Uuid& uuid) noexcept
 {
     try {
         const Footprint* original = mFootprintList->get(uuid).get(); // can throw
-        std::shared_ptr<Footprint> copy(new Footprint(Uuid::createRandom(),
-                                        "Copy of " % original->getNames().getDefaultValue(), "")); // can throw
+        ElementName newName("Copy of " % original->getNames().getDefaultValue()); // can throw
+        std::shared_ptr<Footprint> copy(new Footprint(Uuid::createRandom(), newName, "")); // can throw
         copy->getDescriptions() = original->getDescriptions();
         copy->getPads() = original->getPads();
         copy->getPolygons() = original->getPolygons();
@@ -326,7 +329,7 @@ void FootprintListEditorWidget::copyFootprint(const Uuid& uuid) noexcept
     }
 }
 
-QString FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
+ElementName FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
 {
     Footprint* footprint = mFootprintList->find(uuid).get(); Q_ASSERT(footprint);
     if (footprint->getNames().getDefaultValue() == name) {
@@ -334,11 +337,11 @@ QString FootprintListEditorWidget::setName(const Uuid& uuid, const QString& name
     }
 
     try {
-        throwIfNameEmptyOrExists(name);
+        ElementName elementName = validateNameOrThrow(name); // can throw
         QScopedPointer<CmdFootprintEdit> cmd(new CmdFootprintEdit(*footprint));
-        cmd->setName(name);
+        cmd->setName(elementName);
         mUndoStack->execCmd(cmd.take());
-        return name;
+        return elementName;
     } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Invalid name"), e.getMsg());
         return footprint->getNames().getDefaultValue();
@@ -353,26 +356,24 @@ int FootprintListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexc
     return row;
 }
 
-Uuid FootprintListEditorWidget::getUuidOfRow(int row) const noexcept
+tl::optional<Uuid> FootprintListEditorWidget::getUuidOfRow(int row) const noexcept
 {
     if (isExistingFootprintRow(row)) {
         return mFootprintList->value(rowToIndex(row))->getUuid();
     } else {
-        return Uuid();
+        return tl::nullopt;
     }
 }
 
-void FootprintListEditorWidget::throwIfNameEmptyOrExists(const QString& name) const
+ElementName FootprintListEditorWidget::validateNameOrThrow(const QString& name) const
 {
-    if (name.isEmpty()) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-    }
     for (const Footprint& footprint : *mFootprintList) {
         if (footprint.getNames().getDefaultValue() == name) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("There is already a footprint with the name \"%1\".")).arg(name));
         }
     }
+    return ElementName(name); // can throw
 }
 
 QString FootprintListEditorWidget::cleanName(const QString& name) noexcept

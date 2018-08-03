@@ -60,17 +60,17 @@ Point& Point::makeAbs() noexcept
     return *this;
 }
 
-Point Point::mappedToGrid(const Length& gridInterval) const noexcept
+Point Point::mappedToGrid(const PositiveLength& gridInterval) const noexcept
 {
     Point p(*this);
     p.mapToGrid(gridInterval);
     return p;
 }
 
-Point& Point::mapToGrid(const Length& gridInterval) noexcept
+Point& Point::mapToGrid(const PositiveLength& gridInterval) noexcept
 {
-    mX.mapToGrid(gridInterval);
-    mY.mapToGrid(gridInterval);
+    mX.mapToGrid(*gridInterval);
+    mY.mapToGrid(*gridInterval);
     return *this;
 }
 
@@ -141,56 +141,56 @@ void Point::serialize(SExpression& root) const
 
 // Static Methods
 
-Point Point::fromMm(qreal millimetersX, qreal millimetersY, const Length& gridInterval)
+Point Point::fromMm(qreal millimetersX, qreal millimetersY)
 {
     Point p;
     p.mX.setLengthMm(millimetersX);
     p.mY.setLengthMm(millimetersY);
-    return p.mapToGrid(gridInterval);
+    return p;
 }
 
-Point Point::fromMm(const QPointF& millimeters, const Length& gridInterval)
+Point Point::fromMm(const QPointF& millimeters)
 {
-    return fromMm(millimeters.x(), millimeters.y(), gridInterval);
+    return fromMm(millimeters.x(), millimeters.y());
 }
 
-Point Point::fromInch(qreal inchesX, qreal inchesY, const Length& gridInterval)
+Point Point::fromInch(qreal inchesX, qreal inchesY)
 {
     Point p;
     p.mX.setLengthInch(inchesX);
     p.mY.setLengthInch(inchesY);
-    return p.mapToGrid(gridInterval);
+    return p;
 }
 
-Point Point::fromInch(const QPointF& inches, const Length& gridInterval)
+Point Point::fromInch(const QPointF& inches)
 {
-    return fromInch(inches.x(), inches.y(), gridInterval);
+    return fromInch(inches.x(), inches.y());
 }
 
-Point Point::fromMil(qreal milsX, qreal milsY, const Length& gridInterval)
+Point Point::fromMil(qreal milsX, qreal milsY)
 {
     Point p;
     p.mX.setLengthMil(milsX);
     p.mY.setLengthMil(milsY);
-    return p.mapToGrid(gridInterval);
+    return p;
 }
 
-Point Point::fromMil(const QPointF& mils, const Length& gridInterval)
+Point Point::fromMil(const QPointF& mils)
 {
-    return fromMil(mils.x(), mils.y(), gridInterval);
+    return fromMil(mils.x(), mils.y());
 }
 
-Point Point::fromPx(qreal pixelsX, qreal pixelsY, const Length& gridInterval)
+Point Point::fromPx(qreal pixelsX, qreal pixelsY)
 {
     Point p;
     p.mX.setLengthPx(pixelsX);
     p.mY.setLengthPx(-pixelsY); // invert Y!
-    return p.mapToGrid(gridInterval);
+    return p;
 }
 
-Point Point::fromPx(const QPointF& pixels, const Length& gridInterval)
+Point Point::fromPx(const QPointF& pixels)
 {
-    return fromPx(pixels.x(), pixels.y(), gridInterval);
+    return fromPx(pixels.x(), pixels.y());
 }
 
 // Non-Member Functions

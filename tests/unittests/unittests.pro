@@ -31,11 +31,13 @@ LIBS += \
     -lparseagle -lquazip -lz
 
 INCLUDEPATH += \
+    ../../libs \
     ../../libs/googletest/googletest/include \
     ../../libs/googletest/googlemock/include \
     ../../libs/parseagle \
     ../../libs/quazip \
-    ../../libs \
+    ../../libs/type_safe/include \
+    ../../libs/type_safe/external/debug_assert \
 
 DEPENDPATH += \
     ../../libs/librepcb/eagleimport \

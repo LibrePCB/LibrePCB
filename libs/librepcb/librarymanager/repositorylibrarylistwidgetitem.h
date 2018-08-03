@@ -71,7 +71,7 @@ class RepositoryLibraryListWidgetItem final : public QWidget
         ~RepositoryLibraryListWidgetItem() noexcept;
 
         // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
+        const tl::optional<Uuid>& getUuid() const noexcept {return mUuid;}
         const QSet<Uuid>& getDependencies() const noexcept {return mDependencies;}
         bool isChecked() const noexcept;
 
@@ -102,8 +102,8 @@ class RepositoryLibraryListWidgetItem final : public QWidget
 
         workspace::Workspace& mWorkspace;
         QJsonObject mJsonObject;
-        Uuid mUuid;
-        Version mVersion;
+        tl::optional<Uuid> mUuid;
+        tl::optional<Version> mVersion;
         bool mIsRecommended;
         QSet<Uuid> mDependencies;
         QScopedPointer<Ui::RepositoryLibraryListWidgetItem> mUi;

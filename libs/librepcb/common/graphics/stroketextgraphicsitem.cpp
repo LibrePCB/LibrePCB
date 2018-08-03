@@ -44,7 +44,7 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(StrokeText& text,
 {
     // add origin cross
     mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(Length(1000000));
+    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
 
     // set text properties
     setPosition(mText.getPosition());
@@ -77,7 +77,7 @@ QPainterPath StrokeTextGraphicsItem::shape() const noexcept
  *  Private Methods
  ****************************************************************************************/
 
-void StrokeTextGraphicsItem::strokeTextLayerNameChanged(const QString& newLayerName) noexcept
+void StrokeTextGraphicsItem::strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
 {
     updateLayer(newLayerName);
 }
@@ -99,13 +99,13 @@ void StrokeTextGraphicsItem::strokeTextRotationChanged(const Angle& newRot) noex
     updateTransform();
 }
 
-void StrokeTextGraphicsItem::strokeTextHeightChanged(const Length& newHeight) noexcept
+void StrokeTextGraphicsItem::strokeTextHeightChanged(const PositiveLength& newHeight) noexcept
 {
     Q_UNUSED(newHeight);
     // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(const Length& newStrokeWidth) noexcept
+void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept
 {
     // only line width must be updated because strokeTextPathsChanged() will be called too
     setLineWidth(newStrokeWidth);
@@ -146,9 +146,9 @@ void StrokeTextGraphicsItem::strokeTextPathsChanged(const QVector<Path>& paths) 
     setPath(Path::toQPainterPathPx(paths));
 }
 
-void StrokeTextGraphicsItem::updateLayer(const QString& layerName) noexcept
+void StrokeTextGraphicsItem::updateLayer(const GraphicsLayerName& layerName) noexcept
 {
-    const GraphicsLayer* layer = mLayerProvider.getLayer(layerName);
+    const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
     setLineLayer(layer);
     mOriginCrossGraphicsItem->setLayer(layer);
 }

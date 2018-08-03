@@ -25,15 +25,13 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/units/all_length_units.h>
+#include "../symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-
-class SymbolPin;
 
 /*****************************************************************************************
  *  Class CmdSymbolPinEdit
@@ -53,8 +51,8 @@ class CmdSymbolPinEdit final : public UndoCommand
         ~CmdSymbolPinEdit() noexcept;
 
         // Setters
-        void setName(const QString& name, bool immediate) noexcept;
-        void setLength(const Length& length, bool immediate) noexcept;
+        void setName(const CircuitIdentifier& name, bool immediate) noexcept;
+        void setLength(const UnsignedLength& length, bool immediate) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void setRotation(const Angle& angle, bool immediate) noexcept;
@@ -84,10 +82,10 @@ class CmdSymbolPinEdit final : public UndoCommand
         SymbolPin& mPin;
 
         // General Attributes
-        QString mOldName;
-        QString mNewName;
-        Length mOldLength;
-        Length mNewLength;
+        CircuitIdentifier mOldName;
+        CircuitIdentifier mNewName;
+        UnsignedLength mOldLength;
+        UnsignedLength mNewLength;
         Point mOldPos;
         Point mNewPos;
         Angle mOldRotation;

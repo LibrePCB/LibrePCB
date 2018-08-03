@@ -53,10 +53,10 @@ class CmdStrokeTextEdit final : public UndoCommand
         ~CmdStrokeTextEdit() noexcept;
 
         // Setters
-        void setLayerName(const QString& name, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
         void setText(const QString& text, bool immediate) noexcept;
-        void setHeight(const Length& height, bool immediate) noexcept;
-        void setStrokeWidth(const Length& strokeWidth, bool immediate) noexcept;
+        void setHeight(const PositiveLength& height, bool immediate) noexcept;
+        void setStrokeWidth(const UnsignedLength& strokeWidth, bool immediate) noexcept;
         void setLetterSpacing(const StrokeTextSpacing& spacing, bool immediate) noexcept;
         void setLineSpacing(const StrokeTextSpacing& spacing, bool immediate) noexcept;
         void setAlignment(const Alignment& align, bool immediate) noexcept;
@@ -93,18 +93,18 @@ class CmdStrokeTextEdit final : public UndoCommand
         StrokeText& mText;
 
         // General Attributes
-        QString mOldLayerName;
-        QString mNewLayerName;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
         QString mOldText;
         QString mNewText;
         Point mOldPosition;
         Point mNewPosition;
         Angle mOldRotation;
         Angle mNewRotation;
-        Length mOldHeight;
-        Length mNewHeight;
-        Length mOldStrokeWidth;
-        Length mNewStrokeWidth;
+        PositiveLength mOldHeight;
+        PositiveLength mNewHeight;
+        UnsignedLength mOldStrokeWidth;
+        UnsignedLength mNewStrokeWidth;
         StrokeTextSpacing mOldLetterSpacing;
         StrokeTextSpacing mNewLetterSpacing;
         StrokeTextSpacing mOldLineSpacing;

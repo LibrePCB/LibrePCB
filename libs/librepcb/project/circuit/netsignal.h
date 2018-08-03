@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
+#include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/exceptions.h>
@@ -61,13 +62,13 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         NetSignal() = delete;
         NetSignal(const NetSignal& other) = delete;
         explicit NetSignal(Circuit& circuit, const SExpression& node);
-        explicit NetSignal(Circuit& circuit, NetClass& netclass, const QString& name,
-                           bool autoName);
+        explicit NetSignal(Circuit& circuit, NetClass& netclass,
+                           const CircuitIdentifier& name, bool autoName);
         ~NetSignal() noexcept;
 
         // Getters: Attributes
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+        const CircuitIdentifier& getName() const noexcept {return mName;}
         bool hasAutoName() const noexcept {return mHasAutoName;}
         NetClass& getNetClass() const noexcept {return *mNetClass;}
         bool isHighlighted() const noexcept {return mIsHighlighted;}
@@ -84,7 +85,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
         bool isAddedToCircuit() const noexcept {return mIsAddedToCircuit;}
 
         // Setters
-        void setName(const QString& name, bool isAutoName);
+        void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
         void setHighlighted(bool hl) noexcept;
 
         // General Methods
@@ -110,7 +111,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
 
     signals:
 
-        void nameChanged(const QString& newName);
+        void nameChanged(const CircuitIdentifier& newName);
         void highlightedChanged(bool isHighlighted);
 
 
@@ -126,7 +127,7 @@ class NetSignal final : public QObject, public IF_ErcMsgProvider, public Seriali
 
         // Attributes
         Uuid mUuid;
-        QString mName;
+        CircuitIdentifier mName;
         bool mHasAutoName;
         NetClass* mNetClass;
 

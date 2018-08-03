@@ -50,12 +50,13 @@ BI_NetLine::BI_NetLine(const BI_NetLine& other, BI_NetPoint& startPoint, BI_NetP
 }
 
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node) :
-    BI_Base(segment.getBoard()), mPosition(), mUuid(),
-    mStartPoint(nullptr), mEndPoint(nullptr), mWidth()
+    BI_Base(segment.getBoard()),
+    mPosition(),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mStartPoint(nullptr),
+    mEndPoint(nullptr),
+    mWidth(node.getValueByPath<PositiveLength>("width"))
 {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mWidth = node.getValueByPath<Length>("width");
-
     Uuid spUuid = node.getValueByPath<Uuid>("p1");
     mStartPoint = segment.getNetPointByUuid(spUuid);
     if(!mStartPoint) {
@@ -75,7 +76,7 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node) :
     init();
 }
 
-BI_NetLine::BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const Length& width) :
+BI_NetLine::BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const PositiveLength& width) :
     BI_Base(startPoint.getBoard()), mPosition(), mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint), mEndPoint(&endPoint), mWidth(width)
 {
@@ -84,11 +85,6 @@ BI_NetLine::BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const Len
 
 void BI_NetLine::init()
 {
-    if(mWidth < 0) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid trace width: \"%1\"")).arg(mWidth.toMmString()));
-    }
-
     // check if both netpoints are in the same net segment
     if (&mStartPoint->getNetSegment() != &mEndPoint->getNetSegment()) {
         throw LogicError(__FILE__, __LINE__,
@@ -170,7 +166,8 @@ Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept
 {
     Length width = mWidth + (expansion * 2);
     if (width > 0) {
-        return Path::obround(mStartPoint->getPosition(), mEndPoint->getPosition(), width);
+        return Path::obround(mStartPoint->getPosition(), mEndPoint->getPosition(),
+                             PositiveLength(width));
     } else {
         return Path();
     }
@@ -180,10 +177,9 @@ Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept
  *  Setters
  ****************************************************************************************/
 
-void BI_NetLine::setWidth(const Length& width) noexcept
+void BI_NetLine::setWidth(const PositiveLength& width) noexcept
 {
-    Q_ASSERT(width >= 0);
-    if ((width != mWidth) && (width >= 0)) {
+    if (width != mWidth) {
         mWidth = width;
         mGraphicsItem->updateCacheAndRepaint();
     }
@@ -273,10 +269,8 @@ void BI_NetLine::setSelected(bool selected) noexcept
 
 bool BI_NetLine::checkAttributesValidity() const noexcept
 {
-    if (mUuid.isNull())         return false;
     if (mStartPoint == nullptr) return false;
     if (mEndPoint == nullptr)   return false;
-    if (mWidth < 0)             return false;
     return true;
 }
 

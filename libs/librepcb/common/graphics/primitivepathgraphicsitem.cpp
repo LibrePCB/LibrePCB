@@ -75,10 +75,10 @@ void PrimitivePathGraphicsItem::setPath(const QPainterPath& path) noexcept
     updateBoundingRectAndShape();
 }
 
-void PrimitivePathGraphicsItem::setLineWidth(const Length& width) noexcept
+void PrimitivePathGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept
 {
-    mPen.setWidthF(width.toPx());
-    mPenHighlighted.setWidthF(width.toPx());
+    mPen.setWidthF(width->toPx());
+    mPenHighlighted.setWidthF(width->toPx());
     updateBoundingRectAndShape();
 }
 
@@ -205,7 +205,7 @@ void PrimitivePathGraphicsItem::updateColors() noexcept
 void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept
 {
     prepareGeometryChange();
-    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush, Length(200000));
+    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush, UnsignedLength(200000));
     mBoundingRect = mShape.controlPointRect();
     update();
 }

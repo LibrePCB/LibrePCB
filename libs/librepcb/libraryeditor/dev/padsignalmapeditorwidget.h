@@ -98,10 +98,10 @@ class PadSignalMapEditorWidget final : public QWidget, private DevicePadSignalMa
     private: // Methods
         void updateTable() noexcept;
         void setTableRowContent(int row, const Uuid& padUuid, const QString& padName,
-                                const Uuid& signalUuid) noexcept;
-        void setComponentSignal(const Uuid& pad, const Uuid& signal) noexcept;
-        Uuid getPadUuidOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getPadUuidOfRow(int row) const noexcept;
+                                const tl::optional<Uuid>& signalUuid) noexcept;
+        void setComponentSignal(const Uuid& pad, const tl::optional<Uuid>& signal) noexcept;
+        tl::optional<Uuid> getPadUuidOfTableCellWidget(QObject* obj) const noexcept;
+        tl::optional<Uuid> getPadUuidOfRow(int row) const noexcept;
 
 
     private: // Data
@@ -110,7 +110,7 @@ class PadSignalMapEditorWidget final : public QWidget, private DevicePadSignalMa
         DevicePadSignalMap* mPadSignalMap;
         PackagePadList mPads;
         ComponentSignalList mSignals;
-        Uuid mSelectedPad;
+        tl::optional<Uuid> mSelectedPad;
 };
 
 /*****************************************************************************************

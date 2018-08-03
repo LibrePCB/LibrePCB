@@ -87,17 +87,17 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
 
 
     private: // Methods
-        void updateTable(Uuid selected = Uuid()) noexcept;
-        void setTableRowContent(int row, const Uuid& uuid, const QString& name) noexcept;
+        void updateTable(tl::optional<Uuid> selected = tl::nullopt) noexcept;
+        void setTableRowContent(int row, const tl::optional<Uuid>& uuid, const QString& name) noexcept;
         void addFootprint(const QString& name) noexcept;
         void removeFootprint(const Uuid& uuid) noexcept;
         void moveFootprintUp(int index) noexcept;
         void moveFootprintDown(int index) noexcept;
         void copyFootprint(const Uuid& uuid) noexcept;
-        QString setName(const Uuid& uuid, const QString& name) noexcept;
+        ElementName setName(const Uuid& uuid, const QString& name) noexcept;
         int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        Uuid getUuidOfRow(int row) const noexcept;
-        void throwIfNameEmptyOrExists(const QString& name) const;
+        tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
+        ElementName validateNameOrThrow(const QString& name) const;
         static QString cleanName(const QString& name) noexcept;
 
         // row index <-> signal index conversion methods
@@ -118,7 +118,7 @@ class FootprintListEditorWidget final : public QWidget, private FootprintList::I
         QTableWidget* mTable;
         FootprintList* mFootprintList;
         UndoStack* mUndoStack;
-        Uuid mSelectedFootprint;
+        tl::optional<Uuid> mSelectedFootprint;
 };
 
 /*****************************************************************************************

@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
 
 /*****************************************************************************************
@@ -48,12 +49,12 @@ namespace librepcb {
 class IF_CircleObserver
 {
     public:
-        virtual void circleLayerNameChanged(const QString& newLayerName) noexcept = 0;
-        virtual void circleLineWidthChanged(const Length& newLineWidth) noexcept = 0;
+        virtual void circleLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept = 0;
+        virtual void circleLineWidthChanged(const UnsignedLength& newLineWidth) noexcept = 0;
         virtual void circleIsFilledChanged(bool newIsFilled) noexcept = 0;
         virtual void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
         virtual void circleCenterChanged(const Point& newCenter) noexcept = 0;
-        virtual void circleDiameterChanged(const Length& newDiameter) noexcept = 0;
+        virtual void circleDiameterChanged(const PositiveLength& newDiameter) noexcept = 0;
 
     protected:
         IF_CircleObserver() noexcept {}
@@ -79,27 +80,28 @@ class Circle : public SerializableObject
         Circle() = delete;
         Circle(const Circle& other) noexcept;
         Circle(const Uuid& uuid, const Circle& other) noexcept;
-        Circle(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
-               bool fill, bool isGrabArea, const Point& center, const Length& diameter) noexcept;
+        Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
+               const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
+               const Point& center, const PositiveLength& diameter) noexcept;
         explicit Circle(const SExpression& node);
         virtual ~Circle() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getLayerName() const noexcept {return mLayerName;}
-        const Length& getLineWidth() const noexcept {return mLineWidth;}
+        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
+        const UnsignedLength& getLineWidth() const noexcept {return mLineWidth;}
         bool isFilled() const noexcept {return mIsFilled;}
         bool isGrabArea() const noexcept {return mIsGrabArea;}
         const Point& getCenter() const noexcept {return mCenter;}
-        const Length& getDiameter() const noexcept {return mDiameter;}
+        const PositiveLength& getDiameter() const noexcept {return mDiameter;}
 
         // Setters
-        void setLayerName(const QString& name) noexcept;
-        void setLineWidth(const Length& width) noexcept;
+        void setLayerName(const GraphicsLayerName& name) noexcept;
+        void setLineWidth(const UnsignedLength& width) noexcept;
         void setIsFilled(bool isFilled) noexcept;
         void setIsGrabArea(bool isGrabArea) noexcept;
         void setCenter(const Point& center) noexcept;
-        void setDiameter(const Length& dia) noexcept;
+        void setDiameter(const PositiveLength& dia) noexcept;
 
         // Transformations
         Circle& translate(const Point& offset) noexcept;
@@ -117,18 +119,14 @@ class Circle : public SerializableObject
         Circle& operator=(const Circle& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
-        QString mLayerName;
-        Length mLineWidth;
+        GraphicsLayerName mLayerName;
+        UnsignedLength mLineWidth;
         bool mIsFilled;
         bool mIsGrabArea;
         Point mCenter;
-        Length mDiameter;
+        PositiveLength mDiameter;
 
         // Misc
         mutable QSet<IF_CircleObserver*> mObservers; ///< A list of all observer objects

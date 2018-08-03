@@ -59,9 +59,9 @@ PackagePadComboBox::~PackagePadComboBox() noexcept
 
 PackagePad* PackagePadComboBox::getCurrentPad() const noexcept
 {
-    if (mPackage) {
-        Uuid uuid(mComboBox->itemData(mComboBox->currentIndex(), Qt::UserRole).toString());
-        return mPackage->getPads().find(uuid).get();
+    tl::optional<Uuid> uuid = Uuid::tryFromString(mComboBox->itemData(mComboBox->currentIndex(), Qt::UserRole).toString());
+    if (mPackage && uuid) {
+        return mPackage->getPads().find(*uuid).get();
     } else {
         return nullptr;
     }
@@ -81,7 +81,7 @@ void PackagePadComboBox::setPackage(Package* package, Footprint* footprint) noex
 void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept
 {
     if (mPackage && pad) {
-        mComboBox->setCurrentIndex(mComboBox->findData(pad->getName(), Qt::UserRole));
+        mComboBox->setCurrentIndex(mComboBox->findData(*pad->getName(), Qt::UserRole));
     } else {
         mComboBox->setCurrentIndex(0);
     }
@@ -104,12 +104,12 @@ void PackagePadComboBox::currentIndexChanged(int index) noexcept
 void PackagePadComboBox::updatePads() noexcept
 {
     mComboBox->clear();
-    mComboBox->addItem(tr("(unconnected)"), Uuid().toStr());
+    mComboBox->addItem(tr("(unconnected)"), QString());
 
     if (mPackage) {
         for (const PackagePad& pad : mPackage->getPads()) {
             if ((!mFootprint) || (!mFootprint->getPads().contains(pad.getUuid()))) {
-                mComboBox->addItem(pad.getName(), pad.getUuid().toStr());
+                mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
             }
         }
     }

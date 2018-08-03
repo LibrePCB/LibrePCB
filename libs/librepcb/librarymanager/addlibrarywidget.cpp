@@ -141,7 +141,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
     QString desc = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDescription, false);
     QString author = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
     QString versionStr = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-    Version version(versionStr);
+    tl::optional<Version> version = Version::tryFromString(versionStr);
     QString urlStr = mUi->edtLocalUrl->text().trimmed();
     QUrl url = QUrl::fromUserInput(urlStr);
     bool useCc0License = mUi->cbxLocalCc0License->isChecked();
@@ -160,7 +160,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
         QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter an author."));
         return;
     }
-    if (!version.isValid()) {
+    if (!version) {
         QMessageBox::critical(this, tr("Invalid Input"), tr("The specified version number is not valid."));
         return;
     }
@@ -179,8 +179,8 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
 
     try {
         // create the new library
-        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), version, author,
-                                                name, desc, QString("")));
+        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version, author,
+                                                ElementName(name), desc, QString(""))); // can throw
         lib->setUrl(url);
         lib->setIconFilePath(qApp->getResourcesDir().getPathTo("library/default_image.png"));
         lib->saveTo(directory); // can throw
@@ -380,7 +380,7 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(bool checked) noexcept
             QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
             auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
                                mUi->lstRepoLibs->itemWidget(item));
-            if (widget && (libs.contains(widget->getUuid()))) {
+            if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
                 widget->setChecked(true);
             }
         }
@@ -391,8 +391,8 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(bool checked) noexcept
             QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
             auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
                                mUi->lstRepoLibs->itemWidget(item));
-            if (widget && widget->isChecked()) {
-                libs.insert(widget->getUuid());
+            if (widget && widget->isChecked() && widget->getUuid()) {
+                libs.insert(*widget->getUuid());
             }
         }
         for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {

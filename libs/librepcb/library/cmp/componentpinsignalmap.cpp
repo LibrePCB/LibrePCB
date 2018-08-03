@@ -33,26 +33,24 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept :
+    mPinUuid(other.mPinUuid),
+    mSignalUuid(other.mSignalUuid),
+    mDisplayType(other.mDisplayType)
 {
-    *this = other; // use assignment operator
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
-                                                     const CmpSigPinDisplayType& displayType) noexcept :
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin,
+        const tl::optional<Uuid>& signal, const CmpSigPinDisplayType& displayType) noexcept :
     mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType)
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node) :
+    mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("sig")),
+    mDisplayType(CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp")))
 {
-    // read attributes
-    mPinUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mDisplayType = CmpSigPinDisplayType::fromString(
-                       node.getValueByPath<QString>("disp"));
-    mSignalUuid = node.getValueByPath<Uuid>("sig");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
@@ -65,8 +63,6 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
 
 void ComponentPinSignalMapItem::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mPinUuid);
     root.appendChild("sig", mSignalUuid, false);
     root.appendChild("disp", mDisplayType, false);
@@ -90,16 +86,6 @@ ComponentPinSignalMapItem& ComponentPinSignalMapItem::operator=(const ComponentP
     mSignalUuid = rhs.mSignalUuid;
     mDisplayType = rhs.mDisplayType;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool ComponentPinSignalMapItem::checkAttributesValidity() const noexcept
-{
-    if (mPinUuid.isNull())  return false;
-    return true;
 }
 
 /*****************************************************************************************

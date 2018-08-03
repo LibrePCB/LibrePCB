@@ -54,16 +54,18 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
     // create  component
     std::unique_ptr<library::Component> component(
         new library::Component(mDb.getComponentUuid(mDeviceSet.getName()),
-                               Version("0.1"), "LibrePCB", mDeviceSet.getName(),
-                               createDescription(), ""));
+                               Version::fromString("0.1"), "LibrePCB",
+                               ElementName(mDeviceSet.getName()),
+                               createDescription(), "")); // can throw
 
     // properties
-    component->getPrefixes().setDefaultValue(mDeviceSet.getPrefix());
+    component->getPrefixes().setDefaultValue(
+        library::ComponentPrefix(mDeviceSet.getPrefix())); // can throw
 
     // symbol variant
     std::shared_ptr<library::ComponentSymbolVariant> symbolVariant(
         new library::ComponentSymbolVariant(mDb.getSymbolVariantUuid(component->getUuid()),
-                                            "", "default", ""));
+                                            "", ElementName("default"), "")); // can throw
     component->getSymbolVariants().append(symbolVariant);
 
     // signals
@@ -77,10 +79,11 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
         if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
         if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
         Uuid signalUuid = mDb.getComponentSignalUuid(component->getUuid(), gateName, pinName);
+        CircuitIdentifier signalName(pinName); // can throw
         if (!component->getSignals().contains(signalUuid)) {
             // create signal
             component->getSignals().append(std::make_shared<library::ComponentSignal>(
-                                               signalUuid, pinName));
+                                               signalUuid, signalName));
         }
     }
 
@@ -89,12 +92,13 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const
         QString gateName = gate.getName();
         QString symbolName = gate.getSymbol();
         Uuid symbolUuid = mDb.getSymbolUuid(symbolName);
+        library::ComponentSymbolVariantItemSuffix suffix((gateName == "G$1") ? "" : gateName); // can throw
 
         // create symbol variant item
         std::shared_ptr<library::ComponentSymbolVariantItem> item(
             new library::ComponentSymbolVariantItem(
                 mDb.getSymbolVariantItemUuid(component->getUuid(), gateName),
-                symbolUuid, true, (gateName == "G$1") ? "" : gateName));
+                symbolUuid, true, suffix));
 
         // connect pins
         foreach (const parseagle::Connection& connection, firstDevice.getConnections()) {

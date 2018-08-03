@@ -53,12 +53,12 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(Project& project,
     mUi->setupUi(this);
     connect(mUi->buttonBox, &QDialogButtonBox::clicked,
             this, &DeviceInstancePropertiesDialog::buttonBoxClicked);
-    setWindowTitle(QString(tr("Properties of %1")).arg(mDevice.getComponentInstance().getName()));
+    setWindowTitle(QString(tr("Properties of %1")).arg(*mDevice.getComponentInstance().getName()));
 
     // Component Instance Attributes
     ComponentInstance& cmp = mDevice.getComponentInstance();
     mUi->lblCompInstUuid->setText(cmp.getUuid().toStr());
-    mUi->edtCompInstName->setText(cmp.getName());
+    mUi->edtCompInstName->setText(*cmp.getName());
     mUi->edtCompInstValue->setText(cmp.getValue());
     mUi->attributeListEditorWidget->setAttributeList(cmp.getAttributes());
 
@@ -69,17 +69,17 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(Project& project,
     mUi->lblLibDeviceUuid->setText(htmlLink.arg(mDevice.getLibDevice().getFilePath().toQUrl().toString(),
                                                 mDevice.getLibDevice().getUuid().toStr()));
     mUi->lblLibDeviceUuid->setToolTip(mDevice.getLibDevice().getFilePath().toNative());
-    mUi->lblLibDeviceName->setText(mDevice.getLibDevice().getNames().value(localeOrder));
+    mUi->lblLibDeviceName->setText(*mDevice.getLibDevice().getNames().value(localeOrder));
     mUi->lblLibDeviceName->setToolTip(mDevice.getLibDevice().getDescriptions().value(localeOrder));
 
     mUi->lblLibPackageUuid->setText(htmlLink.arg(mDevice.getLibPackage().getFilePath().toQUrl().toString(),
                                                 mDevice.getLibPackage().getUuid().toStr()));
     mUi->lblLibPackageUuid->setToolTip(mDevice.getLibPackage().getFilePath().toNative());
-    mUi->lblLibPackageName->setText(mDevice.getLibPackage().getNames().value(localeOrder));
+    mUi->lblLibPackageName->setText(*mDevice.getLibPackage().getNames().value(localeOrder));
     mUi->lblLibPackageName->setToolTip(mDevice.getLibPackage().getDescriptions().value(localeOrder));
 
     mUi->lblLibFootprintUuid->setText(mDevice.getLibFootprint().getUuid().toStr());
-    mUi->lblLibFootprintName->setText(mDevice.getLibFootprint().getNames().value(localeOrder));
+    mUi->lblLibFootprintName->setText(*mDevice.getLibFootprint().getNames().value(localeOrder));
     mUi->lblLibFootprintName->setToolTip(mDevice.getLibFootprint().getDescriptions().value(localeOrder));
 
 
@@ -144,12 +144,12 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept
 {
     try {
         UndoStackTransaction transaction(mUndoStack, QString(
-            tr("Change properties of %1")).arg(mDevice.getComponentInstance().getName()));
+            tr("Change properties of %1")).arg(*mDevice.getComponentInstance().getName()));
 
         // Component Instance
         QScopedPointer<CmdComponentInstanceEdit> cmdCmp(new CmdComponentInstanceEdit(
             mProject.getCircuit(), mDevice.getComponentInstance()));
-        cmdCmp->setName(mUi->edtCompInstName->text().trimmed());
+        cmdCmp->setName(CircuitIdentifier(mUi->edtCompInstName->text().trimmed())); // can throw
         cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
         cmdCmp->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
         transaction.append(cmdCmp.take()); // can throw

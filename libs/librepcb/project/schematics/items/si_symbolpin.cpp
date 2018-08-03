@@ -56,8 +56,8 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPins().get(pinUuid).get(); // can throw
     mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMap().get(pinUuid).get(); // can throw
-    Uuid cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
-    mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(cmpSignalUuid);
+    tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
+    if (cmpSignalUuid) mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
 
     mGraphicsItem.reset(new SGI_SymbolPin(*this));
     updatePosition();
@@ -90,24 +90,24 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
     QString text;
     library::CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
     if (displayType == library::CmpSigPinDisplayType::pinName()) {
-        text = mSymbolPin->getName();
+        text = *mSymbolPin->getName();
     } else  if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
         if (mComponentSignalInstance) {
-            text = mComponentSignalInstance->getCompSignal().getName();
+            text = *mComponentSignalInstance->getCompSignal().getName();
         }
     } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
         if (mComponentSignalInstance) {
             if (mComponentSignalInstance->getNetSignal()) {
-                text = mComponentSignalInstance->getNetSignal()->getName();
+                text = *mComponentSignalInstance->getNetSignal()->getName();
             }
         }
     } else if (displayType != library::CmpSigPinDisplayType::none()) {
         Q_ASSERT(false);
     }
     if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
-        text = mComponentSignalInstance->getCompSignal().getName();
+        text = *mComponentSignalInstance->getCompSignal().getName();
     if (text.isEmpty() && returnPinNameIfEmpty)
-        text = mSymbolPin->getName();
+        text = *mSymbolPin->getName();
     return text;
 }
 

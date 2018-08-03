@@ -51,7 +51,7 @@ class LibraryElement : public LibraryBaseElement
         LibraryElement(const LibraryElement& other) = delete;
         LibraryElement(const QString& shortElementName, const QString& longElementName,
                        const Uuid& uuid, const Version& version, const QString& author,
-                       const QString& name_en_US, const QString& description_en_US,
+                       const ElementName& name_en_US, const QString& description_en_US,
                        const QString& keywords_en_US);
         LibraryElement(const FilePath& elementDirectory, const QString& shortElementName,
                        const QString& longElementName, bool readOnly);
@@ -73,7 +73,6 @@ class LibraryElement : public LibraryBaseElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         virtual void serialize(SExpression& root) const override;
-        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Element Attributes
         QSet<Uuid> mCategories;

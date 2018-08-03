@@ -79,7 +79,7 @@ Project* NewProjectWizard::createProject() const
     // create project and set some metadata
     FilePath projectFilePath = mPageMetadata->getFullFilePath();
     QScopedPointer<Project> project(Project::create(projectFilePath));
-    project->getMetadata().setName(mPageMetadata->getProjectName());
+    project->getMetadata().setName(ElementName(mPageMetadata->getProjectName().trimmed())); // can throw
     project->getMetadata().setAuthor(mPageMetadata->getProjectAuthor());
 
     // set project settings (copy from workspace settings)
@@ -89,13 +89,13 @@ Project* NewProjectWizard::createProject() const
 
     // add schematic
     if (mPageInitialization->getCreateSchematic()) {
-        Schematic* schematic = project->createSchematic(mPageInitialization->getSchematicName());
+        Schematic* schematic = project->createSchematic(ElementName(mPageInitialization->getSchematicName())); // can throw
         project->addSchematic(*schematic);
     }
 
     // add board
     if (mPageInitialization->getCreateBoard()) {
-        Board* board = project->createBoard(mPageInitialization->getBoardName());
+        Board* board = project->createBoard(ElementName(mPageInitialization->getBoardName())); // can throw
         project->addBoard(*board);
     }
 

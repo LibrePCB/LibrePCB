@@ -42,7 +42,8 @@ CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass) noexcept 
 {
 }
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass, const QString& name) noexcept :
+CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
+                                 const CircuitIdentifier& name) noexcept :
     UndoCommand(tr("Add netsignal")),
     mCircuit(circuit), mNetClass(netclass), mIsAutoName(false), mName(name),
     mNetSignal(nullptr)
@@ -60,9 +61,10 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 bool CmdNetSignalAdd::performExecute()
 {
     if (mIsAutoName) {
-        mName = mCircuit.generateAutoNetSignalName();
+        mName = CircuitIdentifier(mCircuit.generateAutoNetSignalName()); // can throw
     }
-    mNetSignal = new NetSignal(mCircuit, mNetClass, mName, mIsAutoName); // can throw
+    Q_ASSERT(mName.has_value());
+    mNetSignal = new NetSignal(mCircuit, mNetClass, *mName, mIsAutoName); // can throw
 
     performRedo(); // can throw
 

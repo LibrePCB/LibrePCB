@@ -57,7 +57,7 @@ class PrimitivePathGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerO
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
         void setPath(const QPainterPath& path) noexcept;
-        void setLineWidth(const Length& width) noexcept;
+        void setLineWidth(const UnsignedLength& width) noexcept;
         void setLineLayer(const GraphicsLayer* layer) noexcept;
         void setFillLayer(const GraphicsLayer* layer) noexcept;
 

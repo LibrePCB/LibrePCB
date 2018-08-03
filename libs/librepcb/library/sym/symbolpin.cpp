@@ -35,32 +35,30 @@ namespace library {
  ****************************************************************************************/
 
 SymbolPin::SymbolPin(const SymbolPin& other) noexcept :
+    mUuid(other.mUuid),
+    mName(other.mName),
+    mPosition(other.mPosition),
+    mLength(other.mLength),
+    mRotation(other.mRotation),
     mRegisteredGraphicsItem(nullptr)
 {
-    *this = other; // use assignment operator
 }
 
-SymbolPin::SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                     const Length& length, const Angle& rotation) noexcept :
+SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name, const Point& position,
+                     const UnsignedLength& length, const Angle& rotation) noexcept :
     mUuid(uuid), mName(name), mPosition(position), mLength(length), mRotation(rotation),
     mRegisteredGraphicsItem(nullptr)
 {
-    Q_ASSERT(!mUuid.isNull());
-    Q_ASSERT(!mName.isEmpty());
-    Q_ASSERT(mLength >= 0);
 }
 
 SymbolPin::SymbolPin(const SExpression& node) :
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mPosition(node.getChildByPath("pos")),
+    mLength(node.getValueByPath<UnsignedLength>("length")),
+    mRotation(node.getValueByPath<Angle>("rot")),
     mRegisteredGraphicsItem(nullptr)
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mName = node.getValueByPath<QString>("name", true);
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mLength = node.getValueByPath<Length>("length");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SymbolPin::~SymbolPin() noexcept
@@ -72,9 +70,8 @@ SymbolPin::~SymbolPin() noexcept
  *  Setters
  ****************************************************************************************/
 
-void SymbolPin::setName(const QString& name) noexcept
+void SymbolPin::setName(const CircuitIdentifier& name) noexcept
 {
-    Q_ASSERT(!name.isEmpty());
     mName = name;
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setName(mName);
 }
@@ -85,9 +82,8 @@ void SymbolPin::setPosition(const Point& pos) noexcept
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
 }
 
-void SymbolPin::setLength(const Length& length) noexcept
+void SymbolPin::setLength(const UnsignedLength& length) noexcept
 {
-    Q_ASSERT(length >= 0);
     mLength = length;
     if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLength(mLength);
 }
@@ -116,8 +112,6 @@ void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept
 
 void SymbolPin::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
     root.appendChild(mPosition.serializeToDomElement("pos"), true);
@@ -147,18 +141,6 @@ SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept
     mLength = rhs.mLength;
     mRotation = rhs.mRotation;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool SymbolPin::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())     return false;
-    if (mLength < 0)        return false;
-    if (mName.isEmpty())    return false;
-    return true;
 }
 
 /*****************************************************************************************

@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/circuitidentifier.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -68,8 +69,8 @@ class SymbolPinGraphicsItem final : public QGraphicsItem
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
-        void setLength(const Length& length) noexcept;
-        void setName(const QString& name) noexcept;
+        void setLength(const UnsignedLength& length) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
         void setSelected(bool selected) noexcept;
 
         // Inherited from QGraphicsItem

@@ -71,10 +71,10 @@ void LineGraphicsItem::setLine(const Point& p1, const Point& p2) noexcept
     updateBoundingRectAndShape();
 }
 
-void LineGraphicsItem::setLineWidth(const Length& width) noexcept
+void LineGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept
 {
-    mPen.setWidthF(width.toPx());
-    mPenHighlighted.setWidthF(width.toPx());
+    mPen.setWidthF(width->toPx());
+    mPenHighlighted.setWidthF(width->toPx());
     updateBoundingRectAndShape();
 }
 

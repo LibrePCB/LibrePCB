@@ -100,9 +100,9 @@ void BI_StrokeText::updateGraphicsItems() noexcept
 {
     // update z-value
     Board::ItemZValue zValue = Board::ZValue_Texts;
-    if (GraphicsLayer::isTopLayer(mText->getLayerName())) {
+    if (GraphicsLayer::isTopLayer(*mText->getLayerName())) {
         zValue = Board::ZValue_TextsTop;
-    } else if (GraphicsLayer::isBottomLayer(mText->getLayerName())) {
+    } else if (GraphicsLayer::isBottomLayer(*mText->getLayerName())) {
         zValue = Board::ZValue_TextsBottom;
     }
     mGraphicsItem->setZValue(static_cast<qreal>(zValue));
@@ -111,7 +111,7 @@ void BI_StrokeText::updateGraphicsItems() noexcept
     // show anchor line only if there is a footprint and the text is selected
     if (mFootprint && isSelected()) {
         mAnchorGraphicsItem->setLine(mText->getPosition(), mFootprint->getPosition());
-        mAnchorGraphicsItem->setLayer(mBoard.getLayerStack().getLayer(mText->getLayerName()));
+        mAnchorGraphicsItem->setLayer(mBoard.getLayerStack().getLayer(*mText->getLayerName()));
     } else {
         mAnchorGraphicsItem->setLayer(nullptr);
     }
@@ -161,7 +161,7 @@ const Uuid& BI_StrokeText::getUuid() const noexcept
 
 bool BI_StrokeText::isSelectable() const noexcept
 {
-    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(mText->getLayerName());
+    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(*mText->getLayerName());
     return layer && layer->isVisible();
 }
 

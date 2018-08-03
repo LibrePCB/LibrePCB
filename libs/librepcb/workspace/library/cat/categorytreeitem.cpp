@@ -40,17 +40,17 @@ using namespace library;
 
 template <typename ElementType>
 CategoryTreeItem<ElementType>::CategoryTreeItem(const WorkspaceLibraryDb& library,
-        const QStringList localeOrder, CategoryTreeItem* parent, const Uuid& uuid) noexcept :
+        const QStringList localeOrder, CategoryTreeItem* parent, const tl::optional<Uuid>& uuid) noexcept :
     mLocaleOrder(localeOrder), mParent(parent), mUuid(uuid),
     mDepth(parent ? parent->getDepth() + 1 : 0), mExceptionMessage()
 {
     try {
-        if (!mUuid.isNull()) {
+        if (mUuid) {
             FilePath fp = getLatestCategory(library);
             if (fp.isValid()) mCategory.reset(new ElementType(fp, true));
         }
 
-        if ((!mUuid.isNull()) || (!mParent)) {
+        if (mUuid || (!mParent)) {
             QSet<Uuid> childs = getCategoryChilds(library);
             foreach (const Uuid& childUuid, childs) {
                 ChildType child(new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
@@ -65,7 +65,7 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(const WorkspaceLibraryDb& librar
 
         if (!mParent) {
             // add category for elements without category
-            ChildType child(new CategoryTreeItem(library, mLocaleOrder, this, Uuid()));
+            ChildType child(new CategoryTreeItem(library, mLocaleOrder, this, tl::nullopt));
             mChilds.append(child);
         }
     } catch (const Exception& e) {
@@ -103,10 +103,10 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
     switch (role)
     {
         case Qt::DisplayRole:
-            if (mUuid.isNull())
+            if (!mUuid)
                 return "(Without Category)";
             else if (mCategory)
-                return mCategory->getNames().value(mLocaleOrder);
+                return *mCategory->getNames().value(mLocaleOrder);
             else
                 return "(ERROR)";
 
@@ -118,7 +118,7 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
 
         case Qt::StatusTipRole:
         case Qt::ToolTipRole:
-            if (mUuid.isNull())
+            if (!mUuid)
                 return "All library elements without a category";
             else if (mCategory)
                 return mCategory->getDescriptions().value(mLocaleOrder);
@@ -126,7 +126,7 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
                 return mExceptionMessage;
 
         case Qt::UserRole:
-            return mUuid.toStr();
+            return mUuid ? mUuid->toStr() : QString();
 
         default:
             break;
@@ -141,13 +141,13 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept
 template <>
 FilePath CategoryTreeItem<ComponentCategory>::getLatestCategory(const WorkspaceLibraryDb& lib) const
 {
-    return lib.getLatestComponentCategory(mUuid);
+    return lib.getLatestComponentCategory(*mUuid);
 }
 
 template <>
 FilePath CategoryTreeItem<PackageCategory>::getLatestCategory(const WorkspaceLibraryDb& lib) const
 {
-    return lib.getLatestPackageCategory(mUuid);
+    return lib.getLatestPackageCategory(*mUuid);
 }
 
 template <>

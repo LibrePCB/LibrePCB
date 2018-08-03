@@ -55,10 +55,15 @@ NewElementWizardPage_ComponentProperties::~NewElementWizardPage_ComponentPropert
 
 bool NewElementWizardPage_ComponentProperties::validatePage() noexcept
 {
-    mContext.mComponentSchematicOnly = mUi->cbxSchematicOnly->isChecked();
-    mContext.mComponentDefaultValue = mUi->edtDefaultValue->toPlainText().trimmed();
-    mContext.mComponentPrefixes.setDefaultValue(mUi->edtPrefix->text().toUpper().trimmed());
-    return true;
+    try {
+        mContext.mComponentSchematicOnly = mUi->cbxSchematicOnly->isChecked();
+        mContext.mComponentDefaultValue = mUi->edtDefaultValue->toPlainText().trimmed();
+        mContext.mComponentPrefixes.setDefaultValue(
+            ComponentPrefix(mUi->edtPrefix->text().toUpper().trimmed())); // can throw
+        return true;
+    } catch (const Exception& e) {
+        return false;
+    }
 }
 
 bool NewElementWizardPage_ComponentProperties::isComplete() const noexcept
@@ -80,7 +85,7 @@ void NewElementWizardPage_ComponentProperties::initializePage() noexcept
     QWizardPage::initializePage();
     mUi->cbxSchematicOnly->setChecked(mContext.mComponentSchematicOnly);
     mUi->edtDefaultValue->setPlainText(mContext.mComponentDefaultValue);
-    mUi->edtPrefix->setText(mContext.mComponentPrefixes.getDefaultValue());
+    mUi->edtPrefix->setText(*mContext.mComponentPrefixes.getDefaultValue());
 }
 
 void NewElementWizardPage_ComponentProperties::cleanupPage() noexcept

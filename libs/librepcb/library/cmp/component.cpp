@@ -35,23 +35,23 @@ namespace library {
  ****************************************************************************************/
 
 Component::Component(const Uuid& uuid, const Version& version, const QString& author,
-                     const QString& name_en_US, const QString& description_en_US,
+                     const ElementName& name_en_US, const QString& description_en_US,
                      const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
-    mSchematicOnly(false), mDefaultValue()
+    mSchematicOnly(false), mDefaultValue(), mPrefixes(ComponentPrefix(""))
 {
 }
 
 Component::Component(const FilePath& elementDirectory, bool readOnly) :
     LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
-    mSchematicOnly(false), mDefaultValue()
+    mSchematicOnly(false), mDefaultValue(), mPrefixes(ComponentPrefix(""))
 {
     // Load all properties
     mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");
     mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
     mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value");
-    mPrefixes.loadFromDomElement(mLoadingFileDocument);
+    mPrefixes = NormDependentPrefixMap(mLoadingFileDocument);
     mSignals.loadFromDomElement(mLoadingFileDocument);
     mSymbolVariants.loadFromDomElement(mLoadingFileDocument);
 
@@ -73,17 +73,23 @@ Component::~Component() noexcept
 std::shared_ptr<ComponentSignal> Component::getSignalOfPin(
     const Uuid& symbVar, const Uuid& item, const Uuid& pin)
 {
-    Uuid sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
-    if (sig.isNull()) return std::shared_ptr<ComponentSignal>(nullptr);
-    return mSignals.get(sig); // can throw
+    tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
+    if (sig) {
+        return mSignals.get(*sig); // can throw
+    } else {
+         return std::shared_ptr<ComponentSignal>(nullptr);
+    }
 }
 
 std::shared_ptr<const ComponentSignal> Component::getSignalOfPin(const Uuid& symbVar,
     const Uuid& item, const Uuid& pin) const
 {
-    Uuid sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
-    if (sig.isNull()) return std::shared_ptr<const ComponentSignal>(nullptr);
-    return mSignals.get(sig); // can throw
+    tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)->getPinSignalMap().get(pin)->getSignalUuid(); // can throw
+    if (sig) {
+        return mSignals.get(*sig); // can throw
+    } else {
+         return std::shared_ptr<const ComponentSignal>(nullptr);
+    }
 }
 
 std::shared_ptr<ComponentSymbolVariantItem> Component::getSymbVarItem(
@@ -111,22 +117,6 @@ void Component::serialize(SExpression& root) const
     mAttributes.serialize(root);
     mSignals.serialize(root);
     mSymbolVariants.serialize(root);
-}
-
-bool Component::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())                 return false;
-    if (!mPrefixes.contains(QString("")))                           return false;
-    for (const ComponentSymbolVariant& var : mSymbolVariants) {
-        for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
-            for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                if (!map.getSignalUuid().isNull()) {
-                    if (!mSignals.contains(map.getSignalUuid()))    return false;
-                }
-            }
-        }
-    }
-    return true;
 }
 
 /*****************************************************************************************

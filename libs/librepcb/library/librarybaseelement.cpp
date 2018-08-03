@@ -41,7 +41,7 @@ namespace library {
 LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
                                        const QString& longElementName, const Uuid& uuid,
                                        const Version& version, const QString& author,
-                                       const QString& name_en_US,
+                                       const ElementName& name_en_US,
                                        const QString& description_en_US,
                                        const QString& keywords_en_US) :
     QObject(nullptr), mDirectory(FilePath::getRandomTempPath()),
@@ -49,13 +49,12 @@ LibraryBaseElement::LibraryBaseElement(bool dirnameMustBeUuid, const QString& sh
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName), mLongElementName(longElementName),
     mUuid(uuid), mVersion(version), mAuthor(author),
-    mCreated(QDateTime::currentDateTime()), mIsDeprecated(false)
+    mCreated(QDateTime::currentDateTime()), mIsDeprecated(false),
+    mNames(name_en_US),
+    mDescriptions(description_en_US),
+    mKeywords(keywords_en_US)
 {
     FileUtils::makePath(mDirectory); // can throw
-
-    mNames.setDefaultValue(name_en_US);
-    mDescriptions.setDefaultValue(description_en_US);
-    mKeywords.setDefaultValue(keywords_en_US);
 }
 
 LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
@@ -64,7 +63,12 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
                                        const QString& longElementName, bool readOnly) :
     QObject(nullptr), mDirectory(elementDirectory),mDirectoryIsTemporary(false),
     mOpenedReadOnly(readOnly), mDirectoryNameMustBeUuid(dirnameMustBeUuid),
-    mShortElementName(shortElementName), mLongElementName(longElementName)
+    mShortElementName(shortElementName), mLongElementName(longElementName),
+    mUuid(Uuid::createRandom()), // just for initialization, will be overwritten
+    mVersion(Version::fromString("0.1")), // just for initialization, will be overwritten
+    mNames(ElementName("unknown")), // just for initialization, will be overwritten
+    mDescriptions(""),
+    mKeywords("")
 {
     // determine the filepath to the version file
     FilePath versionFilePath = mDirectory.getPathTo(".librepcb-" % mShortElementName);
@@ -77,8 +81,8 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     }
 
     // check directory name
-    Uuid dirUuid(mDirectory.getFilename());
-    if (mDirectoryNameMustBeUuid && dirUuid.isNull()) {
+    QString dirUuidStr = mDirectory.getFilename();
+    if (mDirectoryNameMustBeUuid && (!Uuid::isValid(dirUuidStr))) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("Directory name is not a valid UUID: \"%1\""))
             .arg(mDirectory.toNative()));
@@ -86,12 +90,11 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 
     // read version number from version file
     SmartVersionFile versionFile(versionFilePath, false, true);
-    mLoadingElementFileVersion = versionFile.getVersion();
-    if (mLoadingElementFileVersion != qApp->getAppVersion()) {
+    if (versionFile.getVersion() > qApp->getAppVersion()) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("The library element %1 was created with a newer application "
                        "version. You need at least LibrePCB version %2 to open it."))
-            .arg(mDirectory.toNative()).arg(mLoadingElementFileVersion.toPrettyStr(3)));
+            .arg(mDirectory.toNative()).arg(versionFile.getVersion().toPrettyStr(3)));
     }
 
     // open main file
@@ -112,13 +115,13 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
     mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
 
     // read names, descriptions and keywords in all available languages
-    mNames.loadFromDomElement(mLoadingFileDocument);
-    mDescriptions.loadFromDomElement(mLoadingFileDocument);
-    mKeywords.loadFromDomElement(mLoadingFileDocument);
+    mNames = LocalizedNameMap(mLoadingFileDocument);
+    mDescriptions = LocalizedDescriptionMap(mLoadingFileDocument);
+    mKeywords = LocalizedKeywordsMap(mLoadingFileDocument);
 
     // check if the UUID equals to the directory basename
-    if (mDirectoryNameMustBeUuid && (mUuid != dirUuid)) {
-        qDebug() << mUuid << "!=" << dirUuid;
+    if (mDirectoryNameMustBeUuid && (mUuid.toStr() != dirUuidStr)) {
+        qDebug() << mUuid.toStr() << "!=" << dirUuidStr;
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("UUID mismatch between element directory and main file: \"%1\""))
             .arg(sexprFilePath.toNative()));
@@ -248,11 +251,6 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
 
 void LibraryBaseElement::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) {
-        throw LogicError(__FILE__, __LINE__,
-            tr("The library element cannot be saved because it is not valid."));
-    }
-
     root.appendChild(mUuid);
     mNames.serialize(root);
     mDescriptions.serialize(root);
@@ -261,14 +259,6 @@ void LibraryBaseElement::serialize(SExpression& root) const
     root.appendChild("version", mVersion, true);
     root.appendChild("created", mCreated, true);
     root.appendChild("deprecated", mIsDeprecated, true);
-}
-
-bool LibraryBaseElement::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())                     return false;
-    if (!mVersion.isValid())                return false;
-    if (mNames.getDefaultValue().isEmpty()) return false;
-    return true;
 }
 
 /*****************************************************************************************

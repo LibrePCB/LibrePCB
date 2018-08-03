@@ -55,7 +55,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
     mUi->graphicsView->setOriginCrossVisible(false);
 
     // load metadata
-    mUi->edtName->setText(mSymbVar.getNames().getDefaultValue());
+    mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());
     mUi->edtDescription->setText(mSymbVar.getDescriptions().getDefaultValue());
     mUi->edtNorm->setText(mSymbVar.getNorm());
 
@@ -80,16 +80,17 @@ ComponentSymbolVariantEditDialog::~ComponentSymbolVariantEditDialog() noexcept
 
 void ComponentSymbolVariantEditDialog::accept() noexcept
 {
-    QString name = mUi->edtName->text().trimmed();
-    if (name.isEmpty()) {
-        QMessageBox::critical(this, tr("Error"), tr("The name must not be empty."));
+    try {
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
+        mSymbVar.setName("", name);
+        mSymbVar.setDescription("", mUi->edtDescription->text().trimmed());
+        mSymbVar.setNorm(mUi->edtNorm->text().trimmed());
+        mOriginalSymbVar = mSymbVar;
+        QDialog::accept();
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
         return;
     }
-    mSymbVar.setName("", name);
-    mSymbVar.setDescription("", mUi->edtDescription->text().trimmed());
-    mSymbVar.setNorm(mUi->edtNorm->text().trimmed());
-    mOriginalSymbVar = mSymbVar;
-    QDialog::accept();
 }
 
 void ComponentSymbolVariantEditDialog::updateGraphicsItems() noexcept

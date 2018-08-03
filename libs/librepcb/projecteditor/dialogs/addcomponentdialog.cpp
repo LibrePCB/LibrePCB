@@ -120,28 +120,28 @@ AddComponentDialog::~AddComponentDialog() noexcept
  *  Getters
  ****************************************************************************************/
 
-Uuid AddComponentDialog::getSelectedComponentUuid() const noexcept
+tl::optional<Uuid> AddComponentDialog::getSelectedComponentUuid() const noexcept
 {
     if (mSelectedComponent && mSelectedSymbVar)
         return mSelectedComponent->getUuid();
     else
-        return Uuid();
+        return tl::nullopt;
 }
 
-Uuid AddComponentDialog::getSelectedSymbVarUuid() const noexcept
+tl::optional<Uuid> AddComponentDialog::getSelectedSymbVarUuid() const noexcept
 {
     if (mSelectedComponent && mSelectedSymbVar)
         return mSelectedSymbVar->getUuid();
     else
-        return Uuid();
+        return tl::nullopt;
 }
 
-Uuid AddComponentDialog::getSelectedDeviceUuid() const noexcept
+tl::optional<Uuid> AddComponentDialog::getSelectedDeviceUuid() const noexcept
 {
     if (mSelectedComponent && mSelectedSymbVar && mSelectedDevice)
         return mSelectedDevice->getUuid();
     else
-        return Uuid();
+        return tl::nullopt;
 }
 
 /*****************************************************************************************
@@ -153,7 +153,7 @@ void AddComponentDialog::searchEditTextChanged(const QString& text) noexcept
     try {
         QModelIndex catIndex = mUi->treeCategories->currentIndex();
         if (text.trimmed().isEmpty() && catIndex.isValid()) {
-            setSelectedCategory(Uuid(catIndex.data(Qt::UserRole).toString()));
+            setSelectedCategory(Uuid::tryFromString(catIndex.data(Qt::UserRole).toString()));
         } else {
             searchComponents(text.trimmed());
         }
@@ -168,7 +168,7 @@ void AddComponentDialog::treeCategories_currentItemChanged(const QModelIndex& cu
     Q_UNUSED(previous);
 
     try {
-        Uuid categoryUuid = Uuid(current.data(Qt::UserRole).toString());
+        tl::optional<Uuid> categoryUuid = Uuid::tryFromString(current.data(Qt::UserRole).toString());
         setSelectedCategory(categoryUuid);
     } catch (Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
@@ -213,10 +213,16 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
 
 void AddComponentDialog::on_cbxSymbVar_currentIndexChanged(int index) noexcept
 {
-    if ((mSelectedComponent) && (index >= 0))
-        setSelectedSymbVar(mSelectedComponent->getSymbolVariants().find(Uuid(mUi->cbxSymbVar->itemData(index).toString())).get());
-    else
+    if ((mSelectedComponent) && (index >= 0)) {
+        tl::optional<Uuid> uuid = Uuid::tryFromString(mUi->cbxSymbVar->itemData(index).toString());
+        if (uuid) {
+            setSelectedSymbVar(mSelectedComponent->getSymbolVariants().find(*uuid).get());
+        } else {
+            setSelectedSymbVar(nullptr);
+        }
+    } else {
         setSelectedSymbVar(nullptr);
+    }
 }
 
 /*****************************************************************************************
@@ -252,16 +258,14 @@ void AddComponentDialog::searchComponents(const QString& input)
                     devItem->setText(0, devName);
                     devItem->setData(0, Qt::UserRole, devFp.toStr());
                     // package
-                    Uuid pkgUuid;
+                    Uuid pkgUuid = Uuid::createRandom(); // only for initialization, will be overwritten
                     mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-                    if (!pkgUuid.isNull()) {
-                        FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
-                        if (pkgFp.isValid()) {
-                            QString pkgName;
-                            mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
-                            devItem->setText(1, pkgName);
-                            devItem->setTextAlignment(1, Qt::AlignRight);
-                        }
+                    FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+                    if (pkgFp.isValid()) {
+                        QString pkgName;
+                        mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
+                        devItem->setText(1, pkgName);
+                        devItem->setTextAlignment(1, Qt::AlignRight);
                     }
                 } catch (const Exception& e) {
                     // what could we do here?
@@ -275,7 +279,7 @@ void AddComponentDialog::searchComponents(const QString& input)
     mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
 }
 
-void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
+void AddComponentDialog::setSelectedCategory(const tl::optional<Uuid>& categoryUuid)
 {
     setSelectedComponent(nullptr);
     mUi->treeComponents->clear();
@@ -305,16 +309,14 @@ void AddComponentDialog::setSelectedCategory(const Uuid& categoryUuid)
                 devItem->setText(0, devName);
                 devItem->setData(0, Qt::UserRole, devFp.toStr());
                 // package
-                Uuid pkgUuid;
+                Uuid pkgUuid = Uuid::createRandom(); // only for initialization, will be overwritten
                 mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-                if (!pkgUuid.isNull()) {
-                    FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
-                    if (pkgFp.isValid()) {
-                        QString pkgName;
-                        mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
-                        devItem->setText(1, pkgName);
-                        devItem->setTextAlignment(1, Qt::AlignRight);
-                    }
+                FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+                if (pkgFp.isValid()) {
+                    QString pkgName;
+                    mWorkspace.getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
+                    devItem->setText(1, pkgName);
+                    devItem->setTextAlignment(1, Qt::AlignRight);
                 }
             } catch (const Exception& e) {
                 // what could we do here?
@@ -342,14 +344,14 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
     {
         const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
-        mUi->lblCompName->setText(cmp->getNames().value(localeOrder));
+        mUi->lblCompName->setText(*cmp->getNames().value(localeOrder));
         mUi->lblCompDescription->setText(cmp->getDescriptions().value(localeOrder));
 
         mSelectedComponent = cmp;
 
         mUi->cbxSymbVar->clear();
         for (const library::ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
-            QString text = symbVar.getNames().value(localeOrder);
+            QString text = *symbVar.getNames().value(localeOrder);
             if (!symbVar.getNorm().isEmpty()) {text += " [" + symbVar.getNorm() + "]";}
             mUi->cbxSymbVar->addItem(text, symbVar.getUuid().toStr());
         }
@@ -401,8 +403,8 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev)
         if (pkgFp.isValid()) {
             mSelectedPackage = new library::Package(pkgFp, true);
             mUi->lblDeviceName->setText(QString("%1 [%2]").arg(
-                mSelectedDevice->getNames().value(localeOrder),
-                mSelectedPackage->getNames().value(localeOrder)));
+                *mSelectedDevice->getNames().value(localeOrder),
+                *mSelectedPackage->getNames().value(localeOrder)));
             if (mSelectedPackage->getFootprints().count() > 0) {
                 mPreviewFootprintGraphicsItem = new library::FootprintPreviewGraphicsItem(
                     *mGraphicsLayerProvider, localeOrder,

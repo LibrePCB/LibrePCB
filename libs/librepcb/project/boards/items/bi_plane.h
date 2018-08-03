@@ -27,6 +27,7 @@
 #include "bi_base.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include <librepcb/common/uuid.h>
 
 /*****************************************************************************************
@@ -68,16 +69,16 @@ class BI_Plane final : public BI_Base, public SerializableObject
         BI_Plane(const BI_Plane& other) = delete;
         BI_Plane(Board& board, const BI_Plane& other);
         BI_Plane(Board& board, const SExpression& node);
-        BI_Plane(Board& board, const Uuid& uuid, const QString& layerName,
+        BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
                  NetSignal& netsignal, const Path& outline);
         ~BI_Plane() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getLayerName() const noexcept {return mLayerName;}
+        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
         NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
-        const Length& getMinWidth() const noexcept {return mMinWidth;}
-        const Length& getMinClearance() const noexcept {return mMinClearance;}
+        const UnsignedLength& getMinWidth() const noexcept {return mMinWidth;}
+        const UnsignedLength& getMinClearance() const noexcept {return mMinClearance;}
         bool getKeepOrphans() const noexcept {return mKeepOrphans;}
         int getPriority() const noexcept {return mPriority;}
         ConnectStyle getConnectStyle() const noexcept {return mConnectStyle;}
@@ -89,10 +90,10 @@ class BI_Plane final : public BI_Base, public SerializableObject
 
         // Setters
         void setOutline(const Path& outline) noexcept;
-        void setLayerName(const QString& layerName) noexcept;
+        void setLayerName(const GraphicsLayerName& layerName) noexcept;
         void setNetSignal(NetSignal& netsignal);
-        void setMinWidth(const Length& minWidth) noexcept;
-        void setMinClearance(const Length& minClearance) noexcept;
+        void setMinWidth(const UnsignedLength& minWidth) noexcept;
+        void setMinClearance(const UnsignedLength& minClearance) noexcept;
         void setConnectStyle(ConnectStyle style) noexcept;
         void setPriority(int priority) noexcept;
         void setKeepOrphans(bool keepOrphans) noexcept;
@@ -129,11 +130,11 @@ class BI_Plane final : public BI_Base, public SerializableObject
 
     private: // Data
         Uuid mUuid;
-        QString mLayerName;
+        GraphicsLayerName mLayerName;
         NetSignal* mNetSignal;
         Path mOutline;
-        Length mMinWidth;
-        Length mMinClearance;
+        UnsignedLength mMinWidth;
+        UnsignedLength mMinClearance;
         bool mKeepOrphans;
         int mPriority;
         ConnectStyle mConnectStyle;

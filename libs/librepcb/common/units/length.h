@@ -24,6 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <type_safe/constrained_type.hpp>
 #include "../fileio/sexpression.h"
 
 /*****************************************************************************************
@@ -87,26 +88,26 @@ class Length
          *
          * The length will be initialized with zero nanometers.
          */
-        Length() noexcept : Length(0) {}
+        constexpr Length() noexcept : Length(0) {}
 
         /**
          * @brief Copy Constructor
          *
          * @param length        Another Length object
          */
-        Length(const Length& length) noexcept : mNanometers(length.mNanometers) {}
+        constexpr Length(const Length& length) noexcept : mNanometers(length.mNanometers) {}
 
         /**
          * @brief Constructor with length in nanometers
          *
          * @param nanometers    The length in nanometers
          */
-        Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
+        constexpr Length(LengthBase_t nanometers) noexcept : mNanometers(nanometers) {}
 
         /**
          * @brief Destructor
          */
-        ~Length() noexcept {}
+        ~Length() = default;
 
 
         // Setters
@@ -448,18 +449,18 @@ class Length
         Length  operator/(const Length& rhs) const  {return Length(mNanometers / rhs.mNanometers);}
         Length  operator/(LengthBase_t rhs) const   {return Length(mNanometers / rhs);}
         Length  operator%(const Length& rhs) const  {return Length(mNanometers % rhs.mNanometers);}
-        bool    operator>(const Length& rhs) const  {return mNanometers > rhs.mNanometers;}
-        bool    operator>(LengthBase_t rhs) const   {return mNanometers > rhs;}
-        bool    operator<(const Length& rhs) const  {return mNanometers < rhs.mNanometers;}
-        bool    operator<(LengthBase_t rhs) const   {return mNanometers < rhs;}
-        bool    operator>=(const Length& rhs) const {return mNanometers >= rhs.mNanometers;}
-        bool    operator>=(LengthBase_t rhs) const  {return mNanometers >= rhs;}
-        bool    operator<=(const Length& rhs) const {return mNanometers <= rhs.mNanometers;}
-        bool    operator<=(LengthBase_t rhs) const  {return mNanometers <= rhs;}
-        bool    operator==(const Length& rhs) const {return mNanometers == rhs.mNanometers;}
-        bool    operator==(LengthBase_t rhs) const  {return mNanometers == rhs;}
-        bool    operator!=(const Length& rhs) const {return mNanometers != rhs.mNanometers;}
-        bool    operator!=(LengthBase_t rhs) const  {return mNanometers != rhs;}
+        constexpr bool operator>(const Length& rhs) const  {return mNanometers > rhs.mNanometers;}
+        constexpr bool operator>(LengthBase_t rhs) const   {return mNanometers > rhs;}
+        constexpr bool operator<(const Length& rhs) const  {return mNanometers < rhs.mNanometers;}
+        constexpr bool operator<(LengthBase_t rhs) const   {return mNanometers < rhs;}
+        constexpr bool operator>=(const Length& rhs) const {return mNanometers >= rhs.mNanometers;}
+        constexpr bool operator>=(LengthBase_t rhs) const  {return mNanometers >= rhs;}
+        constexpr bool operator<=(const Length& rhs) const {return mNanometers <= rhs.mNanometers;}
+        constexpr bool operator<=(LengthBase_t rhs) const  {return mNanometers <= rhs;}
+        constexpr bool operator==(const Length& rhs) const {return mNanometers == rhs.mNanometers;}
+        constexpr bool operator==(LengthBase_t rhs) const  {return mNanometers == rhs;}
+        constexpr bool operator!=(const Length& rhs) const {return mNanometers != rhs.mNanometers;}
+        constexpr bool operator!=(LengthBase_t rhs) const  {return mNanometers != rhs;}
 
     private:
 
@@ -542,11 +543,212 @@ inline Length deserializeFromSExpression(const SExpression& sexpr, bool throwIfE
     return Length::fromMm(str);
 }
 
-QDataStream& operator<<(QDataStream& stream, const Length& length);
-QDebug operator<<(QDebug stream, const Length& length);
+inline QDataStream& operator<<(QDataStream& stream, const Length& length) {
+    stream << length.toMm();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const Length& length) {
+    stream << QString("Length(%1mm)").arg(length.toMm());
+    return stream;
+}
 
 inline uint qHash(const Length& key, uint seed = 0) noexcept {
     return ::qHash(key.toNm(), seed);
+}
+
+/*****************************************************************************************
+ *  Class UnsignedLength
+ ****************************************************************************************/
+
+struct UnsignedLengthVerifier {
+    template <typename Value, typename Predicate>
+    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
+        return p(val) ? std::forward<Value>(val) : (
+            throw RuntimeError(__FILE__, __LINE__, Length::tr("Value must be >= 0!")),
+            std::forward<Value>(val));
+    }
+};
+
+struct UnsignedLengthConstraint {
+    constexpr bool operator()(const Length& l) const noexcept {
+        return l >= 0;
+    }
+};
+
+/**
+ * UnsignedLength is a wrapper around a librepcb::Length object which is guaranteed to
+ * always contain an unsigned (i.e. >= 0) value.
+ *
+ * The constructor throws an exception if constructed from a librepcb::Length object with
+ * a negative value!
+ */
+using UnsignedLength = type_safe::constrained_type<Length, UnsignedLengthConstraint,
+                                                   UnsignedLengthVerifier>;
+
+inline UnsignedLength operator+(const UnsignedLength& lhs, const UnsignedLength& rhs) noexcept {
+    return UnsignedLength(*lhs + *rhs); // will not throw as long as there's no overflow
+}
+
+inline UnsignedLength& operator+=(UnsignedLength& lhs, const UnsignedLength& rhs) noexcept {
+    lhs = lhs + rhs; // will not throw as long as there's no overflow
+    return lhs;
+}
+
+inline Length operator*(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) * rhs;}
+inline Length operator/(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) / rhs;}
+inline Length operator+(const Length& lhs, const UnsignedLength& rhs) noexcept {return lhs + *rhs;}
+inline Length operator+(const UnsignedLength& lhs, const Length& rhs) noexcept {return *lhs + rhs;}
+inline Length operator-(const Length& lhs, const UnsignedLength& rhs) noexcept {return lhs - *rhs;}
+inline Length operator-(const UnsignedLength& lhs, const Length& rhs) noexcept {return *lhs - rhs;}
+inline Length operator-(const UnsignedLength& lhs) noexcept {return -(*lhs);}
+inline bool operator>(const UnsignedLength& lhs, const Length& rhs) noexcept {return (*lhs) > rhs;}
+inline bool operator>(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) > rhs;}
+inline bool operator>=(const UnsignedLength& lhs, const Length& rhs) noexcept {return (*lhs) >= rhs;}
+inline bool operator>=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) >= rhs;}
+inline bool operator<(const UnsignedLength& lhs, const Length& rhs) noexcept {return (*lhs) <= rhs;}
+inline bool operator<(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) <= rhs;}
+inline bool operator==(const UnsignedLength& lhs, const Length& rhs) noexcept {return (*lhs) == rhs;}
+inline bool operator==(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) == rhs;}
+inline bool operator!=(const UnsignedLength& lhs, const Length& rhs) noexcept {return (*lhs) != rhs;}
+inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) != rhs;}
+
+template <>
+inline SExpression serializeToSExpression(const UnsignedLength& obj) {
+    return SExpression::createToken(obj->toMmString());
+}
+
+template <>
+inline UnsignedLength deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return UnsignedLength(Length::fromMm(str));
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const UnsignedLength& length) {
+    stream << length->toMm();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const UnsignedLength& length) {
+    stream << QString("UnsignedLength(%1mm)").arg(length->toMm());
+    return stream;
+}
+
+inline uint qHash(const UnsignedLength& key, uint seed = 0) noexcept {
+    return ::qHash(key->toNm(), seed);
+}
+
+/*****************************************************************************************
+ *  Class PositiveLength
+ ****************************************************************************************/
+
+struct PositiveLengthVerifier {
+    template <typename Value, typename Predicate>
+    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
+        return p(val) ? std::forward<Value>(val) : (
+            throw RuntimeError(__FILE__, __LINE__, Length::tr("Value must be > 0!")),
+            std::forward<Value>(val));
+    }
+};
+
+struct PositiveLengthConstraint {
+    constexpr bool operator()(const Length& l) const noexcept {
+        return l > 0;
+    }
+};
+
+/**
+ * PositiveLength is a wrapper around a librepcb::Length object which is guaranteed to
+ * always contain a positive (i.e. > 0) value.
+ *
+ * The constructor throws an exception if constructed from a librepcb::Length object with
+ * a negative or zero value!
+ */
+using PositiveLength = type_safe::constrained_type<Length, PositiveLengthConstraint,
+                                                   PositiveLengthVerifier>;
+
+inline UnsignedLength positiveToUnsigned(const PositiveLength& l) noexcept {return UnsignedLength(*l);}
+
+inline PositiveLength operator+(const PositiveLength& lhs, const PositiveLength& rhs) noexcept {
+    return PositiveLength(*lhs + *rhs); // will not throw as long as there's no overflow
+}
+
+inline PositiveLength operator+(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {
+    return PositiveLength(*lhs + *rhs); // will not throw as long as there's no overflow
+}
+
+inline PositiveLength operator+(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {
+    return PositiveLength(*lhs + *rhs); // will not throw as long as there's no overflow
+}
+
+inline PositiveLength& operator+=(PositiveLength& lhs, const PositiveLength& rhs) noexcept {
+    lhs = lhs + rhs; // will not throw as long as there's no overflow
+    return lhs;
+}
+
+inline PositiveLength& operator+=(PositiveLength& lhs, const UnsignedLength& rhs) noexcept {
+    lhs = lhs + rhs; // will not throw as long as there's no overflow
+    return lhs;
+}
+
+inline UnsignedLength& operator+=(UnsignedLength& lhs, const PositiveLength& rhs) noexcept {
+    lhs = positiveToUnsigned(lhs + rhs); // will not throw as long as there's no overflow
+    return lhs;
+}
+
+inline Length operator*(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) * rhs;}
+inline Length operator/(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) / rhs;}
+inline Length operator+(const Length& lhs, const PositiveLength& rhs) noexcept {return lhs + *rhs;}
+inline Length operator+(const PositiveLength& lhs, const Length& rhs) noexcept {return *lhs + rhs;}
+inline Length operator-(const Length& lhs, const PositiveLength& rhs) noexcept {return lhs - *rhs;}
+inline Length operator-(const PositiveLength& lhs, const Length& rhs) noexcept {return *lhs - rhs;}
+inline Length operator-(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return *lhs - *rhs;}
+inline Length operator-(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return *lhs - *rhs;}
+inline Length operator-(const PositiveLength& lhs) noexcept {return -(*lhs);}
+inline bool operator>(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return (*lhs) > (*rhs);}
+inline bool operator>(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return (*lhs) > (*rhs);}
+inline bool operator>(const PositiveLength& lhs, const Length& rhs) noexcept {return (*lhs) > rhs;}
+inline bool operator>(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) > rhs;}
+inline bool operator>=(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return (*lhs) >= (*rhs);}
+inline bool operator>=(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return (*lhs) >= (*rhs);}
+inline bool operator>=(const PositiveLength& lhs, const Length& rhs) noexcept {return (*lhs) >= rhs;}
+inline bool operator>=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) >= rhs;}
+inline bool operator<(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return (*lhs) < (*rhs);}
+inline bool operator<(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return (*lhs) < (*rhs);}
+inline bool operator<(const PositiveLength& lhs, const Length& rhs) noexcept {return (*lhs) <= rhs;}
+inline bool operator<(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) <= rhs;}
+inline bool operator==(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return (*lhs) == (*rhs);}
+inline bool operator==(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return (*lhs) == (*rhs);}
+inline bool operator==(const PositiveLength& lhs, const Length& rhs) noexcept {return (*lhs) == rhs;}
+inline bool operator==(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) == rhs;}
+inline bool operator!=(const UnsignedLength& lhs, const PositiveLength& rhs) noexcept {return (*lhs) != (*rhs);}
+inline bool operator!=(const PositiveLength& lhs, const UnsignedLength& rhs) noexcept {return (*lhs) != (*rhs);}
+inline bool operator!=(const PositiveLength& lhs, const Length& rhs) noexcept {return (*lhs) != rhs;}
+inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {return (*lhs) != rhs;}
+
+template <>
+inline SExpression serializeToSExpression(const PositiveLength& obj) {
+    return SExpression::createToken(obj->toMmString());
+}
+
+template <>
+inline PositiveLength deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+    QString str = sexpr.getStringOrToken(throwIfEmpty);
+    return PositiveLength(Length::fromMm(str));
+}
+
+inline QDataStream& operator<<(QDataStream& stream, const PositiveLength& length) {
+    stream << length->toMm();
+    return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const PositiveLength& length) {
+    stream << QString("PositiveLength(%1mm)").arg(length->toMm());
+    return stream;
+}
+
+inline uint qHash(const PositiveLength& key, uint seed = 0) noexcept {
+    return ::qHash(key->toNm(), seed);
 }
 
 /*****************************************************************************************

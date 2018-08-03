@@ -33,9 +33,14 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Polygon::Polygon(const Polygon& other) noexcept
+Polygon::Polygon(const Polygon& other) noexcept :
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mLineWidth(other.mLineWidth),
+    mIsFilled(other.mIsFilled),
+    mIsGrabArea(other.mIsGrabArea),
+    mPath(other.mPath)
 {
-    *this = other; // use assignment operator
 }
 
 Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
@@ -44,25 +49,25 @@ Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept :
     mUuid = uuid;
 }
 
-Polygon::Polygon(const Uuid& uuid, const QString& layerName, const Length& lineWidth,
-                 bool fill, bool isGrabArea, const Path& path) noexcept :
+Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
+                 const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
+                 const Path& path) noexcept :
     mUuid(uuid), mLayerName(layerName), mLineWidth(lineWidth), mIsFilled(fill),
     mIsGrabArea(isGrabArea), mPath(path)
 {
 }
 
-Polygon::Polygon(const SExpression& node)
+Polygon::Polygon(const SExpression& node) :
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mLineWidth(node.getValueByPath<UnsignedLength>("width")),
+    mIsFilled(node.getValueByPath<bool>("fill")),
+    mIsGrabArea(node.getValueByPath<bool>("grab")),
+    mPath()
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    } else {
-        // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
-    mLineWidth = node.getValueByPath<Length>("width");
-    mIsFilled = node.getValueByPath<bool>("fill");
-    mIsGrabArea = node.getValueByPath<bool>("grab");
 
     // load vertices
     if (!node.tryGetChildByPath("pos")) {
@@ -75,8 +80,6 @@ Polygon::Polygon(const SExpression& node)
             mPath.addVertex(Point(child.getChildByPath("pos")));
         }
     }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 Polygon::~Polygon() noexcept
@@ -87,7 +90,7 @@ Polygon::~Polygon() noexcept
  *  Setters
  ****************************************************************************************/
 
-void Polygon::setLayerName(const QString& name) noexcept
+void Polygon::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -96,7 +99,7 @@ void Polygon::setLayerName(const QString& name) noexcept
     }
 }
 
-void Polygon::setLineWidth(const Length& width) noexcept
+void Polygon::setLineWidth(const UnsignedLength& width) noexcept
 {
     if (width == mLineWidth) return;
     mLineWidth = width;
@@ -148,10 +151,8 @@ void Polygon::unregisterObserver(IF_PolygonObserver& object) const noexcept
 
 void Polygon::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("width", mLineWidth, true);
     root.appendChild("fill", mIsFilled, false);
     root.appendChild("grab", mIsGrabArea, false);
@@ -182,15 +183,6 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept
     mIsGrabArea = rhs.mIsGrabArea;
     mPath = rhs.mPath;
     return *this;
-}
-
-bool Polygon::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())         return false;
-    if (mLayerName.isEmpty())   return false;
-    if (mLineWidth < 0)         return false;
-    // TODO: check mPath?
-    return true;
 }
 
 /*****************************************************************************************

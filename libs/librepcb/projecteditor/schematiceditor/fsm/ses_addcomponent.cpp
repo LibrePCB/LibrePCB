@@ -184,7 +184,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             // set temporary position of the current symbol
             Q_ASSERT(mCurrentSymbolEditCommand);
             mCurrentSymbolEditCommand->setPosition(pos, true);
@@ -196,7 +196,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
         {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), mEditor.getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(mEditor.getGridProperties().getInterval());
             switch (sceneEvent->button())
             {
                 case Qt::LeftButton:
@@ -301,7 +301,8 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(SEE_Base* event) noexce
     return PassToParentState;
 }
 
-void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar)
+void SES_AddComponent::startAddingComponent(const tl::optional<Uuid>& cmp,
+                                            const tl::optional<Uuid>& symbVar)
 {
     Schematic* schematic = mEditor.getActiveSchematic();
     Q_ASSERT(schematic); if (!schematic) throw LogicError(__FILE__, __LINE__);
@@ -313,26 +314,27 @@ void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar
         mUndoStack.beginCmdGroup(tr("Add Component to Schematic"));
         mIsUndoCmdActive = true;
 
-        if (cmp.isNull() || symbVar.isNull())
-        {
+        if (cmp && symbVar) {
+            // add selected component to circuit
+            auto* cmd = new CmdAddComponentToCircuit(mWorkspace, mProject, *cmp, *symbVar);
+            mUndoStack.appendToCmdGroup(cmd);
+            mCurrentComponent = cmd->getComponentInstance();
+        } else {
             // show component chooser dialog
             if (!mAddComponentDialog)
                 mAddComponentDialog = new AddComponentDialog(mWorkspace, mProject, &mEditor);
             if (mAddComponentDialog->exec() != QDialog::Accepted)
                 throw UserCanceled(__FILE__, __LINE__); // abort
+            if (!mAddComponentDialog->getSelectedComponentUuid())
+                throw LogicError(__FILE__, __LINE__);
+            if (!mAddComponentDialog->getSelectedSymbVarUuid())
+                throw LogicError(__FILE__, __LINE__);
 
             // add selected component to circuit
             auto cmd = new CmdAddComponentToCircuit(mWorkspace, mProject,
-                mAddComponentDialog->getSelectedComponentUuid(),
-                mAddComponentDialog->getSelectedSymbVarUuid(),
+                *mAddComponentDialog->getSelectedComponentUuid(),
+                *mAddComponentDialog->getSelectedSymbVarUuid(),
                 mAddComponentDialog->getSelectedDeviceUuid());
-            mUndoStack.appendToCmdGroup(cmd);
-            mCurrentComponent = cmd->getComponentInstance();
-        }
-        else
-        {
-            // add selected component to circuit
-            auto* cmd = new CmdAddComponentToCircuit(mWorkspace, mProject, cmp, symbVar);
             mUndoStack.appendToCmdGroup(cmd);
             mCurrentComponent = cmd->getComponentInstance();
         }
@@ -342,10 +344,9 @@ void SES_AddComponent::startAddingComponent(const Uuid& cmp, const Uuid& symbVar
         const library::ComponentSymbolVariantItem* currentSymbVarItem =
             mCurrentComponent->getSymbolVariant().getSymbolItems().value(mCurrentSymbVarItemIndex).get();
         if (!currentSymbVarItem) {
-            qDebug() << symbVar;
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("The component with the UUID \"%1\" does not have any symbol."))
-                .arg(cmp.toStr()));
+                .arg(mCurrentComponent->getUuid().toStr()));
         }
         Point pos = mEditorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
         CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(mWorkspace, *schematic,

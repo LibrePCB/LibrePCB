@@ -75,20 +75,20 @@ void BGI_Via::updateCacheAndRepaint() noexcept
 {
     prepareGeometryChange();
 
-    setToolTip(mVia.getNetSignalOfNetSegment().getName());
+    setToolTip(*mVia.getNetSignalOfNetSegment().getName());
 
     mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
 
     // determine stop mask clearance
-    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(mVia.getDrillDiameter());
-    Length stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(mVia.getSize());
+    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(*mVia.getDrillDiameter());
+    UnsignedLength stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
 
     // set shapes and bounding rect
     mShape = mVia.getOutline().toQPainterPathPx();
     mCopper = mVia.toQPainterPathPx();
-    mStopMask = mVia.getOutline(stopMaskClearance).toQPainterPathPx();
+    mStopMask = mVia.getOutline(*stopMaskClearance).toQPainterPathPx();
     mBoundingRect = mStopMask.boundingRect();
 
     update();
@@ -122,7 +122,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
         // draw netsignal name
         painter->setFont(mFont);
         painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, netsignal.getName());
+        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, *netsignal.getName());
     }
 
     if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {

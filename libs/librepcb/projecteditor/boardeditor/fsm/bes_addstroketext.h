@@ -85,9 +85,9 @@ class BES_AddStrokeText final : public BES_Base
         bool mUndoCmdActive;
         BI_StrokeText* mText;
         QScopedPointer<CmdStrokeTextEdit> mEditCmd;
-        QString mCurrentLayerName;
+        GraphicsLayerName mCurrentLayerName;
         QString mCurrentText;
-        Length mCurrentHeight;
+        PositiveLength mCurrentHeight;
         bool mCurrentMirror;
         Angle mCurrentRotation;
 

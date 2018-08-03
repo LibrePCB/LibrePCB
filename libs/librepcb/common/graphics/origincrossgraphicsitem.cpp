@@ -34,7 +34,7 @@ namespace librepcb {
  ****************************************************************************************/
 
 OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept :
-    QGraphicsItem(parent), mLayer(nullptr)
+    QGraphicsItem(parent), mLayer(nullptr), mSize(0)
 {
     mPen.setWidth(0);
     mPenHighlighted.setWidth(0);
@@ -63,10 +63,10 @@ void OriginCrossGraphicsItem::setRotation(const Angle& rot) noexcept
     QGraphicsItem::setRotation(-rot.toDeg());
 }
 
-void OriginCrossGraphicsItem::setSize(const Length& size) noexcept
+void OriginCrossGraphicsItem::setSize(const UnsignedLength& size) noexcept
 {
     mSize = size;
-    qreal lengthPx = size.toPx() / qreal(2);
+    qreal lengthPx = size->toPx() / qreal(2);
     mLineH.setLine(-lengthPx, qreal(0), lengthPx, qreal(0));
     mLineV.setLine(qreal(0), -lengthPx, qreal(0), lengthPx);
     updateBoundingRectAndShape();
@@ -150,7 +150,7 @@ void OriginCrossGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphic
 void OriginCrossGraphicsItem::updateBoundingRectAndShape() noexcept
 {
     prepareGeometryChange();
-    mBoundingRect = QRectF(-mSize.toPx()/2, -mSize.toPx()/2, mSize.toPx(), mSize.toPx());
+    mBoundingRect = QRectF(-mSize->toPx()/2, -mSize->toPx()/2, mSize->toPx(), mSize->toPx());
     mShape = QPainterPath();
     mShape.addRect(mBoundingRect);
     update();

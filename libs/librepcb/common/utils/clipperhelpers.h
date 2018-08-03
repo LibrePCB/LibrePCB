@@ -51,7 +51,7 @@ class ClipperHelpers final
 
         // General Methods
         static void offset(ClipperLib::Paths& paths, const Length& offset,
-                           const Length& maxArcTolerance);
+                           const PositiveLength& maxArcTolerance);
         static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 
         // Type Conversions
@@ -59,9 +59,9 @@ class ClipperHelpers final
         static Path convert(const ClipperLib::Path& path) noexcept;
         static Point convert(const ClipperLib::IntPoint& point) noexcept;
         static ClipperLib::Paths convert(const QVector<Path>& paths,
-                                         const Length& maxArcTolerance) noexcept;
+                                         const PositiveLength& maxArcTolerance) noexcept;
         static ClipperLib::Path convert(const Path& path,
-                                        const Length& maxArcTolerance) noexcept;
+                                        const PositiveLength& maxArcTolerance) noexcept;
         static ClipperLib::IntPoint convert(const Point& point) noexcept;
 
 

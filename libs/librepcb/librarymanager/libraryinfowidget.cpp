@@ -61,7 +61,7 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     }
 
     // general attributes
-    mUi->lblName->setText(lib->getNames().value(localeOrder));
+    mUi->lblName->setText(*lib->getNames().value(localeOrder));
     mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
     mUi->lblVersion->setText(lib->getVersion().toStr());
     mUi->lblAuthor->setText(lib->getAuthor());
@@ -76,9 +76,9 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
     QString dependencies;
     foreach (const Uuid& uuid, lib->getDependencies()) {
-        Version installedVersion = mWorkspace.getVersionOfLibrary(uuid, true, true);
+        tl::optional<Version> installedVersion = mWorkspace.getVersionOfLibrary(uuid, true, true);
         QString line = dependencies.isEmpty() ? "" : "<br>";
-        if (installedVersion.isValid()) {
+        if (installedVersion) {
             line += QString(" <font color=\"green\">%1 ✔</font>").arg(uuid.toStr());
         } else {
             line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());

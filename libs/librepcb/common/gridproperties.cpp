@@ -37,14 +37,14 @@ GridProperties::GridProperties() noexcept :
 {
 }
 
-GridProperties::GridProperties(const SExpression& node)
+GridProperties::GridProperties(const SExpression& node) :
+    mType(node.getValueByPath<Type_t>("type")),
+    mInterval(node.getValueByPath<PositiveLength>("interval")),
+    mUnit(node.getValueByPath<LengthUnit>("unit"))
 {
-    mType = node.getValueByPath<Type_t>("type");
-    mInterval = node.getValueByPath<Length>("interval");
-    mUnit = node.getValueByPath<LengthUnit>("unit");
 }
 
-GridProperties::GridProperties(Type_t type, const Length& interval, const LengthUnit& unit) noexcept :
+GridProperties::GridProperties(Type_t type, const PositiveLength& interval, const LengthUnit& unit) noexcept :
     mType(type), mInterval(interval), mUnit(unit)
 {
 }

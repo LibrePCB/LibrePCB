@@ -67,19 +67,19 @@ class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem,
 
 
     private: // Methods
-        void strokeTextLayerNameChanged(const QString& newLayerName) noexcept override;
+        void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
         void strokeTextTextChanged(const QString& newText) noexcept override;
         void strokeTextPositionChanged(const Point& newPos) noexcept override;
         void strokeTextRotationChanged(const Angle& newRot) noexcept override;
-        void strokeTextHeightChanged(const Length& newHeight) noexcept override;
-        void strokeTextStrokeWidthChanged(const Length& newStrokeWidth) noexcept override;
+        void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept override;
+        void strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept override;
         void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
         void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
         void strokeTextAlignChanged(const Alignment& newAlign) noexcept override;
         void strokeTextMirroredChanged(bool mirrored) noexcept override;
         void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override;
         void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override;
-        void updateLayer(const QString& layerName) noexcept;
+        void updateLayer(const GraphicsLayerName& layerName) noexcept;
         void updateTransform() noexcept;
         QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
 

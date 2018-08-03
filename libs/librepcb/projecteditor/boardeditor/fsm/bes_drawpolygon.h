@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/common/graphics/graphicslayername.h>
 #include "bes_base.h"
 
 /*****************************************************************************************
@@ -93,8 +94,8 @@ class BES_DrawPolygon final : public BES_Base
 
         // State
         SubState mSubState;
-        QString mCurrentLayerName;
-        Length mCurrentWidth;
+        GraphicsLayerName mCurrentLayerName;
+        UnsignedLength mCurrentWidth;
         bool mCurrentIsFilled;
         BI_Polygon* mCurrentPolygon;
         CmdPolygonEdit* mCmdEditCurrentPolygon;

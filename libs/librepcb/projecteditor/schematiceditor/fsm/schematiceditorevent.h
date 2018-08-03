@@ -156,13 +156,13 @@ class SEE_StartAddComponent final : public SEE_Base
         ~SEE_StartAddComponent();
 
         // Getters
-        const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
-        const Uuid& getSymbVarUuid() const noexcept {return mSymbVarUuid;}
+        const tl::optional<Uuid>& getComponentUuid() const noexcept {return mComponentUuid;}
+        const tl::optional<Uuid>& getSymbVarUuid() const noexcept {return mSymbVarUuid;}
 
     private:
 
-        Uuid mComponentUuid;
-        Uuid mSymbVarUuid;
+        tl::optional<Uuid> mComponentUuid;
+        tl::optional<Uuid> mSymbVarUuid;
 };
 
 /*****************************************************************************************

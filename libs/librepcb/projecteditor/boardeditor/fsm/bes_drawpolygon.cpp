@@ -97,7 +97,7 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
     if (mEditor.getActiveBoard()) {
         mLayerComboBox->setLayers(mEditor.getActiveBoard()->getLayerStack().getAllowedPolygonLayers());
     }
-    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+    mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
     mEditorUi.commandToolbar->addWidget(mLayerComboBox);
     connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged,
             this, &BES_DrawPolygon::layerComboBoxLayerChanged);
@@ -122,7 +122,7 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept
     mWidthComboBox->addItem("2");
     mWidthComboBox->addItem("2.5");
     mWidthComboBox->addItem("3");
-    mWidthComboBox->setCurrentIndex(mWidthComboBox->findText(QString::number(mCurrentWidth.toMm())));
+    mWidthComboBox->setCurrentIndex(mWidthComboBox->findText(QString::number(mCurrentWidth->toMm())));
     mEditorUi.commandToolbar->addWidget(mWidthComboBox);
     connect(mWidthComboBox, &QComboBox::currentTextChanged,
             this, &BES_DrawPolygon::widthComboBoxTextChanged);
@@ -191,7 +191,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processIdleSceneEvent(BEE_Base* event) noe
     switch (qevent->type()) {
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     start(*board, pos);
@@ -232,7 +232,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processPositioningSceneEvent(BEE_Base* eve
         case QEvent::GraphicsSceneMouseDoubleClick:
         case QEvent::GraphicsSceneMousePress: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             switch (sceneEvent->button()) {
                 case Qt::LeftButton:
                     addSegment(*board, pos);
@@ -248,7 +248,7 @@ BES_Base::ProcRetVal BES_DrawPolygon::processPositioningSceneEvent(BEE_Base* eve
         case QEvent::GraphicsSceneMouseMove: {
             QGraphicsSceneMouseEvent* sceneEvent = dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
             Q_ASSERT(sceneEvent);
-            Point pos = Point::fromPx(sceneEvent->scenePos(), board->getGridProperties().getInterval());
+            Point pos = Point::fromPx(sceneEvent->scenePos()).mappedToGrid(board->getGridProperties().getInterval());
             updateSegmentPosition(pos);
             return ForceStayInState;
         }
@@ -376,7 +376,7 @@ void BES_DrawPolygon::makeSelectedLayerVisible() noexcept
 {
     if (mCurrentPolygon) {
         Board& board = mCurrentPolygon->getBoard();
-        GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
+        GraphicsLayer* layer = board.getLayerStack().getLayer(*mCurrentLayerName);
         if (layer && layer->isEnabled()) layer->setVisible(true);
     }
 }

@@ -73,11 +73,11 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context, const FilePath& f
     mUi->formLayout->setWidget(row, QFormLayout::FieldRole, mCategoriesEditorWidget.data());
 
     mDevice.reset(new Device(fp, false)); // can throw
-    setWindowTitle(mDevice->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mDevice->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mDevice->getFilePath().toQUrl().toString(), mDevice->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mDevice->getFilePath().toNative());
-    mUi->edtName->setText(mDevice->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mDevice->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mDevice->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mDevice->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mDevice->getAuthor());
@@ -126,14 +126,8 @@ DeviceEditorWidget::~DeviceEditorWidget() noexcept
 bool DeviceEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
-        Version version(mUi->edtVersion->text().trimmed());
-        if (!version.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
+        Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mDevice->setName("", name);
         mDevice->setDescription("", mUi->edtDescription->toPlainText().trimmed());
@@ -180,11 +174,11 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept
 {
     ComponentChooserDialog dialog(mContext.workspace, &mContext.layerProvider, this);
     if (dialog.exec() == QDialog::Accepted) {
-        Uuid cmpUuid = dialog.getSelectedComponentUuid();
-        if (cmpUuid != mDevice->getComponentUuid()) {
+        tl::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
+        if (cmpUuid && (*cmpUuid != mDevice->getComponentUuid())) {
             try {
                 // load component
-                FilePath fp = mContext.workspace.getLibraryDb().getLatestComponent(cmpUuid); // can throw
+                FilePath fp = mContext.workspace.getLibraryDb().getLatestComponent(*cmpUuid); // can throw
                 if (!fp.isValid()) {
                     throw RuntimeError(__FILE__, __LINE__, tr("Component not found!"));
                 }
@@ -194,13 +188,14 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept
                 QScopedPointer<UndoCommandGroup> cmdGroup(new UndoCommandGroup(
                                                               tr("Change component")));
                 QScopedPointer<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
-                cmdDevEdit->setComponentUuid(cmpUuid);
+                cmdDevEdit->setComponentUuid(*cmpUuid);
                 cmdGroup->appendChild(cmdDevEdit.take());
                 for (DevicePadSignalMapItem& item : mDevice->getPadSignalMap()) {
-                    if (!component.getSignals().contains(item.getSignalUuid())) {
+                    tl::optional<Uuid> signalUuid = item.getSignalUuid();
+                    if (!signalUuid || !component.getSignals().contains(*signalUuid)) {
                         QScopedPointer<CmdDevicePadSignalMapItemEdit> cmdItem(
                             new CmdDevicePadSignalMapItemEdit(item));
-                        cmdItem->setSignalUuid(Uuid());
+                        cmdItem->setSignalUuid(tl::nullopt);
                         cmdGroup->appendChild(cmdItem.take());
                     }
                 }
@@ -216,11 +211,11 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept
 {
     PackageChooserDialog dialog(mContext.workspace, &mContext.layerProvider, this);
     if (dialog.exec() == QDialog::Accepted) {
-        Uuid pkgUuid = dialog.getSelectedPackageUuid();
-        if (pkgUuid != mDevice->getPackageUuid()) {
+        tl::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
+        if (pkgUuid && (*pkgUuid != mDevice->getPackageUuid())) {
             try {
                 // load package
-                FilePath fp = mContext.workspace.getLibraryDb().getLatestPackage(pkgUuid); // can throw
+                FilePath fp = mContext.workspace.getLibraryDb().getLatestPackage(*pkgUuid); // can throw
                 if (!fp.isValid()) {
                     throw RuntimeError(__FILE__, __LINE__, tr("Package not found!"));
                 }
@@ -231,7 +226,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept
                 QScopedPointer<UndoCommandGroup> cmdGroup(new UndoCommandGroup(
                                                               tr("Change package")));
                 QScopedPointer<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
-                cmdDevEdit->setPackageUuid(dialog.getSelectedPackageUuid());
+                cmdDevEdit->setPackageUuid(*pkgUuid);
                 cmdGroup->appendChild(cmdDevEdit.take());
                 for (const DevicePadSignalMapItem& item : mDevice->getPadSignalMap()) {
                     if (!pads.contains(item.getPadUuid())) {
@@ -242,7 +237,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept
                 foreach (const Uuid& pad, pads - mDevice->getPadSignalMap().getUuidSet()) {
                     cmdGroup->appendChild(new CmdDevicePadSignalMapItemInsert(
                         mDevice->getPadSignalMap(),
-                        std::make_shared<DevicePadSignalMapItem>(pad, Uuid())));
+                        std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt)));
                 }
                 mUndoStack->execCmd(cmdGroup.take());
                 Q_ASSERT(mDevice->getPadSignalMap().getUuidSet() == pads);
@@ -265,7 +260,7 @@ void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept
         }
         mComponent.reset(new Component(fp, true)); // can throw
         mUi->padSignalMapEditorWidget->setSignalList(mComponent->getSignals());
-        mUi->lblComponentName->setText(mComponent->getNames().value(getLibLocaleOrder()));
+        mUi->lblComponentName->setText(*mComponent->getNames().value(getLibLocaleOrder()));
         mUi->lblComponentName->setStyleSheet("");
         updateComponentPreview();
     } catch (const Exception& e) {
@@ -311,7 +306,7 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept
         }
         mPackage.reset(new Package(fp, true)); // can throw
         mUi->padSignalMapEditorWidget->setPadList(mPackage->getPads());
-        mUi->lblPackageName->setText(mPackage->getNames().value(getLibLocaleOrder()));
+        mUi->lblPackageName->setText(*mPackage->getNames().value(getLibLocaleOrder()));
         mUi->lblPackageName->setStyleSheet("");
         updatePackagePreview();
     } catch (const Exception& e) {

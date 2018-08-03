@@ -54,16 +54,16 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
             this, &PackageCategoryEditorWidget::edtParentTextChanged);
 
     mCategory.reset(new PackageCategory(fp, false)); // can throw
-    setWindowTitle(mCategory->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mCategory->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mCategory->getFilePath().toQUrl().toString(), mCategory->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mCategory->getFilePath().toNative());
-    mUi->edtName->setText(mCategory->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mCategory->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mCategory->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mCategory->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mCategory->getAuthor());
     mUi->edtVersion->setText(mCategory->getVersion().toStr());
-    mUi->edtParent->setText(mCategory->getParentUuid().toStr());
+    mUi->edtParent->setText(mCategory->getParentUuid() ? mCategory->getParentUuid()->toStr() : QString());
     mUi->cbxDeprecated->setChecked(mCategory->isDeprecated());
 
     connect(mUi->edtName, &QLineEdit::textChanged, this, &QWidget::setWindowTitle);
@@ -87,17 +87,11 @@ PackageCategoryEditorWidget::~PackageCategoryEditorWidget() noexcept
 bool PackageCategoryEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
-        Version version(mUi->edtVersion->text().trimmed());
-        if (!version.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
+        Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
         QString parentUuidStr = mUi->edtParent->text().trimmed();
-        Uuid parentUuid(parentUuidStr);
-        if (parentUuid.isNull() && !parentUuidStr.isEmpty()) {
+        tl::optional<Uuid> parentUuid = Uuid::tryFromString(parentUuidStr);
+        if (!parentUuid && !parentUuidStr.isEmpty()) {
             throw RuntimeError(__FILE__, __LINE__, tr("The parent UUID is invalid."));
         }
 
@@ -124,7 +118,8 @@ void PackageCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept
 {
     PackageCategoryChooserDialog dialog(mContext.workspace);
     if (dialog.exec()) {
-        mUi->edtParent->setText(dialog.getSelectedCategoryUuid().toStr());
+        tl::optional<Uuid> uuid = dialog.getSelectedCategoryUuid();
+        mUi->edtParent->setText(uuid ? uuid->toStr() : QString());
     }
 }
 
@@ -144,8 +139,8 @@ void PackageCategoryEditorWidget::edtParentTextChanged(const QString& text) noex
     textBuilder.setHighlightLastLine(true);
 
     QString trimmed = text.trimmed();
-    Uuid parentUuid(trimmed);
-    if ((trimmed.length() > 0) && parentUuid.isNull()) {
+    tl::optional<Uuid> parentUuid = Uuid::tryFromString(trimmed);
+    if ((trimmed.length() > 0) && !parentUuid) {
         textBuilder.setErrorText(tr("Invalid UUID!"));
     } else {
         textBuilder.updateText(parentUuid, mUi->edtName->text());

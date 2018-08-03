@@ -26,6 +26,7 @@
 #include <QtCore>
 #include "../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/exceptions.h>
 
 /*****************************************************************************************
@@ -122,7 +123,7 @@ class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
 
     private slots:
 
-        void netSignalNameChanged(const QString& newName) noexcept;
+        void netSignalNameChanged(const CircuitIdentifier& newName) noexcept;
         void updateErcMessages() noexcept;
 
 

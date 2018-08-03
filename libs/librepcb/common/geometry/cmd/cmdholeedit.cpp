@@ -65,7 +65,7 @@ void CmdHoleEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noex
     if (immediate) mHole.setPosition(mNewPosition);
 }
 
-void CmdHoleEdit::setDiameter(const Length& diameter, bool immediate) noexcept
+void CmdHoleEdit::setDiameter(const PositiveLength& diameter, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewDiameter = diameter;

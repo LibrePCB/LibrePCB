@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdpackagepadedit.h"
-#include "../packagepad.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -48,7 +47,7 @@ CmdPackagePadEdit::~CmdPackagePadEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdPackagePadEdit::setName(const QString& name) noexcept
+void CmdPackagePadEdit::setName(const CircuitIdentifier& name) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

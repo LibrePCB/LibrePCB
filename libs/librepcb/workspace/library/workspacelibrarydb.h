@@ -97,14 +97,14 @@ class WorkspaceLibraryDb final : public QObject
         void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
 
         // Getters: Special
-        QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const;
-        QSet<Uuid> getPackageCategoryChilds(const Uuid& parent) const;
+        QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
+        QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
         QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
         QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
-        QSet<Uuid> getSymbolsByCategory(const Uuid& category) const;
-        QSet<Uuid> getPackagesByCategory(const Uuid& category) const;
-        QSet<Uuid> getComponentsByCategory(const Uuid& category) const;
-        QSet<Uuid> getDevicesByCategory(const Uuid& category) const;
+        QSet<Uuid> getSymbolsByCategory(const tl::optional<Uuid>& category) const;
+        QSet<Uuid> getPackagesByCategory(const tl::optional<Uuid>& category) const;
+        QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
+        QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
         QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
         QSet<Uuid> getComponentsBySearchKeyword(const QString& keyword) const;
 
@@ -136,11 +136,11 @@ class WorkspaceLibraryDb final : public QObject
         QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
                                                                const Uuid& uuid) const;
         FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
-        QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const;
-        QList<Uuid> getCategoryParents(const QString& tablename, Uuid category) const;
-        Uuid getCategoryParent(const QString& tablename, const Uuid& category) const;
+        QSet<Uuid> getCategoryChilds(const QString& tablename, const tl::optional<Uuid>& categoryUuid) const;
+        QList<Uuid> getCategoryParents(const QString& tablename, const Uuid& category) const;
+        tl::optional<Uuid> getCategoryParent(const QString& tablename, const Uuid& category) const;
         QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
-                                         const Uuid& categoryUuid) const;
+                                         const tl::optional<Uuid>& categoryUuid) const;
         int getLibraryId(const FilePath& lib) const;
         QList<FilePath> getLibraryElements(const FilePath& lib, const QString& tablename) const;
         void createAllTables();

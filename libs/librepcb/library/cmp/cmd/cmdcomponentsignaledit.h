@@ -51,7 +51,7 @@ class CmdComponentSignalEdit final : public UndoCommand
         ~CmdComponentSignalEdit() noexcept;
 
         // Setters
-        void setName(const QString& name) noexcept;
+        void setName(const CircuitIdentifier& name) noexcept;
         void setRole(const SignalRole& role) noexcept;
         void setForcedNetName(const QString& name) noexcept;
         void setIsRequired(bool required) noexcept;
@@ -77,8 +77,8 @@ class CmdComponentSignalEdit final : public UndoCommand
     private: // Data
         ComponentSignal& mSignal;
 
-        QString mOldName;
-        QString mNewName;
+        CircuitIdentifier mOldName;
+        CircuitIdentifier mNewName;
         SignalRole mOldRole;
         SignalRole mNewRole;
         QString mOldForcedNetName;

@@ -49,10 +49,10 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
             this, &TextPropertiesDialog::on_buttonBox_clicked);
 
     // load text attributes
-    selectLayerNameInCombobox(mText.getLayerName());
+    selectLayerNameInCombobox(*mText.getLayerName());
     mUi->edtText->setPlainText(mText.getText());
     mUi->alignmentSelector->setAlignment(mText.getAlign());
-    mUi->spbHeight->setValue(mText.getHeight().toMm());
+    mUi->spbHeight->setValue(mText.getHeight()->toMm());
     mUi->spbPosX->setValue(mText.getPosition().getX().toMm());
     mUi->spbPosY->setValue(mText.getPosition().getY().toMm());
     mUi->spbRotation->setValue(mText.getRotation().toDeg());
@@ -89,11 +89,11 @@ bool TextPropertiesDialog::applyChanges() noexcept
     try {
         QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(mText));
         if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(mUi->cbxLayer->currentData().toString(), false);
+            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
         }
         cmd->setText(mUi->edtText->toPlainText().trimmed(), false);
         cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-        cmd->setHeight(Length::fromMm(mUi->spbHeight->value()), false);
+        cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())), false); // can throw
         cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
         cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
         mUndoStack.execCmd(cmd.take());

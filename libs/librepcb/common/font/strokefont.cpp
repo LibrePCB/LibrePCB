@@ -72,7 +72,7 @@ Ratio StrokeFont::getLineSpacing() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-QVector<Path> StrokeFont::stroke(const QString& text, const Length& height,
+QVector<Path> StrokeFont::stroke(const QString& text, const PositiveLength& height,
     const Length& letterSpacing, const Length& lineSpacing, const Alignment& align,
     Point& bottomLeft, Point& topRight) const noexcept
 {
@@ -129,7 +129,7 @@ QVector<Path> StrokeFont::stroke(const QString& text, const Length& height,
 }
 
 QVector<QPair<QVector<Path>, Length>> StrokeFont::strokeLines(const QString& text,
-    const Length& height, const Length& letterSpacing, Length& width) const noexcept
+    const PositiveLength& height, const Length& letterSpacing, Length& width) const noexcept
 {
     QVector<QPair<QVector<Path>, Length>> result;
     foreach (const QString& line, text.split('\n')) {
@@ -141,7 +141,7 @@ QVector<QPair<QVector<Path>, Length>> StrokeFont::strokeLines(const QString& tex
     return result;
 }
 
-QVector<Path> StrokeFont::strokeLine(const QString& text, const Length& height,
+QVector<Path> StrokeFont::strokeLine(const QString& text, const PositiveLength& height,
     const Length& letterSpacing, Length& width) const noexcept
 {
     QVector<Path> paths;
@@ -168,7 +168,7 @@ QVector<Path> StrokeFont::strokeLine(const QString& text, const Length& height,
     return paths;
 }
 
-QVector<Path> StrokeFont::strokeGlyph(const QChar& glyph, const Length& height,
+QVector<Path> StrokeFont::strokeGlyph(const QChar& glyph, const PositiveLength& height,
                                       Length& spacing) const noexcept
 {
     try {
@@ -217,7 +217,7 @@ const fb::GlyphListAccessor& StrokeFont::accessor() const noexcept
 }
 
 QVector<Path> StrokeFont::polylines2paths(const QVector<fb::Polyline>& polylines,
-                                          const Length& height) noexcept
+                                          const PositiveLength& height) noexcept
 {
     QVector<Path> paths;
     foreach (const fb::Polyline& p, polylines) {
@@ -227,7 +227,7 @@ QVector<Path> StrokeFont::polylines2paths(const QVector<fb::Polyline>& polylines
     return paths;
 }
 
-Path StrokeFont::polyline2path(const fb::Polyline& p, const Length& height) noexcept
+Path StrokeFont::polyline2path(const fb::Polyline& p, const PositiveLength& height) noexcept
 {
     Path path;
     foreach (const fb::Vertex& v, p) {
@@ -236,15 +236,15 @@ Path StrokeFont::polyline2path(const fb::Polyline& p, const Length& height) noex
     return path;
 }
 
-Vertex StrokeFont::convertVertex(const fb::Vertex& v, const Length& height) noexcept
+Vertex StrokeFont::convertVertex(const fb::Vertex& v, const PositiveLength& height) noexcept
 {
-    return Vertex(Point::fromMm(v.scaledX(height.toMm()), v.scaledY(height.toMm())),
+    return Vertex(Point::fromMm(v.scaledX(height->toMm()), v.scaledY(height->toMm())),
                   Angle::fromDeg(v.scaledBulge(180)));
 }
 
-Length StrokeFont::convertLength(const Length& height, qreal length) const noexcept
+Length StrokeFont::convertLength(const PositiveLength& height, qreal length) const noexcept
 {
-    return Length(height.toNm() * length / 9);
+    return Length(height->toNm() * length / 9);
 }
 
 void StrokeFont::computeBoundingRect(const QVector<Path>& paths,

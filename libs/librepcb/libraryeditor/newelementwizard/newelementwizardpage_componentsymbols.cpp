@@ -77,7 +77,8 @@ void NewElementWizardPage_ComponentSymbols::initializePage() noexcept
     mSymbolVariantList = mContext.mComponentSymbolVariants;
     if (mSymbolVariantList.count() < 1) {
         mSymbolVariantList.append(
-            std::make_shared<ComponentSymbolVariant>(Uuid::createRandom(), "", "default", ""));
+            std::make_shared<ComponentSymbolVariant>(Uuid::createRandom(), "",
+                                                     ElementName("default"), ""));
     }
     mUi->symbolListEditorWidget->setVariant(mContext.getWorkspace(),
         mContext.getLayerProvider(), mSymbolVariantList.value(0)->getSymbolItems());

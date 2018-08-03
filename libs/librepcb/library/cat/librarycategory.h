@@ -51,17 +51,17 @@ class LibraryCategory : public LibraryBaseElement
         LibraryCategory(const LibraryCategory& other) = delete;
         LibraryCategory(const QString& shortElementName, const QString& longElementName,
                         const Uuid& uuid, const Version& version, const QString& author,
-                        const QString& name_en_US, const QString& description_en_US,
+                        const ElementName& name_en_US, const QString& description_en_US,
                         const QString& keywords_en_US );
         LibraryCategory(const FilePath& elementDirectory, const QString& shortElementName,
                         const QString& longElementName, bool readOnly);
         virtual ~LibraryCategory() noexcept;
 
         // Getters: Attributes
-        const Uuid& getParentUuid() const noexcept {return mParentUuid;}
+        const tl::optional<Uuid>& getParentUuid() const noexcept {return mParentUuid;}
 
         // Setters: Attributes
-        void setParentUuid(const Uuid& parentUuid) noexcept {mParentUuid = parentUuid;}
+        void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept {mParentUuid = parentUuid;}
 
         // Operator Overloadings
         LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
@@ -73,10 +73,9 @@ class LibraryCategory : public LibraryBaseElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         virtual void serialize(SExpression& root) const override;
-        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
-        Uuid mParentUuid;
+        tl::optional<Uuid> mParentUuid;
 };
 
 /*****************************************************************************************

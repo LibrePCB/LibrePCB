@@ -36,38 +36,41 @@ namespace library {
  ****************************************************************************************/
 
 Footprint::Footprint(const Footprint& other) noexcept :
+    mUuid(other.mUuid),
+    mNames(other.mNames),
+    mDescriptions(other.mDescriptions),
+    mPads(other.mPads, this),
+    mPolygons(other.mPolygons, this),
+    mCircles(other.mCircles, this),
+    mStrokeTexts(other.mStrokeTexts, this),
+    mHoles(other.mHoles, this),
+    mStrokeFont(nullptr),
+    mRegisteredGraphicsItem(nullptr)
+{
+}
+
+Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
+                     const QString& description_en_US) :
+    mUuid(uuid),
+    mNames(name_en_US),
+    mDescriptions(description_en_US),
     mPads(this), mPolygons(this), mCircles(this), mStrokeTexts(this), mHoles(this),
     mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
 {
-    *this = other;
-}
-
-Footprint::Footprint(const Uuid& uuid, const QString& name_en_US,
-                     const QString& description_en_US) :
-    mUuid(uuid), mPads(this), mPolygons(this), mCircles(this), mStrokeTexts(this), mHoles(this),
-    mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
-{
-    Q_ASSERT(mUuid.isNull() == false);
-    mNames.setDefaultValue(name_en_US);
-    mDescriptions.setDefaultValue(description_en_US);
 }
 
 Footprint::Footprint(const SExpression& node) :
-    mPads(this), mPolygons(this), mCircles(this), mStrokeTexts(this), mHoles(this),
-    mStrokeFont(nullptr), mRegisteredGraphicsItem(nullptr)
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mNames(node),
+    mDescriptions(node),
+    mPads(node, this),
+    mPolygons(node, this),
+    mCircles(node, this),
+    mStrokeTexts(node, this),
+    mHoles(node, this),
+    mStrokeFont(nullptr),
+    mRegisteredGraphicsItem(nullptr)
 {
-    // read attributes
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mNames.loadFromDomElement(node);
-    mDescriptions.loadFromDomElement(node);
-
-    // load all elements
-    mPads.loadFromDomElement(node);
-    mPolygons.loadFromDomElement(node);
-    mCircles.loadFromDomElement(node);
-    mStrokeTexts.loadFromDomElement(node);
-    mHoles.loadFromDomElement(node);
-
     // backward compatibility, remove this some time!
     foreach (const SExpression& child, node.getChildren("text")) {
         mStrokeTexts.append(std::make_shared<StrokeText>(child));

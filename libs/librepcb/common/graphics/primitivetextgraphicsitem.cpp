@@ -71,9 +71,9 @@ void PrimitiveTextGraphicsItem::setText(const QString& text) noexcept
     updateBoundingRectAndShape();
 }
 
-void PrimitiveTextGraphicsItem::setHeight(const Length& height) noexcept
+void PrimitiveTextGraphicsItem::setHeight(const PositiveLength& height) noexcept
 {
-    mFont.setPixelSize(height.toPx());
+    mFont.setPixelSize(height->toPx());
     updateBoundingRectAndShape();
 }
 

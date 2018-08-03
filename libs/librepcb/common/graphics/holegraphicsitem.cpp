@@ -40,7 +40,7 @@ HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& l
     PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
 {
     setPosition(mHole.getPosition());
-    setDiameter(mHole.getDiameter());
+    setDiameter(positiveToUnsigned(mHole.getDiameter()));
     setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setZValue(5);
@@ -48,7 +48,7 @@ HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& l
     // add origin cross
     mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
     mOriginCrossGraphicsItem->setRotation(Angle::deg45());
-    mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
+    mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) + UnsignedLength(500000));
     mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
 
     // register to the text to get attribute updates
@@ -78,10 +78,10 @@ void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept
     setPosition(newPos);
 }
 
-void HoleGraphicsItem::holeDiameterChanged(const Length& newDiameter) noexcept
+void HoleGraphicsItem::holeDiameterChanged(const PositiveLength& newDiameter) noexcept
 {
-    setDiameter(newDiameter);
-    mOriginCrossGraphicsItem->setSize(mHole.getDiameter() + Length(500000));
+    setDiameter(positiveToUnsigned(newDiameter));
+    mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) + UnsignedLength(500000));
 }
 
 QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) noexcept

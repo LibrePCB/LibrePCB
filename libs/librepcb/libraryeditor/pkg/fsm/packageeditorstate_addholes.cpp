@@ -73,7 +73,7 @@ bool PackageEditorState_AddHoles::entry() noexcept
     diameterSpinBox->setMaximum(100);
     diameterSpinBox->setSingleStep(0.2);
     diameterSpinBox->setDecimals(6);
-    diameterSpinBox->setValue(mLastDiameter.toMm());
+    diameterSpinBox->setValue(mLastDiameter->toMm());
     connect(diameterSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &PackageEditorState_AddHoles::diameterSpinBoxValueChanged);
@@ -103,7 +103,7 @@ bool PackageEditorState_AddHoles::exit() noexcept
 bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentHole) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         mEditCmd->setPosition(currentPos, true);
         return true;
     } else {
@@ -113,7 +113,7 @@ bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(QGraphicsSceneM
 
 bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentHole) {
         finishAddHole(currentPos);
     }

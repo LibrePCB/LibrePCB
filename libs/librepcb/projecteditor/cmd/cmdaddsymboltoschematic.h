@@ -46,7 +46,6 @@ namespace project {
 class Schematic;
 class ComponentInstance;
 class SI_Symbol;
-class CmdSymbolInstanceAdd;
 
 namespace editor {
 
@@ -68,7 +67,7 @@ class CmdAddSymbolToSchematic final : public UndoCommandGroup
         ~CmdAddSymbolToSchematic() noexcept;
 
         // Getters
-        SI_Symbol* getSymbolInstance() const noexcept;
+        SI_Symbol* getSymbolInstance() const noexcept {return mSymbolInstance;}
 
 
     private:
@@ -89,8 +88,7 @@ class CmdAddSymbolToSchematic final : public UndoCommandGroup
         Point mPosition;
         Angle mAngle;
 
-        // child commands
-        CmdSymbolInstanceAdd* mCmdAddToSchematic;
+        SI_Symbol* mSymbolInstance; // the created symbol instance
 };
 
 /*****************************************************************************************

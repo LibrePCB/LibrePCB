@@ -35,22 +35,21 @@ namespace library {
  ****************************************************************************************/
 
 Device::Device(const Uuid& uuid, const Version& version, const QString& author,
-               const QString& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US) :
+               const ElementName& name_en_US, const QString& description_en_US,
+               const QString& keywords_en_US, const Uuid& component, const Uuid& package) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US)
+                   name_en_US, description_en_US, keywords_en_US),
+    mComponentUuid(component), mPackageUuid(package), mAttributes(), mPadSignalMap()
 {
 }
 
 Device::Device(const FilePath& elementDirectory, bool readOnly) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
+    mComponentUuid(mLoadingFileDocument.getValueByPath<Uuid>("component")),
+    mPackageUuid(mLoadingFileDocument.getValueByPath<Uuid>("package")),
+    mAttributes(mLoadingFileDocument),
+    mPadSignalMap(mLoadingFileDocument)
 {
-    // load attributes
-    mComponentUuid = mLoadingFileDocument.getValueByPath<Uuid>("component");
-    mPackageUuid = mLoadingFileDocument.getValueByPath<Uuid>("package");
-    mAttributes.loadFromDomElement(mLoadingFileDocument); // can throw
-    mPadSignalMap.loadFromDomElement(mLoadingFileDocument);
-
     cleanupAfterLoadingElementFromFile();
 }
 
@@ -87,14 +86,6 @@ void Device::serialize(SExpression& root) const
     root.appendChild("package", mPackageUuid, true);
     mAttributes.serialize(root);
     mPadSignalMap.sortedByUuid().serialize(root);
-}
-
-bool Device::checkAttributesValidity() const noexcept
-{
-    if (!LibraryElement::checkAttributesValidity())             return false;
-    if (mComponentUuid.isNull())                                return false;
-    if (mPackageUuid.isNull())                                  return false;
-    return true;
 }
 
 /*****************************************************************************************

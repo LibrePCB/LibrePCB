@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <memory>
 #include <QtCore>
+#include <librepcb/common/graphics/graphicslayername.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -70,7 +71,7 @@ class PackageConverter final
 
     private:
         QString createDescription() const noexcept;
-        static QString convertBoardLayer(int eagleLayerId);
+        static GraphicsLayerName convertBoardLayer(int eagleLayerId);
 
         const parseagle::Package& mPackage;
         ConverterDb& mDb;

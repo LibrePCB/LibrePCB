@@ -49,7 +49,7 @@ SymbolEditorState::~SymbolEditorState() noexcept
  *  Protected Methods
  ****************************************************************************************/
 
-const Length& SymbolEditorState::getGridInterval() const noexcept
+const PositiveLength& SymbolEditorState::getGridInterval() const noexcept
 {
     return mContext.graphicsView.getGridProperties().getInterval();
 }

@@ -130,9 +130,10 @@ class Workspace final : public QObject
          * @param local     If true, local libraries are searched
          * @param remote    If true, remote libraries are searched
          *
-         * @return The highest version of the library (invalid if library not installed)
+         * @return The highest version of the library (tl::nullopt if library not installed)
          */
-        Version getVersionOfLibrary(const Uuid& uuid, bool local = true, bool remote = true) const noexcept;
+        tl::optional<Version> getVersionOfLibrary(const Uuid& uuid, bool local = true,
+                                                  bool remote = true) const noexcept;
 
         /**
          * @brief Get all local libraries (located in "workspace/v#/libraries/local")
@@ -254,7 +255,7 @@ class Workspace final : public QObject
          * @param path
          * @return
          */
-        static Version getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept;
+        static tl::optional<Version> getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept;
 
         /**
          * @brief Create a new workspace
@@ -294,7 +295,7 @@ class Workspace final : public QObject
          *
          * @return File format version
          */
-        static Version FILE_FORMAT_VERSION() noexcept {return Version("0.1");}
+        static Version FILE_FORMAT_VERSION() noexcept {return Version::fromString("0.1");}
 
 
     signals:

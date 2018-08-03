@@ -61,13 +61,13 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project& project, BI_Via& via
     mUi->spbxPosY->setValue(mVia.getPosition().getY().toMm());
 
     // size spinbox
-    mUi->spbxSize->setValue(mVia.getSize().toMm());
+    mUi->spbxSize->setValue(mVia.getSize()->toMm());
 
     // drill diameter spinbox
-    mUi->spbxDrillDiameter->setValue(mVia.getDrillDiameter().toMm());
+    mUi->spbxDrillDiameter->setValue(mVia.getDrillDiameter()->toMm());
 
     // netsignal combobox
-    mUi->lblNetSignal->setText(mVia.getNetSignalOfNetSegment().getName());
+    mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept
@@ -113,8 +113,8 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept
         cmd->setShape(static_cast<BI_Via::Shape>(mUi->cbxShape->currentData().toInt()), false);
         cmd->setPosition(Point(Length::fromMm(mUi->spbxPosX->value()),
                                Length::fromMm(mUi->spbxPosY->value())), false);
-        cmd->setSize(Length::fromMm(mUi->spbxSize->value()), false);
-        cmd->setDrillDiameter(Length::fromMm(mUi->spbxDrillDiameter->value()), false);
+        cmd->setSize(PositiveLength(Length::fromMm(mUi->spbxSize->value())), false); // can throw
+        cmd->setDrillDiameter(PositiveLength(Length::fromMm(mUi->spbxDrillDiameter->value())), false); // can throw
         mUndoStack.execCmd(cmd.take());
         return true;
     } catch (const Exception& e) {

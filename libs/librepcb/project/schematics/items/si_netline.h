@@ -56,13 +56,13 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         SI_NetLine(const SI_NetLine& other) = delete;
         SI_NetLine(SI_NetSegment& segment, const SExpression& node);
         SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                   const Length& width);
+                   const UnsignedLength& width);
         ~SI_NetLine() noexcept;
 
         // Getters
         SI_NetSegment& getNetSegment() const noexcept;
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const Length& getWidth() const noexcept {return mWidth;}
+        const UnsignedLength& getWidth() const noexcept {return mWidth;}
         SI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
         SI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
         SI_NetPoint* getOtherPoint(const SI_NetPoint& firstPoint) const noexcept;
@@ -70,7 +70,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         bool isAttachedToSymbol() const noexcept;
 
         // Setters
-        void setWidth(const Length& width) noexcept;
+        void setWidth(const UnsignedLength& width) noexcept;
 
         // General Methods
         void addToSchematic() override;
@@ -106,7 +106,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         Uuid mUuid;
         SI_NetPoint* mStartPoint;
         SI_NetPoint* mEndPoint;
-        Length mWidth;
+        UnsignedLength mWidth;
 };
 
 /*****************************************************************************************

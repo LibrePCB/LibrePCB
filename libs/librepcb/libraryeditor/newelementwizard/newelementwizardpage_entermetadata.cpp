@@ -68,10 +68,10 @@ NewElementWizardPage_EnterMetadata::~NewElementWizardPage_EnterMetadata() noexce
 
 bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept
 {
-    if (mContext.mElementName.trimmed().isEmpty()) return false;
-    if (!mContext.mElementVersion.isValid()) return false;
+    if (!mContext.mElementName) return false;
+    if (!mContext.mElementVersion) return false;
     QString category = mUi->edtCategory->text().trimmed();
-    if (mContext.mElementCategoryUuid.isNull() && !category.isEmpty()) return false;
+    if (!mContext.mElementCategoryUuid && !category.isEmpty()) return false;
     return true;
 }
 
@@ -98,8 +98,12 @@ int NewElementWizardPage_EnterMetadata::nextId() const noexcept
 
 void NewElementWizardPage_EnterMetadata::edtNameTextChanged(const QString& text) noexcept
 {
-    mContext.mElementName = text.trimmed();
-    emit completeChanged();
+    try {
+        mContext.mElementName = ElementName(text.trimmed()); // can throw
+        emit completeChanged();
+    } catch (const Exception& e) {
+        // invalid name
+    }
 }
 
 void NewElementWizardPage_EnterMetadata::edtDescriptionTextChanged() noexcept
@@ -119,20 +123,20 @@ void NewElementWizardPage_EnterMetadata::edtAuthorTextChanged(const QString& tex
 
 void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(const QString& text) noexcept
 {
-    mContext.mElementVersion = Version(text.trimmed());
+    mContext.mElementVersion = Version::tryFromString(text.trimmed());
     emit completeChanged();
 }
 
 void NewElementWizardPage_EnterMetadata::edtCategoryTextChanged(const QString& text) noexcept
 {
-    mContext.mElementCategoryUuid = Uuid(text.trimmed());
+    mContext.mElementCategoryUuid = Uuid::tryFromString(text.trimmed());
     updateCategoryTreeLabel();
     emit completeChanged();
 }
 
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept
 {
-    Uuid categoryUuid;
+    tl::optional<Uuid> categoryUuid;
     switch (mContext.mElementType) {
         case NewElementWizardContext::ElementType::ComponentCategory:
         case NewElementWizardContext::ElementType::Symbol:
@@ -155,7 +159,7 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept
             return;
         }
     }
-    mUi->edtCategory->setText(categoryUuid.toStr());
+    mUi->edtCategory->setText(categoryUuid ? categoryUuid->toStr() : QString());
 }
 
 void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept
@@ -195,12 +199,14 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept
 void NewElementWizardPage_EnterMetadata::initializePage() noexcept
 {
     QWizardPage::initializePage();
-    mUi->edtName->setText(mContext.mElementName);
+    mUi->edtName->setText(mContext.mElementName ? **mContext.mElementName : QString());
     mUi->edtDescription->setPlainText(mContext.mElementDescription);
     mUi->edtKeywords->setText(mContext.mElementKeywords);
     mUi->edtAuthor->setText(mContext.mElementAuthor);
-    mUi->edtVersion->setText(mContext.mElementVersion.toStr());
-    mUi->edtCategory->setText(mContext.mElementCategoryUuid.toStr());
+    mUi->edtVersion->setText(mContext.mElementVersion ?
+                             mContext.mElementVersion->toStr() : QString());
+    mUi->edtCategory->setText(mContext.mElementCategoryUuid ?
+                              mContext.mElementCategoryUuid->toStr() : QString());
     updateCategoryTreeLabel();
 }
 

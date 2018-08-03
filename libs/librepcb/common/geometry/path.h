@@ -90,14 +90,14 @@ class Path final : public SerializableObject
 
         // Static Methods
         static Path line(const Point& p1, const Point& p2, const Angle& angle = Angle::deg0()) noexcept;
-        static Path circle(const Length& diameter) noexcept;
-        static Path obround(const Length& width, const Length& height) noexcept;
-        static Path obround(const Point& p1, const Point& p2, const Length& width) noexcept;
+        static Path circle(const PositiveLength& diameter) noexcept;
+        static Path obround(const PositiveLength& width, const PositiveLength& height) noexcept;
+        static Path obround(const Point& p1, const Point& p2, const PositiveLength& width) noexcept;
         static Path rect(const Point& p1, const Point& p2) noexcept;
-        static Path centeredRect(const Length& width, const Length& height) noexcept;
-        static Path octagon(const Length& width, const Length& height) noexcept;
+        static Path centeredRect(const PositiveLength& width, const PositiveLength& height) noexcept;
+        static Path octagon(const PositiveLength& width, const PositiveLength& height) noexcept;
         static Path flatArc(const Point& p1, const Point& p2, const Angle& angle,
-                            const Length& maxTolerance) noexcept;
+                            const PositiveLength& maxTolerance) noexcept;
         static QPainterPath toQPainterPathPx(const QVector<Path>& paths) noexcept;
 
 

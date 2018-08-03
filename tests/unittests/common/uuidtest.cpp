@@ -52,68 +52,26 @@ class UuidTest : public ::testing::TestWithParam<UuidTestData>
  *  Test Methods
  ****************************************************************************************/
 
-TEST(UuidTest, testDefaultConstructor)
-{
-    Uuid uuid;
-    EXPECT_TRUE(uuid.isNull());
-    EXPECT_TRUE(uuid.toStr().isNull());
-}
-
 TEST_P(UuidTest, testCopyConstructor)
 {
     const UuidTestData& data = GetParam();
 
-    Uuid source(data.uuid);
-    Uuid copy(source);
-    EXPECT_EQ(source.isNull(), copy.isNull());
-    EXPECT_EQ(source.toStr(), copy.toStr());
-}
-
-TEST_P(UuidTest, testStringConstructor)
-{
-    const UuidTestData& data = GetParam();
-
-    Uuid uuid(data.uuid);
-    EXPECT_EQ(data.valid, !uuid.isNull());
     if (data.valid) {
-        EXPECT_EQ(data.uuid.toLower(), uuid.toStr());
-    } else {
-        EXPECT_EQ(QString(), uuid.toStr());
+        Uuid source = Uuid::fromString(data.uuid);
+        Uuid copy(source);
+        EXPECT_TRUE(copy == source);
+        EXPECT_EQ(source.toStr(), copy.toStr());
     }
 }
 
-TEST_P(UuidTest, testIsNullAndToStrAndSetUuid)
+TEST_P(UuidTest, testToStr)
 {
     const UuidTestData& data = GetParam();
 
-    {
-        Uuid uuid;
-        EXPECT_EQ(data.valid, uuid.setUuid(data.uuid));
-        EXPECT_EQ(data.valid, !uuid.isNull());
-        EXPECT_EQ(data.valid, !uuid.toStr().isNull());
-        EXPECT_EQ(uuid.toStr().toLower(), uuid.toStr());
-        if (data.valid) {
-            EXPECT_EQ(36, uuid.toStr().length());
-            EXPECT_EQ(data.uuid.toLower(), uuid.toStr());
-        } else {
-            EXPECT_EQ(0, uuid.toStr().length());
-            EXPECT_EQ(QString(), uuid.toStr());
-        }
-    }
-
-    {
-        Uuid uuid("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-        EXPECT_EQ(data.valid, uuid.setUuid(data.uuid));
-        EXPECT_EQ(data.valid, !uuid.isNull());
-        EXPECT_EQ(data.valid, !uuid.toStr().isNull());
-        EXPECT_EQ(uuid.toStr().toLower(), uuid.toStr());
-        if (data.valid) {
-            EXPECT_EQ(36, uuid.toStr().length());
-            EXPECT_EQ(data.uuid.toLower(), uuid.toStr());
-        } else {
-            EXPECT_EQ(0, uuid.toStr().length());
-            EXPECT_EQ(QString(), uuid.toStr());
-        }
+    if (data.valid) {
+        Uuid uuid = Uuid::fromString(data.uuid);
+        EXPECT_EQ(data.uuid, uuid.toStr());
+        EXPECT_EQ(36, uuid.toStr().length());
     }
 }
 
@@ -121,46 +79,52 @@ TEST_P(UuidTest, testOperatorAssign)
 {
     const UuidTestData& data = GetParam();
 
-    Uuid source(data.uuid);
-    Uuid destination("");
-    destination = source;
-    EXPECT_EQ(source.isNull(), destination.isNull());
-    EXPECT_EQ(source.toStr(), destination.toStr());
+    if (data.valid) {
+        Uuid source = Uuid::fromString(data.uuid);
+        Uuid destination = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
+        EXPECT_NE(source.toStr(), destination.toStr());
+        destination = source;
+        EXPECT_EQ(source.toStr(), destination.toStr());
+    }
 }
 
 TEST_P(UuidTest, testOperatorEquals)
 {
     const UuidTestData& data = GetParam();
 
-    Uuid uuid1(data.uuid);
-    Uuid uuid2("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-    EXPECT_FALSE(uuid2 == uuid1);
-    EXPECT_FALSE(uuid1 == uuid2);
-    uuid2 = uuid1;
-    EXPECT_TRUE(uuid2 == uuid1);
-    EXPECT_TRUE(uuid1 == uuid2);
+    if (data.valid) {
+        Uuid uuid1 = Uuid::fromString(data.uuid);
+        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
+        EXPECT_FALSE(uuid2 == uuid1);
+        EXPECT_FALSE(uuid1 == uuid2);
+        uuid2 = uuid1;
+        EXPECT_TRUE(uuid2 == uuid1);
+        EXPECT_TRUE(uuid1 == uuid2);
+    }
 }
 
 TEST_P(UuidTest, testOperatorNotEquals)
 {
     const UuidTestData& data = GetParam();
 
-    Uuid uuid1(data.uuid);
-    Uuid uuid2("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-    EXPECT_TRUE(uuid2 != uuid1);
-    EXPECT_TRUE(uuid1 != uuid2);
-    uuid2 = uuid1;
-    EXPECT_FALSE(uuid2 != uuid1);
-    EXPECT_FALSE(uuid1 != uuid2);
+    if (data.valid) {
+        Uuid uuid1 = Uuid::fromString(data.uuid);
+        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
+        EXPECT_TRUE(uuid2 != uuid1);
+        EXPECT_TRUE(uuid1 != uuid2);
+        uuid2 = uuid1;
+        EXPECT_FALSE(uuid2 != uuid1);
+        EXPECT_FALSE(uuid1 != uuid2);
+    }
 }
 
 TEST_P(UuidTest, testOperatorComparisons)
 {
     const UuidTestData& data = GetParam();
 
-    Uuid uuid1(data.uuid);
-    Uuid uuid2("74CA6127-E785-4355-8580-1CED4F0A0E9E"); // valid UUID
     if (data.valid) {
+        Uuid uuid1 = Uuid::fromString(data.uuid);
+        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
         if (uuid1.toStr() == uuid2.toStr()) {
             EXPECT_FALSE((uuid2 < uuid1) || (uuid2 > uuid1));
             EXPECT_FALSE((uuid1 < uuid2) || (uuid1 > uuid2));
@@ -180,16 +144,6 @@ TEST_P(UuidTest, testOperatorComparisons)
         EXPECT_EQ(uuid1.toStr() <= uuid2.toStr(), uuid1 <= uuid2);
         EXPECT_EQ(uuid2.toStr() >= uuid1.toStr(), uuid2 >= uuid1);
         EXPECT_EQ(uuid1.toStr() >= uuid2.toStr(), uuid1 >= uuid2);
-    } else {
-        // uuid1 is invalid and thus considered as "smaller" than uuid2
-        EXPECT_FALSE(uuid2 < uuid1);
-        EXPECT_TRUE(uuid1 < uuid2);
-        EXPECT_TRUE(uuid2 > uuid1);
-        EXPECT_FALSE(uuid1 > uuid2);
-        EXPECT_FALSE(uuid2 <= uuid1);
-        EXPECT_TRUE(uuid1 <= uuid2);
-        EXPECT_TRUE(uuid2 >= uuid1);
-        EXPECT_FALSE(uuid1 >= uuid2);
     }
 }
 
@@ -197,11 +151,74 @@ TEST(UuidTest, testCreateRandom)
 {
     for (int i = 0; i < 1000; i++) {
         Uuid uuid = Uuid::createRandom();
-        EXPECT_FALSE(uuid.isNull());
         EXPECT_FALSE(uuid.toStr().isEmpty());
         EXPECT_EQ(QUuid::DCE, QUuid(uuid.toStr()).variant());
         EXPECT_EQ(QUuid::Random, QUuid(uuid.toStr()).version());
     }
+}
+
+TEST_P(UuidTest, testIsValid)
+{
+    const UuidTestData& data = GetParam();
+    EXPECT_EQ(data.valid, Uuid::isValid(data.uuid));
+}
+
+TEST_P(UuidTest, testFromString)
+{
+    const UuidTestData& data = GetParam();
+    if (data.valid) {
+        EXPECT_EQ(data.uuid, Uuid::fromString(data.uuid).toStr());
+    } else {
+        EXPECT_THROW(Uuid::fromString(data.uuid), Exception);
+    }
+}
+
+TEST_P(UuidTest, testTryFromString)
+{
+    const UuidTestData& data = GetParam();
+    tl::optional<Uuid> uuid = Uuid::tryFromString(data.uuid);
+    if (data.valid) {
+        EXPECT_TRUE(uuid);
+        EXPECT_EQ(data.uuid, uuid->toStr());
+    } else {
+        EXPECT_FALSE(uuid);
+        EXPECT_EQ(tl::nullopt, uuid);
+    }
+}
+
+TEST_P(UuidTest, testSerializeToSExpression)
+{
+    const UuidTestData& data = GetParam();
+    if (data.valid) {
+        Uuid uuid = Uuid::fromString(data.uuid);
+        EXPECT_EQ(data.uuid, serializeToSExpression(uuid).getStringOrToken());
+        EXPECT_EQ(data.uuid, serializeToSExpression(tl::make_optional(uuid)).getStringOrToken());
+    }
+}
+
+TEST_P(UuidTest, testDeserializeFromSExpression)
+{
+    const UuidTestData& data = GetParam();
+    SExpression sexpr = SExpression::createToken(data.uuid);
+    if (data.valid) {
+        EXPECT_EQ(data.uuid, deserializeFromSExpression<Uuid>(sexpr, false).toStr());
+        EXPECT_EQ(data.uuid, deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false)->toStr());
+    } else {
+        EXPECT_THROW(deserializeFromSExpression<Uuid>(sexpr, false), Exception);
+        EXPECT_THROW(deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false), Exception);
+    }
+}
+
+TEST(UuidTest, testSerializeOptionalToSExpression)
+{
+    tl::optional<Uuid> uuid = tl::nullopt;
+    EXPECT_EQ("none", serializeToSExpression(uuid).getStringOrToken());
+}
+
+TEST(UuidTest, testDeserializeOptionalFromSExpression)
+{
+    SExpression sexpr = SExpression::createToken("none");
+    EXPECT_EQ(tl::nullopt, deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false));
 }
 
 /*****************************************************************************************
@@ -222,10 +239,10 @@ INSTANTIATE_TEST_CASE_P(UuidTest, UuidTest, ::testing::Values(
     UuidTestData({true , "91172d44-bdcc-41b2-8e07-4f8cf44eb108"  }),
     UuidTestData({true , "ecb3a5fe-1cbc-4a1b-bf8f-5d6e26deaee1"  }),
     UuidTestData({true , "908f9c33-40be-46aa-97b4-be2cd7477881"  }),
-    UuidTestData({true , "74CA6127-E785-4355-8580-1CED4F0A0E9E"  }),
-    UuidTestData({true , "568EB40D-CD69-47A5-8932-4F5CC4B2D3FA"  }),
-    UuidTestData({true , "29401DCB-6CB6-47A1-8F7D-72DD7F9F4939"  }),
-    UuidTestData({true , "E367D539-3163-4530-AB47-3B4CB2DF2A40"  }),
+    UuidTestData({true , "74ca6127-e785-4355-8580-1ced4f0a0e9e"  }),
+    UuidTestData({true , "568eb40d-cd69-47a5-8932-4f5cc4b2d3fa"  }),
+    UuidTestData({true , "29401dcb-6cb6-47a1-8f7d-72dd7f9f4939"  }),
+    UuidTestData({true , "e367d539-3163-4530-ab47-3b4cb2df2a40"  }),
     UuidTestData({true , "00000000-0000-4001-8000-000000000000"  }),
     // DCE Version 1 (time based)
     UuidTestData({false, "15edb784-76df-11e6-8b77-86f30ca893d3"  }),
@@ -246,6 +263,10 @@ INSTANTIATE_TEST_CASE_P(UuidTest, UuidTest, ::testing::Values(
     UuidTestData({false, ""                                      }),    // empty
     UuidTestData({false, "                                    "  }),    // empty
     UuidTestData({false, QString()}),                                   // null
+    UuidTestData({false, "74CA6127-E785-4355-8580-1CED4F0A0E9E"  }),    // uppercase
+    UuidTestData({false, "568EB40D-CD69-47A5-8932-4F5CC4B2D3FA"  }),    // uppercase
+    UuidTestData({false, "29401DCB-6CB6-47A1-8F7D-72DD7F9F4939"  }),    // uppercase
+    UuidTestData({false, "E367D539-3163-4530-AB47-3B4CB2DF2A40"  }),    // uppercase
     UuidTestData({false, "C56A4180-65AA-42EC-A945-5FD21DEC"      }),    // too short
     UuidTestData({false, "bdf7bea5-b88e-41b2-be85-c1604e8ddfca " }),    // too long
     UuidTestData({false, " bdf7bea5-b88e-41b2-be85-c1604e8ddfca" }),    // too long

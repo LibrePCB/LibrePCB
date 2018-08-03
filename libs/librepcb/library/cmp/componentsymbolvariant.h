@@ -63,7 +63,7 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
         ComponentSymbolVariant() = delete;
         ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept;
         ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
-                               const QString& name_en_US, const QString& desc_en_US) noexcept;
+                               const ElementName& name_en_US, const QString& desc_en_US) noexcept;
         explicit ComponentSymbolVariant(const SExpression& node);
         ~ComponentSymbolVariant() noexcept;
 
@@ -75,7 +75,7 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
 
         // Setters
         void setNorm(const QString& norm) noexcept;
-        void setName(const QString& locale, const QString& name) noexcept;
+        void setName(const QString& locale, const ElementName& name) noexcept;
         void setDescription(const QString& locale, const QString& desc) noexcept;
         void setNames(const LocalizedNameMap& names) noexcept;
         void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
@@ -105,7 +105,6 @@ class ComponentSymbolVariant final : public QObject, public SerializableObject,
                              const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
         void listObjectRemoved(const ComponentSymbolVariantItemList& list, int oldIndex,
                                const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
-        bool checkAttributesValidity() const noexcept;
 
 
     private: // Data

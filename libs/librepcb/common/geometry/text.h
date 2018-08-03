@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
 #include "../alignment.h"
 
@@ -49,11 +50,11 @@ namespace librepcb {
 class IF_TextObserver
 {
     public:
-        virtual void textLayerNameChanged(const QString& newLayerName) noexcept = 0;
+        virtual void textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept = 0;
         virtual void textTextChanged(const QString& newText) noexcept = 0;
         virtual void textPositionChanged(const Point& newPos) noexcept = 0;
         virtual void textRotationChanged(const Angle& newRot) noexcept = 0;
-        virtual void textHeightChanged(const Length& newHeight) noexcept = 0;
+        virtual void textHeightChanged(const PositiveLength& newHeight) noexcept = 0;
         virtual void textAlignChanged(const Alignment& newAlign) noexcept = 0;
 
     protected:
@@ -80,27 +81,27 @@ class Text final : public SerializableObject
         Text() = delete;
         Text(const Text& other) noexcept;
         Text(const Uuid& uuid, const Text& other) noexcept;
-        Text(const Uuid& uuid, const QString& layerName, const QString& text,
-             const Point& pos, const Angle& rotation, const Length& height,
+        Text(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
+             const Point& pos, const Angle& rotation, const PositiveLength& height,
              const Alignment& align) noexcept;
         explicit Text(const SExpression& node);
         ~Text() noexcept;
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getLayerName() const noexcept {return mLayerName;}
+        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
         const Point& getPosition() const noexcept {return mPosition;}
         const Angle& getRotation() const noexcept {return mRotation;}
-        const Length& getHeight() const noexcept {return mHeight;}
+        const PositiveLength& getHeight() const noexcept {return mHeight;}
         const Alignment& getAlign() const noexcept {return mAlign;}
         const QString& getText() const noexcept {return mText;}
 
         // Setters
-        void setLayerName(const QString& name) noexcept;
+        void setLayerName(const GraphicsLayerName& name) noexcept;
         void setText(const QString& text) noexcept;
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rotation) noexcept;
-        void setHeight(const Length& height) noexcept;
+        void setHeight(const PositiveLength& height) noexcept;
         void setAlign(const Alignment& align) noexcept;
 
         // General Methods
@@ -116,17 +117,13 @@ class Text final : public SerializableObject
         Text& operator=(const Text& rhs) noexcept;
 
 
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
     private: // Data
         Uuid mUuid;
-        QString mLayerName;
+        GraphicsLayerName mLayerName;
         QString mText;
         Point mPosition;
         Angle mRotation;
-        Length mHeight;
+        PositiveLength mHeight;
         Alignment mAlign;
 
         // Misc

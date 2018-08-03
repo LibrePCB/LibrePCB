@@ -35,9 +35,21 @@ namespace librepcb {
  ****************************************************************************************/
 
 StrokeText::StrokeText(const StrokeText& other) noexcept :
-    mAttributeProvider(nullptr), mFont(nullptr)
+    mUuid(other.mUuid),
+    mLayerName(other.mLayerName),
+    mText(other.mText),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mHeight(other.mHeight),
+    mStrokeWidth(other.mStrokeWidth),
+    mLetterSpacing(other.mLetterSpacing),
+    mLineSpacing(other.mLineSpacing),
+    mAlign(other.mAlign),
+    mMirrored(other.mMirrored),
+    mAutoRotate(other.mAutoRotate),
+    mAttributeProvider(nullptr),
+    mFont(nullptr)
 {
-    *this = other; // use assignment operator
 }
 
 StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept :
@@ -46,9 +58,9 @@ StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept :
     mUuid = uuid;
 }
 
-StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString& text,
-        const Point& pos, const Angle& rotation, const Length& height,
-        const Length& strokeWidth, const StrokeTextSpacing& letterSpacing,
+StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
+        const Point& pos, const Angle& rotation, const PositiveLength& height,
+        const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
         const StrokeTextSpacing& lineSpacing, const Alignment& align, bool mirrored,
         bool autoRotate) noexcept :
     mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
@@ -59,67 +71,54 @@ StrokeText::StrokeText(const Uuid& uuid, const QString& layerName, const QString
 }
 
 StrokeText::StrokeText(const SExpression& node) :
-    mAttributeProvider(nullptr), mFont(nullptr)
+    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mText(),
+    mPosition(node.getChildByPath("pos")),
+    mRotation(node.getValueByPath<Angle>("rot")),
+    mHeight(node.getValueByPath<PositiveLength>("height")),
+    mStrokeWidth(200000), // backward compatibility, remove this some time!
+    mLetterSpacing(), // backward compatibility, remove this some time!
+    mLineSpacing(), // backward compatibility, remove this some time!
+    mAlign(node.getChildByPath("align")),
+    mMirrored(false), // backward compatibility, remove this some time!
+    mAutoRotate(true), // backward compatibility, remove this some time!
+    mAttributeProvider(nullptr),
+    mFont(nullptr)
 {
-    if (!Uuid(node.getChildByIndex(0).getValue<QString>()).isNull()) {
+    if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
-        mText = node.getValueByPath<QString>("value", true);
+        mText = node.getValueByPath<QString>("value");
     } else {
         // backward compatibility, remove this some time!
-        mUuid = Uuid::createRandom();
-        mText = node.getChildByIndex(0).getValue<QString>(true);
+        mText = node.getChildByIndex(0).getValue<QString>();
     }
-    mLayerName = node.getValueByPath<QString>("layer", true);
 
     // load geometry attributes
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
-    mHeight = node.getValueByPath<Length>("height");
-    if (!(mHeight > 0)) {
-        throw RuntimeError(__FILE__, __LINE__, tr("The height of a text element is <= 0."));
-    }
     if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
-        mStrokeWidth = child->getValueOfFirstChild<Length>();
-    } else {
-        // backward compatibility, remove this some time!
-        mStrokeWidth = Length(200000);
+        mStrokeWidth = child->getValueOfFirstChild<UnsignedLength>();
     }
     if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
         mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-    } else {
-        // backward compatibility, remove this some time!
-        mLetterSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("line_spacing")) {
         mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-    } else {
-        // backward compatibility, remove this some time!
-        mLineSpacing = StrokeTextSpacing();
     }
     if (const SExpression* child = node.tryGetChildByPath("mirror")) {
         mMirrored = child->getValueOfFirstChild<bool>();
-    } else {
-        // backward compatibility, remove this some time!
-        mMirrored = false;
     }
     if (const SExpression* child = node.tryGetChildByPath("auto_rotate")) {
         mAutoRotate = child->getValueOfFirstChild<bool>();
-    } else {
-        // backward compatibility, remove this some time!
-        mAutoRotate = true;
     }
-    mAlign = Alignment(node.getChildByPath("align"));
 
     // backward compatibility, remove this some time!
     if ((node.getName() == "text") && ((mText == "#NAME") || (mText == "#VALUE"))) {
-        mHeight = Length(1000000);
+        mHeight = PositiveLength(1000000);
     }
 
     // backward compatibility - remove this some time!
     mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
     mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 StrokeText::~StrokeText() noexcept
@@ -146,11 +145,11 @@ Length StrokeText::calcLetterSpacing() const noexcept
     if (mLetterSpacing.isAuto() && mFont) {
         // Use recommended letter spacing of font, but add stroke width to avoid
         // overlapped glyphs caused by thick lines.
-        return Length(mHeight.toNm() * mFont->getLetterSpacing().toNormalized()) + mStrokeWidth;
+        return Length(mHeight->toNm() * mFont->getLetterSpacing().toNormalized()) + mStrokeWidth;
     } else {
         // Use given letter spacing without additional factor or stroke width offset. Also
         // don't use recommended letter spacing of font.
-        return Length(mHeight.toNm() * mLetterSpacing.getRatio().toNormalized());
+        return Length(mHeight->toNm() * mLetterSpacing.getRatio().toNormalized());
     }
 }
 
@@ -159,11 +158,11 @@ Length StrokeText::calcLineSpacing() const noexcept
     if (mLineSpacing.isAuto() && mFont) {
         // Use recommended line spacing of font, but add stroke width to avoid
         // overlapped glyphs caused by thick lines.
-        return Length(mHeight.toNm() * mFont->getLineSpacing().toNormalized()) + mStrokeWidth;
+        return Length(mHeight->toNm() * mFont->getLineSpacing().toNormalized()) + mStrokeWidth;
     } else {
         // Use given line spacing without additional factor or stroke width offset. Also
         // don't use recommended line spacing of font.
-        return Length(mHeight.toNm() * mLineSpacing.getRatio().toNormalized());
+        return Length(mHeight->toNm() * mLineSpacing.getRatio().toNormalized());
     }
 }
 
@@ -171,7 +170,7 @@ Length StrokeText::calcLineSpacing() const noexcept
  *  Setters
  ****************************************************************************************/
 
-void StrokeText::setLayerName(const QString& name) noexcept
+void StrokeText::setLayerName(const GraphicsLayerName& name) noexcept
 {
     if (name == mLayerName) return;
     mLayerName = name;
@@ -214,7 +213,7 @@ void StrokeText::setRotation(const Angle& rotation) noexcept
     }
 }
 
-void StrokeText::setHeight(const Length& height) noexcept
+void StrokeText::setHeight(const PositiveLength& height) noexcept
 {
     if (height == mHeight) return;
     mHeight = height;
@@ -224,7 +223,7 @@ void StrokeText::setHeight(const Length& height) noexcept
     updatePaths(); // because height has changed
 }
 
-void StrokeText::setStrokeWidth(const Length& strokeWidth) noexcept
+void StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept
 {
     if (strokeWidth == mStrokeWidth) return;
     mStrokeWidth = strokeWidth;
@@ -352,10 +351,8 @@ void StrokeText::unregisterObserver(IF_StrokeTextObserver& object) const noexcep
 
 void StrokeText::serialize(SExpression& root) const
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
     root.appendChild(mUuid);
-    root.appendChild("layer", SExpression::createToken(mLayerName), false);
+    root.appendChild("layer", mLayerName, false);
     root.appendChild("height", mHeight, true);
     root.appendChild("stroke_width", mStrokeWidth, false);
     root.appendChild("letter_spacing", mLetterSpacing, false);
@@ -404,19 +401,6 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept
     mMirrored = rhs.mMirrored;
     mAutoRotate = rhs.mAutoRotate;
     return *this;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool StrokeText::checkAttributesValidity() const noexcept
-{
-    if (mUuid.isNull())         return false;
-    if (mText.isEmpty())        return false;
-    if (mHeight <= 0)           return false;
-    if (mStrokeWidth < 0)       return false;
-    return true;
 }
 
 /*****************************************************************************************

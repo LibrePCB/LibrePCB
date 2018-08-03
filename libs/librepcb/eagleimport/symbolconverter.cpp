@@ -53,14 +53,15 @@ SymbolConverter::~SymbolConverter() noexcept
 std::unique_ptr<library::Symbol> SymbolConverter::generate() const
 {
     std::unique_ptr<library::Symbol> symbol(
-        new library::Symbol(mDb.getSymbolUuid(mSymbol.getName()), Version("0.1"),
-                            "LibrePCB", mSymbol.getName(), createDescription(), ""));
+        new library::Symbol(mDb.getSymbolUuid(mSymbol.getName()), Version::fromString("0.1"),
+                            "LibrePCB", ElementName(mSymbol.getName()),
+                            createDescription(), "")); // can throw
 
     foreach (const parseagle::Wire& wire, mSymbol.getWires()) {
-        QString layerName = convertSchematicLayer(wire.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(wire.getLayer());
         bool fill = false;
         bool isGrabArea = true;
-        Length lineWidth = Length::fromMm(wire.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(wire.getWidth())); // can throw
         Point startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
         Point endpos = Point::fromMm(wire.getP2().x, wire.getP2().y);
         Angle angle = Angle::fromDeg(wire.getCurve());
@@ -69,10 +70,10 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Rectangle& rect, mSymbol.getRectangles()) {
-        QString layerName = convertSchematicLayer(rect.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(rect.getLayer());
         bool fill = true;
         bool isGrabArea = true;
-        Length lineWidth = 0;
+        UnsignedLength lineWidth(0);
         Point p1 = Point::fromMm(rect.getP1().x, rect.getP1().y);
         Point p2 = Point::fromMm(rect.getP2().x, rect.getP2().y);
         symbol->getPolygons().append(std::make_shared<Polygon>(Uuid::createRandom(),
@@ -80,21 +81,21 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Circle& circle, mSymbol.getCircles()) {
-        QString layerName = convertSchematicLayer(circle.getLayer());
-        Length radius = Length::fromMm(circle.getRadius());
+        GraphicsLayerName layerName = convertSchematicLayer(circle.getLayer());
+        PositiveLength diameter(Length::fromMm(circle.getRadius()) * 2); // can throw
         Point center = Point::fromMm(circle.getPosition().x, circle.getPosition().y);
-        Length lineWidth = Length::fromMm(circle.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(circle.getWidth())); // can throw
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
         symbol->getCircles().append(std::make_shared<Circle>(Uuid::createRandom(),
-            layerName, lineWidth, fill, isGrabArea, center, radius * 2));
+            layerName, lineWidth, fill, isGrabArea, center, diameter));
     }
 
     foreach (const parseagle::Polygon& polygon, mSymbol.getPolygons()) {
-        QString layerName = convertSchematicLayer(polygon.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(polygon.getLayer());
         bool fill = false;
         bool isGrabArea = true;
-        Length lineWidth = Length::fromMm(polygon.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(polygon.getWidth())); // can throw
         Path path;
         for (int i = 0; i < polygon.getVertices().count(); ++i) {
             const parseagle::Vertex vertex = polygon.getVertices().at(i);
@@ -108,12 +109,12 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
     }
 
     foreach (const parseagle::Text& text, mSymbol.getTexts()) {
-        QString layerName = convertSchematicLayer(text.getLayer());
+        GraphicsLayerName layerName = convertSchematicLayer(text.getLayer());
         QString textStr = text.getValue();
         if (textStr.startsWith(">")) {
             textStr = "{{" + textStr.mid(1) + "}}";
         }
-        Length height = Length::fromMm(text.getSize()) * 2;
+        PositiveLength height(Length::fromMm(text.getSize()) * 2); // can throw
         if (textStr == "{{NAME}}") {
             height = Length::fromMm(3.175);
         } else if (textStr == "{{VALUE}}") {
@@ -128,10 +129,11 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const
 
     foreach (const parseagle::Pin& pin, mSymbol.getPins()) {
         Uuid pinUuid = mDb.getSymbolPinUuid(symbol->getUuid(), pin.getName());
+        CircuitIdentifier pinName(pin.getName()); // can throw
         Point pos = Point::fromMm(pin.getPosition().x, pin.getPosition().y);
-        Length len = Length::fromMm(pin.getLengthInMillimeters());
+        UnsignedLength len(Length::fromMm(pin.getLengthInMillimeters())); // can throw
         Angle rot = Angle::fromDeg(pin.getRotation().getAngle());
-        symbol->getPins().append(std::make_shared<library::SymbolPin>(pinUuid, pin.getName(),
+        symbol->getPins().append(std::make_shared<library::SymbolPin>(pinUuid, pinName,
                                                                       pos, len, rot));
     }
 
@@ -152,14 +154,14 @@ QString SymbolConverter::createDescription() const noexcept
     return desc.trimmed();
 }
 
-QString SymbolConverter::convertSchematicLayer(int eagleLayerId)
+GraphicsLayerName SymbolConverter::convertSchematicLayer(int eagleLayerId)
 {
     switch (eagleLayerId) {
-        case 93: return GraphicsLayer::sSymbolPinNames;
-        case 94: return GraphicsLayer::sSymbolOutlines;
-        case 95: return GraphicsLayer::sSymbolNames;
-        case 96: return GraphicsLayer::sSymbolValues;
-        case 99: return GraphicsLayer::sSchematicReferences; // ???
+        case 93: return GraphicsLayerName(GraphicsLayer::sSymbolPinNames);
+        case 94: return GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+        case 95: return GraphicsLayerName(GraphicsLayer::sSymbolNames);
+        case 96: return GraphicsLayerName(GraphicsLayer::sSymbolValues);
+        case 99: return GraphicsLayerName(GraphicsLayer::sSchematicReferences); // ???
         default: throw Exception(__FILE__, __LINE__, QString("Invalid schematic layer: %1").arg(eagleLayerId));
     }
 }

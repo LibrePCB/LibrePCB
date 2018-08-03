@@ -80,7 +80,7 @@ void CmdBoardPlaneEdit::setOutline(const Path& outline, bool immediate) noexcept
     if (immediate) mPlane.setOutline(mNewOutline);
 }
 
-void CmdBoardPlaneEdit::setLayerName(const QString& layerName, bool immediate) noexcept
+void CmdBoardPlaneEdit::setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = layerName;
@@ -93,13 +93,13 @@ void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept
     mNewNetSignal = &netsignal;
 }
 
-void CmdBoardPlaneEdit::setMinWidth(const Length& minWidth) noexcept
+void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewMinWidth = minWidth;
 }
 
-void CmdBoardPlaneEdit::setMinClearance(const Length& minClearance) noexcept
+void CmdBoardPlaneEdit::setMinClearance(const UnsignedLength& minClearance) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewMinClearance = minClearance;

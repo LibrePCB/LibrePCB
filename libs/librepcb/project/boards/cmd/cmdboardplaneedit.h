@@ -55,10 +55,10 @@ class CmdBoardPlaneEdit final : public UndoCommand
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
         void setOutline(const Path& outline, bool immediate) noexcept;
-        void setLayerName(const QString& layerName, bool immediate) noexcept;
+        void setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept;
         void setNetSignal(NetSignal& netsignal) noexcept;
-        void setMinWidth(const Length& minWidth) noexcept;
-        void setMinClearance(const Length& minClearance) noexcept;
+        void setMinWidth(const UnsignedLength& minWidth) noexcept;
+        void setMinClearance(const UnsignedLength& minClearance) noexcept;
         void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
         void setPriority(int priority) noexcept;
         void setKeepOrphans(bool keepOrphans) noexcept;
@@ -87,14 +87,14 @@ class CmdBoardPlaneEdit final : public UndoCommand
         // General Attributes
         Path mOldOutline;
         Path mNewOutline;
-        QString mOldLayerName;
-        QString mNewLayerName;
+        GraphicsLayerName mOldLayerName;
+        GraphicsLayerName mNewLayerName;
         NetSignal* mOldNetSignal;
         NetSignal* mNewNetSignal;
-        Length mOldMinWidth;
-        Length mNewMinWidth;
-        Length mOldMinClearance;
-        Length mNewMinClearance;
+        UnsignedLength mOldMinWidth;
+        UnsignedLength mNewMinWidth;
+        UnsignedLength mOldMinClearance;
+        UnsignedLength mNewMinClearance;
         BI_Plane::ConnectStyle mOldConnectStyle;
         BI_Plane::ConnectStyle mNewConnectStyle;
         int mOldPriority;

@@ -71,7 +71,7 @@ bool SymbolEditorState_DrawCircle::entry() noexcept
     mContext.commandToolBar.addLabel(tr("Layer:"));
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(new GraphicsLayerComboBox());
     layerComboBox->setLayers(mContext.layerProvider.getSchematicGeometryElementLayers());
-    layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->setCurrentLayer(*mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &SymbolEditorState_DrawCircle::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -82,7 +82,7 @@ bool SymbolEditorState_DrawCircle::entry() noexcept
     lineWidthSpinBox->setMaximum(100);
     lineWidthSpinBox->setSingleStep(0.1);
     lineWidthSpinBox->setDecimals(6);
-    lineWidthSpinBox->setValue(mLastLineWidth.toMm());
+    lineWidthSpinBox->setValue(mLastLineWidth->toMm());
     connect(lineWidthSpinBox.get(),
             static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &SymbolEditorState_DrawCircle::lineWidthSpinBoxValueChanged);
@@ -123,7 +123,7 @@ bool SymbolEditorState_DrawCircle::exit() noexcept
 bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
     if (mCurrentCircle) {
-        Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+        Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
         return updateCircleDiameter(currentPos);
     } else {
         return true;
@@ -132,7 +132,7 @@ bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(QGraphicsScene
 
 bool SymbolEditorState_DrawCircle::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    Point currentPos = Point::fromPx(e.scenePos(), getGridInterval());
+    Point currentPos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
     if (mCurrentCircle) {
         return finishAddCircle(currentPos);
     } else {
@@ -158,7 +158,7 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept
     try {
         mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
         mCurrentCircle = new Circle(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
-                                    mLastFill, mLastGrabArea, pos, Length(0));
+                                    mLastFill, mLastGrabArea, pos, PositiveLength(1));
         mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
             mContext.symbol.getCircles(), std::shared_ptr<Circle>(mCurrentCircle)));
         mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
@@ -178,7 +178,9 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept
 bool SymbolEditorState_DrawCircle::updateCircleDiameter(const Point& pos) noexcept
 {
     Point delta = pos - mCurrentCircle->getCenter();
-    mEditCmd->setDiameter(delta.getLength() * 2, true);
+    Length diameter = delta.getLength() * 2;
+    if (diameter < 1) {diameter = 1;} // diameter must be greater than zero!
+    mEditCmd->setDiameter(PositiveLength(diameter), true);
     return true;
 }
 

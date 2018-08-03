@@ -57,7 +57,7 @@ class LineGraphicsItem final : public QGraphicsItem, public IF_GraphicsLayerObse
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
         void setLine(const Point& p1, const Point& p2) noexcept;
-        void setLineWidth(const Length& width) noexcept;
+        void setLineWidth(const UnsignedLength& width) noexcept;
         void setLayer(const GraphicsLayer* layer) noexcept;
 
         // Inherited from IF_LayerObserver

@@ -54,17 +54,19 @@ PackageConverter::~PackageConverter() noexcept
 std::unique_ptr<library::Package> PackageConverter::generate() const
 {
     std::shared_ptr<library::Footprint> footprint(
-        new library::Footprint(mDb.getFootprintUuid(mPackage.getName()), "default", ""));
+        new library::Footprint(mDb.getFootprintUuid(mPackage.getName()),
+                               ElementName("default"), "")); // can throw
 
     std::unique_ptr<library::Package> package(
-        new library::Package(mDb.getPackageUuid(mPackage.getName()), Version("0.1"),
-                             "LibrePCB", mPackage.getName(), createDescription(), ""));
+        new library::Package(mDb.getPackageUuid(mPackage.getName()), Version::fromString("0.1"),
+                             "LibrePCB", ElementName(mPackage.getName()),
+                             createDescription(), "")); // can throw
 
     foreach (const parseagle::Wire& wire, mPackage.getWires()) {
-        QString layerName = convertBoardLayer(wire.getLayer());
+        GraphicsLayerName layerName = convertBoardLayer(wire.getLayer());
         bool fill = false;
         bool isGrabArea = true;
-        Length lineWidth = Length::fromMm(wire.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(wire.getWidth())); // can throw
         Point startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
         Point endpos = Point::fromMm(wire.getP2().x, wire.getP2().y);
         Angle angle = Angle::fromDeg(wire.getCurve());
@@ -73,10 +75,10 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
     }
 
     foreach (const parseagle::Rectangle& rect, mPackage.getRectangles()) {
-        QString layerName = convertBoardLayer(rect.getLayer());
+        GraphicsLayerName layerName = convertBoardLayer(rect.getLayer());
         bool fill = true;
         bool isGrabArea = true;
-        Length lineWidth = 0;
+        UnsignedLength lineWidth(0);
         Point p1 = Point::fromMm(rect.getP1().x, rect.getP1().y);
         Point p2 = Point::fromMm(rect.getP2().x, rect.getP2().y);
         footprint->getPolygons().append(std::make_shared<Polygon>(Uuid::createRandom(),
@@ -84,21 +86,21 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
     }
 
     foreach (const parseagle::Circle& circle, mPackage.getCircles()) {
-        QString layerName = convertBoardLayer(circle.getLayer());
-        Length radius = Length::fromMm(circle.getRadius());
+        GraphicsLayerName layerName = convertBoardLayer(circle.getLayer());
+        PositiveLength diameter(Length::fromMm(circle.getRadius()) * 2); // can throw
         Point center = Point::fromMm(circle.getPosition().x, circle.getPosition().y);
-        Length lineWidth = Length::fromMm(circle.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(circle.getWidth())); // can throw
         bool fill = (lineWidth == 0);
         bool isGrabArea = true;
         footprint->getCircles().append(std::make_shared<Circle>(Uuid::createRandom(),
-            layerName, lineWidth, fill, isGrabArea, center, radius * 2));
+            layerName, lineWidth, fill, isGrabArea, center, diameter));
     }
 
     foreach (const parseagle::Polygon& polygon, mPackage.getPolygons()) {
-        QString layerName = convertBoardLayer(polygon.getLayer());
+        GraphicsLayerName layerName = convertBoardLayer(polygon.getLayer());
         bool fill = false;
         bool isGrabArea = true;
-        Length lineWidth = Length::fromMm(polygon.getWidth());
+        UnsignedLength lineWidth(Length::fromMm(polygon.getWidth())); // can throw
         Path path;
         for (int i = 0; i < polygon.getVertices().count(); ++i) {
             const parseagle::Vertex vertex = polygon.getVertices().at(i);
@@ -112,36 +114,37 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
     }
 
     foreach (const parseagle::Text& text, mPackage.getTexts()) {
-        QString layerName = convertBoardLayer(text.getLayer());
+        GraphicsLayerName layerName = convertBoardLayer(text.getLayer());
         QString textStr = text.getValue();
         if (textStr.startsWith(">")) {
             textStr = "{{" + textStr.mid(1) + "}}";
         }
-        Length height = Length::fromMm(text.getSize());
+        PositiveLength height(Length::fromMm(text.getSize())); // can throw
         Point pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
         Angle rot = Angle::fromDeg(text.getRotation().getAngle());
         Alignment align(HAlign::left(), VAlign::bottom());
         footprint->getStrokeTexts().append(std::make_shared<StrokeText>(
             Uuid::createRandom(), layerName, textStr, pos, rot, height,
-            Length(200000), StrokeTextSpacing(), StrokeTextSpacing(), align, false, true));
+            UnsignedLength(200000), StrokeTextSpacing(), StrokeTextSpacing(), align,
+            false, true));
     }
 
     foreach (const parseagle::Hole& hole, mPackage.getHoles()) {
         Point pos = Point::fromMm(hole.getPosition().x, hole.getPosition().y);
-        Length diameter = Length::fromMm(hole.getDiameter());
+        PositiveLength diameter(Length::fromMm(hole.getDiameter())); // can throw
         footprint->getHoles().append(std::make_shared<Hole>(Uuid::createRandom(), pos, diameter));
     }
 
     foreach (const parseagle::ThtPad& pad, mPackage.getThtPads()) {
         Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
-        QString name = pad.getName();
+        CircuitIdentifier name(pad.getName()); // can throw
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
         Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
-        Length drillDiameter = Length::fromMm(pad.getDrillDiameter());
-        Length outerDiameter = Length::fromMm(pad.getOuterDiameter());
-        Length padDiameter = (outerDiameter > 0) ? outerDiameter : drillDiameter * 2;
-        Length width = padDiameter;
-        Length height = padDiameter;
+        UnsignedLength drillDiameter(Length::fromMm(pad.getDrillDiameter())); // can throw
+        UnsignedLength outerDiameter(Length::fromMm(pad.getOuterDiameter())); // can throw
+        Length padDiameter = (outerDiameter > 0) ? *outerDiameter : (drillDiameter * 2);
+        PositiveLength width(padDiameter); // can throw
+        PositiveLength height(padDiameter); // can throw
         library::FootprintPad::Shape shape;
         switch (pad.getShape()) {
             case parseagle::ThtPad::Shape::Square:
@@ -155,7 +158,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
                 break;
             case parseagle::ThtPad::Shape::Long:
                 shape = library::FootprintPad::Shape::ROUND;
-                width = padDiameter * 2;
+                width = PositiveLength(padDiameter * 2); // can throw
                 break;
             default:
                 throw Exception(__FILE__, __LINE__, "Unknown shape");
@@ -168,23 +171,23 @@ std::unique_ptr<library::Package> PackageConverter::generate() const
 
     foreach (const parseagle::SmtPad& pad, mPackage.getSmtPads()) {
         Uuid uuid = mDb.getPackagePadUuid(footprint->getUuid(), pad.getName());
-        QString name = pad.getName();
+        CircuitIdentifier name(pad.getName()); // can throw
         package->getPads().append(std::make_shared<library::PackagePad>(uuid, name));
-        QString layerName = convertBoardLayer(pad.getLayer());
+        GraphicsLayerName layerName = convertBoardLayer(pad.getLayer());
         library::FootprintPad::BoardSide side;
         if (layerName == GraphicsLayer::sTopCopper) {
             side = library::FootprintPad::BoardSide::TOP;
         } else if (layerName == GraphicsLayer::sBotCopper) {
             side = library::FootprintPad::BoardSide::BOTTOM;
         } else {
-            throw Exception(__FILE__, __LINE__, QString("Invalid pad layer: %1").arg(layerName));
+            throw Exception(__FILE__, __LINE__, QString("Invalid pad layer: %1").arg(*layerName));
         }
         Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
         Angle rot = Angle::fromDeg(pad.getRotation().getAngle());
-        Length width = Length::fromMm(pad.getWidth());
-        Length height = Length::fromMm(pad.getHeight());
+        PositiveLength width(Length::fromMm(pad.getWidth())); // can throw
+        PositiveLength height(Length::fromMm(pad.getHeight())); // can throw
         std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(uuid, pos,
-            rot, library::FootprintPad::Shape::RECT, width, height, Length(0), side));
+            rot, library::FootprintPad::Shape::RECT, width, height, UnsignedLength(0), side));
         footprint->getPads().append(fptPad);
     }
 
@@ -207,29 +210,29 @@ QString PackageConverter::createDescription() const noexcept
     return desc.trimmed();
 }
 
-QString PackageConverter::convertBoardLayer(int eagleLayerId)
+GraphicsLayerName PackageConverter::convertBoardLayer(int eagleLayerId)
 {
     switch (eagleLayerId)
     {
-        case 1:  return GraphicsLayer::sTopCopper;
-        case 16: return GraphicsLayer::sBotCopper;
-        case 20: return GraphicsLayer::sBoardOutlines;
-        case 21: return GraphicsLayer::sTopPlacement;
-        case 22: return GraphicsLayer::sBotPlacement;
-        case 25: return GraphicsLayer::sTopNames;
-        case 27: return GraphicsLayer::sTopValues;
-        case 29: return GraphicsLayer::sTopStopMask;
-        case 31: return GraphicsLayer::sTopSolderPaste;
-        case 35: return GraphicsLayer::sTopGlue;
-        case 39: return GraphicsLayer::sTopCourtyard;
-        //case 41: return Layer::sTopCopperRestrict;
-        //case 42: return Layer::sBotCopperRestrict;
-        //case 43: return Layer::sViaRestrict;
-        case 46: return GraphicsLayer::sBoardMillingPth;
-        case 48: return GraphicsLayer::sBoardDocumentation;
-        case 49: return GraphicsLayer::sBoardDocumentation; // reference
-        case 51: return GraphicsLayer::sTopDocumentation;
-        case 52: return GraphicsLayer::sBotDocumentation;
+        case 1:  return GraphicsLayerName(GraphicsLayer::sTopCopper);
+        case 16: return GraphicsLayerName(GraphicsLayer::sBotCopper);
+        case 20: return GraphicsLayerName(GraphicsLayer::sBoardOutlines);
+        case 21: return GraphicsLayerName(GraphicsLayer::sTopPlacement);
+        case 22: return GraphicsLayerName(GraphicsLayer::sBotPlacement);
+        case 25: return GraphicsLayerName(GraphicsLayer::sTopNames);
+        case 27: return GraphicsLayerName(GraphicsLayer::sTopValues);
+        case 29: return GraphicsLayerName(GraphicsLayer::sTopStopMask);
+        case 31: return GraphicsLayerName(GraphicsLayer::sTopSolderPaste);
+        case 35: return GraphicsLayerName(GraphicsLayer::sTopGlue);
+        case 39: return GraphicsLayerName(GraphicsLayer::sTopCourtyard);
+        //case 41: return GraphicsLayerName(GraphicsLayer::sTopCopperRestrict);
+        //case 42: return GraphicsLayerName(GraphicsLayer::sBotCopperRestrict);
+        //case 43: return GraphicsLayerName(GraphicsLayer::sViaRestrict);
+        case 46: return GraphicsLayerName(GraphicsLayer::sBoardMillingPth);
+        case 48: return GraphicsLayerName(GraphicsLayer::sBoardDocumentation);
+        case 49: return GraphicsLayerName(GraphicsLayer::sBoardDocumentation); // reference
+        case 51: return GraphicsLayerName(GraphicsLayer::sTopDocumentation);
+        case 52: return GraphicsLayerName(GraphicsLayer::sBotDocumentation);
         default: throw Exception(__FILE__, __LINE__, QString("Invalid board layer: %1").arg(eagleLayerId));
     }
 }

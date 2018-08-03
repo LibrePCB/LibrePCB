@@ -36,7 +36,7 @@ namespace library {
  ****************************************************************************************/
 
 Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
-               const QString& name_en_US, const QString& description_en_US,
+               const ElementName& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
                    name_en_US, description_en_US, keywords_en_US),
@@ -159,25 +159,6 @@ void Symbol::serialize(SExpression& root) const
     mPolygons.serialize(root);
     mCircles.serialize(root);
     mTexts.serialize(root);
-}
-
-bool Symbol::checkAttributesValidity() const noexcept
-{
-    // symbol pin uuids and names must be unique
-    QList<Uuid> uuids;
-    QList<QString> names;
-    for (const SymbolPin& pin : mPins) {
-        Uuid uuid = pin.getUuid();
-        QString name = pin.getName();
-        if (uuid.isNull() || uuids.contains(uuid) || names.contains(name)) {
-            return false;
-        } else {
-            uuids.append(uuid);
-            names.append(name);
-        }
-    }
-
-    return true;
 }
 
 /*****************************************************************************************

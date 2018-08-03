@@ -52,7 +52,7 @@ CmdComponentSignalEdit::~CmdComponentSignalEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdComponentSignalEdit::setName(const QString& name) noexcept
+void CmdComponentSignalEdit::setName(const CircuitIdentifier& name) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewName = name;

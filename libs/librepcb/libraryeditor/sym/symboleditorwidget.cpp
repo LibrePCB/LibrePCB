@@ -70,11 +70,11 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context, const FilePath& f
 
     // load symbol
     mSymbol.reset(new Symbol(fp, false)); // can throw
-    setWindowTitle(mSymbol->getNames().value(getLibLocaleOrder()));
+    setWindowTitle(*mSymbol->getNames().value(getLibLocaleOrder()));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
         mSymbol->getFilePath().toQUrl().toString(), mSymbol->getUuid().toStr()));
     mUi->lblUuid->setToolTip(mSymbol->getFilePath().toNative());
-    mUi->edtName->setText(mSymbol->getNames().value(getLibLocaleOrder()));
+    mUi->edtName->setText(*mSymbol->getNames().value(getLibLocaleOrder()));
     mUi->edtDescription->setPlainText(mSymbol->getDescriptions().value(getLibLocaleOrder()));
     mUi->edtKeywords->setText(mSymbol->getKeywords().value(getLibLocaleOrder()));
     mUi->edtAuthor->setText(mSymbol->getAuthor());
@@ -154,14 +154,8 @@ void SymbolEditorWidget::setToolsActionGroup(ExclusiveActionGroup* group) noexce
 bool SymbolEditorWidget::save() noexcept
 {
     try {
-        QString name = mUi->edtName->text().trimmed();
-        if (name.isEmpty()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The name must not be empty."));
-        }
-        Version version(mUi->edtVersion->text().trimmed());
-        if (!version.isValid()) {
-            throw RuntimeError(__FILE__, __LINE__, tr("The version number is invalid."));
-        }
+        ElementName name(mUi->edtName->text().trimmed()); // can throw
+        Version version = Version::fromString(mUi->edtVersion->text().trimmed()); // can throw
 
         mSymbol->setName("", name);
         mSymbol->setDescription("", mUi->edtDescription->toPlainText().trimmed());

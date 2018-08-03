@@ -60,7 +60,7 @@ CmdStrokeTextEdit::~CmdStrokeTextEdit() noexcept
  *  Setters
  ****************************************************************************************/
 
-void CmdStrokeTextEdit::setLayerName(const QString& name, bool immediate) noexcept
+void CmdStrokeTextEdit::setLayerName(const GraphicsLayerName& name, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewLayerName = name;
@@ -74,14 +74,14 @@ void CmdStrokeTextEdit::setText(const QString& text, bool immediate) noexcept
     if (immediate) mText.setText(mNewText);
 }
 
-void CmdStrokeTextEdit::setHeight(const Length& height, bool immediate) noexcept
+void CmdStrokeTextEdit::setHeight(const PositiveLength& height, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewHeight = height;
     if (immediate) mText.setHeight(mNewHeight);
 }
 
-void CmdStrokeTextEdit::setStrokeWidth(const Length& strokeWidth, bool immediate) noexcept
+void CmdStrokeTextEdit::setStrokeWidth(const UnsignedLength& strokeWidth, bool immediate) noexcept
 {
     Q_ASSERT(!wasEverExecuted());
     mNewStrokeWidth = strokeWidth;
@@ -157,7 +157,7 @@ void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept
 
 void CmdStrokeTextEdit::mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept
 {
-    setLayerName(GraphicsLayer::getMirroredLayerName(mNewLayerName), immediate);
+    setLayerName(GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)), immediate);
     setMirrored(!mNewMirrored, immediate);
     setPosition(mNewPosition.mirrored(orientation, center), immediate);
 }

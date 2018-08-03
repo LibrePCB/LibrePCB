@@ -75,7 +75,8 @@ class Toolbox final
         }
 
         static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen,
-                                          const QBrush& brush, const Length& minWidth = Length(0)) noexcept;
+                                          const QBrush& brush,
+                                          const UnsignedLength& minWidth = UnsignedLength(0)) noexcept;
 
         static Length arcRadius(const Point& p1, const Point& p2, const Angle& a) noexcept;
         static Point arcCenter(const Point& p1, const Point& p2, const Angle& a) noexcept;

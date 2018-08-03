@@ -38,7 +38,8 @@ namespace library {
 LibraryElement::LibraryElement(const QString& shortElementName,
                                const QString& longElementName, const Uuid& uuid,
                                const Version& version, const QString& author,
-                               const QString& name_en_US, const QString& description_en_US,
+                               const ElementName& name_en_US,
+                               const QString& description_en_US,
                                const QString& keywords_en_US) :
     LibraryBaseElement(true, shortElementName, longElementName, uuid, version, author,
                        name_en_US, description_en_US, keywords_en_US)
@@ -69,15 +70,6 @@ void LibraryElement::serialize(SExpression& root) const
     foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
         root.appendChild("category", uuid, true);
     }
-}
-
-bool LibraryElement::checkAttributesValidity() const noexcept
-{
-    if (!LibraryBaseElement::checkAttributesValidity()) return false;
-    foreach (const Uuid& uuid, mCategories) {
-        if (uuid.isNull()) return false;
-    }
-    return true;
 }
 
 /*****************************************************************************************

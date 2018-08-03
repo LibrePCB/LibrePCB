@@ -23,6 +23,13 @@ CXXFLAGS="-Werror"
 if [ "$CC" = "clang" ]; then CFLAGS+=" -Qunused-arguments"; fi
 if [ "$CXX" = "clang++" ]; then CXXFLAGS+=" -Qunused-arguments"; fi
 
+# use libc++ for clang on Linux (see https://stackoverflow.com/questions/24692538/)
+if [ "${TRAVIS_OS_NAME-}" = "linux" -a "$CC" = "clang" ]; then
+  CFLAGS+=" -stdlib=libc++"
+  CXXFLAGS+=" -stdlib=libc++"
+  BUILDSPEC="-spec linux-clang-libc++"
+fi
+
 # download translation files from Transifex (only if API token is available)
 if [ -n "${TX_TOKEN-}" ]; then tx pull --source --all --no-interactive; fi
 
@@ -31,7 +38,7 @@ lupdate -silent -no-obsolete -source-language en -target-language en ./librepcb.
 
 # build librepcb
 mkdir build && pushd build
-qmake ../librepcb.pro -r "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" "QMAKE_CFLAGS=$CFLAGS" "QMAKE_CXXFLAGS=$CXXFLAGS" "PREFIX=`pwd`/install/opt"
+qmake ../librepcb.pro -r ${BUILDSPEC-} "QMAKE_CXX=$CXX" "QMAKE_CC=$CC" "QMAKE_CFLAGS=$CFLAGS" "QMAKE_CXXFLAGS=$CXXFLAGS" "PREFIX=`pwd`/install/opt"
 $MAKE -j8
 $MAKE install
 popd

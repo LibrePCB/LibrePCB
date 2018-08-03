@@ -29,6 +29,7 @@
 #include "../libraryelement.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
+#include "componentprefix.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,11 +41,12 @@ namespace library {
  *  Class NormDependentPrefixMap
  ****************************************************************************************/
 
-struct NormDependentPrefixMapConstants {
+struct NormDependentPrefixMapPolicy {
+    typedef ComponentPrefix ValueType;
     static constexpr const char* tagname = "prefix";
     static constexpr const char* keyname = "norm";
 };
-using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapConstants>;
+using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapPolicy>;
 
 /*****************************************************************************************
  *  Class Component
@@ -75,7 +77,7 @@ class Component final : public LibraryElement
         Component() = delete;
         Component(const Component& other) = delete;
         Component(const Uuid& uuid, const Version& version, const QString& author,
-                  const QString& name_en_US, const QString& description_en_US,
+                  const ElementName& name_en_US, const QString& description_en_US,
                   const QString& keywords_en_US);
         Component(const FilePath& elementDirectory, bool readOnly);
         ~Component() noexcept;
@@ -126,7 +128,6 @@ class Component final : public LibraryElement
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-        bool checkAttributesValidity() const noexcept override;
 
 
     private: // Data
