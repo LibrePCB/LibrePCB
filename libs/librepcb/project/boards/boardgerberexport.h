@@ -70,6 +70,7 @@ class BoardGerberExport final : public QObject, public AttributeProvider
 
         // Getters
         FilePath getOutputDirectory() const noexcept;
+        const QVector<FilePath>& getWrittenFiles() const noexcept {return mWrittenFiles;}
 
         // General Methods
         void exportAllLayers() const;
@@ -130,6 +131,7 @@ class BoardGerberExport final : public QObject, public AttributeProvider
         const Project& mProject;
         const Board& mBoard;
         mutable int mCurrentInnerCopperLayer;
+        mutable QVector<FilePath> mWrittenFiles;
 };
 
 /*****************************************************************************************

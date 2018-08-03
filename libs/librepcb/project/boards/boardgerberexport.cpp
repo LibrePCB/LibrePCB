@@ -81,6 +81,8 @@ FilePath BoardGerberExport::getOutputDirectory() const noexcept
 
 void BoardGerberExport::exportAllLayers() const
 {
+    mWrittenFiles.clear();
+
     if (mBoard.getFabricationOutputSettings().getMergeDrillFiles()) {
         exportDrills();
     } else {
@@ -128,15 +130,18 @@ QVector<const AttributeProvider*> BoardGerberExport::getAttributeProviderParents
 
 void BoardGerberExport::exportDrills() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrills());
     ExcellonGenerator gen;
     drawPthDrills(gen);
     drawNpthDrills(gen);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrills()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportDrillsNpth() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrillsNpth());
     ExcellonGenerator gen;
     int count = drawNpthDrills(gen);
     if (count > 0) {
@@ -144,80 +149,96 @@ void BoardGerberExport::exportDrillsNpth() const
         // As many boards don't have non-plated holes anyway, we create this file only if
         // it's really needed. Maybe this avoids unnecessary issues with manufacturers...
         gen.generate();
-        gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrillsNpth()));
+        gen.saveToFile(fp);
+        mWrittenFiles.append(fp);
     }
 }
 
 void BoardGerberExport::exportDrillsPth() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
     ExcellonGenerator gen;
     drawPthDrills(gen);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixDrillsPth()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerBoardOutlines() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixOutlines());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBoardOutlines);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixOutlines()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerTopCopper() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperTop());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopCopper);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperTop()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerBottomCopper() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperBot());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotCopper);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperBot()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerInnerCopper() const
 {
     for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
         mCurrentInnerCopperLayer = i; // used for attribute provider
+        FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperInner());
         GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                             mBoard.getUuid(), mProject.getMetadata().getVersion());
         drawLayer(gen, GraphicsLayer::getInnerLayerName(i));
         gen.generate();
-        gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixCopperInner()));
+        gen.saveToFile(fp);
+        mWrittenFiles.append(fp);
     }
     mCurrentInnerCopperLayer = 0;
 }
 
 void BoardGerberExport::exportLayerTopSolderMask() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderMaskTop());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopStopMask);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderMaskTop()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerBottomSolderMask() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderMaskBot());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotStopMask);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderMaskBot()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerTopSilkscreen() const
 {
     QStringList layers = mBoard.getFabricationOutputSettings().getSilkscreenLayersTop();
     if (layers.count() > 0) { // don't create silkscreen file if no layers selected
+        FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSilkscreenTop());
         GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                             mBoard.getUuid(), mProject.getMetadata().getVersion());
         foreach (const QString& layer, layers) {
@@ -226,7 +247,8 @@ void BoardGerberExport::exportLayerTopSilkscreen() const
         gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
         drawLayer(gen, GraphicsLayer::sTopStopMask);
         gen.generate();
-        gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSilkscreenTop()));
+        gen.saveToFile(fp);
+        mWrittenFiles.append(fp);
     }
 }
 
@@ -234,6 +256,7 @@ void BoardGerberExport::exportLayerBottomSilkscreen() const
 {
     QStringList layers = mBoard.getFabricationOutputSettings().getSilkscreenLayersBot();
     if (layers.count() > 0) { // don't create silkscreen file if no layers selected
+        FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSilkscreenBot());
         GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                             mBoard.getUuid(), mProject.getMetadata().getVersion());
         foreach (const QString& layer, layers) {
@@ -242,26 +265,31 @@ void BoardGerberExport::exportLayerBottomSilkscreen() const
         gen.setLayerPolarity(GerberGenerator::LayerPolarity::Negative);
         drawLayer(gen, GraphicsLayer::sBotStopMask);
         gen.generate();
-        gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSilkscreenBot()));
+        gen.saveToFile(fp);
+        mWrittenFiles.append(fp);
     }
 }
 
 void BoardGerberExport::exportLayerTopSolderPaste() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderPasteTop());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sTopSolderPaste);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderPasteTop()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerBottomSolderPaste() const
 {
+    FilePath fp = getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderPasteBot());
     GerberGenerator gen(mProject.getMetadata().getName() % " - " % mBoard.getName(),
                         mBoard.getUuid(), mProject.getMetadata().getVersion());
     drawLayer(gen, GraphicsLayer::sBotSolderPaste);
     gen.generate();
-    gen.saveToFile(getOutputFilePath(mBoard.getFabricationOutputSettings().getSuffixSolderPasteBot()));
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
 }
 
 int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const
