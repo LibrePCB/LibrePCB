@@ -111,7 +111,7 @@ void ProjectLibraryUpdater::btnUpdateClicked()
             // check whether project can still be opened of if we broke something
             try {
                 log(QString(tr("Open project %1...")).arg(prettyPath(mProjectFilePath)));
-                project::Project prj(mProjectFilePath, false);
+                project::Project prj(mProjectFilePath, false, false);
                 log(QString(tr("Save project %1...")).arg(prettyPath(mProjectFilePath)));
                 prj.save(true); // force updating library elements file format
             } catch (const Exception& e) {

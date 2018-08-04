@@ -59,7 +59,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments)
 
     // open project from test data directory
     FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");
-    QScopedPointer<Project> project(new Project(projectFp, true));
+    QScopedPointer<Project> project(new Project(projectFp, true, false));
 
     // force planes rebuild
     Board* board = project->getBoards().first();

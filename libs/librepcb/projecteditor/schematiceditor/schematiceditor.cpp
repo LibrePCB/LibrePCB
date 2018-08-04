@@ -323,6 +323,7 @@ void SchematicEditor::on_actionPDF_Export_triggered()
         if (!filename.endsWith(".pdf")) filename.append(".pdf");
         FilePath filepath(filename);
         mProject.exportSchematicsAsPdf(filepath); // this method can throw an exception
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
     }
     catch (Exception& e)
     {

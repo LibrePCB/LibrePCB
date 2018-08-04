@@ -51,7 +51,7 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-Project::Project(const FilePath& filepath, bool create, bool readOnly) :
+Project::Project(const FilePath& filepath, bool create, bool readOnly, bool interactive) :
     QObject(nullptr), AttributeProvider(), mPath(filepath.getParentDir()),
     mFilepath(filepath), mLock(filepath.getParentDir()), mIsRestored(false),
     mIsReadOnly(readOnly)
@@ -104,38 +104,45 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly) :
         }
         case DirectoryLock::LockStatus::Locked: {
             if (!mIsReadOnly) {
-                // the project is locked by another application instance! open read only?
-                QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
-                    tr("The project is already opened by another application instance or user. "
-                    "Do you want to open the project in read-only mode?"), QMessageBox::Yes |
-                    QMessageBox::Cancel, QMessageBox::Cancel);
-                switch (btn)
-                {
-                    case QMessageBox::Yes: // open the project in read-only mode
-                        mIsReadOnly = true;
-                        break;
-                    default: // abort opening the project
-                        throw UserCanceled(__FILE__, __LINE__);
+                if (interactive) {
+                    // the project is locked by another application instance! open read only?
+                    QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Open Read-Only?"),
+                        tr("The project is already opened by another application instance or user. "
+                        "Do you want to open the project in read-only mode?"), QMessageBox::Yes |
+                        QMessageBox::Cancel, QMessageBox::Cancel);
+                    switch (btn)
+                    {
+                        case QMessageBox::Yes: // open the project in read-only mode
+                            mIsReadOnly = true;
+                            break;
+                        default: // abort opening the project
+                            throw UserCanceled(__FILE__, __LINE__);
+                    }
+                } else {
+                    throw RuntimeError(__FILE__, __LINE__,
+                        tr("The project is locked by another process."));
                 }
             }
             break;
         }
         case DirectoryLock::LockStatus::StaleLock: {
-            // the application crashed while this project was open! ask the user what to do
-            QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Restore Project?"),
-                tr("It seems that the application was crashed while this project was open. "
-                "Do you want to restore the last automatic backup?"), QMessageBox::Yes |
-                QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
-            switch (btn)
-            {
-                case QMessageBox::Yes: // open the project and restore the last backup
-                    mIsRestored = true;
-                    break;
-                case QMessageBox::No: // open the project without restoring the last backup
-                    mIsRestored = false;
-                    break;
-                default: // abort opening the project
-                    throw UserCanceled(__FILE__, __LINE__);
+            if (interactive) {
+                // the application crashed while this project was open! ask the user what to do
+                QMessageBox::StandardButton btn = QMessageBox::question(0, tr("Restore Project?"),
+                    tr("It seems that the application was crashed while this project was open. "
+                    "Do you want to restore the last automatic backup?"), QMessageBox::Yes |
+                    QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
+                switch (btn)
+                {
+                    case QMessageBox::Yes: // open the project and restore the last backup
+                        mIsRestored = true;
+                        break;
+                    case QMessageBox::No: // open the project without restoring the last backup
+                        mIsRestored = false;
+                        break;
+                    default: // abort opening the project
+                        throw UserCanceled(__FILE__, __LINE__);
+                }
             }
             break;
         }
@@ -356,7 +363,7 @@ Schematic* Project::getSchematicByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-Schematic* Project::getSchematicByName(const ElementName& name) const noexcept
+Schematic* Project::getSchematicByName(const QString& name) const noexcept
 {
     foreach (Schematic* schematic, mSchematics) {
         if (schematic->getName() == name)
@@ -390,7 +397,7 @@ void Project::addSchematic(Schematic& schematic, int newIndex)
             QString(tr("There is already a schematic with the UUID \"%1\"!"))
             .arg(schematic.getUuid().toStr()));
     }
-    if (getSchematicByName(schematic.getName())) {
+    if (getSchematicByName(*schematic.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a schematic with the name \"%1\"!"))
             .arg(*schematic.getName()));
@@ -440,6 +447,9 @@ void Project::removeSchematic(Schematic& schematic, bool deleteSchematic)
 
 void Project::exportSchematicsAsPdf(const FilePath& filepath)
 {
+    // Create output directory first because QPrinter silently fails if it doesn't exist.
+    FileUtils::makePath(filepath.getParentDir()); // can throw
+
     QPrinter printer(QPrinter::HighResolution);
     printer.setPaperSize(QPrinter::A4);
     printer.setOrientation(QPrinter::Landscape);
@@ -452,8 +462,6 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath)
         pages.append(i);
 
     printSchematicPages(printer, pages);
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
 }
 
 /*****************************************************************************************
@@ -474,7 +482,7 @@ Board* Project::getBoardByUuid(const Uuid& uuid) const noexcept
     return nullptr;
 }
 
-Board* Project::getBoardByName(const ElementName& name) const noexcept
+Board* Project::getBoardByName(const QString& name) const noexcept
 {
     foreach (Board* board, mBoards) {
         if (board->getName() == name)
@@ -523,7 +531,7 @@ void Project::addBoard(Board& board, int newIndex)
             QString(tr("There is already a board with the UUID \"%1\"!"))
             .arg(board.getUuid().toStr()));
     }
-    if (getBoardByName(board.getName())) {
+    if (getBoardByName(*board.getName())) {
         throw RuntimeError(__FILE__, __LINE__,
             QString(tr("There is already a board with the name \"%1\"!"))
             .arg(*board.getName()));

@@ -92,7 +92,7 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_TRUE(mProjectDir.getPathTo("circuit/erc.lp").isExistingFile());
 
     // open project again
-    project.reset(new Project(mProjectFile, false));
+    project.reset(new Project(mProjectFile, false, false));
     EXPECT_EQ(mProjectFile, project->getFilepath());
     EXPECT_EQ(mProjectDir, project->getPath());
     EXPECT_FALSE(project->isReadOnly());
@@ -119,7 +119,7 @@ TEST_F(ProjectTest, testSave)
 
     // close and re-open project
     project.reset();
-    project.reset(new Project(mProjectFile, false));
+    project.reset(new Project(mProjectFile, false, false));
 
     // save project
     project->save(false);
@@ -127,7 +127,7 @@ TEST_F(ProjectTest, testSave)
 
     // close and re-open project
     project.reset();
-    project.reset(new Project(mProjectFile, false));
+    project.reset(new Project(mProjectFile, false, false));
 }
 
 TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave)
@@ -171,7 +171,7 @@ TEST_F(ProjectTest, testSettersGetters)
 
     // close and re-open project (read-only)
     project.reset();
-    project.reset(new Project(mProjectFile, true));
+    project.reset(new Project(mProjectFile, true, false));
 
     // get properties
     EXPECT_EQ(name, project->getMetadata().getName());

@@ -298,7 +298,7 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept
         ProjectEditor* editor = getOpenProject(filepath);
         if (!editor)
         {
-            Project* project = new Project(filepath, false);
+            Project* project = new Project(filepath, false, true);
             editor = new ProjectEditor(mWorkspace, *project);
             connect(editor, &ProjectEditor::projectEditorClosed, this, &ControlPanel::projectEditorClosed);
             connect(editor, &ProjectEditor::showControlPanelClicked, this, &ControlPanel::showControlPanel);
