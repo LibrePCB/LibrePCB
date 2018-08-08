@@ -81,7 +81,7 @@ public:
         m_pos = aCenter;
     }
 
-    virtual VECTOR2I Anchor( int aN ) const override
+    virtual VECTOR2I Anchor( int /*aN*/ ) const override
     {
         return m_pos;
     }

@@ -550,7 +550,7 @@ const VECTOR2<T> LexicographicalMin( const VECTOR2<T>& aA, const VECTOR2<T>& aB 
 
 
 template <class T>
-const int LexicographicalCompare( const VECTOR2<T>& aA, const VECTOR2<T>& aB )
+int LexicographicalCompare( const VECTOR2<T>& aA, const VECTOR2<T>& aB )
 {
     if( aA.x < aB.x )
         return -1;

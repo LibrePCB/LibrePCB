@@ -27,7 +27,7 @@
 #include "pns_meander_placer.h"
 #include "pns_router.h"
 #include "pns_debug_decorator.h"
-#include "util/util.hpp"
+//#include "util/util.hpp"
 
 namespace PNS {
 
@@ -253,9 +253,9 @@ const std::string MEANDER_PLACER::TuningInfo() const
         return ( "?" );
     }
 
-    status += horizon::dim_to_string(m_lastLength, false);
-    status += "/";
-    status += horizon::dim_to_string(m_settings.m_targetLength, false);
+    //status += horizon::dim_to_string(m_lastLength, false);
+    //status += "/";
+    //status += horizon::dim_to_string(m_settings.m_targetLength, false);
 
     return status;
 }

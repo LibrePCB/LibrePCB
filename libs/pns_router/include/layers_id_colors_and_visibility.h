@@ -594,7 +594,7 @@ public:
 private:
 
     /// Take this off the market, it may not be used because of LSET( PCB_LAYER_ID ).
-    LSET( unsigned long __val )
+    LSET( unsigned long /*__val*/ )
     {
         // not usable, it's private.
     }

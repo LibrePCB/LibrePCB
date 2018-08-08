@@ -28,7 +28,7 @@
 
 #include "pns_router.h"
 #include "pns_debug_decorator.h"
-#include "util/util.hpp"
+//#include "util/util.hpp"
 
 namespace PNS {
 
@@ -164,9 +164,9 @@ const std::string MEANDER_SKEW_PLACER::TuningInfo() const
         return ( "?" );
     }
 
-    status += horizon::dim_to_string(m_lastLength - m_coupledLength, false);
-    status += "/";
-    status += horizon::dim_to_string(m_settings.m_targetSkew, false);
+    //status += horizon::dim_to_string(m_lastLength - m_coupledLength, false);
+    //status += "/";
+    //status += horizon::dim_to_string(m_settings.m_targetSkew, false);
 
     return status;
 }

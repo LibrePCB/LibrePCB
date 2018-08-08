@@ -143,7 +143,7 @@ public:
 
     const SHAPE_LINE_CHAIN Hull( int aClearance = 0, int aWalkaroundThickness = 0 ) const override;
 
-    virtual VECTOR2I Anchor( int n ) const override
+    virtual VECTOR2I Anchor( int /*n*/ ) const override
     {
         return m_pos;
     }

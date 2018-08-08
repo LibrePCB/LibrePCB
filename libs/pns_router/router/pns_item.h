@@ -35,7 +35,7 @@ class BOARD_CONNECTED_ITEM;
 namespace PNS {
 
 class NODE;
-class PNS_HORIZON_PARENT_ITEM;
+class PNS_LIBREPCB_PARENT_ITEM;
 
 enum LineMarker {
     MK_HEAD         = ( 1 << 0 ),
@@ -110,7 +110,7 @@ public:
      * @param aClearance defines how far from the body of the item the hull should be,
      * @param aWalkaroundThickness is the width of the line that walks around this hull.
      */
-    virtual const SHAPE_LINE_CHAIN Hull( int aClearance = 0, int aWalkaroundThickness = 0 ) const
+    virtual const SHAPE_LINE_CHAIN Hull( int /*aClearance*/ = 0, int /*aWalkaroundThickness*/ = 0 ) const
     {
         return SHAPE_LINE_CHAIN();
     }
@@ -147,7 +147,7 @@ public:
      *
      * Sets the corresponding parent object in the host application's model.
      */
-    void SetParent( const PNS_HORIZON_PARENT_ITEM *aParent )
+    void SetParent( const PNS_LIBREPCB_PARENT_ITEM *aParent )
     {
         m_parent = aParent;
     }
@@ -157,7 +157,7 @@ public:
      *
      * Returns the corresponding parent object in the host application's model.
      */
-    auto Parent() const
+    const PNS_LIBREPCB_PARENT_ITEM* Parent() const
     {
         return m_parent;
     }
@@ -326,7 +326,7 @@ public:
         return m_rank;
     }
 
-    virtual VECTOR2I Anchor( int n ) const
+    virtual VECTOR2I Anchor( int /*n*/ ) const
     {
         return VECTOR2I();
     }
@@ -358,7 +358,7 @@ private:
 protected:
     PnsKind                 m_kind;
 
-    const PNS_HORIZON_PARENT_ITEM*		   m_parent;
+    const PNS_LIBREPCB_PARENT_ITEM*		   m_parent;
     NODE*               m_owner;
     LAYER_RANGE            m_layers;
 

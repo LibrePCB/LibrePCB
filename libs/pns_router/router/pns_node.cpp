@@ -1327,7 +1327,7 @@ SEGMENT* NODE::findRedundantSegment( SEGMENT* aSeg )
 }
 
 
-ITEM *NODE::FindItemByParent( const PNS_HORIZON_PARENT_ITEM* aParent, int net )
+ITEM *NODE::FindItemByParent( const PNS_LIBREPCB_PARENT_ITEM* aParent, int net )
 {
     INDEX::NET_ITEMS_LIST* l_cur = m_index->GetItemsForNet( net );
 

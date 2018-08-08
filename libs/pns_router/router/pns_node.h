@@ -404,7 +404,7 @@ public:
     int FindByMarker( int aMarker, ITEM_SET& aItems );
     int RemoveByMarker( int aMarker );
 
-    ITEM* FindItemByParent( const class PNS_HORIZON_PARENT_ITEM* aParent, int net);
+    ITEM* FindItemByParent( const class PNS_LIBREPCB_PARENT_ITEM* aParent, int net);
 
     bool HasChildren() const
     {

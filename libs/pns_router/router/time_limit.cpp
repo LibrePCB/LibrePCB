@@ -19,8 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glibmm/timeval.h>
-#include <glibmm/datetime.h>
+#include <chrono>
 
 #include "time_limit.h"
 
@@ -38,9 +37,8 @@ TIME_LIMIT::~TIME_LIMIT()
 
 
 static int64_t get_millis() {
-	Glib::TimeVal tv;
-	Glib::DateTime::create_now_utc().to_timeval(tv);
-	return tv.as_double()*1e3;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 bool TIME_LIMIT::Expired() const
