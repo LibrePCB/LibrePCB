@@ -89,6 +89,7 @@ public:
 
   // Setters
   virtual void setSelected(bool selected) noexcept;
+  virtual void setVisible(bool /*v*/) noexcept {}
 
   // General Methods
   virtual void addToBoard()      = 0;

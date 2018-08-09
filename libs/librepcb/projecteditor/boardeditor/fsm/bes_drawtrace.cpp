@@ -278,21 +278,21 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
       Point pos = Point::fromPx(sceneEvent->scenePos())
                       .mappedToGrid(board->getGridProperties().getInterval());
+      VECTOR2I posv(pos.getX().toNm(), pos.getY().toNm());
       switch (sceneEvent->button()) {
         case Qt::LeftButton:
           // fix the current point and add a new point + line
 
           // PNS
-          // if (router->FixRoute(wrapper->m_endSnapPoint, wrapper->m_endItem))
-          // {
-          //    router->StopRouting();
-          //    imp->canvas_update();
-          //    state = State::START;
-          //    imp->get_highlights().clear();
-          //    imp->update_highlights();
-          //    update_tip();
-          //    return ToolResponse();
-          //}
+          if (router->FixRoute(posv, nullptr)) {
+            // router->StopRouting();
+            // imp->canvas_update();
+            // state = State::START;
+            // imp->get_highlights().clear();
+            // imp->update_highlights();
+            // update_tip();
+            // return ToolResponse();
+          }
           // router->Move(wrapper->m_endSnapPoint, wrapper->m_endItem);
 
           return ForceStayInState;
@@ -397,7 +397,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     sizes.SetTrackWidth(mCurrentWidth->toNm());
     router->UpdateSizes(sizes);
     PNS::ROUTING_SETTINGS settings(router->Settings());
-    settings.SetMode(PNS::RM_Walkaround);
+    settings.SetMode(PNS::RM_Shove);
     router->LoadSettings(settings);
     if (!router->StartRouting(posv, rv, tl)) {
       std::cout << "error " << router->FailureReason() << std::endl;

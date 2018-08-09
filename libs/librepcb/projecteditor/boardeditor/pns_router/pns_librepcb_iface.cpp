@@ -13,6 +13,7 @@
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/primitivecirclegraphicsitem.h>
 #include <librepcb/common/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/common/utils/clipperhelpers.h>
 #include <librepcb/library/pkg/footprintpad.h>
@@ -361,12 +362,16 @@ void PNS_LIBREPCB_IFACE::SyncWorld(PNS::NODE* aWorld) {
 void PNS_LIBREPCB_IFACE::EraseView() {
   std::cout << "iface erase view" << std::endl;
 
-  // canvas->show_all_obj();
   for (const auto& it : m_preview_items) {
     board->getGraphicsScene().removeItem(*it);
     delete it;
   }
   m_preview_items.clear();
+
+  foreach (librepcb::project::BI_Base* item, m_hidden_items) {
+    item->setVisible(true);
+  }
+  m_hidden_items.clear();
 
   if (m_debugDecorator) m_debugDecorator->Clear();
 }
@@ -392,51 +397,58 @@ void PNS_LIBREPCB_IFACE::DisplayItem(const PNS::ITEM* aItem, int /*aColor*/,
     gItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
     gItem->setSelected(true);
     m_preview_items.append(gItem);
+  } else if (aItem->Kind() == PNS::ITEM::SEGMENT_T) {
+    auto    seg_item  = dynamic_cast<const PNS::SEGMENT*>(aItem);
+    auto    seg       = seg_item->Seg();
+    QString layerName = layer_from_router(seg_item->Layer());
+    librepcb::UnsignedLength width(seg_item->Width());
+    librepcb::Path           path;
+    path.addVertex(librepcb::Point(seg.A.x, seg.A.y));
+    path.addVertex(librepcb::Point(seg.B.x, seg.B.y));
+    librepcb::PrimitivePathGraphicsItem* gItem =
+        new librepcb::PrimitivePathGraphicsItem();
+    gItem->setPath(path.toQPainterPathPx());
+    gItem->setLineWidth(width);
+    gItem->setLineLayer(board->getLayerStack().getLayer(layerName));
+    board->getGraphicsScene().addItem(*gItem);
+    m_preview_items.append(gItem);
+  } else if (aItem->Kind() == PNS::ITEM::VIA_T) {
+    auto                     via_item = dynamic_cast<const PNS::VIA*>(aItem);
+    librepcb::Point          pos(via_item->Pos().x, via_item->Pos().y);
+    librepcb::UnsignedLength diameter(via_item->Diameter());
+    // QString layerStart = layer_from_router(via_item->Layers().Start());
+    // QString layerEnd = layer_from_router(via_item->Layers().End());
+    librepcb::PrimitiveCircleGraphicsItem* gItem =
+        new librepcb::PrimitiveCircleGraphicsItem();
+    gItem->setPos(pos.toPxQPointF());
+    gItem->setDiameter(diameter);
+    gItem->setLineLayer(board->getLayerStack().getLayer(
+        librepcb::GraphicsLayer::sBoardViasTht));
+    gItem->setFillLayer(board->getLayerStack().getLayer(
+        librepcb::GraphicsLayer::sBoardViasTht));
+    gItem->setZValue(librepcb::project::Board::ZValue_Vias);
+    board->getGraphicsScene().addItem(*gItem);
+    m_preview_items.append(gItem);
+  } else {
+    assert(false);
   }
-  //    else if (aItem->Kind() == PNS::ITEM::SEGMENT_T) {
-  //        auto seg_item = dynamic_cast<const PNS::SEGMENT *>(aItem);
-  //        auto seg = seg_item->Seg();
-  //        std::deque<librepcb::Coordi> pts;
-  //        pts.emplace_back(seg.A.x, seg.A.y);
-  //        pts.emplace_back(seg.B.x, seg.B.y);
-  //        int la = seg_item->Layer();
-  //        m_preview_items.insert(
-  //                canvas->add_line(pts, seg_item->Width(),
-  //                librepcb::ColorP::FROM_LAYER, layer_from_router(la)));
-  //    }
-  //    else if (aItem->Kind() == PNS::ITEM::VIA_T) {
-  //        auto via_item = dynamic_cast<const PNS::VIA *>(aItem);
-  //        auto pos = via_item->Pos();
-  //
-  //        std::deque<librepcb::Coordi> pts;
-  //        pts.emplace_back(pos.x, pos.y);
-  //        pts.emplace_back(pos.x + 10, pos.y);
-  //        int la = via_item->Layers().Start();
-  //        m_preview_items.insert(
-  //                canvas->add_line(pts, via_item->Diameter(),
-  //                librepcb::ColorP::FROM_LAYER, layer_from_router(la)));
-  //        la = via_item->Layers().End();
-  //        m_preview_items.insert(
-  //                canvas->add_line(pts, via_item->Diameter(),
-  //                librepcb::ColorP::FROM_LAYER, layer_from_router(la)));
-  //    }
-  //    else {
-  //        assert(false);
-  //    }
 }
 
 void PNS_LIBREPCB_IFACE::HideItem(PNS::ITEM* aItem) {
   std::cout << "iface hide item" << std::endl;
-  auto parent = aItem->Parent();
+  const PNS_LIBREPCB_PARENT_ITEM* parent = aItem->Parent();
   if (parent) {
-    // if (parent->track) {
-    //    librepcb::ObjectRef ref(librepcb::ObjectType::TRACK,
-    //    parent->track->uuid); canvas->hide_obj(ref);
-    //}
-    // else if (parent->via) {
-    //    librepcb::ObjectRef ref(librepcb::ObjectType::VIA, parent->via->uuid);
-    //    canvas->hide_obj(ref);
-    //}
+    if (parent->line) {
+      librepcb::project::BI_NetLine* l =
+          const_cast<librepcb::project::BI_NetLine*>(parent->line);
+      l->setVisible(false);
+      m_hidden_items.append(l);
+    } else if (parent->via) {
+      librepcb::project::BI_Via* v =
+          const_cast<librepcb::project::BI_Via*>(parent->via);
+      v->setVisible(false);
+      m_hidden_items.append(v);
+    }
   }
 }
 
@@ -454,43 +466,6 @@ void PNS_LIBREPCB_IFACE::RemoveItem(PNS::ITEM* aItem) {
   }
 }
 
-// std::pair<librepcb::BoardPackage *, librepcb::Pad *>
-// PNS_LIBREPCB_IFACE::find_pad(int layer, const librepcb::Coordi &c)
-//{
-//    for (auto &it : board->packages) {
-//        for (auto &it_pad : it.second.package.pads) {
-//            auto pt = it_pad.second.padstack.type;
-//            if ((pt == librepcb::Padstack::Type::TOP && layer ==
-//            librepcb::BoardLayers::TOP_COPPER)
-//                || (pt == librepcb::Padstack::Type::BOTTOM && layer ==
-//                librepcb::BoardLayers::BOTTOM_COPPER)
-//                || (pt == librepcb::Padstack::Type::THROUGH)) {
-//                auto tr = it.second.placement;
-//                if (it.second.flip) {
-//                    tr.invert_angle();
-//                }
-//                auto pos = tr.transform(it_pad.second.placement.shift);
-//                if (pos == c) {
-//                    return {&it.second, &it_pad.second};
-//                }
-//            }
-//        }
-//    }
-//    return {nullptr, nullptr};
-//}
-//
-// librepcb::Junction *PNS_LIBREPCB_IFACE::find_junction(int layer, const
-// librepcb::Coordi &c)
-//{
-//    for (auto &it : board->junctions) {
-//        if ((layer == 10000 || it.second.layer == layer || it.second.has_via)
-//        && it.second.position == c) {
-//            return &it.second;
-//        }
-//    }
-//    return nullptr;
-//}
-//
 void PNS_LIBREPCB_IFACE::AddItem(PNS::ITEM* aItem) {
   std::cout << "!!!iface add item" << std::endl;
   switch (aItem->Kind()) {

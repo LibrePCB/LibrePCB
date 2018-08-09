@@ -86,6 +86,7 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  void setVisible(bool v) noexcept { mGraphicsItem->setVisible(v); }
 
   // General Methods
   void addToBoard() override;
