@@ -52,7 +52,7 @@ Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for
 details.
 
 For internal details take a look at the
-[automatically generated documentation (doxygen)](https://doxygen.librepcb.org/master/)
+[automatically generated documentation (doxygen)](https://doxygen.librepcb.org/)
 
 ## Development
 

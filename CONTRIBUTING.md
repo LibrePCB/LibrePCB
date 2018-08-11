@@ -17,7 +17,7 @@
 - Open a new issue for your idea, assuming one does not already exist.
 - Fork the repository on GitHub.
 - Have a look at our [development resources](https://github.com/LibrePCB/LibrePCB/tree/master/dev),
-  especially at the [Doxygen documentation](https://doxygen.librepcb.org/master/).
+  especially at the [Doxygen documentation](https://doxygen.librepcb.org/).
 - When using QtCreator, import and use our [code style guide file](https://github.com/LibrePCB/LibrePCB/blob/master/dev/CodingStyle_QtCreator.xml).
 
 ## Making Changes
@@ -27,7 +27,7 @@
   - To quickly create a topic branch based on master:
     `git checkout -b my_contribution master`
   - Please avoid working directly on the `master` branch.
-- Write code which follows our [code style guides](https://doxygen.librepcb.org/master/df/d24/doc_code_style_guide.html)
+- Write code which follows our [code style guides](https://doxygen.librepcb.org/df/d24/doc_code_style_guide.html)
   and [.editorconfig settings](https://github.com/LibrePCB/LibrePCB/blob/master/.editorconfig).
 - Make commits of logical units.
   - Make sure your commit messages are in the [proper format](http://chris.beams.io/posts/git-commit/):
