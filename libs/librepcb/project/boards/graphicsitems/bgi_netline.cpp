@@ -86,7 +86,7 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept
     mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
     QPainterPathStroker ps;
     ps.setCapStyle(Qt::RoundCap);
-    PositiveLength width = qMin(mNetLine.getWidth(), PositiveLength(100000));
+    PositiveLength width = qMax(mNetLine.getWidth(), PositiveLength(100000));
     ps.setWidth(width->toPx());
     mShape = ps.createStroke(mShape);
     update();
