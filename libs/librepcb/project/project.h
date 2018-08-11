@@ -93,11 +93,12 @@ class Project final : public QObject, public AttributeProvider
          *
          * @param filepath      The filepath to the an existing *.lpp project file
          * @param readOnly      It true, the project will be opened in read-only mode
+         * @param interactive   If true, message boxes may be shown.
          *
          * @throw Exception     If the project could not be opened successfully
          */
-        Project(const FilePath& filepath, bool readOnly) :
-            Project(filepath, false, readOnly) {}
+        Project(const FilePath& filepath, bool readOnly, bool interactve) :
+            Project(filepath, false, readOnly, interactve) {}
 
         /**
          * @brief The destructor will close the whole project (without saving!)
@@ -223,7 +224,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @return A pointer to the specified schematic, or nullptr if name is invalid
          */
-        Schematic* getSchematicByName(const ElementName& name) const noexcept;
+        Schematic* getSchematicByName(const QString& name) const noexcept;
 
         /**
          * @brief Create a new schematic (page)
@@ -315,7 +316,7 @@ class Project final : public QObject, public AttributeProvider
          *
          * @return A pointer to the specified board, or nullptr if name is invalid
          */
-        Board* getBoardByName(const ElementName& name) const noexcept;
+        Board* getBoardByName(const QString& name) const noexcept;
 
         /**
          * @brief Create a new board
@@ -395,7 +396,7 @@ class Project final : public QObject, public AttributeProvider
         // Static Methods
 
         static Project* create(const FilePath& filepath)
-        {return new Project(filepath, true, false);}
+        {return new Project(filepath, true, false, false);}
 
         static bool isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
         static bool isProjectFile(const FilePath& file) noexcept;
@@ -448,10 +449,13 @@ class Project final : public QObject, public AttributeProvider
          * @param create        True if the specified project does not exist already and
          *                      must be created.
          * @param readOnly      If true, the project will be opened in read-only mode
+         * @param interactive   If true, message boxes may be shown.
          *
          * @throw Exception     If the project could not be created/opened successfully
+         *
+         * @todo Remove interactive message boxes, should be done at a higher layer!
          */
-        explicit Project(const FilePath& filepath, bool create, bool readOnly);
+        explicit Project(const FilePath& filepath, bool create, bool readOnly, bool interactve);
 
         /**
          * @brief Save the project to the harddisc (to temporary or original files)

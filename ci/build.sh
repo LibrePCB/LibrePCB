@@ -46,27 +46,38 @@ popd
 # Prepare artifacts directory
 mkdir -p ./artifacts/nightly_builds
 
-# Linux: Build AppImage
+# Linux: Build AppImages
 if [ "${TRAVIS_OS_NAME-}" = "linux" ]
 then
+  cp -r "./build/install" "./build/install-cli"
+  mv -f "./build/install-cli/opt/bin/librepcb-cli" "./build/install-cli/opt/bin/librepcb"
+  LD_LIBRARY_PATH="" linuxdeployqt "./build/install-cli/opt/share/applications/librepcb.desktop" -bundle-non-qt-libs -appimage
+  mv ./LibrePCB-x86_64.AppImage ./LibrePCB-CLI-x86_64.AppImage
   LD_LIBRARY_PATH="" linuxdeployqt "./build/install/opt/share/applications/librepcb.desktop" -bundle-non-qt-libs -appimage
   if [ "${DEPLOY_APPIMAGE-}" = "true" ]
   then
     cp ./LibrePCB-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
+    cp ./LibrePCB-CLI-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-x86_64.AppImage
   fi
 fi
 
-# Mac: Build application bundle
+# Mac: Build application bundles
 if [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
-  # replace "bin" and "share" directories with the single librepcb.app directory
+  # replace "bin" and "share" directories with the single *.app directory
   mv "./build/install/opt/bin/librepcb.app" "./build/install/opt/librepcb.app"
-  mv "./build/install/opt/share" "./build/install/opt/librepcb.app/Contents/share"
-  rmdir "./build/install/opt/bin"
+  cp -r "./build/install/opt/share" "./build/install/opt/librepcb.app/Contents/"
+  mv "./build/install/opt/bin/librepcb-cli.app" "./build/install/opt/librepcb-cli.app"
+  cp -r "./build/install/opt/share" "./build/install/opt/librepcb-cli.app/Contents/"
+  rm -r "./build/install/opt/bin" "./build/install/opt/share"
   macdeployqt "./build/install/opt/librepcb.app" -dmg
+  mv ./build/install/opt/librepcb.dmg ./librepcb.dmg
+  macdeployqt "./build/install/opt/librepcb-cli.app" -dmg
+  mv ./build/install/opt/librepcb-cli.dmg ./librepcb-cli.dmg
   if [ "${DEPLOY_BUNDLE-}" = "true" ]
   then
-    mv ./build/install/opt/librepcb.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
+    cp ./librepcb.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
+    cp ./librepcb-cli.dmg ./artifacts/nightly_builds/librepcb-cli-nightly-mac-x86_64.dmg
   fi
 fi
 
@@ -78,6 +89,7 @@ then
   cp -v /c/OpenSSL-Win32/bin/*eay*.dll         ./build/install/opt/bin/  # OpenSSL DLLs
   cp -v "`cygpath -u \"$QTDIR\"`"/bin/lib*.dll ./build/install/opt/bin/  # MinGW DLLs
   windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe # Qt DLLs
+  windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe # Qt DLLs
   cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-x86/
 fi
 
