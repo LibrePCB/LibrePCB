@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
+    <width>346</width>
     <height>220</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
      <item row="0" column="1">
       <widget class="QLabel" name="lblUuid">
        <property name="text">
-        <string>-</string>
+        <string notr="true">-</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -43,7 +43,7 @@
      <item row="1" column="1">
       <widget class="QLabel" name="lblNetSignal">
        <property name="text">
-        <string>-</string>
+        <string notr="true">-</string>
        </property>
       </widget>
      </item>

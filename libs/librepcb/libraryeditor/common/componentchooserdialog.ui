@@ -69,7 +69,7 @@
           </font>
          </property>
          <property name="text">
-          <string>00000000-0000-0000-0000-000000000000</string>
+          <string notr="true">00000000-0000-0000-0000-000000000000</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>

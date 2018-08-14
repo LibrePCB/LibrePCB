@@ -20,7 +20,7 @@
    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
   </property>
   <property name="windowTitle">
-   <string>Layers</string>
+   <string>&amp;Layers</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -53,7 +53,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>TOP</string>
+         <string notr="true">TOP</string>
         </property>
        </widget>
       </item>
@@ -66,7 +66,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>BOT</string>
+         <string notr="true">BOT</string>
         </property>
        </widget>
       </item>
@@ -79,7 +79,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>T+B</string>
+         <string notr="true">T+B</string>
         </property>
        </widget>
       </item>
@@ -92,7 +92,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>ALL</string>
+         <string notr="true">ALL</string>
         </property>
        </widget>
       </item>
@@ -105,7 +105,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>NONE</string>
+         <string notr="true">NONE</string>
         </property>
        </widget>
       </item>

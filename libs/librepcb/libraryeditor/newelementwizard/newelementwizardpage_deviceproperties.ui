@@ -14,7 +14,7 @@
    <string>Device Properties</string>
   </property>
   <property name="title">
-   <string>Device Properties</string>
+   <string>De&amp;vice Properties</string>
   </property>
   <property name="subTitle">
    <string>Set the component and the package of the new device.</string>
@@ -66,14 +66,14 @@
          </font>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="lblComponentDescription">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -142,14 +142,14 @@
          </font>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="lblPackageDescription">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

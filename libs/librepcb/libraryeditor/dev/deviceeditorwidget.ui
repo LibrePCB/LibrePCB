@@ -101,7 +101,7 @@
                </font>
               </property>
               <property name="text">
-               <string>TextLabel</string>
+               <string notr="true">TextLabel</string>
               </property>
              </widget>
             </item>
@@ -137,7 +137,7 @@
             <item row="1" column="1">
              <widget class="QLabel" name="lblPackageUuid">
               <property name="text">
-               <string>TextLabel</string>
+               <string notr="true">TextLabel</string>
               </property>
               <property name="textInteractionFlags">
                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -188,14 +188,14 @@
                </font>
               </property>
               <property name="text">
-               <string>TextLabel</string>
+               <string notr="true">TextLabel</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="lblComponentUuid">
               <property name="text">
-               <string>TextLabel</string>
+               <string notr="true">TextLabel</string>
               </property>
               <property name="textInteractionFlags">
                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -302,7 +302,7 @@
        <item row="0" column="1">
         <widget class="QLabel" name="lblUuid">
          <property name="text">
-          <string>TextLabel</string>
+          <string notr="true">TextLabel</string>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>
@@ -425,6 +425,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../../img/images.qrc"/>
   <include location="../../../../img/images.qrc"/>
  </resources>
  <connections/>

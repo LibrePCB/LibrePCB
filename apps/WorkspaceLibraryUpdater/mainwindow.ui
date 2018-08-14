@@ -70,7 +70,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>+</string>
+         <string notr="true">+</string>
         </property>
        </widget>
       </item>
@@ -83,7 +83,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>-</string>
+         <string notr="true">-</string>
         </property>
        </widget>
       </item>
@@ -96,7 +96,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>clr</string>
+         <string notr="true">clr</string>
         </property>
        </widget>
       </item>
@@ -127,49 +127,49 @@
       <item>
        <widget class="QCheckBox" name="cbx_lplib">
         <property name="text">
-         <string>lplib</string>
+         <string notr="true">lplib</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_cmpcat">
         <property name="text">
-         <string>cmpcat</string>
+         <string notr="true">cmpcat</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_pkgcat">
         <property name="text">
-         <string>pkgcat</string>
+         <string notr="true">pkgcat</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_sym">
         <property name="text">
-         <string>sym</string>
+         <string notr="true">sym</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_pkg">
         <property name="text">
-         <string>pkg</string>
+         <string notr="true">pkg</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_cmp">
         <property name="text">
-         <string>cmp</string>
+         <string notr="true">cmp</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbx_dev">
         <property name="text">
-         <string>dev</string>
+         <string notr="true">dev</string>
         </property>
        </widget>
       </item>

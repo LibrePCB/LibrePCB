@@ -47,7 +47,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -70,7 +70,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -241,7 +241,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -263,7 +263,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -276,7 +276,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -298,7 +298,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -311,7 +311,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -340,7 +340,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -378,7 +378,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>TextLabel</string>
+           <string notr="true">TextLabel</string>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
