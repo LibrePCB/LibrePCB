@@ -41,7 +41,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>...</string>
+       <string notr="true">...</string>
       </property>
      </widget>
     </item>
@@ -136,7 +136,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>+</string>
+         <string notr="true">+</string>
         </property>
        </widget>
       </item>
@@ -149,7 +149,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>+INI</string>
+         <string notr="true">+INI</string>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>-</string>
+         <string notr="true">-</string>
         </property>
        </widget>
       </item>
@@ -175,7 +175,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>clr</string>
+         <string notr="true">clr</string>
         </property>
        </widget>
       </item>
@@ -268,7 +268,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>...</string>
+         <string notr="true">...</string>
         </property>
        </widget>
       </item>
@@ -293,7 +293,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>...</string>
+       <string notr="true">...</string>
       </property>
      </widget>
     </item>
