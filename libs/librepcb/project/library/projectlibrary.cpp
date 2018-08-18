@@ -44,9 +44,8 @@ using namespace library;
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) :
-    QObject(&project), mProject(project),
-    mLibraryPath(project.getPath().getPathTo("library"))
+ProjectLibrary::ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly) :
+    mLibraryPath(libDir)
 {
     qDebug() << "load project library...";
 
@@ -80,10 +79,7 @@ ProjectLibrary::ProjectLibrary(Project& project, bool restore, bool readOnly) :
 ProjectLibrary::~ProjectLibrary() noexcept
 {
     // clean up all removed elements
-    cleanupElements<Symbol>(mAddedSymbols, mRemovedSymbols);
-    cleanupElements<Package>(mAddedPackages, mRemovedPackages);
-    cleanupElements<Component>(mAddedComponents, mRemovedComponents);
-    cleanupElements<Device>(mAddedDevices, mRemovedDevices);
+    cleanupElements();
 
     // Delete all library elements (in reverse order of their creation)
     qDeleteAll(mDevices);       mDevices.clear();
@@ -93,40 +89,16 @@ ProjectLibrary::~ProjectLibrary() noexcept
 }
 
 /*****************************************************************************************
- *  Getters: Library Elements
- ****************************************************************************************/
-
-Symbol* ProjectLibrary::getSymbol(const Uuid& uuid) const noexcept
-{
-    return mSymbols.value(uuid, 0);
-}
-
-Package* ProjectLibrary::getPackage(const Uuid& uuid) const noexcept
-{
-    return mPackages.value(uuid, 0);
-}
-
-Component* ProjectLibrary::getComponent(const Uuid& uuid) const noexcept
-{
-    return mComponents.value(uuid, 0);
-}
-
-Device* ProjectLibrary::getDevice(const Uuid& uuid) const noexcept
-{
-    return mDevices.value(uuid, 0);
-}
-
-/*****************************************************************************************
  *  Getters: Special Queries
  ****************************************************************************************/
 
 QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& compUuid) const noexcept
 {
     QHash<Uuid, library::Device*> list;
-    foreach (library::Device* device, mDevices)
-    {
-        if (device->getComponentUuid() == compUuid)
+    foreach (library::Device* device, mDevices) {
+        if (device->getComponentUuid() == compUuid) {
             list.insert(device->getUuid(), device);
+        }
     }
     return list;
 }
@@ -137,42 +109,42 @@ QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(const Uuid& 
 
 void ProjectLibrary::addSymbol(library::Symbol& s)
 {
-    addElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
+    addElement<Symbol>(s, mSymbols);
 }
 
 void ProjectLibrary::addPackage(library::Package& p)
 {
-    addElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
+    addElement<Package>(p, mPackages);
 }
 
 void ProjectLibrary::addComponent(library::Component& c)
 {
-    addElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
+    addElement<Component>(c, mComponents);
 }
 
 void ProjectLibrary::addDevice(library::Device& d)
 {
-    addElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
+    addElement<Device>(d, mDevices);
 }
 
 void ProjectLibrary::removeSymbol(library::Symbol& s)
 {
-    removeElement<Symbol>(s, mSymbols, mAddedSymbols, mRemovedSymbols);
+    removeElement<Symbol>(s, mSymbols);
 }
 
 void ProjectLibrary::removePackage(library::Package& p)
 {
-    removeElement<Package>(p, mPackages, mAddedPackages, mRemovedPackages);
+    removeElement<Package>(p, mPackages);
 }
 
 void ProjectLibrary::removeComponent(library::Component& c)
 {
-    removeElement<Component>(c, mComponents, mAddedComponents, mRemovedComponents);
+    removeElement<Component>(c, mComponents);
 }
 
 void ProjectLibrary::removeDevice(library::Device& d)
 {
-    removeElement<Device>(d, mDevices, mAddedDevices, mRemovedDevices);
+    removeElement<Device>(d, mDevices);
 }
 
 
@@ -184,15 +156,57 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 {
     bool success = true;
 
-    // Save all elements
-    if (!saveElements<Symbol>(toOriginal, errors, mLibraryPath.getPathTo("sym"), mSymbols, mAddedSymbols, mRemovedSymbols))
-        success = false;
-    if (!saveElements<Package>(toOriginal, errors, mLibraryPath.getPathTo("pkg"), mPackages, mAddedPackages, mRemovedPackages))
-        success = false;
-    if (!saveElements<Component>(toOriginal, errors, mLibraryPath.getPathTo("cmp"), mComponents, mAddedComponents, mRemovedComponents))
-        success = false;
-    if (!saveElements<Device>(toOriginal, errors, mLibraryPath.getPathTo("dev"), mDevices, mAddedDevices, mRemovedDevices))
-        success = false;
+    QSet<LibraryBaseElement*> currentElements = getCurrentElements();
+
+    // remove no longer needed elements
+    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
+        library::LibraryBaseElement* element = it.key();
+        State state = it.value();
+        if (currentElements.contains(element)) continue;
+        if (state == State::Removed) continue;
+        if (toOriginal || state == State::SavedToTemporary) {
+            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
+            try {
+                element->moveIntoParentDirectory(FilePath::getRandomTempPath()); // can throw
+                mElementsState[element] = State::Removed;
+            }
+            catch (Exception& e) {
+                success = false;
+                errors.append(e.getMsg());
+            }
+        }
+    }
+
+    // add new elements
+    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
+        library::LibraryBaseElement* element = it.key();
+        State state = it.value();
+        if (!currentElements.contains(element)) continue;
+        if (state == State::Removed) {
+            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() != mLibraryPath);
+            try {
+                element->moveIntoParentDirectory(mLibraryPath.getPathTo(element->getShortElementName())); // can throw
+                mElementsState[element] = toOriginal ? State::SavedToOriginal : State::SavedToTemporary;
+            }
+            catch (Exception& e) {
+                success = false;
+                errors.append(e.getMsg());
+            }
+        } else if ((state == State::SavedToTemporary) && toOriginal) {
+            mElementsState[element] = State::SavedToOriginal;
+        } else if ((state == State::Loaded) && toOriginal) {
+            // force upgrading file format of loaded elements
+            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
+            try {
+                element->save(); // can throw
+                mElementsState[element] = State::SavedToOriginal;
+            }
+            catch (Exception& e) {
+                success = false;
+                errors.append(e.getMsg());
+            }
+        }
+    }
 
     return success;
 }
@@ -200,6 +214,16 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+QSet<LibraryBaseElement*> ProjectLibrary::getCurrentElements() const noexcept
+{
+    QSet<LibraryBaseElement*> currentElements;
+    foreach (auto element, mSymbols) {currentElements.insert(element);}
+    foreach (auto element, mPackages) {currentElements.insert(element);}
+    foreach (auto element, mComponents) {currentElements.insert(element);}
+    foreach (auto element, mDevices) {currentElements.insert(element);}
+    return currentElements;
+}
 
 template <typename ElementType>
 void ProjectLibrary::loadElements(const FilePath& directory, const QString& type,
@@ -235,6 +259,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
         }
 
         elementList.insert(element->getUuid(), element);
+        mElementsState.insert(element, State::Loaded);
     }
 
     qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
@@ -242,102 +267,44 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
 
 template <typename ElementType>
 void ProjectLibrary::addElement(ElementType& element,
-                                QHash<Uuid, ElementType*>& elementList,
-                                QList<ElementType*>& addedElementsList,
-                                QList<ElementType*>& removedElementsList)
+                                QHash<Uuid, ElementType*>& elementList)
 {
     if (elementList.contains(element.getUuid())) {
         throw LogicError(__FILE__, __LINE__, QString(tr(
             "There is already an element with the same UUID in the project's library: %1"))
             .arg(element.getUuid().toStr()));
     }
-    if (removedElementsList.contains(&element)) {
-        removedElementsList.removeOne(&element);
-    } else {
+    if (!mElementsState.contains(&element)) {
+        // copy from workspace *immediately* to freeze/backup their state
         element.saveIntoParentDirectory(FilePath::getRandomTempPath());
+        mElementsState.insert(&element, State::Removed);
     }
     elementList.insert(element.getUuid(), &element);
-    addedElementsList.append(&element);
 }
 
 template <typename ElementType>
 void ProjectLibrary::removeElement(ElementType& element,
-                                   QHash<Uuid, ElementType*>& elementList,
-                                   QList<ElementType*>& addedElementsList,
-                                   QList<ElementType*>& removedElementsList)
+                                   QHash<Uuid, ElementType*>& elementList)
 {
     Q_ASSERT(elementList.value(element.getUuid()) == &element);
-    Q_ASSERT(!removedElementsList.contains(&element));
     elementList.remove(element.getUuid());
-    addedElementsList.removeOne(&element);
-    removedElementsList.append(&element);
 }
 
-template <typename ElementType>
-bool ProjectLibrary::saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
-                                  QHash<Uuid, ElementType*>& elementList,
-                                  QList<ElementType*>& addedElementsList,
-                                  QList<ElementType*>& removedElementsList) noexcept
+void ProjectLibrary::cleanupElements() noexcept
 {
-    bool success = true;
-
-    if (toOriginal) {
-        foreach (ElementType* element, removedElementsList) {
-            try {
-                if (element->getFilePath().getParentDir().getParentDir() == mLibraryPath) {
-                    element->moveIntoParentDirectory(FilePath::getRandomTempPath());
-                }
-            }
-            catch (Exception& e) {
-                success = false;
-                errors.append(e.getMsg());
+    QSet<LibraryBaseElement*> currentElements = getCurrentElements();
+    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
+        library::LibraryBaseElement* element = it.key();
+        State state = it.value();
+        if (state == State::SavedToTemporary) {
+            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
+            QDir(element->getFilePath().toStr()).removeRecursively();
+            if (!currentElements.contains(element)) {
+                delete element;
             }
         }
+
     }
-
-    foreach (ElementType* element, elementList) {
-        try {
-            FilePath dest = parentDir.getPathTo(element->getUuid().toStr());
-            if (element->getFilePath() != dest) {
-                if (toOriginal || (!dest.isExistingDir())) {
-                    element->moveIntoParentDirectory(parentDir);
-                }
-            }
-            if (toOriginal && (!mSavedLibraryElements.contains(element))) {
-                // TODO:
-                // - first save to temporary files! Not yet supported by LibraryBaseElement :(
-                // - only save if needed (to improve performance)
-                //  - either if file format was upgraded
-                //  - or if library element was modified (not yet supported anyway)
-                element->save(); // can throw
-                mSavedLibraryElements.insert(element);
-            }
-            if (toOriginal && addedElementsList.contains(element))
-                addedElementsList.removeOne(element);
-        }
-        catch (Exception& e) {
-            success = false;
-            errors.append(e.getMsg());
-        }
-    }
-
-    return success;
-}
-
-template <typename ElementType>
-void ProjectLibrary::cleanupElements(QList<ElementType*>& addedElementsList,
-                                     QList<ElementType*>& removedElementsList) noexcept
-{
-    QList<ElementType*> combined;
-    combined.append(addedElementsList);
-    combined.append(removedElementsList);
-    foreach (ElementType* element, combined) {
-        if (element->getFilePath().getParentDir().getParentDir() == mLibraryPath) {
-            QDir dir(element->getFilePath().toStr());
-            dir.removeRecursively();
-        }
-    }
-    qDeleteAll(removedElementsList);        removedElementsList.clear();
 }
 
 /*****************************************************************************************

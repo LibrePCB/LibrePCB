@@ -260,7 +260,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly, bool inte
         connect(mProjectMetadata.data(), &ProjectMetadata::attributesChanged,
                 this, &Project::attributesChanged);
         mProjectSettings.reset(new ProjectSettings(*this, mIsRestored, mIsReadOnly, create));
-        mProjectLibrary.reset(new ProjectLibrary(*this, mIsRestored, mIsReadOnly));
+        mProjectLibrary.reset(new ProjectLibrary(mPath.getPathTo("library"), mIsRestored, mIsReadOnly));
         mErcMsgList.reset(new ErcMsgList(*this, mIsRestored, mIsReadOnly, create));
         mCircuit.reset(new Circuit(*this, mIsRestored, mIsReadOnly, create));
 
