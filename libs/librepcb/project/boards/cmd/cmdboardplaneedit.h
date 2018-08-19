@@ -54,6 +54,7 @@ class CmdBoardPlaneEdit final : public UndoCommand
         // Setters
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
         void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept;
         void setOutline(const Path& outline, bool immediate) noexcept;
         void setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept;
         void setNetSignal(NetSignal& netsignal) noexcept;
