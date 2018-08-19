@@ -66,6 +66,8 @@ class LibraryBaseElement : public QObject, public SerializableObject
 
         // Getters: General
         const FilePath& getFilePath() const noexcept {return mDirectory;}
+        const QString& getShortElementName() const noexcept {return mShortElementName;}
+        const QString& getLongElementName() const noexcept {return mLongElementName;}
         bool isOpenedReadOnly() const noexcept {return mOpenedReadOnly;}
 
         // Getters: Attributes

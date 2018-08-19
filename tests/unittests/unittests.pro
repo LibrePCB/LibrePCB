@@ -83,6 +83,7 @@ SOURCES += \
     eagleimport/symbolconvertertest.cpp \
     main.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
+    project/library/projectlibrarytest.cpp \
     project/projecttest.cpp \
     workspace/workspacetest.cpp \
 

@@ -62,7 +62,7 @@ class ProjectLibrary final : public QObject
     public:
 
         // Constructors / Destructor
-        explicit ProjectLibrary(Project& project, bool restore, bool readOnly);
+        explicit ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly);
         ~ProjectLibrary() noexcept;
 
         // Getters: Library Elements
@@ -70,10 +70,10 @@ class ProjectLibrary final : public QObject
         const QHash<Uuid, library::Package*>&    getPackages()       const noexcept {return mPackages;}
         const QHash<Uuid, library::Component*>&  getComponents()     const noexcept {return mComponents;}
         const QHash<Uuid, library::Device*>&     getDevices()        const noexcept {return mDevices;}
-        library::Symbol*      getSymbol(     const Uuid& uuid) const noexcept;
-        library::Package*     getPackage(    const Uuid& uuid) const noexcept;
-        library::Component*   getComponent(  const Uuid& uuid) const noexcept;
-        library::Device*      getDevice(     const Uuid& uuid) const noexcept;
+        library::Symbol*      getSymbol(     const Uuid& uuid) const noexcept {return mSymbols.value(uuid);}
+        library::Package*     getPackage(    const Uuid& uuid) const noexcept {return mPackages.value(uuid);}
+        library::Component*   getComponent(  const Uuid& uuid) const noexcept {return mComponents.value(uuid);}
+        library::Device*      getDevice(     const Uuid& uuid) const noexcept {return mDevices.value(uuid);}
 
         // Getters: Special Queries
         QHash<Uuid, library::Device*> getDevicesOfComponent(const Uuid& compUuid) const noexcept;
@@ -102,52 +102,29 @@ class ProjectLibrary final : public QObject
         ProjectLibrary& operator=(const ProjectLibrary& rhs);
 
         // Private Methods
+        QSet<library::LibraryBaseElement*> getCurrentElements() const noexcept;
         template <typename ElementType>
         void loadElements(const FilePath& directory, const QString& type,
                           QHash<Uuid, ElementType*>& elementList);
         template <typename ElementType>
         void addElement(ElementType& element,
-                        QHash<Uuid, ElementType*>& elementList,
-                        QList<ElementType*>& addedElementsList,
-                        QList<ElementType*>& removedElementsList);
+                        QHash<Uuid, ElementType*>& elementList);
         template <typename ElementType>
         void removeElement(ElementType& element,
-                           QHash<Uuid, ElementType*>& elementList,
-                           QList<ElementType*>& addedElementsList,
-                           QList<ElementType*>& removedElementsList);
-        template <typename ElementType>
-        bool saveElements(bool toOriginal, QStringList& errors, const FilePath& parentDir,
-                          QHash<Uuid, ElementType*>& elementList,
-                          QList<ElementType*>& addedElementsList,
-                          QList<ElementType*>& removedElementsList) noexcept;
-        template <typename ElementType>
-        void cleanupElements(QList<ElementType*>& addedElementsList,
-                             QList<ElementType*>& removedElementsList) noexcept;
+                           QHash<Uuid, ElementType*>& elementList);
+        void cleanupElements() noexcept;
 
         // General
-        Project& mProject; ///< a reference to the Project object (from the ctor)
         FilePath mLibraryPath; ///< the "library" directory of the project
 
-        // The Library Elements
+        // The currently added library elements
         QHash<Uuid, library::Symbol*> mSymbols;
         QHash<Uuid, library::Package*> mPackages;
         QHash<Uuid, library::Component*> mComponents;
         QHash<Uuid, library::Device*> mDevices;
 
-        // Added Library Elements
-        QList<library::Symbol*> mAddedSymbols;
-        QList<library::Package*> mAddedPackages;
-        QList<library::Component*> mAddedComponents;
-        QList<library::Device*> mAddedDevices;
-
-        // Removed Library Elements
-        QList<library::Symbol*> mRemovedSymbols;
-        QList<library::Package*> mRemovedPackages;
-        QList<library::Component*> mRemovedComponents;
-        QList<library::Device*> mRemovedDevices;
-
-        // Temporary, ugly performance improvement to avoid unnecessary file write operations
-        QSet<library::LibraryBaseElement*> mSavedLibraryElements;
+        enum class State {Loaded, Removed, SavedToTemporary, SavedToOriginal};
+        QHash<library::LibraryBaseElement*, State> mElementsState;
 };
 
 /*****************************************************************************************
