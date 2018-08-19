@@ -75,7 +75,7 @@ dependencies pre-installed. Just follow
 #### Installation on Debian/Ubuntu/Mint
 
 ```bash
-sudo apt-get install git build-essential qt5-default qttools5-dev-tools libglu1-mesa-dev openssl zlib1g zlib1g-dev
+sudo apt-get install git build-essential qt5-default qttools5-dev-tools libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
