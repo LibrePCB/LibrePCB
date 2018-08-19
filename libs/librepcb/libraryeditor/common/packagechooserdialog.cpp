@@ -111,25 +111,23 @@ void PackageChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) n
 
     mSelectedCategoryUuid = uuid;
 
-    if (uuid) {
-        try {
-            QSet<Uuid> packages = mWorkspace.getLibraryDb().getPackagesByCategory(*uuid); // can throw
-            foreach (const Uuid& uuid, packages) {
-                try {
-                    FilePath fp = mWorkspace.getLibraryDb().getLatestPackage(uuid); // can throw
-                    QString name;
-                    mWorkspace.getLibraryDb().getElementTranslations<Package>(fp, localeOrder(),
-                                                                              &name); // can throw
-                    QListWidgetItem* item = new QListWidgetItem(name);
-                    item->setData(Qt::UserRole, uuid.toStr());
-                    mUi->listPackages->addItem(item);
-                } catch (const Exception& e) {
-                    continue; // should we do something here?
-                }
+    try {
+        QSet<Uuid> packages = mWorkspace.getLibraryDb().getPackagesByCategory(uuid); // can throw
+        foreach (const Uuid& pkgUuid, packages) {
+            try {
+                FilePath fp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid); // can throw
+                QString name;
+                mWorkspace.getLibraryDb().getElementTranslations<Package>(fp, localeOrder(),
+                                                                          &name); // can throw
+                QListWidgetItem* item = new QListWidgetItem(name);
+                item->setData(Qt::UserRole, pkgUuid.toStr());
+                mUi->listPackages->addItem(item);
+            } catch (const Exception& e) {
+                continue; // should we do something here?
             }
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
         }
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
     }
 }
 

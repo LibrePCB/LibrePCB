@@ -175,15 +175,14 @@ void ComponentSymbolVariantItemListEditorWidget::isRequiredChanged(bool checked)
 void ComponentSymbolVariantItemListEditorWidget::btnChooseSymbolClicked() noexcept
 {
     SymbolChooserDialog dialog(*mWorkspace, *mLayerProvider, this);
-    tl::optional<Uuid> symbolUuid = dialog.getSelectedSymbolUuid();
-    if ((dialog.exec() == QDialog::Accepted) && symbolUuid) {
+    if ((dialog.exec() == QDialog::Accepted) && dialog.getSelectedSymbolUuid()) {
         int row = getRowOfTableCellWidget(sender());
         tl::optional<Uuid> uuid = getUuidOfRow(row);
         if (isNewItemRow(row)) {
             mNewSymbolLabel->setText(dialog.getSelectedSymbolNameTr());
-            mNewSymbolLabel->setToolTip(symbolUuid->toStr());
+            mNewSymbolLabel->setToolTip(dialog.getSelectedSymbolUuid()->toStr());
         } else if (isExistingItemRow(row) && uuid) {
-            setSymbolUuid(*uuid, *symbolUuid);
+            setSymbolUuid(*uuid, *dialog.getSelectedSymbolUuid());
         }
     }
 }

@@ -128,24 +128,22 @@ void SymbolChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) no
 
     mSelectedCategoryUuid = uuid;
 
-    if (uuid) {
-        try {
-            QSet<Uuid> symbols = mWorkspace.getLibraryDb().getSymbolsByCategory(*uuid); // can throw
-            foreach (const Uuid& symbolUuid, symbols) {
-                try {
-                    QString symName;
-                    FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid); // can throw
-                    mWorkspace.getLibraryDb().getElementTranslations<Symbol>(symFp, localeOrder(), &symName); // can throw
-                    QListWidgetItem* item = new QListWidgetItem(symName);
-                    item->setData(Qt::UserRole, symFp.toStr());
-                    mUi->listSymbols->addItem(item);
-                } catch (const Exception& e) {
-                    continue; // should we do something here?
-                }
+    try {
+        QSet<Uuid> symbols = mWorkspace.getLibraryDb().getSymbolsByCategory(uuid); // can throw
+        foreach (const Uuid& symbolUuid, symbols) {
+            try {
+                QString symName;
+                FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid); // can throw
+                mWorkspace.getLibraryDb().getElementTranslations<Symbol>(symFp, localeOrder(), &symName); // can throw
+                QListWidgetItem* item = new QListWidgetItem(symName);
+                item->setData(Qt::UserRole, symFp.toStr());
+                mUi->listSymbols->addItem(item);
+            } catch (const Exception& e) {
+                continue; // should we do something here?
             }
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Could not load symbols"), e.getMsg());
         }
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Could not load symbols"), e.getMsg());
     }
 }
 
