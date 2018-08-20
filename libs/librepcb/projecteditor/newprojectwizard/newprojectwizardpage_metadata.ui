@@ -213,7 +213,6 @@
  </widget>
  <resources>
   <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
  </resources>
  <connections/>
 </ui>
