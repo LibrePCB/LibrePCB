@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="title">
-   <string>Initialization</string>
+   <string>Initiali&amp;zation</string>
   </property>
   <property name="subTitle">
    <string>Specify how the project should be initialized.</string>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QGroupBox" name="cbxAddSchematic">
      <property name="title">
-      <string>Add Schematic</string>
+      <string>Add Sche&amp;matic</string>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -50,7 +50,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="lblSchematicFileName">
         <property name="text">
-         <string>-</string>
+         <string notr="true">-</string>
         </property>
        </widget>
       </item>
@@ -90,7 +90,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="lblBoardFileName">
         <property name="text">
-         <string>-</string>
+         <string notr="true">-</string>
         </property>
        </widget>
       </item>

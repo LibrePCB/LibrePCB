@@ -76,7 +76,7 @@
         </font>
        </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -93,7 +93,7 @@
      <item row="1" column="1">
       <widget class="QLabel" name="lblDescription">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -110,7 +110,7 @@
      <item row="2" column="1">
       <widget class="QLabel" name="lblVersion">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -127,7 +127,7 @@
      <item row="3" column="1">
       <widget class="QLabel" name="lblAuthor">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -144,7 +144,7 @@
      <item row="4" column="1">
       <widget class="QLabel" name="lblUrl">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -167,7 +167,7 @@
      <item row="5" column="1">
       <widget class="QLabel" name="lblCreated">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -184,7 +184,7 @@
      <item row="6" column="1">
       <widget class="QLabel" name="lblDeprecated">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -208,7 +208,7 @@
      <item row="8" column="1">
       <widget class="QLabel" name="lblUuid">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -225,7 +225,7 @@
      <item row="9" column="1">
       <widget class="QLabel" name="lblLibType">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -245,7 +245,7 @@
      <item row="10" column="1">
       <widget class="QLabel" name="lblDependencies">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -262,7 +262,7 @@
      <item row="11" column="1">
       <widget class="QLabel" name="lblDirectory">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

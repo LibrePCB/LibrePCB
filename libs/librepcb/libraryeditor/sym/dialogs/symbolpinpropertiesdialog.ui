@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
+    <width>313</width>
     <height>197</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
      <item row="0" column="1">
       <widget class="QLabel" name="lblUuid">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">TextLabel</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
