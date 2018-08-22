@@ -111,6 +111,15 @@ It's important to clone the repository recursively to get all submodules too:
 git clone --recursive https://github.com/LibrePCB/LibrePCB.git && cd LibrePCB
 ```
 
+### Updating
+
+When updating the repository, make sure to also update all the submodules
+recursively. Otherwise you may get strange compilation errors:
+
+```bash
+git submodule update --init --recursive
+```
+
 ### Building
 
 #### Using Qt Creator
