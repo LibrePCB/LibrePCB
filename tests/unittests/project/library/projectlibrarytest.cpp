@@ -51,7 +51,7 @@ class ProjectLibraryTest : public ::testing::Test
             mTempDir = FilePath::getRandomTempPath();
             mLibDir = mTempDir.getPathTo("project library test");
 
-            // create component inside project library
+            // create symbol inside project library
             library::Symbol sym(Uuid::createRandom(), Version::fromString("1"),
                                 "", ElementName("Existing Symbol"), "", "");
             sym.saveIntoParentDirectory(mLibDir.getPathTo("sym"));
@@ -81,9 +81,9 @@ class ProjectLibraryTest : public ::testing::Test
 
         void save(ProjectLibrary& lib, bool toOriginal) {
             QStringList errors;
-            bool success = lib.save(toOriginal, errors);
-            ASSERT_TRUE(success);
-            ASSERT_TRUE(errors.isEmpty());
+            if (!lib.save(toOriginal, errors)) {
+                throw RuntimeError(__FILE__, __LINE__, errors.join("\n"));
+            }
         }
 
         void saveToTemporary(ProjectLibrary& lib) {
@@ -124,9 +124,11 @@ TEST_F(ProjectLibraryTest, testAddSymbol)
         EXPECT_EQ(2, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
         EXPECT_FALSE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.dir().exists());
     }
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
     EXPECT_EQ(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // not upgraded
 }
 
@@ -138,10 +140,11 @@ TEST_F(ProjectLibraryTest, testAddSymbol_SaveToTemporary)
         saveToTemporary(lib);
         EXPECT_EQ(2, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
-        EXPECT_TRUE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.exists());
     }
     EXPECT_TRUE(mExistingSymbolFile.exists());
-    EXPECT_FALSE(mNewSymbolFile.exists()); // symbol must be removed in destructor
+    EXPECT_FALSE(mNewSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
     EXPECT_EQ(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // not upgraded
 }
 
@@ -161,6 +164,33 @@ TEST_F(ProjectLibraryTest, testAddSymbol_SaveToOriginal)
     EXPECT_NE(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // upgraded!
 }
 
+TEST_F(ProjectLibraryTest, testRestoreBackup)
+{
+    // create backup
+    ProjectLibrary lib(mLibDir, false, false);
+    lib.addSymbol(*mNewSymbol.take());
+    saveToTemporary(lib);
+    EXPECT_EQ(2, lib.getSymbols().count());
+    EXPECT_TRUE(mExistingSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.exists());
+
+    {
+        // restore backup
+        ProjectLibrary lib2(mLibDir, true, false);
+        EXPECT_EQ(2, lib2.getSymbols().count());
+        EXPECT_TRUE(mExistingSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.exists());
+
+        // save to original
+        saveToTemporary(lib2);
+        saveToOriginal(lib2);
+        EXPECT_TRUE(mExistingSymbolFile.exists());
+        EXPECT_TRUE(mNewSymbolFile.exists());
+    }
+    EXPECT_TRUE(mExistingSymbolFile.exists());
+    EXPECT_TRUE(mNewSymbolFile.exists());
+}
+
 TEST_F(ProjectLibraryTest, testAddRemoveSymbol)
 {
     {
@@ -170,9 +200,11 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol)
         EXPECT_EQ(1, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
         EXPECT_FALSE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.dir().exists());
     }
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
     EXPECT_EQ(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // not upgraded
 }
 
@@ -186,9 +218,11 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_SaveToTemporary)
         EXPECT_EQ(1, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
         EXPECT_FALSE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.dir().exists());
     }
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
     EXPECT_EQ(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // not upgraded
 }
 
@@ -203,9 +237,11 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_SaveToOriginal)
         EXPECT_EQ(1, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
         EXPECT_FALSE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.dir().exists());
     }
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
     EXPECT_NE(mExistingSymbolCreationSize, mExistingSymbolFile.size()); // upgraded!
 }
 
@@ -243,8 +279,10 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_SaveToOriginal)
         saveToOriginal(lib);
         EXPECT_EQ(0, lib.getSymbols().count());
         EXPECT_FALSE(mExistingSymbolFile.exists());
+        EXPECT_FALSE(mExistingSymbolFile.dir().exists());
     }
     EXPECT_FALSE(mExistingSymbolFile.exists());
+    EXPECT_FALSE(mExistingSymbolFile.dir().exists());
 }
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol)
@@ -306,9 +344,11 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_SaveToTemporary_AddNewSymbol_SaveToO
         saveToOriginal(lib);
         EXPECT_EQ(1, lib.getSymbols().count());
         EXPECT_FALSE(mExistingSymbolFile.exists());
+        EXPECT_FALSE(mExistingSymbolFile.dir().exists());
         EXPECT_TRUE(mNewSymbolFile.exists());
     }
     EXPECT_FALSE(mExistingSymbolFile.exists());
+    EXPECT_FALSE(mExistingSymbolFile.dir().exists());
     EXPECT_TRUE(mNewSymbolFile.exists());
 }
 
@@ -322,22 +362,67 @@ TEST_F(ProjectLibraryTest, testAddNewSymbol_SaveToTemporary_RemoveSymbol_SaveToO
         saveToTemporary(lib);
         EXPECT_EQ(2, lib.getSymbols().count());
         EXPECT_TRUE(mExistingSymbolFile.exists());
-        EXPECT_TRUE(mNewSymbolFile.exists());
+        EXPECT_FALSE(mNewSymbolFile.exists());
 
         lib.removeSymbol(*sym);
         saveToTemporary(lib);
         saveToOriginal(lib);
         EXPECT_EQ(1, lib.getSymbols().count());
         EXPECT_FALSE(mExistingSymbolFile.exists());
+        EXPECT_FALSE(mExistingSymbolFile.dir().exists());
         EXPECT_TRUE(mNewSymbolFile.exists());
 
         lib.addSymbol(*sym);
         saveToTemporary(lib);
         EXPECT_EQ(2, lib.getSymbols().count());
-        EXPECT_TRUE(mExistingSymbolFile.exists());
+        EXPECT_FALSE(mExistingSymbolFile.exists());
         EXPECT_TRUE(mNewSymbolFile.exists());
     }
     EXPECT_FALSE(mExistingSymbolFile.exists());
+    EXPECT_FALSE(mExistingSymbolFile.dir().exists());
+    EXPECT_TRUE(mNewSymbolFile.exists());
+}
+
+TEST_F(ProjectLibraryTest, testRemoveSymbol_SaveToTemporary_AddSymbolCopy_SaveToOriginal)
+{
+    ElementName copyName("New Symbol Copy");
+    {
+        ProjectLibrary lib(mLibDir, false, false);
+        library::Symbol* sym = getFirstSymbol(lib);
+
+        lib.removeSymbol(*sym);
+        EXPECT_EQ(0, lib.getSymbols().count());
+        EXPECT_TRUE(mExistingSymbolFile.exists());
+
+        // add new symbol with same UUID as the already added symbol
+        QScopedPointer<library::Symbol> symCopy(
+                    new library::Symbol(sym->getUuid(), Version::fromString("1"),
+                                        "", copyName, "", ""));
+        lib.addSymbol(*symCopy.take());
+        saveToTemporary(lib);
+        saveToOriginal(lib);
+        EXPECT_EQ(1, lib.getSymbols().count());
+        EXPECT_TRUE(mExistingSymbolFile.exists()); // same path as the copied symbol
+    }
+    EXPECT_TRUE(mExistingSymbolFile.exists());
+
+    // check the name of the saved symbol to be sure the right symbol was saved
+    library::Symbol symbol(FilePath(mExistingSymbolFile.dir().absolutePath()), true);
+    EXPECT_EQ(copyName, symbol.getNames().getDefaultValue());
+}
+
+TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory)
+{
+    ProjectLibrary lib(mLibDir, false, false);
+
+    // already create the destination directory to see if saving still works
+    EXPECT_FALSE(mNewSymbolFile.dir().exists());
+    FileUtils::makePath(FilePath(mNewSymbolFile.dir().absolutePath()));
+    EXPECT_TRUE(mNewSymbolFile.dir().exists());
+
+    lib.addSymbol(*mNewSymbol.take());
+    saveToTemporary(lib);
+    saveToOriginal(lib);
     EXPECT_TRUE(mNewSymbolFile.exists());
 }
 
