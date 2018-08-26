@@ -115,6 +115,9 @@ void SI_NetLabel::addToSchematic()
     if (isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
+    mNameChangedConnection = connect(&getNetSignalOfNetSegment(),
+                                     &NetSignal::nameChanged,
+                                     [this](){mGraphicsItem->updateCacheAndRepaint();});
     mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
                                           &NetSignal::highlightedChanged,
                                           [this](){mGraphicsItem->update();});
@@ -128,6 +131,7 @@ void SI_NetLabel::removeFromSchematic()
     if (!isAddedToSchematic()) {
         throw LogicError(__FILE__, __LINE__);
     }
+    disconnect(mNameChangedConnection);
     disconnect(mHighlightChangedConnection);
     SI_Base::removeFromSchematic(mGraphicsItem.data());
 }

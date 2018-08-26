@@ -95,6 +95,7 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
 
         // General
         QScopedPointer<SGI_NetLabel> mGraphicsItem;
+        QMetaObject::Connection mNameChangedConnection;
         QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
