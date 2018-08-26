@@ -112,10 +112,11 @@ class ProjectLibrary final : public QObject
         template <typename ElementType>
         void removeElement(ElementType& element,
                            QHash<Uuid, ElementType*>& elementList);
-        void cleanupElements() noexcept;
 
         // General
         FilePath mLibraryPath; ///< the "library" directory of the project
+        FilePath mBackupPath; ///< same as #mLibraryPath, but with trailing "~"
+        FilePath mTmpDir; ///< path to a temporary directory
 
         // The currently added library elements
         QHash<Uuid, library::Symbol*> mSymbols;
@@ -123,8 +124,10 @@ class ProjectLibrary final : public QObject
         QHash<Uuid, library::Component*> mComponents;
         QHash<Uuid, library::Device*> mDevices;
 
-        enum class State {Loaded, Removed, SavedToTemporary, SavedToOriginal};
-        QHash<library::LibraryBaseElement*, State> mElementsState;
+        QSet<library::LibraryBaseElement*> mAllElements;
+        QSet<library::LibraryBaseElement*> mLoadedElements;
+        QSet<library::LibraryBaseElement*> mSavedToTemporary;
+        QSet<library::LibraryBaseElement*> mSavedToOriginal;
 };
 
 /*****************************************************************************************

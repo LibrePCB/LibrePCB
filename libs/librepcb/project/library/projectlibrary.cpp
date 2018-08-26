@@ -45,32 +45,25 @@ using namespace library;
  ****************************************************************************************/
 
 ProjectLibrary::ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly) :
-    mLibraryPath(libDir)
+    mLibraryPath(libDir), mBackupPath(libDir.toStr() % '~'),
+    mTmpDir(FilePath::getRandomTempPath())
 {
     qDebug() << "load project library...";
-
-    Q_UNUSED(restore)
 
     if ((!mLibraryPath.isExistingDir()) && (!readOnly)) {
         FileUtils::makePath(mLibraryPath); // can throw
     }
 
-    try
-    {
+    try {
         // Load all library elements
-        loadElements<Symbol>    (mLibraryPath.getPathTo("sym"),    "symbols",      mSymbols);
-        loadElements<Package>   (mLibraryPath.getPathTo("pkg"),    "packages",     mPackages);
-        loadElements<Component> (mLibraryPath.getPathTo("cmp"),    "components",   mComponents);
-        loadElements<Device>    (mLibraryPath.getPathTo("dev"),    "devices",      mDevices);
-    }
-    catch (Exception &e)
-    {
-        // free the allocated memory in the reverse order of their allocation...
-        qDeleteAll(mDevices);       mDevices.clear();
-        qDeleteAll(mComponents);    mComponents.clear();
-        qDeleteAll(mPackages);      mPackages.clear();
-        qDeleteAll(mSymbols);       mSymbols.clear();
-        throw; // ...and rethrow the exception
+        const FilePath& dirToLoad = restore && mBackupPath.isExistingDir() ? mBackupPath : mLibraryPath;
+        loadElements<Symbol>    (dirToLoad.getPathTo("sym"),    "symbols",      mSymbols);
+        loadElements<Package>   (dirToLoad.getPathTo("pkg"),    "packages",     mPackages);
+        loadElements<Component> (dirToLoad.getPathTo("cmp"),    "components",   mComponents);
+        loadElements<Device>    (dirToLoad.getPathTo("dev"),    "devices",      mDevices);
+    } catch (const Exception&) {
+        qDeleteAll(mAllElements);       mAllElements.clear();
+        throw;
     }
 
     qDebug() << "project library successfully loaded!";
@@ -78,14 +71,18 @@ ProjectLibrary::ProjectLibrary(const FilePath& libDir, bool restore, bool readOn
 
 ProjectLibrary::~ProjectLibrary() noexcept
 {
-    // clean up all removed elements
-    cleanupElements();
+    // Delete all library elements.
+    qDeleteAll(mAllElements);       mAllElements.clear();
 
-    // Delete all library elements (in reverse order of their creation)
-    qDeleteAll(mDevices);       mDevices.clear();
-    qDeleteAll(mComponents);    mComponents.clear();
-    qDeleteAll(mPackages);      mPackages.clear();
-    qDeleteAll(mSymbols);       mSymbols.clear();
+    // Remove backup directory.
+    if (!QDir(mBackupPath.toStr()).removeRecursively()) {
+        qWarning() << "Could not remove backup directory" << mBackupPath.toStr();
+    }
+
+    // Remove temporary directory.
+    if (!QDir(mTmpDir.toStr()).removeRecursively()) {
+        qWarning() << "Could not remove temporary directory" << mTmpDir.toStr();
+    }
 }
 
 /*****************************************************************************************
@@ -157,54 +154,39 @@ bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept
     bool success = true;
 
     QSet<LibraryBaseElement*> currentElements = getCurrentElements();
+    QSet<LibraryBaseElement*>& savedElements = toOriginal ? mSavedToOriginal : mSavedToTemporary;
+    const FilePath& libDir = toOriginal ? mLibraryPath : mBackupPath;
 
-    // remove no longer needed elements
-    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
-        library::LibraryBaseElement* element = it.key();
-        State state = it.value();
-        if (currentElements.contains(element)) continue;
-        if (state == State::Removed) continue;
-        if (toOriginal || state == State::SavedToTemporary) {
-            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
-            try {
-                element->moveIntoParentDirectory(FilePath::getRandomTempPath()); // can throw
-                mElementsState[element] = State::Removed;
-            }
-            catch (Exception& e) {
-                success = false;
-                errors.append(e.getMsg());
-            }
+    // Remove no longer needed elements.
+    foreach (LibraryBaseElement* element, mLoadedElements + savedElements - currentElements) {
+        FilePath dir = libDir.getPathTo(element->getShortElementName()).getPathTo(element->getUuid().toStr());
+        try {
+            FileUtils::removeDirRecursively(dir); // can throw
+            savedElements.remove(element);
+        } catch (const Exception& e) {
+            success = false;
+            errors.append(e.getMsg());
         }
     }
 
-    // add new elements
-    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
-        library::LibraryBaseElement* element = it.key();
-        State state = it.value();
-        if (!currentElements.contains(element)) continue;
-        if (state == State::Removed) {
-            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() != mLibraryPath);
-            try {
-                element->moveIntoParentDirectory(mLibraryPath.getPathTo(element->getShortElementName())); // can throw
-                mElementsState[element] = toOriginal ? State::SavedToOriginal : State::SavedToTemporary;
-            }
-            catch (Exception& e) {
-                success = false;
-                errors.append(e.getMsg());
-            }
-        } else if ((state == State::SavedToTemporary) && toOriginal) {
-            mElementsState[element] = State::SavedToOriginal;
-        } else if ((state == State::Loaded) && toOriginal) {
-            // force upgrading file format of loaded elements
-            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
-            try {
+    // Add new elements and upgrade loaded elements.
+    foreach (LibraryBaseElement* element, currentElements - savedElements) {
+        FilePath dir = libDir.getPathTo(element->getShortElementName()).getPathTo(element->getUuid().toStr());
+        try {
+            if (toOriginal && mLoadedElements.contains(element)) {
+                // Upgrade library element to latest file format version.
                 element->save(); // can throw
-                mElementsState[element] = State::SavedToOriginal;
+                mLoadedElements.remove(element);
             }
-            catch (Exception& e) {
-                success = false;
-                errors.append(e.getMsg());
+            if (dir.isExistingDir()) {
+                // Avoid copy failure caused by already existing directory.
+                FileUtils::removeDirRecursively(dir);
             }
+            FileUtils::copyDirRecursively(element->getFilePath(), dir); // can throw
+            savedElements.insert(element);
+        } catch (const Exception& e) {
+            success = false;
+            errors.append(e.getMsg());
         }
     }
 
@@ -234,8 +216,7 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
     // search all subdirectories which have a valid UUID as directory name
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable);
     dir.setNameFilters(QStringList() << QString("*.%1").arg(directory.getBasename()));
-    foreach (const QString& dirname, dir.entryList())
-    {
+    foreach (const QString& dirname, dir.entryList()) {
         FilePath subdirPath(directory.getPathTo(dirname));
 
         // check if directory is a valid library element
@@ -249,17 +230,22 @@ void ProjectLibrary::loadElements(const FilePath& directory, const QString& type
             continue;
         }
 
-        // load the library element --> an exception will be thrown on error
-        ElementType* element = new ElementType(subdirPath, false);
+        // Copy element to temporary directory to decouple it from the project library.
+        FilePath elementDir = mTmpDir.getPathTo(QString::number(qrand())).getPathTo(dirname);
+        FileUtils::copyDirRecursively(subdirPath, elementDir); // can throw
 
+        // load the library element
+        ElementType* element = new ElementType(elementDir, false); // can throw
         if (elementList.contains(element->getUuid())) {
             throw RuntimeError(__FILE__, __LINE__,
                 QString(tr("There are multiple library elements with the same "
                 "UUID in the directory \"%1\"")).arg(subdirPath.toNative()));
         }
 
+        // everything is ok -> update members
         elementList.insert(element->getUuid(), element);
-        mElementsState.insert(element, State::Loaded);
+        mAllElements.insert(element);
+        mLoadedElements.insert(element);
     }
 
     qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
@@ -274,10 +260,10 @@ void ProjectLibrary::addElement(ElementType& element,
             "There is already an element with the same UUID in the project's library: %1"))
             .arg(element.getUuid().toStr()));
     }
-    if (!mElementsState.contains(&element)) {
+    if (!mAllElements.contains(&element)) {
         // copy from workspace *immediately* to freeze/backup their state
-        element.saveIntoParentDirectory(FilePath::getRandomTempPath());
-        mElementsState.insert(&element, State::Removed);
+        element.saveIntoParentDirectory(mTmpDir.getPathTo(QString::number(qrand()))); // can throw
+        mAllElements.insert(&element);
     }
     elementList.insert(element.getUuid(), &element);
 }
@@ -287,24 +273,8 @@ void ProjectLibrary::removeElement(ElementType& element,
                                    QHash<Uuid, ElementType*>& elementList)
 {
     Q_ASSERT(elementList.value(element.getUuid()) == &element);
+    Q_ASSERT(mAllElements.contains(&element));
     elementList.remove(element.getUuid());
-}
-
-void ProjectLibrary::cleanupElements() noexcept
-{
-    QSet<LibraryBaseElement*> currentElements = getCurrentElements();
-    for (auto it = mElementsState.constBegin(); it != mElementsState.constEnd(); ++it) {
-        library::LibraryBaseElement* element = it.key();
-        State state = it.value();
-        if (state == State::SavedToTemporary) {
-            Q_ASSERT(element->getFilePath().getParentDir().getParentDir() == mLibraryPath);
-            QDir(element->getFilePath().toStr()).removeRecursively();
-            if (!currentElements.contains(element)) {
-                delete element;
-            }
-        }
-
-    }
 }
 
 /*****************************************************************************************
