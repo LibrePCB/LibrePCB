@@ -60,7 +60,6 @@ class CmdFlipSelectedBoardItems final : public UndoCommandGroup
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
-        void flipDevice(BI_Device& device, const Point& center);
 
 
         // Private Member Variables

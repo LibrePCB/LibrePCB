@@ -31,7 +31,9 @@
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
-#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneadd.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
@@ -72,6 +74,7 @@ bool CmdCombineNetSignals::performExecute()
     // determine all elements which need to be removed temporary
     QList<SI_NetSegment*> schematicNetSegments = mNetSignalToRemove.getSchematicNetSegments();
     QList<BI_NetSegment*> boardNetSegments = mNetSignalToRemove.getBoardNetSegments();
+    QList<BI_Plane*> boardPlanes = mNetSignalToRemove.getBoardPlanes();
 
     // remove all schematic netsegments
     foreach (SI_NetSegment* netsegment, schematicNetSegments) {
@@ -81,6 +84,11 @@ bool CmdCombineNetSignals::performExecute()
     // remove all board netsegments
     foreach (BI_NetSegment* netsegment, boardNetSegments) {
         execNewChildCmd(new CmdBoardNetSegmentRemove(*netsegment)); // can throw
+    }
+
+    // remove all board planes
+    foreach (BI_Plane* plane, boardPlanes) {
+        execNewChildCmd(new CmdBoardPlaneRemove(*plane)); // can throw
     }
 
     // change netsignal of all component signal instances
@@ -94,6 +102,14 @@ bool CmdCombineNetSignals::performExecute()
         cmd->setNetSignal(mResultingNetSignal);
         execNewChildCmd(cmd); // can throw
         execNewChildCmd(new CmdBoardNetSegmentAdd(*netsegment)); // can throw
+    }
+
+    // re-add all board planes
+    foreach (BI_Plane* plane, boardPlanes) {
+        CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
+        cmd->setNetSignal(mResultingNetSignal);
+        execNewChildCmd(cmd); // can throw
+        execNewChildCmd(new CmdBoardPlaneAdd(*plane)); // can throw
     }
 
     // re-add all schematic netsegments

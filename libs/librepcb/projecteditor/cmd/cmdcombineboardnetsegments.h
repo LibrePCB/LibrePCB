@@ -24,7 +24,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/units/point.h>
 #include <librepcb/common/undocommandgroup.h>
 
 /*****************************************************************************************
@@ -34,9 +33,7 @@ namespace librepcb {
 namespace project {
 
 class BI_NetSegment;
-class BI_NetPoint;
-class BI_NetLine;
-class BI_Via;
+class BI_NetLineAnchor;
 
 namespace editor {
 
@@ -56,27 +53,23 @@ class CmdCombineBoardNetSegments final : public UndoCommandGroup
         // Constructors / Destructor
         CmdCombineBoardNetSegments() = delete;
         CmdCombineBoardNetSegments(const CmdCombineBoardNetSegments& other) = delete;
-        CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved, BI_NetPoint& junction) noexcept;
+        CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved, BI_NetLineAnchor& oldAnchor,
+                                   BI_NetSegment& result, BI_NetLineAnchor& newAnchor) noexcept;
         ~CmdCombineBoardNetSegments() noexcept;
 
         // Operator Overloadings
         CmdCombineBoardNetSegments& operator=(const CmdCombineBoardNetSegments& rhs) = delete;
 
 
-    private:
-
-        // Private Methods
-
+    private: // Methods
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
-        BI_NetPoint& addNetPointToVia(BI_Via& via);
-        BI_NetPoint& addNetPointInMiddleOfNetLine(BI_NetLine& l, const Point& pos);
-
-
-        // Attributes from the constructor
-        BI_NetSegment& mNetSegmentToBeRemoved;
-        BI_NetPoint& mJunctionNetPoint;
+    private: // Data
+        BI_NetSegment& mOldSegment;
+        BI_NetSegment& mNewSegment;
+        BI_NetLineAnchor& mOldAnchor;
+        BI_NetLineAnchor& mNewAnchor;
 };
 
 /*****************************************************************************************

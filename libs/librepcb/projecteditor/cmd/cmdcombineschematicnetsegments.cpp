@@ -23,16 +23,15 @@
 #include <QtCore>
 #include "cmdcombineschematicnetsegments.h"
 #include <librepcb/common/scopeguard.h>
-#include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
 #include "cmdremoveunusednetsignals.h"
-#include "cmdcombineschematicnetpoints.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -45,10 +44,11 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdCombineSchematicNetSegments::CmdCombineSchematicNetSegments(SI_NetSegment& toBeRemoved,
-                                                               SI_NetPoint& junction) noexcept :
-    UndoCommandGroup(tr("Combine Schematic Netsegments")),
-    mNetSegmentToBeRemoved(toBeRemoved), mJunctionNetPoint(junction)
+CmdCombineSchematicNetSegments::CmdCombineSchematicNetSegments(
+        SI_NetSegment& toBeRemoved, SI_NetLineAnchor& oldAnchor,
+        SI_NetSegment& result, SI_NetLineAnchor& newAnchor) noexcept :
+    UndoCommandGroup(tr("Combine Schematic Net Segments")),
+    mOldSegment(toBeRemoved), mNewSegment(result), mOldAnchor(oldAnchor), mNewAnchor(newAnchor)
 {
 }
 
@@ -66,94 +66,45 @@ bool CmdCombineSchematicNetSegments::performExecute()
     auto undoScopeGuard = scopeGuard([&](){performUndo();});
 
     // check arguments validity
-    if (mNetSegmentToBeRemoved == mJunctionNetPoint.getNetSegment())
+    if (&mOldSegment == &mNewSegment)
         throw LogicError(__FILE__, __LINE__);
-    if (mNetSegmentToBeRemoved.getNetSignal() != mJunctionNetPoint.getNetSignalOfNetSegment())
+    if (&mOldSegment.getSchematic() != &mNewSegment.getSchematic())
+        throw LogicError(__FILE__, __LINE__);
+    if (&mOldSegment.getNetSignal() != &mNewSegment.getNetSignal())
         throw LogicError(__FILE__, __LINE__);
 
-    // find all interception netpoints
-    QList<SI_NetPoint*> netpointsUnderJunction;
-    mNetSegmentToBeRemoved.getNetPointsAtScenePos(mJunctionNetPoint.getPosition(), netpointsUnderJunction);
-
-    // create exactly one interception netpoint
-    SI_NetPoint* interceptionNetPoint = nullptr;
-    if (netpointsUnderJunction.count() == 0) {
-        QList<SI_NetLine*> netlinesUnderJunction;
-        mNetSegmentToBeRemoved.getNetLinesAtScenePos(mJunctionNetPoint.getPosition(), netlinesUnderJunction);
-        if (netlinesUnderJunction.count() == 0) {
-            throw LogicError(__FILE__, __LINE__);
-        } else {
-            Q_ASSERT(netlinesUnderJunction.count() > 0);
-            SI_NetLine* netline = netlinesUnderJunction.first(); Q_ASSERT(netline);
-            interceptionNetPoint = &addNetPointInMiddleOfNetLine(*netline, mJunctionNetPoint.getPosition());
-        }
-    } else if (netpointsUnderJunction.count() == 1) {
-        interceptionNetPoint = netpointsUnderJunction.first();
-    } else {
-        Q_ASSERT(netpointsUnderJunction.count() > 1);
-        interceptionNetPoint = netpointsUnderJunction.first();
-        foreach (SI_NetPoint* netpoint, netpointsUnderJunction) {
-            if (netpoint != interceptionNetPoint) {
-                execNewChildCmd(new CmdCombineSchematicNetPoints(
-                                    *netpoint, *interceptionNetPoint)); // can throw
-            }
-        }
-    }
-    Q_ASSERT(interceptionNetPoint);
-
-    // move all required netpoints/netlines to the resulting netsegment
-    CmdSchematicNetSegmentAddElements* cmdAdd = new CmdSchematicNetSegmentAddElements(mJunctionNetPoint.getNetSegment());
-    QHash<SI_NetPoint*, SI_NetPoint*> netPointMap;
-    foreach (SI_NetPoint* netpoint, mNetSegmentToBeRemoved.getNetPoints()) {
-        if (netpoint == interceptionNetPoint) {
-            netPointMap.insert(netpoint, &mJunctionNetPoint);
-        } else if (netpoint->isAttachedToPin()) {
-            SI_SymbolPin* pin = netpoint->getSymbolPin(); Q_ASSERT(pin);
-            SI_NetPoint* newNetPoint = cmdAdd->addNetPoint(*pin); Q_ASSERT(newNetPoint);
-            netPointMap.insert(netpoint, newNetPoint);
+    // copy all required netpoints/netlines to the resulting netsegment
+    QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+        new CmdSchematicNetSegmentAddElements(mNewSegment));
+    QHash<SI_NetLineAnchor*, SI_NetLineAnchor*> anchorMap;
+    foreach (SI_NetPoint* netpoint, mOldSegment.getNetPoints()) {
+        if (netpoint == &mOldAnchor) {
+            anchorMap.insert(netpoint, &mNewAnchor);
         } else {
             SI_NetPoint* newNetPoint = cmdAdd->addNetPoint(netpoint->getPosition()); Q_ASSERT(newNetPoint);
-            netPointMap.insert(netpoint, newNetPoint);
+            anchorMap.insert(netpoint, newNetPoint);
         }
     }
-    foreach (SI_NetLine* netline, mNetSegmentToBeRemoved.getNetLines()) {
-        SI_NetPoint* startPoint = netPointMap.value(&netline->getStartPoint()); Q_ASSERT(startPoint);
-        SI_NetPoint* endPoint = netPointMap.value(&netline->getEndPoint()); Q_ASSERT(endPoint);
+    foreach (SI_NetLine* netline, mOldSegment.getNetLines()) {
+        SI_NetLineAnchor* startPoint = anchorMap.value(&netline->getStartPoint(), &netline->getStartPoint()); Q_ASSERT(startPoint);
+        SI_NetLineAnchor* endPoint = anchorMap.value(&netline->getEndPoint(), &netline->getEndPoint()); Q_ASSERT(endPoint);
         SI_NetLine* newNetLine = cmdAdd->addNetLine(*startPoint, *endPoint); Q_ASSERT(newNetLine);
     }
-    execNewChildCmd(new CmdSchematicNetSegmentRemove(mNetSegmentToBeRemoved)); // can throw
-    execNewChildCmd(cmdAdd); // can throw
+    execNewChildCmd(new CmdSchematicNetSegmentRemove(mOldSegment)); // can throw
+    execNewChildCmd(cmdAdd.take()); // can throw
 
-
-    if (getChildCount() > 0) {
-        // remove netsignals which are no longer required
-        execNewChildCmd(new CmdRemoveUnusedNetSignals(mJunctionNetPoint.getCircuit())); // can throw
+    // copy net labels
+    foreach (SI_NetLabel* netlabel, mOldSegment.getNetLabels()) {
+        QScopedPointer<CmdSchematicNetLabelAdd> cmd(
+            new CmdSchematicNetLabelAdd(mNewSegment, netlabel->getPosition(), netlabel->getRotation()));
+        execNewChildCmd(cmd.take()); // can throw
     }
+
+    // remove netsignals which are no longer required
+    execNewChildCmd(new CmdRemoveUnusedNetSignals(mNewSegment.getCircuit())); // can throw
 
     undoScopeGuard.dismiss(); // no undo required
     return true;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-SI_NetPoint& CmdCombineSchematicNetSegments::addNetPointInMiddleOfNetLine(
-        SI_NetLine& l, const Point& pos)
-{
-    // add netpoint + 2 netlines
-    CmdSchematicNetSegmentAddElements* cmdAdd = new CmdSchematicNetSegmentAddElements(l.getNetSegment());
-    SI_NetPoint* netpoint = cmdAdd->addNetPoint(pos); Q_ASSERT(netpoint);
-    SI_NetLine* netline1 = cmdAdd->addNetLine(l.getStartPoint(), *netpoint); Q_ASSERT(netline1);
-    SI_NetLine* netline2 = cmdAdd->addNetLine(l.getEndPoint(), *netpoint); Q_ASSERT(netline2);
-    execNewChildCmd(cmdAdd); // can throw
-
-    // remove netline
-    CmdSchematicNetSegmentRemoveElements* cmdRemove = new CmdSchematicNetSegmentRemoveElements(l.getNetSegment());
-    cmdRemove->removeNetLine(l);
-    execNewChildCmd(cmdRemove); // can throw
-
-    return *netpoint;
 }
 
 /*****************************************************************************************

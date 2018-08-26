@@ -55,11 +55,10 @@ CmdMoveSelectedSchematicItems::CmdMoveSelectedSchematicItems(Schematic& schemati
     // get all selected items
     std::unique_ptr<SchematicSelectionQuery> query(mSchematic.createSelectionQuery());
     query->addSelectedSymbols();
-    query->addSelectedNetPoints(SchematicSelectionQuery::NetPointFilter::Floating);
-    query->addSelectedNetLines(SchematicSelectionQuery::NetLineFilter::All);
+    query->addSelectedNetPoints();
+    query->addSelectedNetLines();
     query->addSelectedNetLabels();
-    query->addNetPointsOfNetLines(SchematicSelectionQuery::NetLineFilter::All,
-                                  SchematicSelectionQuery::NetPointFilter::Floating);
+    query->addNetPointsOfNetLines();
 
     // create undo commands
     foreach (SI_Symbol* symbol, query->getSymbols()) {

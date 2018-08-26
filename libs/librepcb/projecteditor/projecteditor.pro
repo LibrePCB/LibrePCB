@@ -43,20 +43,13 @@ SOURCES += \
     cmd/cmdadddevicetoboard.cpp \
     cmd/cmdaddsymboltoschematic.cpp \
     cmd/cmdchangenetsignalofschematicnetsegment.cpp \
-    cmd/cmdcombineallitemsunderboardnetpoint.cpp \
-    cmd/cmdcombineallitemsunderschematicnetpoint.cpp \
-    cmd/cmdcombineboardnetpoints.cpp \
     cmd/cmdcombineboardnetsegments.cpp \
     cmd/cmdcombinenetsignals.cpp \
-    cmd/cmdcombineschematicnetpoints.cpp \
     cmd/cmdcombineschematicnetsegments.cpp \
-    cmd/cmddetachboardnetpointfromviaorpad.cpp \
     cmd/cmdflipselectedboarditems.cpp \
     cmd/cmdmoveselectedboarditems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
-    cmd/cmdplaceboardnetpoint.cpp \
-    cmd/cmdplaceschematicnetpoint.cpp \
-    cmd/cmdremovedevicefromboard.cpp \
+    cmd/cmdremoveboarditems.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
     cmd/cmdremoveselectedschematicitems.cpp \
     cmd/cmdremoveunusedlibraryelements.cpp \
@@ -110,20 +103,13 @@ HEADERS += \
     cmd/cmdadddevicetoboard.h \
     cmd/cmdaddsymboltoschematic.h \
     cmd/cmdchangenetsignalofschematicnetsegment.h \
-    cmd/cmdcombineallitemsunderboardnetpoint.h \
-    cmd/cmdcombineallitemsunderschematicnetpoint.h \
-    cmd/cmdcombineboardnetpoints.h \
     cmd/cmdcombineboardnetsegments.h \
     cmd/cmdcombinenetsignals.h \
-    cmd/cmdcombineschematicnetpoints.h \
     cmd/cmdcombineschematicnetsegments.h \
-    cmd/cmddetachboardnetpointfromviaorpad.h \
     cmd/cmdflipselectedboarditems.h \
     cmd/cmdmoveselectedboarditems.h \
     cmd/cmdmoveselectedschematicitems.h \
-    cmd/cmdplaceboardnetpoint.h \
-    cmd/cmdplaceschematicnetpoint.h \
-    cmd/cmdremovedevicefromboard.h \
+    cmd/cmdremoveboarditems.h \
     cmd/cmdremoveselectedboarditems.h \
     cmd/cmdremoveselectedschematicitems.h \
     cmd/cmdremoveunusedlibraryelements.h \

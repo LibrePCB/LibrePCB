@@ -24,7 +24,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/undocommand.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -40,6 +40,8 @@ class BI_NetSegment;
 
 namespace editor {
 
+class CmdRemoveBoardItems;
+
 /*****************************************************************************************
  *  Class CmdRemoveSelectedBoardItems
  ****************************************************************************************/
@@ -47,47 +49,26 @@ namespace editor {
 /**
  * @brief The CmdRemoveSelectedBoardItems class
  */
-class CmdRemoveSelectedBoardItems final : public UndoCommandGroup
+class CmdRemoveSelectedBoardItems final : public UndoCommand
 {
-    private:
-        // Private Types
-        struct NetSegmentItems {
-            QSet<BI_Via*> vias;
-            QSet<BI_NetPoint*> netpoints;
-            QSet<BI_NetLine*> netlines;
-        };
-        typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
-
-
     public:
-
         // Constructors / Destructor
         explicit CmdRemoveSelectedBoardItems(Board& board) noexcept;
         ~CmdRemoveSelectedBoardItems() noexcept;
 
-
-    private:
-
-        // Private Methods
-
+    private: // Methods
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
-        void splitUpNetSegment(BI_NetSegment& netsegment, const NetSegmentItems& selectedItems);
-        void createNewSubNetSegment(BI_NetSegment& netsegment, const NetSegmentItems& items);
-        QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(BI_NetSegment& segment,
-                                                                   const NetSegmentItems& removedItems) noexcept;
-        void findAllConnectedNetPointsAndNetLines(BI_NetPoint& netpoint,
-                                                  QSet<BI_Via*>& availableVias,
-                                                  QSet<BI_NetPoint*>& availableNetPoints,
-                                                  QSet<BI_NetLine*>& availableNetLines,
-                                                  QSet<BI_Via*>& vias,
-                                                  QSet<BI_NetPoint*>& netpoints,
-                                                  QSet<BI_NetLine*>& netlines) const noexcept;
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
 
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
 
-        // Attributes from the constructor
+    private: // Data
         Board& mBoard;
+        QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
 };
 
 /*****************************************************************************************

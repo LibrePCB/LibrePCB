@@ -31,10 +31,17 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
+
+class GraphicsLayer;
+
 namespace project {
 
+class NetSignal;
+class BI_Via;
+class BI_FootprintPad;
 class BI_NetPoint;
 class BI_NetLine;
+class BI_NetLineAnchor;
 
 namespace editor {
 
@@ -97,6 +104,15 @@ class BES_DrawTrace final : public BES_Base
                               BI_NetPoint* fixedPoint = nullptr) noexcept;
         bool addNextNetPoint(Board& board, const Point& pos) noexcept;
         bool abortPositioning(bool showErrMsgBox) noexcept;
+        BI_Via* findVia(Board& board, const Point& pos, NetSignal* netsignal = nullptr) const noexcept;
+        BI_FootprintPad* findPad(Board& board, const Point& pos, GraphicsLayer* layer = nullptr,
+                                 NetSignal* netsignal = nullptr) const noexcept;
+        BI_NetPoint* findNetPoint(Board& board, const Point& pos, GraphicsLayer* layer = nullptr,
+                                  NetSignal* netsignal = nullptr,
+                                  const QSet<BI_NetPoint*>& except = {}) const noexcept;
+        BI_NetLine* findNetLine(Board& board, const Point& pos, GraphicsLayer* layer = nullptr,
+                                NetSignal* netsignal = nullptr,
+                                const QSet<BI_NetLine*>& except = {}) const noexcept;
         void updateNetpointPositions(const Point& cursorPos) noexcept;
         void layerComboBoxIndexChanged(int index) noexcept;
         void wireWidthComboBoxTextChanged(const QString& width) noexcept;
@@ -109,7 +125,7 @@ class BES_DrawTrace final : public BES_Base
         WireMode mCurrentWireMode; ///< the current wire mode
         QString mCurrentLayerName; ///< the current board layer name
         PositiveLength mCurrentWidth; ///< the current wire width
-        BI_NetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
+        BI_NetLineAnchor* mFixedStartAnchor; ///< the fixed netline anchor (start point of the line)
         BI_NetLine* mPositioningNetLine1; ///< line between fixed point and p1
         BI_NetPoint* mPositioningNetPoint1; ///< the first netpoint to place
         BI_NetLine* mPositioningNetLine2; ///< line between p1 and p2

@@ -39,7 +39,9 @@ class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLabel;
 class SI_Symbol;
+class SI_SymbolPin;
 class BI_Device;
+class SI_NetLineAnchor;
 class ComponentSignalInstance;
 
 namespace editor {
@@ -83,16 +85,14 @@ class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup
         SI_NetSegment* createNewSubNetSegment(SI_NetSegment& netsegment, const NetSegmentItems& items);
         void removeNetLabel(SI_NetLabel& netlabel);
         void removeSymbol(SI_Symbol& symbol);
-        void detachNetPointFromSymbolPin(SI_NetPoint& netpoint);
-        ComponentSignalInstance* getCmpSigInstToBeDisconnected(SI_NetPoint& netpoint) const noexcept;
         void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
         QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(SI_NetSegment& segment,
                                                                    const NetSegmentItems& removedItems) noexcept;
-        void findAllConnectedNetPointsAndNetLines(SI_NetPoint& netpoint,
-                                                  QSet<SI_NetPoint*>& availableNetPoints,
-                                                  QSet<SI_NetLine*>& availableNetLines,
+        void findAllConnectedNetPointsAndNetLines(SI_NetLineAnchor& anchor,
+                                                  QSet<SI_NetLineAnchor*>& processedAnchors,
                                                   QSet<SI_NetPoint*>& netpoints,
-                                                  QSet<SI_NetLine*>& netlines) const noexcept;
+                                                  QSet<SI_NetLine*>& netlines,
+                                                  QSet<SI_NetLine*>& availableNetLines) const noexcept;
         int getNearestNetSegmentOfNetLabel(const SI_NetLabel& netlabel,
                                            const QList<NetSegmentItems>& segments) const noexcept;
         Length getDistanceBetweenNetLabelAndNetSegment(const SI_NetLabel& netlabel,

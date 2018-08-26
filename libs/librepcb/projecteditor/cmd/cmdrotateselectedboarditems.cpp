@@ -71,11 +71,10 @@ bool CmdRotateSelectedBoardItems::performExecute()
 {
     // get all selected items
     std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-    query->addSelectedFootprints();
+    query->addDeviceInstancesOfSelectedFootprints();
     query->addSelectedVias();
-    query->addSelectedNetPoints(BoardSelectionQuery::NetPointFilter::Floating);
-    query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
-                                  BoardSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedNetPoints();
+    query->addNetPointsOfNetLines();
     query->addSelectedPlanes();
     query->addSelectedPolygons();
     query->addSelectedBoardStrokeTexts();
@@ -85,8 +84,8 @@ bool CmdRotateSelectedBoardItems::performExecute()
     // find the center of all elements
     Point center = Point(0, 0);
     int count = 0;
-    foreach (BI_Footprint* footprint, query->getFootprints()) {
-        center += footprint->getPosition();
+    foreach (BI_Device* device, query->getDeviceInstances()) {
+        center += device->getPosition();
         ++count;
     }
     foreach (BI_Via* via, query->getVias()) {
@@ -111,7 +110,7 @@ bool CmdRotateSelectedBoardItems::performExecute()
     }
     foreach (BI_StrokeText* text, query->getStrokeTexts()) {
         // do not count texts of footprints if the footprint is selected too
-        if (!query->getFootprints().contains(text->getFootprint())) {
+        if ((!text->getFootprint()) || (!query->getDeviceInstances().contains(&text->getFootprint()->getDeviceInstance()))) {
             center += text->getPosition();
             ++count;
         }
@@ -130,9 +129,8 @@ bool CmdRotateSelectedBoardItems::performExecute()
     }
 
     // rotate all selected elements
-    foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
-        BI_Device& device = footprint->getDeviceInstance();
-        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
+    foreach (BI_Device* device, query->getDeviceInstances()) { Q_ASSERT(device);
+        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
         cmd->rotate(mAngle, center, false);
         appendChild(cmd);
     }
