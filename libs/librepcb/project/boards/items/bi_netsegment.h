@@ -40,8 +40,10 @@ namespace project {
 class NetSignal;
 class BI_Device;
 class BI_Via;
+class BI_FootprintPad;
 class BI_NetPoint;
 class BI_NetLine;
+class BI_NetLineAnchor;
 
 /*****************************************************************************************
  *  Class BI_NetSegment
@@ -125,7 +127,10 @@ class BI_NetSegment final : public BI_Base, public SerializableObject
     private:
         bool checkAttributesValidity() const noexcept;
         bool areAllNetPointsConnectedTogether() const noexcept;
-        void findAllConnectedNetPoints(const BI_NetPoint& p, QList<const BI_NetPoint*>& points) const noexcept;
+        void findAllConnectedNetPoints(const BI_NetLineAnchor& p,
+                                       QSet<const BI_Via*>& vias,
+                                       QSet<const BI_FootprintPad*>& pads,
+                                       QSet<const BI_NetPoint*>& points) const noexcept;
 
 
         // Attributes

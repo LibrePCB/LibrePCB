@@ -68,8 +68,7 @@ BoardSelectionQuery::~BoardSelectionQuery() noexcept
 
 int BoardSelectionQuery::getResultCount() const noexcept
 {
-    return  //mResultDeviceInstances.count() +
-            mResultFootprints.count() +
+    return  mResultDeviceInstances.count() +
             mResultNetPoints.count() +
             mResultNetLines.count() +
             mResultVias.count() +
@@ -83,11 +82,11 @@ int BoardSelectionQuery::getResultCount() const noexcept
  *  General Methods
  ****************************************************************************************/
 
-void BoardSelectionQuery::addSelectedFootprints() noexcept
+void BoardSelectionQuery::addDeviceInstancesOfSelectedFootprints() noexcept
 {
     foreach (BI_Device* device, mDevices) {
         if (device->getFootprint().isSelected()) {
-            mResultFootprints.insert(&device->getFootprint());
+            mResultDeviceInstances.insert(device);
         }
     }
 }
@@ -103,37 +102,23 @@ void BoardSelectionQuery::addSelectedVias() noexcept
     }
 }
 
-void BoardSelectionQuery::addSelectedNetPoints(NetPointFilters f) noexcept
+void BoardSelectionQuery::addSelectedNetPoints() noexcept
 {
     foreach (BI_NetSegment* netsegment, mNetSegments) {
         foreach (BI_NetPoint* netpoint, netsegment->getNetPoints()) {
-            if (netpoint->isSelected() && doesNetPointMatchFilter(*netpoint, f)) {
+            if (netpoint->isSelected()) {
                 mResultNetPoints.insert(netpoint);
             }
         }
     }
 }
 
-void BoardSelectionQuery::addSelectedNetLines(NetLineFilters f) noexcept
+void BoardSelectionQuery::addSelectedNetLines() noexcept
 {
     foreach (BI_NetSegment* netsegment, mNetSegments) {
         foreach (BI_NetLine* netline, netsegment->getNetLines()) {
-            if (netline->isSelected() && doesNetLineMatchFilter(*netline, f)) {
+            if (netline->isSelected()) {
                 mResultNetLines.insert(netline);
-            }
-        }
-    }
-}
-
-void BoardSelectionQuery::addNetPointsOfNetLines(NetLineFilters lf, NetPointFilters pf) noexcept
-{
-    foreach (BI_NetLine* netline, mResultNetLines) {
-        if (doesNetLineMatchFilter(*netline, lf)) {
-            if (doesNetPointMatchFilter(netline->getStartPoint(), pf)) {
-                mResultNetPoints.insert(&netline->getStartPoint());
-            }
-            if (doesNetPointMatchFilter(netline->getEndPoint(), pf)) {
-                mResultNetPoints.insert(&netline->getEndPoint());
             }
         }
     }
@@ -186,28 +171,14 @@ void BoardSelectionQuery::addSelectedHoles() noexcept
     }
 }
 
-bool BoardSelectionQuery::doesNetPointMatchFilter(const BI_NetPoint& p, NetPointFilters f) noexcept
+void BoardSelectionQuery::addNetPointsOfNetLines() noexcept
 {
-    if (f.testFlag(NetPointFilter::Floating) && (!p.isAttached())) return true;
-    if (f.testFlag(NetPointFilter::Attached) && (p.isAttached())) return true;
-    if (f.testFlag(NetPointFilter::AllConnectedLinesSelected)) {
-        bool allLinesSelected = true;
-        foreach (const BI_NetLine* netline, p.getLines()) {
-            if (!netline->isSelected()) {
-                allLinesSelected = false;
-                break;
-            }
-        }
-        if (allLinesSelected) return true;
+    foreach (BI_NetLine* netline, mResultNetLines) {
+        BI_NetPoint* p1 = dynamic_cast<BI_NetPoint*>(&netline->getStartPoint());
+        BI_NetPoint* p2 = dynamic_cast<BI_NetPoint*>(&netline->getEndPoint());
+        if (p1) mResultNetPoints.insert(p1);
+        if (p2) mResultNetPoints.insert(p2);
     }
-    return false;
-}
-
-bool BoardSelectionQuery::doesNetLineMatchFilter(const BI_NetLine& l, NetLineFilters f) noexcept
-{
-    if (f.testFlag(NetLineFilter::Floating) && (!l.isAttached())) return true;
-    if (f.testFlag(NetLineFilter::Attached) && (l.isAttached())) return true;
-    return false;
 }
 
 /*****************************************************************************************

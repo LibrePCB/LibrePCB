@@ -49,36 +49,35 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
                              const QHash<const BI_Device*, BI_Device*>& devMap) :
     BI_Base(board), mUuid(Uuid::createRandom()), mNetSignal(&other.getNetSignal())
 {
+    // determine new pad anchors
+    QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorsMap;
+    for (auto it = devMap.begin(); it != devMap.end(); ++it) {
+        BI_Footprint& oldFp = it.key()->getFootprint();
+        BI_Footprint& newFp = it.value()->getFootprint();
+        foreach (const BI_FootprintPad* pad, oldFp.getPads()) {
+            anchorsMap.insert(pad, newFp.getPad(pad->getLibPadUuid()));
+        }
+    }
+
     // copy vias
-    QHash<const BI_Via*, BI_Via*> viaMap;
     foreach (const BI_Via* via, other.mVias) {
         BI_Via* copy = new BI_Via(*this, *via);
         Q_ASSERT(!getViaByUuid(copy->getUuid()));
         mVias.append(copy);
-        viaMap.insert(via, copy);
+        anchorsMap.insert(via, copy);
     }
     // copy netpoints
-    QHash<const BI_NetPoint*, BI_NetPoint*> copiedNetPoints;
     foreach (const BI_NetPoint* netpoint, other.mNetPoints) {
-        BI_FootprintPad* pad = nullptr;
-        if (netpoint->getFootprintPad()) {
-            const BI_Device* oldDevice = &netpoint->getFootprintPad()->getFootprint().getDeviceInstance();
-            const BI_Device* newDevice = devMap.value(oldDevice, nullptr); Q_ASSERT(newDevice);
-            pad = newDevice->getFootprint().getPad(netpoint->getFootprintPad()->getLibPadUuid()); Q_ASSERT(pad);
-        }
-        BI_Via* via = viaMap.value(netpoint->getVia(), nullptr);
-        BI_NetPoint* copy = new BI_NetPoint(*this, *netpoint, pad, via);
+        BI_NetPoint* copy = new BI_NetPoint(*this, *netpoint);
         mNetPoints.append(copy);
-        copiedNetPoints.insert(netpoint, copy);
+        anchorsMap.insert(netpoint, copy);
     }
     // copy netlines
-    QList<BI_NetLine*> copiedNetLines;
     foreach (const BI_NetLine* netline, other.mNetLines) {
-        BI_NetPoint* start = copiedNetPoints.value(&netline->getStartPoint()); Q_ASSERT(start);
-        BI_NetPoint* end = copiedNetPoints.value(&netline->getEndPoint()); Q_ASSERT(end);
-        BI_NetLine* copy = new BI_NetLine(*netline, *start, *end);
+        BI_NetLineAnchor* start = anchorsMap.value(&netline->getStartPoint()); Q_ASSERT(start);
+        BI_NetLineAnchor* end = anchorsMap.value(&netline->getEndPoint()); Q_ASSERT(end);
+        BI_NetLine* copy = new BI_NetLine(*this, *netline, *start, *end);
         mNetLines.append(copy);
-        copiedNetLines.append(copy);
     }
 }
 
@@ -106,19 +105,40 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node) :
         }
 
         // Load all netpoints
-        foreach (const SExpression& node, node.getChildren("netpoint")) {
-            BI_NetPoint* netpoint = new BI_NetPoint(*this, node);
-            if (getNetPointByUuid(netpoint->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-                    .arg(netpoint->getUuid().toStr()));
+        QHash<Uuid, QString> netpointLayerMap; // backward compatibility, remove this some time!
+        QHash<Uuid, BI_NetLineAnchor*> netPointAnchorMap; // backward compatibility, remove this some time!
+        foreach (const SExpression& child, node.getChildren("netpoint") + node.getChildren("junction")) {
+            if (const SExpression* layerNode = child.tryGetChildByPath("layer")) {
+                Uuid netpointUuid = child.getValueOfFirstChild<Uuid>();
+                netpointLayerMap.insert(netpointUuid, layerNode->getValueOfFirstChild<QString>());
             }
-            mNetPoints.append(netpoint);
+            if (const SExpression* viaNode = child.tryGetChildByPath("via")) {
+                Uuid netpointUuid = child.getValueOfFirstChild<Uuid>();
+                Uuid viaUuid = viaNode->getValueOfFirstChild<Uuid>();
+                BI_Via* via = getViaByUuid(viaUuid); Q_ASSERT(via);
+                netPointAnchorMap.insert(netpointUuid, via);
+            } else if (const SExpression* devNode = child.tryGetChildByPath("dev")) {
+                Uuid netpointUuid = child.getValueOfFirstChild<Uuid>();
+                Uuid deviceUuid = devNode->getValueOfFirstChild<Uuid>();
+                Uuid padUuid = child.getValueByPath<Uuid>("pad");
+                BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(deviceUuid); Q_ASSERT(device);
+                BI_FootprintPad* pad = device->getFootprint().getPad(padUuid);
+                netPointAnchorMap.insert(netpointUuid, pad);
+            } else {
+                BI_NetPoint* netpoint = new BI_NetPoint(*this, child);
+                if (getNetPointByUuid(netpoint->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__,
+                        QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                        .arg(netpoint->getUuid().toStr()));
+                }
+                mNetPoints.append(netpoint);
+            }
         }
 
         // Load all netlines
-        foreach (const SExpression& node, node.getChildren("netline")) {
-            BI_NetLine* netline = new BI_NetLine(*this, node);
+        foreach (const SExpression& node, node.getChildren("netline") + node.getChildren("trace")) {
+            BI_NetLine* netline = new BI_NetLine(*this, node, netpointLayerMap,
+                                                 netPointAnchorMap);
             if (getNetLineByUuid(netline->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("There is already a netline with the UUID \"%1\"!"))
@@ -187,7 +207,7 @@ int BI_NetSegment::getNetPointsAtScenePos(const Point& pos, const GraphicsLayer*
     foreach (BI_NetPoint* netpoint, mNetPoints) {
         if (netpoint->isSelectable()
             && netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF())
-            && ((!layer) || (&netpoint->getLayer() == layer)))
+            && ((!layer) || (netpoint->getLayerOfLines() == layer)))
         {
             points.append(netpoint);
             ++count;
@@ -468,8 +488,8 @@ void BI_NetSegment::serialize(SExpression& root) const
     root.appendChild(mUuid);
     root.appendChild("net", mNetSignal->getUuid(), true);
     serializePointerContainerUuidSorted(root, mVias, "via");
-    serializePointerContainerUuidSorted(root, mNetPoints, "netpoint");
-    serializePointerContainerUuidSorted(root, mNetLines, "netline");
+    serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+    serializePointerContainerUuidSorted(root, mNetLines, "trace");
 }
 
 /*****************************************************************************************
@@ -514,32 +534,62 @@ bool BI_NetSegment::checkAttributesValidity() const noexcept
 
 bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept
 {
-    if (mNetPoints.count() > 1) {
-        const BI_NetPoint* firstPoint = mNetPoints.first();
-        QList<const BI_NetPoint*> points({firstPoint});
-        findAllConnectedNetPoints(*firstPoint, points);
-        return (points.count() == mNetPoints.count());
+    const BI_NetLineAnchor* p = nullptr;
+    if (mVias.count() > 0) {
+        p = mVias.first();
+    } else if (mNetPoints.count() > 0) {
+        p = mNetPoints.first();
     } else {
-        return true; // there is only 0 or 1 netpoint => must be "connected together" :)
+        return true; // there are no vias or netpoints => must be "connected together" :)
     }
+    Q_ASSERT(p);
+    QSet<const BI_Via*> vias;
+    QSet<const BI_NetPoint*> points;
+    QSet<const BI_FootprintPad*> pads;
+    findAllConnectedNetPoints(*p, vias, pads, points);
+    return (vias.count() == mVias.count()) && (points.count() == mNetPoints.count());
 }
 
-void BI_NetSegment::findAllConnectedNetPoints(const BI_NetPoint& p, QList<const BI_NetPoint*>& points) const noexcept
+void BI_NetSegment::findAllConnectedNetPoints(const BI_NetLineAnchor& p,
+                                              QSet<const BI_Via*>& vias,
+                                              QSet<const BI_FootprintPad*>& pads,
+                                              QSet<const BI_NetPoint*>& points) const noexcept
 {
-    if (p.isAttachedToVia()) { Q_ASSERT(p.getVia());
-        foreach (const BI_NetPoint* np, mNetPoints) {
-            if ((np->getVia() == p.getVia()) && (!points.contains(np))) {
-                points.append(np);
-                findAllConnectedNetPoints(*np, points);
+    if (const BI_Via* via = dynamic_cast<const BI_Via*>(&p)) {
+        if (vias.contains(via)) return;
+        vias.insert(via);
+        foreach (const BI_NetLine* netline, mNetLines) {
+            if (&netline->getStartPoint() == via) {
+                findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+            }
+            if (&netline->getEndPoint() == via) {
+                findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
             }
         }
-    }
-    foreach (const BI_NetLine* line, mNetLines) {
-        const BI_NetPoint* p2 = line->getOtherPoint(p);
-        if ((p2) && (!points.contains(p2))) {
-            points.append(p2);
-            findAllConnectedNetPoints(*p2, points);
+    } else if (const BI_FootprintPad* pad = dynamic_cast<const BI_FootprintPad*>(&p)) {
+        if (pads.contains(pad)) return;
+        pads.insert(pad);
+        foreach (const BI_NetLine* netline, mNetLines) {
+            if (&netline->getStartPoint() == pad) {
+                findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+            }
+            if (&netline->getEndPoint() == pad) {
+                findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
+            }
         }
+    } else if (const BI_NetPoint* np = dynamic_cast<const BI_NetPoint*>(&p)) {
+        if (points.contains(np)) return;
+        points.insert(np);
+        foreach (const BI_NetLine* netline, mNetLines) {
+            if (&netline->getStartPoint() == np) {
+                findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+            }
+            if (&netline->getEndPoint() == np) {
+                findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
+            }
+        }
+    } else {
+        Q_ASSERT(false);
     }
 }
 

@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
+#include "./bi_netline.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include <librepcb/common/geometry/path.h>
 
@@ -41,8 +42,6 @@ class ComponentSignal;
 namespace project {
 
 class BI_Footprint;
-class BI_NetPoint;
-class Circuit;
 class ComponentSignalInstance;
 
 /*****************************************************************************************
@@ -52,7 +51,7 @@ class ComponentSignalInstance;
 /**
  * @brief The BI_FootprintPad class
  */
-class BI_FootprintPad final : public BI_Base
+class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor
 {
         Q_OBJECT
 
@@ -69,14 +68,12 @@ class BI_FootprintPad final : public BI_Base
         QString getDisplayText() const noexcept;
         const Angle& getRotation() const noexcept {return mRotation;}
         BI_Footprint& getFootprint() const noexcept {return mFootprint;}
-        const QMap<QString, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
-        BI_NetPoint* getNetPointOfLayer(const QString& layerName) const noexcept {return mRegisteredNetPoints.value(layerName, nullptr);}
         QString getLayerName() const noexcept;
         bool isOnLayer(const QString& layerName) const noexcept;
         const library::FootprintPad& getLibPad() const noexcept {return *mFootprintPad;}
         ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
         NetSignal* getCompSigInstNetSignal() const noexcept;
-        bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
+        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
         bool isSelectable() const noexcept override;
         Path getOutline(const Length& expansion = Length(0)) const noexcept;
         Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
@@ -84,10 +81,7 @@ class BI_FootprintPad final : public BI_Base
         // General Methods
         void addToBoard() override;
         void removeFromBoard() override;
-        void registerNetPoint(BI_NetPoint& netpoint);
-        void unregisterNetPoint(BI_NetPoint& netpoint);
         void updatePosition() noexcept;
-
 
         // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
@@ -95,6 +89,11 @@ class BI_FootprintPad final : public BI_Base
         bool getIsMirrored() const noexcept override;
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Inherited from BI_NetLineAnchor
+        void registerNetLine(BI_NetLine& netline) override;
+        void unregisterNetLine(BI_NetLine& netline) override;
+        const QSet<BI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
 
         // Operator Overloadings
         BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
@@ -121,8 +120,10 @@ class BI_FootprintPad final : public BI_Base
         // Misc
         Point mPosition;
         Angle mRotation;
-        QMap<QString, BI_NetPoint*> mRegisteredNetPoints; ///< key: layer name
         QScopedPointer<BGI_FootprintPad> mGraphicsItem;
+
+        // Registered Elements
+        QSet<BI_NetLine*> mRegisteredNetLines;
 };
 
 /*****************************************************************************************

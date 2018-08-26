@@ -17,74 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
+#define LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdboardnetpointedit.h"
-#include "../items/bi_netpoint.h"
+#include <librepcb/common/undocommand.h>
+#include "../items/bi_netline.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class CmdBoardNetLineEdit
  ****************************************************************************************/
 
-CmdBoardNetPointEdit::CmdBoardNetPointEdit(BI_NetPoint& point) noexcept :
-    UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldPos(point.getPosition()), mNewPos(mOldPos)
+/**
+ * @brief The CmdBoardNetLineEdit class
+ */
+class CmdBoardNetLineEdit final : public UndoCommand
 {
-}
+    public:
 
-CmdBoardNetPointEdit::~CmdBoardNetPointEdit() noexcept
-{
-    if (!wasEverExecuted()) {
-        mNetPoint.setPosition(mOldPos);
-    }
-}
+        // Constructors / Destructor
+        explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
+        ~CmdBoardNetLineEdit() noexcept;
 
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
+        // Setters
+        void setLayer(GraphicsLayer& layer) noexcept;
+        void setWidth(const PositiveLength& width) noexcept;
 
-void CmdBoardNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPos = pos;
-    if (immediate) mNetPoint.setPosition(mNewPos);
-}
 
-void CmdBoardNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPos = mOldPos + deltaPos;
-    if (immediate) mNetPoint.setPosition(mNewPos);
-}
+    private: // Methods
 
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() override;
 
-bool CmdBoardNetPointEdit::performExecute()
-{
-    performRedo(); // can throw
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
 
-    return true; // TODO: determine if the netpoint was really modified
-}
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
 
-void CmdBoardNetPointEdit::performUndo()
-{
-    mNetPoint.setPosition(mOldPos);
-}
 
-void CmdBoardNetPointEdit::performRedo()
-{
-    mNetPoint.setPosition(mNewPos);
-}
+    private: // Data
+        BI_NetLine& mNetLine;
+        GraphicsLayer* mOldLayer;
+        GraphicsLayer* mNewLayer;
+        PositiveLength mOldWidth;
+        PositiveLength mNewWidth;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -92,3 +79,5 @@ void CmdBoardNetPointEdit::performRedo()
 
 } // namespace project
 } // namespace librepcb
+
+#endif // LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H

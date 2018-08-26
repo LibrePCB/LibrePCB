@@ -22,15 +22,9 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_via.h"
-#include "bi_netpoint.h"
-#include "bi_netline.h"
 #include "bi_netsegment.h"
-#include "../board.h"
 #include "../boardlayerstack.h"
-#include "../../project.h"
-#include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
-#include <librepcb/common/graphics/graphicsscene.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -137,7 +131,9 @@ void BI_Via::setPosition(const Point& position) noexcept
     if (position != mPosition) {
         mPosition = position;
         mGraphicsItem->setPos(mPosition.toPxQPointF());
-        updateNetPoints();
+        foreach (BI_NetLine* netline, mRegisteredNetLines) {
+            netline->updateLine();
+        }
         mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
     }
 }
@@ -192,33 +188,26 @@ void BI_Via::removeFromBoard()
     mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
-void BI_Via::registerNetPoint(BI_NetPoint& netpoint)
+void BI_Via::registerNetLine(BI_NetLine& netline)
 {
-    if ((!isAddedToBoard()) || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
-        || (netpoint.getBoard() != mBoard) || (&netpoint.getNetSegment() != &mNetSegment))
+    if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline))
+        || (&netline.getNetSegment() != &mNetSegment))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.insert(netpoint.getLayer().getName(), &netpoint);
-    netpoint.updateLines();
+    mRegisteredNetLines.insert(&netline);
+    netline.updateLine();
     mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_Via::unregisterNetPoint(BI_NetPoint& netpoint)
+void BI_Via::unregisterNetLine(BI_NetLine& netline)
 {
-    if ((!isAddedToBoard()) || (getNetPointOfLayer(netpoint.getLayer().getName()) != &netpoint)) {
+    if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.remove(netpoint.getLayer().getName());
-    netpoint.updateLines();
+    mRegisteredNetLines.remove(&netline);
+    netline.updateLine();
     mGraphicsItem->updateCacheAndRepaint();
-}
-
-void BI_Via::updateNetPoints() const noexcept
-{
-    foreach (BI_NetPoint* point, mRegisteredNetPoints) {
-        point->setPosition(mPosition);
-    }
 }
 
 void BI_Via::serialize(SExpression& root) const

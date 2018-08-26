@@ -40,8 +40,28 @@ class GraphicsLayer;
 namespace project {
 
 class NetSignal;
-class BI_NetPoint;
 class BI_NetSegment;
+
+/*****************************************************************************************
+ *  Class BI_NetLineAnchor
+ ****************************************************************************************/
+
+class BI_NetLineAnchor
+{
+    public:
+        BI_NetLineAnchor() noexcept = default;
+        virtual ~BI_NetLineAnchor() noexcept = default;
+
+        virtual void registerNetLine(BI_NetLine& netline) = 0;
+        virtual void unregisterNetLine(BI_NetLine& netline) = 0;
+        virtual const QSet<BI_NetLine*>& getNetLines() const noexcept = 0;
+        virtual const Point& getPosition() const noexcept = 0;
+
+        std::vector<PositiveLength> getLineWidths() const noexcept;
+        UnsignedLength getMaxLineWidth() const noexcept;
+        UnsignedLength getMedianLineWidth() const noexcept;
+        BI_NetSegment* getNetSegmentOfLines() const noexcept;
+};
 
 /*****************************************************************************************
  *  Class BI_NetLine
@@ -59,27 +79,35 @@ class BI_NetLine final : public BI_Base, public SerializableObject
         // Constructors / Destructor
         BI_NetLine() = delete;
         BI_NetLine(const BI_NetLine& other) = delete;
-        BI_NetLine(const BI_NetLine& other, BI_NetPoint& startPoint, BI_NetPoint& endPoint);
-        BI_NetLine(BI_NetSegment& segment, const SExpression& node);
-        BI_NetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint, const PositiveLength& width);
+        BI_NetLine(BI_NetSegment& segment,
+                   const BI_NetLine& other,
+                   BI_NetLineAnchor& startPoint,
+                   BI_NetLineAnchor& endPoint);
+        BI_NetLine(BI_NetSegment& segment,
+                   const SExpression& node,
+                   const QHash<Uuid, QString>& netpointLayerMap,
+                   const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap);
+        BI_NetLine(BI_NetSegment& segment,
+                   BI_NetLineAnchor& startPoint,
+                   BI_NetLineAnchor& endPoint,
+                   GraphicsLayer& layer,
+                   const PositiveLength& width);
         ~BI_NetLine() noexcept;
 
         // Getters
-        BI_NetSegment& getNetSegment() const noexcept;
+        BI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
         const Uuid& getUuid() const noexcept {return mUuid;}
+        GraphicsLayer& getLayer() const noexcept {return *mLayer;}
         const PositiveLength& getWidth() const noexcept {return mWidth;}
-        BI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
-        BI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
-        BI_NetPoint* getOtherPoint(const BI_NetPoint& firstPoint) const noexcept;
+        BI_NetLineAnchor& getStartPoint() const noexcept {return *mStartPoint;}
+        BI_NetLineAnchor& getEndPoint() const noexcept {return *mEndPoint;}
+        BI_NetLineAnchor* getOtherPoint(const BI_NetLineAnchor& firstPoint) const noexcept;
         NetSignal& getNetSignalOfNetSegment() const noexcept;
-        GraphicsLayer& getLayer() const noexcept;
-        bool isAttached() const noexcept;
-        bool isAttachedToFootprint() const noexcept;
-        bool isAttachedToVia() const noexcept;
         bool isSelectable() const noexcept override;
         Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
 
         // Setters
+        void setLayer(GraphicsLayer& layer);
         void setWidth(const PositiveLength& width) noexcept;
 
         // General Methods
@@ -105,18 +133,24 @@ class BI_NetLine final : public BI_Base, public SerializableObject
     private:
 
         void init();
-        bool checkAttributesValidity() const noexcept;
+        BI_NetLineAnchor* deserializeAnchor(const SExpression& root,
+            const QString& oldKey, const QString& newKey,
+            const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap,
+            Uuid& oldPointUuid) const;
+        void serializeAnchor(SExpression& root, BI_NetLineAnchor* anchor) const;
 
 
         // General
+        BI_NetSegment& mNetSegment;
         QScopedPointer<BGI_NetLine> mGraphicsItem;
         Point mPosition; ///< the center of startpoint and endpoint
         QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;
-        BI_NetPoint* mStartPoint;
-        BI_NetPoint* mEndPoint;
+        BI_NetLineAnchor* mStartPoint;
+        BI_NetLineAnchor* mEndPoint;
+        GraphicsLayer* mLayer;
         PositiveLength mWidth;
 };
 

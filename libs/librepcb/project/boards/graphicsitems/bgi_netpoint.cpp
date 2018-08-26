@@ -56,7 +56,8 @@ BGI_NetPoint::~BGI_NetPoint() noexcept
 
 bool BGI_NetPoint::isSelectable() const noexcept
 {
-    return mNetPoint.getLayer().isVisible();
+    GraphicsLayer* layer = mNetPoint.getLayerOfLines();
+    return layer ? layer->isVisible() : false;
 }
 
 /*****************************************************************************************
@@ -70,7 +71,8 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept
     prepareGeometryChange();
 
     // set Z value
-    setZValue(getZValueOfCopperLayer(mNetPoint.getLayer().getName()));
+    GraphicsLayer* layer = mNetPoint.getLayerOfLines();
+    setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
 
     qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
     mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);

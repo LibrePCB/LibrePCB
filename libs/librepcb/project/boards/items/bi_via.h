@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "bi_base.h"
+#include "./bi_netline.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
@@ -33,17 +34,8 @@
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
-class QGraphicsItem;
-
 namespace librepcb {
-
-class BoardLayer;
-
 namespace project {
-
-class BI_NetSegment;
-class BI_NetPoint;
-class ErcMsg;
 
 /*****************************************************************************************
  *  Class BI_Via
@@ -52,7 +44,9 @@ class ErcMsg;
 /**
  * @brief The BI_Via class
  */
-class BI_Via final : public BI_Base, public SerializableObject
+class BI_Via final : public BI_Base,
+                     public BI_NetLineAnchor,
+                     public SerializableObject
 {
         Q_OBJECT
 
@@ -77,9 +71,7 @@ class BI_Via final : public BI_Base, public SerializableObject
         Shape getShape() const noexcept {return mShape;}
         const PositiveLength& getDrillDiameter() const noexcept {return mDrillDiameter;}
         const PositiveLength& getSize() const noexcept {return mSize;}
-        const QMap<QString, BI_NetPoint*>& getNetPoints() const noexcept {return mRegisteredNetPoints;}
-        BI_NetPoint* getNetPointOfLayer(const QString& layerName) const noexcept {return mRegisteredNetPoints.value(layerName, nullptr);}
-        bool isUsed() const noexcept {return (mRegisteredNetPoints.count() > 0);}
+        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
         bool isOnLayer(const QString& layerName) const noexcept;
         bool isSelectable() const noexcept override;
         Path getOutline(const Length& expansion = Length(0)) const noexcept;
@@ -95,20 +87,21 @@ class BI_Via final : public BI_Base, public SerializableObject
         // General Methods
         void addToBoard() override;
         void removeFromBoard() override;
-        void registerNetPoint(BI_NetPoint& netpoint);
-        void unregisterNetPoint(BI_NetPoint& netpoint);
-        void updateNetPoints() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
 
-
-        // Inherited from SI_Base
+        // Inherited from BI_Base
         Type_t getType() const noexcept override {return BI_Base::Type_t::Via;}
         const Point& getPosition() const noexcept override {return mPosition;}
         bool getIsMirrored() const noexcept override {return false;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Inherited from BI_NetLineAnchor
+        void registerNetLine(BI_NetLine& netline) override;
+        void unregisterNetLine(BI_NetLine& netline) override;
+        const QSet<BI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
 
         // Operator Overloadings
         BI_Via& operator=(const BI_Via& rhs) = delete;
@@ -135,7 +128,7 @@ class BI_Via final : public BI_Base, public SerializableObject
         PositiveLength mDrillDiameter;
 
         // Registered Elements
-        QMap<QString, BI_NetPoint*> mRegisteredNetPoints;   ///< key: layer name
+        QSet<BI_NetLine*> mRegisteredNetLines;
 };
 
 /*****************************************************************************************

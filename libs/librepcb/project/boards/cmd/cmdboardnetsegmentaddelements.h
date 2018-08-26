@@ -32,16 +32,12 @@
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace project {
 
-class NetSignal;
 class BI_NetSegment;
-class BI_FootprintPad;
 class BI_NetPoint;
 class BI_NetLine;
+class BI_NetLineAnchor;
 
 /*****************************************************************************************
  *  Class CmdBoardNetSegmentAddElements
@@ -63,11 +59,11 @@ class CmdBoardNetSegmentAddElements final : public UndoCommand
         BI_Via* addVia(const Point& position, BI_Via::Shape shape,
                        const PositiveLength& size, const PositiveLength& drillDiameter);
         BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
-        BI_NetPoint* addNetPoint(GraphicsLayer& layer, const Point& position);
-        BI_NetPoint* addNetPoint(GraphicsLayer& layer, BI_FootprintPad& pad);
-        BI_NetPoint* addNetPoint(GraphicsLayer& layer, BI_Via& via);
+        BI_NetPoint* addNetPoint(const Point& position);
         BI_NetLine* addNetLine(BI_NetLine& netline);
-        BI_NetLine* addNetLine(BI_NetPoint& startPoint, BI_NetPoint& endPoint,
+        BI_NetLine* addNetLine(BI_NetLineAnchor& startPoint,
+                               BI_NetLineAnchor& endPoint,
+                               GraphicsLayer& layer,
                                const PositiveLength& width);
 
 

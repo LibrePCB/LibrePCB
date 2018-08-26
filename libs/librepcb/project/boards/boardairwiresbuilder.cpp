@@ -165,9 +165,7 @@ BoardAirWiresBuilder::~BoardAirWiresBuilder() noexcept
 QVector<QPair<Point, Point> > BoardAirWiresBuilder::buildAirWires() const
 {
     std::vector<delaunay::Vector2<qreal>> points;
-    QHash<const BI_FootprintPad*, int> padMap;
-    QHash<const BI_Via*, int> viaMap;
-    QHash<const BI_NetPoint*, int> netPointMap;
+    QHash<const BI_NetLineAnchor*, int> anchorMap;
     QHash<int, QString> layerMap;
     std::vector<delaunay::Edge<qreal>> edges;
 
@@ -178,7 +176,7 @@ QVector<QPair<Point, Point> > BoardAirWiresBuilder::buildAirWires() const
             int id = points.size();
             Point pos = pad->getPosition();
             points.emplace_back(pos.getX().toNm(), pos.getY().toNm(), id);
-            padMap[pad] = id;
+            anchorMap[pad] = id;
             if (pad->getLibPad().getBoardSide() == library::FootprintPad::BoardSide::THT) {
                 layerMap[id] = QString(); // on all layers
             } else {
@@ -194,29 +192,23 @@ QVector<QPair<Point, Point> > BoardAirWiresBuilder::buildAirWires() const
             int id = points.size();
             Point pos = via->getPosition();
             points.emplace_back(pos.getX().toNm(), pos.getY().toNm(), id);
-            viaMap[via] = id;
+            anchorMap[via] = id;
             layerMap[id] = QString(); // on all layers
         }
         foreach (const BI_NetPoint* netpoint, netsegment->getNetPoints()) { Q_ASSERT(netpoint);
-            int id = points.size();
-            Point pos = netpoint->getPosition();
-            points.emplace_back(pos.getX().toNm(), pos.getY().toNm(), id);
-            netPointMap[netpoint] = id;
-            layerMap[id] = netpoint->getLayer().getName();
-            if (const BI_Via* via = netpoint->getVia()) {
-                Q_ASSERT(viaMap.contains(via));
-                edges.emplace_back(points[id], points[viaMap[via]], -1);
-            }
-            if (const BI_FootprintPad* pad = netpoint->getFootprintPad()) {
-                Q_ASSERT(padMap.contains(pad));
-                edges.emplace_back(points[id], points[padMap[pad]], -1);
+            if (const GraphicsLayer* layer = netpoint->getLayerOfLines()) {
+                int id = points.size();
+                Point pos = netpoint->getPosition();
+                points.emplace_back(pos.getX().toNm(), pos.getY().toNm(), id);
+                anchorMap[netpoint] = id;
+                layerMap[id] = layer->getName();
             }
         }
         foreach (const BI_NetLine* netline, netsegment->getNetLines()) { Q_ASSERT(netline);
-            Q_ASSERT(netPointMap.contains(&netline->getStartPoint()));
-            Q_ASSERT(netPointMap.contains(&netline->getEndPoint()));
-            edges.emplace_back(points[netPointMap[&netline->getStartPoint()]],
-                               points[netPointMap[&netline->getEndPoint()]], -1);
+            Q_ASSERT(anchorMap.contains(&netline->getStartPoint()));
+            Q_ASSERT(anchorMap.contains(&netline->getEndPoint()));
+            edges.emplace_back(points[anchorMap[&netline->getStartPoint()]],
+                               points[anchorMap[&netline->getEndPoint()]], -1);
         }
     }
 

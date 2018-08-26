@@ -58,23 +58,6 @@ class BoardSelectionQuery final : public QObject
 
     public:
 
-        // Types
-        enum class NetPointFilter : uint32_t {
-            Floating = (1 << 0),
-            Attached = (1 << 1),
-            AllConnectedLinesSelected = (1 << 2),
-            All = (NetPointFilter::Floating | NetPointFilter::Attached)
-        };
-        Q_DECLARE_FLAGS(NetPointFilters, NetPointFilter)
-
-        enum class NetLineFilter : uint32_t {
-            Floating = (1 << 0),
-            Attached = (1 << 1),
-            All = (NetLineFilter::Floating | NetLineFilter::Attached)
-        };
-        Q_DECLARE_FLAGS(NetLineFilters, NetLineFilter)
-
-
         // Constructors / Destructor
         BoardSelectionQuery() = delete;
         BoardSelectionQuery(const BoardSelectionQuery& other) = delete;
@@ -88,8 +71,7 @@ class BoardSelectionQuery final : public QObject
         ~BoardSelectionQuery() noexcept;
 
         // Getters
-        //const QSet<BI_Device*>& getDeviceInstances() const noexcept { return mResultDeviceInstances; }
-        const QSet<BI_Footprint*>& getFootprints() const noexcept { return mResultFootprints; }
+        const QSet<BI_Device*>& getDeviceInstances() const noexcept { return mResultDeviceInstances; }
         const QSet<BI_NetPoint*>& getNetPoints() const noexcept { return mResultNetPoints; }
         const QSet<BI_NetLine*>& getNetLines() const noexcept { return mResultNetLines; }
         const QSet<BI_Via*>& getVias() const noexcept { return mResultVias; }
@@ -101,25 +83,22 @@ class BoardSelectionQuery final : public QObject
         bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
         // General Methods
-        void addSelectedFootprints() noexcept;
+        void addDeviceInstancesOfSelectedFootprints() noexcept;
         void addSelectedVias() noexcept;
-        void addSelectedNetPoints(NetPointFilters f) noexcept;
-        void addSelectedNetLines(NetLineFilters f) noexcept;
-        void addNetPointsOfNetLines(NetLineFilters lf, NetPointFilters pf) noexcept;
+        void addSelectedNetPoints() noexcept;
+        void addSelectedNetLines() noexcept;
         void addSelectedPlanes() noexcept;
         void addSelectedPolygons() noexcept;
         void addSelectedBoardStrokeTexts() noexcept;
         void addSelectedFootprintStrokeTexts() noexcept;
         void addSelectedHoles() noexcept;
+        void addNetPointsOfNetLines() noexcept;
 
         // Operator Overloadings
         BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;
 
 
     private:
-
-        static bool doesNetPointMatchFilter(const BI_NetPoint& p, NetPointFilters f) noexcept;
-        static bool doesNetLineMatchFilter(const BI_NetLine& l, NetLineFilters f) noexcept;
 
         // references to the Board object
         const QMap<Uuid, BI_Device*>& mDevices;
@@ -130,8 +109,7 @@ class BoardSelectionQuery final : public QObject
         const QList<BI_Hole*>& mHoles;
 
         // query result
-        //QSet<BI_Device*> mResultDeviceInstances;
-        QSet<BI_Footprint*> mResultFootprints;
+        QSet<BI_Device*> mResultDeviceInstances;
         QSet<BI_NetPoint*> mResultNetPoints;
         QSet<BI_NetLine*> mResultNetLines;
         QSet<BI_Via*> mResultVias;
@@ -140,9 +118,6 @@ class BoardSelectionQuery final : public QObject
         QSet<BI_StrokeText*> mResultStrokeTexts;
         QSet<BI_Hole*> mResultHoles;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(BoardSelectionQuery::NetPointFilters)
-Q_DECLARE_OPERATORS_FOR_FLAGS(BoardSelectionQuery::NetLineFilters)
 
 /*****************************************************************************************
  *  End of File
