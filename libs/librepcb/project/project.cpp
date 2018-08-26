@@ -195,7 +195,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly, bool inte
             filesToMove.insert(mPath.getPathTo("core/settings.lp"),
                                mPath.getPathTo("project/settings.lp"));
             foreach (const FilePath& fp, FileUtils::getFilesInDirectory(mPath.getPathTo("boards"))) {
-                if (fp.getFilename() != "boards.lp") {
+                if ((fp.getFilename() != "boards.lp") && (!fp.getFilename().endsWith('~'))) {
                     filesToMove.insert(fp,
                         mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp"));
                     filesToMove.insert(mPath.getPathTo("user/boards/" % fp.getFilename()),
@@ -203,7 +203,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly, bool inte
                 }
             }
             foreach (const FilePath& fp, FileUtils::getFilesInDirectory(mPath.getPathTo("schematics"))) {
-                if (fp.getFilename() != "schematics.lp") {
+                if ((fp.getFilename() != "schematics.lp") && (!fp.getFilename().endsWith('~'))) {
                     filesToMove.insert(fp,
                         mPath.getPathTo("schematics/" % fp.getBasename() % "/schematic.lp"));
                 }
