@@ -52,23 +52,6 @@ class SchematicSelectionQuery final : public QObject
 
     public:
 
-        // Types
-        enum class NetPointFilter : uint32_t {
-            Floating = (1 << 0),
-            Attached = (1 << 1),
-            AllConnectedLinesSelected = (1 << 2),
-            All = (NetPointFilter::Floating | NetPointFilter::Attached)
-        };
-        Q_DECLARE_FLAGS(NetPointFilters, NetPointFilter)
-
-        enum class NetLineFilter : uint32_t {
-            Floating = (1 << 0),
-            Attached = (1 << 1),
-            All = (NetLineFilter::Floating | NetLineFilter::Attached)
-        };
-        Q_DECLARE_FLAGS(NetLineFilters, NetLineFilter)
-
-
         // Constructors / Destructor
         SchematicSelectionQuery() = delete;
         SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
@@ -87,20 +70,17 @@ class SchematicSelectionQuery final : public QObject
 
         // General Methods
         void addSelectedSymbols() noexcept;
-        void addSelectedNetPoints(NetPointFilters f) noexcept;
-        void addSelectedNetLines(NetLineFilters f) noexcept;
+        void addSelectedNetPoints() noexcept;
+        void addSelectedNetLines() noexcept;
         void addSelectedNetLabels() noexcept;
-        void addNetPointsOfNetLines(NetLineFilters lf, NetPointFilters pf) noexcept;
+        void addNetPointsOfNetLines() noexcept;
+        void addNetLinesOfSymbolPins() noexcept;
 
         // Operator Overloadings
         SchematicSelectionQuery& operator=(const SchematicSelectionQuery& rhs) = delete;
 
 
     private:
-
-        static bool doesNetPointMatchFilter(const SI_NetPoint& p, NetPointFilters f) noexcept;
-        static bool doesNetLineMatchFilter(const SI_NetLine& l, NetLineFilters f) noexcept;
-
         // references to the Schematic object
         const QList<SI_Symbol*>& mSymbols;
         const QList<SI_NetSegment*>& mNetSegments;
@@ -111,9 +91,6 @@ class SchematicSelectionQuery final : public QObject
         QSet<SI_NetLine*> mResultNetLines;
         QSet<SI_NetLabel*> mResultNetLabels;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(SchematicSelectionQuery::NetPointFilters)
-Q_DECLARE_OPERATORS_FOR_FLAGS(SchematicSelectionQuery::NetLineFilters)
 
 /*****************************************************************************************
  *  End of File

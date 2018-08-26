@@ -87,6 +87,8 @@ class SGI_SymbolPin final : public SGI_Base
         qreal mRadiusPx;
 
         // Cached Attributes
+        bool mIsVisibleJunction;
+        GraphicsLayer* mJunctionLayer;
         QStaticText mStaticText;
         bool mRotate180;
         QRectF mBoundingRect;

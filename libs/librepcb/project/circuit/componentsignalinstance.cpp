@@ -130,7 +130,7 @@ int ComponentSignalInstance::getRegisteredElementsCount() const noexcept
 bool ComponentSignalInstance::arePinsOrPadsUsed() const noexcept
 {
     foreach (const SI_SymbolPin* pin, mRegisteredSymbolPins) {
-        if (pin->getNetPoint()) {
+        if (pin->isUsed()) {
             return true;
         }
     }

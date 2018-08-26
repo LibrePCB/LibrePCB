@@ -48,10 +48,13 @@ namespace project {
  ****************************************************************************************/
 
 SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept :
-    SGI_Base(), mPin(pin), mLibPin(pin.getLibPin())
+    SGI_Base(), mPin(pin), mLibPin(pin.getLibPin()), mIsVisibleJunction(false)
 {
     setZValue(Schematic::ZValue_Symbols);
     setToolTip(*mLibPin.getName());
+
+    mJunctionLayer = getLayer(GraphicsLayer::sSchematicNetLines);
+    Q_ASSERT(mJunctionLayer);
 
     mStaticText.setTextFormat(Qt::PlainText);
     mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -106,6 +109,8 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept
         mTextBoundingRect = QRectF(mTextOrigin.x(), -mTextOrigin.y()-mStaticText.size().height(), mStaticText.size().width(), mStaticText.size().height()).normalized();
     mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
 
+    mIsVisibleJunction = mPin.isVisibleJunction();
+
     update();
 }
 
@@ -140,6 +145,13 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     {
         painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
+        painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
+    }
+
+    // fill circle
+    if (mIsVisibleJunction && mJunctionLayer && mJunctionLayer->isVisible()) {
+        painter->setPen(QPen(mJunctionLayer->getColor(highlight), 0));
+        painter->setBrush(mJunctionLayer->getColor(highlight));
         painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }
 

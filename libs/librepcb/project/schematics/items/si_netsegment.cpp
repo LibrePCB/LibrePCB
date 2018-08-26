@@ -25,6 +25,7 @@
 #include "si_netline.h"
 #include "si_netpoint.h"
 #include "si_netlabel.h"
+#include "si_symbol.h"
 #include "si_symbolpin.h"
 #include "../schematic.h"
 #include "../../project.h"
@@ -59,19 +60,29 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node) :
         }
 
         // Load all netpoints
-        foreach (const SExpression& child, node.getChildren("netpoint")) {
-            SI_NetPoint* netpoint = new SI_NetPoint(*this, child);
-            if (getNetPointByUuid(netpoint->getUuid())) {
-                throw RuntimeError(__FILE__, __LINE__,
-                    QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-                    .arg(netpoint->getUuid().toStr()));
+        QHash<Uuid, SI_NetLineAnchor*> netPointAnchorMap; // backward compatibility, remove this some time!
+        foreach (const SExpression& child, node.getChildren("netpoint") + node.getChildren("junction")) {
+            if (const SExpression* symNode = child.tryGetChildByPath("sym")) {
+                Uuid netpointUuid = child.getValueOfFirstChild<Uuid>();
+                Uuid symbolUuid = symNode->getValueOfFirstChild<Uuid>();
+                Uuid pinUuid = child.getValueByPath<Uuid>("pin");
+                SI_Symbol* symbol = mSchematic.getSymbolByUuid(symbolUuid); Q_ASSERT(symbol);
+                SI_SymbolPin* pin = symbol->getPin(pinUuid);
+                netPointAnchorMap.insert(netpointUuid, pin);
+            } else {
+                SI_NetPoint* netpoint = new SI_NetPoint(*this, child);
+                if (getNetPointByUuid(netpoint->getUuid())) {
+                    throw RuntimeError(__FILE__, __LINE__,
+                        QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                        .arg(netpoint->getUuid().toStr()));
+                }
+                mNetPoints.append(netpoint);
             }
-            mNetPoints.append(netpoint);
         }
 
         // Load all netlines
-        foreach (const SExpression& child, node.getChildren("netline")) {
-            SI_NetLine* netline = new SI_NetLine(*this, child);
+        foreach (const SExpression& child, node.getChildren("netline") + node.getChildren("line")) {
+            SI_NetLine* netline = new SI_NetLine(*this, child, netPointAnchorMap);
             if (getNetLineByUuid(netline->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__,
                     QString(tr("There is already a netline with the UUID \"%1\"!"))
@@ -81,7 +92,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node) :
         }
 
         // Load all netlabels
-        foreach (const SExpression& child, node.getChildren("netlabel")) {
+        foreach (const SExpression& child, node.getChildren("netlabel") + node.getChildren("label")) {
             SI_NetLabel* netlabel = new SI_NetLabel(*this, child);
             if (getNetLabelByUuid(netlabel->getUuid())) {
                 throw RuntimeError(__FILE__, __LINE__,
@@ -89,12 +100,6 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node) :
                     .arg(netlabel->getUuid().toStr()));
             }
             mNetLabels.append(netlabel);
-        }
-
-        if (mNetPoints.count() < 2) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The netsegment with the UUID \"%1\" has too few netpoints!"))
-                .arg(mUuid.toStr()));
         }
 
         if (!areAllNetPointsConnectedTogether()) {
@@ -176,14 +181,13 @@ int SI_NetSegment::getNetLabelsAtScenePos(const Point& pos, QList<SI_NetLabel*>&
 QSet<QString> SI_NetSegment::getForcedNetNames() const noexcept
 {
     QSet<QString> names;
-    foreach (SI_NetPoint* netpoint, mNetPoints) {
-        if (netpoint->isAttachedToPin()) {
-            SI_SymbolPin* pin = netpoint->getSymbolPin(); Q_ASSERT(pin);
-            ComponentSignalInstance* sig = pin->getComponentSignalInstance(); Q_ASSERT(sig);
-            if (sig->isNetSignalNameForced()) {
-                names.insert(sig->getForcedNetSignalName());
-            }
-        }
+    foreach (SI_NetLine* netline, mNetLines) {
+        SI_SymbolPin* pin1 = dynamic_cast<SI_SymbolPin*>(&netline->getStartPoint());
+        SI_SymbolPin* pin2 = dynamic_cast<SI_SymbolPin*>(&netline->getEndPoint());
+        ComponentSignalInstance* sig1 = pin1 ? pin1->getComponentSignalInstance() : nullptr;
+        ComponentSignalInstance* sig2 = pin2 ? pin2->getComponentSignalInstance() : nullptr;
+        if (sig1 && sig1->isNetSignalNameForced()) names.insert(sig1->getForcedNetSignalName());
+        if (sig2 && sig2->isNetSignalNameForced()) names.insert(sig2->getForcedNetSignalName());
     }
     return names;
 }
@@ -213,6 +217,20 @@ Point SI_NetSegment::calcNearestPoint(const Point& p) const noexcept
         }
     }
     return pos;
+}
+
+QSet<SI_SymbolPin*> SI_NetSegment::getAllConnectedPins() const noexcept
+{
+    Q_ASSERT(isAddedToSchematic());
+    QSet<SI_SymbolPin*> pins;
+    foreach (const SI_NetLine* netline, mNetLines) {
+        SI_SymbolPin* p1 = dynamic_cast<SI_SymbolPin*>(&netline->getStartPoint());
+        SI_SymbolPin* p2 = dynamic_cast<SI_SymbolPin*>(&netline->getEndPoint());
+        if (p1) { pins.insert(p1); Q_ASSERT(p1->getCompSigInstNetSignal() == mNetSignal); }
+        if (p2) { pins.insert(p2); Q_ASSERT(p2->getCompSigInstNetSignal() == mNetSignal); }
+    }
+
+    return pins;
 }
 
 /*****************************************************************************************
@@ -483,9 +501,9 @@ void SI_NetSegment::serialize(SExpression& root) const
 
     root.appendChild(mUuid);
     root.appendChild("net", mNetSignal->getUuid(), true);
-    serializePointerContainerUuidSorted(root, mNetPoints, "netpoint");
-    serializePointerContainerUuidSorted(root, mNetLines, "netline");
-    serializePointerContainerUuidSorted(root, mNetLabels, "netlabel");
+    serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+    serializePointerContainerUuidSorted(root, mNetLines, "line");
+    serializePointerContainerUuidSorted(root, mNetLabels, "label");
 }
 
 /*****************************************************************************************
@@ -518,7 +536,6 @@ void SI_NetSegment::setSelected(bool selected) noexcept
 bool SI_NetSegment::checkAttributesValidity() const noexcept
 {
     if (mNetSignal == nullptr)                  return false;
-    if (mNetPoints.count() < 2)                 return false;
     if (!areAllNetPointsConnectedTogether())    return false;
     return true;
 }
@@ -527,22 +544,43 @@ bool SI_NetSegment::areAllNetPointsConnectedTogether() const noexcept
 {
     if (mNetPoints.count() > 1) {
         const SI_NetPoint* firstPoint = mNetPoints.first();
-        QList<const SI_NetPoint*> points({firstPoint});
-        findAllConnectedNetPoints(*firstPoint, points);
+        QSet<const SI_SymbolPin*> pins;
+        QSet<const SI_NetPoint*> points;
+        findAllConnectedNetPoints(*firstPoint, pins, points);
         return (points.count() == mNetPoints.count());
     } else {
         return true; // there is only 0 or 1 netpoint => must be "connected together" :)
     }
 }
 
-void SI_NetSegment::findAllConnectedNetPoints(const SI_NetPoint& p, QList<const SI_NetPoint*>& points) const noexcept
+void SI_NetSegment::findAllConnectedNetPoints(const SI_NetLineAnchor& p,
+                                              QSet<const SI_SymbolPin*>& pins,
+                                              QSet<const SI_NetPoint*>& points) const noexcept
 {
-    foreach (const SI_NetLine* line, mNetLines) {
-        const SI_NetPoint* p2 = line->getOtherPoint(p);
-        if ((p2) && (!points.contains(p2))) {
-            points.append(p2);
-            findAllConnectedNetPoints(*p2, points);
+    if (const SI_SymbolPin* pin = dynamic_cast<const SI_SymbolPin*>(&p)) {
+        if (pins.contains(pin)) return;
+        pins.insert(pin);
+        foreach (const SI_NetLine* netline, mNetLines) {
+            if (&netline->getStartPoint() == pin) {
+                findAllConnectedNetPoints(netline->getEndPoint(), pins, points);
+            }
+            if (&netline->getEndPoint() == pin) {
+                findAllConnectedNetPoints(netline->getStartPoint(), pins, points);
+            }
         }
+    } else if (const SI_NetPoint* np = dynamic_cast<const SI_NetPoint*>(&p)) {
+        if (points.contains(np)) return;
+        points.insert(np);
+        foreach (const SI_NetLine* netline, mNetLines) {
+            if (&netline->getStartPoint() == np) {
+                findAllConnectedNetPoints(netline->getEndPoint(), pins, points);
+            }
+            if (&netline->getEndPoint() == np) {
+                findAllConnectedNetPoints(netline->getStartPoint(), pins, points);
+            }
+        }
+    } else {
+        Q_ASSERT(false);
     }
 }
 

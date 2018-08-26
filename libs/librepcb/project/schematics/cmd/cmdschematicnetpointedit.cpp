@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdschematicnetpointedit.h"
-#include <librepcb/common/scopeguardlist.h>
 #include "../items/si_netpoint.h"
 
 /*****************************************************************************************
@@ -37,7 +36,6 @@ namespace project {
 
 CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept :
     UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldSymbolPin(point.getSymbolPin()), mNewSymbolPin(mOldSymbolPin),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
 }
@@ -52,12 +50,6 @@ CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void CmdSchematicNetPointEdit::setPinToAttach(SI_SymbolPin* pin) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewSymbolPin = pin;
-}
 
 void CmdSchematicNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
@@ -86,20 +78,12 @@ bool CmdSchematicNetPointEdit::performExecute()
 
 void CmdSchematicNetPointEdit::performUndo()
 {
-    ScopeGuardList sgl;
-    mNetPoint.setPinToAttach(mOldSymbolPin); // can throw
-    sgl.add([&](){mNetPoint.setPinToAttach(mNewSymbolPin);});
     mNetPoint.setPosition(mOldPos);
-    sgl.dismiss();
 }
 
 void CmdSchematicNetPointEdit::performRedo()
 {
-    ScopeGuardList sgl;
-    mNetPoint.setPinToAttach(mNewSymbolPin); // can throw
-    sgl.add([&](){mNetPoint.setPinToAttach(mOldSymbolPin);});
     mNetPoint.setPosition(mNewPos);
-    sgl.dismiss();
 }
 
 /*****************************************************************************************
