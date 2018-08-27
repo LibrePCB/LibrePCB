@@ -75,8 +75,6 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->lblCompDescription->hide();
     mUi->lblSymbVar->hide();
     mUi->cbxSymbVar->hide();
-    mUi->lblDeviceName->hide();
-    mUi->viewDevice->hide();
     connect(mUi->edtSearch, &QLineEdit::textChanged,
             this, &AddComponentDialog::searchEditTextChanged);
     connect(mUi->treeComponents, &QTreeWidget::currentItemChanged,
@@ -100,6 +98,9 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace, Project&
     mUi->treeCategories->setModel(mCategoryTreeModel);
     connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &AddComponentDialog::treeCategories_currentItemChanged);
+
+    // Reset GUI to state of nothing selected
+    setSelectedComponent(nullptr);
 }
 
 AddComponentDialog::~AddComponentDialog() noexcept
@@ -331,10 +332,11 @@ void AddComponentDialog::setSelectedCategory(const tl::optional<Uuid>& categoryU
 
 void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
 {
-    if (cmp == mSelectedComponent) return;
+    if (cmp && (cmp == mSelectedComponent)) return;
 
     mUi->lblCompName->setText(tr("No component selected"));
     mUi->lblCompDescription->clear();
+    mUi->cbxSymbVar->clear();
     setSelectedDevice(nullptr);
     setSelectedSymbVar(nullptr);
     delete mSelectedComponent;
@@ -349,7 +351,6 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
 
         mSelectedComponent = cmp;
 
-        mUi->cbxSymbVar->clear();
         for (const library::ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
             QString text = *symbVar.getNames().value(localeOrder);
             if (!symbVar.getNorm().isEmpty()) {text += " [" + symbVar.getNorm() + "]";}
@@ -365,7 +366,7 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp)
 
 void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar)
 {
-    if (symbVar == mSelectedSymbVar) return;
+    if (symbVar && (symbVar == mSelectedSymbVar)) return;
     qDeleteAll(mPreviewSymbolGraphicsItems);
     mPreviewSymbolGraphicsItems.clear();
     mSelectedSymbVar = symbVar;
@@ -390,8 +391,9 @@ void AddComponentDialog::setSelectedSymbVar(const library::ComponentSymbolVarian
 
 void AddComponentDialog::setSelectedDevice(const library::Device* dev)
 {
-    if (dev == mSelectedDevice) return;
+    if (dev && (dev == mSelectedDevice)) return;
 
+    mUi->lblDeviceName->setText(tr("No device selected"));
     delete mPreviewFootprintGraphicsItem;   mPreviewFootprintGraphicsItem = nullptr;
     delete mSelectedPackage;                mSelectedPackage = nullptr;
     delete mSelectedDevice;                 mSelectedDevice = nullptr;
@@ -415,10 +417,6 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev)
             }
         }
     }
-
-    mUi->lblDeviceName->setVisible(dev ? true : false);
-    mUi->viewDevice->setVisible(dev ? true : false);
-    mUi->viewComponent->zoomAll();
 }
 
 void AddComponentDialog::accept() noexcept
