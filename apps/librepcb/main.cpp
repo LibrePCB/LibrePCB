@@ -121,6 +121,7 @@ static void setApplicationMetadata() noexcept
     Application::setOrganizationName("LibrePCB");
     Application::setOrganizationDomain("librepcb.org");
     Application::setApplicationName("LibrePCB");
+    Application::setDesktopFileName("org.librepcb.LibrePCB");
 }
 
 /*****************************************************************************************

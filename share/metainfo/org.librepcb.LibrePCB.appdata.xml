@@ -64,7 +64,5 @@
     <binary>librepcb-cli</binary>
   </provides>
   
-  ​<launchable type="desktop-id">librepcb.desktop</launchable>
-  
   <content_rating type="oars-1.1"/>
 </component>
