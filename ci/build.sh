@@ -51,9 +51,9 @@ if [ "${TRAVIS_OS_NAME-}" = "linux" ]
 then
   cp -r "./build/install" "./build/install-cli"
   mv -f "./build/install-cli/opt/bin/librepcb-cli" "./build/install-cli/opt/bin/librepcb"
-  LD_LIBRARY_PATH="" linuxdeployqt "./build/install-cli/opt/share/applications/librepcb.desktop" -bundle-non-qt-libs -appimage
+  LD_LIBRARY_PATH="" linuxdeployqt "./build/install-cli/opt/share/applications/org.librepcb.LibrePCB.desktop" -bundle-non-qt-libs -appimage
   mv ./LibrePCB-x86_64.AppImage ./LibrePCB-CLI-x86_64.AppImage
-  LD_LIBRARY_PATH="" linuxdeployqt "./build/install/opt/share/applications/librepcb.desktop" -bundle-non-qt-libs -appimage
+  LD_LIBRARY_PATH="" linuxdeployqt "./build/install/opt/share/applications/org.librepcb.LibrePCB.desktop" -bundle-non-qt-libs -appimage
   if [ "${DEPLOY_APPIMAGE-}" = "true" ]
   then
     cp ./LibrePCB-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
