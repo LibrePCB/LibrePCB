@@ -27,7 +27,7 @@ Component.prototype.createOperations = function() {
 
         if (systemInfo.kernelType === "linux") {
             component.addOperation("InstallIcons",
-                                   "@TargetDir@/nightly/share/icons/hicolor/scalable/apps");
+                                   "@TargetDir@/nightly/share/icons");
             component.addOperation("CreateDesktopEntry",
                                    "librepcb-nightly-from-installer.desktop",
                                    "Name=LibrePCB Nightly\n" +
@@ -36,7 +36,7 @@ Component.prototype.createOperations = function() {
                                    "Categories=Development;Engineering;Electronics;\n" +
                                    "Type=Application\n" +
                                    "Terminal=false\n" +
-                                   "Icon=librepcb\n" +
+                                   "Icon=org.librepcb.LibrePCB\n" +
                                    "Exec=@TargetDir@/nightly/bin/librepcb %U\n" +
                                    "MimeType=application/x-librepcb-project;");
             component.addOperation("Execute",
