@@ -121,6 +121,9 @@ static void setApplicationMetadata() noexcept
     Application::setOrganizationName("LibrePCB");
     Application::setOrganizationDomain("librepcb.org");
     Application::setApplicationName("LibrePCB");
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
+        Application::setDesktopFileName("org.librepcb.LibrePCB");
+    #endif
 }
 
 /*****************************************************************************************
