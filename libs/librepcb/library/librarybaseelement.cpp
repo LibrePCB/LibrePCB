@@ -220,10 +220,21 @@ void LibraryBaseElement::copyTo(const FilePath& destination, bool removeSource)
                 .arg(destination.getFilename()));
         }
 
+        // Unfortunately empty directories are sometimes not removed properly, for example
+        // some Git operations remove the contained files but not the parent directories.
+        // But if the destination directory exists already, FileUtils::copyDirRecursively()
+        // would throw an exception because it requires that the destination does not
+        // exist yet. To avoid this issue, we remove the destination first if it's an
+        // empty directory. If it's not empty, we accept that an exception is thrown
+        // because this would likely be a serious error.
+        if (destination.isEmptyDir()) {
+            FileUtils::removeDirRecursively(destination);
+        }
+
         // check if destination directory exists already
         if (destination.isExistingDir() || destination.isExistingFile()) {
             throw RuntimeError(__FILE__, __LINE__, QString(tr("Could not copy "
-                "library element \"%1\" to \"%2\" because the directory exists already."))
+                "library element \"%1\" to \"%2\" because the destination exists already."))
                 .arg(mDirectory.toNative(), destination.toNative()));
         }
 
