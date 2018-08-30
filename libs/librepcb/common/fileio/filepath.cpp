@@ -285,6 +285,12 @@ QString FilePath::makeWellFormatted(const QString& filepath) noexcept
     while ((newPath.endsWith("/")) && (newPath != "/")) // the last character is "/"
         newPath.chop(1); // remove the last character
 
+    // Make sure that Windows drive paths end with a slash (i.e. convert "C:" to "C:/").
+    // This is important for FilePath::isRoot() to work properly (it fails with "C:")!
+    if ((newPath.length() == 2) && newPath.endsWith(":")) {
+        newPath += '/';
+    }
+
     // convert "." (current directory) to "" (especially required for Qt >= 5.5.1
     // as QDir::relativeFilePath() now returns a dot instead of an empty string)
     if (newPath == ".") newPath = QString("");

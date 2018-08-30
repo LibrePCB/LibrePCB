@@ -42,6 +42,7 @@ typedef struct {
     QString toStr;
     QString toWindowsStyle; // used to test toNative() on Windows
     QString toRelative;
+    bool isRoot;
 } FilePathTestData;
 
 /*****************************************************************************************
@@ -136,6 +137,14 @@ TEST_P(FilePathTest, testFromRelative)
     }
 }
 
+TEST_P(FilePathTest, testIsRoot)
+{
+    const FilePathTestData& data = GetParam();
+
+    FilePath p(data.inputFilePath);
+    EXPECT_EQ(data.isRoot, p.isRoot());
+}
+
 TEST_P(FilePathTest, testOperatorAssign)
 {
     const FilePathTestData& data = GetParam();
@@ -171,31 +180,31 @@ TEST(FilePathTest, testCleanFileName)
 
 INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
 
-    // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      , "isRoot" }
 #ifdef Q_OS_WIN
-    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             }), // Win path to a dir
-    FilePathTestData({true , "C:\\foo\\bar\\"        , "C:/bar"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "../foo/bar"      }), // Win path to a dir + backslash
-    FilePathTestData({true , "C:\\foo\\bar.txt"      , "C:/bar"         , "C:/foo/bar.txt"  , "C:\\foo\\bar.txt"    , "../foo/bar.txt"  }), // Win path to a file
-    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo\\bar"    , "C:/foo/bar"      , "C:\\foo\\bar"        , ""                }), // Win path with path==base
-    FilePathTestData({true , "C:\\\\foo\\..\\bar\\"  , "C:\\"           , "C:/bar"          , "C:\\bar"             , "bar"             }), // Win path with .. and double backslashes
-    FilePathTestData({true , "C:\\"                  , "C:\\foo"        , "C:"              , "C:"                  , ".."              }), // Win drive root path
+    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             , false}), // Win path to a dir
+    FilePathTestData({true , "C:\\foo\\bar\\"        , "C:/bar"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "../foo/bar"      , false}), // Win path to a dir + backslash
+    FilePathTestData({true , "C:\\foo\\bar.txt"      , "C:/bar"         , "C:/foo/bar.txt"  , "C:\\foo\\bar.txt"    , "../foo/bar.txt"  , false}), // Win path to a file
+    FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo\\bar"    , "C:/foo/bar"      , "C:\\foo\\bar"        , ""                , false}), // Win path with path==base
+    FilePathTestData({true , "C:\\\\foo\\..\\bar\\"  , "C:\\"           , "C:/bar"          , "C:\\bar"             , "bar"             , false}), // Win path with .. and double backslashes
+    FilePathTestData({true , "C:\\"                  , "C:\\foo"        , "C:/"             , "C:\\"                , ".."              , true }), // Win drive root path
 #endif
-    FilePathTestData({true , "/foo/bar"              , "/foo"           , "/foo/bar"        , "\\foo\\bar"          , "bar"             }), // UNIX path to a dir
-    FilePathTestData({true , "/foo/bar/"             , "/bar"           , "/foo/bar"        , "\\foo\\bar"          , "../foo/bar"      }), // UNIX path to a dir + slash
-    FilePathTestData({true , "/foo/bar.txt"          , "/bar"           , "/foo/bar.txt"    , "\\foo\\bar.txt"      , "../foo/bar.txt"  }), // UNIX path to a file
-    FilePathTestData({true , "/foo/bar"              , "/foo/bar"       , "/foo/bar"        , "\\foo\\bar"          , ""                }), // UNIX path with path==base
+    FilePathTestData({true , "/foo/bar"              , "/foo"           , "/foo/bar"        , "\\foo\\bar"          , "bar"             , false}), // UNIX path to a dir
+    FilePathTestData({true , "/foo/bar/"             , "/bar"           , "/foo/bar"        , "\\foo\\bar"          , "../foo/bar"      , false}), // UNIX path to a dir + slash
+    FilePathTestData({true , "/foo/bar.txt"          , "/bar"           , "/foo/bar.txt"    , "\\foo\\bar.txt"      , "../foo/bar.txt"  , false}), // UNIX path to a file
+    FilePathTestData({true , "/foo/bar"              , "/foo/bar"       , "/foo/bar"        , "\\foo\\bar"          , ""                , false}), // UNIX path with path==base
 /// @TODO: this test fails on Windows --> fix this!
-//    FilePathTestData({true , "//foo/..//bar//"       , "/"              , "/bar"            , "\\bar"               , "bar"             }), // UNIX path with .. and double slashes
-    FilePathTestData({true , "/"                     , "/foo"           , "/"               , "\\"                  , ".."              }), // UNIX root path
+//    FilePathTestData({true , "//foo/..//bar//"       , "/"              , "/bar"            , "\\bar"               , "bar"             , false}), // UNIX path with .. and double slashes
+    FilePathTestData({true , "/"                     , "/foo"           , "/"               , "\\"                  , ".."              , true }), // UNIX root path
 
-    // invalid paths {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      }
+    // invalid paths {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      , false}
 #ifdef Q_OS_WIN
-    FilePathTestData({false, "foo\\bar"              , ""               , ""                , ""                    , ""                }), // rel. Win path to a dir
-    FilePathTestData({false, "foo\\bar.txt"          , ""               , ""                , ""                    , ""                }), // rel. Win path to a file
+    FilePathTestData({false, "foo\\bar"              , ""               , ""                , ""                    , ""                , false}), // rel. Win path to a dir
+    FilePathTestData({false, "foo\\bar.txt"          , ""               , ""                , ""                    , ""                , false}), // rel. Win path to a file
 #endif
-    FilePathTestData({false, "foo/bar"               , ""               , ""                , ""                    , ""                }), // rel. UNIX path to a dir
-    FilePathTestData({false, "foo/bar.txt"           , ""               , ""                , ""                    , ""                }), // rel. UNIX path to a file
-    FilePathTestData({false, ""                      , ""               , ""                , ""                    , ""                })  // empty path
+    FilePathTestData({false, "foo/bar"               , ""               , ""                , ""                    , ""                , false}), // rel. UNIX path to a dir
+    FilePathTestData({false, "foo/bar.txt"           , ""               , ""                , ""                    , ""                , false}), // rel. UNIX path to a file
+    FilePathTestData({false, ""                      , ""               , ""                , ""                    , ""                , false})  // empty path
 ));
 
 /*****************************************************************************************
