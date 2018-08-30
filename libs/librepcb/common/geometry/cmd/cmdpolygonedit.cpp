@@ -21,6 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "cmdpolygonedit.h"
 
 /*****************************************************************************************
@@ -96,6 +97,12 @@ void CmdPolygonEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) n
 void CmdPolygonEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
 {
     setPath(mNewPath.rotated(angle, center), immediate);
+}
+
+void CmdPolygonEdit::mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept
+{
+    setLayerName(GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)), immediate);
+    setPath(mNewPath.mirrored(orientation, center), immediate);
 }
 
 /*****************************************************************************************

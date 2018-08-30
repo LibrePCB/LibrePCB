@@ -492,6 +492,12 @@ bool BI_NetSegment::isSelected() const noexcept
 
 void BI_NetSegment::setSelected(bool selected) noexcept
 {
+    foreach (BI_Via* via, mVias)
+        via->setSelected(selected);
+    foreach (BI_NetPoint* netpoint, mNetPoints)
+        netpoint->setSelected(selected);
+    foreach (BI_NetLine* netline, mNetLines)
+        netline->setSelected(selected);
     BI_Base::setSelected(selected);
 }
 

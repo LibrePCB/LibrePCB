@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdboardplaneedit.h"
+#include <librepcb/common/graphics/graphicslayer.h>
 #include "../board.h"
 
 /*****************************************************************************************
@@ -71,6 +72,12 @@ void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center, bool imm
     Q_ASSERT(!wasEverExecuted());
     mNewOutline = mOldOutline.rotated(angle, center);
     if (immediate) mPlane.setOutline(mNewOutline);
+}
+
+void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept
+{
+    setLayerName(GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)), immediate);
+    setOutline(mNewOutline.mirrored(orientation, center), immediate);
 }
 
 void CmdBoardPlaneEdit::setOutline(const Path& outline, bool immediate) noexcept

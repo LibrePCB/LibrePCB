@@ -28,6 +28,8 @@
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/boards/items/bi_netsegment.h>
+#include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
@@ -339,17 +341,76 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             return ForceStayInState;
         }
 
+        case BI_Base::Type_t::NetLine: {
+            BI_NetLine* netline = dynamic_cast<BI_NetLine*>(items.first()); Q_ASSERT(netline);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Trace");
+            QAction* aRemoveSegment = menu.addAction(QIcon(":/img/actions/minus.png"), "Remove Whole Segment");
+            menu.addSeparator();
+            QAction* aSelectSegment = menu.addAction(QIcon(":/img/actions/bookmark.png"), tr("Select Whole Segment"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aRemoveSegment) {
+                netline->getNetSegment().setSelected(true);
+                removeSelectedItems();
+            } else if (action == aSelectSegment) {
+                netline->getNetSegment().setSelected(true);
+            }
+            return ForceStayInState;
+        }
+
+        case BI_Base::Type_t::Via: {
+            BI_Via* via = dynamic_cast<BI_Via*>(items.first()); Q_ASSERT(via);
+
+            // build the context menu
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Via");
+            QAction* aRemoveSegment = menu.addAction(QIcon(":/img/actions/minus.png"), "Remove Whole Segment");
+            menu.addSeparator();
+            QAction* aSelectSegment = menu.addAction(QIcon(":/img/actions/bookmark.png"), tr("Select Whole Segment"));
+            menu.addSeparator();
+            QAction* aProperties = menu.addAction(tr("Properties"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == nullptr) {
+                // aborted --> nothing to do
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aRemoveSegment) {
+                via->getNetSegment().setSelected(true);
+                removeSelectedItems();
+            } else if (action == aSelectSegment) {
+                via->getNetSegment().setSelected(true);
+            } else if (action == aProperties) {
+                openViaPropertiesDialog(*via);
+            }
+            return ForceStayInState;
+        }
+
         case BI_Base::Type_t::Plane: {
             BI_Plane* plane = dynamic_cast<BI_Plane*>(items.first()); Q_ASSERT(plane);
 
             // build the context menu
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
             QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Plane");
+            menu.addSeparator();
             QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"), tr("Plane Properties"));
 
             // execute the context menu
             QAction* action = menu.exec(mouseEvent->screenPos());
             if (action == nullptr) {
                 // aborted --> nothing to do
+            } else if (action == aRotateCCW) {
+                rotateSelectedItems(Angle::deg90());
+            } else if (action == aFlipH) {
+                flipSelectedItems(Qt::Horizontal);
             } else if (action == aRemove) {
                 removeSelectedItems();
             } else if (action == aProperties) {
@@ -362,13 +423,20 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first()); Q_ASSERT(polygon);
 
             // build the context menu
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
             QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Polygon");
+            menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
             // execute the context menu
             QAction* action = menu.exec(mouseEvent->screenPos());
             if (action == nullptr) {
                 // aborted --> nothing to do
+            } else if (action == aRotateCCW) {
+                rotateSelectedItems(Angle::deg90());
+            } else if (action == aFlipH) {
+                flipSelectedItems(Qt::Horizontal);
             } else if (action == aRemove) {
                 removeSelectedItems();
             } else if (action == aProperties) {
@@ -381,13 +449,20 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
             BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first()); Q_ASSERT(text);
 
             // build the context menu
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aFlipH = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
             QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Text");
+            menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
             // execute the context menu
             QAction* action = menu.exec(mouseEvent->screenPos());
             if (action == nullptr) {
                 // aborted --> nothing to do
+            } else if (action == aRotateCCW) {
+                rotateSelectedItems(Angle::deg90());
+            } else if (action == aFlipH) {
+                flipSelectedItems(Qt::Horizontal);
             } else if (action == aRemove) {
                 removeSelectedItems();
             } else if (action == aProperties) {
@@ -401,6 +476,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
 
             // build the context menu
             QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Hole");
+            menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
             // execute the context menu

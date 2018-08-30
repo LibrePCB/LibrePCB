@@ -104,13 +104,13 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdle(SEE_Base* event) noexcept
     switch (event->getType())
     {
         case SEE_Base::Edit_Cut:
-            cutSelectedItems();
+            //cutSelectedItems();
             return ForceStayInState;
         case SEE_Base::Edit_Copy:
-            copySelectedItems();
+            //copySelectedItems();
             return ForceStayInState;
         case SEE_Base::Edit_Paste:
-            pasteItems();
+            //pasteItems();
             return ForceStayInState;
         case SEE_Base::Edit_RotateCW:
             rotateSelectedItems(-Angle::deg90());
@@ -226,60 +226,49 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
 
     // build and execute the context menu
     QMenu menu;
-    switch (items.first()->getType())
-    {
-        case SI_Base::Type_t::Symbol:
-        {
+    switch (items.first()->getType()) {
+        case SI_Base::Type_t::Symbol: {
             SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-            ComponentInstance& cmpInstance = symbol->getComponentInstance();
 
             // build the context menu
-            QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
             QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-            QAction* aMirror = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
-            menu.addSeparator();
-            QAction* aPlaceUnplacedSymbols = menu.addAction(QString(tr("Place unplaced symbols of %1 (%2)")).arg(*cmpInstance.getName()).arg(cmpInstance.getUnplacedSymbolsCount()));
-            aPlaceUnplacedSymbols->setEnabled(cmpInstance.getUnplacedSymbolsCount() > 0);
-            QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), QString(tr("Remove Symbol %1")).arg(symbol->getName()));
-            aRemoveSymbol->setEnabled(cmpInstance.getPlacedSymbolsCount() > 1);
-            QAction* aRemoveCmp = menu.addAction(QIcon(":/img/actions/cancel.png"), QString(tr("Remove Component %1")).arg(*cmpInstance.getName()));
+            QAction* aRemoveSymbol = menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove Symbol"));
             menu.addSeparator();
             QAction* aProperties = menu.addAction(tr("Properties"));
 
             // execute the context menu
             QAction* action = menu.exec(mouseEvent->screenPos());
-            if (action == aCopy)
-            {
-                // TODO
-            }
-            else if (action == aRotateCCW)
-            {
+            if (action == aRotateCCW) {
                 rotateSelectedItems(Angle::deg90());
-            }
-            else if (action == aMirror)
-            {
-                // TODO
-            }
-            else if (action == aPlaceUnplacedSymbols)
-            {
-                // TODO
-            }
-            else if (action == aRemoveSymbol)
-            {
-                // TODO
-            }
-            else if (action == aRemoveCmp)
-            {
-                // TODO
-            }
-            else if (action == aProperties)
-            {
-                // open the properties editor dialog of the selected item
-                SymbolInstancePropertiesDialog dialog(mProject, cmpInstance, *symbol, mUndoStack, &mEditor);
-                dialog.exec();
+            } else if (action == aRemoveSymbol) {
+                removeSelectedItems();
+            } else if (action == aProperties) {
+                openSymbolPropertiesDialog(*symbol);
             }
             return ForceStayInState;
         }
+
+        case SI_Base::Type_t::NetLabel: {
+            SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(items.first()); Q_ASSERT(netlabel);
+
+            // build the context menu
+            QAction* aRotateCCW = menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+            QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove Net Label"));
+            menu.addSeparator();
+            QAction* aRenameNetSegment = menu.addAction(tr("Rename Net Segment"));
+
+            // execute the context menu
+            QAction* action = menu.exec(mouseEvent->screenPos());
+            if (action == aRotateCCW) {
+                rotateSelectedItems(Angle::deg90());
+            } else if (action == aRemove) {
+                removeSelectedItems();
+            } else if (action == aRenameNetSegment) {
+                openNetLabelPropertiesDialog(*netlabel);
+            }
+            return ForceStayInState;
+        }
+
         default:
             break;
     }
@@ -295,45 +284,16 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(QGraphicsSceneMous
         QList<SI_Base*> items = schematic->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
         if (items.isEmpty()) return PassToParentState;
         // open the properties editor dialog of the top most item
-        switch (items.first()->getType())
-        {
-            case SI_Base::Type_t::Symbol:
-            {
+        switch (items.first()->getType()) {
+            case SI_Base::Type_t::Symbol: {
                 SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first()); Q_ASSERT(symbol);
-                ComponentInstance& cmpInstance = symbol->getComponentInstance();
-                SymbolInstancePropertiesDialog dialog(mProject, cmpInstance, *symbol, mUndoStack, &mEditor);
-                dialog.exec();
+                openSymbolPropertiesDialog(*symbol);
                 return ForceStayInState;
             }
-            case SI_Base::Type_t::NetLabel:
-            {
-                SI_NetLabel* label = dynamic_cast<SI_NetLabel*>(items.first()); Q_ASSERT(label);
-                NetSignal& netsignal = label->getNetSignalOfNetSegment();
-                QString name = QInputDialog::getText(&mEditor, tr("Change net of segment"),
-                                                     tr("New net name:"), QLineEdit::Normal,
-                                                     *netsignal.getName());
-                if (!name.isNull()) {
-                    try {
-                        // change netsignal of netsegment
-                        CircuitIdentifier newName(name.trimmed()); // can throw
-                        mUndoStack.beginCmdGroup(tr("Change netsignal of netsegment"));
-                        NetSignal* newSignal = mCircuit.getNetSignalByName(name);
-                        if (!newSignal) {
-                            CmdNetSignalAdd* cmd = new CmdNetSignalAdd(mProject.getCircuit(),
-                                                                       netsignal.getNetClass(),
-                                                                       newName);
-                            mUndoStack.appendToCmdGroup(cmd);
-                            newSignal = cmd->getNetSignal();
-                            Q_ASSERT(newSignal);
-                        }
-                        mUndoStack.appendToCmdGroup(new CmdChangeNetSignalOfSchematicNetSegment(
-                                                    label->getNetSegment(), *newSignal));
-                        mUndoStack.commitCmdGroup();
-                    } catch (const Exception& e) {
-                        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-                    }
-                }
-                break;
+            case SI_Base::Type_t::NetLabel: {
+                SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(items.first()); Q_ASSERT(netlabel);
+                openNetLabelPropertiesDialog(*netlabel);
+                return ForceStayInState;
             }
             default:
                 break;
@@ -460,20 +420,40 @@ bool SES_Select::removeSelectedItems() noexcept
     }
 }
 
-bool SES_Select::cutSelectedItems() noexcept
+void SES_Select::openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept
 {
-
-    return false; // TODO
+    SymbolInstancePropertiesDialog dialog(mProject, symbol.getComponentInstance(), symbol,
+                                          mUndoStack, &mEditor);
+    dialog.exec();
 }
 
-bool SES_Select::copySelectedItems() noexcept
+void SES_Select::openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept
 {
-    return false; // TODO
-}
-
-bool SES_Select::pasteItems() noexcept
-{
-    return false; // TODO
+    NetSignal& netsignal = netlabel.getNetSignalOfNetSegment();
+    QString name = QInputDialog::getText(&mEditor, tr("Change net of segment"),
+                                         tr("New net name:"), QLineEdit::Normal,
+                                         *netsignal.getName());
+    if (!name.isNull()) {
+        try {
+            // change netsignal of netsegment
+            CircuitIdentifier newName(name.trimmed()); // can throw
+            mUndoStack.beginCmdGroup(tr("Change netsignal of netsegment"));
+            NetSignal* newSignal = mCircuit.getNetSignalByName(name);
+            if (!newSignal) {
+                CmdNetSignalAdd* cmd = new CmdNetSignalAdd(mProject.getCircuit(),
+                                                           netsignal.getNetClass(),
+                                                           newName);
+                mUndoStack.appendToCmdGroup(cmd);
+                newSignal = cmd->getNetSignal();
+                Q_ASSERT(newSignal);
+            }
+            mUndoStack.appendToCmdGroup(new CmdChangeNetSignalOfSchematicNetSegment(
+                                        netlabel.getNetSegment(), *newSignal));
+            mUndoStack.commitCmdGroup();
+        } catch (const Exception& e) {
+            QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+        }
+    }
 }
 
 /*****************************************************************************************
