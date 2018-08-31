@@ -337,7 +337,7 @@ void ComponentSignalListEditorWidget::setTableRowContent(int row, const tl::opti
     mTable->setItem(row, COLUMN_FORCEDNETNAME, new QTableWidgetItem(forcedNetName));
 
     // button
-    int btnSize = requiredCheckBox->sizeHint().height();
+    int btnSize = qMax(requiredCheckBox->sizeHint().height(), 17);
     QToolButton* btnAddRemove = new QToolButton(this);
     btnAddRemove->setProperty("row", row);
     btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
