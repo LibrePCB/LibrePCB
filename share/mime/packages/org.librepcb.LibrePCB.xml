@@ -7,6 +7,7 @@
 		<magic priority="50">
 		  <match value="(librepcb" type="string" offset="0"/>
 		</magic>
+		<icon name="org.librepcb.LibrePCB-file"/>
 	</mime-type>
 	<mime-type type="application/x-librepcb-project">
 		<sub-class-of type="text/plain"/>
@@ -15,5 +16,6 @@
 		<magic priority="50">
 		  <match value="LIBREPCB-PROJECT" type="string" offset="0"/>
 		</magic>
+		<icon name="org.librepcb.LibrePCB-project"/>
 	</mime-type>
 </mime-info>
