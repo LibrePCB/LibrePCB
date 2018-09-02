@@ -26,7 +26,11 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QListWidget" name="lstUnplacedComponents"/>
+      <widget class="QListWidget" name="lstUnplacedComponents">
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>

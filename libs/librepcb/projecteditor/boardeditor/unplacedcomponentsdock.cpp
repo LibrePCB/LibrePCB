@@ -240,11 +240,10 @@ void UnplacedComponentsDock::updateComponentsList() noexcept
             if (component->getLibComponent().isSchematicOnly()) continue;
 
             // add component to list
-            int deviceCount = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(component->getLibComponent().getUuid()).count();
             CircuitIdentifier name = component->getName();
             QString value = component->getValue(true).replace("\n", "|");
             ElementName compName = component->getLibComponent().getNames().value(mProject.getSettings().getLocaleOrder());
-            QString text = QString("{%1} %2 (%3) [%4]").arg(deviceCount).arg(*name, value, *compName);
+            QString text = QString("%1: %2 %3").arg(*name, value, *compName);
             QListWidgetItem* item = new QListWidgetItem(text, mUi->lstUnplacedComponents);
             item->setData(Qt::UserRole, component->getUuid().toStr());
         }
@@ -270,22 +269,25 @@ void UnplacedComponentsDock::setSelectedComponentInstance(ComponentInstance* cmp
         QSet<Uuid> devices = mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(mSelectedComponent->getLibComponent().getUuid());
         foreach (const Uuid& deviceUuid, devices)
         {
-            // TODO: use library metadata instead of loading the files
+            // get device metadata
             FilePath devFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(deviceUuid);
             if (!devFp.isValid()) continue;
-            const library::Device device(devFp, true);
-
+            QString devName;
+            mProjectEditor.getWorkspace().getLibraryDb().getElementTranslations<library::Device>(devFp, localeOrder, &devName);
             Uuid pkgUuid = Uuid::createRandom(); // only for initialization, will be overwritten
             mProjectEditor.getWorkspace().getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-            FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(pkgUuid);
-            const library::Package package(pkgFp, true);
 
-            ElementName devName = device.getNames().value(localeOrder);
-            ElementName pkgName = package.getNames().value(localeOrder);
-            QString text = QString("%1 [%2]").arg(*devName, *pkgName);
+            // get package metadata
+            FilePath pkgFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(pkgUuid);
+            if (!pkgFp.isValid()) continue;
+            QString pkgName;
+            mProjectEditor.getWorkspace().getLibraryDb().getElementTranslations<library::Package>(pkgFp, localeOrder, &pkgName);
+
+            QString text = QString("%1 [%2]").arg(devName, pkgName);
             mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
         }
         if (mUi->cbxSelectedDevice->count() > 0) {
+            mUi->cbxSelectedDevice->model()->sort(0);
             tl::optional<Uuid> deviceUuid = mSelectedComponent->getDefaultDeviceUuid();
             if (!deviceUuid) {
                 deviceUuid = mLastDeviceOfComponent.value(mSelectedComponent->getLibComponent().getUuid(), Uuid::createRandom());
