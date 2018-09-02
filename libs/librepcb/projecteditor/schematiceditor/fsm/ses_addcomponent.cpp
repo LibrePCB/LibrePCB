@@ -114,10 +114,12 @@ SES_Base::ProcRetVal SES_AddComponent::process(SEE_Base* event) noexcept
             return PassToParentState;
         }
         case SEE_Base::Edit_RotateCW:
-            mCurrentSymbolEditCommand->rotate(-Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+            mLastAngle -= Angle::deg90();
+            mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
             return ForceStayInState;
         case SEE_Base::Edit_RotateCCW:
-            mCurrentSymbolEditCommand->rotate(Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+            mLastAngle += Angle::deg90();
+            mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
             return ForceStayInState;
         case SEE_Base::GraphicsViewEvent:
             return processSceneEvent(event);
