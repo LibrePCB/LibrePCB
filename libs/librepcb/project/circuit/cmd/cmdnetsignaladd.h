@@ -50,9 +50,8 @@ class CmdNetSignalAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdNetSignalAdd(Circuit& circuit, NetClass& netclass) noexcept;
         CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
-                        const CircuitIdentifier& name) noexcept;
+                        const tl::optional<CircuitIdentifier>& name = tl::nullopt) noexcept;
         ~CmdNetSignalAdd() noexcept;
 
         // Getters
@@ -77,7 +76,6 @@ class CmdNetSignalAdd final : public UndoCommand
 
         Circuit& mCircuit;
         NetClass& mNetClass;
-        bool mIsAutoName;
         tl::optional<CircuitIdentifier> mName;
         NetSignal* mNetSignal;
 };

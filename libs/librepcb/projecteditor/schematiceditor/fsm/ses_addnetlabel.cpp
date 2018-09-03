@@ -192,7 +192,7 @@ bool SES_AddNetLabel::addLabel(Schematic& schematic, const Point& pos) noexcept
 
         mUndoStack.beginCmdGroup(tr("Add net label to schematic"));
         mUndoCmdActive = true;
-        CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(netsegment, pos);
+        CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(netsegment, pos, Angle::deg0());
         mUndoStack.appendToCmdGroup(cmdAdd);
         mCurrentNetLabel = cmdAdd->getNetLabel();
         mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);

@@ -56,7 +56,8 @@ class SI_NetLabel final : public SI_Base, public SerializableObject
         SI_NetLabel() = delete;
         SI_NetLabel(const SI_NetLabel& other) = delete;
         explicit SI_NetLabel(SI_NetSegment& segment, const SExpression& node);
-        explicit SI_NetLabel(SI_NetSegment& segment, const Point& position);
+        explicit SI_NetLabel(SI_NetSegment& segment, const Point& position,
+                             const Angle& rotation);
         ~SI_NetLabel() noexcept;
 
         // Getters

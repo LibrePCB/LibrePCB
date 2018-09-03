@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -50,7 +50,8 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position) noexcept;
+        CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
+                                const Angle& rotation) noexcept;
         ~CmdSchematicNetLabelAdd() noexcept;
 
         // Getters
@@ -75,6 +76,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand
 
         SI_NetSegment& mNetSegment;
         Point mPosition;
+        Angle mRotation;
         SI_NetLabel* mNetLabel;
 };
 

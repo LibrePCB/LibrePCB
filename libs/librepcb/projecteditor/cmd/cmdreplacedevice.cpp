@@ -91,7 +91,7 @@ bool CmdReplaceDevice::performExecute()
     }
 
     // replace the device instance
-    execNewChildCmd(new CmdDeviceInstanceRemove(mBoard, mDeviceInstance)); // can throw
+    execNewChildCmd(new CmdDeviceInstanceRemove(mDeviceInstance)); // can throw
     CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(mWorkspace, mBoard,
                                                        mDeviceInstance.getComponentInstance(),
                                                        mNewDeviceUuid, mNewFootprintUuid,

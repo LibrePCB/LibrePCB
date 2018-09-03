@@ -49,9 +49,9 @@ SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node) :
     init();
 }
 
-SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position) :
+SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position, const Angle& rotation) :
     SI_Base(segment.getSchematic()), mNetSegment(segment), mUuid(Uuid::createRandom()),
-    mPosition(position), mRotation(0)
+    mPosition(position), mRotation(rotation)
 {
     init();
 }

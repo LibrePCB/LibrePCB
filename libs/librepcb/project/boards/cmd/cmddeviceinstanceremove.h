@@ -47,7 +47,7 @@ class CmdDeviceInstanceRemove final : public UndoCommand
     public:
 
         // Constructors / Destructor
-        CmdDeviceInstanceRemove(Board& board, BI_Device& dev) noexcept;
+        CmdDeviceInstanceRemove(BI_Device& dev) noexcept;
         ~CmdDeviceInstanceRemove() noexcept;
 
 

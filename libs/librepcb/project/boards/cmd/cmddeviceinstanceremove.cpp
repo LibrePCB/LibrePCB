@@ -35,9 +35,9 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(Board& board, BI_Device& dev) noexcept :
+CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(BI_Device& dev) noexcept :
     UndoCommand(tr("Remove device instance")),
-    mBoard(board), mDevice(dev)
+    mBoard(dev.getBoard()), mDevice(dev)
 {
 }
 

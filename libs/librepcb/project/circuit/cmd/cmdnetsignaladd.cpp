@@ -35,18 +35,10 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass) noexcept :
-    UndoCommand(tr("Add netsignal")),
-    mCircuit(circuit), mNetClass(netclass), mIsAutoName(true), mName(),
-    mNetSignal(nullptr)
-{
-}
-
 CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
-                                 const CircuitIdentifier& name) noexcept :
+                                 const tl::optional<CircuitIdentifier>& name) noexcept :
     UndoCommand(tr("Add netsignal")),
-    mCircuit(circuit), mNetClass(netclass), mIsAutoName(false), mName(name),
-    mNetSignal(nullptr)
+    mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(nullptr)
 {
 }
 
@@ -60,11 +52,12 @@ CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
 
 bool CmdNetSignalAdd::performExecute()
 {
-    if (mIsAutoName) {
+    bool autoName = !mName.has_value();
+    if (!mName) {
         mName = CircuitIdentifier(mCircuit.generateAutoNetSignalName()); // can throw
     }
     Q_ASSERT(mName.has_value());
-    mNetSignal = new NetSignal(mCircuit, mNetClass, *mName, mIsAutoName); // can throw
+    mNetSignal = new NetSignal(mCircuit, mNetClass, *mName, autoName); // can throw
 
     performRedo(); // can throw
 

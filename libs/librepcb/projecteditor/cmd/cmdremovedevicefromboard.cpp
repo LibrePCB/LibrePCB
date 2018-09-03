@@ -68,7 +68,7 @@ bool CmdRemoveDeviceFromBoard::performExecute()
     }
 
     // remove the device itself
-    execNewChildCmd(new CmdDeviceInstanceRemove(mDevice.getBoard(), mDevice)); // can throw
+    execNewChildCmd(new CmdDeviceInstanceRemove(mDevice)); // can throw
 
     undoScopeGuard.dismiss(); // no undo required
     return (getChildCount() > 0);

@@ -273,7 +273,8 @@ SI_NetSegment* CmdRemoveSelectedSchematicItems::createNewSubNetSegment(
     // create new netlabels
     foreach (const SI_NetLabel* netlabel, items.netlabels) {
         CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*newNetSegment,
-                                                                      netlabel->getPosition());
+                                                                      netlabel->getPosition(),
+                                                                      netlabel->getRotation());
         execNewChildCmd(cmdAdd);
         CmdSchematicNetLabelEdit* cmdEdit = new CmdSchematicNetLabelEdit(*cmdAdd->getNetLabel());
         cmdEdit->setRotation(netlabel->getRotation(), false);

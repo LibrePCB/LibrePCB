@@ -36,9 +36,11 @@ namespace project {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position) noexcept :
+CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment,
+                                                 const Point& position,
+                                                 const Angle& rotation) noexcept :
     UndoCommand(tr("Add netlabel")),
-    mNetSegment(segment), mPosition(position), mNetLabel(nullptr)
+    mNetSegment(segment), mPosition(position), mRotation(rotation), mNetLabel(nullptr)
 {
 }
 
@@ -52,7 +54,7 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
 
 bool CmdSchematicNetLabelAdd::performExecute()
 {
-    mNetLabel = new SI_NetLabel(mNetSegment, mPosition); // can throw
+    mNetLabel = new SI_NetLabel(mNetSegment, mPosition, mRotation); // can throw
 
     performRedo(); // can throw
 
