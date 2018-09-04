@@ -46,8 +46,15 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other) :
 BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
     BI_Base(segment.getBoard()), mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos"))
+    mPosition(0, 0)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+
     init();
 }
 
@@ -163,7 +170,7 @@ void BI_NetPoint::unregisterNetLine(BI_NetLine& netline)
 void BI_NetPoint::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendChild(mPosition.serializeToDomElement("position"), false);
 }
 
 /*****************************************************************************************

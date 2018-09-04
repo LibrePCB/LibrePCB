@@ -43,9 +43,22 @@ namespace project {
 SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node) :
     SI_Base(segment.getSchematic()), mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos")),
-    mRotation(node.getValueByPath<Angle>("rot"))
+    mPosition(0, 0),
+    mRotation(0)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
+
     init();
 }
 
@@ -139,8 +152,8 @@ void SI_NetLabel::removeFromSchematic()
 void SI_NetLabel::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mRotation, false);
 }
 
 /*****************************************************************************************

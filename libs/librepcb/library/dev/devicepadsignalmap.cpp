@@ -48,8 +48,14 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const tl::option
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node) :
     QObject(nullptr),
     mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("sig"))
+    mSignalUuid(Uuid::createRandom()) // backward compatibility, remove this some time!
 {
+    if (node.tryGetChildByPath("signal")) {
+        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
+    } else {
+        // backward compatibility, remove this some time!
+        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
+    }
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept
@@ -74,7 +80,7 @@ void DevicePadSignalMapItem::setSignalUuid(const tl::optional<Uuid>& uuid) noexc
 void DevicePadSignalMapItem::serialize(SExpression& root) const
 {
     root.appendChild(mPadUuid);
-    root.appendChild("sig", mSignalUuid, false);
+    root.appendChild("signal", mSignalUuid, false);
 }
 
 /*****************************************************************************************

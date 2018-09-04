@@ -62,15 +62,21 @@ Polygon::Polygon(const SExpression& node) :
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(node.getValueByPath<bool>("grab")),
+    mIsGrabArea(false),
     mPath()
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
     }
+    if (node.tryGetChildByPath("grab_area")) {
+        mIsGrabArea = node.getValueByPath<bool>("grab_area");
+    } else {
+        // backward compatibility, remove this some time!
+        mIsGrabArea = node.getValueByPath<bool>("grab");
+    }
 
     // load vertices
-    if (!node.tryGetChildByPath("pos")) {
+    if ((!node.tryGetChildByPath("pos")) && (!node.tryGetChildByPath("position"))) {
         mPath = Path(node); // can throw
     } else {
         // backward compatibility, remove this some time!
@@ -155,7 +161,7 @@ void Polygon::serialize(SExpression& root) const
     root.appendChild("layer", mLayerName, false);
     root.appendChild("width", mLineWidth, true);
     root.appendChild("fill", mIsFilled, false);
-    root.appendChild("grab", mIsGrabArea, false);
+    root.appendChild("grab_area", mIsGrabArea, false);
     mPath.serialize(root);
 }
 

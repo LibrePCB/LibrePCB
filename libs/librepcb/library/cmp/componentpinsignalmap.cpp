@@ -48,9 +48,22 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin,
 
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node) :
     mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("sig")),
-    mDisplayType(CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp")))
+    mSignalUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+    mDisplayType(CmpSigPinDisplayType::componentSignal())
 {
+    if (node.tryGetChildByPath("signal")) {
+        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
+    } else {
+        // backward compatibility, remove this some time!
+        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
+    }
+
+    if (node.tryGetChildByPath("text")) {
+        mDisplayType = CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("text"));
+    } else {
+        // backward compatibility, remove this some time!
+        mDisplayType = CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp"));
+    }
 }
 
 ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
@@ -64,8 +77,8 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
 void ComponentPinSignalMapItem::serialize(SExpression& root) const
 {
     root.appendChild(mPinUuid);
-    root.appendChild("sig", mSignalUuid, false);
-    root.appendChild("disp", mDisplayType, false);
+    root.appendChild("signal", mSignalUuid, false);
+    root.appendChild("text", mDisplayType, false);
 }
 
 /*****************************************************************************************

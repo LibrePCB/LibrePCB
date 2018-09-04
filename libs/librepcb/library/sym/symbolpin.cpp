@@ -54,11 +54,23 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name, const Poin
 SymbolPin::SymbolPin(const SExpression& node) :
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<CircuitIdentifier>("name", true)),
-    mPosition(node.getChildByPath("pos")),
+    mPosition(0, 0),
     mLength(node.getValueByPath<UnsignedLength>("length")),
-    mRotation(node.getValueByPath<Angle>("rot")),
+    mRotation(0),
     mRegisteredGraphicsItem(nullptr)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
 }
 
 SymbolPin::~SymbolPin() noexcept
@@ -114,8 +126,8 @@ void SymbolPin::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
     root.appendChild("name", mName, false);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mRotation, false);
     root.appendChild("length", mLength, false);
 }
 

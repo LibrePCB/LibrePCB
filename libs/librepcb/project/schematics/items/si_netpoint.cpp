@@ -39,8 +39,15 @@ namespace project {
 SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node) :
     SI_Base(segment.getSchematic()), mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos"))
+    mPosition(0, 0)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+
     init();
 }
 
@@ -156,7 +163,7 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline)
 void SI_NetPoint::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendChild(mPosition.serializeToDomElement("position"), false);
 }
 
 /*****************************************************************************************

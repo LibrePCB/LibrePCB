@@ -72,8 +72,18 @@ BI_Device::BI_Device(Board& board, const SExpression& node) :
     initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
     // get position, rotation and mirrored
-    mPosition = Point(node.getChildByPath("pos"));
-    mRotation = node.getValueByPath<Angle>("rot");
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
     mIsMirrored = node.getValueByPath<bool>("mirror");
 
     // load attributes
@@ -233,8 +243,8 @@ void BI_Device::serialize(SExpression& root) const
     root.appendChild(mCompInstance->getUuid());
     root.appendChild("lib_device", mLibDevice->getUuid(), true);
     root.appendChild("lib_footprint", mLibFootprint->getUuid(), true);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mRotation, false);
     root.appendChild("mirror", mIsMirrored, false);
     mAttributes.serialize(root);
     mFootprint->serialize(root);

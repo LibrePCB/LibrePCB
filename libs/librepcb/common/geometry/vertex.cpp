@@ -35,7 +35,12 @@ namespace librepcb {
 Vertex::Vertex(const SExpression& node)
 {
     try {
-        mPos = Point(node.getChildByPath("pos"));
+        if (node.tryGetChildByPath("position")) {
+            mPos = Point(node.getChildByPath("position"));
+        } else {
+            // backward compatibility, remove this some time!
+            mPos = Point(node.getChildByPath("pos"));
+        }
         mAngle = node.getValueByPath<Angle>("angle");
     } catch (const Exception& e) {
         throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
@@ -49,7 +54,7 @@ Vertex::Vertex(const SExpression& node)
 
 void Vertex::serialize(SExpression& root) const
 {
-    root.appendChild(mPos.serializeToDomElement("pos"), false);
+    root.appendChild(mPos.serializeToDomElement("position"), false);
     root.appendChild("angle", mAngle, false);
 }
 

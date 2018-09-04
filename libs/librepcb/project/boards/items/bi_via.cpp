@@ -48,11 +48,18 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node) :
     BI_Base(netsegment.getBoard()),
     mNetSegment(netsegment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos")),
+    mPosition(0, 0),
     mShape(node.getValueByPath<Shape>("shape")),
     mSize(node.getValueByPath<PositiveLength>("size")),
     mDrillDiameter(node.getValueByPath<PositiveLength>("drill"))
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+
     init();
 }
 
@@ -213,7 +220,7 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline)
 void BI_Via::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
     root.appendChild("size", mSize, false);
     root.appendChild("drill", mDrillDiameter, false);
     root.appendChild("shape", mShape, false);

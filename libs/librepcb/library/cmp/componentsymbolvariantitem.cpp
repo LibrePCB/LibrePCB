@@ -57,12 +57,24 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(const Uuid& uuid,
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node) :
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mSymbolPos(node.getChildByPath("pos")),
-    mSymbolRot(node.getValueByPath<Angle>("rot")),
+    mSymbolPos(0, 0),
+    mSymbolRot(0),
     mIsRequired(node.getValueByPath<bool>("required")),
     mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
     mPinSignalMap(node)
 {
+    if (node.tryGetChildByPath("position")) {
+        mSymbolPos = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mSymbolPos = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mSymbolRot = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mSymbolRot = node.getValueByPath<Angle>("rot");
+    }
 }
 
 ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept
@@ -77,8 +89,8 @@ void ComponentSymbolVariantItem::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
     root.appendChild("symbol", mSymbolUuid, true);
-    root.appendChild(mSymbolPos.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mSymbolRot, false);
+    root.appendChild(mSymbolPos.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mSymbolRot, false);
     root.appendChild("required", mIsRequired, false);
     root.appendChild("suffix", mSuffix, false);
     mPinSignalMap.sortedByUuid().serialize(root);
