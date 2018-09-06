@@ -37,6 +37,7 @@ SOURCES += \
     settings/items/wsi_librarynormorder.cpp \
     settings/items/wsi_projectautosaveinterval.cpp \
     settings/items/wsi_repositories.cpp \
+    settings/items/wsi_user.cpp \
     settings/workspacesettings.cpp \
     settings/workspacesettingsdialog.cpp \
     workspace.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     settings/items/wsi_librarynormorder.h \
     settings/items/wsi_projectautosaveinterval.h \
     settings/items/wsi_repositories.h \
+    settings/items/wsi_user.h \
     settings/workspacesettings.h \
     settings/workspacesettingsdialog.h \
     workspace.h \

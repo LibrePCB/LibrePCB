@@ -36,6 +36,7 @@
 #include "items/wsi_debugtools.h"
 #include "items/wsi_appearance.h"
 #include "items/wsi_repositories.h"
+#include "items/wsi_user.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -78,6 +79,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject
 
 
         // Getters: Settings Items
+        WSI_User& getUser() const noexcept {return *mUser;}
         WSI_AppLocale& getAppLocale() const noexcept {return *mAppLocale;}
         WSI_AppDefaultMeasurementUnits& getAppDefMeasUnits() const noexcept {return *mAppDefMeasUnits;}
         WSI_ProjectAutosaveInterval& getProjectAutosaveInterval() const noexcept {return *mProjectAutosaveInterval;}
@@ -125,6 +127,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject
 
         // Settings Items
         QList<WSI_Base*> mItems; ///< contains all settings items
+        QScopedPointer<WSI_User> mUser;
         QScopedPointer<WSI_AppLocale> mAppLocale;
         QScopedPointer<WSI_AppDefaultMeasurementUnits> mAppDefMeasUnits;
         QScopedPointer<WSI_ProjectAutosaveInterval> mProjectAutosaveInterval;
