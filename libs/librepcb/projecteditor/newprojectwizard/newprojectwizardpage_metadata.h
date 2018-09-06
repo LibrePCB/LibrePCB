@@ -32,6 +32,11 @@
  ****************************************************************************************/
 
 namespace librepcb {
+
+namespace workspace {
+class Workspace;
+}
+
 namespace project {
 namespace editor {
 
@@ -56,7 +61,8 @@ class NewProjectWizardPage_Metadata final : public QWizardPage
     public:
 
         // Constructors / Destructor
-        explicit NewProjectWizardPage_Metadata(QWidget* parent = nullptr) noexcept;
+        explicit NewProjectWizardPage_Metadata(const workspace::Workspace& ws,
+                                               QWidget* parent = nullptr) noexcept;
         NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) = delete;
         ~NewProjectWizardPage_Metadata() noexcept;
 

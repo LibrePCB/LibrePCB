@@ -52,7 +52,7 @@ NewProjectWizard::NewProjectWizard(const workspace::Workspace& ws, QWidget* pare
 {
     mUi->setupUi(this);
 
-    addPage(mPageMetadata = new NewProjectWizardPage_Metadata(this));
+    addPage(mPageMetadata = new NewProjectWizardPage_Metadata(mWorkspace, this));
     addPage(mPageInitialization = new NewProjectWizardPage_Initialization(this));
     //addPage(mPageVersionControl = new NewProjectWizardPage_VersionControl(this));
 }

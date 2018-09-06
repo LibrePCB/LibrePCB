@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "projectmetadata.h"
-#include <librepcb/common/systeminfo.h>
 #include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/fileio/sexpression.h>
 #include "../project.h"
@@ -53,7 +52,7 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, 
         } catch (const Exception&) {
             // fall back to default name
         }
-        mAuthor = SystemInfo::getFullUsername();
+        mAuthor = tr("Unknown");
         mVersion = "v1";
         mCreated = QDateTime::currentDateTime();
     } else {
