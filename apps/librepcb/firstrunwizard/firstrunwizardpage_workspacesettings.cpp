@@ -17,69 +17,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_H
-#define LIBREPCB_FIRSTRUNWIZARD_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/fileio/filepath.h>
+#include <QFileDialog>
+#include "firstrunwizardpage_workspacesettings.h"
+#include "ui_firstrunwizardpage_workspacesettings.h"
+#include <librepcb/common/systeminfo.h>
+#include <librepcb/workspace/workspace.h>
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace application {
 
-namespace Ui {
-class FirstRunWizard;
+/*****************************************************************************************
+ *  Constructors / Destructor
+ ****************************************************************************************/
+
+FirstRunWizardPage_WorkspaceSettings::FirstRunWizardPage_WorkspaceSettings(QWidget *parent) noexcept :
+    QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspaceSettings)
+{
+    mUi->setupUi(this);
+    registerField("NewWorkspaceUserName", mUi->edtUserName);
+
+    // Initialize user name with the system's username.
+    mUi->edtUserName->setText(SystemInfo::getFullUsername());
+}
+
+FirstRunWizardPage_WorkspaceSettings::~FirstRunWizardPage_WorkspaceSettings() noexcept
+{
 }
 
 /*****************************************************************************************
- *  Class FirstRunWizard
+ *  Inherited Methods
  ****************************************************************************************/
 
-/**
- * @brief The FirstRunWizard class
- *
- * @author ubruhin
- * @date 2015-09-22
- */
-class FirstRunWizard final : public QWizard
+bool FirstRunWizardPage_WorkspaceSettings::validatePage() noexcept
 {
-        Q_OBJECT
-
-        enum PageId {
-            Page_Welcome,
-            Page_WorkspacePath,
-            Page_WorkspaceSettings,
-        };
-
-    public:
-
-        // Constructors / Destructor
-        explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-        ~FirstRunWizard() noexcept;
-
-        // Getters
-        bool getCreateNewWorkspace() const noexcept;
-        FilePath getWorkspaceFilePath() const noexcept;
-        QString getNewWorkspaceUserName() const noexcept;
-
-        // Inherited from QWizard
-        int nextId() const override;
-
-
-    private:
-
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizard)
-
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizard> mUi;
-};
+    return true; // Any user name is valid
+}
 
 /*****************************************************************************************
  *  End of File
@@ -87,5 +65,3 @@ class FirstRunWizard final : public QWizard
 
 } // namespace application
 } // namespace librepcb
-
-#endif // LIBREPCB_FIRSTRUNWIZARD_H

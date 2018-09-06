@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_H
-#define LIBREPCB_FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
+#define LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,51 +33,36 @@ namespace librepcb {
 namespace application {
 
 namespace Ui {
-class FirstRunWizard;
+class FirstRunWizardPage_WorkspaceSettings;
 }
 
 /*****************************************************************************************
- *  Class FirstRunWizard
+ *  Class FirstRunWizardPage_WorkspaceSettings
  ****************************************************************************************/
 
 /**
- * @brief The FirstRunWizard class
- *
- * @author ubruhin
- * @date 2015-09-22
+ * @brief The FirstRunWizardPage_WorkspaceSettings class
  */
-class FirstRunWizard final : public QWizard
+class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage
 {
         Q_OBJECT
-
-        enum PageId {
-            Page_Welcome,
-            Page_WorkspacePath,
-            Page_WorkspaceSettings,
-        };
 
     public:
 
         // Constructors / Destructor
-        explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-        ~FirstRunWizard() noexcept;
+        explicit FirstRunWizardPage_WorkspaceSettings(QWidget *parent = 0) noexcept;
+        ~FirstRunWizardPage_WorkspaceSettings() noexcept;
 
-        // Getters
-        bool getCreateNewWorkspace() const noexcept;
-        FilePath getWorkspaceFilePath() const noexcept;
-        QString getNewWorkspaceUserName() const noexcept;
-
-        // Inherited from QWizard
-        int nextId() const override;
+        // Inherited Methods
+        bool validatePage() noexcept override;
 
 
-    private:
+    private: // Methods
+        Q_DISABLE_COPY(FirstRunWizardPage_WorkspaceSettings)
 
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizard)
 
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizard> mUi;
+    private: // Data
+        QScopedPointer<Ui::FirstRunWizardPage_WorkspaceSettings> mUi;
 };
 
 /*****************************************************************************************
@@ -88,4 +72,4 @@ class FirstRunWizard final : public QWizard
 } // namespace application
 } // namespace librepcb
 
-#endif // LIBREPCB_FIRSTRUNWIZARD_H
+#endif // LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
