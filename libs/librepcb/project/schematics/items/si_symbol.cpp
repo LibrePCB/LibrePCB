@@ -46,9 +46,22 @@ namespace project {
 SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
     SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos")),
-    mRotation(node.getValueByPath<Angle>("rot"))
+    mPosition(0, 0),
+    mRotation(0)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
+
     Uuid gcUuid = node.getValueByPath<Uuid>("component");
     mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
     if (!mComponentInstance) {
@@ -200,8 +213,8 @@ void SI_Symbol::serialize(SExpression& root) const
     root.appendChild(mUuid);
     root.appendChild("component", mComponentInstance->getUuid(), true);
     root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mRotation, false);
 }
 
 /*****************************************************************************************

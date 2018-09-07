@@ -68,7 +68,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node) 
     mAttributes.reset(new AttributeList(node)); // can throw
 
     // load all signal instances
-    foreach (const SExpression& node, node.getChildren("sig")) {
+    foreach (const SExpression& node, node.getChildren("sig") + node.getChildren("signal")) {
         ComponentSignalInstance* signal = new ComponentSignalInstance(mCircuit, *this, node);
         if (mSignals.contains(signal->getCompSignal().getUuid())) {
             throw RuntimeError(__FILE__, __LINE__,
@@ -340,7 +340,7 @@ void ComponentInstance::serialize(SExpression& root) const
     root.appendChild("name", mName, true);
     root.appendChild("value", mValue, false);
     mAttributes->serialize(root);
-    serializePointerContainer(root, mSignals, "sig");
+    serializePointerContainer(root, mSignals, "signal");
 }
 
 /*****************************************************************************************

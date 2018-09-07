@@ -61,8 +61,8 @@ Text::Text(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mText(),
-    mPosition(node.getChildByPath("pos")),
-    mRotation(node.getValueByPath<Angle>("rot")),
+    mPosition(0, 0),
+    mRotation(0),
     mHeight(node.getValueByPath<PositiveLength>("height")),
     mAlign(node.getChildByPath("align"))
 {
@@ -72,6 +72,18 @@ Text::Text(const SExpression& node) :
     } else {
         // backward compatibility, remove this some time!
         mText = node.getChildByIndex(0).getValue<QString>();
+    }
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
     }
 
     // backward compatibility - remove this some time!
@@ -162,8 +174,8 @@ void Text::serialize(SExpression& root) const
     root.appendChild("value", mText, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
     root.appendChild("height", mHeight, false);
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), false);
+    root.appendChild("rotation", mRotation, false);
 }
 
 /*****************************************************************************************

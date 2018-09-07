@@ -74,8 +74,8 @@ StrokeText::StrokeText(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mText(),
-    mPosition(node.getChildByPath("pos")),
-    mRotation(node.getValueByPath<Angle>("rot")),
+    mPosition(0, 0),
+    mRotation(0),
     mHeight(node.getValueByPath<PositiveLength>("height")),
     mStrokeWidth(200000), // backward compatibility, remove this some time!
     mLetterSpacing(), // backward compatibility, remove this some time!
@@ -95,6 +95,18 @@ StrokeText::StrokeText(const SExpression& node) :
     }
 
     // load geometry attributes
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
     if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
         mStrokeWidth = child->getValueOfFirstChild<UnsignedLength>();
     }
@@ -358,10 +370,10 @@ void StrokeText::serialize(SExpression& root) const
     root.appendChild("letter_spacing", mLetterSpacing, false);
     root.appendChild("line_spacing", mLineSpacing, false);
     root.appendChild(mAlign.serializeToDomElement("align"), true);
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
-    root.appendChild("rot", mRotation, false);
-    root.appendChild("auto_rotate", mAutoRotate, false);
-    root.appendChild("mirror", mMirrored, true);
+    root.appendChild(mPosition.serializeToDomElement("position"), false);
+    root.appendChild("rotation", mRotation, false);
+    root.appendChild("auto_rotate", mAutoRotate, true);
+    root.appendChild("mirror", mMirrored, false);
     root.appendChild("value", mText, false);
 }
 

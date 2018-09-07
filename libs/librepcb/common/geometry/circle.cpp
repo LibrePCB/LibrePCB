@@ -61,14 +61,29 @@ Circle::Circle(const SExpression& node) :
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(node.getValueByPath<bool>("grab")),
-    mCenter(node.getChildByPath("pos")),
+    mIsGrabArea(false),
+    mCenter(0, 0),
     mDiameter(1)
 {
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
     }
-    if (node.tryGetChildByPath("dia")) {
+    if (node.tryGetChildByPath("grab_area")) {
+        mIsGrabArea = node.getValueByPath<bool>("grab_area");
+    } else {
+        // backward compatibility, remove this some time!
+        mIsGrabArea = node.getValueByPath<bool>("grab");
+    }
+    if (node.tryGetChildByPath("position")) {
+        mCenter = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mCenter = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("diameter")) {
+        mDiameter = node.getValueByPath<PositiveLength>("diameter");
+    } else if (node.tryGetChildByPath("dia")) {
+        // backward compatibility, remove this some time!
         mDiameter = node.getValueByPath<PositiveLength>("dia");
     } else if (node.tryGetChildByPath("size")) {
         // backward compatibility, remove this some time!
@@ -171,9 +186,9 @@ void Circle::serialize(SExpression& root) const
     root.appendChild("layer", mLayerName, false);
     root.appendChild("width", mLineWidth, true);
     root.appendChild("fill", mIsFilled, false);
-    root.appendChild("grab", mIsGrabArea, false);
-    root.appendChild("dia", mDiameter, false);
-    root.appendChild(mCenter.serializeToDomElement("pos"), false);
+    root.appendChild("grab_area", mIsGrabArea, false);
+    root.appendChild("diameter", mDiameter, false);
+    root.appendChild(mCenter.serializeToDomElement("position"), false);
 }
 
 /*****************************************************************************************

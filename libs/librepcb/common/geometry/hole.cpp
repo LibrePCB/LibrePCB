@@ -52,9 +52,21 @@ Hole::Hole(const Uuid& uuid, const Point& position, const PositiveLength& diamet
 
 Hole::Hole(const SExpression& node) :
     mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
-    mPosition(node.getChildByPath("pos")),
-    mDiameter(node.getValueByPath<PositiveLength>("dia"))
+    mPosition(0, 0),
+    mDiameter(1)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("diameter")) {
+        mDiameter = node.getValueByPath<PositiveLength>("diameter");
+    } else {
+        // backward compatibility, remove this some time!
+        mDiameter = node.getValueByPath<PositiveLength>("dia");
+    }
     if (node.getChildByIndex(0).isString()) {
         mUuid = node.getChildByIndex(0).getValue<Uuid>();
     }
@@ -104,8 +116,8 @@ void Hole::unregisterObserver(IF_HoleObserver& object) const noexcept
 void Hole::serialize(SExpression& root) const
 {
     root.appendChild(mUuid);
-    root.appendChild("dia", mDiameter, false);
-    root.appendChild(mPosition.serializeToDomElement("pos"), false);
+    root.appendChild("diameter", mDiameter, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), false);
 }
 
 /*****************************************************************************************

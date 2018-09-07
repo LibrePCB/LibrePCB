@@ -59,8 +59,8 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& r
 
 FootprintPad::FootprintPad(const SExpression& node) :
     mPackagePadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("pos")),
-    mRotation(node.getValueByPath<Angle>("rot")),
+    mPosition(0, 0),
+    mRotation(0),
     mShape(node.getValueByPath<Shape>("shape")),
     mWidth(Point(node.getChildByPath("size")).getX()),
     mHeight(Point(node.getChildByPath("size")).getY()),
@@ -68,6 +68,18 @@ FootprintPad::FootprintPad(const SExpression& node) :
     mBoardSide(node.getValueByPath<BoardSide>("side")),
     mRegisteredGraphicsItem(nullptr)
 {
+    if (node.tryGetChildByPath("position")) {
+        mPosition = Point(node.getChildByPath("position"));
+    } else {
+        // backward compatibility, remove this some time!
+        mPosition = Point(node.getChildByPath("pos"));
+    }
+    if (node.tryGetChildByPath("rotation")) {
+        mRotation = node.getValueByPath<Angle>("rotation");
+    } else {
+        // backward compatibility, remove this some time!
+        mRotation = node.getValueByPath<Angle>("rot");
+    }
 }
 
 FootprintPad::~FootprintPad() noexcept
@@ -197,8 +209,8 @@ void FootprintPad::serialize(SExpression& root) const
     root.appendChild(mPackagePadUuid);
     root.appendChild("side", mBoardSide, false);
     root.appendChild("shape", mShape, false);
-    root.appendChild(mPosition.serializeToDomElement("pos"), true);
-    root.appendChild("rot", mRotation, false);
+    root.appendChild(mPosition.serializeToDomElement("position"), true);
+    root.appendChild("rotation", mRotation, false);
     root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"), false);
     root.appendChild("drill", mDrillDiameter, false);
 }
