@@ -17,71 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDDETACHBOARDNETPOINTFROMVIAORPAD_H
-#define LIBREPCB_PROJECT_CMDDETACHBOARDNETPOINTFROMVIAORPAD_H
-
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+#include "cmdboardnetlineedit.h"
 
 /*****************************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace project {
 
-class BI_NetPoint;
-class BI_NetLine;
-
-namespace editor {
-
 /*****************************************************************************************
- *  Class CmdDetachBoardNetPointFromViaOrPad
+ *  Constructors / Destructor
  ****************************************************************************************/
 
-/**
- * @brief The CmdDetachBoardNetPointFromViaOrPad class
- */
-class CmdDetachBoardNetPointFromViaOrPad final : public UndoCommandGroup
+CmdBoardNetLineEdit::CmdBoardNetLineEdit(BI_NetLine& netline) noexcept :
+    UndoCommand(tr("Edit trace")), mNetLine(netline),
+    mOldLayer(&netline.getLayer()), mNewLayer(mOldLayer),
+    mOldWidth(netline.getWidth()), mNewWidth(mOldWidth)
 {
-    public:
+}
 
-        // Constructors / Destructor
-        CmdDetachBoardNetPointFromViaOrPad() = delete;
-        CmdDetachBoardNetPointFromViaOrPad(const CmdDetachBoardNetPointFromViaOrPad& other) = delete;
-        CmdDetachBoardNetPointFromViaOrPad(BI_NetPoint& p) noexcept;
-        ~CmdDetachBoardNetPointFromViaOrPad() noexcept;
+CmdBoardNetLineEdit::~CmdBoardNetLineEdit() noexcept
+{
+}
 
-        // Operator Overloadings
-        CmdDetachBoardNetPointFromViaOrPad& operator=(const CmdDetachBoardNetPointFromViaOrPad& other) = delete;
+/*****************************************************************************************
+ *  Setters
+ ****************************************************************************************/
 
+void CmdBoardNetLineEdit::setLayer(GraphicsLayer& layer) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewLayer = &layer;
+}
 
-    private:
+void CmdBoardNetLineEdit::setWidth(const PositiveLength& width) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewWidth = width;
+}
 
-        // Private Methods
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+bool CmdBoardNetLineEdit::performExecute()
+{
+    performRedo(); // can throw
 
-        // Helper Methods
-        void detachNetPoint();
-        void removeNetPointWithAllNetlines();
+    return true; // TODO: determine if the via was really modified
+}
 
+void CmdBoardNetLineEdit::performUndo()
+{
+    mNetLine.setLayer(*mOldLayer);
+    mNetLine.setWidth(mOldWidth);
+}
 
-        // Private Member Variables
-
-        // Attributes from the constructor
-        BI_NetPoint& mNetPoint;
-};
+void CmdBoardNetLineEdit::performRedo()
+{
+    mNetLine.setLayer(*mNewLayer);
+    mNetLine.setWidth(mNewWidth);
+}
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb
-
-#endif // LIBREPCB_PROJECT_CMDDETACHBOARDNETPOINTFROMVIAORPAD_H

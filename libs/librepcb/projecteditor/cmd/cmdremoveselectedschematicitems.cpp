@@ -60,9 +60,9 @@
 #include "cmdremoveunusednetsignals.h"
 #include <librepcb/project/schematics/schematicselectionquery.h>
 #include "cmdchangenetsignalofschematicnetsegment.h"
-#include "cmdremovedevicefromboard.h"
-#include "cmddetachboardnetpointfromviaorpad.h"
+#include "cmdremoveboarditems.h"
 #include "cmdremoveunusedlibraryelements.h"
+#include "cmdremoveboarditems.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -96,10 +96,10 @@ bool CmdRemoveSelectedSchematicItems::performExecute()
     // get all selected items
     std::unique_ptr<SchematicSelectionQuery> query(mSchematic.createSelectionQuery());
     query->addSelectedSymbols();
-    query->addSelectedNetLines(SchematicSelectionQuery::NetLineFilter::All);
+    query->addSelectedNetLines();
     query->addSelectedNetLabels();
-    query->addNetPointsOfNetLines(SchematicSelectionQuery::NetLineFilter::All,
-                                  SchematicSelectionQuery::NetPointFilter::AllConnectedLinesSelected);
+    query->addNetPointsOfNetLines();
+    query->addNetLinesOfSymbolPins();
 
     // clear selection because these items will be removed now
     mSchematic.clearSelection();
@@ -107,20 +107,21 @@ bool CmdRemoveSelectedSchematicItems::performExecute()
     // determine all affected netsegments and their items
     NetSegmentItemList netSegmentItems;
     foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
-        NetSegmentItems& items = netSegmentItems[&netpoint->getNetSegment()];
-        items.netpoints.insert(netpoint);
+        Q_ASSERT(netpoint->isAddedToSchematic());
+        netSegmentItems[&netpoint->getNetSegment()].netpoints.insert(netpoint);
     }
     foreach (SI_NetLine* netline, query->getNetLines()) {
-        NetSegmentItems& items = netSegmentItems[&netline->getNetSegment()];
-        items.netlines.insert(netline);
+        Q_ASSERT(netline->isAddedToSchematic());
+        netSegmentItems[&netline->getNetSegment()].netlines.insert(netline);
     }
     foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
-        NetSegmentItems& items = netSegmentItems[&netlabel->getNetSegment()];
-        items.netlabels.insert(netlabel);
+        Q_ASSERT(netlabel->isAddedToSchematic());
+        netSegmentItems[&netlabel->getNetSegment()].netlabels.insert(netlabel);
     }
 
     // remove netlines/netpoints/netlabels/netsegments
     foreach (SI_NetSegment* netsegment, netSegmentItems.keys()) {
+        Q_ASSERT(netsegment->isAddedToSchematic());
         const NetSegmentItems& items = netSegmentItems.value(netsegment);
         if (items.netlines.count() == 0) {
             // only netlabels of this netsegment are selected
@@ -141,6 +142,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute()
 
     // remove all symbols, devices and component instances
     foreach (SI_Symbol* symbol, query->getSymbols()) {
+        Q_ASSERT(symbol->isAddedToSchematic());
         removeSymbol(*symbol); // can throw
     }
 
@@ -161,12 +163,12 @@ bool CmdRemoveSelectedSchematicItems::performExecute()
 void CmdRemoveSelectedSchematicItems::removeNetSegment(SI_NetSegment& netsegment)
 {
     // determine component signal instances to be disconnected
-    QList<ComponentSignalInstance*> cmpSigInstToBeDisconnected;
-    foreach (SI_NetPoint* netpoint, netsegment.getNetPoints()) {
-        // check if this was the last symbol pin of the component signal
-        ComponentSignalInstance* cmpSig = getCmpSigInstToBeDisconnected(*netpoint);
-        if (cmpSig) {
-            cmpSigInstToBeDisconnected.append(cmpSig);
+    QSet<SI_SymbolPin*> pinsToBeDisconnected = netsegment.getAllConnectedPins();
+    QSet<ComponentSignalInstance*> cmpSigsToBeDisconnected;
+    foreach (SI_SymbolPin* pin, pinsToBeDisconnected) {
+        ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance(); Q_ASSERT(cmpSig);
+        if (pinsToBeDisconnected.contains(cmpSig->getRegisteredSymbolPins().toSet())) {
+            cmpSigsToBeDisconnected.insert(cmpSig);
         }
     }
 
@@ -174,7 +176,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegment(SI_NetSegment& netsegment
     execNewChildCmd(new CmdSchematicNetSegmentRemove(netsegment)); // can throw
 
     // disconnect component signal instances
-    foreach (ComponentSignalInstance* cmpSig, cmpSigInstToBeDisconnected) {
+    foreach (ComponentSignalInstance* cmpSig, cmpSigsToBeDisconnected) {
         disconnectComponentSignalInstance(*cmpSig); // can throw
     }
 }
@@ -186,12 +188,17 @@ void CmdRemoveSelectedSchematicItems::splitUpNetSegment(SI_NetSegment& netsegmen
     QList<NetSegmentItems> subsegments = getNonCohesiveNetSegmentSubSegments(
                                              netsegment, selectedItems);
 
-    // remove all selected netlines & netpoints
+    // determine component signal instances to be disconnected
+    QSet<SI_SymbolPin*> pinsToBeDisconnected;
+    foreach (SI_SymbolPin* pin, netsegment.getAllConnectedPins()) {
+        if (selectedItems.netlines.contains(pin->getNetLines())) {
+            pinsToBeDisconnected.insert(pin);
+        }
+    }
     QSet<ComponentSignalInstance*> cmpSigsToBeDisconnected;
-    foreach (SI_NetPoint* netpoint, selectedItems.netpoints) {
-        // check if this was the last symbol pin of the component signal
-        ComponentSignalInstance* cmpSig = getCmpSigInstToBeDisconnected(*netpoint);
-        if (cmpSig) {
+    foreach (SI_SymbolPin* pin, pinsToBeDisconnected) {
+        ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance(); Q_ASSERT(cmpSig);
+        if (pinsToBeDisconnected.contains(cmpSig->getRegisteredSymbolPins().toSet())) {
             cmpSigsToBeDisconnected.insert(cmpSig);
         }
     }
@@ -250,21 +257,14 @@ SI_NetSegment* CmdRemoveSelectedSchematicItems::createNewSubNetSegment(
 
     // create new netpoints and netlines
     CmdSchematicNetSegmentAddElements* cmdAddElements = new CmdSchematicNetSegmentAddElements(*newNetSegment);
-    QHash<const SI_NetPoint*, SI_NetPoint*> netPointMap;
+    QHash<const SI_NetLineAnchor*, SI_NetLineAnchor*> netPointMap;
     foreach (const SI_NetPoint* netpoint, items.netpoints) {
-        SI_NetPoint* newNetPoint;
-        if (netpoint->isAttachedToPin()) {
-            SI_SymbolPin* pin = netpoint->getSymbolPin(); Q_ASSERT(pin);
-            newNetPoint = cmdAddElements->addNetPoint(*pin);
-        } else {
-            newNetPoint = cmdAddElements->addNetPoint(netpoint->getPosition());
-        }
-        Q_ASSERT(newNetPoint);
+        SI_NetPoint* newNetPoint = cmdAddElements->addNetPoint(netpoint->getPosition());
         netPointMap.insert(netpoint, newNetPoint);
     }
     foreach (const SI_NetLine* netline, items.netlines) {
-        SI_NetPoint* p1 = netPointMap.value(&netline->getStartPoint()); Q_ASSERT(p1);
-        SI_NetPoint* p2 = netPointMap.value(&netline->getEndPoint()); Q_ASSERT(p2);
+        SI_NetLineAnchor* p1 = netPointMap.value(&netline->getStartPoint(), &netline->getStartPoint());
+        SI_NetLineAnchor* p2 = netPointMap.value(&netline->getEndPoint(), &netline->getEndPoint());
         SI_NetLine* newNetLine = cmdAddElements->addNetLine(*p1, *p2);
         Q_ASSERT(newNetLine);
     }
@@ -316,14 +316,6 @@ void CmdRemoveSelectedSchematicItems::removeNetLabel(SI_NetLabel& netlabel)
 
 void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol)
 {
-    // disconnect all netpoints from pins
-    foreach (SI_SymbolPin* pin, symbol.getPins()) {
-        SI_NetPoint* netpoint = pin->getNetPoint();
-        if (netpoint) {
-            detachNetPointFromSymbolPin(*netpoint); // can throw
-        }
-    }
-
     // remove symbol
     execNewChildCmd(new CmdSymbolInstanceRemove(mSchematic, symbol)); // can throw
 
@@ -333,7 +325,9 @@ void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol)
         foreach (Board* board, mSchematic.getProject().getBoards()) {
             BI_Device* device = board->getDeviceInstanceByComponentUuid(component.getUuid());
             if (device) {
-                execNewChildCmd(new CmdRemoveDeviceFromBoard(*device)); // can throw
+                QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(device->getBoard()));
+                cmd->removeDeviceInstances({device});
+                execNewChildCmd(cmd.take()); // can throw
             }
         }
         execNewChildCmd(new CmdComponentInstanceRemove(mSchematic.getProject().getCircuit(),
@@ -341,48 +335,18 @@ void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol)
     }
 }
 
-void CmdRemoveSelectedSchematicItems::detachNetPointFromSymbolPin(SI_NetPoint& netpoint)
-{
-    Q_ASSERT(netpoint.isAttachedToPin());
-    SI_SymbolPin* pin = netpoint.getSymbolPin(); Q_ASSERT(pin);
-
-    // remove netsegment
-    execNewChildCmd(new CmdSchematicNetSegmentRemove(netpoint.getNetSegment())); // can throw
-
-    // detach netpoint from symbol pin
-    CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(netpoint);
-    cmd->setPinToAttach(nullptr);
-    execNewChildCmd(cmd); // can throw
-
-    // re-add netsegment
-    execNewChildCmd(new CmdSchematicNetSegmentAdd(netpoint.getNetSegment())); // can throw
-}
-
-ComponentSignalInstance* CmdRemoveSelectedSchematicItems::getCmpSigInstToBeDisconnected(
-        SI_NetPoint& netpoint) const noexcept
-{
-    SI_SymbolPin* symbolPin = netpoint.getSymbolPin();
-    if (!symbolPin) return nullptr;
-
-    ComponentSignalInstance* cmpSig = symbolPin->getComponentSignalInstance();
-    if (!cmpSig) return nullptr;
-
-    foreach (const SI_SymbolPin* pin, cmpSig->getRegisteredSymbolPins()) {
-        if ((pin != symbolPin) && (pin->getNetPoint())) {
-            return nullptr;
-        }
-    }
-    return cmpSig;
-}
-
 void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(
         ComponentSignalInstance& signal)
 {
-    // disconnect board items
-    foreach (BI_FootprintPad* pad, signal.getRegisteredFootprintPads()) {
-        foreach (BI_NetPoint* netpoint, pad->getNetPoints()) {
-            execNewChildCmd(new CmdDetachBoardNetPointFromViaOrPad(*netpoint));
-        }
+    // disconnect traces from pads in all boards
+    QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
+    foreach (BI_FootprintPad* pad, signal.getRegisteredFootprintPads()) { Q_ASSERT(pad);
+        boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
+    }
+    for (auto it = boardNetLinesToRemove.constBegin(); it != boardNetLinesToRemove.constEnd(); ++it) {
+        QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(*it.key()));
+        cmd->removeNetLines(it.value());
+        execNewChildCmd(cmd.take()); // can throw
     }
 
     // disconnect the component signal instance from the net signal
@@ -394,21 +358,21 @@ CmdRemoveSelectedSchematicItems::getNonCohesiveNetSegmentSubSegments(
         SI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept
 {
     // get all netpoints, netlines and netlabels of the segment
-    QSet<SI_NetPoint*> netpoints = segment.getNetPoints().toSet() - removedItems.netpoints;
     QSet<SI_NetLine*> netlines = segment.getNetLines().toSet() - removedItems.netlines;
     QSet<SI_NetLabel*> netlabels = segment.getNetLabels().toSet() - removedItems.netlabels;
 
     // find all separate segments of the netsegment
     QList<NetSegmentItems> segments;
-    while (netpoints.count() > 0) {
+    while (netlines.count() > 0) {
         NetSegmentItems seg;
-        findAllConnectedNetPointsAndNetLines(*netpoints.values().first(),
-                                             netpoints, netlines,
-                                             seg.netpoints, seg.netlines);
-        foreach (SI_NetPoint* p, seg.netpoints) netpoints.remove(p);
-        foreach (SI_NetLine* l, seg.netlines) netlines.remove(l);
+        QSet<SI_NetLineAnchor*> processedAnchors;
+        findAllConnectedNetPointsAndNetLines(netlines.values().first()->getStartPoint(),
+                                             processedAnchors, seg.netpoints, seg.netlines,
+                                             netlines);
+        netlines -= seg.netlines;
         segments.append(seg);
     }
+    Q_ASSERT(netlines.isEmpty());
 
     // re-assign all netlabels to the resulting netsegments
     foreach (SI_NetLabel* netlabel, netlabels) {
@@ -419,20 +383,27 @@ CmdRemoveSelectedSchematicItems::getNonCohesiveNetSegmentSubSegments(
     return segments;
 }
 
-void CmdRemoveSelectedSchematicItems::findAllConnectedNetPointsAndNetLines(SI_NetPoint& netpoint,
-        QSet<SI_NetPoint*>& availableNetPoints, QSet<SI_NetLine*>& availableNetLines,
-        QSet<SI_NetPoint*>& netpoints, QSet<SI_NetLine*>& netlines) const noexcept
+void CmdRemoveSelectedSchematicItems::findAllConnectedNetPointsAndNetLines(
+        SI_NetLineAnchor& anchor, QSet<SI_NetLineAnchor*>& processedAnchors,
+        QSet<SI_NetPoint*>& netpoints, QSet<SI_NetLine*>& netlines,
+        QSet<SI_NetLine*>& availableNetLines) const noexcept
 {
-    Q_ASSERT(!netpoints.contains(&netpoint));
-    Q_ASSERT(availableNetPoints.contains(&netpoint));
-    netpoints.insert(&netpoint);
-    foreach (SI_NetLine* line, netpoint.getLines()) {
-        if (availableNetLines.contains(line)) {
+    Q_ASSERT(!processedAnchors.contains(&anchor));
+    processedAnchors.insert(&anchor);
+
+    if (SI_NetPoint* anchorPoint = dynamic_cast<SI_NetPoint*>(&anchor)) {
+        Q_ASSERT(!netpoints.contains(anchorPoint));
+        netpoints.insert(anchorPoint);
+    }
+
+    foreach (SI_NetLine* line, anchor.getNetLines()) {
+        if (availableNetLines.contains(line) && (!netlines.contains(line))) {
             netlines.insert(line);
-            SI_NetPoint* p2 = line->getOtherPoint(netpoint); Q_ASSERT(p2);
-            if ((availableNetPoints.contains(p2)) && (!netpoints.contains(p2))) {
-                findAllConnectedNetPointsAndNetLines(*p2, availableNetPoints,
-                                                     availableNetLines, netpoints, netlines);
+            availableNetLines.remove(line);
+            SI_NetLineAnchor* p2 = line->getOtherPoint(anchor); Q_ASSERT(p2);
+            if (!processedAnchors.contains(p2)) {
+                findAllConnectedNetPointsAndNetLines(*p2, processedAnchors, netpoints,
+                                                     netlines, availableNetLines);
             }
         }
     }

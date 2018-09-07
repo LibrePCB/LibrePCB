@@ -66,9 +66,8 @@ bool CmdRotateSelectedSchematicItems::performExecute()
     // get all selected items
     std::unique_ptr<SchematicSelectionQuery> query(mSchematic.createSelectionQuery());
     query->addSelectedSymbols();
-    query->addSelectedNetPoints(SchematicSelectionQuery::NetPointFilter::Floating);
-    query->addNetPointsOfNetLines(SchematicSelectionQuery::NetLineFilter::All,
-                                  SchematicSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedNetPoints();
+    query->addNetPointsOfNetLines();
     query->addSelectedNetLabels();
 
     // find the center of all elements

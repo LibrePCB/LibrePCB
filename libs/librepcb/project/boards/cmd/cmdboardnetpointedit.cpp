@@ -22,10 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "cmdboardnetpointedit.h"
-#include <librepcb/common/scopeguardlist.h>
 #include "../items/bi_netpoint.h"
-#include "../items/bi_footprintpad.h"
-#include "../items/bi_via.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -39,9 +36,6 @@ namespace project {
 
 CmdBoardNetPointEdit::CmdBoardNetPointEdit(BI_NetPoint& point) noexcept :
     UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldLayer(&point.getLayer()), mNewLayer(mOldLayer),
-    mOldFootprintPad(point.getFootprintPad()), mNewFootprintPad(mOldFootprintPad),
-    mOldVia(point.getVia()), mNewVia(mOldVia),
     mOldPos(point.getPosition()), mNewPos(mOldPos)
 {
 }
@@ -56,26 +50,6 @@ CmdBoardNetPointEdit::~CmdBoardNetPointEdit() noexcept
 /*****************************************************************************************
  *  Setters
  ****************************************************************************************/
-
-void CmdBoardNetPointEdit::setLayer(GraphicsLayer& layer) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewLayer = &layer;
-}
-
-void CmdBoardNetPointEdit::setPadToAttach(BI_FootprintPad* pad) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewFootprintPad = pad;
-    if (pad) mNewPos = pad->getPosition();
-}
-
-void CmdBoardNetPointEdit::setViaToAttach(BI_Via* via) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewVia = via;
-    if (via) mNewPos = via->getPosition();
-}
 
 void CmdBoardNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
@@ -104,28 +78,12 @@ bool CmdBoardNetPointEdit::performExecute()
 
 void CmdBoardNetPointEdit::performUndo()
 {
-    ScopeGuardList sgl;
-    mNetPoint.setLayer(*mOldLayer); // can throw
-    sgl.add([&](){mNetPoint.setLayer(*mNewLayer);});
-    mNetPoint.setPadToAttach(mOldFootprintPad); // can throw
-    sgl.add([&](){mNetPoint.setPadToAttach(mNewFootprintPad);});
-    mNetPoint.setViaToAttach(mOldVia); // can throw
-    sgl.add([&](){mNetPoint.setViaToAttach(mNewVia);});
     mNetPoint.setPosition(mOldPos);
-    sgl.dismiss();
 }
 
 void CmdBoardNetPointEdit::performRedo()
 {
-    ScopeGuardList sgl;
-    mNetPoint.setLayer(*mNewLayer); // can throw
-    sgl.add([&](){mNetPoint.setLayer(*mOldLayer);});
-    mNetPoint.setPadToAttach(mNewFootprintPad); // can throw
-    sgl.add([&](){mNetPoint.setPadToAttach(mOldFootprintPad);});
-    mNetPoint.setViaToAttach(mNewVia); // can throw
-    sgl.add([&](){mNetPoint.setViaToAttach(mOldVia);});
     mNetPoint.setPosition(mNewPos);
-    sgl.dismiss();
 }
 
 /*****************************************************************************************

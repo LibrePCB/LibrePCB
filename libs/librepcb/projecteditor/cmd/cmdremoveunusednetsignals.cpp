@@ -25,6 +25,8 @@
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -53,7 +55,15 @@ CmdRemoveUnusedNetSignals::~CmdRemoveUnusedNetSignals() noexcept
 bool CmdRemoveUnusedNetSignals::performExecute()
 {
     foreach (NetSignal* netsignal, mCircuit.getNetSignals()) {
-        if (!netsignal->isUsed()) {
+        bool noComponentSignals = netsignal->getComponentSignals().isEmpty();
+        bool noSchematicNetSegments = netsignal->getSchematicNetSegments().isEmpty();
+        if (noComponentSignals && noSchematicNetSegments) {
+            foreach (BI_NetSegment* netsegment, netsignal->getBoardNetSegments()) {
+                appendChild(new CmdBoardNetSegmentRemove(*netsegment));
+            }
+            foreach (BI_Plane* plane, netsignal->getBoardPlanes()) {
+                appendChild(new CmdBoardPlaneRemove(*plane));
+            }
             appendChild(new CmdNetSignalRemove(mCircuit, *netsignal));
         }
     }

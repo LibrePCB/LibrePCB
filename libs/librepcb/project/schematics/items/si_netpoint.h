@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "si_base.h"
+#include "./si_netline.h"
 #include <librepcb/common/fileio/serializableobject.h>
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
@@ -32,17 +33,8 @@
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
-class QGraphicsItem;
-
 namespace librepcb {
 namespace project {
-
-class NetSignal;
-class SI_NetLine;
-class SI_Symbol;
-class SI_SymbolPin;
-class SI_NetSegment;
-class ErcMsg;
 
 /*****************************************************************************************
  *  Class SI_NetPoint
@@ -51,7 +43,9 @@ class ErcMsg;
 /**
  * @brief The SI_NetPoint class
  */
-class SI_NetPoint final : public SI_Base, public SerializableObject,
+class SI_NetPoint final : public SI_Base,
+                          public SI_NetLineAnchor,
+                          public SerializableObject,
                           public IF_ErcMsgProvider
 {
         Q_OBJECT
@@ -69,35 +63,32 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
 
         // Getters
         const Uuid& getUuid() const noexcept {return mUuid;}
-        bool isAttachedToPin() const noexcept {return (mSymbolPin ? true : false);}
         bool isVisibleJunction() const noexcept;
         bool isOpenLineEnd() const noexcept;
         SI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
         NetSignal& getNetSignalOfNetSegment() const noexcept;
-        SI_SymbolPin* getSymbolPin() const noexcept {return mSymbolPin;}
-        const QList<SI_NetLine*>& getLines() const noexcept {return mRegisteredLines;}
-        bool isUsed() const noexcept {return (mRegisteredLines.count() > 0);}
+        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
 
         // Setters
-        void setPinToAttach(SI_SymbolPin* pin);
         void setPosition(const Point& position) noexcept;
 
         // General Methods
         void addToSchematic() override;
         void removeFromSchematic() override;
-        void registerNetLine(SI_NetLine& netline);
-        void unregisterNetLine(SI_NetLine& netline);
-        void updateLines() const noexcept;
 
         /// @copydoc librepcb::SerializableObject::serialize()
         void serialize(SExpression& root) const override;
-
 
         // Inherited from SI_Base
         Type_t getType() const noexcept override {return SI_Base::Type_t::NetPoint;}
         const Point& getPosition() const noexcept override {return mPosition;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Inherited from SI_NetLineAnchor
+        void registerNetLine(SI_NetLine& netline) override;
+        void unregisterNetLine(SI_NetLine& netline) override;
+        const QSet<SI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
 
         // Operator Overloadings
         SI_NetPoint& operator=(const SI_NetPoint& rhs) = delete;
@@ -108,7 +99,6 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
     private:
 
         void init();
-        bool checkAttributesValidity() const noexcept;
 
 
         // General
@@ -119,10 +109,9 @@ class SI_NetPoint final : public SI_Base, public SerializableObject,
         SI_NetSegment& mNetSegment;
         Uuid mUuid;
         Point mPosition;
-        SI_SymbolPin* mSymbolPin;   ///< only needed if the netpoint is attached to a pin
 
         // Registered Elements
-        QList<SI_NetLine*> mRegisteredLines;    ///< all registered netlines
+        QSet<SI_NetLine*> mRegisteredNetLines;    ///< all registered netlines
 
         // ERC Messages
         /// @brief The ERC message for dead netpoints

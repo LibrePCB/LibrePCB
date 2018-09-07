@@ -33,11 +33,10 @@
 namespace librepcb {
 namespace project {
 
-class NetSignal;
 class SI_NetSegment;
-class SI_SymbolPin;
 class SI_NetPoint;
 class SI_NetLine;
+class SI_NetLineAnchor;
 
 /*****************************************************************************************
  *  Class CmdSchematicNetSegmentAddElements
@@ -57,9 +56,8 @@ class CmdSchematicNetSegmentAddElements final : public UndoCommand
         // General Methods
         SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
         SI_NetPoint* addNetPoint(const Point& position);
-        SI_NetPoint* addNetPoint(SI_SymbolPin& pin);
         SI_NetLine* addNetLine(SI_NetLine& netline);
-        SI_NetLine* addNetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint);
+        SI_NetLine* addNetLine(SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint);
 
 
     private:

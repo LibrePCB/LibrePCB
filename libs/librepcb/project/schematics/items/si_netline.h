@@ -35,8 +35,23 @@ namespace librepcb {
 namespace project {
 
 class NetSignal;
-class SI_NetPoint;
 class SI_NetSegment;
+
+/*****************************************************************************************
+ *  Class SI_NetLineAnchor
+ ****************************************************************************************/
+
+class SI_NetLineAnchor
+{
+    public:
+        SI_NetLineAnchor() noexcept = default;
+        virtual ~SI_NetLineAnchor() noexcept = default;
+
+        virtual void registerNetLine(SI_NetLine& netline) = 0;
+        virtual void unregisterNetLine(SI_NetLine& netline) = 0;
+        virtual const QSet<SI_NetLine*>& getNetLines() const noexcept = 0;
+        virtual const Point& getPosition() const noexcept = 0;
+};
 
 /*****************************************************************************************
  *  Class SI_NetLine
@@ -54,20 +69,20 @@ class SI_NetLine final : public SI_Base, public SerializableObject
         // Constructors / Destructor
         SI_NetLine() = delete;
         SI_NetLine(const SI_NetLine& other) = delete;
-        SI_NetLine(SI_NetSegment& segment, const SExpression& node);
-        SI_NetLine(SI_NetPoint& startPoint, SI_NetPoint& endPoint,
-                   const UnsignedLength& width);
+        SI_NetLine(SI_NetSegment& segment, const SExpression& node,
+                   const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap);
+        SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
+                   SI_NetLineAnchor& endPoint, const UnsignedLength& width);
         ~SI_NetLine() noexcept;
 
         // Getters
-        SI_NetSegment& getNetSegment() const noexcept;
+        SI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
         const Uuid& getUuid() const noexcept {return mUuid;}
         const UnsignedLength& getWidth() const noexcept {return mWidth;}
-        SI_NetPoint& getStartPoint() const noexcept {return *mStartPoint;}
-        SI_NetPoint& getEndPoint() const noexcept {return *mEndPoint;}
-        SI_NetPoint* getOtherPoint(const SI_NetPoint& firstPoint) const noexcept;
+        SI_NetLineAnchor& getStartPoint() const noexcept {return *mStartPoint;}
+        SI_NetLineAnchor& getEndPoint() const noexcept {return *mEndPoint;}
+        SI_NetLineAnchor* getOtherPoint(const SI_NetLineAnchor& firstPoint) const noexcept;
         NetSignal& getNetSignalOfNetSegment() const noexcept;
-        bool isAttachedToSymbol() const noexcept;
 
         // Setters
         void setWidth(const UnsignedLength& width) noexcept;
@@ -94,18 +109,22 @@ class SI_NetLine final : public SI_Base, public SerializableObject
     private:
 
         void init();
-        bool checkAttributesValidity() const noexcept;
+        SI_NetLineAnchor* deserializeAnchor(const SExpression& root,
+            const QString& oldKey, const QString& newKey,
+            const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap) const;
+        void serializeAnchor(SExpression& root, SI_NetLineAnchor* anchor) const;
 
 
         // General
+        SI_NetSegment& mNetSegment;
         QScopedPointer<SGI_NetLine> mGraphicsItem;
         Point mPosition; ///< the center of startpoint and endpoint
         QMetaObject::Connection mHighlightChangedConnection;
 
         // Attributes
         Uuid mUuid;
-        SI_NetPoint* mStartPoint;
-        SI_NetPoint* mEndPoint;
+        SI_NetLineAnchor* mStartPoint;
+        SI_NetLineAnchor* mEndPoint;
         UnsignedLength mWidth;
 };
 

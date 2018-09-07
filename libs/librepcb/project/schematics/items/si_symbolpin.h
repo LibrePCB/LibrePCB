@@ -27,6 +27,7 @@
 #include "si_base.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_symbolpin.h"
+#include "./si_netline.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -44,7 +45,6 @@ namespace project {
 class Circuit;
 class ComponentSignalInstance;
 class SI_Symbol;
-class SI_NetPoint;
 class ErcMsg;
 
 
@@ -55,7 +55,9 @@ class ErcMsg;
 /**
  * @brief The SI_SymbolPin class
  */
-class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
+class SI_SymbolPin final : public SI_Base,
+                           public SI_NetLineAnchor,
+                           public IF_ErcMsgProvider
 {
         Q_OBJECT
         DECLARE_ERC_MSG_CLASS_NAME(SI_SymbolPin)
@@ -73,18 +75,17 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
                                bool returnPinNameIfEmpty = false) const noexcept;
         SI_Symbol& getSymbol() const noexcept {return mSymbol;}
-        SI_NetPoint* getNetPoint() const noexcept {return mRegisteredNetPoint;}
         const library::SymbolPin& getLibPin() const noexcept {return *mSymbolPin;}
         ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
         NetSignal* getCompSigInstNetSignal() const noexcept;
+        SI_NetSegment* getNetSegmentOfLines() const noexcept;
         bool isRequired() const noexcept;
-        bool isUsed() const noexcept {return mRegisteredNetPoint ? true : false;}
+        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
+        bool isVisibleJunction() const noexcept;
 
         // General Methods
         void addToSchematic() override;
         void removeFromSchematic() override;
-        void registerNetPoint(SI_NetPoint& netpoint);
-        void unregisterNetPoint(SI_NetPoint& netpoint);
         void updatePosition() noexcept;
 
         // Inherited from SI_Base
@@ -92,6 +93,11 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         const Point& getPosition() const noexcept override {return mPosition;}
         QPainterPath getGrabAreaScenePx() const noexcept override;
         void setSelected(bool selected) noexcept override;
+
+        // Inherited from SI_NetLineAnchor
+        void registerNetLine(SI_NetLine& netline) override;
+        void unregisterNetLine(SI_NetLine& netline) override;
+        const QSet<SI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
 
         // Operator Overloadings
         SI_SymbolPin& operator=(const SI_SymbolPin& rhs) = delete;
@@ -114,8 +120,10 @@ class SI_SymbolPin final : public SI_Base, public IF_ErcMsgProvider
         // Misc
         Point mPosition;
         Angle mRotation;
-        SI_NetPoint* mRegisteredNetPoint;
         QScopedPointer<SGI_SymbolPin> mGraphicsItem;
+
+        // Registered Elements
+        QSet<SI_NetLine*> mRegisteredNetLines;    ///< all registered netlines
 
         /// @brief The ERC message for unconnected required pins
         QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredPin;

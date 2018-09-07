@@ -27,16 +27,9 @@
 #include <librepcb/library/sym/symbolpin.h>
 #include "../../circuit/componentinstance.h"
 #include <librepcb/library/cmp/component.h>
-#include "si_netpoint.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../erc/ercmsg.h"
-#include "../schematic.h"
-#include "../../project.h"
-#include "../../circuit/circuit.h"
-#include <librepcb/library/cmp/componentsymbolvariantitem.h>
 #include "../../circuit/netsignal.h"
-#include "../../settings/projectsettings.h"
-#include <librepcb/common/graphics/graphicsscene.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -50,8 +43,7 @@ namespace project {
 
 SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
     SI_Base(symbol.getSchematic()), mSymbol(symbol), mSymbolPin(nullptr),
-    mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr),
-    mRegisteredNetPoint(nullptr)
+    mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr)
 {
     // read attributes
     mSymbolPin = mSymbol.getLibSymbol().getPins().get(pinUuid).get(); // can throw
@@ -120,6 +112,12 @@ NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept
     }
 }
 
+SI_NetSegment* SI_SymbolPin::getNetSegmentOfLines() const noexcept
+{
+    auto it = mRegisteredNetLines.constBegin();
+    return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getNetSegment()) : nullptr;
+}
+
 bool SI_SymbolPin::isRequired() const noexcept
 {
     if (mComponentSignalInstance) {
@@ -127,6 +125,11 @@ bool SI_SymbolPin::isRequired() const noexcept
     } else {
         return false;
     }
+}
+
+bool SI_SymbolPin::isVisibleJunction() const noexcept
+{
+    return (mRegisteredNetLines.count() > 1);
 }
 
 /*****************************************************************************************
@@ -147,6 +150,7 @@ void SI_SymbolPin::addToSchematic()
     }
     SI_Base::addToSchematic(mGraphicsItem.data());
     updateErcMessages();
+    mGraphicsItem->updateCacheAndRepaint();
 }
 
 void SI_SymbolPin::removeFromSchematic()
@@ -164,28 +168,34 @@ void SI_SymbolPin::removeFromSchematic()
     updateErcMessages();
 }
 
-void SI_SymbolPin::registerNetPoint(SI_NetPoint& netpoint)
+void SI_SymbolPin::registerNetLine(SI_NetLine& netline)
 {
-    if ((!isAddedToSchematic()) || (!mComponentSignalInstance) || (mRegisteredNetPoint)
-        || (netpoint.getSchematic() != mSchematic)
-        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
+    if ((!isAddedToSchematic()) || (mRegisteredNetLines.contains(&netline))
+        || (netline.getSchematic() != mSchematic)
+        || (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoint = &netpoint;
+    foreach (const SI_NetLine* l, mRegisteredNetLines) {
+        if (&l->getNetSegment() != &netline.getNetSegment()) {
+            throw LogicError(__FILE__, __LINE__);
+        }
+    }
+    mRegisteredNetLines.insert(&netline);
+    netline.updateLine();
     updateErcMessages();
+    mGraphicsItem->updateCacheAndRepaint(); // re-check whether to fill the circle or not
 }
 
-void SI_SymbolPin::unregisterNetPoint(SI_NetPoint& netpoint)
+void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline)
 {
-    if ((!isAddedToSchematic()) || (!mComponentSignalInstance)
-        || (mRegisteredNetPoint != &netpoint)
-        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
-    {
+    if ((!isAddedToSchematic()) || (!mRegisteredNetLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoint = nullptr;
+    mRegisteredNetLines.remove(&netline);
+    netline.updateLine();
     updateErcMessages();
+    mGraphicsItem->updateCacheAndRepaint(); // re-check whether to fill the circle or not
 }
 
 void SI_SymbolPin::updatePosition() noexcept
@@ -195,8 +205,8 @@ void SI_SymbolPin::updatePosition() noexcept
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     mGraphicsItem->setRotation(-mRotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
-    if (mRegisteredNetPoint) {
-        mRegisteredNetPoint->setPosition(mPosition);
+    foreach (SI_NetLine* netline, mRegisteredNetLines) {
+        netline->updateLine();
     }
 }
 
@@ -226,7 +236,7 @@ void SI_SymbolPin::updateErcMessages() noexcept
         .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
 
     mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() && isRequired()
-                                              && (!mRegisteredNetPoint));
+                                              && (!isUsed()));
 }
 
 /*****************************************************************************************

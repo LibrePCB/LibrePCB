@@ -76,22 +76,22 @@ void SchematicSelectionQuery::addSelectedSymbols() noexcept
     }
 }
 
-void SchematicSelectionQuery::addSelectedNetPoints(NetPointFilters f) noexcept
+void SchematicSelectionQuery::addSelectedNetPoints() noexcept
 {
     foreach (SI_NetSegment* netsegment, mNetSegments) {
         foreach (SI_NetPoint* netpoint, netsegment->getNetPoints()) {
-            if (netpoint->isSelected() && doesNetPointMatchFilter(*netpoint, f)) {
+            if (netpoint->isSelected()) {
                 mResultNetPoints.insert(netpoint);
             }
         }
     }
 }
 
-void SchematicSelectionQuery::addSelectedNetLines(NetLineFilters f) noexcept
+void SchematicSelectionQuery::addSelectedNetLines() noexcept
 {
     foreach (SI_NetSegment* netsegment, mNetSegments) {
         foreach (SI_NetLine* netline, netsegment->getNetLines()) {
-            if (netline->isSelected() && doesNetLineMatchFilter(*netline, f)) {
+            if (netline->isSelected()) {
                 mResultNetLines.insert(netline);
             }
         }
@@ -109,42 +109,23 @@ void SchematicSelectionQuery::addSelectedNetLabels() noexcept
     }
 }
 
-void SchematicSelectionQuery::addNetPointsOfNetLines(NetLineFilters lf, NetPointFilters pf) noexcept
+void SchematicSelectionQuery::addNetPointsOfNetLines() noexcept
 {
     foreach (SI_NetLine* netline, mResultNetLines) {
-        if (doesNetLineMatchFilter(*netline, lf)) {
-            if (doesNetPointMatchFilter(netline->getStartPoint(), pf)) {
-                mResultNetPoints.insert(&netline->getStartPoint());
-            }
-            if (doesNetPointMatchFilter(netline->getEndPoint(), pf)) {
-                mResultNetPoints.insert(&netline->getEndPoint());
-            }
-        }
+        SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getStartPoint());
+        SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getEndPoint());
+        if (p1) mResultNetPoints.insert(p1);
+        if (p2) mResultNetPoints.insert(p2);
     }
 }
 
-bool SchematicSelectionQuery::doesNetPointMatchFilter(const SI_NetPoint& p, NetPointFilters f) noexcept
+void SchematicSelectionQuery::addNetLinesOfSymbolPins() noexcept
 {
-    if (f.testFlag(NetPointFilter::Floating) && (!p.isAttachedToPin())) return true;
-    if (f.testFlag(NetPointFilter::Attached) && (p.isAttachedToPin())) return true;
-    if (f.testFlag(NetPointFilter::AllConnectedLinesSelected)) {
-        bool allLinesSelected = true;
-        foreach (const SI_NetLine* netline, p.getLines()) {
-            if (!netline->isSelected()) {
-                allLinesSelected = false;
-                break;
-            }
+    foreach (SI_Symbol* symbol, mResultSymbols) {
+        foreach (SI_SymbolPin* pin, symbol->getPins()) {
+            mResultNetLines += pin->getNetLines();
         }
-        if (allLinesSelected) return true;
     }
-    return false;
-}
-
-bool SchematicSelectionQuery::doesNetLineMatchFilter(const SI_NetLine& l, NetLineFilters f) noexcept
-{
-    if (f.testFlag(NetLineFilter::Floating) && (!l.isAttachedToSymbol())) return true;
-    if (f.testFlag(NetLineFilter::Attached) && (l.isAttachedToSymbol())) return true;
-    return false;
 }
 
 /*****************************************************************************************

@@ -33,6 +33,7 @@ SOURCES += \
     boards/cmd/cmdboardholeadd.cpp \
     boards/cmd/cmdboardholeremove.cpp \
     boards/cmd/cmdboardlayerstackedit.cpp \
+    boards/cmd/cmdboardnetlineedit.cpp \
     boards/cmd/cmdboardnetpointedit.cpp \
     boards/cmd/cmdboardnetsegmentadd.cpp \
     boards/cmd/cmdboardnetsegmentaddelements.cpp \
@@ -147,6 +148,7 @@ HEADERS += \
     boards/cmd/cmdboardholeadd.h \
     boards/cmd/cmdboardholeremove.h \
     boards/cmd/cmdboardlayerstackedit.h \
+    boards/cmd/cmdboardnetlineedit.h \
     boards/cmd/cmdboardnetpointedit.h \
     boards/cmd/cmdboardnetsegmentadd.h \
     boards/cmd/cmdboardnetsegmentaddelements.h \

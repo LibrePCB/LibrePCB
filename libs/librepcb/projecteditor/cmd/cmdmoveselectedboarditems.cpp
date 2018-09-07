@@ -58,21 +58,19 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(Board& board, const Point& 
 {
     // get all selected items
     std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-    query->addSelectedFootprints();
+    query->addDeviceInstancesOfSelectedFootprints();
     query->addSelectedVias();
-    query->addSelectedNetPoints(BoardSelectionQuery::NetPointFilter::Floating);
-    query->addSelectedNetLines(BoardSelectionQuery::NetLineFilter::All);
-    query->addNetPointsOfNetLines(BoardSelectionQuery::NetLineFilter::All,
-                                  BoardSelectionQuery::NetPointFilter::Floating);
+    query->addSelectedNetPoints();
+    query->addSelectedNetLines();
+    query->addNetPointsOfNetLines();
     query->addSelectedPlanes();
     query->addSelectedPolygons();
     query->addSelectedBoardStrokeTexts();
     query->addSelectedFootprintStrokeTexts();
     query->addSelectedHoles();
 
-    foreach (BI_Footprint* footprint, query->getFootprints()) { Q_ASSERT(footprint);
-        BI_Device& device = footprint->getDeviceInstance();
-        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(device);
+    foreach (BI_Device* device, query->getDeviceInstances()) { Q_ASSERT(device);
+        CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
         mDeviceEditCmds.append(cmd);
     }
     foreach (BI_Via* via, query->getVias()) { Q_ASSERT(via);

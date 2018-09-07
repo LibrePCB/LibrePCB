@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
-#define LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#ifndef LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
+#define LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/undocommand.h>
+#include "../items/bi_netline.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -32,47 +33,51 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetPoint;
-
-namespace editor {
-
 /*****************************************************************************************
- *  Class CmdCombineSchematicNetPoints
+ *  Class CmdBoardNetLineEdit
  ****************************************************************************************/
 
 /**
- * @brief This undo command combines two schematic netpoints together
- *
- * @note Both netpoints must have the same netsegment!
+ * @brief The CmdBoardNetLineEdit class
  */
-class CmdCombineSchematicNetPoints final : public UndoCommandGroup
+class CmdBoardNetLineEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdCombineSchematicNetPoints(SI_NetPoint& toBeRemoved, SI_NetPoint& result) noexcept;
-        ~CmdCombineSchematicNetPoints() noexcept;
+        explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
+        ~CmdBoardNetLineEdit() noexcept;
+
+        // Setters
+        void setLayer(GraphicsLayer& layer) noexcept;
+        void setWidth(const PositiveLength& width) noexcept;
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() override;
 
-        // Attributes from the constructor
-        SI_NetPoint& mNetPointToBeRemoved;
-        SI_NetPoint& mResultingNetPoint;
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() override;
+
+
+    private: // Data
+        BI_NetLine& mNetLine;
+        GraphicsLayer* mOldLayer;
+        GraphicsLayer* mNewLayer;
+        PositiveLength mOldWidth;
+        PositiveLength mNewWidth;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace project
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETPOINTS_H
+#endif // LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H

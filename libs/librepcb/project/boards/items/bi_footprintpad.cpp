@@ -24,18 +24,9 @@
 #include "bi_footprintpad.h"
 #include "bi_footprint.h"
 #include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/library/pkg/packagepad.h>
-#include "../board.h"
-#include "../../project.h"
-#include "../../circuit/circuit.h"
-#include "../../settings/projectsettings.h"
-#include <librepcb/common/graphics/graphicsscene.h>
 #include "bi_device.h"
 #include <librepcb/library/dev/device.h>
 #include "../../circuit/componentinstance.h"
-#include <librepcb/library/cmp/component.h>
-#include "bi_netpoint.h"
 #include "../../circuit/componentsignalinstance.h"
 #include <librepcb/common/graphics/graphicslayer.h>
 #include "../../circuit/netsignal.h"
@@ -151,31 +142,31 @@ void BI_FootprintPad::removeFromBoard()
     BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
-void BI_FootprintPad::registerNetPoint(BI_NetPoint& netpoint)
+void BI_FootprintPad::registerNetLine(BI_NetLine& netline)
 {
-    if ((!isAddedToBoard()) || (!mComponentSignalInstance)
-        || (netpoint.getBoard() != mBoard)
-        || (mRegisteredNetPoints.contains(netpoint.getLayer().getName()))
-        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal())
-        || (!netpoint.getLayer().isCopperLayer())
-        || (!isOnLayer(netpoint.getLayer().getName())))
+    if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline))
+        || (netline.getBoard() != mBoard)
+        || (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal())
+        || (!isOnLayer(netline.getLayer().getName())))
     {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.insert(netpoint.getLayer().getName(), &netpoint);
-    netpoint.updateLines();
+    foreach (const BI_NetLine* l, mRegisteredNetLines) {
+        if (&l->getNetSegment() != &netline.getNetSegment()) {
+            throw LogicError(__FILE__, __LINE__);
+        }
+    }
+    mRegisteredNetLines.insert(&netline);
+    netline.updateLine();
 }
 
-void BI_FootprintPad::unregisterNetPoint(BI_NetPoint& netpoint)
+void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline)
 {
-    if ((!isAddedToBoard()) || (!mComponentSignalInstance)
-        || (getNetPointOfLayer(netpoint.getLayer().getName()) != &netpoint)
-        || (&netpoint.getNetSignalOfNetSegment() != mComponentSignalInstance->getNetSignal()))
-    {
+    if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
         throw LogicError(__FILE__, __LINE__);
     }
-    mRegisteredNetPoints.remove(netpoint.getLayer().getName());
-    netpoint.updateLines();
+    mRegisteredNetLines.remove(&netline);
+    netline.updateLine();
 }
 
 void BI_FootprintPad::updatePosition() noexcept
@@ -185,8 +176,8 @@ void BI_FootprintPad::updatePosition() noexcept
     mGraphicsItem->setPos(mPosition.toPxQPointF());
     updateGraphicsItemTransform();
     mGraphicsItem->updateCacheAndRepaint();
-    foreach (BI_NetPoint* netpoint, mRegisteredNetPoints) {
-        netpoint->setPosition(mPosition);
+    foreach (BI_NetLine* netline, mRegisteredNetLines) {
+        netline->updateLine();
     }
 }
 
@@ -206,7 +197,7 @@ QPainterPath BI_FootprintPad::getGrabAreaScenePx() const noexcept
 
 bool BI_FootprintPad::isSelectable() const noexcept
 {
-    return mFootprint.isSelectable() && mGraphicsItem->isSelectable();
+    return mGraphicsItem->isSelectable();
 }
 
 void BI_FootprintPad::setSelected(bool selected) noexcept
@@ -236,6 +227,7 @@ void BI_FootprintPad::footprintAttributesChanged()
 
 void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to)
 {
+    Q_ASSERT(!isUsed()); // no netlines must be connected when netsignal changes!
     if (mHighlightChangedConnection) {
         disconnect(mHighlightChangedConnection);
     }

@@ -35,6 +35,8 @@ namespace project {
 
 class SI_NetPoint;
 class SI_NetLine;
+class SI_SymbolPin;
+class SI_NetLineAnchor;
 
 namespace editor {
 
@@ -97,6 +99,11 @@ class SES_DrawWire final : public SES_Base
                               SI_NetPoint* fixedPoint = nullptr) noexcept;
         bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
         bool abortPositioning(bool showErrMsgBox) noexcept;
+        SI_SymbolPin* findSymbolPin(Schematic& schematic, const Point& pos) const noexcept;
+        SI_NetPoint* findNetPoint(Schematic& schematic, const Point& pos,
+                                  SI_NetPoint* except = nullptr) const noexcept;
+        SI_NetLine* findNetLine(Schematic& schematic, const Point& pos,
+                                SI_NetLine* except = nullptr) const noexcept;
         void updateNetpointPositions(const Point& cursorPos) noexcept;
         void updateWireModeActionsCheckedState() noexcept;
         Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const noexcept;
@@ -105,7 +112,7 @@ class SES_DrawWire final : public SES_Base
         // General Attributes
         SubState mSubState; ///< the current substate
         WireMode mWireMode; ///< the current wire mode
-        SI_NetPoint* mFixedNetPoint; ///< the fixed netpoint (start point of the line)
+        SI_NetLineAnchor* mFixedStartAnchor; ///< the fixed anchor (start point of the line)
         SI_NetLine* mPositioningNetLine1; ///< line between fixed point and p1
         SI_NetPoint* mPositioningNetPoint1; ///< the first netpoint to place
         SI_NetLine* mPositioningNetLine2; ///< line between p1 and p2

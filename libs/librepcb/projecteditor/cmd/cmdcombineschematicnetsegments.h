@@ -24,7 +24,6 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/units/point.h>
 #include <librepcb/common/undocommandgroup.h>
 
 /*****************************************************************************************
@@ -34,8 +33,7 @@ namespace librepcb {
 namespace project {
 
 class SI_NetSegment;
-class SI_NetPoint;
-class SI_NetLine;
+class SI_NetLineAnchor;
 
 namespace editor {
 
@@ -55,26 +53,23 @@ class CmdCombineSchematicNetSegments final : public UndoCommandGroup
         // Constructors / Destructor
         CmdCombineSchematicNetSegments() = delete;
         CmdCombineSchematicNetSegments(const CmdCombineSchematicNetSegments& other) = delete;
-        CmdCombineSchematicNetSegments(SI_NetSegment& toBeRemoved, SI_NetPoint& junction) noexcept;
+        CmdCombineSchematicNetSegments(SI_NetSegment& toBeRemoved, SI_NetLineAnchor& oldAnchor,
+                                       SI_NetSegment& result, SI_NetLineAnchor& newAnchor) noexcept;
         ~CmdCombineSchematicNetSegments() noexcept;
 
         // Operator Overloadings
         CmdCombineSchematicNetSegments& operator=(const CmdCombineSchematicNetSegments& rhs) = delete;
 
 
-    private:
-
-        // Private Methods
-
+    private: // Methods
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() override;
 
-        SI_NetPoint& addNetPointInMiddleOfNetLine(SI_NetLine& l, const Point& pos);
-
-
-        // Attributes from the constructor
-        SI_NetSegment& mNetSegmentToBeRemoved;
-        SI_NetPoint& mJunctionNetPoint;
+    private: // Data
+        SI_NetSegment& mOldSegment;
+        SI_NetSegment& mNewSegment;
+        SI_NetLineAnchor& mOldAnchor;
+        SI_NetLineAnchor& mNewAnchor;
 };
 
 /*****************************************************************************************

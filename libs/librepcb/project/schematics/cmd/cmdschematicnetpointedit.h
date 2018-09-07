@@ -34,8 +34,6 @@ namespace librepcb {
 namespace project {
 
 class SI_NetPoint;
-class SI_SymbolPin;
-class NetSignal;
 
 /*****************************************************************************************
  *  Class CmdSchematicNetPointEdit
@@ -53,7 +51,6 @@ class CmdSchematicNetPointEdit final : public UndoCommand
         ~CmdSchematicNetPointEdit() noexcept;
 
         // Setters
-        void setPinToAttach(SI_SymbolPin* pin) noexcept;
         void setPosition(const Point& pos, bool immediate) noexcept;
         void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
 
@@ -78,8 +75,6 @@ class CmdSchematicNetPointEdit final : public UndoCommand
         SI_NetPoint& mNetPoint;
 
         // General Attributes
-        SI_SymbolPin* mOldSymbolPin;
-        SI_SymbolPin* mNewSymbolPin;
         Point mOldPos;
         Point mNewPos;
 };
