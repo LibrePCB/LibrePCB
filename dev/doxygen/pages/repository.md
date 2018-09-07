@@ -20,8 +20,8 @@ ready to use.
 
 # Repository API
 
-Every server which implements a specific API can be used as a LibrePCB repsository. Take a look at
-[our own repository](https://github.com/LibrePCB/librepcb-api-static) to see how it looks like.
+Every server which implements a specific API can be used as a LibrePCB repsository.
+See @ref doc_server_api for details.
 
 
 # Workspace Settings
