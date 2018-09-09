@@ -20,87 +20,89 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include "firstrunwizard.h"
-#include "ui_firstrunwizard.h"
-#include "firstrunwizardpage_welcome.h"
-#include "firstrunwizardpage_workspacepath.h"
-#include "firstrunwizardpage_workspacesettings.h"
+#include <QtCore>
+#include <QtWidgets>
+#include "wsi_user.h"
+#include <librepcb/common/systeminfo.h>
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
-namespace application {
+namespace workspace {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget *parent) noexcept :
-    QWizard(parent), mUi(new Ui::FirstRunWizard)
+WSI_User::WSI_User(const SExpression& node) :
+    WSI_Base()
 {
-    mUi->setupUi(this);
-
-    // add pages
-    setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
-    setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
-    setPage(Page_WorkspaceSettings, new FirstRunWizardPage_WorkspaceSettings());
-
-    // set header logo
-    setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
-}
-
-FirstRunWizard::~FirstRunWizard() noexcept
-{
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool FirstRunWizard::getCreateNewWorkspace() const noexcept
-{
-    return field("CreateWorkspace").toBool();
-}
-
-FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept
-{
-    if (getCreateNewWorkspace())
-        return FilePath(field("CreateWorkspacePath").toString());
-    else
-        return FilePath(field("OpenWorkspacePath").toString());
-}
-
-QString FirstRunWizard::getNewWorkspaceUserName() const noexcept
-{
-    return field("NewWorkspaceUserName").toString();
-}
-
-/*****************************************************************************************
- *  Inherited from QWizard
- ****************************************************************************************/
-
-int FirstRunWizard::nextId() const
-{
-    switch (currentId()) {
-        case Page_Welcome: {
-            return Page_WorkspacePath;
-        }
-        case Page_WorkspacePath: {
-            return getCreateNewWorkspace() ? Page_WorkspaceSettings : -1;
-        }
-        case Page_WorkspaceSettings: {
-            return -1;
-        }
-        default: {
-            return -1;
-        }
+    if (const SExpression* child = node.tryGetChildByPath("user")) {
+        mName = child->getValueOfFirstChild<QString>();
+    } else {
+        // Fallback to system's username if no user name defined. This should actually
+        // only happen once when upgrading older workspace settings.
+        mName = SystemInfo::getFullUsername();
     }
+
+    // create widget
+    mWidget.reset(new QWidget());
+    QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
+    layout->setContentsMargins(0, 0, 0, 0);
+    mNameEdit.reset(new QLineEdit(mName));
+    mNameEdit->setMaxLength(100);
+    mNameEdit->setPlaceholderText(tr("e.g. \"John Doe\""));
+    layout->addWidget(mNameEdit.data());
+    layout->addWidget(new QLabel(tr("This name will be used as author when creating new "
+                                    "projects or libraries.")));
+}
+
+WSI_User::~WSI_User() noexcept
+{
+}
+
+/*****************************************************************************************
+ * Direct Access
+ ****************************************************************************************/
+
+void WSI_User::setName(const QString& name) noexcept
+{
+    mName = name;
+    mNameEdit->setText(name);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void WSI_User::restoreDefault() noexcept
+{
+    mNameEdit->setText(SystemInfo::getFullUsername());
+}
+
+void WSI_User::apply() noexcept
+{
+    mName = mNameEdit->text();
+}
+
+void WSI_User::revert() noexcept
+{
+    mNameEdit->setText(mName);
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void WSI_User::serialize(SExpression& root) const
+{
+    root.appendChild("user", mName, true);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace application
+} // namespace workspace
 } // namespace librepcb

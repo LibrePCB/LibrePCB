@@ -45,6 +45,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
     // Add all settings widgets
 
     // tab: general
+    mUi->generalLayout->addRow(mSettings.getUser().getLabelText(),
+                               mSettings.getUser().getWidget());
     mUi->generalLayout->addRow(mSettings.getAppLocale().getLabelText(),
                                mSettings.getAppLocale().getWidget());
     mUi->generalLayout->addRow(mSettings.getAppDefMeasUnits().getLengthUnitLabelText(),
@@ -85,6 +87,7 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
     // Remove all settings widgets from the dialog (important for memory management!)
 
     // tab: general
+    mSettings.getUser().getWidget()->setParent(0);
     mSettings.getAppLocale().getWidget()->setParent(0);
     mSettings.getAppDefMeasUnits().getLengthUnitComboBox()->setParent(0);
     mSettings.getProjectAutosaveInterval().getWidget()->setParent(0);

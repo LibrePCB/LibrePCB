@@ -53,6 +53,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace) :
     }
 
     // load all settings
+    loadSettingsItem(mUser,                     root);
     loadSettingsItem(mAppLocale,                root);
     loadSettingsItem(mAppDefMeasUnits,          root);
     loadSettingsItem(mProjectAutosaveInterval,  root);

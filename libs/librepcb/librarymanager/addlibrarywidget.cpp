@@ -25,7 +25,6 @@
 #include "addlibrarywidget.h"
 #include "ui_addlibrarywidget.h"
 #include <librepcb/common/application.h>
-#include <librepcb/common/systeminfo.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/network/repository.h>
 #include <librepcb/library/library.h>
@@ -62,7 +61,7 @@ AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept :
 
     // tab "create local library": set placeholder texts
     mUi->edtLocalName->setPlaceholderText("My Library");
-    mUi->edtLocalAuthor->setPlaceholderText(SystemInfo::getFullUsername());
+    mUi->edtLocalAuthor->setPlaceholderText(mWorkspace.getSettings().getUser().getName());
     mUi->edtLocalVersion->setPlaceholderText("0.1");
     mUi->edtLocalUrl->setPlaceholderText(tr("e.g. the URL to the Git repository (optional)"));
     localLibraryNameLineEditTextChanged(mUi->edtLocalName->text());

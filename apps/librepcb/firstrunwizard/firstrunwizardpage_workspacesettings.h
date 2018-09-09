@@ -17,95 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H
-#define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H
+#ifndef LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
+#define LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/fileio/filepath.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
-
 namespace librepcb {
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-namespace editor {
+namespace application {
 
 namespace Ui {
-class NewProjectWizardPage_Metadata;
+class FirstRunWizardPage_WorkspaceSettings;
 }
 
 /*****************************************************************************************
- *  Class NewProjectWizardPage_Metadata
+ *  Class FirstRunWizardPage_WorkspaceSettings
  ****************************************************************************************/
 
 /**
- * @brief The NewProjectWizardPage_Metadata class
- *
- * @author ubruhin
- * @date 2016-08-13
+ * @brief The FirstRunWizardPage_WorkspaceSettings class
  */
-class NewProjectWizardPage_Metadata final : public QWizardPage
+class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit NewProjectWizardPage_Metadata(const workspace::Workspace& ws,
-                                               QWidget* parent = nullptr) noexcept;
-        NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) = delete;
-        ~NewProjectWizardPage_Metadata() noexcept;
+        explicit FirstRunWizardPage_WorkspaceSettings(QWidget *parent = 0) noexcept;
+        ~FirstRunWizardPage_WorkspaceSettings() noexcept;
 
-        // Setters
-        void setDefaultLocation(const FilePath& dir) noexcept;
-
-        // Getters
-        QString getProjectName() const noexcept;
-        QString getProjectAuthor() const noexcept;
-        bool isLicenseSet() const noexcept;
-        FilePath getProjectLicenseFilePath() const noexcept;
-        FilePath getFullFilePath() const noexcept;
-
-        // Operator Overloadings
-        NewProjectWizardPage_Metadata& operator=(const NewProjectWizardPage_Metadata& rhs) = delete;
-
-
-    private: // GUI Action Handlers
-
-        void nameChanged(const QString& name) noexcept;
-        void locationChanged(const QString& dir) noexcept;
-        void chooseLocationClicked() noexcept;
-
-
-    private: // Methods
-
-        void updateProjectFilePath() noexcept;
-        bool isComplete() const noexcept override;
+        // Inherited Methods
         bool validatePage() noexcept override;
 
 
-    private: // Data
+    private: // Methods
+        Q_DISABLE_COPY(FirstRunWizardPage_WorkspaceSettings)
 
-        QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
-        FilePath mFullFilePath;
+
+    private: // Data
+        QScopedPointer<Ui::FirstRunWizardPage_WorkspaceSettings> mUi;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
-} // namespace project
+} // namespace application
 } // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_METADATA_H
+#endif // LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H

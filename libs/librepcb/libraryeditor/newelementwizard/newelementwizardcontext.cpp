@@ -21,7 +21,6 @@
  *  Includes
  ****************************************************************************************/
 #include "newelementwizardcontext.h"
-#include <librepcb/common/systeminfo.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -69,7 +68,7 @@ void NewElementWizardContext::reset() noexcept
     mElementName = tl::nullopt;
     mElementDescription.clear();
     mElementKeywords.clear();
-    mElementAuthor = SystemInfo::getFullUsername();
+    mElementAuthor = mWorkspace.getSettings().getUser().getName();
     mElementVersion = Version::fromString("0.1");
     mElementCategoryUuid = tl::nullopt;
 

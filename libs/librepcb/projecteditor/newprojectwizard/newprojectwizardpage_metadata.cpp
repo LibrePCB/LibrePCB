@@ -25,7 +25,8 @@
 #include "newprojectwizardpage_metadata.h"
 #include "ui_newprojectwizardpage_metadata.h"
 #include <librepcb/common/application.h>
-#include <librepcb/common/systeminfo.h>
+#include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -38,7 +39,7 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(QWidget *parent) noexcept :
+NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(const workspace::Workspace& ws, QWidget *parent) noexcept :
     QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_Metadata)
 {
     mUi->setupUi(this);
@@ -54,7 +55,7 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(QWidget *parent) no
             this, &NewProjectWizardPage_Metadata::chooseLocationClicked);
 
     // insert values
-    mUi->edtAuthor->setText(SystemInfo::getFullUsername());
+    mUi->edtAuthor->setText(ws.getSettings().getUser().getName());
     mUi->cbxLicense->addItem(QString("No License (not recommended)"),
                              QString());
     mUi->cbxLicense->addItem(tr("CC0-1.0 (no restrictions, recommended for open hardware projects)"),

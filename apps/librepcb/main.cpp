@@ -28,6 +28,7 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/network/networkaccessmanager.h>
 #include <librepcb/workspace/workspace.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
 #include "firstrunwizard/firstrunwizard.h"
 #include "controlpanel/controlpanel.h"
 
@@ -238,7 +239,13 @@ static FilePath determineWorkspacePath() noexcept
             wsPath = wizard.getWorkspaceFilePath();
             if (wizard.getCreateNewWorkspace()) {
                 try {
+                    // create new workspace
                     Workspace::createNewWorkspace(wsPath); // can throw
+
+                    // open workspace and apply settings
+                    Workspace ws(wsPath);
+                    ws.getSettings().getUser().setName(wizard.getNewWorkspaceUserName());
+                    ws.getSettings().applyAll(); // can throw
                 } catch (const Exception& e) {
                     QMessageBox::critical(0, Application::translate("Workspace", "Error"),
                                           e.getMsg());

@@ -102,6 +102,7 @@ void FirstRunWizardPage_WorkspacePath::on_rbtnCreateWs_toggled(bool checked)
     mUi->lblCreateWs->setEnabled(checked);
     mUi->edtCreateWsPath->setEnabled(checked);
     mUi->btnCreateWsBrowse->setEnabled(checked);
+    setFinalPage(!checked); // force updating page order
 }
 
 void FirstRunWizardPage_WorkspacePath::on_rbtnOpenWs_toggled(bool checked)
@@ -109,6 +110,7 @@ void FirstRunWizardPage_WorkspacePath::on_rbtnOpenWs_toggled(bool checked)
     mUi->lblOpenWs->setEnabled(checked);
     mUi->edtOpenWsPath->setEnabled(checked);
     mUi->btnOpenWsBrowse->setEnabled(checked);
+    setFinalPage(checked); // force updating page order
 }
 
 void FirstRunWizardPage_WorkspacePath::on_btnCreateWsBrowse_clicked()

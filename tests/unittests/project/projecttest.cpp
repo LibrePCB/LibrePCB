@@ -22,7 +22,6 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <gtest/gtest.h>
-#include <librepcb/common/systeminfo.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 
@@ -69,7 +68,7 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_FALSE(project->isReadOnly());
     EXPECT_FALSE(project->isRestored());
     EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getMetadata().getName());
-    EXPECT_EQ(SystemInfo::getFullUsername(), project->getMetadata().getAuthor());
+    EXPECT_EQ("Unknown", project->getMetadata().getAuthor());
     EXPECT_EQ(QString("v1"), project->getMetadata().getVersion());
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
                 project->getMetadata().getCreated().toMSecsSinceEpoch(), 5000);
@@ -98,7 +97,7 @@ TEST_F(ProjectTest, testCreateCloseOpen)
     EXPECT_FALSE(project->isReadOnly());
     EXPECT_FALSE(project->isRestored());
     EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getMetadata().getName());
-    EXPECT_EQ(SystemInfo::getFullUsername(), project->getMetadata().getAuthor());
+    EXPECT_EQ("Unknown", project->getMetadata().getAuthor());
     EXPECT_EQ(QString("v1"), project->getMetadata().getVersion());
     EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
                 project->getMetadata().getCreated().toMSecsSinceEpoch(), 5000);

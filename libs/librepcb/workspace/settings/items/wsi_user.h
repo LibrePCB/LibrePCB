@@ -17,75 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_H
-#define LIBREPCB_FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_WORKSPACE_WSI_USER_H
+#define LIBREPCB_WORKSPACE_WSI_USER_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/fileio/filepath.h>
+#include "wsi_base.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-namespace application {
-
-namespace Ui {
-class FirstRunWizard;
-}
+namespace workspace {
 
 /*****************************************************************************************
- *  Class FirstRunWizard
+ *  Class WSI_User
  ****************************************************************************************/
 
 /**
- * @brief The FirstRunWizard class
- *
- * @author ubruhin
- * @date 2015-09-22
+ * @brief The WSI_User class contains the default author used for projects and libraries
  */
-class FirstRunWizard final : public QWizard
+class WSI_User final : public WSI_Base
 {
         Q_OBJECT
-
-        enum PageId {
-            Page_Welcome,
-            Page_WorkspacePath,
-            Page_WorkspaceSettings,
-        };
 
     public:
 
         // Constructors / Destructor
-        explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-        ~FirstRunWizard() noexcept;
+        WSI_User() = delete;
+        WSI_User(const WSI_User& other) = delete;
+        explicit WSI_User(const SExpression& node);
+        ~WSI_User() noexcept;
 
-        // Getters
-        bool getCreateNewWorkspace() const noexcept;
-        FilePath getWorkspaceFilePath() const noexcept;
-        QString getNewWorkspaceUserName() const noexcept;
+        // Direct Access
+        void setName(const QString& name) noexcept;
+        const QString& getName() const noexcept {return mName;}
 
-        // Inherited from QWizard
-        int nextId() const override;
+        // Getters: Widgets
+        QString getLabelText() const noexcept {return tr("User Name:");}
+        QWidget* getWidget() const noexcept {return mWidget.data();}
+
+        // General Methods
+        void restoreDefault() noexcept override;
+        void apply() noexcept override;
+        void revert() noexcept override;
+
+        /// @copydoc librepcb::SerializableObject::serialize()
+        void serialize(SExpression& root) const override;
+
+        // Operator Overloadings
+        WSI_User& operator=(const WSI_User& rhs) = delete;
 
 
-    private:
+    private: // Data
+        QString mName;
 
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizard)
-
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizard> mUi;
+        // Widgets
+        QScopedPointer<QWidget> mWidget;
+        QScopedPointer<QLineEdit> mNameEdit;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace application
+} // namespace workspace
 } // namespace librepcb
 
-#endif // LIBREPCB_FIRSTRUNWIZARD_H
+#endif // LIBREPCB_WORKSPACE_WSI_USER_H
