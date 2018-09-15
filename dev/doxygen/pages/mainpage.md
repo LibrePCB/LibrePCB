@@ -7,6 +7,7 @@ LibrePCB Developers Documentation {#mainpage}
 
 - @ref doc_developers
 - @ref doc_code_style_guide
+- @ref doc_release_workflow
 - @ref doc_architecture_overview
 - @ref doc_attributes_system
 - @ref doc_versioning

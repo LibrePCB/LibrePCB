@@ -3,6 +3,8 @@ File Format Versioning {#doc_versioning}
 
 [TOC]
 
+See also @ref doc_release_workflow_versioning.
+
 # Version Files {#doc_versioning_file}
 
 All LibrePCB entities which are saved as directories (workspaces, projects, libraries and library
@@ -15,7 +17,7 @@ check whether the element is older, newer or equal to the current application ve
 the result, LibrePCB decides if and how that element can be opened.
 
 
-# Backward Compatibility
+# Backward Compatibility {#doc_versioning_backward_compatibility}
 
 LibrePCB provides backward compatibility, at least to the previous major application version
 (ideally even down to `v0.1`). This means that a specific application version can always open
@@ -26,7 +28,7 @@ application version, an update mechanism first migrates all files to the new fil
 the element is opened ordinary.
 
 
-# Forward Compatibility
+# Forward Compatibility {#doc_versioning_forward_compatibility}
 
 On the other hand, LibrePCB does *not* provide forward compatibility for all kinds of elements! So
 it's not possible to open elements which were saved with a newer than the currently used application
