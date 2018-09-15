@@ -30,11 +30,8 @@ if [ "${TRAVIS_OS_NAME-}" = "linux" -a "$CC" = "clang" ]; then
   BUILDSPEC="-spec linux-clang-libc++"
 fi
 
-# download translation files from Transifex (only if API token is available)
-if [ -n "${TX_TOKEN-}" ]; then tx pull --source --all --no-interactive; fi
-
-# update translation source file
-lupdate -silent -no-obsolete -source-language en -target-language en ./librepcb.pro
+# download latest translation files (just pull the i18n submodule)
+git -C ./i18n checkout master && git -C ./i18n pull origin master
 
 # build librepcb
 mkdir build && pushd build

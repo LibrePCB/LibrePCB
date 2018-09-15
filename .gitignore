@@ -26,7 +26,6 @@ build/
 
 # Translation Files
 i18n/*.qm
-i18n/*.ts
 
 # Vim
 *.swp
