@@ -70,6 +70,7 @@ class Application final : public QApplication
 
         // Getters
         const Version& getAppVersion() const noexcept {return mAppVersion;}
+        const QString& getAppVersionLabel() const noexcept {return mAppVersionLabel;}
         const QString& getGitVersion() const noexcept {return mGitVersion;}
         const QDateTime& getBuildDate() const noexcept {return mBuildDate;}
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
@@ -96,6 +97,7 @@ class Application final : public QApplication
 
     private: // Data
         Version mAppVersion;
+        QString mAppVersionLabel;
         QString mGitVersion;
         QDateTime mBuildDate;
         Version mFileFormatVersion;

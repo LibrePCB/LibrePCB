@@ -44,7 +44,7 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept :
     mUi->tabWidget->setCurrentIndex(0);
 
     // Get some version information
-    const Version& appVersion = qApp->getAppVersion();
+    const QString& appVersion = qApp->applicationVersion();
     const QString& gitVersion = qApp->getGitVersion();
     const QString& buildDate = qApp->getBuildDate().toString("yyyy-MM-dd hh:mm:ss (t)");
 

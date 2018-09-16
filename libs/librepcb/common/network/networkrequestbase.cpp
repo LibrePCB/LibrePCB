@@ -41,9 +41,9 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept :
     Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
 
     // set initial HTTP header fields
-    QString userAgent = QString("LibrePCB/%1").arg(qApp->getAppVersion().toStr());
+    QString userAgent = QString("LibrePCB/%1").arg(qApp->applicationVersion());
     mRequest.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
-    mRequest.setRawHeader("X-LibrePCB-AppVersion", qApp->getAppVersion().toStr().toUtf8());
+    mRequest.setRawHeader("X-LibrePCB-AppVersion", qApp->applicationVersion().toUtf8());
     mRequest.setRawHeader("X-LibrePCB-AppVersionGit", qApp->getGitVersion().toUtf8());
     mRequest.setRawHeader("X-LibrePCB-FileFormatVersion", qApp->getFileFormatVersion().toStr().toUtf8());
 

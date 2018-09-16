@@ -65,7 +65,7 @@ ControlPanel::ControlPanel(Workspace& workspace) :
     mUi->setupUi(this);
 
     setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
-                   .arg(qApp->getAppVersion().toPrettyStr(2)));
+                   .arg(qApp->applicationVersion()));
 
     // show workspace path in status bar
     QString wsPath = mWorkspace.getPath().toNative();

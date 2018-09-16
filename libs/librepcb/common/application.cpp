@@ -38,7 +38,8 @@ namespace librepcb {
 
 Application::Application(int& argc, char** argv) noexcept :
     QApplication(argc, argv),
-    mAppVersion(Version::fromString(APP_VERSION)),
+    mAppVersion(Version::fromString(QString(APP_VERSION).section('-', 0, 0))),
+    mAppVersionLabel(QString(APP_VERSION).section('-', 1, 1)),
     mGitVersion(GIT_VERSION),
     mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION))
 {
@@ -47,7 +48,7 @@ Application::Application(int& argc, char** argv) noexcept :
     qRegisterMetaType<Point>();
 
     // set application version
-    QApplication::setApplicationVersion(mAppVersion.toPrettyStr(2));
+    QApplication::setApplicationVersion(APP_VERSION);
 
     // set build timestamp
     QDate buildDate = QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
