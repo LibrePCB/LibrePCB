@@ -11,6 +11,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
 RUN git clone --recursive https://github.com/LibrePCB/LibrePCB.git /opt/LibrePCB \
   && cd /opt/LibrePCB
 
+# checkout demo workspace
+RUN git clone --recursive https://github.com/LibrePCB/demo-workspace.git /librepcb-workspace
+
 # build and install librepcb
 RUN /opt/LibrePCB/dev/docker/make_librepcb.sh
 

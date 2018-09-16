@@ -1,6 +1,3 @@
-[submodule "dev/demo-workspace"]
-	path = dev/demo-workspace
-	url = https://github.com/LibrePCB/demo-workspace.git
 [submodule "libs/hoedown"]
 	path = libs/hoedown
 	url = https://github.com/LibrePCB/hoedown.git
