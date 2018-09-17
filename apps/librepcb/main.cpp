@@ -49,6 +49,7 @@ static void writeLogHeader() noexcept;
 static void installTranslations() noexcept;
 static void init3rdPartyLibs() noexcept;
 static void cleanup3rdPartyLibs() noexcept;
+static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static FilePath determineWorkspacePath() noexcept;
 static int openWorkspace(const FilePath& path) noexcept;
 static int appExec() noexcept;
@@ -92,13 +93,19 @@ int main(int argc, char* argv[])
 
     // --------------------------------- OPEN WORKSPACE ----------------------------------
 
-    // Get the path of the workspace to open (may show the first run wizard)
-    FilePath wsPath = determineWorkspacePath();
-
-    // Open the workspace and catch the return value
     int retval = 0;
-    if (wsPath.isValid()) {
-        retval = openWorkspace(wsPath);
+
+    // If the file format is unstable (e.g. for nightly builds), ask to abort now. This
+    // warning *must* come that early to be really sure that no files are overwritten with
+    // unstable content!
+    if (isFileFormatStableOrAcceptUnstable()) {
+        // Get the path of the workspace to open (may show the first run wizard)
+        FilePath wsPath = determineWorkspacePath();
+
+        // Open the workspace and catch the return value
+        if (wsPath.isValid()) {
+            retval = openWorkspace(wsPath);
+        }
     }
 
     // -------------------------------- EXIT APPLICATION ---------------------------------
@@ -224,6 +231,30 @@ static void init3rdPartyLibs() noexcept
 static void cleanup3rdPartyLibs() noexcept
 {
 
+}
+
+/*****************************************************************************************
+ *  isFileFormatStableOrAcceptUnstable()
+ ****************************************************************************************/
+
+static bool isFileFormatStableOrAcceptUnstable() noexcept
+{
+    if (qApp->isFileFormatStable() || (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") == "1")) {
+        return true;
+    } else {
+        QMessageBox::StandardButton btn = QMessageBox::critical(nullptr,
+            QCoreApplication::translate("main", "Unstable file format!"),
+            QCoreApplication::translate("main",
+                "<p><b>ATTENTION: This application version is UNSTABLE!</b></p>"
+                "<p>Everything you do with this application could break your workspace, "
+                "libraries or projects! It's highly recommended to create a backup "
+                "before proceeding. If you are unsure, please download an official "
+                "stable release instead.</p>"
+                "<p>Are you really sure to continue with the risk of breaking your "
+                "files?!</p>"),
+                QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+        return (btn == QMessageBox::Yes);
+    }
 }
 
 /*****************************************************************************************

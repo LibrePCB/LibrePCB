@@ -15,6 +15,7 @@ DEFINES += BUILD_OUTPUT_DIRECTORY="\\\"$${OUTPUT_DIR_ABS}\\\""
 DEFINES += SHARE_DIRECTORY_SOURCE="\\\"$${SHARE_DIR_ABS}\\\""
 DEFINES += APP_VERSION="\\\"0.1.0-unstable\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
+DEFINES += FILE_FORMAT_STABLE=true  # TODO: set to "false" after the first release is published!
 DEFINES += GIT_COMMIT_SHA="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" rev-parse --verify HEAD)\\\""
 
 QT += core widgets xml opengl network sql
