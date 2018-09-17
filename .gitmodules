@@ -34,3 +34,6 @@
 [submodule "libs/type_safe"]
 	path = libs/type_safe
 	url = https://github.com/LibrePCB/type_safe.git
+[submodule "i18n"]
+	path = i18n
+	url = https://github.com/LibrePCB/librepcb-i18n.git

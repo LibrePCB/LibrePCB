@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 QTIFW_VERSION="3.0.4"
-TRANSIFEX_CLI_VERSION="0.13.3"
 
 QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
 LINUXDEPLOYQT_URL="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
@@ -21,10 +20,6 @@ then
     sudo apt-get install -qq qt5-default qttools5-dev-tools
   fi
   sudo apt-get install -qq libc++-dev libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
-
-  # python packages
-  pip install --user --upgrade --upgrade-strategy only-if-needed \
-              "urllib3[secure]==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
 
   # linuxdeployqt
   sudo wget -cq "$LINUXDEPLOYQT_URL" -O /usr/local/bin/linuxdeployqt
@@ -47,11 +42,6 @@ then
   brew link --force qt5
   export PATH="/usr/local/opt/ccache/libexec:$PATH"
 
-  # python packages
-  pip2 install --user --upgrade --upgrade-strategy only-if-needed \
-               "urllib3==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
-  export PATH="$PATH:`python2 -m site --user-base`/bin"
-
   # Qt Installer Framework
   wget -cq "$QTIFW_URL_BASE/QtInstallerFramework-mac-x64.dmg"
   hdiutil attach ./QtInstallerFramework-mac-x64.dmg
@@ -68,7 +58,5 @@ elif [ -n "${APPVEYOR-}" ]
 then
 
   pacman -Sy --noconfirm --needed openssl
-  pip install --upgrade --upgrade-strategy only-if-needed \
-              "urllib3==1.22" "transifex-client~=$TRANSIFEX_CLI_VERSION"
 
 fi
