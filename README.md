@@ -31,9 +31,6 @@ about the currently available features, limitations and known bugs.
 
 ## Installation & Usage
 
-*Warning: Because LibrePCB's file format is not yet considered as stable (i.e.
-breaking changes can occur), you should not yet use LibrePCB productively!*
-
 **Please read our [user manual](https://docs.librepcb.org/) to see how you can
 install and use LibrePCB.**
 The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
@@ -55,6 +52,13 @@ For internal details take a look at the
 [automatically generated documentation (doxygen)](https://doxygen.librepcb.org/)
 
 ## Development
+
+***WARNING: The `master` branch always contains the latest UNSTABLE version of
+LibrePCB. Everything you do with this unstable version could break your
+workspace, libraries or projects, so you should not use it productively! For
+productive use, please install an official release as described in the
+[user manual](https://docs.librepcb.org/). For development, please read details
+[here](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_unstable_versions).***
 
 ### Requirements
 
