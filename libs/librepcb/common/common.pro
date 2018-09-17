@@ -15,7 +15,7 @@ DEFINES += BUILD_OUTPUT_DIRECTORY="\\\"$${OUTPUT_DIR_ABS}\\\""
 DEFINES += SHARE_DIRECTORY_SOURCE="\\\"$${SHARE_DIR_ABS}\\\""
 DEFINES += APP_VERSION="\\\"0.1.0-unstable\\\""
 DEFINES += FILE_FORMAT_VERSION="\\\"0.1\\\""
-DEFINES += GIT_VERSION="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe --abbrev=7 --dirty --always --tags)\\\""
+DEFINES += GIT_COMMIT_SHA="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" rev-parse --verify HEAD)\\\""
 
 QT += core widgets xml opengl network sql
 

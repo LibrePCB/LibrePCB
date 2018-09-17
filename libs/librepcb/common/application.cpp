@@ -40,7 +40,7 @@ Application::Application(int& argc, char** argv) noexcept :
     QApplication(argc, argv),
     mAppVersion(Version::fromString(QString(APP_VERSION).section('-', 0, 0))),
     mAppVersionLabel(QString(APP_VERSION).section('-', 1, 1)),
-    mGitVersion(GIT_VERSION),
+    mGitRevision(GIT_COMMIT_SHA),
     mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION))
 {
     // register meta types
@@ -55,8 +55,8 @@ Application::Application(int& argc, char** argv) noexcept :
     QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
     mBuildDate = QDateTime(buildDate, buildTime);
 
-    // check "git describe" version
-    if (mGitVersion.isEmpty()) {
+    // check git revision
+    if (mGitRevision.isEmpty()) {
         qWarning() << "Git revision not compiled into the executable!";
     }
 

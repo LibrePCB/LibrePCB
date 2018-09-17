@@ -168,7 +168,7 @@ static void writeLogHeader() noexcept
 {
     // write application name and version to log
     qInfo() << QString("LibrePCB %1 (%2)").arg(qApp->applicationVersion(),
-                                               qApp->getGitVersion());
+                                               qApp->getGitRevision());
 
     // write Qt version to log
     qInfo() << QString("Qt version: %1 (compiled against %2)").arg(qVersion(), QT_VERSION_STR);

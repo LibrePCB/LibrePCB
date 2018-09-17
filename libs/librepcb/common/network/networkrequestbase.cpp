@@ -44,7 +44,7 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept :
     QString userAgent = QString("LibrePCB/%1").arg(qApp->applicationVersion());
     mRequest.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
     mRequest.setRawHeader("X-LibrePCB-AppVersion", qApp->applicationVersion().toUtf8());
-    mRequest.setRawHeader("X-LibrePCB-AppVersionGit", qApp->getGitVersion().toUtf8());
+    mRequest.setRawHeader("X-LibrePCB-GitRevision", qApp->getGitRevision().toUtf8());
     mRequest.setRawHeader("X-LibrePCB-FileFormatVersion", qApp->getFileFormatVersion().toStr().toUtf8());
 
     // create queued connection to let executeRequest() execute in download thread

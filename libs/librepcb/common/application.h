@@ -71,7 +71,7 @@ class Application final : public QApplication
         // Getters
         const Version& getAppVersion() const noexcept {return mAppVersion;}
         const QString& getAppVersionLabel() const noexcept {return mAppVersionLabel;}
-        const QString& getGitVersion() const noexcept {return mGitVersion;}
+        const QString& getGitRevision() const noexcept {return mGitRevision;}
         const QDateTime& getBuildDate() const noexcept {return mBuildDate;}
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
         const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
@@ -98,7 +98,7 @@ class Application final : public QApplication
     private: // Data
         Version mAppVersion;
         QString mAppVersionLabel;
-        QString mGitVersion;
+        QString mGitRevision;
         QDateTime mBuildDate;
         Version mFileFormatVersion;
         FilePath mResourcesDir;

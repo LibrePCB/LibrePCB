@@ -130,7 +130,7 @@ int CommandLineInterface::execute() noexcept
     // --version
     if (parser.isSet(versionOption)) {
         print(QString(tr("LibrePCB CLI Version %1")).arg(mApp.applicationVersion()));
-        print(QString(tr("Git Revision %1")).arg(mApp.getGitVersion()));
+        print(QString(tr("Git Revision %1")).arg(mApp.getGitRevision()));
         print(QString(tr("Qt Version %1 (compiled against %2)")).arg(qVersion(), QT_VERSION_STR));
         print(QString(tr("Built at %1")).arg(mApp.getBuildDate().toString(Qt::LocalDate)));
         return 0;
