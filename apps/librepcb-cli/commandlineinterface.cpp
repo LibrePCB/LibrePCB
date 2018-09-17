@@ -127,6 +127,15 @@ int CommandLineInterface::execute() noexcept
         return 1;
     }
 
+    // --version
+    if (parser.isSet(versionOption)) {
+        print(QString(tr("LibrePCB CLI Version %1")).arg(mApp.getAppVersion().toPrettyStr(3)));
+        print(QString(tr("Git Revision %1")).arg(mApp.getGitVersion()));
+        print(QString(tr("Qt Version %1 (compiled against %2)")).arg(qVersion(), QT_VERSION_STR));
+        print(QString(tr("Built at %1")).arg(mApp.getBuildDate().toString(Qt::LocalDate)));
+        return 0;
+    }
+
     // --help (also shown if no command supplied)
     if (parser.isSet(helpOption) || command.isEmpty()) {
         print(parser.helpText(), 0);
@@ -136,15 +145,6 @@ int CommandLineInterface::execute() noexcept
                 print("  " % it.key().leftJustified(15) % it.value().first);
             }
         }
-        return 0;
-    }
-
-    // --version
-    if (parser.isSet(versionOption)) {
-        print(QString(tr("LibrePCB CLI Version %1")).arg(mApp.getAppVersion().toPrettyStr(3)));
-        print(QString(tr("Git Revision %1")).arg(mApp.getGitVersion()));
-        print(QString(tr("Qt Version %1 (compiled against %2)")).arg(qVersion(), QT_VERSION_STR));
-        print(QString(tr("Built at %1")).arg(mApp.getBuildDate().toString(Qt::LocalDate)));
         return 0;
     }
 
