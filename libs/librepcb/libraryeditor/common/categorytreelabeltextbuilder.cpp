@@ -160,7 +160,7 @@ QList<Uuid> CategoryTreeLabelTextBuilder<ComponentCategory>::getCategoryParents(
 template <>
 QList<Uuid> CategoryTreeLabelTextBuilder<PackageCategory>::getCategoryParents(const Uuid& category) const
 {
-    return mDb.getComponentCategoryParents(category);
+    return mDb.getPackageCategoryParents(category);
 }
 
 /*****************************************************************************************
