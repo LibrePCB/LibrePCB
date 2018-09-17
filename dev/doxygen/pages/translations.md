@@ -19,3 +19,9 @@ For consistent translations, certain LibrePCB specific terms (like "package" or
 | **Package** | Gehäuse |
 | **Pad** | Pad |
 | **Footprint** | Footprint |
+| **Workspace** | Workspace |
+| **Project** | Projekt |
+| **Library** | Library |
+| **Schematic** | Schema |
+| **Board** | Board |
+| **Attribute** | Attribut |
