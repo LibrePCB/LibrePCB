@@ -15,6 +15,7 @@ LibrePCB Developers Documentation {#mainpage}
 - @ref doc_project
 - @ref doc_repository
 - @ref doc_server_api
+- @ref doc_translations
 
 
 # Related Pages {#doc_main_related_pages}
