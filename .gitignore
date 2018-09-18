@@ -29,3 +29,9 @@ i18n/*.qm
 
 # Vim
 *.swp
+
+# Python
+.idea/
+.pytest_cache/
+__pycache__/
+*.pyc
