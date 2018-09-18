@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QPrinter>
+#include <QPainterPathStroker>
 #include "sgi_symbol.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
@@ -86,7 +87,13 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
         mBoundingRect = mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
 
         // update shape
-        if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
+        if (polygon.isGrabArea()) {
+            QPainterPathStroker stroker;
+            stroker.setCapStyle(Qt::RoundCap);
+            stroker.setJoinStyle(Qt::RoundJoin);
+            stroker.setWidth(2 * w);
+            mShape = stroker.createStroke(polygonPath);
+        }
     }
 
     // circles
