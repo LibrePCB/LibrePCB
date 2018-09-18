@@ -48,14 +48,16 @@ class PackageConverterTest : public ::testing::Test
 
 TEST_F(PackageConverterTest, testConversion)
 {
+    FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
+
     // load eagle package
-    FilePath eagleLibFp = FilePath(TEST_DATA_DIR).getPathTo("eagleimport/resistor.lbr");
+    FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
     parseagle::Library eagleLibrary(eagleLibFp.toStr());
     ASSERT_EQ(1, eagleLibrary.getPackages().count());
     const parseagle::Package& eaglePackage = eagleLibrary.getPackages().first();
 
     // load converter database
-    ConverterDb db(FilePath(TEST_DATA_DIR).getPathTo("eagleimport/db.ini"));
+    ConverterDb db(testDataDir.getPathTo("db.ini"));
 
     // convert package
     PackageConverter converter(eaglePackage, db);

@@ -187,17 +187,17 @@ TEST_P(FileDownloadTest, testDownload)
  ****************************************************************************************/
 
 INSTANTIATE_TEST_CASE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unit/FileDownloadTest/first_pcb.zip"),
+    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
                           QString("first_pcb_downloaded.zip"),
                           QString("first_pcb_extracted"),
                           QByteArray::fromHex("f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f89"),
                           true}),
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unit/FileDownloadTest/first_pcb.zip"),
+    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
                           QString("first_pcb_downloaded.zip"),
                           QString(),
                           QByteArray::fromHex("f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f88"), // wrong
                           false}),
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/common/api/v1/libraries"),
+    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/libraries"),
                           QString("libraries.json"),
                           QString(),
                           QByteArray(),

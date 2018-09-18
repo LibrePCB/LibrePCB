@@ -48,14 +48,16 @@ class DeviceSetConverterTest : public ::testing::Test
 
 TEST_F(DeviceSetConverterTest, testConversion)
 {
+    FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
+
     // load eagle device set
-    FilePath eagleLibFp = FilePath(TEST_DATA_DIR).getPathTo("eagleimport/resistor.lbr");
+    FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
     parseagle::Library eagleLibrary(eagleLibFp.toStr());
     ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
     const parseagle::DeviceSet& eagleDeviceSet = eagleLibrary.getDeviceSets().first();
 
     // load converter database
-    ConverterDb db(FilePath(TEST_DATA_DIR).getPathTo("eagleimport/db.ini"));
+    ConverterDb db(testDataDir.getPathTo("db.ini"));
 
     // convert device set
     DeviceSetConverter converter(eagleDeviceSet, db);
