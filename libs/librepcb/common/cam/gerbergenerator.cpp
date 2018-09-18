@@ -26,7 +26,6 @@
 #include "../geometry/circle.h"
 #include "../geometry/path.h"
 #include "../fileio/smarttextfile.h"
-#include "../application.h"
 #include "../toolbox.h"
 
 /*****************************************************************************************
@@ -300,7 +299,7 @@ void GerberGenerator::printHeader() noexcept
     mOutput.append("G04 --- HEADER BEGIN --- *\n");
 
     // add some X2 attributes
-    QString appVersion = qApp->getAppVersion().toPrettyStr(3);
+    QString appVersion = qApp->applicationVersion();
     QString creationDate = QDateTime::currentDateTime().toString(Qt::ISODate);
     QString projId = mProjectId.remove(',');
     QString projUuid = mProjectUuid.toStr();

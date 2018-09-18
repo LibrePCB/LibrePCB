@@ -28,6 +28,32 @@
 #include "units/all_length_units.h"
 
 /*****************************************************************************************
+ *  Version Information
+ ****************************************************************************************/
+
+// Read the release workflow documentation (at https://developers.librepcb.org) before
+// making changes here!!!
+
+// Application version:
+//  - Always three numbers (MAJOR.MINOR.PATCH)!
+//  - Unstable versions (non-release branches): Suffix "-unstable", e.g. "1.0.0-unstable"
+//  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
+//  - Releases (on release branches):           No suffix, e.g. "1.0.0"
+static const char* APP_VERSION = "0.1.0-unstable";
+
+// File format version:
+//  - Must be equal to the major version of APP_VERSION!
+//  - If APP_VERSION < 1.0.0:   Two numbers, e.g. "0.2" for APP_VERSION=="0.2.x"
+//  - If APP_VERSION >= 1.0.0:  Only one number, e.g. "2" for APP_VERSION=="2.x.y"
+static const char* FILE_FORMAT_VERSION = "0.1";
+
+// File format stable flag:
+//  - On all non-release branches: false
+//    TODO: set to "false" after the first release is published!
+//  - On release branches: true
+static const bool FILE_FORMAT_STABLE = true;
+
+/*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
@@ -38,24 +64,26 @@ namespace librepcb {
 
 Application::Application(int& argc, char** argv) noexcept :
     QApplication(argc, argv),
-    mAppVersion(Version::fromString(APP_VERSION)),
-    mGitVersion(GIT_VERSION),
-    mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION))
+    mAppVersion(Version::fromString(QString(APP_VERSION).section('-', 0, 0))),
+    mAppVersionLabel(QString(APP_VERSION).section('-', 1, 1)),
+    mGitRevision(GIT_COMMIT_SHA),
+    mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION)),
+    mIsFileFormatStable(FILE_FORMAT_STABLE)
 {
     // register meta types
     qRegisterMetaType<FilePath>();
     qRegisterMetaType<Point>();
 
     // set application version
-    QApplication::setApplicationVersion(mAppVersion.toPrettyStr(2));
+    QApplication::setApplicationVersion(APP_VERSION);
 
     // set build timestamp
     QDate buildDate = QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
     QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
     mBuildDate = QDateTime(buildDate, buildTime);
 
-    // check "git describe" version
-    if (mGitVersion.isEmpty()) {
+    // check git revision
+    if (mGitRevision.isEmpty()) {
         qWarning() << "Git revision not compiled into the executable!";
     }
 

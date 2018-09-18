@@ -70,9 +70,11 @@ class Application final : public QApplication
 
         // Getters
         const Version& getAppVersion() const noexcept {return mAppVersion;}
-        const QString& getGitVersion() const noexcept {return mGitVersion;}
+        const QString& getAppVersionLabel() const noexcept {return mAppVersionLabel;}
+        const QString& getGitRevision() const noexcept {return mGitRevision;}
         const QDateTime& getBuildDate() const noexcept {return mBuildDate;}
         const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
+        bool isFileFormatStable() const noexcept {return mIsFileFormatStable;}
         const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
         FilePath getResourcesFilePath(const QString& filepath) const noexcept;
         const QFont& getDefaultSansSerifFont() const noexcept {return mSansSerifFont;}
@@ -96,9 +98,11 @@ class Application final : public QApplication
 
     private: // Data
         Version mAppVersion;
-        QString mGitVersion;
+        QString mAppVersionLabel;
+        QString mGitRevision;
         QDateTime mBuildDate;
         Version mFileFormatVersion;
+        bool mIsFileFormatStable;
         FilePath mResourcesDir;
         QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all application stroke fonts
         QFont mSansSerifFont;

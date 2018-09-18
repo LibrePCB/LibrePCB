@@ -44,12 +44,12 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept :
     mUi->tabWidget->setCurrentIndex(0);
 
     // Get some version information
-    const Version& appVersion = qApp->getAppVersion();
-    const QString& gitVersion = qApp->getGitVersion();
+    const QString& appVersion = qApp->applicationVersion();
+    const QString& gitRevision = qApp->getGitRevision().left(10); // 10 digits should be enough
     const QString& buildDate = qApp->getBuildDate().toString("yyyy-MM-dd hh:mm:ss (t)");
 
     // Dynamic text
-    mUi->textVersion->setText(QString("Version: %1 (%2)<br>Build date: %3").arg(appVersion.toPrettyStr(3), gitVersion, buildDate));
+    mUi->textVersion->setText(QString("Version: %1<br>Git revision: %2<br>Build date: %3").arg(appVersion, gitRevision, buildDate));
     mUi->textLinks->setText(tr("For more information, please check out <a href='%1'>librepcb.org</a> or our <a href='%2'>GitHub repository</a>.").arg("http://librepcb.org/", "https://github.com/LibrePCB/LibrePCB"));
     mUi->textContributeFinancially->setText(
         tr("Support sustainable development of LibrePCB by donating financially, either via <a href='%1'>Patreon</a> or via <a href='%2'>Bitcoin</a>!")

@@ -7,9 +7,29 @@ This page contains some general information for LibrePCB developers. Please also
 contribution guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md
 
 
+# Unstable Version {#doc_developers_unstable_versions}
+
+As explained in the @ref doc_release_workflow, the `master` branch is always
+unstable. And unstable doesn't mean "If you have bad luck, something doesn't
+work as expected". It rather means "Everything you save with an unstable
+version can't be opened again with any other (stable or unstable) version!!!".
+So it's highly recommended to use a dedicated workspace for testing purposes,
+then the files in your productive workspace are safe. When working with real
+projects or libraries, make a backup first or at least use a version control
+system so any modifications can be reverted afterwards.
+
+Unstable application versions show a warning message box on every startup to
+protect users from (accidentylly) beaking their files (for example if they are
+trying out a nightly build). For developers this message box is very annoying,
+so you can set the environment variable `LIBREPCB_DISABLE_UNSTABLE_WARNING=1` to
+disable it. If you use QtCreator, this variable can be set in the run
+configuration, so the warning is only disabled when starting LibrePCB from
+within QtCreator. But be careful with the disabled warning! :)
+
+
 # Git {#doc_developers_git}
 
-- The `master` branch must always be stable (CI successful).
+- The `master` branch must always compile and all tests have to pass (CI successful).
 - Use separate branches to fix bugs or implement new features.
 - Do not pack lot of changes in one commit. Make small, incremental commits instead.
 - Write commit messages according this guideline: http://chris.beams.io/posts/git-commit/

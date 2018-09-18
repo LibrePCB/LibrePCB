@@ -50,7 +50,7 @@ TEST(ApplicationTest, testAppVersion)
     EXPECT_GE(Version::fromString("0.1"), v);
 
     // compare with QApplication version
-    Version v1 = Version::fromString(qApp->applicationVersion());
+    Version v1 = Version::fromString(qApp->applicationVersion().section('-', 0, 0));
     EXPECT_GE(Version::fromString("0.1"), v1);
     EXPECT_EQ(v, v1);
 }
