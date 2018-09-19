@@ -103,7 +103,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
 
         // get the bounding rectangle for the circle
         QPointF center = circle.getCenter().toPxQPointF();
-        QRectF boundingRect = QRectF(QPointF(center.x() - r, center.y() - r), QSizeF(r, r));
+        QRectF boundingRect = QRectF(QPointF(center.x() - r, center.y() - r), QSizeF(r * 2, r * 2));
 
         // update bounding rectangle
         mBoundingRect = mBoundingRect.united(boundingRect);
