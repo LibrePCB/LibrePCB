@@ -91,6 +91,9 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
             stroker.setCapStyle(Qt::RoundCap);
             stroker.setJoinStyle(Qt::RoundJoin);
             stroker.setWidth(2 * w);
+            // add polygon area
+            mShape = mShape.united(polygonPath);
+            // add stroke area
             mShape = mShape.united(stroker.createStroke(polygonPath));
         }
     }
