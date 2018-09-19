@@ -55,7 +55,7 @@ class BoardPlaneFragmentsBuilderTest : public ::testing::Test
 
 TEST(BoardPlaneFragmentsBuilderTest, testFragments)
 {
-    FilePath testDataDir(TEST_DATA_DIR "/project/boards/BoardPlaneFragmentsBuilderTest");
+    FilePath testDataDir(TEST_DATA_DIR "/unittests/librepcbproject/BoardPlaneFragmentsBuilderTest");
 
     // open project from test data directory
     FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");

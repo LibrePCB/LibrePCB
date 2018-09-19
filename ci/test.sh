@@ -17,14 +17,13 @@ else
   ./build/output/librepcb-unittests.exe
 fi
 
-# check if the CLI works
+# run CLI system tests
 if [ "${TRAVIS_OS_NAME-}" = "linux" ]
 then
-  xvfb-run -a ./LibrePCB-CLI-x86_64.AppImage --help
+  xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="LibrePCB-CLI-x86_64.AppImage" ./tests/cli
 elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
 then
-  ./build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli --help
+  pytest -v --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
 else
-  ./build/install/opt/bin/librepcb-cli.exe --help
+  pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
 fi
-

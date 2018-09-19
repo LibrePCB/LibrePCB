@@ -153,7 +153,7 @@ TEST_P(NetworkRequestTest, testDownload)
  ****************************************************************************************/
 
 INSTANTIATE_TEST_CASE_P(NetworkRequestTest, NetworkRequestTest, ::testing::Values(
-    NetworkRequestTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/common/api/v1/libraries"),
+    NetworkRequestTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/NetworkRequestTest/libraries"),
                             QByteArray("application/json"),
                             QByteArray("{"),
                             true}),
