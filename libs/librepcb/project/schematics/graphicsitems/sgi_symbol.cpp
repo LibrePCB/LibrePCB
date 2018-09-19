@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QPrinter>
-#include <QPainterPathStroker>
 #include "sgi_symbol.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
@@ -92,7 +91,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept
             stroker.setCapStyle(Qt::RoundCap);
             stroker.setJoinStyle(Qt::RoundJoin);
             stroker.setWidth(2 * w);
-            mShape = stroker.createStroke(polygonPath);
+            mShape = mShape.united(stroker.createStroke(polygonPath));
         }
     }
 
