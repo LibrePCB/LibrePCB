@@ -66,7 +66,9 @@ then
 elif [ -n "${APPVEYOR-}" ]
 then
 
-  pacman -Sy --noconfirm --needed openssl
+  # MSYS2 packages
+  pacman -Sy --noconfirm --needed openssl mingw-w64-x86_64-ccache
+  ccache -s
 
   # python packages
   pip install future
