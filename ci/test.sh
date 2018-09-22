@@ -27,3 +27,17 @@ then
 else
   pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
 fi
+
+# run functional tests
+if [ "${TRAVIS_OS_NAME-}" = "linux" ]
+then
+  xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="LibrePCB-x86_64.AppImage" ./tests/funq
+elif [ "${TRAVIS_OS_NAME-}" = "osx" ]
+then
+  pytest -v --librepcb-executable="build/install/opt/librepcb.app/Contents/MacOS/librepcb" ./tests/funq
+else
+  pytest -v --librepcb-executable="build/install/opt/bin/librepcb.exe" ./tests/funq
+fi
+
+# run python style checks
+flake8 --ignore=E501 tests
