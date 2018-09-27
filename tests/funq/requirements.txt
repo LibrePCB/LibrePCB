@@ -1,0 +1,3 @@
+git+https://github.com/parkouss/funq.git@6da9961f8aa44083e1943dcbd882704ed4f3e55e#egg=funq-server&subdirectory=server
+git+https://github.com/parkouss/funq.git@6da9961f8aa44083e1943dcbd882704ed4f3e55e#egg=funq&subdirectory=client
+pytest~=3.6.3

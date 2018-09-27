@@ -17,13 +17,14 @@ then
     source "/opt/${QT_BASE}/bin/${QT_BASE}-env.sh"
   else
     sudo apt-get update -qq
-    sudo apt-get install -qq qt5-default qttools5-dev-tools
+    sudo apt-get install -qq qt5-default qttools5-dev-tools qtdeclarative5-dev qtdeclarative5-qtquick2-plugin
   fi
   sudo apt-get install -qq libc++-dev libglu1-mesa-dev zlib1g zlib1g-dev openssl xvfb doxygen graphviz
 
   # python packages
-  pip install --user future
+  pip install --user future flake8
   pip install --user -r ./tests/cli/requirements.txt
+  pip install --user -r ./tests/funq/requirements.txt
 
   # linuxdeployqt
   sudo wget -cq "$LINUXDEPLOYQT_URL" -O /usr/local/bin/linuxdeployqt
@@ -47,8 +48,9 @@ then
   export PATH="/usr/local/opt/ccache/libexec:$PATH"
 
   # python packages
-  pip2 install --user future
+  pip2 install --user future flake8
   pip2 install --user -r ./tests/cli/requirements.txt
+  pip2 install --user -r ./tests/funq/requirements.txt
   export PATH="$PATH:`python2 -m site --user-base`/bin"
 
   # Qt Installer Framework
@@ -71,7 +73,8 @@ then
   ccache -s
 
   # python packages
-  pip install future
+  pip install future flake8
   pip install -r ./tests/cli/requirements.txt
+  pip install -r ./tests/funq/requirements.txt
 
 fi

@@ -25,6 +25,7 @@
 #include "newprojectwizardpage_metadata.h"
 #include "ui_newprojectwizardpage_metadata.h"
 #include <librepcb/common/application.h>
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 
@@ -136,7 +137,7 @@ void NewProjectWizardPage_Metadata::locationChanged(const QString& dir) noexcept
 
 void NewProjectWizardPage_Metadata::chooseLocationClicked() noexcept
 {
-    QString dir = QFileDialog::getExistingDirectory(this,
+    QString dir = FileDialog::getExistingDirectory(this,
         tr("Project's parent directory"), mUi->edtLocation->text());
     if (!dir.isEmpty()) {
         mUi->edtLocation->setText(FilePath(dir).toNative());

@@ -21,12 +21,12 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <QFileDialog>
 #include "workspace.h"
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/application.h>
 #include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/project/project.h>
@@ -331,7 +331,7 @@ void Workspace::setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept
 
 FilePath Workspace::chooseWorkspacePath() noexcept
 {
-    FilePath path(QFileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
+    FilePath path(FileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
 
     if ((path.isValid()) && (!isValidWorkspacePath(path))) {
         int answer = QMessageBox::question(0, tr("Create new workspace?"),

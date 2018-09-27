@@ -20,10 +20,10 @@
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
-#include <QFileDialog>
 #include "firstrunwizardpage_workspacepath.h"
 #include "ui_firstrunwizardpage_workspacepath.h"
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/workspace/workspace.h>
 
 /*****************************************************************************************
@@ -115,14 +115,14 @@ void FirstRunWizardPage_WorkspacePath::on_rbtnOpenWs_toggled(bool checked)
 
 void FirstRunWizardPage_WorkspacePath::on_btnCreateWsBrowse_clicked()
 {
-    QString filepath = QFileDialog::getExistingDirectory(0, tr("Select Empty Directory"));
+    QString filepath = FileDialog::getExistingDirectory(0, tr("Select Empty Directory"));
     if (filepath.isEmpty()) return;
     mUi->edtCreateWsPath->setText(filepath);
 }
 
 void FirstRunWizardPage_WorkspacePath::on_btnOpenWsBrowse_clicked()
 {
-    QString filepath = QFileDialog::getExistingDirectory(0, tr("Select Workspace Directory"));
+    QString filepath = FileDialog::getExistingDirectory(0, tr("Select Workspace Directory"));
     if (filepath.isEmpty()) return;
     mUi->edtOpenWsPath->setText(filepath);
 }

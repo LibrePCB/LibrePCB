@@ -1,0 +1,145 @@
+################################################################################
+# Control Panel
+################################################################################
+
+# Main window
+controlPanel = librepcb__application__ControlPanel
+controlPanelWidget = {controlPanel}::centralWidget
+
+# Menu
+controlPanelMenuBar = {controlPanel}::menuBar
+controlPanelMenuExtras = {controlPanelMenuBar}::menuExtras
+
+# Labels at top
+controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibraries
+
+# Buttons in the top right frame
+controlPanelButtonsFrame = {controlPanelWidget}::splitter_h::layoutWidget1::frame
+controlPanelNewProjectButton = {controlPanelButtonsFrame}::newProjectButton
+controlPanelOpenProjectButton = {controlPanelButtonsFrame}::openProjectButton
+controlPanelOpenLibraryManagerButton = {controlPanelButtonsFrame}::openLibraryManagerButton
+
+# Open project dialog
+controlPanelOpenProjectDialog = {controlPanel}::{QT_FILE_DIALOG}
+controlPanelOpenProjectDialogFileNameEdit = {controlPanel}::{QT_FILE_DIALOG_LINE_EDIT}
+controlPanelOpenProjectDialogOkButton = {controlPanel}::{QT_FILE_DIALOG_BTN_OK}
+
+# New project wizard
+controlPanelNewProjectWizard = {controlPanel}::librepcb__project__editor__NewProjectWizard
+controlPanelNewProjectWizardWidget = {controlPanelNewProjectWizard}::QWidget
+controlPanelNewProjectWizardNextButton = {controlPanelNewProjectWizardWidget}::__qt__passive_wizardbutton1
+controlPanelNewProjectWizardFinishButton = {controlPanelNewProjectWizardWidget}::qt_wizard_finish
+controlPanelNewProjectWizardFrame = {controlPanelNewProjectWizardWidget}::QFrame
+controlPanelNewProjectWizardMetadataPage = {controlPanelNewProjectWizardFrame}::librepcb__project__editor__NewProjectWizardPage_Metadata
+controlPanelNewProjectWizardMetadataNameEdit = {controlPanelNewProjectWizardMetadataPage}::edtName
+controlPanelNewProjectWizardMetadataPathLabel = {controlPanelNewProjectWizardMetadataPage}::lblFullFilePath
+
+
+################################################################################
+# Library Manager
+################################################################################
+
+# Main window
+libraryManager = {controlPanel}::librepcb__library__manager__LibraryManager
+libraryManagerWidget = {libraryManager}::centralwidget
+
+# Installed libraries list
+libraryManagerInstalledLibrariesList = {libraryManagerWidget}::lstLibraries
+libraryManagerInstalledLibrariesListViewport = {libraryManagerInstalledLibrariesList}::qt_scrollarea_viewport
+
+# Add library widget
+libraryManagerAddLibraryWidget = {libraryManagerWidget}::librepcb__library__manager____AddLibraryWidget
+libraryManagerAddLibraryTabWidget = {libraryManagerAddLibraryWidget}::tabWidget
+libraryManagerAddLibraryTabBar = {libraryManagerAddLibraryTabWidget}::qt_tabwidget_tabbar
+libraryManagerAddLibraryStackedWidget = {libraryManagerAddLibraryTabWidget}::qt_tabwidget_stackedwidget
+
+# Remote libraries tab
+libraryManagerDownloadFromRepoTab = {libraryManagerAddLibraryStackedWidget}::tabDownloadFromRepo
+libraryManagerDownloadFromRepoLibraryList = {libraryManagerDownloadFromRepoTab}::lstRepoLibs
+libraryManagerDownloadFromRepoLibraryListViewport = {libraryManagerDownloadFromRepoLibraryList}::qt_scrollarea_viewport
+libraryManagerDownloadFromRepoLibraryListItem = {libraryManagerDownloadFromRepoLibraryListViewport}::librepcb__library__manager__RepositoryLibraryListWidgetItem
+libraryManagerDownloadFromRepoDownloadButton = {libraryManagerDownloadFromRepoTab}::btnRepoLibsDownload
+
+# Create local library tab
+libraryManagerCreateLocalLibraryTab = {libraryManagerAddLibraryStackedWidget}::tabCreateLocal
+libraryManagerCreateLocalLibraryNameEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalName
+libraryManagerCreateLocalLibraryDescriptionEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDescription
+libraryManagerCreateLocalLibraryAuthorEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalAuthor
+libraryManagerCreateLocalLibraryUrlEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalUrl
+libraryManagerCreateLocalLibraryVersionEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalVersion
+libraryManagerCreateLocalLibraryCc0LicenseCheckbox = {libraryManagerCreateLocalLibraryTab}::cbxLocalCc0License
+libraryManagerCreateLocalLibraryDirectoryEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDirectory
+libraryManagerCreateLocalLibraryCreateButton = {libraryManagerCreateLocalLibraryTab}::btnLocalCreate
+
+# Library info widget
+libraryManagerLibraryInfoWidget = {libraryManagerWidget}::librepcb__library__manager__LibraryInfoWidget
+libraryManagerLibraryInfoWidgetOpenEditorButton = {libraryManagerLibraryInfoWidget}::btnOpenLibraryEditor
+
+
+################################################################################
+# Library Editor
+################################################################################
+
+# Main window
+libraryEditor = librepcb__library__editor__LibraryEditor
+libraryEditorWidget = {libraryEditor}::centralWidget
+
+# Tab widget
+libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
+libraryEditorStackedWidget = {libraryEditorTabWidget}::qt_tabwidget_stackedwidget
+
+# Library overview widget
+libraryEditorOverviewWidget = {libraryEditorStackedWidget}::librepcb__library__editor__LibraryOverviewWidget
+libraryEditorOverviewMetadataWidget = {libraryEditorOverviewWidget}::splitter::layoutWidget
+libraryEditorOverviewNameEdit = {libraryEditorOverviewMetadataWidget}::edtName
+libraryEditorOverviewDescriptionEdit = {libraryEditorOverviewMetadataWidget}::edtDescription
+libraryEditorOverviewKeywordsEdit = {libraryEditorOverviewMetadataWidget}::edtKeywords
+libraryEditorOverviewAuthorEdit = {libraryEditorOverviewMetadataWidget}::edtAuthor
+libraryEditorOverviewVersionEdit = {libraryEditorOverviewMetadataWidget}::edtVersion
+libraryEditorOverviewDeprecatedCheckbox = {libraryEditorOverviewMetadataWidget}::cbxDeprecated
+libraryEditorOverviewUrlEdit = {libraryEditorOverviewMetadataWidget}::edtUrl
+
+# New element wizard
+libraryEditorNewElementWizard = librepcb__library__editor__NewElementWizard
+libraryEditorNewElementWizardWidget = {libraryEditorNewElementWizard}::centralWidget
+libraryEditorNewElementWizardNextButton = {libraryEditorNewElementWizardWidget}::__qt__passive_wizardbutton1
+libraryEditorNewElementWizardFinishButton = {libraryEditorNewElementWizardWidget}::qt_wizard_finish
+libraryEditorNewElementWizardFrame = {libraryEditorNewElementWizard}::QFrame
+libraryEditorNewElementWizardChooseTypePage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_ChooseType
+libraryEditorNewElementWizardChooseTypeCmpCatButton = {libraryEditorNewElementWizardChooseTypePage}::btnComponentCategory
+libraryEditorNewElementWizardChooseTypePkgCatButton = {libraryEditorNewElementWizardChooseTypePage}::btnPackageCategory
+libraryEditorNewElementWizardChooseTypeSymbolButton = {libraryEditorNewElementWizardChooseTypePage}::btnSymbol
+libraryEditorNewElementWizardChooseTypePackageButton = {libraryEditorNewElementWizardChooseTypePage}::btnPackage
+libraryEditorNewElementWizardChooseTypeComponentButton = {libraryEditorNewElementWizardChooseTypePage}::btnComponent
+libraryEditorNewElementWizardChooseTypeDeviceButton = {libraryEditorNewElementWizardChooseTypePage}::btnDevice
+libraryEditorNewElementWizardMetadataPage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_EnterMetadata
+libraryEditorNewElementWizardMetadataNameEdit = {libraryEditorNewElementWizardMetadataPage}::edtName
+libraryEditorNewElementWizardMetadataDescriptionEdit = {libraryEditorNewElementWizardMetadataPage}::edtDescription
+libraryEditorNewElementWizardMetadataKeywordsEdit = {libraryEditorNewElementWizardMetadataPage}::edtKeywords
+libraryEditorNewElementWizardMetadataAuthorEdit = {libraryEditorNewElementWizardMetadataPage}::edtAuthor
+libraryEditorNewElementWizardMetadataVersionEdit = {libraryEditorNewElementWizardMetadataPage}::edtVersion
+libraryEditorNewElementWizardMetadataCategoryEdit = {libraryEditorNewElementWizardMetadataPage}::edtCategory
+libraryEditorNewElementWizardMetadataCategoryLabel = {libraryEditorNewElementWizardMetadataPage}::lblCategoryTree
+libraryEditorNewElementWizardMetadataCategoryButton = {libraryEditorNewElementWizardMetadataPage}::btnChooseCategory
+
+
+################################################################################
+# Schematic Editor
+################################################################################
+
+# Main window
+schematicEditor = librepcb__project__editor__SchematicEditor
+schematicEditorWidget = {schematicEditor}::centralWidget
+
+# Graphics view
+schematicEditorGraphicsView = {schematicEditor}::librepcb:_:GraphicsView
+schematicEditorGraphicsViewWidget = {schematicEditorGraphicsView}::QWidget
+
+
+################################################################################
+# Board Editor
+################################################################################
+
+# Main window
+boardEditor = librepcb__project__editor__BoardEditor
+boardEditorWidget = {boardEditor}::centralWidget

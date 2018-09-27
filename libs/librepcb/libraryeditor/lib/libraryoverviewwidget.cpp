@@ -24,6 +24,7 @@
 #include <QtWidgets>
 #include "libraryoverviewwidget.h"
 #include "ui_libraryoverviewwidget.h"
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -208,7 +209,7 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget, const QIc
 
 void LibraryOverviewWidget::btnIconClicked() noexcept
 {
-    QString fp = QFileDialog::getOpenFileName(this, tr("Choose library icon"),
+    QString fp = FileDialog::getOpenFileName(this, tr("Choose library icon"),
         mLibrary->getIconFilePath().toNative(), tr("Portable Network Graphics (*.png)"));
     if (!fp.isEmpty()) {
         mLibrary->setIconFilePath(FilePath(fp));
