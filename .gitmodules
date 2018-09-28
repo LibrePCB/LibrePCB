@@ -1,39 +1,39 @@
 [submodule "libs/hoedown"]
-	path = libs/hoedown
-	url = https://github.com/LibrePCB/hoedown.git
+    path = libs/hoedown
+    url = https://github.com/LibrePCB/hoedown.git
 [submodule "libs/quazip"]
-	path = libs/quazip
-	url = https://github.com/LibrePCB/quazip.git
+    path = libs/quazip
+    url = https://github.com/LibrePCB/quazip.git
 [submodule "libs/googletest"]
-	path = libs/googletest
-	url = https://github.com/LibrePCB/googletest.git
+    path = libs/googletest
+    url = https://github.com/LibrePCB/googletest.git
 [submodule "tests/data"]
-	path = tests/data
-	url = https://github.com/LibrePCB/librepcb-test-data.git
+    path = tests/data
+    url = https://github.com/LibrePCB/librepcb-test-data.git
 [submodule "libs/parseagle"]
-	path = libs/parseagle
-	url = https://github.com/LibrePCB/parseagle.git
+    path = libs/parseagle
+    url = https://github.com/LibrePCB/parseagle.git
 [submodule "libs/sexpresso"]
-	path = libs/sexpresso
-	url = https://github.com/LibrePCB/sexpresso.git
+    path = libs/sexpresso
+    url = https://github.com/LibrePCB/sexpresso.git
 [submodule "libs/fontobene"]
-	path = libs/fontobene
-	url = https://github.com/fontobene/fontobene-qt5.git
+    path = libs/fontobene
+    url = https://github.com/fontobene/fontobene-qt5.git
 [submodule "share/librepcb/fontobene"]
-	path = share/librepcb/fontobene
-	url = https://github.com/LibrePCB/fontobene-fonts.git
+    path = share/librepcb/fontobene
+    url = https://github.com/LibrePCB/fontobene-fonts.git
 [submodule "libs/delaunay-triangulation"]
-	path = libs/delaunay-triangulation
-	url = https://github.com/LibrePCB/delaunay-triangulation.git
+    path = libs/delaunay-triangulation
+    url = https://github.com/LibrePCB/delaunay-triangulation.git
 [submodule "share/librepcb/fonts"]
-	path = share/librepcb/fonts
-	url = https://github.com/LibrePCB/librepcb-fonts.git
+    path = share/librepcb/fonts
+    url = https://github.com/LibrePCB/librepcb-fonts.git
 [submodule "libs/optional"]
-	path = libs/optional
-	url = https://github.com/LibrePCB/optional.git
+    path = libs/optional
+    url = https://github.com/LibrePCB/optional.git
 [submodule "libs/type_safe"]
-	path = libs/type_safe
-	url = https://github.com/LibrePCB/type_safe.git
+    path = libs/type_safe
+    url = https://github.com/LibrePCB/type_safe.git
 [submodule "i18n"]
-	path = i18n
-	url = https://github.com/LibrePCB/librepcb-i18n.git
+    path = i18n
+    url = https://github.com/LibrePCB/librepcb-i18n.git

@@ -10,13 +10,13 @@ if [ $? -eq 0 ]; then
   read answer
   if [ "$answer" == "n" ]; then
     echo "ABORTED"
-	  exit 1
+    exit 1
   fi
   echo "WARNING: The container 'librepcb' is running! Kill it? [Y/n]"
   read answer
   if [ "$answer" == "n" ]; then
     echo "ABORTED"
-	  exit 1
+    exit 1
   fi
   docker rm -f librepcb
 fi
