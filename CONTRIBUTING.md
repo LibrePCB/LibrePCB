@@ -29,6 +29,9 @@
   - Please avoid working directly on the `master` branch.
 - Write code which follows our [code style guides](https://doxygen.librepcb.org/df/d24/doc_code_style_guide.html)
   and [.editorconfig settings](https://github.com/LibrePCB/LibrePCB/blob/master/.editorconfig).
+  - You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to
+    automatically format the code. To format all files at once, just run the
+    script [`./dev/format_code.sh`](dev/format_code.sh).
 - Make commits of logical units.
   - Make sure your commit messages are in the [proper format](http://chris.beams.io/posts/git-commit/):
 ```
