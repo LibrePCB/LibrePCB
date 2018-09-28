@@ -5,11 +5,6 @@ root = true
 [*]
 charset = utf-8
 indent_style = space
+indent_size = 2
 end_of_line = lf
 insert_final_newline = true
-
-[*.{cpp,h,pro}]
-indent_size = 4
-
-[{.travis.yml,appveyor.yml}]
-indent_size = 2
