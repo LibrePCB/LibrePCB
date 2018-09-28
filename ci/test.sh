@@ -38,6 +38,3 @@ then
 else
   pytest -v --librepcb-executable="build/install/opt/bin/librepcb.exe" ./tests/funq
 fi
-
-# run python style checks
-flake8 --ignore=E501 tests

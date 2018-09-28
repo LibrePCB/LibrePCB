@@ -34,6 +34,7 @@ install:
   - source ./ci/install_dependencies.sh # source required because it modifies the environment
 
 script:
+  - ./ci/stylecheck.sh            || travis_terminate 1
   - ./ci/build.sh                 || travis_terminate 1
   - ./ci/test.sh                  || travis_terminate 1
   - ./ci/upload_artifacts.sh      || travis_terminate 1
