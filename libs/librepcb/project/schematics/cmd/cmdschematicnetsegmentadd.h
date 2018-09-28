@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADD_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -36,52 +37,48 @@ class NetSignal;
 class Schematic;
 class SI_NetSegment;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetSegmentAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetSegmentAdd class
  */
-class CmdSchematicNetSegmentAdd final : public UndoCommand
-{
-    public:
+class CmdSchematicNetSegmentAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdSchematicNetSegmentAdd(SI_NetSegment& segment) noexcept;
+  CmdSchematicNetSegmentAdd(Schematic& schematic,
+                            NetSignal& netsignal) noexcept;
+  ~CmdSchematicNetSegmentAdd() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdSchematicNetSegmentAdd(SI_NetSegment& segment) noexcept;
-        CmdSchematicNetSegmentAdd(Schematic& schematic, NetSignal& netsignal) noexcept;
-        ~CmdSchematicNetSegmentAdd() noexcept;
+  // Getters
+  SI_NetSegment* getNetSegment() const noexcept { return mNetSegment; }
 
-        // Getters
-        SI_NetSegment* getNetSegment() const noexcept {return mNetSegment;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Schematic& mSchematic;
-        NetSignal& mNetSignal;
-        SI_NetSegment* mNetSegment;
+  Schematic&     mSchematic;
+  NetSignal&     mNetSignal;
+  SI_NetSegment* mNetSegment;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADD_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADD_H

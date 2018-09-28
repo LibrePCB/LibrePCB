@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPEVOLTAGE_H
 #define LIBREPCB_ATTRTYPEVOLTAGE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeVoltage
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeVoltage class
  */
-class AttrTypeVoltage final : public AttributeType
-{
+class AttrTypeVoltage final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeVoltage& instance() noexcept {
+    static AttrTypeVoltage x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeVoltage(const AttrTypeVoltage& other) = delete;
+  AttrTypeVoltage& operator=(const AttrTypeVoltage& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeVoltage& instance() noexcept {static AttrTypeVoltage x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeVoltage(const AttrTypeVoltage& other) = delete;
-        AttrTypeVoltage& operator=(const AttrTypeVoltage& rhs) = delete;
-
-
-        // Constructors / Destructor
-        AttrTypeVoltage() noexcept;
-        ~AttrTypeVoltage() noexcept;
+  // Constructors / Destructor
+  AttrTypeVoltage() noexcept;
+  ~AttrTypeVoltage() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPEVOLTAGE_H
+#endif  // LIBREPCB_ATTRTYPEVOLTAGE_H

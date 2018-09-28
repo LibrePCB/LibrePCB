@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSIGNALS_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSIGNALS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_ComponentSignals;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ComponentSignals
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_ComponentSignals class
@@ -48,47 +49,45 @@ class NewElementWizardPage_ComponentSignals;
  * @author ubruhin
  * @date 2017-03-26
  */
-class NewElementWizardPage_ComponentSignals final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_ComponentSignals final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_ComponentSignals() = delete;
+  NewElementWizardPage_ComponentSignals(
+      const NewElementWizardPage_ComponentSignals& other) = delete;
+  explicit NewElementWizardPage_ComponentSignals(
+      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_ComponentSignals() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_ComponentSignals() = delete;
-        NewElementWizardPage_ComponentSignals(const NewElementWizardPage_ComponentSignals& other) = delete;
-        explicit NewElementWizardPage_ComponentSignals(NewElementWizardContext& context,
-                                                       QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_ComponentSignals() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_ComponentSignals& operator       =(
+      const NewElementWizardPage_ComponentSignals& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  QHash<Uuid, CircuitIdentifier> getPinNames(const Uuid&    symbol,
+                                             const QString& suffix) const
+      noexcept;
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_ComponentSignals& operator=(const NewElementWizardPage_ComponentSignals& rhs) = delete;
-
-
-    private: // Methods
-        QHash<Uuid, CircuitIdentifier> getPinNames(const Uuid& symbol, const QString& suffix) const noexcept;
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_ComponentSignals> mUi;
+private:  // Data
+  NewElementWizardContext&                                  mContext;
+  QScopedPointer<Ui::NewElementWizardPage_ComponentSignals> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSIGNALS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSIGNALS_H

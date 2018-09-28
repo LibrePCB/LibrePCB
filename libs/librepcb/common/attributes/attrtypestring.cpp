@@ -17,53 +17,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtypestring.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeString::AttrTypeString() noexcept :
-    AttributeType(Type_t::String, "string", tr("String"))
-{
+AttrTypeString::AttrTypeString() noexcept
+  : AttributeType(Type_t::String, "string", tr("String")) {
 }
 
-AttrTypeString::~AttrTypeString() noexcept
-{
+AttrTypeString::~AttrTypeString() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeString::isValueValid(const QString& value) const noexcept
-{
-    Q_UNUSED(value);
-    return true;
+bool AttrTypeString::isValueValid(const QString& value) const noexcept {
+  Q_UNUSED(value);
+  return true;
 }
 
-QString AttrTypeString::valueFromTr(const QString& value) const noexcept
-{
-    return value;
+QString AttrTypeString::valueFromTr(const QString& value) const noexcept {
+  return value;
 }
 
-QString AttrTypeString::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    Q_UNUSED(unit);
-    return value;
+QString AttrTypeString::printableValueTr(const QString&       value,
+                                         const AttributeUnit* unit) const
+    noexcept {
+  Q_UNUSED(unit);
+  return value;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

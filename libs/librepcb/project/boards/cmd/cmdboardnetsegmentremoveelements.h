@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
 #define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,53 +38,48 @@ class BI_Via;
 class BI_NetPoint;
 class BI_NetLine;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardNetSegmentRemoveElements
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardNetSegmentRemoveElements class
  */
-class CmdBoardNetSegmentRemoveElements final : public UndoCommand
-{
-    public:
+class CmdBoardNetSegmentRemoveElements final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardNetSegmentRemoveElements(BI_NetSegment& segment) noexcept;
+  ~CmdBoardNetSegmentRemoveElements() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardNetSegmentRemoveElements(BI_NetSegment& segment) noexcept;
-        ~CmdBoardNetSegmentRemoveElements() noexcept;
+  // General Methods
+  void removeVia(BI_Via& via);
+  void removeNetPoint(BI_NetPoint& netpoint);
+  void removeNetLine(BI_NetLine& netline);
 
-        // General Methods
-        void removeVia(BI_Via& via);
-        void removeNetPoint(BI_NetPoint& netpoint);
-        void removeNetLine(BI_NetLine& netline);
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-        BI_NetSegment& mNetSegment;
-        QList<BI_Via*> mVias;
-        QList<BI_NetPoint*> mNetPoints;
-        QList<BI_NetLine*> mNetLines;
+  // Private Member Variables
+  BI_NetSegment&      mNetSegment;
+  QList<BI_Via*>      mVias;
+  QList<BI_NetPoint*> mNetPoints;
+  QList<BI_NetLine*>  mNetLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H

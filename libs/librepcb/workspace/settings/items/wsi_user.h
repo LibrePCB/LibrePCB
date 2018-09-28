@@ -20,69 +20,67 @@
 #ifndef LIBREPCB_WORKSPACE_WSI_USER_H
 #define LIBREPCB_WORKSPACE_WSI_USER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "wsi_base.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WSI_User
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The WSI_User class contains the default author used for projects and libraries
+ * @brief The WSI_User class contains the default author used for projects and
+ * libraries
  */
-class WSI_User final : public WSI_Base
-{
-        Q_OBJECT
+class WSI_User final : public WSI_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WSI_User()                      = delete;
+  WSI_User(const WSI_User& other) = delete;
+  explicit WSI_User(const SExpression& node);
+  ~WSI_User() noexcept;
 
-        // Constructors / Destructor
-        WSI_User() = delete;
-        WSI_User(const WSI_User& other) = delete;
-        explicit WSI_User(const SExpression& node);
-        ~WSI_User() noexcept;
+  // Direct Access
+  void           setName(const QString& name) noexcept;
+  const QString& getName() const noexcept { return mName; }
 
-        // Direct Access
-        void setName(const QString& name) noexcept;
-        const QString& getName() const noexcept {return mName;}
+  // Getters: Widgets
+  QString  getLabelText() const noexcept { return tr("User Name:"); }
+  QWidget* getWidget() const noexcept { return mWidget.data(); }
 
-        // Getters: Widgets
-        QString getLabelText() const noexcept {return tr("User Name:");}
-        QWidget* getWidget() const noexcept {return mWidget.data();}
+  // General Methods
+  void restoreDefault() noexcept override;
+  void apply() noexcept override;
+  void revert() noexcept override;
 
-        // General Methods
-        void restoreDefault() noexcept override;
-        void apply() noexcept override;
-        void revert() noexcept override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  WSI_User& operator=(const WSI_User& rhs) = delete;
 
-        // Operator Overloadings
-        WSI_User& operator=(const WSI_User& rhs) = delete;
+private:  // Data
+  QString mName;
 
-
-    private: // Data
-        QString mName;
-
-        // Widgets
-        QScopedPointer<QWidget> mWidget;
-        QScopedPointer<QLineEdit> mNameEdit;
+  // Widgets
+  QScopedPointer<QWidget>   mWidget;
+  QScopedPointer<QLineEdit> mNameEdit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_WSI_USER_H
+#endif  // LIBREPCB_WORKSPACE_WSI_USER_H

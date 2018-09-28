@@ -20,24 +20,25 @@
 #ifndef LIBREPCB_POLYGONGRAPHICSITEM_H
 #define LIBREPCB_POLYGONGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "../geometry/polygon.h"
+#include "primitivepathgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "primitivepathgraphicsitem.h"
-#include "../geometry/polygon.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PolygonGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PolygonGraphicsItem class
@@ -45,42 +46,41 @@ class IF_GraphicsLayerProvider;
  * @author ubruhin
  * @date 2017-05-28
  */
-class PolygonGraphicsItem final : public PrimitivePathGraphicsItem, public IF_PolygonObserver
-{
-    public:
+class PolygonGraphicsItem final : public PrimitivePathGraphicsItem,
+                                  public IF_PolygonObserver {
+public:
+  // Constructors / Destructor
+  PolygonGraphicsItem()                                 = delete;
+  PolygonGraphicsItem(const PolygonGraphicsItem& other) = delete;
+  PolygonGraphicsItem(Polygon& polygon, const IF_GraphicsLayerProvider& lp,
+                      QGraphicsItem* parent = nullptr) noexcept;
+  ~PolygonGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        PolygonGraphicsItem() = delete;
-        PolygonGraphicsItem(const PolygonGraphicsItem& other) = delete;
-        PolygonGraphicsItem(Polygon& polygon, const IF_GraphicsLayerProvider& lp,
-                            QGraphicsItem* parent = nullptr) noexcept;
-        ~PolygonGraphicsItem() noexcept;
+  // Getters
+  Polygon& getPolygon() noexcept { return mPolygon; }
 
-        // Getters
-        Polygon& getPolygon() noexcept {return mPolygon;}
+  // Operator Overloadings
+  PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;
+private:  // Methods
+  void polygonLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept override;
+  void polygonLineWidthChanged(
+      const UnsignedLength& newLineWidth) noexcept override;
+  void polygonIsFilledChanged(bool newIsFilled) noexcept override;
+  void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
+  void polygonPathChanged(const Path& newPath) noexcept override;
+  void updateFillLayer() noexcept;
 
-
-    private: // Methods
-        void polygonLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
-        void polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept override;
-        void polygonIsFilledChanged(bool newIsFilled) noexcept override;
-        void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-        void polygonPathChanged(const Path& newPath) noexcept override;
-        void updateFillLayer() noexcept;
-
-
-    private: // Data
-        Polygon& mPolygon;
-        const IF_GraphicsLayerProvider& mLayerProvider;
+private:  // Data
+  Polygon&                        mPolygon;
+  const IF_GraphicsLayerProvider& mLayerProvider;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_POLYGONGRAPHICSITEM_H
+#endif  // LIBREPCB_POLYGONGRAPHICSITEM_H

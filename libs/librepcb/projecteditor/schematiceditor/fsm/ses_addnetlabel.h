@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_SES_ADDNETLABEL_H
 #define LIBREPCB_PROJECT_SES_ADDNETLABEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ses_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,51 +39,48 @@ class CmdSchematicNetLabelEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SES_AddNetLabel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SES_AddNetLabel class
  */
-class SES_AddNetLabel final : public SES_Base
-{
-        Q_OBJECT
+class SES_AddNetLabel final : public SES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit SES_AddNetLabel(SchematicEditor&     editor,
+                           Ui::SchematicEditor& editorUi,
+                           GraphicsView&        editorGraphicsView,
+                           UndoStack&           undoStack);
+  ~SES_AddNetLabel();
 
-        // Constructors / Destructor
-        explicit SES_AddNetLabel(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                 GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~SES_AddNetLabel();
+  // General Methods
+  ProcRetVal process(SEE_Base* event) noexcept override;
+  bool       entry(SEE_Base* event) noexcept override;
+  bool       exit(SEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(SEE_Base* event) noexcept override;
-        bool entry(SEE_Base* event) noexcept override;
-        bool exit(SEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+  bool       addLabel(Schematic& schematic, const Point& pos) noexcept;
+  bool       updateLabel(const Point& pos) noexcept;
+  bool       fixLabel(const Point& pos) noexcept;
 
-
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        bool addLabel(Schematic& schematic, const Point& pos) noexcept;
-        bool updateLabel(const Point& pos) noexcept;
-        bool fixLabel(const Point& pos) noexcept;
-
-
-        // General Attributes
-        bool mUndoCmdActive;
-        SI_NetLabel* mCurrentNetLabel;
-        CmdSchematicNetLabelEdit* mEditCmd;
+  // General Attributes
+  bool                      mUndoCmdActive;
+  SI_NetLabel*              mCurrentNetLabel;
+  CmdSchematicNetLabelEdit* mEditCmd;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_ADDNETLABEL_H
+#endif  // LIBREPCB_PROJECT_SES_ADDNETLABEL_H

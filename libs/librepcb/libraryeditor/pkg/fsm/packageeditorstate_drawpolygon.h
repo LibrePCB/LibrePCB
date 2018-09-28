@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGON_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGON_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate_drawpolygonbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_DrawPolygon
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_DrawPolygon class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawPolygon final : public PackageEditorState_DrawPolygonBase
-{
-        Q_OBJECT
+class PackageEditorState_DrawPolygon final
+  : public PackageEditorState_DrawPolygonBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_DrawPolygon() = delete;
+  PackageEditorState_DrawPolygon(const PackageEditorState_DrawPolygon& other) =
+      delete;
+  explicit PackageEditorState_DrawPolygon(Context& context) noexcept;
+  ~PackageEditorState_DrawPolygon() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_DrawPolygon() = delete;
-        PackageEditorState_DrawPolygon(const PackageEditorState_DrawPolygon& other) = delete;
-        explicit PackageEditorState_DrawPolygon(Context& context) noexcept;
-        ~PackageEditorState_DrawPolygon() noexcept;
-
-        // Operator Overloadings
-        PackageEditorState_DrawPolygon& operator=(const PackageEditorState_DrawPolygon& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_DrawPolygon& operator       =(
+      const PackageEditorState_DrawPolygon& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGON_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGON_H

@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
 #define LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class FileDownload;
@@ -36,9 +37,9 @@ class FileDownload;
 namespace library {
 namespace manager {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryDownload
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryDownload class
@@ -46,80 +47,72 @@ namespace manager {
  * @author ubruhin
  * @date 2016-10-01
  */
-class LibraryDownload final : public QObject
-{
-        Q_OBJECT
+class LibraryDownload final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryDownload()                             = delete;
+  LibraryDownload(const LibraryDownload& other) = delete;
+  LibraryDownload(const QUrl& urlToZip, const FilePath& destDir) noexcept;
+  ~LibraryDownload() noexcept;
 
-        // Constructors / Destructor
-        LibraryDownload() = delete;
-        LibraryDownload(const LibraryDownload& other) = delete;
-        LibraryDownload(const QUrl& urlToZip, const FilePath& destDir) noexcept;
-        ~LibraryDownload() noexcept;
+  // Getters
+  const FilePath& getDestinationDir() const noexcept { return mDestDir; }
 
-        // Getters
-        const FilePath& getDestinationDir() const noexcept {return mDestDir;}
+  // Setters
 
-        // Setters
+  /**
+   * @copydoc librepcb::NetworkRequestBase::setExpectedReplyContentSize()
+   */
+  void setExpectedZipFileSize(qint64 bytes) noexcept;
 
-        /**
-         * @copydoc librepcb::NetworkRequestBase::setExpectedReplyContentSize()
-         */
-        void setExpectedZipFileSize(qint64 bytes) noexcept;
+  /**
+   * @copydoc librepcb::NetworkRequestBase::setExpectedChecksum()
+   */
+  void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
+                           const QByteArray&             checksum) noexcept;
 
-        /**
-         * @copydoc librepcb::NetworkRequestBase::setExpectedChecksum()
-         */
-        void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
-                                 const QByteArray& checksum) noexcept;
+  // Operator Overloadings
+  LibraryDownload& operator=(const LibraryDownload& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryDownload& operator=(const LibraryDownload& rhs) = delete;
+public slots:
 
+  /**
+   * @brief Start downloading the library
+   */
+  void start() noexcept;
 
-    public slots:
+  /**
+   * @brief Abort downloading the library
+   */
+  void abort() noexcept;
 
-        /**
-         * @brief Start downloading the library
-         */
-        void start() noexcept;
+signals:
 
-        /**
-         * @brief Abort downloading the library
-         */
-        void abort() noexcept;
+  void progressState(const QString& status);
+  void progressPercent(int percent);
+  void finished(bool success, const QString& errMsg);
+  void abortRequested();  // internal signal!
 
+private:  // Methods
+  void     downloadErrored(const QString& errMsg) noexcept;
+  void     downloadAborted() noexcept;
+  void     downloadSucceeded() noexcept;
+  FilePath getPathToLibDir() noexcept;
 
-    signals:
-
-        void progressState(const QString& status);
-        void progressPercent(int percent);
-        void finished(bool success, const QString& errMsg);
-        void abortRequested(); // internal signal!
-
-
-    private: // Methods
-
-        void downloadErrored(const QString& errMsg) noexcept;
-        void downloadAborted() noexcept;
-        void downloadSucceeded() noexcept;
-        FilePath getPathToLibDir() noexcept;
-
-
-    private: // Data
-
-        QScopedPointer<FileDownload> mFileDownload;
-        FilePath mDestDir;
-        FilePath mTempDestDir;
+private:  // Data
+  QScopedPointer<FileDownload> mFileDownload;
+  FilePath                     mDestDir;
+  FilePath                     mTempDestDir;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
+#endif  // LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H

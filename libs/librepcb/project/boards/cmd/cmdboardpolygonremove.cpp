@@ -17,58 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardpolygonremove.h"
+
 #include "../board.h"
 #include "../items/bi_polygon.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardPolygonRemove::CmdBoardPolygonRemove(BI_Polygon& polygon) noexcept :
-    UndoCommand(tr("Remove polygon from board")),
-    mBoard(polygon.getBoard()), mPolygon(polygon)
-{
+CmdBoardPolygonRemove::CmdBoardPolygonRemove(BI_Polygon& polygon) noexcept
+  : UndoCommand(tr("Remove polygon from board")),
+    mBoard(polygon.getBoard()),
+    mPolygon(polygon) {
 }
 
-CmdBoardPolygonRemove::~CmdBoardPolygonRemove() noexcept
-{
+CmdBoardPolygonRemove::~CmdBoardPolygonRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardPolygonRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardPolygonRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardPolygonRemove::performUndo()
-{
-    mBoard.addPolygon(mPolygon); // can throw
+void CmdBoardPolygonRemove::performUndo() {
+  mBoard.addPolygon(mPolygon);  // can throw
 }
 
-void CmdBoardPolygonRemove::performRedo()
-{
-    mBoard.removePolygon(mPolygon); // can throw
+void CmdBoardPolygonRemove::performRedo() {
+  mBoard.removePolygon(mPolygon);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

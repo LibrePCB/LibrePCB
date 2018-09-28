@@ -17,66 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "graphicsscene.h"
+
 #include "../units/point.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsScene::GraphicsScene() noexcept :
-    QGraphicsScene(nullptr), mSelectionRectItem(nullptr)
-{
-    /*QBrush selectBrush = QGuiApplication::palette().highlight();
-    QColor selectColor = selectBrush.color();
-    selectColor.setAlpha(50);
-    selectBrush.setColor(selectColor);*/
-    QBrush selectBrush(QColor(150, 200, 255, 80), Qt::SolidPattern);
-    mSelectionRectItem = new QGraphicsRectItem();
-    mSelectionRectItem->setPen(QPen(QColor(120, 170, 255, 255), 0));
-    mSelectionRectItem->setBrush(selectBrush);
-    mSelectionRectItem->setZValue(1000);
-    QGraphicsScene::addItem(mSelectionRectItem);
+GraphicsScene::GraphicsScene() noexcept
+  : QGraphicsScene(nullptr), mSelectionRectItem(nullptr) {
+  /*QBrush selectBrush = QGuiApplication::palette().highlight();
+  QColor selectColor = selectBrush.color();
+  selectColor.setAlpha(50);
+  selectBrush.setColor(selectColor);*/
+  QBrush selectBrush(QColor(150, 200, 255, 80), Qt::SolidPattern);
+  mSelectionRectItem = new QGraphicsRectItem();
+  mSelectionRectItem->setPen(QPen(QColor(120, 170, 255, 255), 0));
+  mSelectionRectItem->setBrush(selectBrush);
+  mSelectionRectItem->setZValue(1000);
+  QGraphicsScene::addItem(mSelectionRectItem);
 }
 
-GraphicsScene::~GraphicsScene() noexcept
-{
-    QGraphicsScene::removeItem(mSelectionRectItem);
-    delete mSelectionRectItem;  mSelectionRectItem = nullptr;
+GraphicsScene::~GraphicsScene() noexcept {
+  QGraphicsScene::removeItem(mSelectionRectItem);
+  delete mSelectionRectItem;
+  mSelectionRectItem = nullptr;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void GraphicsScene::addItem(QGraphicsItem& item) noexcept
-{
-    QGraphicsScene::addItem(&item);
+void GraphicsScene::addItem(QGraphicsItem& item) noexcept {
+  QGraphicsScene::addItem(&item);
 }
 
-void GraphicsScene::removeItem(QGraphicsItem& item) noexcept
-{
-    QGraphicsScene::removeItem(&item);
+void GraphicsScene::removeItem(QGraphicsItem& item) noexcept {
+  QGraphicsScene::removeItem(&item);
 }
 
-void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2) noexcept
-{
-    QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-    mSelectionRectItem->setRect(rectPx);
+void GraphicsScene::setSelectionRect(const Point& p1,
+                                     const Point& p2) noexcept {
+  QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+  mSelectionRectItem->setRect(rectPx);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

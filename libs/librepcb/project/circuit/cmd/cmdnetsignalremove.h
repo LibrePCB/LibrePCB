@@ -20,62 +20,58 @@
 #ifndef LIBREPCB_PROJECT_CMDNETSIGNALREMOVE_H
 #define LIBREPCB_PROJECT_CMDNETSIGNALREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Circuit;
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdNetSignalRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdNetSignalRemove class
  */
-class CmdNetSignalRemove final : public UndoCommand
-{
-    public:
+class CmdNetSignalRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal) noexcept;
+  ~CmdNetSignalRemove() noexcept;
 
-        // Constructors / Destructor
-        CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal) noexcept;
-        ~CmdNetSignalRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Circuit& mCircuit;
-        NetSignal& mNetSignal;
+  Circuit&   mCircuit;
+  NetSignal& mNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDNETSIGNALREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDNETSIGNALREMOVE_H

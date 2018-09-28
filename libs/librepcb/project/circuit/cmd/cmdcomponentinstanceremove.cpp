@@ -17,59 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdcomponentinstanceremove.h"
+
 #include "../circuit.h"
 #include "../componentinstance.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdComponentInstanceRemove::CmdComponentInstanceRemove(Circuit& circuit,
-                                                       ComponentInstance& cmp) noexcept :
-    UndoCommand(tr("Remove component")),
-    mCircuit(circuit), mComponentInstance(cmp)
-{
+CmdComponentInstanceRemove::CmdComponentInstanceRemove(
+    Circuit& circuit, ComponentInstance& cmp) noexcept
+  : UndoCommand(tr("Remove component")),
+    mCircuit(circuit),
+    mComponentInstance(cmp) {
 }
 
-CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept
-{
+CmdComponentInstanceRemove::~CmdComponentInstanceRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdComponentInstanceRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdComponentInstanceRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdComponentInstanceRemove::performUndo()
-{
-    mCircuit.addComponentInstance(mComponentInstance); // can throw
+void CmdComponentInstanceRemove::performUndo() {
+  mCircuit.addComponentInstance(mComponentInstance);  // can throw
 }
 
-void CmdComponentInstanceRemove::performRedo()
-{
-    mCircuit.removeComponentInstance(mComponentInstance); // can throw
+void CmdComponentInstanceRemove::performRedo() {
+  mCircuit.removeComponentInstance(mComponentInstance);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

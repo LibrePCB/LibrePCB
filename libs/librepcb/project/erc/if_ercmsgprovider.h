@@ -20,32 +20,38 @@
 #ifndef LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
 #define LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-class ErcMsg; // all classes which implement IF_ErcMsgProvider will need this declaration
+class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
+               // declaration
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Macros
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @note    The specified class name should be unique only in the namespace #project,
- *          so we won't use the namespace as a prefix. Simple use the class name.
+ * @note    The specified class name should be unique only in the namespace
+ * #project, so we won't use the namespace as a prefix. Simple use the class
+ * name.
  *
- * @warning Do not change the name of an existing class if you don't know what you're doing!
+ * @warning Do not change the name of an existing class if you don't know what
+ * you're doing!
  */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
-public: \
-    virtual const char* getErcMsgOwnerClassName() const noexcept override {return #msgOwnerClassName;} \
+#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName)                     \
+public:                                                                   \
+  virtual const char* getErcMsgOwnerClassName() const noexcept override { \
+    return #msgOwnerClassName;                                            \
+  }                                                                       \
+                                                                          \
 private:
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class IF_ErcMsgProvider
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The IF_ErcMsgProvider class
@@ -53,23 +59,21 @@ private:
  * @author ubruhin
  * @date 2015-02-02
  */
-class IF_ErcMsgProvider
-{
-    public:
+class IF_ErcMsgProvider {
+public:
+  // Constructors / Destructor
+  IF_ErcMsgProvider() {}
+  virtual ~IF_ErcMsgProvider() {}
 
-        // Constructors / Destructor
-        IF_ErcMsgProvider() {}
-        virtual ~IF_ErcMsgProvider() {}
-
-        // Getters
-        virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
+  // Getters
+  virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
+#endif  // LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H

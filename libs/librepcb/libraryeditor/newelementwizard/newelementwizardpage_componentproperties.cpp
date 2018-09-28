@@ -17,86 +17,87 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "newelementwizardpage_componentproperties.h"
-#include "ui_newelementwizardpage_componentproperties.h"
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/workspace/workspace.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include "../common/symbolchooserdialog.h"
 
-/*****************************************************************************************
+#include "../common/symbolchooserdialog.h"
+#include "ui_newelementwizardpage_componentproperties.h"
+
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/workspace/workspace.h>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewElementWizardPage_ComponentProperties::NewElementWizardPage_ComponentProperties(NewElementWizardContext& context, QWidget *parent) noexcept :
-    QWizardPage(parent), mContext(context), mUi(new Ui::NewElementWizardPage_ComponentProperties)
-{
-    mUi->setupUi(this);
+NewElementWizardPage_ComponentProperties::
+    NewElementWizardPage_ComponentProperties(NewElementWizardContext& context,
+                                             QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mContext(context),
+    mUi(new Ui::NewElementWizardPage_ComponentProperties) {
+  mUi->setupUi(this);
 }
 
-NewElementWizardPage_ComponentProperties::~NewElementWizardPage_ComponentProperties() noexcept
-{
+NewElementWizardPage_ComponentProperties::
+    ~NewElementWizardPage_ComponentProperties() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewElementWizardPage_ComponentProperties::validatePage() noexcept
-{
-    try {
-        mContext.mComponentSchematicOnly = mUi->cbxSchematicOnly->isChecked();
-        mContext.mComponentDefaultValue = mUi->edtDefaultValue->toPlainText().trimmed();
-        mContext.mComponentPrefixes.setDefaultValue(
-            ComponentPrefix(mUi->edtPrefix->text().toUpper().trimmed())); // can throw
-        return true;
-    } catch (const Exception& e) {
-        return false;
-    }
-}
-
-bool NewElementWizardPage_ComponentProperties::isComplete() const noexcept
-{
+bool NewElementWizardPage_ComponentProperties::validatePage() noexcept {
+  try {
+    mContext.mComponentSchematicOnly = mUi->cbxSchematicOnly->isChecked();
+    mContext.mComponentDefaultValue =
+        mUi->edtDefaultValue->toPlainText().trimmed();
+    mContext.mComponentPrefixes.setDefaultValue(ComponentPrefix(
+        mUi->edtPrefix->text().toUpper().trimmed()));  // can throw
     return true;
+  } catch (const Exception& e) {
+    return false;
+  }
 }
 
-int NewElementWizardPage_ComponentProperties::nextId() const noexcept
-{
-    return NewElementWizardContext::ID_ComponentSymbols;
+bool NewElementWizardPage_ComponentProperties::isComplete() const noexcept {
+  return true;
 }
 
-/*****************************************************************************************
+int NewElementWizardPage_ComponentProperties::nextId() const noexcept {
+  return NewElementWizardContext::ID_ComponentSymbols;
+}
+
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NewElementWizardPage_ComponentProperties::initializePage() noexcept
-{
-    QWizardPage::initializePage();
-    mUi->cbxSchematicOnly->setChecked(mContext.mComponentSchematicOnly);
-    mUi->edtDefaultValue->setPlainText(mContext.mComponentDefaultValue);
-    mUi->edtPrefix->setText(*mContext.mComponentPrefixes.getDefaultValue());
+void NewElementWizardPage_ComponentProperties::initializePage() noexcept {
+  QWizardPage::initializePage();
+  mUi->cbxSchematicOnly->setChecked(mContext.mComponentSchematicOnly);
+  mUi->edtDefaultValue->setPlainText(mContext.mComponentDefaultValue);
+  mUi->edtPrefix->setText(*mContext.mComponentPrefixes.getDefaultValue());
 }
 
-void NewElementWizardPage_ComponentProperties::cleanupPage() noexcept
-{
-    QWizardPage::cleanupPage();
+void NewElementWizardPage_ComponentProperties::cleanupPage() noexcept {
+  QWizardPage::cleanupPage();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

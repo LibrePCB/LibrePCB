@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Hole;
@@ -40,9 +41,9 @@ namespace library {
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddHoles
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddHoles class
@@ -50,53 +51,53 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-30
  */
-class PackageEditorState_AddHoles final : public PackageEditorState
-{
-        Q_OBJECT
+class PackageEditorState_AddHoles final : public PackageEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_AddHoles() = delete;
+  PackageEditorState_AddHoles(const PackageEditorState_AddHoles& other) =
+      delete;
+  explicit PackageEditorState_AddHoles(Context& context) noexcept;
+  ~PackageEditorState_AddHoles() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_AddHoles() = delete;
-        PackageEditorState_AddHoles(const PackageEditorState_AddHoles& other) = delete;
-        explicit PackageEditorState_AddHoles(Context& context) noexcept;
-        ~PackageEditorState_AddHoles() noexcept;
+  // General Methods
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
-        // General Methods
-        bool entry() noexcept override;
-        bool exit() noexcept override;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
+  // Operator Overloadings
+  PackageEditorState_AddHoles& operator       =(
+      const PackageEditorState_AddHoles& rhs) = delete;
 
-        // Operator Overloadings
-        PackageEditorState_AddHoles& operator=(const PackageEditorState_AddHoles& rhs) = delete;
+private:  // Methods
+  bool startAddHole(const Point& pos) noexcept;
+  bool finishAddHole(const Point& pos) noexcept;
+  bool abortAddHole() noexcept;
+  void diameterSpinBoxValueChanged(double value) noexcept;
 
+private:  // Data
+  Point                       mStartPos;
+  QScopedPointer<CmdHoleEdit> mEditCmd;
+  Hole*                       mCurrentHole;
+  HoleGraphicsItem*           mCurrentGraphicsItem;
 
-    private: // Methods
-        bool startAddHole(const Point& pos) noexcept;
-        bool finishAddHole(const Point& pos) noexcept;
-        bool abortAddHole() noexcept;
-        void diameterSpinBoxValueChanged(double value) noexcept;
-
-
-    private: // Data
-        Point mStartPos;
-        QScopedPointer<CmdHoleEdit> mEditCmd;
-        Hole* mCurrentHole;
-        HoleGraphicsItem* mCurrentGraphicsItem;
-
-        // parameter memory
-        PositiveLength mLastDiameter;
+  // parameter memory
+  PositiveLength mLastDiameter;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H

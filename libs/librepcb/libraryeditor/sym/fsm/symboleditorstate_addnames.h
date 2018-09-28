@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDNAMES_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDNAMES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "symboleditorstate_drawtextbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_AddNames
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_AddNames class
@@ -44,28 +45,27 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-01-03
  */
-class SymbolEditorState_AddNames final : public SymbolEditorState_DrawTextBase
-{
-        Q_OBJECT
+class SymbolEditorState_AddNames final : public SymbolEditorState_DrawTextBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorState_AddNames()                                        = delete;
+  SymbolEditorState_AddNames(const SymbolEditorState_AddNames& other) = delete;
+  explicit SymbolEditorState_AddNames(const Context& context) noexcept;
+  ~SymbolEditorState_AddNames() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_AddNames() = delete;
-        SymbolEditorState_AddNames(const SymbolEditorState_AddNames& other) = delete;
-        explicit SymbolEditorState_AddNames(const Context& context) noexcept;
-        ~SymbolEditorState_AddNames() noexcept;
-
-        // Operator Overloadings
-        SymbolEditorState_AddNames& operator=(const SymbolEditorState_AddNames& rhs) = delete;
+  // Operator Overloadings
+  SymbolEditorState_AddNames& operator=(const SymbolEditorState_AddNames& rhs) =
+      delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDNAMES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDNAMES_H

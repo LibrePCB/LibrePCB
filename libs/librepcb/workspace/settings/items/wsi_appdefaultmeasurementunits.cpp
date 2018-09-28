@@ -17,94 +17,92 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_appdefaultmeasurementunits.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(const SExpression& node) :
-    WSI_Base(),
-    mLengthUnit(LengthUnit::millimeters()), mLengthUnitTmp(mLengthUnit)
-{
-    if (const SExpression* child = node.tryGetChildByPath("default_length_unit")) {
-        mLengthUnit = child->getValueOfFirstChild<LengthUnit>();
-        mLengthUnitTmp = mLengthUnit;
-    }
-
-    // create a QComboBox with all available length units
-    mLengthUnitComboBox.reset(new QComboBox());
-    foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
-        mLengthUnitComboBox->addItem(unit.toStringTr(), unit.getIndex());
-    }
-    updateLengthUnitComboBoxIndex();
-    connect(mLengthUnitComboBox.data(),
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged);
-}
-
-WSI_AppDefaultMeasurementUnits::~WSI_AppDefaultMeasurementUnits() noexcept
-{
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void WSI_AppDefaultMeasurementUnits::restoreDefault() noexcept
-{
-    mLengthUnitTmp = LengthUnit::millimeters();
-    updateLengthUnitComboBoxIndex();
-}
-
-void WSI_AppDefaultMeasurementUnits::apply() noexcept
-{
-    mLengthUnit = mLengthUnitTmp;
-}
-
-void WSI_AppDefaultMeasurementUnits::revert() noexcept
-{
+WSI_AppDefaultMeasurementUnits::WSI_AppDefaultMeasurementUnits(
+    const SExpression& node)
+  : WSI_Base(),
+    mLengthUnit(LengthUnit::millimeters()),
+    mLengthUnitTmp(mLengthUnit) {
+  if (const SExpression* child =
+          node.tryGetChildByPath("default_length_unit")) {
+    mLengthUnit    = child->getValueOfFirstChild<LengthUnit>();
     mLengthUnitTmp = mLengthUnit;
-    updateLengthUnitComboBoxIndex();
+  }
+
+  // create a QComboBox with all available length units
+  mLengthUnitComboBox.reset(new QComboBox());
+  foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
+    mLengthUnitComboBox->addItem(unit.toStringTr(), unit.getIndex());
+  }
+  updateLengthUnitComboBoxIndex();
+  connect(
+      mLengthUnitComboBox.data(),
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged);
 }
 
-/*****************************************************************************************
+WSI_AppDefaultMeasurementUnits::~WSI_AppDefaultMeasurementUnits() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void WSI_AppDefaultMeasurementUnits::restoreDefault() noexcept {
+  mLengthUnitTmp = LengthUnit::millimeters();
+  updateLengthUnitComboBoxIndex();
+}
+
+void WSI_AppDefaultMeasurementUnits::apply() noexcept {
+  mLengthUnit = mLengthUnitTmp;
+}
+
+void WSI_AppDefaultMeasurementUnits::revert() noexcept {
+  mLengthUnitTmp = mLengthUnit;
+  updateLengthUnitComboBoxIndex();
+}
+
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(int index) noexcept
-{
-    try {
-        mLengthUnitTmp = LengthUnit::fromIndex(index);
-    } catch (Exception& e) {
-        QMessageBox::critical(mLengthUnitComboBox.data(), tr("Error"), e.getMsg());
-    }
+void WSI_AppDefaultMeasurementUnits::lengthUnitComboBoxIndexChanged(
+    int index) noexcept {
+  try {
+    mLengthUnitTmp = LengthUnit::fromIndex(index);
+  } catch (Exception& e) {
+    QMessageBox::critical(mLengthUnitComboBox.data(), tr("Error"), e.getMsg());
+  }
 }
 
-void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept
-{
-    mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
+void WSI_AppDefaultMeasurementUnits::updateLengthUnitComboBoxIndex() noexcept {
+  mLengthUnitComboBox->setCurrentIndex(mLengthUnitTmp.getIndex());
 }
 
-void WSI_AppDefaultMeasurementUnits::serialize(SExpression& root) const
-{
-    root.appendChild("default_length_unit", mLengthUnit, true);
+void WSI_AppDefaultMeasurementUnits::serialize(SExpression& root) const {
+  root.appendChild("default_length_unit", mLengthUnit, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

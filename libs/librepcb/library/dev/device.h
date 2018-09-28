@@ -20,91 +20,96 @@
 #ifndef LIBREPCB_LIBRARY_DEVICE_H
 #define LIBREPCB_LIBRARY_DEVICE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/attributes/attribute.h>
+ ******************************************************************************/
 #include "../libraryelement.h"
 #include "devicepadsignalmap.h"
 
-/*****************************************************************************************
+#include <librepcb/common/attributes/attribute.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Device
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The Device class represents an instance of a component (a "real" component)
+ * @brief The Device class represents an instance of a component (a "real"
+ * component)
  *
- * Following information is considered as the "interface" of a device and must therefore
- * never be changed:
+ * Following information is considered as the "interface" of a device and must
+ * therefore never be changed:
  *  - UUID
  *  - Component UUID
  *  - Package UUID
  *  - Pad-signal-mapping
  */
-class Device final : public LibraryElement
-{
-        Q_OBJECT
+class Device final : public LibraryElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Device()                    = delete;
+  Device(const Device& other) = delete;
+  Device(const Uuid& uuid, const Version& version, const QString& author,
+         const ElementName& name_en_US, const QString& description_en_US,
+         const QString& keywords_en_US, const Uuid& component,
+         const Uuid& package);
+  Device(const FilePath& elementDirectory, bool readOnly);
+  ~Device() noexcept;
 
-        // Constructors / Destructor
-        Device() = delete;
-        Device(const Device& other) = delete;
-        Device(const Uuid& uuid, const Version& version, const QString& author,
-               const ElementName& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US, const Uuid& component, const Uuid& package);
-        Device(const FilePath& elementDirectory, bool readOnly);
-        ~Device() noexcept;
+  // Getters
+  const Uuid& getComponentUuid() const noexcept { return mComponentUuid; }
+  const Uuid& getPackageUuid() const noexcept { return mPackageUuid; }
+  const AttributeList& getAttributes() const noexcept { return mAttributes; }
+  DevicePadSignalMap&  getPadSignalMap() noexcept { return mPadSignalMap; }
+  const DevicePadSignalMap& getPadSignalMap() const noexcept {
+    return mPadSignalMap;
+  }
 
-        // Getters
-        const Uuid& getComponentUuid() const noexcept {return mComponentUuid;}
-        const Uuid& getPackageUuid() const noexcept {return mPackageUuid;}
-        const AttributeList& getAttributes() const noexcept {return mAttributes;}
-        DevicePadSignalMap& getPadSignalMap() noexcept {return mPadSignalMap;}
-        const DevicePadSignalMap& getPadSignalMap() const noexcept {return mPadSignalMap;}
+  // Setters
+  void setComponentUuid(const Uuid& uuid) noexcept;
+  void setPackageUuid(const Uuid& uuid) noexcept;
 
-        // Setters
-        void setComponentUuid(const Uuid& uuid) noexcept;
-        void setPackageUuid(const Uuid& uuid) noexcept;
+  // Operator Overloadings
+  Device& operator=(const Device& rhs) = delete;
 
-        // Operator Overloadings
-        Device& operator=(const Device& rhs) = delete;
+  // Static Methods
+  static QString getShortElementName() noexcept {
+    return QStringLiteral("dev");
+  }
+  static QString getLongElementName() noexcept {
+    return QStringLiteral("device");
+  }
 
-        // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("dev");}
-        static QString getLongElementName() noexcept {return QStringLiteral("device");}
+signals:
+  void componentUuidChanged(const Uuid& uuid);
+  void packageUuidChanged(const Uuid& uuid);
 
+private:  // Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-    signals:
-        void componentUuidChanged(const Uuid& uuid);
-        void packageUuidChanged(const Uuid& uuid);
-
-
-    private: // Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-    private: // Data
-        Uuid mComponentUuid;
-        Uuid mPackageUuid;
-        AttributeList mAttributes; ///< not yet used, but already specified in file format
-        DevicePadSignalMap mPadSignalMap;
+private:  // Data
+  Uuid mComponentUuid;
+  Uuid mPackageUuid;
+  AttributeList
+                     mAttributes;  ///< not yet used, but already specified in file format
+  DevicePadSignalMap mPadSignalMap;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_DEVICE_H
+#endif  // LIBREPCB_LIBRARY_DEVICE_H

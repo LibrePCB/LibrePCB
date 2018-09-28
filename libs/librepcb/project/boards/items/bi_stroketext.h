@@ -20,19 +20,21 @@
 #ifndef LIBREPCB_PROJECT_BI_STROKETEXT_H
 #define LIBREPCB_PROJECT_BI_STROKETEXT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_base.h"
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/geometry/path.h>
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/path.h>
+#include <librepcb/common/geometry/stroketext.h>
+#include <librepcb/common/uuid.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class StrokeTextGraphicsItem;
@@ -44,88 +46,118 @@ class Project;
 class Board;
 class BI_Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_StrokeText
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_StrokeText class
  */
-class BI_StrokeText final : public BI_Base, public SerializableObject,
-                            public IF_StrokeTextObserver
-{
-        Q_OBJECT
+class BI_StrokeText final : public BI_Base,
+                            public SerializableObject,
+                            public IF_StrokeTextObserver {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BI_StrokeText()                           = delete;
+  BI_StrokeText(const BI_StrokeText& other) = delete;
+  BI_StrokeText(Board& board, const BI_StrokeText& other);
+  BI_StrokeText(Board& board, const SExpression& node);
+  BI_StrokeText(Board& board, const StrokeText& text);
+  ~BI_StrokeText() noexcept;
 
-        // Constructors / Destructor
-        BI_StrokeText() = delete;
-        BI_StrokeText(const BI_StrokeText& other) = delete;
-        BI_StrokeText(Board& board, const BI_StrokeText& other);
-        BI_StrokeText(Board& board, const SExpression& node);
-        BI_StrokeText(Board& board, const StrokeText& text);
-        ~BI_StrokeText() noexcept;
+  // Getters
+  StrokeText&       getText() noexcept { return *mText; }
+  const StrokeText& getText() const noexcept { return *mText; }
+  const Uuid&       getUuid() const
+      noexcept;  // convenience function, e.g. for template usage
+  bool isSelectable() const noexcept override;
 
-        // Getters
-        StrokeText& getText() noexcept {return *mText;}
-        const StrokeText& getText() const noexcept {return *mText;}
-        const Uuid& getUuid() const noexcept; // convenience function, e.g. for template usage
-        bool isSelectable() const noexcept override;
+  // General Methods
+  BI_Footprint* getFootprint() const noexcept { return mFootprint; }
+  void          setFootprint(BI_Footprint* footprint) noexcept;
+  void          updateGraphicsItems() noexcept;
+  void          addToBoard() override;
+  void          removeFromBoard() override;
 
-        // General Methods
-        BI_Footprint* getFootprint() const noexcept {return mFootprint;}
-        void setFootprint(BI_Footprint* footprint) noexcept;
-        void updateGraphicsItems() noexcept;
-        void addToBoard() override;
-        void removeFromBoard() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override {
+    return BI_Base::Type_t::StrokeText;
+  }
+  const Point& getPosition() const noexcept override;
+  bool         getIsMirrored() const noexcept override { return false; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::StrokeText;}
-        const Point& getPosition() const noexcept override;
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Operator Overloadings
+  BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
 
-        // Operator Overloadings
-        BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
+private slots:
+  void boardAttributesChanged();
 
+private:  // Methods
+  void init();
+  void updatePaths() noexcept;
+  void strokeTextLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept override {
+    Q_UNUSED(newLayerName);
+    updateGraphicsItems();
+  }
+  void strokeTextTextChanged(const QString& newText) noexcept override {
+    Q_UNUSED(newText);
+  }
+  void strokeTextPositionChanged(const Point& newPos) noexcept override {
+    Q_UNUSED(newPos);
+    updateGraphicsItems();
+  }
+  void strokeTextRotationChanged(const Angle& newRot) noexcept override {
+    Q_UNUSED(newRot);
+  }
+  void strokeTextHeightChanged(
+      const PositiveLength& newHeight) noexcept override {
+    Q_UNUSED(newHeight);
+  }
+  void strokeTextStrokeWidthChanged(
+      const UnsignedLength& newStrokeWidth) noexcept override {
+    Q_UNUSED(newStrokeWidth);
+  }
+  void strokeTextLetterSpacingChanged(
+      const StrokeTextSpacing& spacing) noexcept override {
+    Q_UNUSED(spacing);
+  }
+  void strokeTextLineSpacingChanged(
+      const StrokeTextSpacing& spacing) noexcept override {
+    Q_UNUSED(spacing);
+  }
+  void strokeTextAlignChanged(const Alignment& newAlign) noexcept override {
+    Q_UNUSED(newAlign);
+  }
+  void strokeTextMirroredChanged(bool mirrored) noexcept override {
+    Q_UNUSED(mirrored);
+  }
+  void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override {
+    Q_UNUSED(newAutoRotate);
+  }
+  void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override {
+    Q_UNUSED(paths);
+  }
 
-    private slots:
-        void boardAttributesChanged();
-
-
-    private: // Methods
-        void init();
-        void updatePaths() noexcept;
-        void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override {Q_UNUSED(newLayerName); updateGraphicsItems();}
-        void strokeTextTextChanged(const QString& newText) noexcept override {Q_UNUSED(newText);}
-        void strokeTextPositionChanged(const Point& newPos) noexcept override {Q_UNUSED(newPos); updateGraphicsItems();}
-        void strokeTextRotationChanged(const Angle& newRot) noexcept override {Q_UNUSED(newRot);}
-        void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept override {Q_UNUSED(newHeight);}
-        void strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept override {Q_UNUSED(newStrokeWidth);}
-        void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept override {Q_UNUSED(spacing);}
-        void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept override {Q_UNUSED(spacing);}
-        void strokeTextAlignChanged(const Alignment& newAlign) noexcept override {Q_UNUSED(newAlign);}
-        void strokeTextMirroredChanged(bool mirrored) noexcept override {Q_UNUSED(mirrored);}
-        void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override {Q_UNUSED(newAutoRotate);}
-        void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override {Q_UNUSED(paths);}
-
-
-    private: // Data
-        BI_Footprint* mFootprint;
-        QScopedPointer<StrokeText> mText;
-        QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
-        QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
+private:  // Data
+  BI_Footprint*                          mFootprint;
+  QScopedPointer<StrokeText>             mText;
+  QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
+  QScopedPointer<LineGraphicsItem>       mAnchorGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_STROKETEXT_H
+#endif  // LIBREPCB_PROJECT_BI_STROKETEXT_H

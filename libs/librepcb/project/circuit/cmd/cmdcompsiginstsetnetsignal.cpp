@@ -17,59 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdcompsiginstsetnetsignal.h"
+
 #include "../componentsignalinstance.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
-                                                       NetSignal* netsignal) noexcept :
-    UndoCommand(tr("Change component signal net")),
-    mComponentSignalInstance(cmpSigInstance), mNetSignal(netsignal),
-    mOldNetSignal(cmpSigInstance.getNetSignal())
-{
+CmdCompSigInstSetNetSignal::CmdCompSigInstSetNetSignal(
+    ComponentSignalInstance& cmpSigInstance, NetSignal* netsignal) noexcept
+  : UndoCommand(tr("Change component signal net")),
+    mComponentSignalInstance(cmpSigInstance),
+    mNetSignal(netsignal),
+    mOldNetSignal(cmpSigInstance.getNetSignal()) {
 }
 
-CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept
-{
+CmdCompSigInstSetNetSignal::~CmdCompSigInstSetNetSignal() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdCompSigInstSetNetSignal::performExecute()
-{
-    performRedo(); // can throw
+bool CmdCompSigInstSetNetSignal::performExecute() {
+  performRedo();  // can throw
 
-    return true; // TODO: determine if the netsignal was really changed
+  return true;  // TODO: determine if the netsignal was really changed
 }
 
-void CmdCompSigInstSetNetSignal::performUndo()
-{
-    mComponentSignalInstance.setNetSignal(mOldNetSignal); // can throw
+void CmdCompSigInstSetNetSignal::performUndo() {
+  mComponentSignalInstance.setNetSignal(mOldNetSignal);  // can throw
 }
 
-void CmdCompSigInstSetNetSignal::performRedo()
-{
-    mComponentSignalInstance.setNetSignal(mNetSignal); // can throw
+void CmdCompSigInstSetNetSignal::performRedo() {
+  mComponentSignalInstance.setNetSignal(mNetSignal);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -17,93 +17,96 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/project/project.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_plane.h>
+#include <librepcb/project/project.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The BoardPlaneFragmentsBuilderTest checks if board plane fragments are correct
+ * @brief The BoardPlaneFragmentsBuilderTest checks if board plane fragments are
+ * correct
  *
- * In the test data directory is a project containing some planes and a file with the
- * expected paths of all plane fragments. This test then re-calculates all plane fragments
- * and compares them with the expected fragments.
+ * In the test data directory is a project containing some planes and a file
+ * with the expected paths of all plane fragments. This test then re-calculates
+ * all plane fragments and compares them with the expected fragments.
  */
-class BoardPlaneFragmentsBuilderTest : public ::testing::Test
-{
-};
+class BoardPlaneFragmentsBuilderTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST(BoardPlaneFragmentsBuilderTest, testFragments)
-{
-    FilePath testDataDir(TEST_DATA_DIR "/unittests/librepcbproject/BoardPlaneFragmentsBuilderTest");
+TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
+  FilePath testDataDir(
+      TEST_DATA_DIR
+      "/unittests/librepcbproject/BoardPlaneFragmentsBuilderTest");
 
-    // open project from test data directory
-    FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");
-    QScopedPointer<Project> project(new Project(projectFp, true, false));
+  // open project from test data directory
+  FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");
+  QScopedPointer<Project> project(new Project(projectFp, true, false));
 
-    // force planes rebuild
-    Board* board = project->getBoards().first();
-    board->rebuildAllPlanes();
+  // force planes rebuild
+  Board* board = project->getBoards().first();
+  board->rebuildAllPlanes();
 
-    // determine actual plane fragments
-    QMap<Uuid, QSet<Path>> actualPlaneFragments;
-    foreach (const BI_Plane* plane, board->getPlanes()) {
-        foreach (const Path& fragment, plane->getFragments()) {
-            actualPlaneFragments[plane->getUuid()].insert(fragment);
-        }
+  // determine actual plane fragments
+  QMap<Uuid, QSet<Path>> actualPlaneFragments;
+  foreach (const BI_Plane* plane, board->getPlanes()) {
+    foreach (const Path& fragment, plane->getFragments()) {
+      actualPlaneFragments[plane->getUuid()].insert(fragment);
     }
+  }
 
-    // write actual plane fragments into file (useful for debugging purposes)
-    SExpression actualSexpr = SExpression::createList("actual");
-    foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
-        SExpression child = SExpression::createList("plane");
-        child.appendChild(uuid);
-        foreach (const Path& fragment, actualPlaneFragments[uuid]) {
-            child.appendChild(fragment.serializeToDomElement("fragment"), true);
-        }
-        actualSexpr.appendChild(child, true);
+  // write actual plane fragments into file (useful for debugging purposes)
+  SExpression actualSexpr = SExpression::createList("actual");
+  foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
+    SExpression child = SExpression::createList("plane");
+    child.appendChild(uuid);
+    foreach (const Path& fragment, actualPlaneFragments[uuid]) {
+      child.appendChild(fragment.serializeToDomElement("fragment"), true);
     }
-    FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actualSexpr.toString(0).toUtf8());
+    actualSexpr.appendChild(child, true);
+  }
+  FileUtils::writeFile(testDataDir.getPathTo("actual.lp"),
+                       actualSexpr.toString(0).toUtf8());
 
-    // load expected plane fragments from file
-    FilePath expectedFp = testDataDir.getPathTo("expected.lp");
-    SExpression expectedSexpr = SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
-    QMap<Uuid, QSet<Path>> expectedPlaneFragments;
-    foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
-        Uuid uuid = child.getValueOfFirstChild<Uuid>();
-        foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
-            expectedPlaneFragments[uuid].insert(Path(fragmentChild));
-        }
+  // load expected plane fragments from file
+  FilePath    expectedFp = testDataDir.getPathTo("expected.lp");
+  SExpression expectedSexpr =
+      SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
+  QMap<Uuid, QSet<Path>> expectedPlaneFragments;
+  foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
+    Uuid uuid = child.getValueOfFirstChild<Uuid>();
+    foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
+      expectedPlaneFragments[uuid].insert(Path(fragmentChild));
     }
+  }
 
-    // compare
-    EXPECT_EQ(expectedPlaneFragments, actualPlaneFragments);
+  // compare
+  EXPECT_EQ(expectedPlaneFragments, actualPlaneFragments);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace project
-} // namespace librepcb
+}  // namespace tests
+}  // namespace project
+}  // namespace librepcb

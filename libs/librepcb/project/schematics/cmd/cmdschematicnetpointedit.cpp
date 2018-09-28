@@ -17,78 +17,77 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetpointedit.h"
+
 #include "../items/si_netpoint.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept :
-    UndoCommand(tr("Edit netpoint")), mNetPoint(point),
-    mOldPos(point.getPosition()), mNewPos(mOldPos)
-{
+CmdSchematicNetPointEdit::CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept
+  : UndoCommand(tr("Edit netpoint")),
+    mNetPoint(point),
+    mOldPos(point.getPosition()),
+    mNewPos(mOldPos) {
 }
 
-CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept
-{
-    if (!wasEverExecuted()) {
-        mNetPoint.setPosition(mOldPos);
-    }
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void CmdSchematicNetPointEdit::setPosition(const Point& pos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPos = pos;
-    if (immediate) mNetPoint.setPosition(mNewPos);
-}
-
-void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPos = mOldPos + deltaPos;
-    if (immediate) mNetPoint.setPosition(mNewPos);
-}
-
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
-
-bool CmdSchematicNetPointEdit::performExecute()
-{
-    performRedo(); // can throw
-
-    return true; // TODO: determine if the netpoint was really modified
-}
-
-void CmdSchematicNetPointEdit::performUndo()
-{
+CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept {
+  if (!wasEverExecuted()) {
     mNetPoint.setPosition(mOldPos);
+  }
 }
 
-void CmdSchematicNetPointEdit::performRedo()
-{
-    mNetPoint.setPosition(mNewPos);
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void CmdSchematicNetPointEdit::setPosition(const Point& pos,
+                                           bool         immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos = pos;
+  if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
-/*****************************************************************************************
+void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos,
+                                                  bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos = mOldPos + deltaPos;
+  if (immediate) mNetPoint.setPosition(mNewPos);
+}
+
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
+
+bool CmdSchematicNetPointEdit::performExecute() {
+  performRedo();  // can throw
+
+  return true;  // TODO: determine if the netpoint was really modified
+}
+
+void CmdSchematicNetPointEdit::performUndo() {
+  mNetPoint.setPosition(mOldPos);
+}
+
+void CmdSchematicNetPointEdit::performRedo() {
+  mNetPoint.setPosition(mNewPos);
+}
+
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

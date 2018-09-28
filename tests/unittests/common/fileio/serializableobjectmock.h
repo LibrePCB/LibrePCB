@@ -20,95 +20,95 @@
 #ifndef SERIALIZABLEOBJECTMOCK_H
 #define SERIALIZABLEOBJECTMOCK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
 #include <gmock/gmock.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class MinimalSerializableObjectMock
- ****************************************************************************************/
+ ******************************************************************************/
 
-class MinimalSerializableObjectMock final : public SerializableObject
-{
-    public:
-        QString mValue;
-        MinimalSerializableObjectMock() = delete;
-        MinimalSerializableObjectMock(const QString& value) :
-            mValue(value) {}
-        MinimalSerializableObjectMock(const SExpression& root) :
-            mValue(root.getValueOfFirstChild<QString>()) {}
-        MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
-        MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) = delete;
-        ~MinimalSerializableObjectMock() {}
+class MinimalSerializableObjectMock final : public SerializableObject {
+public:
+  QString mValue;
+  MinimalSerializableObjectMock() = delete;
+  MinimalSerializableObjectMock(const QString& value) : mValue(value) {}
+  MinimalSerializableObjectMock(const SExpression& root)
+    : mValue(root.getValueOfFirstChild<QString>()) {}
+  MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
+  MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) =
+      delete;
+  ~MinimalSerializableObjectMock() {}
 
-        void serialize(SExpression& root) const override {
-            root.appendChild("value", mValue, true);
-        }
+  void serialize(SExpression& root) const override {
+    root.appendChild("value", mValue, true);
+  }
 
-        bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
-        bool operator!=(const MinimalSerializableObjectMock& rhs) = delete;
-        MinimalSerializableObjectMock& operator=(const MinimalSerializableObjectMock& rhs) = delete;
+  bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
+  bool operator!=(const MinimalSerializableObjectMock& rhs) = delete;
+  MinimalSerializableObjectMock& operator                   =(
+      const MinimalSerializableObjectMock& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SerializableObjectMock
- ****************************************************************************************/
+ ******************************************************************************/
 
-class SerializableObjectMock final : public SerializableObject
-{
-    public:
-        Uuid mUuid;
-        QString mName;
-        SerializableObjectMock() = delete;
-        SerializableObjectMock(const SerializableObjectMock& other) noexcept :
-            mUuid(other.mUuid), mName(other.mName) {}
-        SerializableObjectMock(SerializableObjectMock&& other) noexcept :
-            mUuid(std::move(other.mUuid)), mName(std::move(other.mName)) {}
-        SerializableObjectMock(const Uuid& uuid, const QString& name) :
-            mUuid(uuid), mName(name) {}
-        SerializableObjectMock(const SExpression& root) :
-            mUuid(root.getValueOfFirstChild<Uuid>()),
-            mName(root.getValueByPath<QString>("name")) {}
-        ~SerializableObjectMock() {}
+class SerializableObjectMock final : public SerializableObject {
+public:
+  Uuid    mUuid;
+  QString mName;
+  SerializableObjectMock() = delete;
+  SerializableObjectMock(const SerializableObjectMock& other) noexcept
+    : mUuid(other.mUuid), mName(other.mName) {}
+  SerializableObjectMock(SerializableObjectMock&& other) noexcept
+    : mUuid(std::move(other.mUuid)), mName(std::move(other.mName)) {}
+  SerializableObjectMock(const Uuid& uuid, const QString& name)
+    : mUuid(uuid), mName(name) {}
+  SerializableObjectMock(const SExpression& root)
+    : mUuid(root.getValueOfFirstChild<Uuid>()),
+      mName(root.getValueByPath<QString>("name")) {}
+  ~SerializableObjectMock() {}
 
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const QString& getName() const noexcept {return mName;}
+  const Uuid&    getUuid() const noexcept { return mUuid; }
+  const QString& getName() const noexcept { return mName; }
 
-        void serialize(SExpression& root) const override {
-            root.appendChild(mUuid);
-            root.appendChild("name", mName, true);
-        }
+  void serialize(SExpression& root) const override {
+    root.appendChild(mUuid);
+    root.appendChild("name", mName, true);
+  }
 
-        bool operator==(const SerializableObjectMock& rhs) const noexcept {
-            return (mUuid == rhs.mUuid) && (mName == rhs.mName);
-        }
-        bool operator!=(const SerializableObjectMock& rhs) const noexcept {
-            return (mUuid != rhs.mUuid) || (mName != rhs.mName);
-        }
-        SerializableObjectMock& operator=(const SerializableObjectMock& rhs) noexcept {
-            mUuid = rhs.mUuid;
-            mName = rhs.mName;
-            return *this;
-        }
+  bool operator==(const SerializableObjectMock& rhs) const noexcept {
+    return (mUuid == rhs.mUuid) && (mName == rhs.mName);
+  }
+  bool operator!=(const SerializableObjectMock& rhs) const noexcept {
+    return (mUuid != rhs.mUuid) || (mName != rhs.mName);
+  }
+  SerializableObjectMock& operator=(
+      const SerializableObjectMock& rhs) noexcept {
+    mUuid = rhs.mUuid;
+    mName = rhs.mName;
+    return *this;
+  }
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb
 
-#endif // SERIALIZABLEOBJECTMOCK_H
-
+#endif  // SERIALIZABLEOBJECTMOCK_H

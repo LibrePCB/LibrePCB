@@ -20,69 +20,70 @@
 #ifndef LIBREPCB_LIBRARY_LIBRARYELEMENT_H
 #define LIBREPCB_LIBRARY_LIBRARYELEMENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "librarybaseelement.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryElement
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The LibraryElement class extends the LibraryBaseElement class with some
- *        attributes and methods which are used for all library classes except categories.
+ * @brief The LibraryElement class extends the LibraryBaseElement class with
+ * some attributes and methods which are used for all library classes except
+ * categories.
  */
-class LibraryElement : public LibraryBaseElement
-{
-        Q_OBJECT
+class LibraryElement : public LibraryBaseElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryElement()                            = delete;
+  LibraryElement(const LibraryElement& other) = delete;
+  LibraryElement(const QString& shortElementName,
+                 const QString& longElementName, const Uuid& uuid,
+                 const Version& version, const QString& author,
+                 const ElementName& name_en_US,
+                 const QString&     description_en_US,
+                 const QString&     keywords_en_US);
+  LibraryElement(const FilePath& elementDirectory,
+                 const QString&  shortElementName,
+                 const QString& longElementName, bool readOnly);
+  virtual ~LibraryElement() noexcept;
 
-        // Constructors / Destructor
-        LibraryElement() = delete;
-        LibraryElement(const LibraryElement& other) = delete;
-        LibraryElement(const QString& shortElementName, const QString& longElementName,
-                       const Uuid& uuid, const Version& version, const QString& author,
-                       const ElementName& name_en_US, const QString& description_en_US,
-                       const QString& keywords_en_US);
-        LibraryElement(const FilePath& elementDirectory, const QString& shortElementName,
-                       const QString& longElementName, bool readOnly);
-        virtual ~LibraryElement() noexcept;
+  // Getters: Attributes
+  const QSet<Uuid>& getCategories() const noexcept { return mCategories; }
 
-        // Getters: Attributes
-        const QSet<Uuid>& getCategories() const noexcept {return mCategories;}
+  // Setters: Attributes
+  void setCategories(const QSet<Uuid>& uuids) noexcept { mCategories = uuids; }
 
-        // Setters: Attributes
-        void setCategories(const QSet<Uuid>& uuids) noexcept {mCategories = uuids;}
+  // Operator Overloadings
+  LibraryElement& operator=(const LibraryElement& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryElement& operator=(const LibraryElement& rhs) = delete;
+protected:
+  // Protected Methods
 
+  /// @copydoc librepcb::SerializableObject::serialize()
+  virtual void serialize(SExpression& root) const override;
 
-    protected:
-
-        // Protected Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(SExpression& root) const override;
-
-        // General Library Element Attributes
-        QSet<Uuid> mCategories;
+  // General Library Element Attributes
+  QSet<Uuid> mCategories;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_LIBRARYELEMENT_H
+#endif  // LIBREPCB_LIBRARY_LIBRARYELEMENT_H

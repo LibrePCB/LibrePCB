@@ -20,70 +20,67 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDADD_H
 #define LIBREPCB_PROJECT_CMDBOARDADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Project;
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardAdd class
  */
-class CmdBoardAdd final : public UndoCommand
-{
-    public:
+class CmdBoardAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardAdd(Project& project, const ElementName& name) noexcept;
+  CmdBoardAdd(Project& project, const Board& boardToCopy,
+              const ElementName& name) noexcept;
+  ~CmdBoardAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardAdd(Project& project, const ElementName& name) noexcept;
-        CmdBoardAdd(Project& project, const Board& boardToCopy, const ElementName& name) noexcept;
-        ~CmdBoardAdd() noexcept;
+  // Getters
+  Board* getBoard() const noexcept { return mBoard; }
 
-        // Getters
-        Board* getBoard() const noexcept {return mBoard;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Project& mProject;
-        const Board* mBoardToCopy;
-        ElementName mName;
-        Board* mBoard;
-        int mPageIndex;
+  Project&     mProject;
+  const Board* mBoardToCopy;
+  ElementName  mName;
+  Board*       mBoard;
+  int          mPageIndex;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDADD_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDADD_H

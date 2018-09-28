@@ -17,175 +17,172 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <gtest/gtest.h>
-#include <librepcb/common/network/networkaccessmanager.h>
-#include <librepcb/common/network/filedownload.h>
-#include <librepcb/common/fileio/fileutils.h>
+ ******************************************************************************/
 #include "networkrequestbasesignalreceiver.h"
 
-/*****************************************************************************************
+#include <gtest/gtest.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/network/filedownload.h>
+#include <librepcb/common/network/networkaccessmanager.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data Type
- ****************************************************************************************/
+ ******************************************************************************/
 
 typedef struct {
-    QUrl url;
-    QString destFilename;
-    QString extractDirname;
-    QByteArray sha256;
-    bool success;
+  QUrl       url;
+  QString    destFilename;
+  QString    extractDirname;
+  QByteArray sha256;
+  bool       success;
 } FileDownloadTestData;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData>
-{
-    public:
+class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData> {
+public:
+  static void SetUpTestCase() { sDownloadManager = new NetworkAccessManager(); }
 
-        static void SetUpTestCase() {
-            sDownloadManager = new NetworkAccessManager();
-        }
+  static void TearDownTestCase() { delete sDownloadManager; }
 
-        static void TearDownTestCase() {
-            delete sDownloadManager;
-        }
+  static FilePath getDestination(const FileDownloadTestData& data) {
+    return FilePath::getApplicationTempPath().getPathTo(data.destFilename);
+  }
 
-        static FilePath getDestination(const FileDownloadTestData& data) {
-            return FilePath::getApplicationTempPath().getPathTo(data.destFilename);
-        }
+  static FilePath getExtractToDir(const FileDownloadTestData& data) {
+    if (!data.extractDirname.isEmpty()) {
+      return FilePath::getApplicationTempPath().getPathTo(data.extractDirname);
+    } else {
+      return FilePath();
+    }
+  }
 
-        static FilePath getExtractToDir(const FileDownloadTestData& data) {
-            if (!data.extractDirname.isEmpty()) {
-                return FilePath::getApplicationTempPath().getPathTo(data.extractDirname);
-            } else {
-                return FilePath();
-            }
-        }
-
-    protected:
-
-        NetworkRequestBaseSignalReceiver mSignalReceiver;
-        static NetworkAccessManager* sDownloadManager;
+protected:
+  NetworkRequestBaseSignalReceiver mSignalReceiver;
+  static NetworkAccessManager*     sDownloadManager;
 };
 
 NetworkAccessManager* FileDownloadTest::sDownloadManager = nullptr;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_P(FileDownloadTest, testConstructorAndSettersAndDestructor)
-{
-    const FileDownloadTestData& data = GetParam();
+TEST_P(FileDownloadTest, testConstructorAndSettersAndDestructor) {
+  const FileDownloadTestData& data = GetParam();
 
-    FileDownload dl(data.url, getDestination(data));
-    dl.setExpectedReplyContentSize(100);
-    dl.setExpectedChecksum(QCryptographicHash::Sha1, QByteArray("42"));
-    dl.setZipExtractionDirectory(getExtractToDir(data));
+  FileDownload dl(data.url, getDestination(data));
+  dl.setExpectedReplyContentSize(100);
+  dl.setExpectedChecksum(QCryptographicHash::Sha1, QByteArray("42"));
+  dl.setZipExtractionDirectory(getExtractToDir(data));
 }
 
-TEST_P(FileDownloadTest, testDownload)
-{
-    const FileDownloadTestData& data = GetParam();
+TEST_P(FileDownloadTest, testDownload) {
+  const FileDownloadTestData& data = GetParam();
 
-    // remove target file/directory
-    if (getDestination(data).isExistingFile()) {
-        FileUtils::removeFile(getDestination(data));
-    }
-    if (getExtractToDir(data).isExistingDir()) {
-        FileUtils::removeDirRecursively(getExtractToDir(data));
-    }
+  // remove target file/directory
+  if (getDestination(data).isExistingFile()) {
+    FileUtils::removeFile(getDestination(data));
+  }
+  if (getExtractToDir(data).isExistingDir()) {
+    FileUtils::removeDirRecursively(getExtractToDir(data));
+  }
 
-    // start the file download
-    FileDownload* dl = new FileDownload(data.url, getDestination(data));
-    dl->setZipExtractionDirectory(getExtractToDir(data));
-    dl->setExpectedChecksum(QCryptographicHash::Sha256, data.sha256);
-    QObject::connect(dl, &FileDownload::progressState,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::progressState);
-    QObject::connect(dl, &FileDownload::progressPercent,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::progressPercent);
-    QObject::connect(dl, &FileDownload::progress,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::progress);
-    QObject::connect(dl, &FileDownload::aborted,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::aborted);
-    QObject::connect(dl, &FileDownload::succeeded,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::succeeded);
-    QObject::connect(dl, &FileDownload::errored,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::errored);
-    QObject::connect(dl, &FileDownload::finished,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::finished);
-    QObject::connect(dl, &FileDownload::fileDownloaded,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::fileDownloaded);
-    QObject::connect(dl, &FileDownload::zipFileExtracted,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::zipFileExtracted);
-    QObject::connect(dl, &FileDownload::destroyed,
-            &mSignalReceiver, &NetworkRequestBaseSignalReceiver::destroyed);
-    dl->start();
+  // start the file download
+  FileDownload* dl = new FileDownload(data.url, getDestination(data));
+  dl->setZipExtractionDirectory(getExtractToDir(data));
+  dl->setExpectedChecksum(QCryptographicHash::Sha256, data.sha256);
+  QObject::connect(dl, &FileDownload::progressState, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::progressState);
+  QObject::connect(dl, &FileDownload::progressPercent, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::progressPercent);
+  QObject::connect(dl, &FileDownload::progress, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::progress);
+  QObject::connect(dl, &FileDownload::aborted, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::aborted);
+  QObject::connect(dl, &FileDownload::succeeded, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::succeeded);
+  QObject::connect(dl, &FileDownload::errored, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::errored);
+  QObject::connect(dl, &FileDownload::finished, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::finished);
+  QObject::connect(dl, &FileDownload::fileDownloaded, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::fileDownloaded);
+  QObject::connect(dl, &FileDownload::zipFileExtracted, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::zipFileExtracted);
+  QObject::connect(dl, &FileDownload::destroyed, &mSignalReceiver,
+                   &NetworkRequestBaseSignalReceiver::destroyed);
+  dl->start();
 
-    // wait until download finished (with timeout)
-    qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    auto currentTime = [](){return QDateTime::currentDateTime().toMSecsSinceEpoch();};
-    while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {
-        QThread::msleep(100);
-        qApp->processEvents();
-    }
+  // wait until download finished (with timeout)
+  qint64 start       = QDateTime::currentDateTime().toMSecsSinceEpoch();
+  auto   currentTime = []() {
+    return QDateTime::currentDateTime().toMSecsSinceEpoch();
+  };
+  while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {
+    QThread::msleep(100);
+    qApp->processEvents();
+  }
 
-    // check count and parameters of emited signals
-    EXPECT_TRUE(mSignalReceiver.mDestroyed) << "Download timed out!";
-    EXPECT_GT(mSignalReceiver.mProgressStateCallCount, 0);
-    EXPECT_EQ(mSignalReceiver.mAdvancedProgressCallCount,
-              mSignalReceiver.mSimpleProgressCallCount);
-    EXPECT_EQ(0, mSignalReceiver.mAbortedCallCount);
-    EXPECT_EQ(1, mSignalReceiver.mFinishedCallCount);
-    EXPECT_EQ(0, mSignalReceiver.mDataReceivedCallCount);
-    EXPECT_TRUE(mSignalReceiver.mReceivedData.isNull())
-            << qPrintable(mSignalReceiver.mReceivedData);
-    if (data.success) {
-        EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 1);
-        EXPECT_EQ(1, mSignalReceiver.mSucceededCallCount);
-        EXPECT_EQ(0, mSignalReceiver.mErroredCallCount);
-        EXPECT_EQ(1, mSignalReceiver.mFileDownloadedCallCount);
-        EXPECT_TRUE(mSignalReceiver.mErrorMessage.isNull())
-                << qPrintable(mSignalReceiver.mErrorMessage);
-        EXPECT_TRUE(mSignalReceiver.mFinishedSuccess);
-        EXPECT_EQ(getDestination(data),     mSignalReceiver.mDownloadedToFilePath);
-        EXPECT_EQ(getExtractToDir(data),    mSignalReceiver.mExtractedToFilePath);
-        EXPECT_EQ(data.extractDirname.isNull(), getDestination(data).isExistingFile());
-    } else {
-        EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 0);
-        EXPECT_EQ(0, mSignalReceiver.mSucceededCallCount);
-        EXPECT_EQ(1, mSignalReceiver.mErroredCallCount);
-        EXPECT_EQ(0, mSignalReceiver.mFileDownloadedCallCount);
-        EXPECT_FALSE(mSignalReceiver.mErrorMessage.isEmpty())
-                << qPrintable(mSignalReceiver.mErrorMessage);
-        EXPECT_FALSE(mSignalReceiver.mFinishedSuccess);
-        EXPECT_FALSE(getDestination(data).isExistingFile());
-    }
-    if (data.success && (!data.extractDirname.isNull())) {
-        EXPECT_EQ(1, mSignalReceiver.mZipFileExtractedCallCount);
-        EXPECT_TRUE(getExtractToDir(data).isExistingDir());
-        EXPECT_FALSE(getExtractToDir(data).isEmptyDir());
-    } else {
-        EXPECT_EQ(0, mSignalReceiver.mZipFileExtractedCallCount);
-        EXPECT_FALSE(getExtractToDir(data).isExistingDir());
-    }
+  // check count and parameters of emited signals
+  EXPECT_TRUE(mSignalReceiver.mDestroyed) << "Download timed out!";
+  EXPECT_GT(mSignalReceiver.mProgressStateCallCount, 0);
+  EXPECT_EQ(mSignalReceiver.mAdvancedProgressCallCount,
+            mSignalReceiver.mSimpleProgressCallCount);
+  EXPECT_EQ(0, mSignalReceiver.mAbortedCallCount);
+  EXPECT_EQ(1, mSignalReceiver.mFinishedCallCount);
+  EXPECT_EQ(0, mSignalReceiver.mDataReceivedCallCount);
+  EXPECT_TRUE(mSignalReceiver.mReceivedData.isNull())
+      << qPrintable(mSignalReceiver.mReceivedData);
+  if (data.success) {
+    EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 1);
+    EXPECT_EQ(1, mSignalReceiver.mSucceededCallCount);
+    EXPECT_EQ(0, mSignalReceiver.mErroredCallCount);
+    EXPECT_EQ(1, mSignalReceiver.mFileDownloadedCallCount);
+    EXPECT_TRUE(mSignalReceiver.mErrorMessage.isNull())
+        << qPrintable(mSignalReceiver.mErrorMessage);
+    EXPECT_TRUE(mSignalReceiver.mFinishedSuccess);
+    EXPECT_EQ(getDestination(data), mSignalReceiver.mDownloadedToFilePath);
+    EXPECT_EQ(getExtractToDir(data), mSignalReceiver.mExtractedToFilePath);
+    EXPECT_EQ(data.extractDirname.isNull(),
+              getDestination(data).isExistingFile());
+  } else {
+    EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 0);
+    EXPECT_EQ(0, mSignalReceiver.mSucceededCallCount);
+    EXPECT_EQ(1, mSignalReceiver.mErroredCallCount);
+    EXPECT_EQ(0, mSignalReceiver.mFileDownloadedCallCount);
+    EXPECT_FALSE(mSignalReceiver.mErrorMessage.isEmpty())
+        << qPrintable(mSignalReceiver.mErrorMessage);
+    EXPECT_FALSE(mSignalReceiver.mFinishedSuccess);
+    EXPECT_FALSE(getDestination(data).isExistingFile());
+  }
+  if (data.success && (!data.extractDirname.isNull())) {
+    EXPECT_EQ(1, mSignalReceiver.mZipFileExtractedCallCount);
+    EXPECT_TRUE(getExtractToDir(data).isExistingDir());
+    EXPECT_FALSE(getExtractToDir(data).isEmptyDir());
+  } else {
+    EXPECT_EQ(0, mSignalReceiver.mZipFileExtractedCallCount);
+    EXPECT_FALSE(getExtractToDir(data).isExistingDir());
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data
- ****************************************************************************************/
+ ******************************************************************************/
 
+// clang-format off
 INSTANTIATE_TEST_CASE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
     FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
                           QString("first_pcb_downloaded.zip"),
@@ -208,10 +205,11 @@ INSTANTIATE_TEST_CASE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
                           QByteArray(),
                           false})
 ));
+// clang-format on
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

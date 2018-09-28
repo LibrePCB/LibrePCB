@@ -17,60 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardremove.h"
-#include "../board.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include "../../project.h"
+#include "../board.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardRemove::CmdBoardRemove(Board& board) noexcept :
-    UndoCommand(tr("Remove board")),
-    mProject(board.getProject()), mBoard(board), mIndex(-1)
-{
+CmdBoardRemove::CmdBoardRemove(Board& board) noexcept
+  : UndoCommand(tr("Remove board")),
+    mProject(board.getProject()),
+    mBoard(board),
+    mIndex(-1) {
 }
 
-CmdBoardRemove::~CmdBoardRemove() noexcept
-{
+CmdBoardRemove::~CmdBoardRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardRemove::performExecute()
-{
-    mIndex = mProject.getBoardIndex(mBoard);
+bool CmdBoardRemove::performExecute() {
+  mIndex = mProject.getBoardIndex(mBoard);
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardRemove::performUndo()
-{
-    mProject.addBoard(mBoard, mIndex); // can throw
+void CmdBoardRemove::performUndo() {
+  mProject.addBoard(mBoard, mIndex);  // can throw
 }
 
-void CmdBoardRemove::performRedo()
-{
-    mProject.removeBoard(mBoard); // can throw
+void CmdBoardRemove::performRedo() {
+  mProject.removeBoard(mBoard);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

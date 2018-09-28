@@ -17,62 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboarddesignrulesmodify.h"
+
 #include "../board.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardDesignRulesModify::CmdBoardDesignRulesModify(Board& board, const BoardDesignRules& newRules) noexcept :
-    UndoCommand(tr("Modify board design rules")), mBoard(board),
-    mOldRules(), mNewRules(newRules)
-{
+CmdBoardDesignRulesModify::CmdBoardDesignRulesModify(
+    Board& board, const BoardDesignRules& newRules) noexcept
+  : UndoCommand(tr("Modify board design rules")),
+    mBoard(board),
+    mOldRules(),
+    mNewRules(newRules) {
 }
 
-CmdBoardDesignRulesModify::~CmdBoardDesignRulesModify() noexcept
-{
+CmdBoardDesignRulesModify::~CmdBoardDesignRulesModify() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardDesignRulesModify::performExecute()
-{
-    mOldRules = mBoard.getDesignRules(); // memorize current design rules
+bool CmdBoardDesignRulesModify::performExecute() {
+  mOldRules = mBoard.getDesignRules();  // memorize current design rules
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true; // TODO: determine if the design rules were really modified
+  return true;  // TODO: determine if the design rules were really modified
 }
 
-void CmdBoardDesignRulesModify::performUndo()
-{
-    mBoard.getDesignRules() = mOldRules;
-    emit mBoard.attributesChanged();
+void CmdBoardDesignRulesModify::performUndo() {
+  mBoard.getDesignRules() = mOldRules;
+  emit mBoard.attributesChanged();
 }
 
-void CmdBoardDesignRulesModify::performRedo()
-{
-    mBoard.getDesignRules() = mNewRules;
-    emit mBoard.attributesChanged();
+void CmdBoardDesignRulesModify::performRedo() {
+  mBoard.getDesignRules() = mNewRules;
+  emit mBoard.attributesChanged();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
-
+}  // namespace project
+}  // namespace librepcb

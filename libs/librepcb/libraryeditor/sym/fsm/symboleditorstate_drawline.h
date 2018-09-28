@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWLINE_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWLINE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "symboleditorstate_drawpolygonbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_DrawLine
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_DrawLine class
@@ -44,28 +45,28 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-02-23
  */
-class SymbolEditorState_DrawLine final : public SymbolEditorState_DrawPolygonBase
-{
-        Q_OBJECT
+class SymbolEditorState_DrawLine final
+  : public SymbolEditorState_DrawPolygonBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorState_DrawLine()                                        = delete;
+  SymbolEditorState_DrawLine(const SymbolEditorState_DrawLine& other) = delete;
+  explicit SymbolEditorState_DrawLine(const Context& context) noexcept;
+  ~SymbolEditorState_DrawLine() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_DrawLine() = delete;
-        SymbolEditorState_DrawLine(const SymbolEditorState_DrawLine& other) = delete;
-        explicit SymbolEditorState_DrawLine(const Context& context) noexcept;
-        ~SymbolEditorState_DrawLine() noexcept;
-
-        // Operator Overloadings
-        SymbolEditorState_DrawLine& operator=(const SymbolEditorState_DrawLine& rhs) = delete;
+  // Operator Overloadings
+  SymbolEditorState_DrawLine& operator=(const SymbolEditorState_DrawLine& rhs) =
+      delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWLINE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWLINE_H

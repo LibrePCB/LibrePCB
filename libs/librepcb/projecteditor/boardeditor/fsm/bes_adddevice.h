@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_BES_ADDDEVICE_H
 #define LIBREPCB_PROJECT_BES_ADDDEVICE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -39,54 +40,50 @@ class CmdDeviceInstanceEditAll;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_AddDevice
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_AddDevice class
  */
-class BES_AddDevice final : public BES_Base
-{
-        Q_OBJECT
+class BES_AddDevice final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BES_AddDevice(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  ~BES_AddDevice();
 
-        // Constructors / Destructor
-        BES_AddDevice(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_AddDevice();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+  void       startAddingDevice(ComponentInstance& cmp, const Uuid& dev,
+                               const Uuid& fpt);
+  bool       abortCommand(bool showErrMsgBox) noexcept;
+  void       rotateDevice(const Angle& angle) noexcept;
+  void       mirrorDevice(Qt::Orientation orientation) noexcept;
 
+  // General Attributes
+  bool mIsUndoCmdActive;
 
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        void startAddingDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt);
-        bool abortCommand(bool showErrMsgBox) noexcept;
-        void rotateDevice(const Angle& angle) noexcept;
-        void mirrorDevice(Qt::Orientation orientation) noexcept;
-
-
-        // General Attributes
-        bool mIsUndoCmdActive;
-
-        // information about the current device to place
-        BI_Device* mCurrentDeviceToPlace;
-        QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
+  // information about the current device to place
+  BI_Device*                               mCurrentDeviceToPlace;
+  QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_ADDDEVICE_H
+#endif  // LIBREPCB_PROJECT_BES_ADDDEVICE_H

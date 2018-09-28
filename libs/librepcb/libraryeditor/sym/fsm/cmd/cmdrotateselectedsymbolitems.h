@@ -20,24 +20,26 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+ ******************************************************************************/
 #include "../symboleditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRotateSelectedSymbolItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRotateSelectedSymbolItems class
@@ -45,40 +47,37 @@ namespace editor {
  * @author  ubruhin
  * @date    2016-11-05
  */
-class CmdRotateSelectedSymbolItems final : public UndoCommandGroup
-{
-    public:
+class CmdRotateSelectedSymbolItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRotateSelectedSymbolItems() = delete;
+  CmdRotateSelectedSymbolItems(const CmdRotateSelectedSymbolItems& other) =
+      delete;
+  CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
+                               const Angle& angle) noexcept;
+  ~CmdRotateSelectedSymbolItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRotateSelectedSymbolItems() = delete;
-        CmdRotateSelectedSymbolItems(const CmdRotateSelectedSymbolItems& other) = delete;
-        CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                     const Angle& angle) noexcept;
-        ~CmdRotateSelectedSymbolItems() noexcept;
+  // Operator Overloadings
+  CmdRotateSelectedSymbolItems& operator       =(
+      const CmdRotateSelectedSymbolItems& rhs) = delete;
 
-        // Operator Overloadings
-        CmdRotateSelectedSymbolItems& operator=(const CmdRotateSelectedSymbolItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        const SymbolEditorState::Context& mContext;
-        Angle mAngle;
+  // Private Member Variables
+  const SymbolEditorState::Context& mContext;
+  Angle                             mAngle;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H

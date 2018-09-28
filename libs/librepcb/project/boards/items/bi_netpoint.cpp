@@ -17,185 +17,177 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_netpoint.h"
-#include "bi_netsegment.h"
+
 #include "../../circuit/netsignal.h"
 #include "../../erc/ercmsg.h"
+#include "bi_netsegment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other) :
-    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
-    mPosition(other.mPosition)
-{
-    init();
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other)
+  : BI_Base(segment.getBoard()),
+    mNetSegment(segment),
+    mUuid(Uuid::createRandom()),
+    mPosition(other.mPosition) {
+  init();
 }
 
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node) :
-    BI_Base(segment.getBoard()), mNetSegment(segment),
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node)
+  : BI_Base(segment.getBoard()),
+    mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0)
-{
-    if (node.tryGetChildByPath("position")) {
-        mPosition = Point(node.getChildByPath("position"));
-    } else {
-        // backward compatibility, remove this some time!
-        mPosition = Point(node.getChildByPath("pos"));
-    }
+    mPosition(0, 0) {
+  if (node.tryGetChildByPath("position")) {
+    mPosition = Point(node.getChildByPath("position"));
+  } else {
+    // backward compatibility, remove this some time!
+    mPosition = Point(node.getChildByPath("pos"));
+  }
 
-    init();
+  init();
 }
 
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Point& position) :
-    BI_Base(segment.getBoard()), mNetSegment(segment), mUuid(Uuid::createRandom()),
-    mPosition(position)
-{
-    init();
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Point& position)
+  : BI_Base(segment.getBoard()),
+    mNetSegment(segment),
+    mUuid(Uuid::createRandom()),
+    mPosition(position) {
+  init();
 }
 
-void BI_NetPoint::init()
-{
-    // create the graphics item
-    mGraphicsItem.reset(new BGI_NetPoint(*this));
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
+void BI_NetPoint::init() {
+  // create the graphics item
+  mGraphicsItem.reset(new BGI_NetPoint(*this));
+  mGraphicsItem->setPos(mPosition.toPxQPointF());
 
-    // create ERC messages
-    mErcMsgDeadNetPoint.reset(new ErcMsg(mBoard.getProject(), *this,
-        mUuid.toStr(), "Dead", ErcMsg::ErcMsgType_t::BoardError,
-        QString(tr("Dead net point in board page \"%1\": %2"))
-        .arg(*mBoard.getName()).arg(mUuid.toStr())));
+  // create ERC messages
+  mErcMsgDeadNetPoint.reset(
+      new ErcMsg(mBoard.getProject(), *this, mUuid.toStr(), "Dead",
+                 ErcMsg::ErcMsgType_t::BoardError,
+                 QString(tr("Dead net point in board page \"%1\": %2"))
+                     .arg(*mBoard.getName())
+                     .arg(mUuid.toStr())));
 }
 
-BI_NetPoint::~BI_NetPoint() noexcept
-{
-    mGraphicsItem.reset();
+BI_NetPoint::~BI_NetPoint() noexcept {
+  mGraphicsItem.reset();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept
-{
-    return mNetSegment.getNetSignal();
+NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept {
+  return mNetSegment.getNetSignal();
 }
 
-GraphicsLayer* BI_NetPoint::getLayerOfLines() const noexcept
-{
-    auto it = mRegisteredNetLines.constBegin();
-    return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getLayer()) : nullptr;
+GraphicsLayer* BI_NetPoint::getLayerOfLines() const noexcept {
+  auto it = mRegisteredNetLines.constBegin();
+  return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getLayer())
+                                                : nullptr;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BI_NetPoint::setPosition(const Point& position) noexcept
-{
-    if (position != mPosition) {
-        mPosition = position;
-        mGraphicsItem->setPos(mPosition.toPxQPointF());
-        foreach (BI_NetLine* line, mRegisteredNetLines) {
-            line->updateLine();
-        }
-        mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
-    }
+void BI_NetPoint::setPosition(const Point& position) noexcept {
+  if (position != mPosition) {
+    mPosition = position;
+    mGraphicsItem->setPos(mPosition.toPxQPointF());
+    foreach (BI_NetLine* line, mRegisteredNetLines) { line->updateLine(); }
+    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BI_NetPoint::addToBoard()
-{
-    if (isAddedToBoard() || isUsed()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mHighlightChangedConnection = connect(&getNetSignalOfNetSegment(),
-                                          &NetSignal::highlightedChanged,
-                                          [this](){mGraphicsItem->update();});
-    mErcMsgDeadNetPoint->setVisible(true);
-    BI_Base::addToBoard(mGraphicsItem.data());
-    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+void BI_NetPoint::addToBoard() {
+  if (isAddedToBoard() || isUsed()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mHighlightChangedConnection =
+      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
+              [this]() { mGraphicsItem->update(); });
+  mErcMsgDeadNetPoint->setVisible(true);
+  BI_Base::addToBoard(mGraphicsItem.data());
+  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
-void BI_NetPoint::removeFromBoard()
-{
-    if ((!isAddedToBoard()) || isUsed()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    disconnect(mHighlightChangedConnection);
-    mErcMsgDeadNetPoint->setVisible(false);
-    BI_Base::removeFromBoard(mGraphicsItem.data());
-    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+void BI_NetPoint::removeFromBoard() {
+  if ((!isAddedToBoard()) || isUsed()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  disconnect(mHighlightChangedConnection);
+  mErcMsgDeadNetPoint->setVisible(false);
+  BI_Base::removeFromBoard(mGraphicsItem.data());
+  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
-void BI_NetPoint::registerNetLine(BI_NetLine& netline)
-{
-    if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline))
-        || (&netline.getNetSegment() != &mNetSegment)
-        || ((mRegisteredNetLines.count() > 0) && (&netline.getLayer() != getLayerOfLines())))
-    {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredNetLines.insert(&netline);
-    netline.updateLine();
-    mGraphicsItem->updateCacheAndRepaint();
-    mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
+void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
+  if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline)) ||
+      (&netline.getNetSegment() != &mNetSegment) ||
+      ((mRegisteredNetLines.count() > 0) &&
+       (&netline.getLayer() != getLayerOfLines()))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredNetLines.insert(&netline);
+  netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();
+  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
-void BI_NetPoint::unregisterNetLine(BI_NetLine& netline)
-{
-    if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredNetLines.remove(&netline);
-    netline.updateLine();
-    mGraphicsItem->updateCacheAndRepaint();
-    mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
+void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
+  if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredNetLines.remove(&netline);
+  netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();
+  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
-void BI_NetPoint::serialize(SExpression& root) const
-{
-    root.appendChild(mUuid);
-    root.appendChild(mPosition.serializeToDomElement("position"), false);
+void BI_NetPoint::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild(mPosition.serializeToDomElement("position"), false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from BI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
-QPainterPath BI_NetPoint::getGrabAreaScenePx() const noexcept
-{
-    return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+QPainterPath BI_NetPoint::getGrabAreaScenePx() const noexcept {
+  return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
 }
 
-bool BI_NetPoint::isSelectable() const noexcept
-{
-    return mGraphicsItem->isSelectable();
+bool BI_NetPoint::isSelectable() const noexcept {
+  return mGraphicsItem->isSelectable();
 }
 
-void BI_NetPoint::setSelected(bool selected) noexcept
-{
-    BI_Base::setSelected(selected);
-    mGraphicsItem->update();
+void BI_NetPoint::setSelected(bool selected) noexcept {
+  BI_Base::setSelected(selected);
+  mGraphicsItem->update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,18 +20,20 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWTEXTBASE_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWTEXTBASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/alignment.h>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "symboleditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/alignment.h>
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Text;
@@ -42,9 +44,9 @@ namespace library {
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_DrawTextBase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_DrawTextBase class
@@ -52,68 +54,70 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-01-03
  */
-class SymbolEditorState_DrawTextBase : public SymbolEditorState
-{
-        Q_OBJECT
+class SymbolEditorState_DrawTextBase : public SymbolEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class Mode { NAME, VALUE, TEXT };
 
-        // Types
-        enum class Mode {NAME, VALUE, TEXT};
+  // Constructors / Destructor
+  SymbolEditorState_DrawTextBase() = delete;
+  SymbolEditorState_DrawTextBase(const SymbolEditorState_DrawTextBase& other) =
+      delete;
+  explicit SymbolEditorState_DrawTextBase(const Context& context,
+                                          Mode           mode) noexcept;
+  virtual ~SymbolEditorState_DrawTextBase() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_DrawTextBase() = delete;
-        SymbolEditorState_DrawTextBase(const SymbolEditorState_DrawTextBase& other) = delete;
-        explicit SymbolEditorState_DrawTextBase(const Context& context, Mode mode) noexcept;
-        virtual ~SymbolEditorState_DrawTextBase() noexcept;
+  // General Methods
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
-        // General Methods
-        bool entry() noexcept override;
-        bool exit() noexcept override;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processRotateCw() noexcept override;
+  bool processRotateCcw() noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processRotateCw() noexcept override;
-        bool processRotateCcw() noexcept override;
+  // Operator Overloadings
+  SymbolEditorState_DrawTextBase& operator       =(
+      const SymbolEditorState_DrawTextBase& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolEditorState_DrawTextBase& operator=(const SymbolEditorState_DrawTextBase& rhs) = delete;
+private:  // Methods
+  bool      startAddText(const Point& pos) noexcept;
+  bool      finishAddText(const Point& pos) noexcept;
+  bool      abortAddText() noexcept;
+  void      resetToDefaultParameters() noexcept;
+  Alignment getAlignment() const noexcept;
 
+  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void heightSpinBoxValueChanged(double value) noexcept;
+  void textComboBoxValueChanged(const QString& value) noexcept;
 
-    private: // Methods
-        bool startAddText(const Point& pos) noexcept;
-        bool finishAddText(const Point& pos) noexcept;
-        bool abortAddText() noexcept;
-        void resetToDefaultParameters() noexcept;
-        Alignment getAlignment() const noexcept;
+private:  // Types / Data
+  Mode                        mMode;
+  Point                       mStartPos;
+  QScopedPointer<CmdTextEdit> mEditCmd;
+  Text*                       mCurrentText;
+  TextGraphicsItem*           mCurrentGraphicsItem;
 
-        void layerComboBoxValueChanged(const QString& layerName) noexcept;
-        void heightSpinBoxValueChanged(double value) noexcept;
-        void textComboBoxValueChanged(const QString& value) noexcept;
-
-
-    private: // Types / Data
-        Mode mMode;
-        Point mStartPos;
-        QScopedPointer<CmdTextEdit> mEditCmd;
-        Text* mCurrentText;
-        TextGraphicsItem* mCurrentGraphicsItem;
-
-        // parameter memory
-        GraphicsLayerName mLastLayerName;
-        Angle mLastRotation;
-        PositiveLength mLastHeight;
-        QString mLastText;
+  // parameter memory
+  GraphicsLayerName mLastLayerName;
+  Angle             mLastRotation;
+  PositiveLength    mLastHeight;
+  QString           mLastText;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWTEXTBASE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWTEXTBASE_H

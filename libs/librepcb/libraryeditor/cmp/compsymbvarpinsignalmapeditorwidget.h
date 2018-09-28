@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/library/cmp/componentsignal.h>
+#include <librepcb/library/cmp/componentsymbolvariant.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/library/cmp/componentsymbolvariant.h>
-#include <librepcb/library/cmp/componentsignal.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -44,9 +45,9 @@ class ComponentSymbolVariant;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CompSymbVarPinSignalMapEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CompSymbVarPinSignalMapEditorWidget class
@@ -54,79 +55,77 @@ namespace editor {
  * @author ubruhin
  * @date 2017-03-19
  */
-class CompSymbVarPinSignalMapEditorWidget final : public QWidget
-{
-        Q_OBJECT
+class CompSymbVarPinSignalMapEditorWidget final : public QWidget {
+  Q_OBJECT
 
-    private: // Types
-        enum Column {
-            COLUMN_SYMBOL = 0,
-            COLUMN_PIN,
-            COLUMN_SIGNAL,
-            COLUMN_DISPLAYTYPE,
-            _COLUMN_COUNT
-        };
+private:  // Types
+  enum Column {
+    COLUMN_SYMBOL = 0,
+    COLUMN_PIN,
+    COLUMN_SIGNAL,
+    COLUMN_DISPLAYTYPE,
+    _COLUMN_COUNT
+  };
 
+public:
+  // Constructors / Destructor
+  explicit CompSymbVarPinSignalMapEditorWidget(
+      QWidget* parent = nullptr) noexcept;
+  CompSymbVarPinSignalMapEditorWidget(
+      const CompSymbVarPinSignalMapEditorWidget& other) = delete;
+  ~CompSymbVarPinSignalMapEditorWidget() noexcept;
 
-    public:
-        // Constructors / Destructor
-        explicit CompSymbVarPinSignalMapEditorWidget(QWidget* parent = nullptr) noexcept;
-        CompSymbVarPinSignalMapEditorWidget(const CompSymbVarPinSignalMapEditorWidget& other) = delete;
-        ~CompSymbVarPinSignalMapEditorWidget() noexcept;
+  // General Methods
+  void setVariant(const workspace::Workspace& ws,
+                  const ComponentSignalList&  sigs,
+                  ComponentSymbolVariant&     variant) noexcept;
+  void updateVariant() noexcept { updateTable(mSelectedItem, mSelectedPin); }
 
+  // Operator Overloadings
+  CompSymbVarPinSignalMapEditorWidget& operator       =(
+      const CompSymbVarPinSignalMapEditorWidget& rhs) = delete;
 
-        // General Methods
-        void setVariant(const workspace::Workspace& ws, const ComponentSignalList& sigs,
-                        ComponentSymbolVariant& variant) noexcept;
-        void updateVariant() noexcept {updateTable(mSelectedItem, mSelectedPin);}
+signals:
+  void edited();
 
+private:  // Slots
+  void currentCellChanged(int currentRow, int currentColumn, int previousRow,
+                          int previousColumn) noexcept;
+  void componentSignalChanged(int index) noexcept;
+  void displayTypeChanged(const CmpSigPinDisplayType& dt) noexcept;
+  void btnAutoAssignSignalsClicked() noexcept;
 
-        // Operator Overloadings
-        CompSymbVarPinSignalMapEditorWidget& operator=(const CompSymbVarPinSignalMapEditorWidget& rhs) = delete;
+private:  // Methods
+  void updateTable(tl::optional<Uuid> selItem = tl::nullopt,
+                   tl::optional<Uuid> selPin  = tl::nullopt) noexcept;
+  void setTableRowContent(int row, const ComponentSymbolVariantItem& item,
+                          const ComponentPinSignalMapItem& map, int itemNumber,
+                          const Symbol* symbol) noexcept;
+  void setComponentSignal(const Uuid& item, const Uuid& pin,
+                          const tl::optional<Uuid>& signal) noexcept;
+  void setDisplayType(const Uuid& item, const Uuid& pin,
+                      const CmpSigPinDisplayType& dt) noexcept;
+  int  getRowOfTableCellWidget(QObject* obj) const noexcept;
+  tl::optional<Uuid> getItemUuidOfRow(int row) const noexcept;
+  tl::optional<Uuid> getPinUuidOfRow(int row) const noexcept;
+  int                getTotalPinCount() const noexcept;
+  const QStringList& getLocaleOrder() const noexcept;
 
-
-    signals:
-        void edited();
-
-
-    private: // Slots
-        void currentCellChanged(int currentRow, int currentColumn,
-                                int previousRow, int previousColumn) noexcept;
-        void componentSignalChanged(int index) noexcept;
-        void displayTypeChanged(const CmpSigPinDisplayType& dt) noexcept;
-        void btnAutoAssignSignalsClicked() noexcept;
-
-
-    private: // Methods
-        void updateTable(tl::optional<Uuid> selItem = tl::nullopt,
-                         tl::optional<Uuid> selPin = tl::nullopt) noexcept;
-        void setTableRowContent(int row, const ComponentSymbolVariantItem& item,
-                                const ComponentPinSignalMapItem& map,
-                                int itemNumber, const Symbol* symbol) noexcept;
-        void setComponentSignal(const Uuid& item, const Uuid&pin, const tl::optional<Uuid>& signal) noexcept;
-        void setDisplayType(const Uuid& item, const Uuid& pin, const CmpSigPinDisplayType& dt) noexcept;
-        int getRowOfTableCellWidget(QObject* obj) const noexcept;
-        tl::optional<Uuid> getItemUuidOfRow(int row) const noexcept;
-        tl::optional<Uuid> getPinUuidOfRow(int row) const noexcept;
-        int getTotalPinCount() const noexcept;
-        const QStringList& getLocaleOrder() const noexcept;
-
-
-    private: // Data
-        QTableWidget* mTable;
-        const workspace::Workspace* mWorkspace;
-        const ComponentSignalList* mSignalList;
-        ComponentSymbolVariant* mSymbolVariant;
-        tl::optional<Uuid> mSelectedItem;
-        tl::optional<Uuid> mSelectedPin;
+private:  // Data
+  QTableWidget*               mTable;
+  const workspace::Workspace* mWorkspace;
+  const ComponentSignalList*  mSignalList;
+  ComponentSymbolVariant*     mSymbolVariant;
+  tl::optional<Uuid>          mSelectedItem;
+  tl::optional<Uuid>          mSelectedPin;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H

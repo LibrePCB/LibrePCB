@@ -17,57 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "schematiceditorevent.h"
+
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
+
 #include <librepcb/project/schematics/schematic.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SEE_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
-SEE_Base::SEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
-{
+SEE_Base::SEE_Base(EventType_t type) : mType(type), mAccepted(false) {
 }
 
-SEE_Base::~SEE_Base()
-{
+SEE_Base::~SEE_Base() {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SEE_StartAddComponent
- ****************************************************************************************/
+ ******************************************************************************/
 
-SEE_StartAddComponent::SEE_StartAddComponent() :
-    SEE_Base(EventType_t::StartAddComponent), mComponentUuid(), mSymbVarUuid()
-{
+SEE_StartAddComponent::SEE_StartAddComponent()
+  : SEE_Base(EventType_t::StartAddComponent), mComponentUuid(), mSymbVarUuid() {
 }
 
-SEE_StartAddComponent::SEE_StartAddComponent(const Uuid& cmp, const Uuid& symbVar) :
-    SEE_Base(EventType_t::StartAddComponent), mComponentUuid(cmp), mSymbVarUuid(symbVar)
-{
+SEE_StartAddComponent::SEE_StartAddComponent(const Uuid& cmp,
+                                             const Uuid& symbVar)
+  : SEE_Base(EventType_t::StartAddComponent),
+    mComponentUuid(cmp),
+    mSymbVarUuid(symbVar) {
 }
 
-SEE_StartAddComponent::~SEE_StartAddComponent()
-{
+SEE_StartAddComponent::~SEE_StartAddComponent() {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

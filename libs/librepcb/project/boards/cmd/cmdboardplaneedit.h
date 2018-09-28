@@ -20,95 +20,94 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDPLANEEDIT_H
 #define LIBREPCB_PROJECT_CMDBOARDPLANEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/geometry/path.h>
+ ******************************************************************************/
 #include "../items/bi_plane.h"
 
-/*****************************************************************************************
+#include <librepcb/common/geometry/path.h>
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardPlaneEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardPlaneEdit class
  */
-class CmdBoardPlaneEdit final : public UndoCommand
-{
-    public:
+class CmdBoardPlaneEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardPlaneEdit(BI_Plane& plane, bool rebuildOnChanges) noexcept;
+  ~CmdBoardPlaneEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardPlaneEdit(BI_Plane& plane, bool rebuildOnChanges) noexcept;
-        ~CmdBoardPlaneEdit() noexcept;
+  // Setters
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(const Point& center, Qt::Orientation orientation,
+              bool immediate) noexcept;
+  void setOutline(const Path& outline, bool immediate) noexcept;
+  void setLayerName(const GraphicsLayerName& layerName,
+                    bool                     immediate) noexcept;
+  void setNetSignal(NetSignal& netsignal) noexcept;
+  void setMinWidth(const UnsignedLength& minWidth) noexcept;
+  void setMinClearance(const UnsignedLength& minClearance) noexcept;
+  void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
+  void setPriority(int priority) noexcept;
+  void setKeepOrphans(bool keepOrphans) noexcept;
 
-        // Setters
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept;
-        void setOutline(const Path& outline, bool immediate) noexcept;
-        void setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept;
-        void setNetSignal(NetSignal& netsignal) noexcept;
-        void setMinWidth(const UnsignedLength& minWidth) noexcept;
-        void setMinClearance(const UnsignedLength& minClearance) noexcept;
-        void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
-        void setPriority(int priority) noexcept;
-        void setKeepOrphans(bool keepOrphans) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  BI_Plane& mPlane;
+  bool      mDoRebuildOnChanges;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        BI_Plane& mPlane;
-        bool mDoRebuildOnChanges;
-
-        // General Attributes
-        Path mOldOutline;
-        Path mNewOutline;
-        GraphicsLayerName mOldLayerName;
-        GraphicsLayerName mNewLayerName;
-        NetSignal* mOldNetSignal;
-        NetSignal* mNewNetSignal;
-        UnsignedLength mOldMinWidth;
-        UnsignedLength mNewMinWidth;
-        UnsignedLength mOldMinClearance;
-        UnsignedLength mNewMinClearance;
-        BI_Plane::ConnectStyle mOldConnectStyle;
-        BI_Plane::ConnectStyle mNewConnectStyle;
-        int mOldPriority;
-        int mNewPriority;
-        bool mOldKeepOrphans;
-        bool mNewKeepOrphans;
+  // General Attributes
+  Path                   mOldOutline;
+  Path                   mNewOutline;
+  GraphicsLayerName      mOldLayerName;
+  GraphicsLayerName      mNewLayerName;
+  NetSignal*             mOldNetSignal;
+  NetSignal*             mNewNetSignal;
+  UnsignedLength         mOldMinWidth;
+  UnsignedLength         mNewMinWidth;
+  UnsignedLength         mOldMinClearance;
+  UnsignedLength         mNewMinClearance;
+  BI_Plane::ConnectStyle mOldConnectStyle;
+  BI_Plane::ConnectStyle mNewConnectStyle;
+  int                    mOldPriority;
+  int                    mNewPriority;
+  bool                   mOldKeepOrphans;
+  bool                   mNewKeepOrphans;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDPLANEEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDPLANEEDIT_H

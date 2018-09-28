@@ -20,70 +20,66 @@
 #ifndef LIBREPCB_UNDOSTACKACTIONGROUP_H
 #define LIBREPCB_UNDOSTACKACTIONGROUP_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class UndoStackActionGroup
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The UndoStackActionGroup class groups an undo-QAction and redo-QAction together
- *        and optionally connects them with a librepcb::UndoStack
+ * @brief The UndoStackActionGroup class groups an undo-QAction and redo-QAction
+ * together and optionally connects them with a librepcb::UndoStack
  *
  * @author ubruhin
  * @date 2016-12-04
  */
-class UndoStackActionGroup final : public QObject
-{
-        Q_OBJECT
+class UndoStackActionGroup final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  UndoStackActionGroup()                                  = delete;
+  UndoStackActionGroup(const UndoStackActionGroup& other) = delete;
+  UndoStackActionGroup(QAction& undo, QAction& redo, QAction* save,
+                       UndoStack* stack, QWidget* msgBoxParent) noexcept;
+  ~UndoStackActionGroup() noexcept;
 
-        // Constructors / Destructor
-        UndoStackActionGroup() = delete;
-        UndoStackActionGroup(const UndoStackActionGroup& other) = delete;
-        UndoStackActionGroup(QAction& undo, QAction& redo, QAction* save,
-                             UndoStack* stack, QWidget* msgBoxParent) noexcept;
-        ~UndoStackActionGroup() noexcept;
+  // General Methods
+  void setUndoStack(UndoStack* stack) noexcept;
 
-        // General Methods
-        void setUndoStack(UndoStack* stack) noexcept;
+  // Operator Overloadings
+  UndoStackActionGroup& operator=(const UndoStackActionGroup& rhs) = delete;
 
-        // Operator Overloadings
-        UndoStackActionGroup& operator=(const UndoStackActionGroup& rhs) = delete;
+private:  // Methods
+  void undoTriggered() noexcept;
+  void redoTriggered() noexcept;
+  void unregisterFromStack() noexcept;
+  void registerToStack(UndoStack* stack) noexcept;
 
-
-    private: // Methods
-        void undoTriggered() noexcept;
-        void redoTriggered() noexcept;
-        void unregisterFromStack() noexcept;
-        void registerToStack(UndoStack* stack) noexcept;
-
-
-    private: // Data
-        QAction& mUndo;
-        QAction& mRedo;
-        QAction* mSave;
-        UndoStack* mStack;
-        QWidget* mMsgBoxParent;
-        QList<QMetaObject::Connection> mConnections;
+private:  // Data
+  QAction&                       mUndo;
+  QAction&                       mRedo;
+  QAction*                       mSave;
+  UndoStack*                     mStack;
+  QWidget*                       mMsgBoxParent;
+  QList<QMetaObject::Connection> mConnections;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_UNDOSTACKACTIONGROUP_H
+#endif  // LIBREPCB_UNDOSTACKACTIONGROUP_H

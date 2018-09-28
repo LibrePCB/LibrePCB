@@ -17,75 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardnetlineedit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardNetLineEdit::CmdBoardNetLineEdit(BI_NetLine& netline) noexcept :
-    UndoCommand(tr("Edit trace")), mNetLine(netline),
-    mOldLayer(&netline.getLayer()), mNewLayer(mOldLayer),
-    mOldWidth(netline.getWidth()), mNewWidth(mOldWidth)
-{
+CmdBoardNetLineEdit::CmdBoardNetLineEdit(BI_NetLine& netline) noexcept
+  : UndoCommand(tr("Edit trace")),
+    mNetLine(netline),
+    mOldLayer(&netline.getLayer()),
+    mNewLayer(mOldLayer),
+    mOldWidth(netline.getWidth()),
+    mNewWidth(mOldWidth) {
 }
 
-CmdBoardNetLineEdit::~CmdBoardNetLineEdit() noexcept
-{
+CmdBoardNetLineEdit::~CmdBoardNetLineEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdBoardNetLineEdit::setLayer(GraphicsLayer& layer) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewLayer = &layer;
+void CmdBoardNetLineEdit::setLayer(GraphicsLayer& layer) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLayer = &layer;
 }
 
-void CmdBoardNetLineEdit::setWidth(const PositiveLength& width) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewWidth = width;
+void CmdBoardNetLineEdit::setWidth(const PositiveLength& width) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewWidth = width;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardNetLineEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardNetLineEdit::performExecute() {
+  performRedo();  // can throw
 
-    return true; // TODO: determine if the via was really modified
+  return true;  // TODO: determine if the via was really modified
 }
 
-void CmdBoardNetLineEdit::performUndo()
-{
-    mNetLine.setLayer(*mOldLayer);
-    mNetLine.setWidth(mOldWidth);
+void CmdBoardNetLineEdit::performUndo() {
+  mNetLine.setLayer(*mOldLayer);
+  mNetLine.setWidth(mOldWidth);
 }
 
-void CmdBoardNetLineEdit::performRedo()
-{
-    mNetLine.setLayer(*mNewLayer);
-    mNetLine.setWidth(mNewWidth);
+void CmdBoardNetLineEdit::performRedo() {
+  mNetLine.setLayer(*mNewLayer);
+  mNetLine.setWidth(mNewWidth);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

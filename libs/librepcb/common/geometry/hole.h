@@ -20,24 +20,25 @@
 #ifndef LIBREPCB_HOLE_H
 #define LIBREPCB_HOLE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../fileio/serializableobjectlist.h"
+ ******************************************************************************/
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Interface IF_HoleObserver
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The IF_HoleObserver class
@@ -45,85 +46,86 @@ namespace librepcb {
  * @author ubruhin
  * @date 2017-05-20
  */
-class IF_HoleObserver
-{
-    public:
-        virtual void holePositionChanged(const Point& newPos) noexcept = 0;
-        virtual void holeDiameterChanged(const PositiveLength& newDiameter) noexcept = 0;
+class IF_HoleObserver {
+public:
+  virtual void holePositionChanged(const Point& newPos) noexcept = 0;
+  virtual void holeDiameterChanged(
+      const PositiveLength& newDiameter) noexcept = 0;
 
-    protected:
-        IF_HoleObserver() noexcept {}
-        explicit IF_HoleObserver(const IF_HoleObserver& other) = delete;
-        virtual ~IF_HoleObserver() noexcept {}
-        IF_HoleObserver& operator=(const IF_HoleObserver& rhs) = delete;
+protected:
+  IF_HoleObserver() noexcept {}
+  explicit IF_HoleObserver(const IF_HoleObserver& other) = delete;
+  virtual ~IF_HoleObserver() noexcept {}
+  IF_HoleObserver& operator=(const IF_HoleObserver& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Hole
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Hole class
  */
-class Hole final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(Hole)
+class Hole final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(Hole)
 
-    public:
+public:
+  // Constructors / Destructor
+  Hole() = delete;
+  Hole(const Hole& other) noexcept;
+  Hole(const Uuid& uuid, const Hole& other) noexcept;
+  Hole(const Uuid& uuid, const Point& position,
+       const PositiveLength& diameter) noexcept;
+  explicit Hole(const SExpression& node);
+  ~Hole() noexcept;
 
-        // Constructors / Destructor
-        Hole() = delete;
-        Hole(const Hole& other) noexcept;
-        Hole(const Uuid& uuid, const Hole& other) noexcept;
-        Hole(const Uuid& uuid, const Point& position, const PositiveLength& diameter) noexcept;
-        explicit Hole(const SExpression& node);
-        ~Hole() noexcept;
+  // Getters
+  const Uuid&           getUuid() const noexcept { return mUuid; }
+  const Point&          getPosition() const noexcept { return mPosition; }
+  const PositiveLength& getDiameter() const noexcept { return mDiameter; }
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const Point& getPosition() const noexcept {return mPosition;}
-        const PositiveLength& getDiameter() const noexcept {return mDiameter;}
+  // Setters
+  void setPosition(const Point& position) noexcept;
+  void setDiameter(const PositiveLength& diameter) noexcept;
 
-        // Setters
-        void setPosition(const Point& position) noexcept;
-        void setDiameter(const PositiveLength& diameter) noexcept;
+  // General Methods
+  void registerObserver(IF_HoleObserver& object) const noexcept;
+  void unregisterObserver(IF_HoleObserver& object) const noexcept;
 
-        // General Methods
-        void registerObserver(IF_HoleObserver& object) const noexcept;
-        void unregisterObserver(IF_HoleObserver& object) const noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool  operator==(const Hole& rhs) const noexcept;
+  bool  operator!=(const Hole& rhs) const noexcept { return !(*this == rhs); }
+  Hole& operator=(const Hole& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const Hole& rhs) const noexcept;
-        bool operator!=(const Hole& rhs) const noexcept {return !(*this == rhs);}
-        Hole& operator=(const Hole& rhs) noexcept;
+private:  // Data
+  Uuid           mUuid;
+  Point          mPosition;
+  PositiveLength mDiameter;
 
-
-    private: // Data
-        Uuid mUuid;
-        Point mPosition;
-        PositiveLength mDiameter;
-
-        // Misc
-        mutable QSet<IF_HoleObserver*> mObservers; ///< A list of all observer objects
+  // Misc
+  mutable QSet<IF_HoleObserver*>
+      mObservers;  ///< A list of all observer objects
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class HoleList
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct HoleListNameProvider {static constexpr const char* tagname = "hole";};
-using HoleList = SerializableObjectList<Hole, HoleListNameProvider>;
+struct HoleListNameProvider {
+  static constexpr const char* tagname = "hole";
+};
+using HoleList      = SerializableObjectList<Hole, HoleListNameProvider>;
 using CmdHoleInsert = CmdListElementInsert<Hole, HoleListNameProvider>;
 using CmdHoleRemove = CmdListElementRemove<Hole, HoleListNameProvider>;
-using CmdHolesSwap = CmdListElementsSwap<Hole, HoleListNameProvider>;
+using CmdHolesSwap  = CmdListElementsSwap<Hole, HoleListNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_HOLE_H
+#endif  // LIBREPCB_HOLE_H

@@ -17,124 +17,125 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
+ ******************************************************************************/
 #include "bgi_netline.h"
-#include "../items/bi_netline.h"
-#include "../items/bi_netpoint.h"
+
+#include "../../circuit/netsignal.h"
+#include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-#include "../../project.h"
-#include "../../circuit/netsignal.h"
+#include "../items/bi_netline.h"
+#include "../items/bi_netpoint.h"
 
-/*****************************************************************************************
+#include <QPrinter>
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BGI_NetLine::BGI_NetLine(BI_NetLine& netline) noexcept :
-    BGI_Base(), mNetLine(netline), mLayer(nullptr)
-{
-    updateCacheAndRepaint();
+BGI_NetLine::BGI_NetLine(BI_NetLine& netline) noexcept
+  : BGI_Base(), mNetLine(netline), mLayer(nullptr) {
+  updateCacheAndRepaint();
 }
 
-BGI_NetLine::~BGI_NetLine() noexcept
-{
+BGI_NetLine::~BGI_NetLine() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool BGI_NetLine::isSelectable() const noexcept
-{
-    return mLayer && mLayer->isVisible();
+bool BGI_NetLine::isSelectable() const noexcept {
+  return mLayer && mLayer->isVisible();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_NetLine::updateCacheAndRepaint() noexcept
-{
-    setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
+void BGI_NetLine::updateCacheAndRepaint() noexcept {
+  setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
 
-    prepareGeometryChange();
+  prepareGeometryChange();
 
-    // set Z value
-    setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
+  // set Z value
+  setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
 
-    mLayer = &mNetLine.getLayer();
-    Q_ASSERT(mLayer);
+  mLayer = &mNetLine.getLayer();
+  Q_ASSERT(mLayer);
 
-    mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
-    mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
-    mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
-    mBoundingRect.adjust(-mNetLine.getWidth()->toPx()/2, -mNetLine.getWidth()->toPx()/2,
-                         mNetLine.getWidth()->toPx()/2, mNetLine.getWidth()->toPx()/2);
-    mShape = QPainterPath();
-    mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
-    mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
-    QPainterPathStroker ps;
-    ps.setCapStyle(Qt::RoundCap);
-    PositiveLength width = qMax(mNetLine.getWidth(), PositiveLength(100000));
-    ps.setWidth(width->toPx());
-    mShape = ps.createStroke(mShape);
-    update();
+  mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
+  mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
+  mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
+  mBoundingRect.adjust(
+      -mNetLine.getWidth()->toPx() / 2, -mNetLine.getWidth()->toPx() / 2,
+      mNetLine.getWidth()->toPx() / 2, mNetLine.getWidth()->toPx() / 2);
+  mShape = QPainterPath();
+  mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
+  mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
+  QPainterPathStroker ps;
+  ps.setCapStyle(Qt::RoundCap);
+  PositiveLength width = qMax(mNetLine.getWidth(), PositiveLength(100000));
+  ps.setWidth(width->toPx());
+  mShape = ps.createStroke(mShape);
+  update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_NetLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+void BGI_NetLine::paint(QPainter*                       painter,
+                        const QStyleOptionGraphicsItem* option,
+                        QWidget*                        widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
 
-    bool highlight = mNetLine.isSelected() || mNetLine.getNetSignalOfNetSegment().isHighlighted();
+  bool highlight = mNetLine.isSelected() ||
+                   mNetLine.getNetSignalOfNetSegment().isHighlighted();
 
-    // draw line
-    if (mLayer->isVisible())
-    {
-        QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(), Qt::SolidLine, Qt::RoundCap);
-        painter->setPen(pen);
-        painter->drawLine(mLineF);
-    }
+  // draw line
+  if (mLayer->isVisible()) {
+    QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
+             Qt::SolidLine, Qt::RoundCap);
+    painter->setPen(pen);
+    painter->drawLine(mLineF);
+  }
 
 #ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mBoundingRect);
-    }
+  GraphicsLayer* layer =
+      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+  Q_ASSERT(layer);
+  if (layer->isVisible()) {
+    // draw bounding rect
+    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(mBoundingRect);
+  }
 #endif
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayer* BGI_NetLine::getLayer(const QString& name) const noexcept
-{
-    return mNetLine.getBoard().getLayerStack().getLayer(name);
+GraphicsLayer* BGI_NetLine::getLayer(const QString& name) const noexcept {
+  return mNetLine.getBoard().getLayerStack().getLayer(name);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -17,89 +17,90 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdcomponentinstanceedit.h"
+
 #include "../circuit.h"
 #include "../componentinstance.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdComponentInstanceEdit::CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept :
-    UndoCommand(tr("Edit Component")), mCircuit(circuit), mComponentInstance(cmp),
-    mOldName(cmp.getName()), mNewName(mOldName),
-    mOldValue(cmp.getValue()), mNewValue(mOldValue),
-    mOldAttributes(cmp.getAttributes()), mNewAttributes(mOldAttributes)
-{
+CmdComponentInstanceEdit::CmdComponentInstanceEdit(
+    Circuit& circuit, ComponentInstance& cmp) noexcept
+  : UndoCommand(tr("Edit Component")),
+    mCircuit(circuit),
+    mComponentInstance(cmp),
+    mOldName(cmp.getName()),
+    mNewName(mOldName),
+    mOldValue(cmp.getValue()),
+    mNewValue(mOldValue),
+    mOldAttributes(cmp.getAttributes()),
+    mNewAttributes(mOldAttributes) {
 }
 
-CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept
-{
+CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdComponentInstanceEdit::setName(const CircuitIdentifier& name) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = name;
+void CmdComponentInstanceEdit::setName(const CircuitIdentifier& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
 }
 
-void CmdComponentInstanceEdit::setValue(const QString& value) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewValue = value;
+void CmdComponentInstanceEdit::setValue(const QString& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewValue = value;
 }
 
-void CmdComponentInstanceEdit::setAttributes(const AttributeList& attributes) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewAttributes = attributes;
+void CmdComponentInstanceEdit::setAttributes(
+    const AttributeList& attributes) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAttributes = attributes;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdComponentInstanceEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdComponentInstanceEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewName != mOldName)               return true;
-    if (mNewValue != mOldValue)             return true;
-    if (mNewAttributes != mOldAttributes)   return true;
-    return false;
+  if (mNewName != mOldName) return true;
+  if (mNewValue != mOldValue) return true;
+  if (mNewAttributes != mOldAttributes) return true;
+  return false;
 }
 
-void CmdComponentInstanceEdit::performUndo()
-{
-    mCircuit.setComponentInstanceName(mComponentInstance, mOldName); // can throw
-    mComponentInstance.setValue(mOldValue);
-    mComponentInstance.setAttributes(mOldAttributes);
+void CmdComponentInstanceEdit::performUndo() {
+  mCircuit.setComponentInstanceName(mComponentInstance, mOldName);  // can throw
+  mComponentInstance.setValue(mOldValue);
+  mComponentInstance.setAttributes(mOldAttributes);
 }
 
-void CmdComponentInstanceEdit::performRedo()
-{
-    mCircuit.setComponentInstanceName(mComponentInstance, mNewName); // can throw
-    mComponentInstance.setValue(mNewValue);
-    mComponentInstance.setAttributes(mNewAttributes);
+void CmdComponentInstanceEdit::performRedo() {
+  mCircuit.setComponentInstanceName(mComponentInstance, mNewName);  // can throw
+  mComponentInstance.setValue(mNewValue);
+  mComponentInstance.setAttributes(mNewAttributes);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

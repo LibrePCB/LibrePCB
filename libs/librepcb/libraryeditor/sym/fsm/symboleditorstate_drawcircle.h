@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "symboleditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Circle;
@@ -40,9 +42,9 @@ class CmdCircleEdit;
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_DrawCircle
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_DrawCircle class
@@ -50,61 +52,61 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-01-02
  */
-class SymbolEditorState_DrawCircle final : public SymbolEditorState
-{
-        Q_OBJECT
+class SymbolEditorState_DrawCircle final : public SymbolEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorState_DrawCircle() = delete;
+  SymbolEditorState_DrawCircle(const SymbolEditorState_DrawCircle& other) =
+      delete;
+  explicit SymbolEditorState_DrawCircle(const Context& context) noexcept;
+  ~SymbolEditorState_DrawCircle() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_DrawCircle() = delete;
-        SymbolEditorState_DrawCircle(const SymbolEditorState_DrawCircle& other) = delete;
-        explicit SymbolEditorState_DrawCircle(const Context& context) noexcept;
-        ~SymbolEditorState_DrawCircle() noexcept;
+  // General Methods
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
-        // General Methods
-        bool entry() noexcept override;
-        bool exit() noexcept override;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processAbortCommand() noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processAbortCommand() noexcept override;
+  // Operator Overloadings
+  SymbolEditorState_DrawCircle& operator       =(
+      const SymbolEditorState_DrawCircle& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolEditorState_DrawCircle& operator=(const SymbolEditorState_DrawCircle& rhs) = delete;
+private:  // Methods
+  bool startAddCircle(const Point& pos) noexcept;
+  bool updateCircleDiameter(const Point& pos) noexcept;
+  bool finishAddCircle(const Point& pos) noexcept;
+  bool abortAddCircle() noexcept;
 
+  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void lineWidthSpinBoxValueChanged(double value) noexcept;
+  void fillCheckBoxCheckedChanged(bool checked) noexcept;
+  void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
 
-    private: // Methods
-        bool startAddCircle(const Point& pos) noexcept;
-        bool updateCircleDiameter(const Point& pos) noexcept;
-        bool finishAddCircle(const Point& pos) noexcept;
-        bool abortAddCircle() noexcept;
+private:  // Types / Data
+  QScopedPointer<CmdCircleEdit> mEditCmd;
+  Circle*                       mCurrentCircle;
+  CircleGraphicsItem*           mCurrentGraphicsItem;
 
-        void layerComboBoxValueChanged(const QString& layerName) noexcept;
-        void lineWidthSpinBoxValueChanged(double value) noexcept;
-        void fillCheckBoxCheckedChanged(bool checked) noexcept;
-        void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
-
-
-    private: // Types / Data
-        QScopedPointer<CmdCircleEdit> mEditCmd;
-        Circle* mCurrentCircle;
-        CircleGraphicsItem* mCurrentGraphicsItem;
-
-        // parameter memory
-        GraphicsLayerName mLastLayerName;
-        UnsignedLength mLastLineWidth;
-        bool mLastFill;
-        bool mLastGrabArea;
+  // parameter memory
+  GraphicsLayerName mLastLayerName;
+  UnsignedLength    mLastLineWidth;
+  bool              mLastFill;
+  bool              mLastGrabArea;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H

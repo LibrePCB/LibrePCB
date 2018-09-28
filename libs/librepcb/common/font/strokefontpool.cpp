@@ -17,58 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "strokefontpool.h"
+
 #include "../fileio/fileutils.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-StrokeFontPool::StrokeFontPool(const FilePath& directory) noexcept
-{
-    try {
-        foreach (const FilePath& fp, FileUtils::getFilesInDirectory(directory, {"*.bene"})) {
-            try {
-                qDebug() << "Load stroke font:" << fp.getFilename();
-                mFonts.insert(fp.getFilename(), std::make_shared<StrokeFont>(fp)); // can throw
-            } catch (const Exception& e) {
-                qCritical() << "Failed to load stroke font" << fp.toNative() << ":" << e.getMsg();
-            }
-        }
-    } catch (const Exception& e) {
-        qCritical() << "Failed to load stroke font pool:" << e.getMsg();
+StrokeFontPool::StrokeFontPool(const FilePath& directory) noexcept {
+  try {
+    foreach (const FilePath& fp,
+             FileUtils::getFilesInDirectory(directory, {"*.bene"})) {
+      try {
+        qDebug() << "Load stroke font:" << fp.getFilename();
+        mFonts.insert(fp.getFilename(),
+                      std::make_shared<StrokeFont>(fp));  // can throw
+      } catch (const Exception& e) {
+        qCritical() << "Failed to load stroke font" << fp.toNative() << ":"
+                    << e.getMsg();
+      }
     }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to load stroke font pool:" << e.getMsg();
+  }
 }
 
-StrokeFontPool::~StrokeFontPool() noexcept
-{
+StrokeFontPool::~StrokeFontPool() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-const StrokeFont& StrokeFontPool::getFont(const QString& filename) const
-{
-    if (mFonts.contains(filename)) {
-        return *mFonts[filename];
-    } else {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The font \"%1\" does not exist in the font pool.")).arg(filename));
-    }
+const StrokeFont& StrokeFontPool::getFont(const QString& filename) const {
+  if (mFonts.contains(filename)) {
+    return *mFonts[filename];
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("The font \"%1\" does not exist in the font pool."))
+            .arg(filename));
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

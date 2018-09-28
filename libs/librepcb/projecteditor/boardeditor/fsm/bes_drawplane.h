@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BES_DRAWPLANE_H
 #define LIBREPCB_PROJECT_EDITOR_BES_DRAWPLANE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "bes_base.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayerComboBox;
@@ -43,79 +45,73 @@ class CmdBoardPlaneEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_DrawPlane
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_DrawPlane class
  */
-class BES_DrawPlane final : public BES_Base
-{
-        Q_OBJECT
+class BES_DrawPlane final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_DrawPlane(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                         GraphicsView& editorGraphicsView,
+                         UndoStack&    undoStack);
+  ~BES_DrawPlane();
 
-        // Constructors / Destructor
-        explicit BES_DrawPlane(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                               GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_DrawPlane();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:  // Methods
+  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
+  ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
+  ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
+  bool       start(Board& board, const Point& pos) noexcept;
+  bool       addSegment(Board& board, const Point& pos) noexcept;
+  bool       abort(bool showErrMsgBox) noexcept;
+  void       updateVertexPosition(const Point& cursorPos) noexcept;
+  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
+  // void widthComboBoxTextChanged(const QString& width) noexcept;
+  // void filledCheckBoxCheckedChanged(bool checked) noexcept;
+  void makeSelectedLayerVisible() noexcept;
+  void setNetSignal(NetSignal* netsignal) noexcept;
 
+private:  // Types
+  /// Internal FSM States (substates)
+  enum class SubState {
+    Idle,
+    Positioning,
+  };
 
-    private: // Methods
-        ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-        ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
-        ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
-        bool start(Board& board, const Point& pos) noexcept;
-        bool addSegment(Board& board, const Point& pos) noexcept;
-        bool abort(bool showErrMsgBox) noexcept;
-        void updateVertexPosition(const Point& cursorPos) noexcept;
-        void layerComboBoxLayerChanged(const QString& layerName) noexcept;
-        //void widthComboBoxTextChanged(const QString& width) noexcept;
-        //void filledCheckBoxCheckedChanged(bool checked) noexcept;
-        void makeSelectedLayerVisible() noexcept;
-        void setNetSignal(NetSignal* netsignal) noexcept;
+private:  // Data
+  // State
+  SubState           mSubState;
+  NetSignal*         mCurrentNetSignal;
+  GraphicsLayerName  mCurrentLayerName;
+  BI_Plane*          mCurrentPlane;
+  CmdBoardPlaneEdit* mCmdEditCurrentPlane;
+  Point              mLastVertexPos;
 
-
-    private: // Types
-
-        /// Internal FSM States (substates)
-        enum class SubState {
-            Idle,
-            Positioning,
-        };
-
-
-    private: // Data
-
-        // State
-        SubState mSubState;
-        NetSignal* mCurrentNetSignal;
-        GraphicsLayerName mCurrentLayerName;
-        BI_Plane* mCurrentPlane;
-        CmdBoardPlaneEdit* mCmdEditCurrentPlane;
-        Point mLastVertexPos;
-
-        // Widgets for the command toolbar
-        QList<QAction*> mActionSeparators;
-        QLabel* mNetSignalLabel;
-        QComboBox* mNetSignalComboBox;
-        QLabel* mLayerLabel;
-        GraphicsLayerComboBox* mLayerComboBox;
+  // Widgets for the command toolbar
+  QList<QAction*>        mActionSeparators;
+  QLabel*                mNetSignalLabel;
+  QComboBox*             mNetSignalComboBox;
+  QLabel*                mLayerLabel;
+  GraphicsLayerComboBox* mLayerComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BES_DRAWPLANE_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BES_DRAWPLANE_H

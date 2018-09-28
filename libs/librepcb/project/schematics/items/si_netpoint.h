@@ -20,25 +20,27 @@
 #ifndef LIBREPCB_PROJECT_SI_NETPOINT_H
 #define LIBREPCB_PROJECT_SI_NETPOINT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "si_base.h"
-#include "./si_netline.h"
-#include <librepcb/common/fileio/serializableobject.h>
+ ******************************************************************************/
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
+#include "./si_netline.h"
+#include "si_base.h"
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/serializableobject.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SI_NetPoint
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SI_NetPoint class
@@ -46,83 +48,80 @@ namespace project {
 class SI_NetPoint final : public SI_Base,
                           public SI_NetLineAnchor,
                           public SerializableObject,
-                          public IF_ErcMsgProvider
-{
-        Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(SI_NetPoint)
+                          public IF_ErcMsgProvider {
+  Q_OBJECT
+  DECLARE_ERC_MSG_CLASS_NAME(SI_NetPoint)
 
-    public:
+public:
+  // Constructors / Destructor
+  SI_NetPoint()                         = delete;
+  SI_NetPoint(const SI_NetPoint& other) = delete;
+  SI_NetPoint(SI_NetSegment& segment, const SExpression& node);
+  SI_NetPoint(SI_NetSegment& segment, const Point& position);
+  SI_NetPoint(SI_NetSegment& segment, SI_SymbolPin& pin);
+  ~SI_NetPoint() noexcept;
 
-        // Constructors / Destructor
-        SI_NetPoint() = delete;
-        SI_NetPoint(const SI_NetPoint& other) = delete;
-        SI_NetPoint(SI_NetSegment& segment, const SExpression& node);
-        SI_NetPoint(SI_NetSegment& segment, const Point& position);
-        SI_NetPoint(SI_NetSegment& segment, SI_SymbolPin& pin);
-        ~SI_NetPoint() noexcept;
+  // Getters
+  const Uuid&    getUuid() const noexcept { return mUuid; }
+  bool           isVisibleJunction() const noexcept;
+  bool           isOpenLineEnd() const noexcept;
+  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal&     getNetSignalOfNetSegment() const noexcept;
+  bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        bool isVisibleJunction() const noexcept;
-        bool isOpenLineEnd() const noexcept;
-        SI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
-        NetSignal& getNetSignalOfNetSegment() const noexcept;
-        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
+  // Setters
+  void setPosition(const Point& position) noexcept;
 
-        // Setters
-        void setPosition(const Point& position) noexcept;
+  // General Methods
+  void addToSchematic() override;
+  void removeFromSchematic() override;
 
-        // General Methods
-        void addToSchematic() override;
-        void removeFromSchematic() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from SI_Base
+  Type_t getType() const noexcept override { return SI_Base::Type_t::NetPoint; }
+  const Point& getPosition() const noexcept override { return mPosition; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from SI_Base
-        Type_t getType() const noexcept override {return SI_Base::Type_t::NetPoint;}
-        const Point& getPosition() const noexcept override {return mPosition;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Inherited from SI_NetLineAnchor
+  void                     registerNetLine(SI_NetLine& netline) override;
+  void                     unregisterNetLine(SI_NetLine& netline) override;
+  const QSet<SI_NetLine*>& getNetLines() const noexcept override {
+    return mRegisteredNetLines;
+  }
 
-        // Inherited from SI_NetLineAnchor
-        void registerNetLine(SI_NetLine& netline) override;
-        void unregisterNetLine(SI_NetLine& netline) override;
-        const QSet<SI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
+  // Operator Overloadings
+  SI_NetPoint& operator=(const SI_NetPoint& rhs) = delete;
+  bool operator==(const SI_NetPoint& rhs) noexcept { return (this == &rhs); }
+  bool operator!=(const SI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
-        // Operator Overloadings
-        SI_NetPoint& operator=(const SI_NetPoint& rhs) = delete;
-        bool operator==(const SI_NetPoint& rhs) noexcept {return (this == &rhs);}
-        bool operator!=(const SI_NetPoint& rhs) noexcept {return (this != &rhs);}
+private:
+  void init();
 
+  // General
+  QScopedPointer<SGI_NetPoint> mGraphicsItem;
+  QMetaObject::Connection      mHighlightChangedConnection;
 
-    private:
+  // Attributes
+  SI_NetSegment& mNetSegment;
+  Uuid           mUuid;
+  Point          mPosition;
 
-        void init();
+  // Registered Elements
+  QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
 
-
-        // General
-        QScopedPointer<SGI_NetPoint> mGraphicsItem;
-        QMetaObject::Connection mHighlightChangedConnection;
-
-        // Attributes
-        SI_NetSegment& mNetSegment;
-        Uuid mUuid;
-        Point mPosition;
-
-        // Registered Elements
-        QSet<SI_NetLine*> mRegisteredNetLines;    ///< all registered netlines
-
-        // ERC Messages
-        /// @brief The ERC message for dead netpoints
-        QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
+  // ERC Messages
+  /// @brief The ERC message for dead netpoints
+  QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SI_NETPOINT_H
+#endif  // LIBREPCB_PROJECT_SI_NETPOINT_H

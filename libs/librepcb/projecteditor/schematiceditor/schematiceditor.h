@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATICEDITOR_H
 #define LIBREPCB_PROJECT_SCHEMATICEDITOR_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsView;
@@ -53,98 +54,95 @@ namespace Ui {
 class SchematicEditor;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicEditor
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SchematicEditor class
  */
-class SchematicEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
-{
-        Q_OBJECT
+class SchematicEditor final : public QMainWindow,
+                              public IF_GraphicsViewEventHandler {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
+  ~SchematicEditor();
 
-        // Constructors / Destructor
-        explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
-        ~SchematicEditor();
+  // Getters
+  ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
+  Project&       getProject() const noexcept { return mProject; }
+  int getActiveSchematicIndex() const noexcept { return mActiveSchematicIndex; }
+  Schematic*            getActiveSchematic() const noexcept;
+  const GridProperties& getGridProperties() const noexcept {
+    return *mGridProperties;
+  }
 
-        // Getters
-        ProjectEditor& getProjectEditor() const noexcept {return mProjectEditor;}
-        Project& getProject() const noexcept {return mProject;}
-        int getActiveSchematicIndex() const noexcept {return mActiveSchematicIndex;}
-        Schematic* getActiveSchematic() const noexcept;
-        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+  // Setters
+  bool setActiveSchematicIndex(int index) noexcept;
 
-        // Setters
-        bool setActiveSchematicIndex(int index) noexcept;
+  // General Methods
+  void abortAllCommands() noexcept;
 
-        // General Methods
-        void abortAllCommands() noexcept;
+protected:
+  void closeEvent(QCloseEvent* event);
 
-    protected:
+private slots:
 
-        void closeEvent(QCloseEvent* event);
+  // Actions
+  void on_actionClose_Project_triggered();
+  void on_actionNew_Schematic_Page_triggered();
+  void on_actionGrid_triggered();
+  void on_actionPDF_Export_triggered();
+  void on_actionAddComp_Resistor_triggered();
+  void on_actionAddComp_BipolarCapacitor_triggered();
+  void on_actionAddComp_UnipolarCapacitor_triggered();
+  void on_actionAddComp_Inductor_triggered();
+  void on_actionAddComp_gnd_triggered();
+  void on_actionAddComp_vcc_triggered();
+  void on_actionProjectProperties_triggered();
+  void on_actionUpdateLibrary_triggered();
 
-    private slots:
+signals:
 
-        // Actions
-        void on_actionClose_Project_triggered();
-        void on_actionNew_Schematic_Page_triggered();
-        void on_actionGrid_triggered();
-        void on_actionPDF_Export_triggered();
-        void on_actionAddComp_Resistor_triggered();
-        void on_actionAddComp_BipolarCapacitor_triggered();
-        void on_actionAddComp_UnipolarCapacitor_triggered();
-        void on_actionAddComp_Inductor_triggered();
-        void on_actionAddComp_gnd_triggered();
-        void on_actionAddComp_vcc_triggered();
-        void on_actionProjectProperties_triggered();
-        void on_actionUpdateLibrary_triggered();
+  void activeSchematicChanged(int oldIndex, int newIndex);
 
+private:
+  // make some methods inaccessible...
+  SchematicEditor();
+  SchematicEditor(const SchematicEditor& other);
+  SchematicEditor& operator=(const SchematicEditor& rhs);
 
-    signals:
+  // Private Methods
+  bool graphicsViewEventHandler(QEvent* event);
+  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
 
-        void activeSchematicChanged(int oldIndex, int newIndex);
+  // General Attributes
+  ProjectEditor&                       mProjectEditor;
+  Project&                             mProject;
+  Ui::SchematicEditor*                 mUi;
+  GraphicsView*                        mGraphicsView;
+  GridProperties*                      mGridProperties;
+  QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
+  QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
+  int mActiveSchematicIndex;
 
-    private:
+  // Docks
+  SchematicPagesDock* mPagesDock;
+  ErcMsgDock*         mErcMsgDock;
 
-        // make some methods inaccessible...
-        SchematicEditor();
-        SchematicEditor(const SchematicEditor& other);
-        SchematicEditor& operator=(const SchematicEditor& rhs);
-
-        // Private Methods
-        bool graphicsViewEventHandler(QEvent* event);
-        void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
-
-        // General Attributes
-        ProjectEditor& mProjectEditor;
-        Project& mProject;
-        Ui::SchematicEditor* mUi;
-        GraphicsView* mGraphicsView;
-        GridProperties* mGridProperties;
-        QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
-        QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
-
-        int mActiveSchematicIndex;
-
-        // Docks
-        SchematicPagesDock* mPagesDock;
-        ErcMsgDock* mErcMsgDock;
-
-        // Finite State Machine
-        SES_FSM* mFsm;
+  // Finite State Machine
+  SES_FSM* mFsm;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATICEDITOR_H
+#endif  // LIBREPCB_PROJECT_SCHEMATICEDITOR_H

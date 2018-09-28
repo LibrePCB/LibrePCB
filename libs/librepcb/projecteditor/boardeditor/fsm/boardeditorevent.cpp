@@ -17,53 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "boardeditorevent.h"
+
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BEE_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
-BEE_Base::BEE_Base(EventType_t type) :
-    mType(type), mAccepted(false)
-{
+BEE_Base::BEE_Base(EventType_t type) : mType(type), mAccepted(false) {
 }
 
-BEE_Base::~BEE_Base()
-{
+BEE_Base::~BEE_Base() {
 }
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BEE_StartAddDevice
- ****************************************************************************************/
+ ******************************************************************************/
 
-BEE_StartAddDevice::BEE_StartAddDevice(ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) :
-    BEE_Base(EventType_t::StartAddDevice), mComponentInstance(cmp), mDeviceUuid(dev),
-    mFootprintUuid(fpt)
-{
+BEE_StartAddDevice::BEE_StartAddDevice(ComponentInstance& cmp, const Uuid& dev,
+                                       const Uuid& fpt)
+  : BEE_Base(EventType_t::StartAddDevice),
+    mComponentInstance(cmp),
+    mDeviceUuid(dev),
+    mFootprintUuid(fpt) {
 }
 
-BEE_StartAddDevice::~BEE_StartAddDevice()
-{
+BEE_StartAddDevice::~BEE_StartAddDevice() {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

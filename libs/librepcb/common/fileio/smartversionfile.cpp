@@ -17,73 +17,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "smartversionfile.h"
+
 #include "fileutils.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly) :
-    SmartFile(filepath, restore, readOnly, false),
-    mVersion(readVersionFromFile(mOpenedFilePath))
-{
+SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore,
+                                   bool readOnly)
+  : SmartFile(filepath, restore, readOnly, false),
+    mVersion(readVersionFromFile(mOpenedFilePath)) {
 }
 
-SmartVersionFile::SmartVersionFile(const FilePath& filepath, const Version& newVersion) :
-    SmartFile(filepath, false, false, true), mVersion(newVersion)
-{
+SmartVersionFile::SmartVersionFile(const FilePath& filepath,
+                                   const Version&  newVersion)
+  : SmartFile(filepath, false, false, true), mVersion(newVersion) {
 }
 
-SmartVersionFile::~SmartVersionFile() noexcept
-{
+SmartVersionFile::~SmartVersionFile() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SmartVersionFile::save(bool toOriginal)
-{
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, QString("%1\n").arg(mVersion.toStr()).toUtf8());
-    updateMembersAfterSaving(toOriginal);
+void SmartVersionFile::save(bool toOriginal) {
+  const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
+  FileUtils::writeFile(filepath,
+                       QString("%1\n").arg(mVersion.toStr()).toUtf8());
+  updateMembersAfterSaving(toOriginal);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartVersionFile* SmartVersionFile::create(const FilePath& filepath, const Version& version)
-{
-    return new SmartVersionFile(filepath, version);
+SmartVersionFile* SmartVersionFile::create(const FilePath& filepath,
+                                           const Version&  version) {
+  return new SmartVersionFile(filepath, version);
 }
 
-Version SmartVersionFile::readVersionFromFile(const FilePath& filepath)
-{
-    try {
-        QString content = QString(FileUtils::readFile(filepath)); // can throw
-        QStringList lines = content.split("\n", QString::KeepEmptyParts);
-        Q_ASSERT(lines.count() >= 1);
-        return Version::fromString(lines.first()); // can throw
-    } catch (const Exception& e) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Could not read version number from \"%1\": %2"))
+Version SmartVersionFile::readVersionFromFile(const FilePath& filepath) {
+  try {
+    QString     content = QString(FileUtils::readFile(filepath));  // can throw
+    QStringList lines   = content.split("\n", QString::KeepEmptyParts);
+    Q_ASSERT(lines.count() >= 1);
+    return Version::fromString(lines.first());  // can throw
+  } catch (const Exception& e) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Could not read version number from \"%1\": %2"))
             .arg(filepath.toNative(), e.getMsg()));
-    }
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

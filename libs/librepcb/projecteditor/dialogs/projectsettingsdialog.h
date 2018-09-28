@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
 #define LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -45,65 +46,61 @@ namespace Ui {
 class ProjectSettingsDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectSettingsDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectSettingsDialog class
  */
-class ProjectSettingsDialog final : public QDialog
-{
-        Q_OBJECT
+class ProjectSettingsDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit ProjectSettingsDialog(ProjectSettings& settings,
+                                 UndoStack&       undoStack,
+                                 QWidget*         parent = 0) noexcept;
+  ~ProjectSettingsDialog() noexcept;
 
-        // Constructors / Destructor
-        explicit ProjectSettingsDialog(ProjectSettings& settings, UndoStack& undoStack,
-                                       QWidget* parent = 0) noexcept;
-        ~ProjectSettingsDialog() noexcept;
+private slots:
 
-    private slots:
+  // GUI Events
+  void on_buttonBox_clicked(QAbstractButton* button);
+  void on_btnLocaleAdd_clicked();
+  void on_btnLocaleRemove_clicked();
+  void on_btnLocaleUp_clicked();
+  void on_btnLocaleDown_clicked();
+  void on_btnNormAdd_clicked();
+  void on_btnNormRemove_clicked();
+  void on_btnNormUp_clicked();
+  void on_btnNormDown_clicked();
 
-        // GUI Events
-        void on_buttonBox_clicked(QAbstractButton *button);
-        void on_btnLocaleAdd_clicked();
-        void on_btnLocaleRemove_clicked();
-        void on_btnLocaleUp_clicked();
-        void on_btnLocaleDown_clicked();
-        void on_btnNormAdd_clicked();
-        void on_btnNormRemove_clicked();
-        void on_btnNormUp_clicked();
-        void on_btnNormDown_clicked();
+private:
+  // make some methods inaccessible...
+  ProjectSettingsDialog();
+  ProjectSettingsDialog(const ProjectSettingsDialog& other);
+  ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs);
 
-    private:
+  // Private Methods
+  void accept();
+  void reject();
+  bool applySettings() noexcept;
+  bool restoreDefaultSettings() noexcept;
+  void updateGuiFromSettings() noexcept;
 
-        // make some methods inaccessible...
-        ProjectSettingsDialog();
-        ProjectSettingsDialog(const ProjectSettingsDialog& other);
-        ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs);
-
-
-        // Private Methods
-        void accept();
-        void reject();
-        bool applySettings() noexcept;
-        bool restoreDefaultSettings() noexcept;
-        void updateGuiFromSettings() noexcept;
-
-
-        // General
-        ProjectSettings& mSettings;
-        Ui::ProjectSettingsDialog* mUi;
-        UndoStack& mUndoStack;
+  // General
+  ProjectSettings&           mSettings;
+  Ui::ProjectSettingsDialog* mUi;
+  UndoStack&                 mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
+#endif  // LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H

@@ -17,68 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdnetclassedit.h"
-#include "../netclass.h"
-#include "../circuit.h"
 
-/*****************************************************************************************
+#include "../circuit.h"
+#include "../netclass.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdNetClassEdit::CmdNetClassEdit(Circuit& circuit, NetClass& netclass) noexcept :
-    UndoCommand(tr("Edit netclass")), mCircuit(circuit), mNetClass(netclass),
-    mOldName(netclass.getName()), mNewName(mOldName)
-{
+CmdNetClassEdit::CmdNetClassEdit(Circuit& circuit, NetClass& netclass) noexcept
+  : UndoCommand(tr("Edit netclass")),
+    mCircuit(circuit),
+    mNetClass(netclass),
+    mOldName(netclass.getName()),
+    mNewName(mOldName) {
 }
 
-CmdNetClassEdit::~CmdNetClassEdit() noexcept
-{
+CmdNetClassEdit::~CmdNetClassEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdNetClassEdit::setName(const ElementName& name) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = name;
+void CmdNetClassEdit::setName(const ElementName& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdNetClassEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdNetClassEdit::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdNetClassEdit::performUndo()
-{
-    mCircuit.setNetClassName(mNetClass, mOldName); // can throw
+void CmdNetClassEdit::performUndo() {
+  mCircuit.setNetClassName(mNetClass, mOldName);  // can throw
 }
 
-void CmdNetClassEdit::performRedo()
-{
-    mCircuit.setNetClassName(mNetClass, mNewName); // can throw
+void CmdNetClassEdit::performRedo() {
+  mCircuit.setNetClassName(mNetClass, mNewName);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

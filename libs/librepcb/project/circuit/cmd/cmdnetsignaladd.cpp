@@ -17,66 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdnetsignaladd.h"
-#include "../netsignal.h"
-#include "../circuit.h"
 
-/*****************************************************************************************
+#include "../circuit.h"
+#include "../netsignal.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdNetSignalAdd::CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
-                                 const tl::optional<CircuitIdentifier>& name) noexcept :
-    UndoCommand(tr("Add netsignal")),
-    mCircuit(circuit), mNetClass(netclass), mName(name), mNetSignal(nullptr)
-{
+CmdNetSignalAdd::CmdNetSignalAdd(
+    Circuit& circuit, NetClass& netclass,
+    const tl::optional<CircuitIdentifier>& name) noexcept
+  : UndoCommand(tr("Add netsignal")),
+    mCircuit(circuit),
+    mNetClass(netclass),
+    mName(name),
+    mNetSignal(nullptr) {
 }
 
-CmdNetSignalAdd::~CmdNetSignalAdd() noexcept
-{
+CmdNetSignalAdd::~CmdNetSignalAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdNetSignalAdd::performExecute()
-{
-    bool autoName = !mName.has_value();
-    if (!mName) {
-        mName = CircuitIdentifier(mCircuit.generateAutoNetSignalName()); // can throw
-    }
-    Q_ASSERT(mName.has_value());
-    mNetSignal = new NetSignal(mCircuit, mNetClass, *mName, autoName); // can throw
+bool CmdNetSignalAdd::performExecute() {
+  bool autoName = !mName.has_value();
+  if (!mName) {
+    mName =
+        CircuitIdentifier(mCircuit.generateAutoNetSignalName());  // can throw
+  }
+  Q_ASSERT(mName.has_value());
+  mNetSignal =
+      new NetSignal(mCircuit, mNetClass, *mName, autoName);  // can throw
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdNetSignalAdd::performUndo()
-{
-    mCircuit.removeNetSignal(*mNetSignal); // can throw
+void CmdNetSignalAdd::performUndo() {
+  mCircuit.removeNetSignal(*mNetSignal);  // can throw
 }
 
-void CmdNetSignalAdd::performRedo()
-{
-    mCircuit.addNetSignal(*mNetSignal); // can throw
+void CmdNetSignalAdd::performRedo() {
+  mCircuit.addNetSignal(*mNetSignal);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

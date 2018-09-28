@@ -17,73 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "categorychooserdialog.h"
+
+#include "ui_categorychooserdialog.h"
+
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include "categorychooserdialog.h"
-#include "ui_categorychooserdialog.h"
-#include <librepcb/workspace/workspace.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-CategoryChooserDialog<ElementType>::CategoryChooserDialog(const workspace::Workspace& ws,
-                                                          QWidget* parent) noexcept :
-    QDialog(parent), mUi(new Ui::CategoryChooserDialog)
-{
-    mUi->setupUi(this);
-    connect(mUi->treeView, &QTreeView::doubleClicked,
-            this, &CategoryChooserDialog<ElementType>::accept);
+CategoryChooserDialog<ElementType>::CategoryChooserDialog(
+    const workspace::Workspace& ws, QWidget* parent) noexcept
+  : QDialog(parent), mUi(new Ui::CategoryChooserDialog) {
+  mUi->setupUi(this);
+  connect(mUi->treeView, &QTreeView::doubleClicked, this,
+          &CategoryChooserDialog<ElementType>::accept);
 
-    mModel.reset(new workspace::CategoryTreeModel<ElementType>(ws.getLibraryDb(),
-                 ws.getSettings().getLibLocaleOrder().getLocaleOrder()));
-    mUi->treeView->setModel(mModel.data());
-    mUi->treeView->setRootIndex(QModelIndex());
+  mModel.reset(new workspace::CategoryTreeModel<ElementType>(
+      ws.getLibraryDb(),
+      ws.getSettings().getLibLocaleOrder().getLocaleOrder()));
+  mUi->treeView->setModel(mModel.data());
+  mUi->treeView->setRootIndex(QModelIndex());
 }
 
 template <typename ElementType>
-CategoryChooserDialog<ElementType>::~CategoryChooserDialog() noexcept
-{
+CategoryChooserDialog<ElementType>::~CategoryChooserDialog() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid() const noexcept
-{
-    QModelIndex index = mUi->treeView->currentIndex();
-    if (index.isValid() && index.internalPointer()) {
-        workspace::CategoryTreeItem<ElementType>* item = mModel->getItem(index);
-        return item ? item->getUuid() : tl::nullopt;
-    } else {
-        return tl::nullopt;
-    }
+tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid()
+    const noexcept {
+  QModelIndex index = mUi->treeView->currentIndex();
+  if (index.isValid() && index.internalPointer()) {
+    workspace::CategoryTreeItem<ElementType>* item = mModel->getItem(index);
+    return item ? item->getUuid() : tl::nullopt;
+  } else {
+    return tl::nullopt;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Explicit template instantiations
- ****************************************************************************************/
+ ******************************************************************************/
 template class CategoryChooserDialog<library::ComponentCategory>;
 template class CategoryChooserDialog<library::PackageCategory>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPESTRING_H
 #define LIBREPCB_ATTRTYPESTRING_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeString
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeString class
  */
-class AttrTypeString final : public AttributeType
-{
+class AttrTypeString final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeString& instance() noexcept {
+    static AttrTypeString x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeString(const AttrTypeString& other) = delete;
+  AttrTypeString& operator=(const AttrTypeString& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeString& instance() noexcept {static AttrTypeString x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeString(const AttrTypeString& other) = delete;
-        AttrTypeString& operator=(const AttrTypeString& rhs) = delete;
-
-
-        // Constructors / Destructor
-        AttrTypeString() noexcept;
-        ~AttrTypeString() noexcept;
+  // Constructors / Destructor
+  AttrTypeString() noexcept;
+  ~AttrTypeString() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPESTRING_H
+#endif  // LIBREPCB_ATTRTYPESTRING_H

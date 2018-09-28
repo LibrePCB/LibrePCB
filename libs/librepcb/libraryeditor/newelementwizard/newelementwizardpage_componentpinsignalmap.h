@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPINSIGNALMAP_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPINSIGNALMAP_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_ComponentPinSignalMap;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ComponentPinSignalMap
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_ComponentPinSignalMap class
@@ -48,47 +49,43 @@ class NewElementWizardPage_ComponentPinSignalMap;
  * @author ubruhin
  * @date 2017-03-26
  */
-class NewElementWizardPage_ComponentPinSignalMap final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_ComponentPinSignalMap final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_ComponentPinSignalMap() = delete;
+  NewElementWizardPage_ComponentPinSignalMap(
+      const NewElementWizardPage_ComponentPinSignalMap& other) = delete;
+  explicit NewElementWizardPage_ComponentPinSignalMap(
+      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_ComponentPinSignalMap() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_ComponentPinSignalMap() = delete;
-        NewElementWizardPage_ComponentPinSignalMap(const NewElementWizardPage_ComponentPinSignalMap& other) = delete;
-        explicit NewElementWizardPage_ComponentPinSignalMap(NewElementWizardContext& context,
-                                                            QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_ComponentPinSignalMap() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_ComponentPinSignalMap& operator       =(
+      const NewElementWizardPage_ComponentPinSignalMap& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_ComponentPinSignalMap& operator=(const NewElementWizardPage_ComponentPinSignalMap& rhs) = delete;
-
-
-    private: // Methods
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_ComponentPinSignalMap> mUi;
-        ComponentSymbolVariantList mSymbolVariantList;
+private:  // Data
+  NewElementWizardContext&                                       mContext;
+  QScopedPointer<Ui::NewElementWizardPage_ComponentPinSignalMap> mUi;
+  ComponentSymbolVariantList mSymbolVariantList;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPINSIGNALMAP_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPINSIGNALMAP_H

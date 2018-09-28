@@ -20,107 +20,106 @@
 #ifndef LIBREPCB_CMDSTROKETEXTEDIT_H
 #define LIBREPCB_CMDSTROKETEXTEDIT_H
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../../undocommand.h"
 #include "../stroketext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class StrokeText;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdStrokeTextEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdStrokeTextEdit class
  */
-class CmdStrokeTextEdit final : public UndoCommand
-{
-    public:
+class CmdStrokeTextEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdStrokeTextEdit()                               = delete;
+  CmdStrokeTextEdit(const CmdStrokeTextEdit& other) = delete;
+  explicit CmdStrokeTextEdit(StrokeText& text) noexcept;
+  ~CmdStrokeTextEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdStrokeTextEdit() = delete;
-        CmdStrokeTextEdit(const CmdStrokeTextEdit& other) = delete;
-        explicit CmdStrokeTextEdit(StrokeText& text) noexcept;
-        ~CmdStrokeTextEdit() noexcept;
+  // Setters
+  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setText(const QString& text, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setStrokeWidth(const UnsignedLength& strokeWidth,
+                      bool                  immediate) noexcept;
+  void setLetterSpacing(const StrokeTextSpacing& spacing,
+                        bool                     immediate) noexcept;
+  void setLineSpacing(const StrokeTextSpacing& spacing,
+                      bool                     immediate) noexcept;
+  void setAlignment(const Alignment& align, bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& delta, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void setMirrored(bool mirrored, bool immediate) noexcept;
+  void mirror(const Point& center, Qt::Orientation orientation,
+              bool immediate) noexcept;
+  void setAutoRotate(bool autoRotate, bool immediate) noexcept;
 
-        // Setters
-        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
-        void setText(const QString& text, bool immediate) noexcept;
-        void setHeight(const PositiveLength& height, bool immediate) noexcept;
-        void setStrokeWidth(const UnsignedLength& strokeWidth, bool immediate) noexcept;
-        void setLetterSpacing(const StrokeTextSpacing& spacing, bool immediate) noexcept;
-        void setLineSpacing(const StrokeTextSpacing& spacing, bool immediate) noexcept;
-        void setAlignment(const Alignment& align, bool immediate) noexcept;
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void translate(const Point& delta, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate) noexcept;
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept;
-        void setAutoRotate(bool autoRotate, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdStrokeTextEdit& operator=(const CmdStrokeTextEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdStrokeTextEdit& operator=(const CmdStrokeTextEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  StrokeText& mText;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        StrokeText& mText;
-
-        // General Attributes
-        GraphicsLayerName mOldLayerName;
-        GraphicsLayerName mNewLayerName;
-        QString mOldText;
-        QString mNewText;
-        Point mOldPosition;
-        Point mNewPosition;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        PositiveLength mOldHeight;
-        PositiveLength mNewHeight;
-        UnsignedLength mOldStrokeWidth;
-        UnsignedLength mNewStrokeWidth;
-        StrokeTextSpacing mOldLetterSpacing;
-        StrokeTextSpacing mNewLetterSpacing;
-        StrokeTextSpacing mOldLineSpacing;
-        StrokeTextSpacing mNewLineSpacing;
-        Alignment mOldAlign;
-        Alignment mNewAlign;
-        bool mOldMirrored;
-        bool mNewMirrored;
-        bool mOldAutoRotate;
-        bool mNewAutoRotate;
+  // General Attributes
+  GraphicsLayerName mOldLayerName;
+  GraphicsLayerName mNewLayerName;
+  QString           mOldText;
+  QString           mNewText;
+  Point             mOldPosition;
+  Point             mNewPosition;
+  Angle             mOldRotation;
+  Angle             mNewRotation;
+  PositiveLength    mOldHeight;
+  PositiveLength    mNewHeight;
+  UnsignedLength    mOldStrokeWidth;
+  UnsignedLength    mNewStrokeWidth;
+  StrokeTextSpacing mOldLetterSpacing;
+  StrokeTextSpacing mNewLetterSpacing;
+  StrokeTextSpacing mOldLineSpacing;
+  StrokeTextSpacing mNewLineSpacing;
+  Alignment         mOldAlign;
+  Alignment         mNewAlign;
+  bool              mOldMirrored;
+  bool              mNewMirrored;
+  bool              mOldAutoRotate;
+  bool              mNewAutoRotate;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDSTROKETEXTEDIT_H
+#endif  // LIBREPCB_CMDSTROKETEXTEDIT_H

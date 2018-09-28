@@ -17,112 +17,111 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "footprintpadshapeselectorwidget.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FootprintPadShapeSelectorWidget::FootprintPadShapeSelectorWidget(QWidget* parent) noexcept :
-    QWidget(parent), mBtnRound(new QToolButton(this)), mBtnRect(new QToolButton(this)),
-    mBtnOctagon(new QToolButton(this))
-{
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(mBtnRound);
-    layout->addWidget(mBtnRect);
-    layout->addWidget(mBtnOctagon);
+FootprintPadShapeSelectorWidget::FootprintPadShapeSelectorWidget(
+    QWidget* parent) noexcept
+  : QWidget(parent),
+    mBtnRound(new QToolButton(this)),
+    mBtnRect(new QToolButton(this)),
+    mBtnOctagon(new QToolButton(this)) {
+  QHBoxLayout* layout = new QHBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(mBtnRound);
+  layout->addWidget(mBtnRect);
+  layout->addWidget(mBtnOctagon);
 
-    mBtnRound->setIcon(QIcon(":/img/command_toolbars/shape_round.png"));
-    mBtnRect->setIcon(QIcon(":/img/command_toolbars/shape_rect.png"));
-    mBtnOctagon->setIcon(QIcon(":/img/command_toolbars/shape_octagon.png"));
-    mBtnRound->setToolTip(tr("Round"));
-    mBtnRect->setToolTip(tr("Rectangular"));
-    mBtnOctagon->setToolTip(tr("Octagon"));
-    mBtnRound->setCheckable(true);
-    mBtnRect->setCheckable(true);
-    mBtnOctagon->setCheckable(true);
-    mBtnRound->setFixedWidth(32);
-    mBtnRect->setFixedWidth(32);
-    mBtnOctagon->setFixedWidth(32);
+  mBtnRound->setIcon(QIcon(":/img/command_toolbars/shape_round.png"));
+  mBtnRect->setIcon(QIcon(":/img/command_toolbars/shape_rect.png"));
+  mBtnOctagon->setIcon(QIcon(":/img/command_toolbars/shape_octagon.png"));
+  mBtnRound->setToolTip(tr("Round"));
+  mBtnRect->setToolTip(tr("Rectangular"));
+  mBtnOctagon->setToolTip(tr("Octagon"));
+  mBtnRound->setCheckable(true);
+  mBtnRect->setCheckable(true);
+  mBtnOctagon->setCheckable(true);
+  mBtnRound->setFixedWidth(32);
+  mBtnRect->setFixedWidth(32);
+  mBtnOctagon->setFixedWidth(32);
 
-    connect(mBtnRound, &QToolButton::clicked,
-            this, &FootprintPadShapeSelectorWidget::btnRoundToggled);
-    connect(mBtnRect, &QToolButton::clicked,
-            this, &FootprintPadShapeSelectorWidget::btnRectToggled);
-    connect(mBtnOctagon, &QToolButton::clicked,
-            this, &FootprintPadShapeSelectorWidget::btnOctagonToggled);
+  connect(mBtnRound, &QToolButton::clicked, this,
+          &FootprintPadShapeSelectorWidget::btnRoundToggled);
+  connect(mBtnRect, &QToolButton::clicked, this,
+          &FootprintPadShapeSelectorWidget::btnRectToggled);
+  connect(mBtnOctagon, &QToolButton::clicked, this,
+          &FootprintPadShapeSelectorWidget::btnOctagonToggled);
 }
 
-FootprintPadShapeSelectorWidget::~FootprintPadShapeSelectorWidget() noexcept
-{
+FootprintPadShapeSelectorWidget::~FootprintPadShapeSelectorWidget() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-FootprintPad::Shape FootprintPadShapeSelectorWidget::getCurrentShape() const noexcept
-{
-    if (mBtnRound->isChecked())     return FootprintPad::Shape::ROUND;
-    if (mBtnRect->isChecked())      return FootprintPad::Shape::RECT;
-    if (mBtnOctagon->isChecked())   return FootprintPad::Shape::OCTAGON;
-    return FootprintPad::Shape::ROUND;
+FootprintPad::Shape FootprintPadShapeSelectorWidget::getCurrentShape() const
+    noexcept {
+  if (mBtnRound->isChecked()) return FootprintPad::Shape::ROUND;
+  if (mBtnRect->isChecked()) return FootprintPad::Shape::RECT;
+  if (mBtnOctagon->isChecked()) return FootprintPad::Shape::OCTAGON;
+  return FootprintPad::Shape::ROUND;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void FootprintPadShapeSelectorWidget::setCurrentShape(FootprintPad::Shape shape) noexcept
-{
-    mBtnRound->setChecked(shape == FootprintPad::Shape::ROUND);
-    mBtnRect->setChecked(shape == FootprintPad::Shape::RECT);
-    mBtnOctagon->setChecked(shape == FootprintPad::Shape::OCTAGON);
+void FootprintPadShapeSelectorWidget::setCurrentShape(
+    FootprintPad::Shape shape) noexcept {
+  mBtnRound->setChecked(shape == FootprintPad::Shape::ROUND);
+  mBtnRect->setChecked(shape == FootprintPad::Shape::RECT);
+  mBtnOctagon->setChecked(shape == FootprintPad::Shape::OCTAGON);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void FootprintPadShapeSelectorWidget::btnRoundToggled(bool checked) noexcept
-{
-    mBtnRect->setChecked(!checked);
-    mBtnOctagon->setChecked(!checked);
-    emit currentShapeChanged(getCurrentShape());
+void FootprintPadShapeSelectorWidget::btnRoundToggled(bool checked) noexcept {
+  mBtnRect->setChecked(!checked);
+  mBtnOctagon->setChecked(!checked);
+  emit currentShapeChanged(getCurrentShape());
 }
 
-void FootprintPadShapeSelectorWidget::btnRectToggled(bool checked) noexcept
-{
-    mBtnRound->setChecked(!checked);
-    mBtnOctagon->setChecked(!checked);
-    emit currentShapeChanged(getCurrentShape());
+void FootprintPadShapeSelectorWidget::btnRectToggled(bool checked) noexcept {
+  mBtnRound->setChecked(!checked);
+  mBtnOctagon->setChecked(!checked);
+  emit currentShapeChanged(getCurrentShape());
 }
 
-void FootprintPadShapeSelectorWidget::btnOctagonToggled(bool checked) noexcept
-{
-    mBtnRound->setChecked(!checked);
-    mBtnRect->setChecked(!checked);
-    emit currentShapeChanged(getCurrentShape());
+void FootprintPadShapeSelectorWidget::btnOctagonToggled(bool checked) noexcept {
+  mBtnRound->setChecked(!checked);
+  mBtnRect->setChecked(!checked);
+  emit currentShapeChanged(getCurrentShape());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

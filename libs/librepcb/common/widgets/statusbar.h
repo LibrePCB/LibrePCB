@@ -20,21 +20,22 @@
 #ifndef LIBREPCB_STATUSBAR_H
 #define LIBREPCB_STATUSBAR_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../units/point.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class StatusBar
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The StatusBar class extends QStatusBar for some commonly used fields
@@ -42,56 +43,54 @@ namespace librepcb {
  * @author ubruhin
  * @date 2017-09-03
  */
-class StatusBar final : public QStatusBar
-{
-        Q_OBJECT
+class StatusBar final : public QStatusBar {
+  Q_OBJECT
 
-    public:
-        // Types
-        enum Field {
-            AbsolutePosition    = 1<<0,
-            ProgressBar         = 1<<1,
-        };
-        Q_DECLARE_FLAGS(Fields, Field);
+public:
+  // Types
+  enum Field {
+    AbsolutePosition = 1 << 0,
+    ProgressBar      = 1 << 1,
+  };
+  Q_DECLARE_FLAGS(Fields, Field);
 
-        // Constructors / Destructor
-        explicit StatusBar(QWidget* parent = nullptr) noexcept;
-        StatusBar(const StatusBar& other) = delete;
-        ~StatusBar() noexcept;
+  // Constructors / Destructor
+  explicit StatusBar(QWidget* parent = nullptr) noexcept;
+  StatusBar(const StatusBar& other) = delete;
+  ~StatusBar() noexcept;
 
-        // Getters
-        Fields getFields() const noexcept {return mFields;}
+  // Getters
+  Fields getFields() const noexcept { return mFields; }
 
-        // Setters
-        void setFields(Fields fields) noexcept;
-        void setField(Field field, bool enable) noexcept;
-        void setAbsoluteCursorPosition(const Point& pos) noexcept;
-        void setProgressBarVisible(bool visible) noexcept;
-        void setProgressBarTextFormat(const QString& format) noexcept;
-        void setProgressBarPercent(int percent) noexcept;
+  // Setters
+  void setFields(Fields fields) noexcept;
+  void setField(Field field, bool enable) noexcept;
+  void setAbsoluteCursorPosition(const Point& pos) noexcept;
+  void setProgressBarVisible(bool visible) noexcept;
+  void setProgressBarTextFormat(const QString& format) noexcept;
+  void setProgressBarPercent(int percent) noexcept;
 
-        // General Methods
-        void showProgressBar() noexcept {setProgressBarVisible(true);}
-        void hideProgressBar() noexcept {setProgressBarVisible(false);}
+  // General Methods
+  void showProgressBar() noexcept { setProgressBarVisible(true); }
+  void hideProgressBar() noexcept { setProgressBarVisible(false); }
 
-        // Operator Overloadings
-        StatusBar& operator=(const StatusBar& rhs) = delete;
+  // Operator Overloadings
+  StatusBar& operator=(const StatusBar& rhs) = delete;
 
-
-    private: // Data
-        Fields mFields;
-        QScopedPointer<QLabel> mAbsPosXLabel;
-        QScopedPointer<QLabel> mAbsPosYLabel;
-        QScopedPointer<QProgressBar> mProgressBar;
-        QScopedPointer<QWidget> mProgressBarPlaceHolder;
+private:  // Data
+  Fields                       mFields;
+  QScopedPointer<QLabel>       mAbsPosXLabel;
+  QScopedPointer<QLabel>       mAbsPosYLabel;
+  QScopedPointer<QProgressBar> mProgressBar;
+  QScopedPointer<QWidget>      mProgressBarPlaceHolder;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::StatusBar::Fields)
 
-#endif // LIBREPCB_STATUSBAR_H
+#endif  // LIBREPCB_STATUSBAR_H

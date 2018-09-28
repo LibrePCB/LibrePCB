@@ -20,24 +20,25 @@
 #ifndef LIBREPCB_CIRCLEGRAPHICSITEM_H
 #define LIBREPCB_CIRCLEGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "../geometry/circle.h"
+#include "primitivecirclegraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "primitivecirclegraphicsitem.h"
-#include "../geometry/circle.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CircleGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CircleGraphicsItem class
@@ -45,43 +46,43 @@ class IF_GraphicsLayerProvider;
  * @author ubruhin
  * @date 2017-05-28
  */
-class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_CircleObserver
-{
-    public:
+class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem,
+                                 public IF_CircleObserver {
+public:
+  // Constructors / Destructor
+  CircleGraphicsItem()                                = delete;
+  CircleGraphicsItem(const CircleGraphicsItem& other) = delete;
+  CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerProvider& lp,
+                     QGraphicsItem* parent = nullptr) noexcept;
+  ~CircleGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        CircleGraphicsItem() = delete;
-        CircleGraphicsItem(const CircleGraphicsItem& other) = delete;
-        CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerProvider& lp,
-                            QGraphicsItem* parent = nullptr) noexcept;
-        ~CircleGraphicsItem() noexcept;
+  // Getters
+  Circle& getCircle() noexcept { return mCircle; }
 
-        // Getters
-        Circle& getCircle() noexcept {return mCircle;}
+  // Operator Overloadings
+  CircleGraphicsItem& operator=(const CircleGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        CircleGraphicsItem& operator=(const CircleGraphicsItem& rhs) = delete;
+private:  // Methods
+  void circleLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept override;
+  void circleLineWidthChanged(
+      const UnsignedLength& newLineWidth) noexcept override;
+  void circleIsFilledChanged(bool newIsFilled) noexcept override;
+  void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
+  void circleCenterChanged(const Point& newCenter) noexcept override;
+  void circleDiameterChanged(
+      const PositiveLength& newDiameter) noexcept override;
+  void updateFillLayer() noexcept;
 
-
-    private: // Methods
-        void circleLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
-        void circleLineWidthChanged(const UnsignedLength& newLineWidth) noexcept override;
-        void circleIsFilledChanged(bool newIsFilled) noexcept override;
-        void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-        void circleCenterChanged(const Point& newCenter) noexcept override;
-        void circleDiameterChanged(const PositiveLength& newDiameter) noexcept override;
-        void updateFillLayer() noexcept;
-
-
-    private: // Data
-        Circle& mCircle;
-        const IF_GraphicsLayerProvider& mLayerProvider;
+private:  // Data
+  Circle&                         mCircle;
+  const IF_GraphicsLayerProvider& mLayerProvider;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CIRCLEGRAPHICSITEM_H
+#endif  // LIBREPCB_CIRCLEGRAPHICSITEM_H

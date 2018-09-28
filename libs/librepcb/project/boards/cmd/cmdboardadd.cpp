@@ -17,71 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardadd.h"
-#include "../board.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include "../../project.h"
+#include "../board.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const ElementName& name) noexcept :
-    UndoCommand(tr("Add board")),
-    mProject(project), mBoardToCopy(nullptr), mName(name), mBoard(nullptr), mPageIndex(-1)
-{
+CmdBoardAdd::CmdBoardAdd(Project& project, const ElementName& name) noexcept
+  : UndoCommand(tr("Add board")),
+    mProject(project),
+    mBoardToCopy(nullptr),
+    mName(name),
+    mBoard(nullptr),
+    mPageIndex(-1) {
 }
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy, const ElementName& name) noexcept :
-    UndoCommand(tr("Copy board")),
-    mProject(project), mBoardToCopy(&boardToCopy), mName(name), mBoard(nullptr),
-    mPageIndex(-1)
-{
+CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy,
+                         const ElementName& name) noexcept
+  : UndoCommand(tr("Copy board")),
+    mProject(project),
+    mBoardToCopy(&boardToCopy),
+    mName(name),
+    mBoard(nullptr),
+    mPageIndex(-1) {
 }
 
-CmdBoardAdd::~CmdBoardAdd() noexcept
-{
+CmdBoardAdd::~CmdBoardAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardAdd::performExecute()
-{
-    if (mBoardToCopy) {
-        mBoard = mProject.createBoard(*mBoardToCopy, mName); // can throw
-    } else {
-        mBoard = mProject.createBoard(mName); // can throw
-    }
+bool CmdBoardAdd::performExecute() {
+  if (mBoardToCopy) {
+    mBoard = mProject.createBoard(*mBoardToCopy, mName);  // can throw
+  } else {
+    mBoard = mProject.createBoard(mName);  // can throw
+  }
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardAdd::performUndo()
-{
-    mProject.removeBoard(*mBoard); // can throw
+void CmdBoardAdd::performUndo() {
+  mProject.removeBoard(*mBoard);  // can throw
 }
 
-void CmdBoardAdd::performRedo()
-{
-    mProject.addBoard(*mBoard, mPageIndex); // can throw
+void CmdBoardAdd::performRedo() {
+  mProject.addBoard(*mBoard, mPageIndex);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

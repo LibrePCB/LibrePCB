@@ -20,79 +20,75 @@
 #ifndef LIBREPCB_PROJECT_CMDSYMBOLINSTANCEEDIT_H
 #define LIBREPCB_PROJECT_CMDSYMBOLINSTANCEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class SI_Symbol;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSymbolInstanceEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSymbolInstanceEdit class
  */
-class CmdSymbolInstanceEdit final : public UndoCommand
-{
-    public:
+class CmdSymbolInstanceEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept;
+  ~CmdSymbolInstanceEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept;
-        ~CmdSymbolInstanceEdit() noexcept;
+  // General Methods
+  void setPosition(Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void setMirrored(bool mirrored, bool immediate) noexcept;
+  void mirror(const Point& center, Qt::Orientation orientation,
+              bool immediate) noexcept;
 
-        // General Methods
-        void setPosition(Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate) noexcept;
-        void mirror(const Point& center, Qt::Orientation orientation,
-                    bool immediate) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  SI_Symbol& mSymbol;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        SI_Symbol& mSymbol;
-
-        // General Attributes
-        Point mOldPos;
-        Point mNewPos;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        bool mOldMirrored;
-        bool mNewMirrored;
+  // General Attributes
+  Point mOldPos;
+  Point mNewPos;
+  Angle mOldRotation;
+  Angle mNewRotation;
+  bool  mOldMirrored;
+  bool  mNewMirrored;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEEDIT_H

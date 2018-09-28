@@ -19,46 +19,44 @@
 #ifndef LIBREPCB_MARKDOWNCONVERTER_H
 #define LIBREPCB_MARKDOWNCONVERTER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class MarkdownConverter
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The MarkdownConverter class
  */
-class MarkdownConverter final
-{
-    public:
+class MarkdownConverter final {
+public:
+  // Static Methods
+  static QString convertMarkdownToHtml(const FilePath& markdownFile) noexcept;
+  static QString convertMarkdownToHtml(const QString& markdown) noexcept;
 
-        // Static Methods
-        static QString convertMarkdownToHtml(const FilePath& markdownFile) noexcept;
-        static QString convertMarkdownToHtml(const QString& markdown) noexcept;
-
-    private:
-
-        // Constructors / Destructor
-        MarkdownConverter() = delete;
-        MarkdownConverter(const MarkdownConverter& other) = delete;
-        ~MarkdownConverter() = delete;
+private:
+  // Constructors / Destructor
+  MarkdownConverter()                               = delete;
+  MarkdownConverter(const MarkdownConverter& other) = delete;
+  ~MarkdownConverter()                              = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_MARKDOWNCONVERTER_H
+#endif  // LIBREPCB_MARKDOWNCONVERTER_H

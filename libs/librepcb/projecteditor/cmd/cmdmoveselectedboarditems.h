@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
 #define LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdPolygonEdit;
@@ -46,54 +47,49 @@ class CmdBoardPlaneEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdMoveSelectedBoardItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdMoveSelectedBoardItems class
  */
-class CmdMoveSelectedBoardItems final : public UndoCommandGroup
-{
-    public:
+class CmdMoveSelectedBoardItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
+  ~CmdMoveSelectedBoardItems() noexcept;
 
-        // Constructors / Destructor
-        CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
-        ~CmdMoveSelectedBoardItems() noexcept;
+  // General Methods
+  void setCurrentPosition(const Point& pos) noexcept;
 
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
+  Board& mBoard;
+  Point  mStartPos;
+  Point  mDeltaPos;
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        Board& mBoard;
-        Point mStartPos;
-        Point mDeltaPos;
-
-        // Move commands
-        QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-        QList<CmdBoardViaEdit*> mViaEditCmds;
-        QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-        QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
-        QList<CmdPolygonEdit*> mPolygonEditCmds;
-        QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
-        QList<CmdHoleEdit*> mHoleEditCmds;
+  // Move commands
+  QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
+  QList<CmdBoardViaEdit*>       mViaEditCmds;
+  QList<CmdBoardNetPointEdit*>  mNetPointEditCmds;
+  QList<CmdBoardPlaneEdit*>     mPlaneEditCmds;
+  QList<CmdPolygonEdit*>        mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*>     mStrokeTextEditCmds;
+  QList<CmdHoleEdit*>           mHoleEditCmds;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H

@@ -20,74 +20,71 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
 #define LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/graphics/graphicslayer.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Project;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicLayerProvider
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The SchematicLayerProvider class provides and manages all available schematic
- *        layers which are used in the #project#SchematicEditor class
+ * @brief The SchematicLayerProvider class provides and manages all available
+ * schematic layers which are used in the #project#SchematicEditor class
  */
-class SchematicLayerProvider final : public IF_GraphicsLayerProvider
-{
-    public:
+class SchematicLayerProvider final : public IF_GraphicsLayerProvider {
+public:
+  // Constructors / Destructor
+  SchematicLayerProvider()                                    = delete;
+  SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
+  explicit SchematicLayerProvider(Project& project);
+  ~SchematicLayerProvider() noexcept;
 
-        // Constructors / Destructor
-        SchematicLayerProvider() = delete;
-        SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
-        explicit SchematicLayerProvider(Project& project);
-        ~SchematicLayerProvider() noexcept;
+  // Getters
+  Project& getProject() const noexcept { return mProject; }
 
-        // Getters
-        Project& getProject() const noexcept {return mProject;}
+  /// @copydoc IF_GraphicsLayerProvider#getLayer()
+  GraphicsLayer* getLayer(const QString& name) const noexcept override {
+    foreach (GraphicsLayer* layer, mLayers) {
+      if (layer->getName() == name) {
+        return layer;
+      }
+    }
+    return nullptr;
+  }
 
-        /// @copydoc IF_GraphicsLayerProvider#getLayer()
-        GraphicsLayer* getLayer(const QString& name) const noexcept override {
-            foreach (GraphicsLayer* layer, mLayers) {
-                if (layer->getName() == name) {
-                    return layer;
-                }
-            }
-            return nullptr;
-        }
+  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+    return mLayers;
+  }
 
-        QList<GraphicsLayer*> getAllLayers() const noexcept override {
-            return mLayers;
-        }
+  // Operator Overloadings
+  SchematicLayerProvider& operator=(const SchematicLayerProvider& rhs) = delete;
 
-        // Operator Overloadings
-        SchematicLayerProvider& operator=(const SchematicLayerProvider& rhs) = delete;
+private:  // Methods
+  void addLayer(const QString& name) noexcept;
 
-
-    private: // Methods
-        void addLayer(const QString& name) noexcept;
-
-
-    private: // Data
-        Project& mProject; ///< A reference to the Project object (from the ctor)
-        QList<GraphicsLayer*> mLayers;
+private:              // Data
+  Project& mProject;  ///< A reference to the Project object (from the ctor)
+  QList<GraphicsLayer*> mLayers;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
+#endif  // LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H

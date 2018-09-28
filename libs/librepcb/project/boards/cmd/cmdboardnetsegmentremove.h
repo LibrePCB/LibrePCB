@@ -20,62 +20,58 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
 #define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 class BI_NetSegment;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardNetSegmentRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardNetSegmentRemove class
  */
-class CmdBoardNetSegmentRemove final : public UndoCommand
-{
-    public:
+class CmdBoardNetSegmentRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept;
+  ~CmdBoardNetSegmentRemove() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept;
-        ~CmdBoardNetSegmentRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Board& mBoard;
-        BI_NetSegment& mNetSegment;
+  Board&         mBoard;
+  BI_NetSegment& mNetSegment;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H

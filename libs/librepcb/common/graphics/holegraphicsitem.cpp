@@ -17,83 +17,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "holegraphicsitem.h"
+
+#include "../graphics/graphicslayer.h"
+#include "origincrossgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "holegraphicsitem.h"
-#include "origincrossgraphicsitem.h"
-#include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                                   QGraphicsItem* parent) noexcept :
-    PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp)
-{
-    setPosition(mHole.getPosition());
-    setDiameter(positiveToUnsigned(mHole.getDiameter()));
-    setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-    setZValue(5);
+HoleGraphicsItem::HoleGraphicsItem(Hole&                           hole,
+                                   const IF_GraphicsLayerProvider& lp,
+                                   QGraphicsItem* parent) noexcept
+  : PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp) {
+  setPosition(mHole.getPosition());
+  setDiameter(positiveToUnsigned(mHole.getDiameter()));
+  setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setZValue(5);
 
-    // add origin cross
-    mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setRotation(Angle::deg45());
-    mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) + UnsignedLength(500000));
-    mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
+  // add origin cross
+  mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
+  mOriginCrossGraphicsItem->setRotation(Angle::deg45());
+  mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) +
+                                    UnsignedLength(500000));
+  mOriginCrossGraphicsItem->setLayer(
+      mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
 
-    // register to the text to get attribute updates
-    mHole.registerObserver(*this);
+  // register to the text to get attribute updates
+  mHole.registerObserver(*this);
 }
 
-HoleGraphicsItem::~HoleGraphicsItem() noexcept
-{
-    mHole.unregisterObserver(*this);
+HoleGraphicsItem::~HoleGraphicsItem() noexcept {
+  mHole.unregisterObserver(*this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-QPainterPath HoleGraphicsItem::shape() const noexcept
-{
-    return PrimitiveCircleGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
+QPainterPath HoleGraphicsItem::shape() const noexcept {
+  return PrimitiveCircleGraphicsItem::shape() +
+         mOriginCrossGraphicsItem->shape();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept
-{
-    setPosition(newPos);
+void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept {
+  setPosition(newPos);
 }
 
-void HoleGraphicsItem::holeDiameterChanged(const PositiveLength& newDiameter) noexcept
-{
-    setDiameter(positiveToUnsigned(newDiameter));
-    mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) + UnsignedLength(500000));
+void HoleGraphicsItem::holeDiameterChanged(
+    const PositiveLength& newDiameter) noexcept {
+  setDiameter(positiveToUnsigned(newDiameter));
+  mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) +
+                                    UnsignedLength(500000));
 }
 
-QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) noexcept
-{
-    if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
-        mOriginCrossGraphicsItem->setSelected(value.toBool());
-    }
-    return QGraphicsItem::itemChange(change, value);
+QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change,
+                                      const QVariant&    value) noexcept {
+  if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
+    mOriginCrossGraphicsItem->setSelected(value.toBool());
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

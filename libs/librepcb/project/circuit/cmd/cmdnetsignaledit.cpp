@@ -17,70 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdnetsignaledit.h"
-#include "../netsignal.h"
-#include "../circuit.h"
 
-/*****************************************************************************************
+#include "../circuit.h"
+#include "../netsignal.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdNetSignalEdit::CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal) noexcept :
-    UndoCommand(tr("Edit netsignal")), mCircuit(circuit), mNetSignal(netsignal),
-    mOldName(netsignal.getName()), mNewName(mOldName),
-    mOldIsAutoName(netsignal.hasAutoName()), mNewIsAutoName(mOldIsAutoName)
-{
+CmdNetSignalEdit::CmdNetSignalEdit(Circuit&   circuit,
+                                   NetSignal& netsignal) noexcept
+  : UndoCommand(tr("Edit netsignal")),
+    mCircuit(circuit),
+    mNetSignal(netsignal),
+    mOldName(netsignal.getName()),
+    mNewName(mOldName),
+    mOldIsAutoName(netsignal.hasAutoName()),
+    mNewIsAutoName(mOldIsAutoName) {
 }
 
-CmdNetSignalEdit::~CmdNetSignalEdit() noexcept
-{
+CmdNetSignalEdit::~CmdNetSignalEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdNetSignalEdit::setName(const CircuitIdentifier& name, bool isAutoName) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = name;
-    mNewIsAutoName = isAutoName;
+void CmdNetSignalEdit::setName(const CircuitIdentifier& name,
+                               bool                     isAutoName) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName       = name;
+  mNewIsAutoName = isAutoName;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdNetSignalEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdNetSignalEdit::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdNetSignalEdit::performUndo()
-{
-    mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName); // can throw
+void CmdNetSignalEdit::performUndo() {
+  mCircuit.setNetSignalName(mNetSignal, mOldName, mOldIsAutoName);  // can throw
 }
 
-void CmdNetSignalEdit::performRedo()
-{
-    mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName); // can throw
+void CmdNetSignalEdit::performRedo() {
+  mCircuit.setNetSignalName(mNetSignal, mNewName, mNewIsAutoName);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

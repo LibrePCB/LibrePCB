@@ -20,62 +20,58 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDSTROKETEXTREMOVE_H
 #define LIBREPCB_PROJECT_CMDBOARDSTROKETEXTREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 class BI_StrokeText;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardStrokeTextRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardStrokeTextRemove class
  */
-class CmdBoardStrokeTextRemove final : public UndoCommand
-{
-    public:
+class CmdBoardStrokeTextRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardStrokeTextRemove(BI_StrokeText& text) noexcept;
+  ~CmdBoardStrokeTextRemove() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardStrokeTextRemove(BI_StrokeText& text) noexcept;
-        ~CmdBoardStrokeTextRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Board& mBoard;
-        BI_StrokeText& mText;
+  Board&         mBoard;
+  BI_StrokeText& mText;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDSTROKETEXTREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDSTROKETEXTREMOVE_H

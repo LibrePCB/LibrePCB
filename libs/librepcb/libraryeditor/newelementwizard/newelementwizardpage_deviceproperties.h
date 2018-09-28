@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_DEVICEPROPERTIES_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_DEVICEPROPERTIES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_DeviceProperties;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_DeviceProperties
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_DeviceProperties class
@@ -48,51 +49,47 @@ class NewElementWizardPage_DeviceProperties;
  * @author ubruhin
  * @date 2017-03-26
  */
-class NewElementWizardPage_DeviceProperties final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_DeviceProperties final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_DeviceProperties() = delete;
+  NewElementWizardPage_DeviceProperties(
+      const NewElementWizardPage_DeviceProperties& other) = delete;
+  explicit NewElementWizardPage_DeviceProperties(
+      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_DeviceProperties() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_DeviceProperties() = delete;
-        NewElementWizardPage_DeviceProperties(const NewElementWizardPage_DeviceProperties& other) = delete;
-        explicit NewElementWizardPage_DeviceProperties(NewElementWizardContext& context,
-                                                       QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_DeviceProperties() noexcept;
+  // Getters
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_DeviceProperties& operator       =(
+      const NewElementWizardPage_DeviceProperties& rhs) = delete;
 
-        // Getters
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void edtComponentUuidTextChanged(const QString& text) noexcept;
+  void edtPackageUuidTextChanged(const QString& text) noexcept;
+  void btnChooseComponentClicked() noexcept;
+  void btnChoosePackageClicked() noexcept;
+  void setComponent(const tl::optional<Uuid>& uuid) noexcept;
+  void setPackage(const tl::optional<Uuid>& uuid) noexcept;
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_DeviceProperties& operator=(const NewElementWizardPage_DeviceProperties& rhs) = delete;
-
-
-    private: // Methods
-        void edtComponentUuidTextChanged(const QString& text) noexcept;
-        void edtPackageUuidTextChanged(const QString& text) noexcept;
-        void btnChooseComponentClicked() noexcept;
-        void btnChoosePackageClicked() noexcept;
-        void setComponent(const tl::optional<Uuid>& uuid) noexcept;
-        void setPackage(const tl::optional<Uuid>& uuid) noexcept;
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_DeviceProperties> mUi;
+private:  // Data
+  NewElementWizardContext&                                  mContext;
+  QScopedPointer<Ui::NewElementWizardPage_DeviceProperties> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_DEVICEPROPERTIES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_DEVICEPROPERTIES_H

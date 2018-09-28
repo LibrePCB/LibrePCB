@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPEFREQUENCY_H
 #define LIBREPCB_ATTRTYPEFREQUENCY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeFrequency
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeFrequency class
  */
-class AttrTypeFrequency final : public AttributeType
-{
+class AttrTypeFrequency final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeFrequency& instance() noexcept {
+    static AttrTypeFrequency x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeFrequency(const AttrTypeFrequency& other) = delete;
+  AttrTypeFrequency& operator=(const AttrTypeFrequency& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeFrequency& instance() noexcept {static AttrTypeFrequency x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeFrequency(const AttrTypeFrequency& other) = delete;
-        AttrTypeFrequency& operator=(const AttrTypeFrequency& rhs) = delete;
-
-
-        // Constructors / Destructor
-        AttrTypeFrequency() noexcept;
-        ~AttrTypeFrequency() noexcept;
+  // Constructors / Destructor
+  AttrTypeFrequency() noexcept;
+  ~AttrTypeFrequency() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPEFREQUENCY_H
+#endif  // LIBREPCB_ATTRTYPEFREQUENCY_H

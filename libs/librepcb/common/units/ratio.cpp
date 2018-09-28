@@ -17,68 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ratio.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Ratio
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString Ratio::toNormalizedString() const noexcept
-{
-    QString str = QLocale::c().toString(toNormalized(), 'f', 6);
-    for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
-        str.chop(1);
-    }
-    return str;
+QString Ratio::toNormalizedString() const noexcept {
+  QString str = QLocale::c().toString(toNormalized(), 'f', 6);
+  for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
+    str.chop(1);
+  }
+  return str;
 }
 
 // Static Methods
 
-Ratio Ratio::fromPercent(qreal percent) noexcept
-{
-    Ratio ratio;
-    ratio.setRatioPercent(percent);
-    return ratio;
+Ratio Ratio::fromPercent(qreal percent) noexcept {
+  Ratio ratio;
+  ratio.setRatioPercent(percent);
+  return ratio;
 }
 
-Ratio Ratio::fromNormalized(qreal normalized) noexcept
-{
-    Ratio ratio;
-    ratio.setRatioNormalized(normalized);
-    return ratio;
+Ratio Ratio::fromNormalized(qreal normalized) noexcept {
+  Ratio ratio;
+  ratio.setRatioNormalized(normalized);
+  return ratio;
 }
 
-Ratio Ratio::fromNormalized(const QString& normalized)
-{
-    Ratio ratio;
-    ratio.setRatioNormalized(normalized);
-    return ratio;
+Ratio Ratio::fromNormalized(const QString& normalized) {
+  Ratio ratio;
+  ratio.setRatioNormalized(normalized);
+  return ratio;
 }
 
 // Private Static Methods
 
-qint32 Ratio::normalizedStringToPpm(const QString& normalized)
-{
-    bool ok;
-    qreal ratio = qRound(QLocale::c().toDouble(normalized, &ok) * 1e6);
-    if (!ok) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid ratio string: \"%1\"")).arg(normalized));
-    }
-    return ratio;
+qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
+  bool  ok;
+  qreal ratio = qRound(QLocale::c().toDouble(normalized, &ok) * 1e6);
+  if (!ok) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Invalid ratio string: \"%1\"")).arg(normalized));
+  }
+  return ratio;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

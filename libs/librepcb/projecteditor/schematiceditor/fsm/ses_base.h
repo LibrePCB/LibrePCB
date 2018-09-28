@@ -20,19 +20,21 @@
 #ifndef LIBREPCB_PROJECT_SES_BASE_H
 #define LIBREPCB_PROJECT_SES_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "schematiceditorevent.h"
+ ******************************************************************************/
 #include "../schematiceditor.h"
+#include "schematiceditorevent.h"
 #include "ui_schematiceditor.h"
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/graphics/graphicsview.h>
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/units/all_length_units.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -48,54 +50,58 @@ class Circuit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SES_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SES_Base (SchematicEditorState Base) class
  */
-class SES_Base : public QObject
-{
-        Q_OBJECT
+class SES_Base : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  /// process() return values
+  enum ProcRetVal {
+    ForceStayInState,   ///< event handled, stay in the current state
+    ForceLeaveState,    ///< event handled, leave the current state
+    PassToParentState,  ///< event unhandled, pass it to the parent
+  };
 
-        /// process() return values
-        enum ProcRetVal {
-            ForceStayInState,   ///< event handled, stay in the current state
-            ForceLeaveState,    ///< event handled, leave the current state
-            PassToParentState,  ///< event unhandled, pass it to the parent
-        };
+  // Constructors / Destructor
+  explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                    GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  virtual ~SES_Base();
 
-        // Constructors / Destructor
-        explicit SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                          GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        virtual ~SES_Base();
+  // General Methods
+  virtual ProcRetVal process(SEE_Base* event) noexcept = 0;
+  virtual bool       entry(SEE_Base* event) noexcept {
+    Q_UNUSED(event);
+    return true;
+  }
+  virtual bool exit(SEE_Base* event) noexcept {
+    Q_UNUSED(event);
+    return true;
+  }
 
-        // General Methods
-        virtual ProcRetVal process(SEE_Base* event) noexcept = 0;
-        virtual bool entry(SEE_Base* event) noexcept {Q_UNUSED(event); return true;}
-        virtual bool exit(SEE_Base* event) noexcept {Q_UNUSED(event); return true;}
-
-    protected:
-
-        // General Attributes which are needed by some state objects
-        workspace::Workspace& mWorkspace;
-        Project& mProject;
-        Circuit& mCircuit;
-        SchematicEditor& mEditor;
-        Ui::SchematicEditor& mEditorUi; ///< allows access to SchematicEditor UI
-        GraphicsView& mEditorGraphicsView; ///< allows access to the schematic editor graphics view
-        UndoStack& mUndoStack;
+protected:
+  // General Attributes which are needed by some state objects
+  workspace::Workspace& mWorkspace;
+  Project&              mProject;
+  Circuit&              mCircuit;
+  SchematicEditor&      mEditor;
+  Ui::SchematicEditor&  mEditorUi;    ///< allows access to SchematicEditor UI
+  GraphicsView& mEditorGraphicsView;  ///< allows access to the schematic editor
+                                      ///< graphics view
+  UndoStack& mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_BASE_H
+#endif  // LIBREPCB_PROJECT_SES_BASE_H

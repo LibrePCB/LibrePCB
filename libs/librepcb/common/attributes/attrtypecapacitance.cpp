@@ -17,73 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtypecapacitance.h"
+
 #include "attributeunit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeCapacitance::AttrTypeCapacitance() noexcept :
-    AttributeType(Type_t::Capacitance, "capacitance", tr("Capacitance"))
-{
-    mDefaultUnit = new AttributeUnit("microfarad", tr("μF"));
+AttrTypeCapacitance::AttrTypeCapacitance() noexcept
+  : AttributeType(Type_t::Capacitance, "capacitance", tr("Capacitance")) {
+  mDefaultUnit = new AttributeUnit("microfarad", tr("μF"));
 
-    mAvailableUnits.append(new AttributeUnit("picofarad",   tr("pF")));
-    mAvailableUnits.append(new AttributeUnit("nanofarad",   tr("nF")));
-    mAvailableUnits.append(mDefaultUnit);
-    mAvailableUnits.append(new AttributeUnit("millifarad",  tr("mF")));
-    mAvailableUnits.append(new AttributeUnit("farad",       tr("F")));
+  mAvailableUnits.append(new AttributeUnit("picofarad", tr("pF")));
+  mAvailableUnits.append(new AttributeUnit("nanofarad", tr("nF")));
+  mAvailableUnits.append(mDefaultUnit);
+  mAvailableUnits.append(new AttributeUnit("millifarad", tr("mF")));
+  mAvailableUnits.append(new AttributeUnit("farad", tr("F")));
 }
 
-AttrTypeCapacitance::~AttrTypeCapacitance() noexcept
-{
+AttrTypeCapacitance::~AttrTypeCapacitance() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeCapacitance::isValueValid(const QString& value) const noexcept
-{
-    bool ok = false;
-    value.toFloat(&ok);
-    return (ok || value.isEmpty());
+bool AttrTypeCapacitance::isValueValid(const QString& value) const noexcept {
+  bool ok = false;
+  value.toFloat(&ok);
+  return (ok || value.isEmpty());
 }
 
-QString AttrTypeCapacitance::valueFromTr(const QString& value) const noexcept
-{
-    bool ok = false;
-    float v = QLocale().toFloat(value, &ok);
-    if (ok)
-        return QString::number(v);
-    else
-        return QString();
+QString AttrTypeCapacitance::valueFromTr(const QString& value) const noexcept {
+  bool  ok = false;
+  float v  = QLocale().toFloat(value, &ok);
+  if (ok)
+    return QString::number(v);
+  else
+    return QString();
 }
 
-QString AttrTypeCapacitance::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    bool ok = false;
-    float v = value.toFloat(&ok);
-    if (ok && unit)
-        return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
-    else if (ok)
-        return QLocale().toString(v);
-    else
-        return QString();
+QString AttrTypeCapacitance::printableValueTr(const QString&       value,
+                                              const AttributeUnit* unit) const
+    noexcept {
+  bool  ok = false;
+  float v  = value.toFloat(&ok);
+  if (ok && unit)
+    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+  else if (ok)
+    return QLocale().toString(v);
+  else
+    return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

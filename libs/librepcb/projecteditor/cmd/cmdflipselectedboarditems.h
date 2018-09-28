@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
 #define LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,43 +39,38 @@ class BI_Device;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdFlipSelectedBoardItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdFlipSelectedBoardItems class
  */
-class CmdFlipSelectedBoardItems final : public UndoCommandGroup
-{
-    public:
+class CmdFlipSelectedBoardItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdFlipSelectedBoardItems(Board& board, Qt::Orientation orientation) noexcept;
+  ~CmdFlipSelectedBoardItems() noexcept;
 
-        // Constructors / Destructor
-        CmdFlipSelectedBoardItems(Board& board, Qt::Orientation orientation) noexcept;
-        ~CmdFlipSelectedBoardItems() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Board& mBoard;
-        Qt::Orientation mOrientation;
+  // Attributes from the constructor
+  Board&          mBoard;
+  Qt::Orientation mOrientation;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H

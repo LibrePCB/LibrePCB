@@ -17,114 +17,128 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdrotateselectedsymbolitems.h"
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/gridproperties.h>
+
 #include <librepcb/common/geometry/cmd/cmdcircleedit.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/library/sym/symbolpin.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
+#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/gridproperties.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/library/sym/symbolpingraphicsitem.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdRotateSelectedSymbolItems::CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                                       const Angle& angle) noexcept :
-    UndoCommandGroup(tr("Rotate Symbol Elements")), mContext(context), mAngle(angle)
-{
+CmdRotateSelectedSymbolItems::CmdRotateSelectedSymbolItems(
+    const SymbolEditorState::Context& context, const Angle& angle) noexcept
+  : UndoCommandGroup(tr("Rotate Symbol Elements")),
+    mContext(context),
+    mAngle(angle) {
 }
 
-CmdRotateSelectedSymbolItems::~CmdRotateSelectedSymbolItems() noexcept
-{
+CmdRotateSelectedSymbolItems::~CmdRotateSelectedSymbolItems() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdRotateSelectedSymbolItems::performExecute()
-{
-    // get all selected items
-    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = mContext.symbolGraphicsItem.getSelectedPins();
-    QList<QSharedPointer<CircleGraphicsItem>> circles = mContext.symbolGraphicsItem.getSelectedCircles();
-    QList<QSharedPointer<PolygonGraphicsItem>> polygons = mContext.symbolGraphicsItem.getSelectedPolygons();
-    QList<QSharedPointer<TextGraphicsItem>> texts = mContext.symbolGraphicsItem.getSelectedTexts();
-    int count = pins.count() + circles.count() + polygons.count() + texts.count();
+bool CmdRotateSelectedSymbolItems::performExecute() {
+  // get all selected items
+  QList<QSharedPointer<SymbolPinGraphicsItem>> pins =
+      mContext.symbolGraphicsItem.getSelectedPins();
+  QList<QSharedPointer<CircleGraphicsItem>> circles =
+      mContext.symbolGraphicsItem.getSelectedCircles();
+  QList<QSharedPointer<PolygonGraphicsItem>> polygons =
+      mContext.symbolGraphicsItem.getSelectedPolygons();
+  QList<QSharedPointer<TextGraphicsItem>> texts =
+      mContext.symbolGraphicsItem.getSelectedTexts();
+  int count = pins.count() + circles.count() + polygons.count() + texts.count();
 
-    // no items selected --> nothing to do here
-    if (count <= 0) {
-        return false;
-    }
+  // no items selected --> nothing to do here
+  if (count <= 0) {
+    return false;
+  }
 
-    // find the center of all elements
-    Point center = Point(0, 0);
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
-        center += pin->getPin().getPosition();
+  // find the center of all elements
+  Point center = Point(0, 0);
+  foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {
+    Q_ASSERT(pin);
+    center += pin->getPin().getPosition();
+  }
+  foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
+    Q_ASSERT(circle);
+    center += circle->getCircle().getCenter();
+  }
+  foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
+    Q_ASSERT(polygon);
+    --count;  // polygon itself does not count
+    foreach (const Vertex& vertex,
+             polygon->getPolygon().getPath().getVertices()) {
+      center += vertex.getPos();
+      ++count;
     }
-    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
-        center += circle->getCircle().getCenter();
-    }
-    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        --count; // polygon itself does not count
-        foreach (const Vertex& vertex, polygon->getPolygon().getPath().getVertices()) {
-            center += vertex.getPos();
-            ++count;
-        }
-    }
-    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
-        center += text->getText().getPosition();
-    }
-    center /= count;
-    center.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+  }
+  foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {
+    Q_ASSERT(text);
+    center += text->getText().getPosition();
+  }
+  center /= count;
+  center.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
 
-    // rotate all selected elements
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
-        CmdSymbolPinEdit* cmd = new CmdSymbolPinEdit(pin->getPin());
-        cmd->rotate(mAngle, center, false);
-        appendChild(cmd);
-    }
-    foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {Q_ASSERT(circle);
-        CmdCircleEdit* cmd = new CmdCircleEdit(circle->getCircle());
-        cmd->rotate(mAngle, center, false);
-        appendChild(cmd);
-    }
-    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {Q_ASSERT(polygon);
-        CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
-        cmd->rotate(mAngle, center, false);
-        appendChild(cmd);
-    }
-    foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {Q_ASSERT(text);
-        CmdTextEdit* cmd = new CmdTextEdit(text->getText());
-        cmd->rotate(mAngle, center, false);
-        appendChild(cmd);
-    }
+  // rotate all selected elements
+  foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {
+    Q_ASSERT(pin);
+    CmdSymbolPinEdit* cmd = new CmdSymbolPinEdit(pin->getPin());
+    cmd->rotate(mAngle, center, false);
+    appendChild(cmd);
+  }
+  foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
+    Q_ASSERT(circle);
+    CmdCircleEdit* cmd = new CmdCircleEdit(circle->getCircle());
+    cmd->rotate(mAngle, center, false);
+    appendChild(cmd);
+  }
+  foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
+    Q_ASSERT(polygon);
+    CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
+    cmd->rotate(mAngle, center, false);
+    appendChild(cmd);
+  }
+  foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {
+    Q_ASSERT(text);
+    CmdTextEdit* cmd = new CmdTextEdit(text->getText());
+    cmd->rotate(mAngle, center, false);
+    appendChild(cmd);
+  }
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

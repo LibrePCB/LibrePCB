@@ -17,87 +17,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "textgraphicsitem.h"
+
+#include "../graphics/graphicslayer.h"
+#include "origincrossgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "textgraphicsitem.h"
-#include "origincrossgraphicsitem.h"
-#include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-TextGraphicsItem::TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent) noexcept :
-    PrimitiveTextGraphicsItem(parent), mText(text), mLayerProvider(lp)
-{
-    setFont(TextGraphicsItem::Font::SansSerif);
-    setPosition(mText.getPosition());
-    setRotation(mText.getRotation());
-    setText(mText.getText());
-    setHeight(mText.getHeight());
-    setAlignment(mText.getAlign());
-    setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-    setZValue(5);
+TextGraphicsItem::TextGraphicsItem(Text&                           text,
+                                   const IF_GraphicsLayerProvider& lp,
+                                   QGraphicsItem* parent) noexcept
+  : PrimitiveTextGraphicsItem(parent), mText(text), mLayerProvider(lp) {
+  setFont(TextGraphicsItem::Font::SansSerif);
+  setPosition(mText.getPosition());
+  setRotation(mText.getRotation());
+  setText(mText.getText());
+  setHeight(mText.getHeight());
+  setAlignment(mText.getAlign());
+  setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setZValue(5);
 
-    // add origin cross
-    mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
-    mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences)); // TODO
+  // add origin cross
+  mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
+  mOriginCrossGraphicsItem->setLayer(
+      mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences));  // TODO
 
-    // register to the text to get attribute updates
-    mText.registerObserver(*this);
+  // register to the text to get attribute updates
+  mText.registerObserver(*this);
 }
 
-TextGraphicsItem::~TextGraphicsItem() noexcept
-{
-    mText.unregisterObserver(*this);
+TextGraphicsItem::~TextGraphicsItem() noexcept {
+  mText.unregisterObserver(*this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void TextGraphicsItem::textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
-{
-    setLayer(mLayerProvider.getLayer(*newLayerName));
+void TextGraphicsItem::textLayerNameChanged(
+    const GraphicsLayerName& newLayerName) noexcept {
+  setLayer(mLayerProvider.getLayer(*newLayerName));
 }
 
-void TextGraphicsItem::textTextChanged(const QString& newText) noexcept
-{
-    setText(newText);
+void TextGraphicsItem::textTextChanged(const QString& newText) noexcept {
+  setText(newText);
 }
 
-void TextGraphicsItem::textPositionChanged(const Point& newPos) noexcept
-{
-    setPosition(newPos);
+void TextGraphicsItem::textPositionChanged(const Point& newPos) noexcept {
+  setPosition(newPos);
 }
 
-void TextGraphicsItem::textRotationChanged(const Angle& newRot) noexcept
-{
-    setRotation(newRot);
+void TextGraphicsItem::textRotationChanged(const Angle& newRot) noexcept {
+  setRotation(newRot);
 }
 
-void TextGraphicsItem::textHeightChanged(const PositiveLength& newHeight) noexcept
-{
-    setHeight(newHeight);
+void TextGraphicsItem::textHeightChanged(
+    const PositiveLength& newHeight) noexcept {
+  setHeight(newHeight);
 }
 
-void TextGraphicsItem::textAlignChanged(const Alignment& newAlign) noexcept
-{
-    setAlignment(newAlign);
+void TextGraphicsItem::textAlignChanged(const Alignment& newAlign) noexcept {
+  setAlignment(newAlign);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

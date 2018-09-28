@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDNETSIGNALADD_H
 #define LIBREPCB_PROJECT_CMDNETSIGNALADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <optional/tl/optional.hpp>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
+#include <librepcb/common/undocommand.h>
+#include <optional/tl/optional.hpp>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,53 +39,49 @@ class Circuit;
 class NetClass;
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdNetSignalAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdNetSignalAdd class
  */
-class CmdNetSignalAdd final : public UndoCommand
-{
-    public:
+class CmdNetSignalAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdNetSignalAdd(
+      Circuit& circuit, NetClass& netclass,
+      const tl::optional<CircuitIdentifier>& name = tl::nullopt) noexcept;
+  ~CmdNetSignalAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdNetSignalAdd(Circuit& circuit, NetClass& netclass,
-                        const tl::optional<CircuitIdentifier>& name = tl::nullopt) noexcept;
-        ~CmdNetSignalAdd() noexcept;
+  // Getters
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
 
-        // Getters
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Circuit& mCircuit;
-        NetClass& mNetClass;
-        tl::optional<CircuitIdentifier> mName;
-        NetSignal* mNetSignal;
+  Circuit&                        mCircuit;
+  NetClass&                       mNetClass;
+  tl::optional<CircuitIdentifier> mName;
+  NetSignal*                      mNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDNETSIGNALADD_H
+#endif  // LIBREPCB_PROJECT_CMDNETSIGNALADD_H

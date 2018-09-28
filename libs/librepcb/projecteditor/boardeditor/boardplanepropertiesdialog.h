@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H
 #define LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/geometry/vertex.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -46,46 +47,43 @@ namespace Ui {
 class BoardPlanePropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardPlanePropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardPlanePropertiesDialog class
  */
-class BoardPlanePropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class BoardPlanePropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardPlanePropertiesDialog()                                        = delete;
+  BoardPlanePropertiesDialog(const BoardPlanePropertiesDialog& other) = delete;
+  BoardPlanePropertiesDialog(Project& project, BI_Plane& plane,
+                             UndoStack& undoStack, QWidget* parent) noexcept;
+  ~BoardPlanePropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        BoardPlanePropertiesDialog() = delete;
-        BoardPlanePropertiesDialog(const BoardPlanePropertiesDialog& other) = delete;
-        BoardPlanePropertiesDialog(Project& project, BI_Plane& plane,
-                                   UndoStack& undoStack, QWidget* parent) noexcept;
-        ~BoardPlanePropertiesDialog() noexcept;
+private:  // GUI Events
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
 
-    private: // GUI Events
-        void buttonBoxClicked(QAbstractButton* button) noexcept;
+private:  // Methods
+  bool applyChanges() noexcept;
 
-
-    private: // Methods
-        bool applyChanges() noexcept;
-
-        // General
-        Project& mProject;
-        BI_Plane& mPlane;
-        QScopedPointer<Ui::BoardPlanePropertiesDialog> mUi;
-        UndoStack& mUndoStack;
+  // General
+  Project&                                       mProject;
+  BI_Plane&                                      mPlane;
+  QScopedPointer<Ui::BoardPlanePropertiesDialog> mUi;
+  UndoStack&                                     mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BOARDPLANEPROPERTIESDIALOG_H

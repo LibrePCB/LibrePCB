@@ -20,100 +20,101 @@
 #ifndef LIBREPCB_SYSTEMINFO_H
 #define LIBREPCB_SYSTEMINFO_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "exceptions.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SystemInfo
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief This class provides some methods to get information from the operating system
+ * @brief This class provides some methods to get information from the operating
+ * system
  *
- * For example, this class is used to get the name of the user which is logged in and the
- * hostname of the computer to create a lock file (see class #DirectoryLock).
+ * For example, this class is used to get the name of the user which is logged
+ * in and the hostname of the computer to create a lock file (see class
+ * #DirectoryLock).
  *
- * @note Only static methods are available. You cannot create objects of this class.
+ * @note Only static methods are available. You cannot create objects of this
+ * class.
  *
  * @author ubruhin
  * @date 2014-07-28
  */
-class SystemInfo final
-{
-        Q_DECLARE_TR_FUNCTIONS(SystemInfo)
+class SystemInfo final {
+  Q_DECLARE_TR_FUNCTIONS(SystemInfo)
 
-    public:
+public:
+  // Constructors/Destructor
+  SystemInfo() = delete;
 
-        // Constructors/Destructor
-        SystemInfo() = delete;
+  /**
+   * @brief Get the name of the user which is logged in (like "homer")
+   *
+   * @return The username (in case of an error, this string can be empty!)
+   */
+  static const QString& getUsername() noexcept;
 
-        /**
-         * @brief Get the name of the user which is logged in (like "homer")
-         *
-         * @return The username (in case of an error, this string can be empty!)
-         */
-        static const QString& getUsername() noexcept;
+  /**
+   * @brief Get the full name of the user which is logged in (like "Homer
+   * Simpson")
+   *
+   * @return The full user name (can be empty)
+   *
+   * @todo The implementation of this method is very ugly...
+   */
+  static const QString& getFullUsername() noexcept;
 
-        /**
-         * @brief Get the full name of the user which is logged in (like "Homer Simpson")
-         *
-         * @return The full user name (can be empty)
-         *
-         * @todo The implementation of this method is very ugly...
-         */
-        static const QString& getFullUsername() noexcept;
+  /**
+   * @brief Get the hostname of the computer (like "homer-workstation")
+   *
+   * @return The hostname (in case of an error, this string can be empty!)
+   */
+  static const QString& getHostname() noexcept;
 
-        /**
-         * @brief Get the hostname of the computer (like "homer-workstation")
-         *
-         * @return The hostname (in case of an error, this string can be empty!)
-         */
-        static const QString& getHostname() noexcept;
+  /**
+   * @brief Check whether a process with a given PID is running or not
+   *
+   * @param pid   The process ID to query
+   *
+   * @return  True if the process is running, fals if not
+   *
+   * @throw  Exception    In case of an error.
+   */
+  static bool isProcessRunning(qint64 pid);
 
-        /**
-         * @brief Check whether a process with a given PID is running or not
-         *
-         * @param pid   The process ID to query
-         *
-         * @return  True if the process is running, fals if not
-         *
-         * @throw  Exception    In case of an error.
-         */
-        static bool isProcessRunning(qint64 pid);
+  /**
+   * @brief Get the process name of a given PID
+   *
+   * @param pid   The process ID (may be a running process or not)
+   *
+   * @return  The name of the given process ID, or an empty string if no process
+   *          with the given PID exists.
+   *
+   * @throw  Exception    In case of an error.
+   */
+  static QString getProcessNameByPid(qint64 pid);
 
-        /**
-         * @brief Get the process name of a given PID
-         *
-         * @param pid   The process ID (may be a running process or not)
-         *
-         * @return  The name of the given process ID, or an empty string if no process
-         *          with the given PID exists.
-         *
-         * @throw  Exception    In case of an error.
-         */
-        static QString getProcessNameByPid(qint64 pid);
-
-
-    private:
-
-        // Cached Data
-        static QString sUsername;
-        static QString sFullUsername;
-        static QString sHostname;
+private:
+  // Cached Data
+  static QString sUsername;
+  static QString sFullUsername;
+  static QString sHostname;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SYSTEMINFO_H
+#endif  // LIBREPCB_SYSTEMINFO_H

@@ -20,64 +20,60 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDPOLYGONADD_H
 #define LIBREPCB_PROJECT_CMDBOARDPOLYGONADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 class BI_Polygon;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardPolygonAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardPolygonAdd class
  */
-class CmdBoardPolygonAdd final : public UndoCommand
-{
-    public:
+class CmdBoardPolygonAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardPolygonAdd()                                = delete;
+  CmdBoardPolygonAdd(const CmdBoardPolygonAdd& other) = delete;
+  explicit CmdBoardPolygonAdd(BI_Polygon& polygon) noexcept;
+  ~CmdBoardPolygonAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardPolygonAdd() = delete;
-        CmdBoardPolygonAdd(const CmdBoardPolygonAdd& other) = delete;
-        explicit CmdBoardPolygonAdd(BI_Polygon& polygon) noexcept;
-        ~CmdBoardPolygonAdd() noexcept;
+  // Getters
+  // BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
 
-        // Getters
-        //BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        Board& mBoard;
-        BI_Polygon& mPolygon;
+private:  // Data
+  Board&      mBoard;
+  BI_Polygon& mPolygon;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDPOLYGONADD_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDPOLYGONADD_H

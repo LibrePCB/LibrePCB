@@ -20,71 +20,69 @@
 #ifndef LIBREPCB_FILEDIALOG_H
 #define LIBREPCB_FILEDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FileDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief Wrapper around QFileDialog to slightly change its behaviour
  *
- * Using these methods ensures that no native file dialogs are used if the environment
- * variable `LIBREPCB_DISABLE_NATIVE_DIALOGS` is set to "1". This is needed for automatic
- * functional testing, as native dialogs are hard to test.
+ * Using these methods ensures that no native file dialogs are used if the
+ * environment variable `LIBREPCB_DISABLE_NATIVE_DIALOGS` is set to "1". This is
+ * needed for automatic functional testing, as native dialogs are hard to test.
  */
-class FileDialog final
-{
-    public:
+class FileDialog final {
+public:
+  // Constructors / Destructor
+  FileDialog()                        = delete;
+  FileDialog(const FileDialog &other) = delete;
+  ~FileDialog()                       = delete;
 
-        // Constructors / Destructor
-        FileDialog() = delete;
-        FileDialog(const FileDialog& other) = delete;
-        ~FileDialog() = delete;
+  static QString getOpenFileName(QWidget *            parent  = 0,
+                                 const QString &      caption = QString(),
+                                 const QString &      dir     = QString(),
+                                 const QString &      filter  = QString(),
+                                 QString *            selectedFilter = 0,
+                                 QFileDialog::Options options        = 0);
 
-        static QString getOpenFileName(QWidget *parent = 0,
-                                       const QString &caption = QString(),
-                                       const QString &dir = QString(),
-                                       const QString &filter = QString(),
-                                       QString *selectedFilter = 0,
-                                       QFileDialog::Options options = 0);
+  static QStringList getOpenFileNames(QWidget *            parent  = 0,
+                                      const QString &      caption = QString(),
+                                      const QString &      dir     = QString(),
+                                      const QString &      filter  = QString(),
+                                      QString *            selectedFilter = 0,
+                                      QFileDialog::Options options        = 0);
 
-        static QStringList getOpenFileNames(QWidget *parent = 0,
-                                            const QString &caption = QString(),
-                                            const QString &dir = QString(),
-                                            const QString &filter = QString(),
-                                            QString *selectedFilter = 0,
-                                            QFileDialog::Options options = 0);
+  static QString getSaveFileName(QWidget *            parent  = 0,
+                                 const QString &      caption = QString(),
+                                 const QString &      dir     = QString(),
+                                 const QString &      filter  = QString(),
+                                 QString *            selectedFilter = 0,
+                                 QFileDialog::Options options        = 0);
 
-        static QString getSaveFileName(QWidget *parent = 0,
-                                       const QString &caption = QString(),
-                                       const QString &dir = QString(),
-                                       const QString &filter = QString(),
-                                       QString *selectedFilter = 0,
-                                       QFileDialog::Options options = 0);
+  static QString getExistingDirectory(
+      QWidget *parent = 0, const QString &caption = QString(),
+      const QString &      dir     = QString(),
+      QFileDialog::Options options = QFileDialog::ShowDirsOnly);
 
-        static QString getExistingDirectory(QWidget *parent = 0,
-                                            const QString &caption = QString(),
-                                            const QString &dir = QString(),
-                                            QFileDialog::Options options = QFileDialog::ShowDirsOnly);
-
-    private:
-        static void patchOptions(QFileDialog::Options& options) noexcept;
+private:
+  static void patchOptions(QFileDialog::Options &options) noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_FILEDIALOG_H
+#endif  // LIBREPCB_FILEDIALOG_H

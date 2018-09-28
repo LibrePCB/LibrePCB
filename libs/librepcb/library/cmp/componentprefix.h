@@ -20,95 +20,123 @@
 #ifndef LIBREPCB_LIBRARY_COMPONENTPREFIX_H
 #define LIBREPCB_LIBRARY_COMPONENTPREFIX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <type_safe/constrained_type.hpp>
+ ******************************************************************************/
 #include <librepcb/common/fileio/sexpression.h>
+#include <type_safe/constrained_type.hpp>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentPrefix
- ****************************************************************************************/
+ ******************************************************************************/
 
 struct ComponentPrefixVerifier {
-    template <typename Value, typename Predicate>
-    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
-        return p(val) ? std::forward<Value>(val) : (
-            throw RuntimeError(__FILE__, __LINE__, QString(
-                QApplication::translate("ComponentPrefix", "Invalid component prefix: '%1'")).arg(val)),
-            std::forward<Value>(val));
-    }
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val) ? std::forward<Value>(val)
+                  : (throw RuntimeError(
+                         __FILE__, __LINE__,
+                         QString(QApplication::translate(
+                                     "ComponentPrefix",
+                                     "Invalid component prefix: '%1'"))
+                             .arg(val)),
+                     std::forward<Value>(val));
+  }
 };
 
 struct ComponentPrefixConstraint {
-    bool operator()(const QString& value) const noexcept {
-        return QRegularExpression("^[a-zA-Z_]{0,16}$")
-            .match(value, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch();
-    }
+  bool operator()(const QString& value) const noexcept {
+    return QRegularExpression("^[a-zA-Z_]{0,16}$")
+        .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
+        .hasMatch();
+  }
 };
 
 /**
- * ComponentPrefix is a wrapper around QString which guarantees to contain a valid prefix
- * used for librepcb::library::Component (e.g. "R" for a resistor)
+ * ComponentPrefix is a wrapper around QString which guarantees to contain a
+ * valid prefix used for librepcb::library::Component (e.g. "R" for a resistor)
  *
  * A component prefix is considered as valid if it:
  *   - contains only the characters [a-zA-Z_]
  *   - is not longer than 16 characters
  *
- * The constructor throws an exception if constructed from a QString which is not a valid
- * component prefix according these rules.
+ * The constructor throws an exception if constructed from a QString which is
+ * not a valid component prefix according these rules.
  */
-using ComponentPrefix = type_safe::constrained_type<QString, ComponentPrefixConstraint,
-                                                    ComponentPrefixVerifier>;
+using ComponentPrefix =
+    type_safe::constrained_type<QString, ComponentPrefixConstraint,
+                                ComponentPrefixVerifier>;
 
-} // namespace library
+}  // namespace library
 
-inline bool operator==(const library::ComponentPrefix& lhs, const QString& rhs) noexcept {return (*lhs) == rhs;}
-inline bool operator==(const QString& lhs, const library::ComponentPrefix& rhs) noexcept {return lhs == (*rhs);}
-inline bool operator!=(const library::ComponentPrefix& lhs, const QString& rhs) noexcept {return (*lhs) != rhs;}
-inline bool operator!=(const QString& lhs, const library::ComponentPrefix& rhs) noexcept {return lhs != (*rhs);}
-inline QString operator%(const library::ComponentPrefix& lhs, const QString& rhs) noexcept {return (*lhs) % rhs;}
-inline QString operator%(const QString& lhs, const library::ComponentPrefix& rhs) noexcept {return lhs % (*rhs);}
+inline bool operator==(const library::ComponentPrefix& lhs,
+                       const QString&                  rhs) noexcept {
+  return (*lhs) == rhs;
+}
+inline bool operator==(const QString&                  lhs,
+                       const library::ComponentPrefix& rhs) noexcept {
+  return lhs == (*rhs);
+}
+inline bool operator!=(const library::ComponentPrefix& lhs,
+                       const QString&                  rhs) noexcept {
+  return (*lhs) != rhs;
+}
+inline bool operator!=(const QString&                  lhs,
+                       const library::ComponentPrefix& rhs) noexcept {
+  return lhs != (*rhs);
+}
+inline QString operator%(const library::ComponentPrefix& lhs,
+                         const QString&                  rhs) noexcept {
+  return (*lhs) % rhs;
+}
+inline QString operator%(const QString&                  lhs,
+                         const library::ComponentPrefix& rhs) noexcept {
+  return lhs % (*rhs);
+}
 
 template <>
 inline SExpression serializeToSExpression(const library::ComponentPrefix& obj) {
-    return SExpression::createString(*obj);
+  return SExpression::createString(*obj);
 }
 
 template <>
-inline library::ComponentPrefix deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    // backward compatibility - remove this some time!
-    str.remove(QRegularExpression("[^a-zA-Z_]"));
-    str.truncate(16);
-    return library::ComponentPrefix(str); // can throw
+inline library::ComponentPrefix deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  // backward compatibility - remove this some time!
+  str.remove(QRegularExpression("[^a-zA-Z_]"));
+  str.truncate(16);
+  return library::ComponentPrefix(str);  // can throw
 }
 
-inline QDataStream& operator<<(QDataStream& stream, const library::ComponentPrefix& obj) {
-    stream << *obj;
-    return stream;
+inline QDataStream& operator<<(QDataStream&                    stream,
+                               const library::ComponentPrefix& obj) {
+  stream << *obj;
+  return stream;
 }
 
 inline QDebug operator<<(QDebug stream, const library::ComponentPrefix& obj) {
-    stream << QString("ComponentPrefix('%1'')").arg(*obj);
-    return stream;
+  stream << QString("ComponentPrefix('%1'')").arg(*obj);
+  return stream;
 }
 
 inline uint qHash(const library::ComponentPrefix& key, uint seed = 0) noexcept {
-    return ::qHash(*key, seed);
+  return ::qHash(*key, seed);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_COMPONENTPREFIX_H
+#endif  // LIBREPCB_LIBRARY_COMPONENTPREFIX_H

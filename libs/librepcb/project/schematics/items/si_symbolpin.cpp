@@ -17,243 +17,243 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "si_symbolpin.h"
+
+#include "../../circuit/componentinstance.h"
+#include "../../circuit/componentsignalinstance.h"
+#include "../../circuit/netsignal.h"
+#include "../../erc/ercmsg.h"
 #include "si_symbol.h"
+
+#include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolpin.h>
-#include "../../circuit/componentinstance.h"
-#include <librepcb/library/cmp/component.h>
-#include "../../circuit/componentsignalinstance.h"
-#include "../../erc/ercmsg.h"
-#include "../../circuit/netsignal.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid) :
-    SI_Base(symbol.getSchematic()), mSymbol(symbol), mSymbolPin(nullptr),
-    mPinSignalMapItem(nullptr), mComponentSignalInstance(nullptr)
-{
-    // read attributes
-    mSymbolPin = mSymbol.getLibSymbol().getPins().get(pinUuid).get(); // can throw
-    mPinSignalMapItem = mSymbol.getCompSymbVarItem().getPinSignalMap().get(pinUuid).get(); // can throw
-    tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
-    if (cmpSignalUuid) mComponentSignalInstance = mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
+SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
+  : SI_Base(symbol.getSchematic()),
+    mSymbol(symbol),
+    mSymbolPin(nullptr),
+    mPinSignalMapItem(nullptr),
+    mComponentSignalInstance(nullptr) {
+  // read attributes
+  mSymbolPin =
+      mSymbol.getLibSymbol().getPins().get(pinUuid).get();  // can throw
+  mPinSignalMapItem = mSymbol.getCompSymbVarItem()
+                          .getPinSignalMap()
+                          .get(pinUuid)
+                          .get();  // can throw
+  tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
+  if (cmpSignalUuid)
+    mComponentSignalInstance =
+        mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
 
-    mGraphicsItem.reset(new SGI_SymbolPin(*this));
-    updatePosition();
+  mGraphicsItem.reset(new SGI_SymbolPin(*this));
+  updatePosition();
 
-    // create ERC messages
-    mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(mSchematic.getProject(), *this,
-        QString("%1/%2").arg(mSymbol.getUuid().toStr()).arg(mSymbolPin->getUuid().toStr()),
-        "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
-    updateErcMessages();
+  // create ERC messages
+  mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(
+      mSchematic.getProject(), *this,
+      QString("%1/%2")
+          .arg(mSymbol.getUuid().toStr())
+          .arg(mSymbolPin->getUuid().toStr()),
+      "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
+  updateErcMessages();
 }
 
-SI_SymbolPin::~SI_SymbolPin()
-{
-    Q_ASSERT(!isUsed());
-    mGraphicsItem.reset();
+SI_SymbolPin::~SI_SymbolPin() {
+  Q_ASSERT(!isUsed());
+  mGraphicsItem.reset();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept
-{
-    return mSymbolPin->getUuid();
+const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept {
+  return mSymbolPin->getUuid();
 }
 
 QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
-                                     bool returnPinNameIfEmpty) const noexcept
-{
-    QString text;
-    library::CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
-    if (displayType == library::CmpSigPinDisplayType::pinName()) {
-        text = *mSymbolPin->getName();
-    } else  if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
-        if (mComponentSignalInstance) {
-            text = *mComponentSignalInstance->getCompSignal().getName();
-        }
-    } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
-        if (mComponentSignalInstance) {
-            if (mComponentSignalInstance->getNetSignal()) {
-                text = *mComponentSignalInstance->getNetSignal()->getName();
-            }
-        }
-    } else if (displayType != library::CmpSigPinDisplayType::none()) {
-        Q_ASSERT(false);
-    }
-    if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
-        text = *mComponentSignalInstance->getCompSignal().getName();
-    if (text.isEmpty() && returnPinNameIfEmpty)
-        text = *mSymbolPin->getName();
-    return text;
-}
-
-NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept
-{
+                                     bool returnPinNameIfEmpty) const noexcept {
+  QString                       text;
+  library::CmpSigPinDisplayType displayType =
+      mPinSignalMapItem->getDisplayType();
+  if (displayType == library::CmpSigPinDisplayType::pinName()) {
+    text = *mSymbolPin->getName();
+  } else if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
     if (mComponentSignalInstance) {
-        return mComponentSignalInstance->getNetSignal();
-    } else {
-        return nullptr;
+      text = *mComponentSignalInstance->getCompSignal().getName();
     }
-}
-
-SI_NetSegment* SI_SymbolPin::getNetSegmentOfLines() const noexcept
-{
-    auto it = mRegisteredNetLines.constBegin();
-    return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getNetSegment()) : nullptr;
-}
-
-bool SI_SymbolPin::isRequired() const noexcept
-{
+  } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
     if (mComponentSignalInstance) {
-        return mComponentSignalInstance->getCompSignal().isRequired();
-    } else {
-        return false;
+      if (mComponentSignalInstance->getNetSignal()) {
+        text = *mComponentSignalInstance->getNetSignal()->getName();
+      }
     }
+  } else if (displayType != library::CmpSigPinDisplayType::none()) {
+    Q_ASSERT(false);
+  }
+  if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
+    text = *mComponentSignalInstance->getCompSignal().getName();
+  if (text.isEmpty() && returnPinNameIfEmpty) text = *mSymbolPin->getName();
+  return text;
 }
 
-bool SI_SymbolPin::isVisibleJunction() const noexcept
-{
-    return (mRegisteredNetLines.count() > 1);
+NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept {
+  if (mComponentSignalInstance) {
+    return mComponentSignalInstance->getNetSignal();
+  } else {
+    return nullptr;
+  }
 }
 
-/*****************************************************************************************
+SI_NetSegment* SI_SymbolPin::getNetSegmentOfLines() const noexcept {
+  auto it = mRegisteredNetLines.constBegin();
+  return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getNetSegment())
+                                                : nullptr;
+}
+
+bool SI_SymbolPin::isRequired() const noexcept {
+  if (mComponentSignalInstance) {
+    return mComponentSignalInstance->getCompSignal().isRequired();
+  } else {
+    return false;
+  }
+}
+
+bool SI_SymbolPin::isVisibleJunction() const noexcept {
+  return (mRegisteredNetLines.count() > 1);
+}
+
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_SymbolPin::addToSchematic()
-{
-    if (isAddedToSchematic() || isUsed()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (mComponentSignalInstance) {
-        mComponentSignalInstance->registerSymbolPin(*this); // can throw
-    }
-    if (getCompSigInstNetSignal()) {
-        mHighlightChangedConnection = connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
-                                              [this](){mGraphicsItem->update();});
-    }
-    SI_Base::addToSchematic(mGraphicsItem.data());
-    updateErcMessages();
-    mGraphicsItem->updateCacheAndRepaint();
+void SI_SymbolPin::addToSchematic() {
+  if (isAddedToSchematic() || isUsed()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mComponentSignalInstance) {
+    mComponentSignalInstance->registerSymbolPin(*this);  // can throw
+  }
+  if (getCompSigInstNetSignal()) {
+    mHighlightChangedConnection =
+        connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
+                [this]() { mGraphicsItem->update(); });
+  }
+  SI_Base::addToSchematic(mGraphicsItem.data());
+  updateErcMessages();
+  mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_SymbolPin::removeFromSchematic()
-{
-    if ((!isAddedToSchematic()) || isUsed()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (mComponentSignalInstance) {
-        mComponentSignalInstance->unregisterSymbolPin(*this); // can throw
-    }
-    if (getCompSigInstNetSignal()) {
-        disconnect(mHighlightChangedConnection);
-    }
-    SI_Base::removeFromSchematic(mGraphicsItem.data());
-    updateErcMessages();
+void SI_SymbolPin::removeFromSchematic() {
+  if ((!isAddedToSchematic()) || isUsed()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mComponentSignalInstance) {
+    mComponentSignalInstance->unregisterSymbolPin(*this);  // can throw
+  }
+  if (getCompSigInstNetSignal()) {
+    disconnect(mHighlightChangedConnection);
+  }
+  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  updateErcMessages();
 }
 
-void SI_SymbolPin::registerNetLine(SI_NetLine& netline)
-{
-    if ((!isAddedToSchematic()) || (mRegisteredNetLines.contains(&netline))
-        || (netline.getSchematic() != mSchematic)
-        || (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()))
-    {
-        throw LogicError(__FILE__, __LINE__);
+void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
+  if ((!isAddedToSchematic()) || (mRegisteredNetLines.contains(&netline)) ||
+      (netline.getSchematic() != mSchematic) ||
+      (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal())) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  foreach (const SI_NetLine* l, mRegisteredNetLines) {
+    if (&l->getNetSegment() != &netline.getNetSegment()) {
+      throw LogicError(__FILE__, __LINE__);
     }
-    foreach (const SI_NetLine* l, mRegisteredNetLines) {
-        if (&l->getNetSegment() != &netline.getNetSegment()) {
-            throw LogicError(__FILE__, __LINE__);
-        }
-    }
-    mRegisteredNetLines.insert(&netline);
-    netline.updateLine();
-    updateErcMessages();
-    mGraphicsItem->updateCacheAndRepaint(); // re-check whether to fill the circle or not
+  }
+  mRegisteredNetLines.insert(&netline);
+  netline.updateLine();
+  updateErcMessages();
+  mGraphicsItem
+      ->updateCacheAndRepaint();  // re-check whether to fill the circle or not
 }
 
-void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline)
-{
-    if ((!isAddedToSchematic()) || (!mRegisteredNetLines.contains(&netline))) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredNetLines.remove(&netline);
-    netline.updateLine();
-    updateErcMessages();
-    mGraphicsItem->updateCacheAndRepaint(); // re-check whether to fill the circle or not
+void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
+  if ((!isAddedToSchematic()) || (!mRegisteredNetLines.contains(&netline))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredNetLines.remove(&netline);
+  netline.updateLine();
+  updateErcMessages();
+  mGraphicsItem
+      ->updateCacheAndRepaint();  // re-check whether to fill the circle or not
 }
 
-void SI_SymbolPin::updatePosition() noexcept
-{
-    mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
-    mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
-    updateGraphicsItemTransform();
-    mGraphicsItem->updateCacheAndRepaint();
-    foreach (SI_NetLine* netline, mRegisteredNetLines) {
-        netline->updateLine();
-    }
+void SI_SymbolPin::updatePosition() noexcept {
+  mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
+  mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
+  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  updateGraphicsItemTransform();
+  mGraphicsItem->updateCacheAndRepaint();
+  foreach (SI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from SI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
-QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept
-{
-    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept {
+  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
-void SI_SymbolPin::setSelected(bool selected) noexcept
-{
-    SI_Base::setSelected(selected);
-    mGraphicsItem->update();
+void SI_SymbolPin::setSelected(bool selected) noexcept {
+  SI_Base::setSelected(selected);
+  mGraphicsItem->update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Slots
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_SymbolPin::updateErcMessages() noexcept
-{
-    mErcMsgUnconnectedRequiredPin->setMsg(
-        QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
-        .arg(getDisplayText(true, true)).arg(mSymbol.getName()));
+void SI_SymbolPin::updateErcMessages() noexcept {
+  mErcMsgUnconnectedRequiredPin->setMsg(
+      QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
+          .arg(getDisplayText(true, true))
+          .arg(mSymbol.getName()));
 
-    mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() && isRequired()
-                                              && (!isUsed()));
+  mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() &&
+                                            isRequired() && (!isUsed()));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_SymbolPin::updateGraphicsItemTransform() noexcept
-{
-    QTransform t;
-    if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
-    t.rotate(-mRotation.toDeg());
-    mGraphicsItem->setTransform(t);
+void SI_SymbolPin::updateGraphicsItemTransform() noexcept {
+  QTransform t;
+  if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
+  t.rotate(-mRotation.toDeg());
+  mGraphicsItem->setTransform(t);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
 #define LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/angle.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,43 +38,38 @@ class Board;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRotateSelectedBoardItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRotateSelectedBoardItems class
  */
-class CmdRotateSelectedBoardItems final : public UndoCommandGroup
-{
-    public:
+class CmdRotateSelectedBoardItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRotateSelectedBoardItems(Board& board, const Angle& angle) noexcept;
+  ~CmdRotateSelectedBoardItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRotateSelectedBoardItems(Board& board, const Angle& angle) noexcept;
-        ~CmdRotateSelectedBoardItems() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Board& mBoard;
-        Angle mAngle;
+  // Attributes from the constructor
+  Board& mBoard;
+  Angle  mAngle;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H

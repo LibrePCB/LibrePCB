@@ -17,59 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "smarttextfile.h"
+
 #include "fileutils.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
-    SmartFile(filepath, restore, readOnly, create)
-{
-    if (mIsCreated) {
-        // nothing to do, leave "mContent" empty
-    } else {
-        // read the content of the file
-        mContent = FileUtils::readFile(mOpenedFilePath);
-    }
+SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore,
+                             bool readOnly, bool create)
+  : SmartFile(filepath, restore, readOnly, create) {
+  if (mIsCreated) {
+    // nothing to do, leave "mContent" empty
+  } else {
+    // read the content of the file
+    mContent = FileUtils::readFile(mOpenedFilePath);
+  }
 }
 
-SmartTextFile::~SmartTextFile() noexcept
-{
+SmartTextFile::~SmartTextFile() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SmartTextFile::save(bool toOriginal)
-{
-    const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-    FileUtils::writeFile(filepath, mContent);
-    updateMembersAfterSaving(toOriginal);
+void SmartTextFile::save(bool toOriginal) {
+  const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
+  FileUtils::writeFile(filepath, mContent);
+  updateMembersAfterSaving(toOriginal);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartTextFile* SmartTextFile::create(const FilePath& filepath)
-{
-    return new SmartTextFile(filepath, false, false, true);
+SmartTextFile* SmartTextFile::create(const FilePath& filepath) {
+  return new SmartTextFile(filepath, false, false, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

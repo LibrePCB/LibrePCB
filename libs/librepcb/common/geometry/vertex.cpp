@@ -17,65 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "vertex.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-Vertex::Vertex(const SExpression& node)
-{
-    try {
-        if (node.tryGetChildByPath("position")) {
-            mPos = Point(node.getChildByPath("position"));
-        } else {
-            // backward compatibility, remove this some time!
-            mPos = Point(node.getChildByPath("pos"));
-        }
-        mAngle = node.getValueByPath<Angle>("angle");
-    } catch (const Exception& e) {
-        throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
-                             QString(), e.getMsg());
+Vertex::Vertex(const SExpression& node) {
+  try {
+    if (node.tryGetChildByPath("position")) {
+      mPos = Point(node.getChildByPath("position"));
+    } else {
+      // backward compatibility, remove this some time!
+      mPos = Point(node.getChildByPath("pos"));
     }
+    mAngle = node.getValueByPath<Angle>("angle");
+  } catch (const Exception& e) {
+    throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
+                         QString(), e.getMsg());
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Vertex::serialize(SExpression& root) const
-{
-    root.appendChild(mPos.serializeToDomElement("position"), false);
-    root.appendChild("angle", mAngle, false);
+void Vertex::serialize(SExpression& root) const {
+  root.appendChild(mPos.serializeToDomElement("position"), false);
+  root.appendChild("angle", mAngle, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool Vertex::operator==(const Vertex& rhs) const noexcept
-{
-    return mPos == rhs.mPos && mAngle == rhs.mAngle;
+bool Vertex::operator==(const Vertex& rhs) const noexcept {
+  return mPos == rhs.mPos && mAngle == rhs.mAngle;
 }
 
-Vertex& Vertex::operator=(const Vertex& rhs) noexcept
-{
-    mPos = rhs.mPos;
-    mAngle = rhs.mAngle;
-    return *this;
+Vertex& Vertex::operator=(const Vertex& rhs) noexcept {
+  mPos   = rhs.mPos;
+  mAngle = rhs.mAngle;
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

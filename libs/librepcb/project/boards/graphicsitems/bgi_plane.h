@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_PLANE_H
 #define LIBREPCB_PROJECT_BGI_PLANE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Path;
@@ -40,9 +41,9 @@ namespace project {
 
 class BI_Plane;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_Plane
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_Plane class
@@ -50,52 +51,49 @@ class BI_Plane;
  * @author ubruhin
  * @date 2017-11-19
  */
-class BGI_Plane final : public BGI_Base
-{
-    public:
+class BGI_Plane final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_Plane(BI_Plane& plane) noexcept;
+  ~BGI_Plane() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_Plane(BI_Plane& plane) noexcept;
-        ~BGI_Plane() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+private:
+  // make some methods inaccessible...
+  BGI_Plane()                       = delete;
+  BGI_Plane(const BGI_Plane& other) = delete;
+  BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(QString name) const noexcept;
 
-    private:
+  // General Attributes
+  BI_Plane& mPlane;
 
-        // make some methods inaccessible...
-        BGI_Plane() = delete;
-        BGI_Plane(const BGI_Plane& other) = delete;
-        BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(QString name) const noexcept;
-
-        // General Attributes
-        BI_Plane& mPlane;
-
-        // Cached Attributes
-        GraphicsLayer* mLayer;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QPainterPath mOutline;
-        QVector<QPainterPath> mAreas;
+  // Cached Attributes
+  GraphicsLayer*        mLayer;
+  QRectF                mBoundingRect;
+  QPainterPath          mShape;
+  QPainterPath          mOutline;
+  QVector<QPainterPath> mAreas;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_PLANE_H
+#endif  // LIBREPCB_PROJECT_BGI_PLANE_H

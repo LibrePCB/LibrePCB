@@ -20,95 +20,92 @@
 #ifndef LIBREPCB_LIBRARY_CMDFOOTPRINTPADEDIT_H
 #define LIBREPCB_LIBRARY_CMDFOOTPRINTPADEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../footprintpad.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdFootprintPadEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdFootprintPadEdit class
  */
-class CmdFootprintPadEdit final : public UndoCommand
-{
-    public:
+class CmdFootprintPadEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdFootprintPadEdit()                                 = delete;
+  CmdFootprintPadEdit(const CmdFootprintPadEdit& other) = delete;
+  explicit CmdFootprintPadEdit(FootprintPad& pad) noexcept;
+  ~CmdFootprintPadEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdFootprintPadEdit() = delete;
-        CmdFootprintPadEdit(const CmdFootprintPadEdit& other) = delete;
-        explicit CmdFootprintPadEdit(FootprintPad& pad) noexcept;
-        ~CmdFootprintPadEdit() noexcept;
+  // Setters
+  void setPackagePadUuid(const Uuid& pad, bool immediate) noexcept;
+  void setBoardSide(FootprintPad::BoardSide side, bool immediate) noexcept;
+  void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
+  void setWidth(const PositiveLength& width, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-        // Setters
-        void setPackagePadUuid(const Uuid& pad, bool immediate) noexcept;
-        void setBoardSide(FootprintPad::BoardSide side, bool immediate) noexcept;
-        void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
-        void setWidth(const PositiveLength& width, bool immediate) noexcept;
-        void setHeight(const PositiveLength& height, bool immediate) noexcept;
-        void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdFootprintPadEdit& operator=(const CmdFootprintPadEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdFootprintPadEdit& operator=(const CmdFootprintPadEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  FootprintPad& mPad;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        FootprintPad& mPad;
-
-        // General Attributes
-        Uuid mOldPackagePadUuid;
-        Uuid mNewPackagePadUuid;
-        FootprintPad::BoardSide mOldBoardSide;
-        FootprintPad::BoardSide mNewBoardSide;
-        FootprintPad::Shape mOldShape;
-        FootprintPad::Shape mNewShape;
-        PositiveLength mOldWidth;
-        PositiveLength mNewWidth;
-        PositiveLength mOldHeight;
-        PositiveLength mNewHeight;
-        Point mOldPos;
-        Point mNewPos;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        UnsignedLength mOldDrillDiameter;
-        UnsignedLength mNewDrillDiameter;
+  // General Attributes
+  Uuid                    mOldPackagePadUuid;
+  Uuid                    mNewPackagePadUuid;
+  FootprintPad::BoardSide mOldBoardSide;
+  FootprintPad::BoardSide mNewBoardSide;
+  FootprintPad::Shape     mOldShape;
+  FootprintPad::Shape     mNewShape;
+  PositiveLength          mOldWidth;
+  PositiveLength          mNewWidth;
+  PositiveLength          mOldHeight;
+  PositiveLength          mNewHeight;
+  Point                   mOldPos;
+  Point                   mNewPos;
+  Angle                   mOldRotation;
+  Angle                   mNewRotation;
+  UnsignedLength          mOldDrillDiameter;
+  UnsignedLength          mNewDrillDiameter;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDFOOTPRINTPADEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDFOOTPRINTPADEDIT_H

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_ChooseType;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ChooseType
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_ChooseType class
@@ -48,52 +49,48 @@ class NewElementWizardPage_ChooseType;
  * @author ubruhin
  * @date 2017-03-21
  */
-class NewElementWizardPage_ChooseType final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_ChooseType final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_ChooseType() = delete;
+  NewElementWizardPage_ChooseType(
+      const NewElementWizardPage_ChooseType& other) = delete;
+  explicit NewElementWizardPage_ChooseType(NewElementWizardContext& context,
+                                           QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_ChooseType() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_ChooseType() = delete;
-        NewElementWizardPage_ChooseType(const NewElementWizardPage_ChooseType& other) = delete;
-        explicit NewElementWizardPage_ChooseType(NewElementWizardContext& context,
-                                                 QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_ChooseType() noexcept;
+  // Getters
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_ChooseType& operator       =(
+      const NewElementWizardPage_ChooseType& rhs) = delete;
 
-        // Getters
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void btnComponentCategoryClicked() noexcept;
+  void btnPackageCategoryClicked() noexcept;
+  void btnSymbolClicked() noexcept;
+  void btnPackageClicked() noexcept;
+  void btnComponentClicked() noexcept;
+  void btnDeviceClicked() noexcept;
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
+  void setElementType(NewElementWizardContext::ElementType type) noexcept;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_ChooseType& operator=(const NewElementWizardPage_ChooseType& rhs) = delete;
-
-
-    private: // Methods
-        void btnComponentCategoryClicked() noexcept;
-        void btnPackageCategoryClicked() noexcept;
-        void btnSymbolClicked() noexcept;
-        void btnPackageClicked() noexcept;
-        void btnComponentClicked() noexcept;
-        void btnDeviceClicked() noexcept;
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-        void setElementType(NewElementWizardContext::ElementType type) noexcept;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_ChooseType> mUi;
+private:  // Data
+  NewElementWizardContext&                            mContext;
+  QScopedPointer<Ui::NewElementWizardPage_ChooseType> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H

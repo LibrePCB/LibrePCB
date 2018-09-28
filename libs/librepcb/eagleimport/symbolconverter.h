@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_EAGLEIMPORT_SYMBOLCONVERTER_H
 #define LIBREPCB_EAGLEIMPORT_SYMBOLCONVERTER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/graphics/graphicslayername.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace parseagle {
 class Symbol;
@@ -45,43 +47,40 @@ namespace eagleimport {
 
 class ConverterDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolConverter
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolConverter class
  */
-class SymbolConverter final
-{
-    public:
+class SymbolConverter final {
+public:
+  // Constructors / Destructor
+  SymbolConverter()                             = delete;
+  SymbolConverter(const SymbolConverter& other) = delete;
+  SymbolConverter(const parseagle::Symbol& symbol, ConverterDb& db) noexcept;
+  ~SymbolConverter() noexcept;
 
-        // Constructors / Destructor
-        SymbolConverter() = delete;
-        SymbolConverter(const SymbolConverter& other) = delete;
-        SymbolConverter(const parseagle::Symbol& symbol, ConverterDb& db) noexcept;
-        ~SymbolConverter() noexcept;
+  // General Methods
+  std::unique_ptr<library::Symbol> generate() const;
 
-        // General Methods
-        std::unique_ptr<library::Symbol> generate() const;
+  // Operator Overloadings
+  SymbolConverter& operator=(const SymbolConverter& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolConverter& operator=(const SymbolConverter& rhs) = delete;
+private:
+  QString                  createDescription() const noexcept;
+  static GraphicsLayerName convertSchematicLayer(int eagleLayerId);
 
-
-    private:
-        QString createDescription() const noexcept;
-        static GraphicsLayerName convertSchematicLayer(int eagleLayerId);
-
-        const parseagle::Symbol& mSymbol;
-        ConverterDb& mDb;
+  const parseagle::Symbol& mSymbol;
+  ConverterDb&             mDb;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace eagleimport
+}  // namespace librepcb
 
-#endif // LIBREPCB_EAGLEIMPORT_SYMBOLCONVERTER_H
+#endif  // LIBREPCB_EAGLEIMPORT_SYMBOLCONVERTER_H

@@ -20,87 +20,83 @@
 #ifndef LIBREPCB_CMDTEXTEDIT_H
 #define LIBREPCB_CMDTEXTEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../text.h"
+ ******************************************************************************/
 #include "../../undocommand.h"
+#include "../text.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdTextEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdTextEdit class
  */
-class CmdTextEdit final : public UndoCommand
-{
-    public:
+class CmdTextEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdTextEdit()                         = delete;
+  CmdTextEdit(const CmdTextEdit& other) = delete;
+  explicit CmdTextEdit(Text& text) noexcept;
+  ~CmdTextEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdTextEdit() = delete;
-        CmdTextEdit(const CmdTextEdit& other) = delete;
-        explicit CmdTextEdit(Text& text) noexcept;
-        ~CmdTextEdit() noexcept;
+  // Setters
+  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setText(const QString& text, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setAlignment(const Alignment& align, bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-        // Setters
-        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
-        void setText(const QString& text, bool immediate) noexcept;
-        void setHeight(const PositiveLength& height, bool immediate) noexcept;
-        void setAlignment(const Alignment& align, bool immediate) noexcept;
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdTextEdit& operator=(const CmdTextEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdTextEdit& operator=(const CmdTextEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Text& mText;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Text& mText;
-
-        // General Attributes
-        GraphicsLayerName mOldLayerName;
-        GraphicsLayerName mNewLayerName;
-        QString mOldText;
-        QString mNewText;
-        Point mOldPosition;
-        Point mNewPosition;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        PositiveLength mOldHeight;
-        PositiveLength mNewHeight;
-        Alignment mOldAlign;
-        Alignment mNewAlign;
+  // General Attributes
+  GraphicsLayerName mOldLayerName;
+  GraphicsLayerName mNewLayerName;
+  QString           mOldText;
+  QString           mNewText;
+  Point             mOldPosition;
+  Point             mNewPosition;
+  Angle             mOldRotation;
+  Angle             mNewRotation;
+  PositiveLength    mOldHeight;
+  PositiveLength    mNewHeight;
+  Alignment         mOldAlign;
+  Alignment         mNewAlign;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDTEXTEDIT_H
+#endif  // LIBREPCB_CMDTEXTEDIT_H

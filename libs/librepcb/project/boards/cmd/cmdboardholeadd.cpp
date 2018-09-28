@@ -17,58 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardholeadd.h"
-#include "../items/bi_hole.h"
-#include "../board.h"
 
-/*****************************************************************************************
+#include "../board.h"
+#include "../items/bi_hole.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardHoleAdd::CmdBoardHoleAdd(BI_Hole& hole) noexcept :
-    UndoCommand(tr("Add hole to board")),
-    mBoard(hole.getBoard()), mHole(&hole)
-{
+CmdBoardHoleAdd::CmdBoardHoleAdd(BI_Hole& hole) noexcept
+  : UndoCommand(tr("Add hole to board")),
+    mBoard(hole.getBoard()),
+    mHole(&hole) {
 }
 
-CmdBoardHoleAdd::~CmdBoardHoleAdd() noexcept
-{
+CmdBoardHoleAdd::~CmdBoardHoleAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardHoleAdd::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardHoleAdd::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardHoleAdd::performUndo()
-{
-    mBoard.removeHole(*mHole);
+void CmdBoardHoleAdd::performUndo() {
+  mBoard.removeHole(*mHole);
 }
 
-void CmdBoardHoleAdd::performRedo()
-{
-    mBoard.addHole(*mHole);
+void CmdBoardHoleAdd::performRedo() {
+  mBoard.addHole(*mHole);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

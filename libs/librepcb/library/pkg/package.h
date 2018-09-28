@@ -20,30 +20,31 @@
 #ifndef LIBREPCB_LIBRARY_PACKAGE_H
 #define LIBREPCB_LIBRARY_PACKAGE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../libraryelement.h"
-#include "packagepad.h"
 #include "footprint.h"
+#include "packagepad.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Package
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The Package class represents a package of a component (including footprint and
- *        3D model)
+ * @brief The Package class represents a package of a component (including
+ * footprint and 3D model)
  *
- * Following information is considered as the "interface" of a package and must therefore
- * never be changed:
+ * Following information is considered as the "interface" of a package and must
+ * therefore never be changed:
  *  - UUID
  *  - Package pads (neither adding nor removing pads is allowed)
  *    - UUID
@@ -52,51 +53,50 @@ namespace library {
  *    - Footprint pads (neither adding nor removing pads is allowed)
  *      - UUID
  */
-class Package final : public LibraryElement
-{
-        Q_OBJECT
+class Package final : public LibraryElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Package()                     = delete;
+  Package(const Package& other) = delete;
+  Package(const Uuid& uuid, const Version& version, const QString& author,
+          const ElementName& name_en_US, const QString& description_en_US,
+          const QString& keywords_en_US);
+  Package(const FilePath& elementDirectory, bool readOnly);
+  ~Package() noexcept;
 
-        // Constructors / Destructor
-        Package() = delete;
-        Package(const Package& other) = delete;
-        Package(const Uuid& uuid, const Version& version, const QString& author,
-                const ElementName& name_en_US, const QString& description_en_US,
-                const QString& keywords_en_US);
-        Package(const FilePath& elementDirectory, bool readOnly);
-        ~Package() noexcept;
+  // Getters
+  PackagePadList&       getPads() noexcept { return mPads; }
+  const PackagePadList& getPads() const noexcept { return mPads; }
+  FootprintList&        getFootprints() noexcept { return mFootprints; }
+  const FootprintList&  getFootprints() const noexcept { return mFootprints; }
 
-        // Getters
-        PackagePadList& getPads() noexcept {return mPads;}
-        const PackagePadList& getPads() const noexcept {return mPads;}
-        FootprintList& getFootprints() noexcept {return mFootprints;}
-        const FootprintList& getFootprints() const noexcept {return mFootprints;}
+  // Operator Overloadings
+  Package& operator=(const Package& rhs) = delete;
 
-        // Operator Overloadings
-        Package& operator=(const Package& rhs) = delete;
+  // Static Methods
+  static QString getShortElementName() noexcept {
+    return QStringLiteral("pkg");
+  }
+  static QString getLongElementName() noexcept {
+    return QStringLiteral("package");
+  }
 
-        // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("pkg");}
-        static QString getLongElementName() noexcept {return QStringLiteral("package");}
+private:  // Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-
-    private: // Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-    private: // Data
-        PackagePadList mPads; ///< empty list if the package has no pads
-        FootprintList mFootprints; ///< minimum one footprint
+private:                       // Data
+  PackagePadList mPads;        ///< empty list if the package has no pads
+  FootprintList  mFootprints;  ///< minimum one footprint
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_PACKAGE_H
+#endif  // LIBREPCB_LIBRARY_PACKAGE_H

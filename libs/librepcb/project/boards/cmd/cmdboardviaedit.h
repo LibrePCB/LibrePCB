@@ -20,80 +20,78 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDVIAEDIT_H
 #define LIBREPCB_PROJECT_CMDBOARDVIAEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/units/point.h>
+ ******************************************************************************/
 #include "../items/bi_via.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/point.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardViaEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardViaEdit class
  */
-class CmdBoardViaEdit final : public UndoCommand
-{
-    public:
+class CmdBoardViaEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardViaEdit(BI_Via& via) noexcept;
+  ~CmdBoardViaEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardViaEdit(BI_Via& via) noexcept;
-        ~CmdBoardViaEdit() noexcept;
+  // Setters
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setShape(BI_Via::Shape shape, bool immediate) noexcept;
+  void setSize(const PositiveLength& size, bool immediate) noexcept;
+  void setDrillDiameter(const PositiveLength& diameter,
+                        bool                  immediate) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setShape(BI_Via::Shape shape, bool immediate) noexcept;
-        void setSize(const PositiveLength& size, bool immediate) noexcept;
-        void setDrillDiameter(const PositiveLength& diameter, bool immediate) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  BI_Via& mVia;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        BI_Via& mVia;
-
-        // General Attributes
-        Point mOldPos;
-        Point mNewPos;
-        BI_Via::Shape mOldShape;
-        BI_Via::Shape mNewShape;
-        PositiveLength mOldSize;
-        PositiveLength mNewSize;
-        PositiveLength mOldDrillDiameter;
-        PositiveLength mNewDrillDiameter;
+  // General Attributes
+  Point          mOldPos;
+  Point          mNewPos;
+  BI_Via::Shape  mOldShape;
+  BI_Via::Shape  mNewShape;
+  PositiveLength mOldSize;
+  PositiveLength mNewSize;
+  PositiveLength mOldDrillDiameter;
+  PositiveLength mNewDrillDiameter;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDVIAEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDVIAEDIT_H

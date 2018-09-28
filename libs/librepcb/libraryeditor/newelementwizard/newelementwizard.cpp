@@ -17,104 +17,104 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "newelementwizard.h"
-#include "ui_newelementwizard.h"
+
 #include "newelementwizardpage_choosetype.h"
+#include "newelementwizardpage_componentpinsignalmap.h"
+#include "newelementwizardpage_componentproperties.h"
+#include "newelementwizardpage_componentsignals.h"
+#include "newelementwizardpage_componentsymbols.h"
 #include "newelementwizardpage_copyfrom.h"
+#include "newelementwizardpage_deviceproperties.h"
 #include "newelementwizardpage_entermetadata.h"
 #include "newelementwizardpage_packagepads.h"
-#include "newelementwizardpage_componentproperties.h"
-#include "newelementwizardpage_componentsymbols.h"
-#include "newelementwizardpage_componentsignals.h"
-#include "newelementwizardpage_componentpinsignalmap.h"
-#include "newelementwizardpage_deviceproperties.h"
+#include "ui_newelementwizard.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewElementWizard::NewElementWizard(const workspace::Workspace& ws, const Library& lib,
-        const IF_GraphicsLayerProvider& lp, QWidget *parent) noexcept :
-    QWizard(parent), mUi(new Ui::NewElementWizard)
-{
-    mUi->setupUi(this);
-    setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
-    mContext.reset(new NewElementWizardContext(ws, lib, lp));
+NewElementWizard::NewElementWizard(const workspace::Workspace&     ws,
+                                   const Library&                  lib,
+                                   const IF_GraphicsLayerProvider& lp,
+                                   QWidget* parent) noexcept
+  : QWizard(parent), mUi(new Ui::NewElementWizard) {
+  mUi->setupUi(this);
+  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+  mContext.reset(new NewElementWizardContext(ws, lib, lp));
 
-    // add pages
-    insertPage(NewElementWizardContext::ID_ChooseType,
-               new NewElementWizardPage_ChooseType(*mContext, this));
-    insertPage(NewElementWizardContext::ID_CopyFrom,
-               new NewElementWizardPage_CopyFrom(*mContext, this));
-    insertPage(NewElementWizardContext::ID_EnterMetadata,
-               new NewElementWizardPage_EnterMetadata(*mContext, this));
-    insertPage(NewElementWizardContext::ID_PackagePads,
-               new NewElementWizardPage_PackagePads(*mContext, this));
-    insertPage(NewElementWizardContext::ID_ComponentProperties,
-               new NewElementWizardPage_ComponentProperties(*mContext, this));
-    insertPage(NewElementWizardContext::ID_ComponentSymbols,
-               new NewElementWizardPage_ComponentSymbols(*mContext, this));
-    insertPage(NewElementWizardContext::ID_ComponentSignals,
-               new NewElementWizardPage_ComponentSignals(*mContext, this));
-    insertPage(NewElementWizardContext::ID_ComponentPinSignalMap,
-               new NewElementWizardPage_ComponentPinSignalMap(*mContext, this));
-    insertPage(NewElementWizardContext::ID_DeviceProperties,
-               new NewElementWizardPage_DeviceProperties(*mContext, this));
+  // add pages
+  insertPage(NewElementWizardContext::ID_ChooseType,
+             new NewElementWizardPage_ChooseType(*mContext, this));
+  insertPage(NewElementWizardContext::ID_CopyFrom,
+             new NewElementWizardPage_CopyFrom(*mContext, this));
+  insertPage(NewElementWizardContext::ID_EnterMetadata,
+             new NewElementWizardPage_EnterMetadata(*mContext, this));
+  insertPage(NewElementWizardContext::ID_PackagePads,
+             new NewElementWizardPage_PackagePads(*mContext, this));
+  insertPage(NewElementWizardContext::ID_ComponentProperties,
+             new NewElementWizardPage_ComponentProperties(*mContext, this));
+  insertPage(NewElementWizardContext::ID_ComponentSymbols,
+             new NewElementWizardPage_ComponentSymbols(*mContext, this));
+  insertPage(NewElementWizardContext::ID_ComponentSignals,
+             new NewElementWizardPage_ComponentSignals(*mContext, this));
+  insertPage(NewElementWizardContext::ID_ComponentPinSignalMap,
+             new NewElementWizardPage_ComponentPinSignalMap(*mContext, this));
+  insertPage(NewElementWizardContext::ID_DeviceProperties,
+             new NewElementWizardPage_DeviceProperties(*mContext, this));
 
-    setStartId(NewElementWizardContext::ID_ChooseType);
+  setStartId(NewElementWizardContext::ID_ChooseType);
 }
 
-NewElementWizard::~NewElementWizard() noexcept
-{
-    // ensure that mContext lives longer than all pages!
-    qDeleteAll(mPages); mPages.clear();
+NewElementWizard::~NewElementWizard() noexcept {
+  // ensure that mContext lives longer than all pages!
+  qDeleteAll(mPages);
+  mPages.clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewElementWizard::validateCurrentPage() noexcept
-{
-    if (currentPage() && (!currentPage()->validatePage())) {
-        return false;
+bool NewElementWizard::validateCurrentPage() noexcept {
+  if (currentPage() && (!currentPage()->validatePage())) {
+    return false;
+  }
+  if (nextId() == NewElementWizardContext::ID_None) {
+    // last page --> create the library element!
+    try {
+      mContext->createLibraryElement();  // can throw
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Failed to create element"), e.getMsg());
+      return false;
     }
-    if (nextId() == NewElementWizardContext::ID_None) {
-        // last page --> create the library element!
-        try {
-            mContext->createLibraryElement(); // can throw
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Failed to create element"), e.getMsg());
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NewElementWizard::insertPage(int index, QWizardPage* page) noexcept
-{
-    setPage(index, page);
-    mPages.append(page);
+void NewElementWizard::insertPage(int index, QWizardPage* page) noexcept {
+  setPage(index, page);
+  mPages.append(page);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

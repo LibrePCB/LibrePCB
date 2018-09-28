@@ -20,76 +20,73 @@
 #ifndef LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H
 #define LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../projectmetadata.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdProjectMetadataEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdProjectMetadataEdit class
  */
-class CmdProjectMetadataEdit final : public UndoCommand
-{
-    public:
+class CmdProjectMetadataEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdProjectMetadataEdit(ProjectMetadata& metadata) noexcept;
+  ~CmdProjectMetadataEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdProjectMetadataEdit(ProjectMetadata& metadata) noexcept;
-        ~CmdProjectMetadataEdit() noexcept;
+  // Setters
+  void setName(const ElementName& newName) noexcept;
+  void setAuthor(const QString& newAuthor) noexcept;
+  void setVersion(const QString& newVersion) noexcept;
+  void setAttributes(const AttributeList& attributes) noexcept;
 
-        // Setters
-        void setName(const ElementName& newName) noexcept;
-        void setAuthor(const QString& newAuthor) noexcept;
-        void setVersion(const QString& newVersion) noexcept;
-        void setAttributes(const AttributeList& attributes) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // General
+  ProjectMetadata& mMetadata;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // General
-        ProjectMetadata& mMetadata;
-
-        // Misc
-        ElementName mOldName;
-        ElementName mNewName;
-        QString mOldAuthor;
-        QString mNewAuthor;
-        QString mOldVersion;
-        QString mNewVersion;
-        AttributeList mOldAttributes;
-        AttributeList mNewAttributes;
+  // Misc
+  ElementName   mOldName;
+  ElementName   mNewName;
+  QString       mOldAuthor;
+  QString       mNewAuthor;
+  QString       mOldVersion;
+  QString       mNewVersion;
+  AttributeList mOldAttributes;
+  AttributeList mNewAttributes;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDPROJECTMETADATAEDIT_H

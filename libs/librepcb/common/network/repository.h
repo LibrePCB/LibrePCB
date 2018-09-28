@@ -20,20 +20,21 @@
 #ifndef LIBREPCB_REPOSITORY_H
 #define LIBREPCB_REPOSITORY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../fileio/serializableobject.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Repository
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Repository class provides access to a LibrePCB API server
@@ -41,57 +42,50 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-08-10
  */
-class Repository final : public QObject, public SerializableObject
-{
-        Q_OBJECT
+class Repository final : public QObject, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Repository() = delete;
+  explicit Repository(const Repository& other) noexcept;
+  explicit Repository(const QUrl& url) noexcept;
+  explicit Repository(const SExpression& node);
+  ~Repository() noexcept;
 
-        // Constructors / Destructor
-        Repository() = delete;
-        explicit Repository(const Repository& other) noexcept;
-        explicit Repository(const QUrl& url) noexcept;
-        explicit Repository(const SExpression& node);
-        ~Repository() noexcept;
+  // Getters
+  bool        isValid() const noexcept { return mUrl.isValid(); }
+  const QUrl& getUrl() const noexcept { return mUrl; }
 
-        // Getters
-        bool isValid() const noexcept {return mUrl.isValid();}
-        const QUrl& getUrl() const noexcept {return mUrl;}
+  // Setters
+  bool setUrl(const QUrl& url) noexcept;
 
-        // Setters
-        bool setUrl(const QUrl& url) noexcept;
+  // General Methods
+  void requestLibraryList() const noexcept;
 
-        // General Methods
-        void requestLibraryList() const noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operators
+  Repository& operator=(const Repository& rhs) = delete;
 
-        // Operators
-        Repository& operator=(const Repository& rhs) = delete;
+signals:
 
+  void libraryListReceived(const QJsonArray& libs);
+  void errorWhileFetchingLibraryList(const QString& errorMsg);
 
-    signals:
+private:  // Methods
+  void requestLibraryList(const QUrl& url) const noexcept;
+  void requestedDataReceived(const QByteArray& data) noexcept;
 
-        void libraryListReceived(const QJsonArray& libs);
-        void errorWhileFetchingLibraryList(const QString& errorMsg);
-
-
-    private: // Methods
-
-        void requestLibraryList(const QUrl& url) const noexcept;
-        void requestedDataReceived(const QByteArray& data) noexcept;
-
-
-    private: // Data
-
-        QUrl mUrl;
+private:  // Data
+  QUrl mUrl;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_REPOSITORY_H
+#endif  // LIBREPCB_REPOSITORY_H

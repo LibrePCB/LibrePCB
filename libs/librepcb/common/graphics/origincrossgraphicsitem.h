@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
 #define LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../graphics/graphicslayer.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class OriginCrossGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The OriginCrossGraphicsItem class
@@ -43,57 +44,60 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-11-13
  */
-class OriginCrossGraphicsItem final : public QGraphicsItem, public IF_GraphicsLayerObserver
-{
-    public:
+class OriginCrossGraphicsItem final : public QGraphicsItem,
+                                      public IF_GraphicsLayerObserver {
+public:
+  // Constructors / Destructor
+  // OriginCrossGraphicsItem() = delete;
+  OriginCrossGraphicsItem(const OriginCrossGraphicsItem& other) = delete;
+  explicit OriginCrossGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
+  ~OriginCrossGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        //OriginCrossGraphicsItem() = delete;
-        OriginCrossGraphicsItem(const OriginCrossGraphicsItem& other) = delete;
-        explicit OriginCrossGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-        ~OriginCrossGraphicsItem() noexcept;
+  // Setters
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setSize(const UnsignedLength& size) noexcept;
+  void setLayer(const GraphicsLayer* layer) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setSize(const UnsignedLength& size) noexcept;
-        void setLayer(const GraphicsLayer* layer) noexcept;
+  // Inherited from IF_LayerObserver
+  void layerColorChanged(const GraphicsLayer& layer,
+                         const QColor&        newColor) noexcept override;
+  void layerHighlightColorChanged(const GraphicsLayer& layer,
+                                  const QColor& newColor) noexcept override;
+  void layerVisibleChanged(const GraphicsLayer& layer,
+                           bool                 newVisible) noexcept override;
+  void layerEnabledChanged(const GraphicsLayer& layer,
+                           bool                 newEnabled) noexcept override;
+  void layerDestroyed(const GraphicsLayer& layer) noexcept override;
 
-        // Inherited from IF_LayerObserver
-        void layerColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept override;
-        void layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept override;
-        void layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept override;
-        void layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept override;
-        void layerDestroyed(const GraphicsLayer& layer) noexcept override;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+  // Operator Overloadings
+  OriginCrossGraphicsItem& operator=(const OriginCrossGraphicsItem& rhs) =
+      delete;
 
-        // Operator Overloadings
-        OriginCrossGraphicsItem& operator=(const OriginCrossGraphicsItem& rhs) = delete;
+private:  // Methods
+  void updateBoundingRectAndShape() noexcept;
 
-
-    private: // Methods
-        void updateBoundingRectAndShape() noexcept;
-
-
-    private: // Data
-        const GraphicsLayer* mLayer;
-        QPen mPen;
-        QPen mPenHighlighted;
-        UnsignedLength mSize;
-        QLineF mLineH;
-        QLineF mLineV;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+private:  // Data
+  const GraphicsLayer* mLayer;
+  QPen                 mPen;
+  QPen                 mPenHighlighted;
+  UnsignedLength       mSize;
+  QLineF               mLineH;
+  QLineF               mLineV;
+  QRectF               mBoundingRect;
+  QPainterPath         mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
+#endif  // LIBREPCB_ORIGINCROSSGRAPHICSITEM_H

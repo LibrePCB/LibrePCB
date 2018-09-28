@@ -17,57 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributeprovider.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Public Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString AttributeProvider::getAttributeValue(const QString& key) const noexcept
-{
-   QVector<const AttributeProvider*> backtrace; // for endless loop detection
-   return getAttributeValue(key, backtrace);
+QString AttributeProvider::getAttributeValue(const QString& key) const
+    noexcept {
+  QVector<const AttributeProvider*> backtrace;  // for endless loop detection
+  return getAttributeValue(key, backtrace);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString AttributeProvider::getAttributeValue(const QString& key,
-                                             QVector<const AttributeProvider*>& backtrace) const noexcept
-{
-    // priority 1: user defined attributes of this object
-    QString value = getUserDefinedAttributeValue(key);
-    if (!value.isEmpty()) return value;
+QString AttributeProvider::getAttributeValue(
+    const QString& key, QVector<const AttributeProvider*>& backtrace) const
+    noexcept {
+  // priority 1: user defined attributes of this object
+  QString value = getUserDefinedAttributeValue(key);
+  if (!value.isEmpty()) return value;
 
-    // priority 2: built-in attributes of this object
-    value = getBuiltInAttributeValue(key);
-    if (!value.isEmpty()) return value;
+  // priority 2: built-in attributes of this object
+  value = getBuiltInAttributeValue(key);
+  if (!value.isEmpty()) return value;
 
-    // priority 3: attributes from all parent objects in specific order
-    backtrace.append(this);
-    foreach (const AttributeProvider* parent, getAttributeProviderParents()) {
-        if (parent && (!backtrace.contains(parent))) { // break possible endless loop
-            value = parent->getAttributeValue(key, backtrace);
-            if (!value.isEmpty()) return value;
-        }
+  // priority 3: attributes from all parent objects in specific order
+  backtrace.append(this);
+  foreach (const AttributeProvider* parent, getAttributeProviderParents()) {
+    if (parent &&
+        (!backtrace.contains(parent))) {  // break possible endless loop
+      value = parent->getAttributeValue(key, backtrace);
+      if (!value.isEmpty()) return value;
     }
+  }
 
-    // attribute not set...
-    return QString();
+  // attribute not set...
+  return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

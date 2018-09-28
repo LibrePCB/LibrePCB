@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H
 #define LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class DomElement;
@@ -39,9 +40,9 @@ class Schematic;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicClipboard
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SchematicClipboard class
@@ -49,42 +50,39 @@ namespace editor {
  * @author ubruhin
  * @author 2015-03-07
  */
-class SchematicClipboard final : public QObject
-{
-        Q_OBJECT
+class SchematicClipboard final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // General Methods
+  // void clear() noexcept;
+  // void cut(const QList<SymbolInstance*>& symbols);
+  // void copy(const QList<SymbolInstance*>& symbols);
+  // void paste(Schematic& schematic, QList<SymbolInstance*>& symbols);
 
-        // General Methods
-        //void clear() noexcept;
-        //void cut(const QList<SymbolInstance*>& symbols);
-        //void copy(const QList<SymbolInstance*>& symbols);
-        //void paste(Schematic& schematic, QList<SymbolInstance*>& symbols);
+  // Static Methods
+  static SchematicClipboard& instance() noexcept {
+    static SchematicClipboard i;
+    return i;
+  }
 
+private:
+  // Private Methods
+  SchematicClipboard() noexcept;
+  ~SchematicClipboard() noexcept;
+  // void setElements(const QList<SymbolInstance*>& symbols);
 
-        // Static Methods
-        static SchematicClipboard& instance() noexcept {static SchematicClipboard i; return i;}
-
-    private:
-
-        // Private Methods
-        SchematicClipboard() noexcept;
-        ~SchematicClipboard() noexcept;
-        //void setElements(const QList<SymbolInstance*>& symbols);
-
-
-        // Attributes
-        bool mCutActive;
-        //QList<DomElement*> mSymbolInstances;
-
+  // Attributes
+  bool mCutActive;
+  // QList<DomElement*> mSymbolInstances;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H
+#endif  // LIBREPCB_PROJECT_SCHEMATICCLIPBOARD_H

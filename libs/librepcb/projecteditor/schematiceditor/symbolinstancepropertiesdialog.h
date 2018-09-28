@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
 #define LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -46,52 +46,49 @@ namespace Ui {
 class SymbolInstancePropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolInstancePropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolInstancePropertiesDialog class
  */
-class SymbolInstancePropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class SymbolInstancePropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolInstancePropertiesDialog() = delete;
+  SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other) =
+      delete;
+  SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
+                                 SI_Symbol& symbol, UndoStack& undoStack,
+                                 QWidget* parent) noexcept;
+  ~SymbolInstancePropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        SymbolInstancePropertiesDialog() = delete;
-        SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other) = delete;
-        SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
-                                       SI_Symbol& symbol, UndoStack& undoStack,
-                                       QWidget* parent) noexcept;
-        ~SymbolInstancePropertiesDialog() noexcept;
+  // Operator Overloadings
+  SymbolInstancePropertiesDialog& operator       =(
+      const SymbolInstancePropertiesDialog& rhs) = delete;
 
+private:  // Methods
+  void keyPressEvent(QKeyEvent* e);
+  void accept();
+  bool applyChanges() noexcept;
 
-        // Operator Overloadings
-        SymbolInstancePropertiesDialog& operator=(const SymbolInstancePropertiesDialog& rhs) = delete;
-
-
-    private: // Methods
-        void keyPressEvent(QKeyEvent* e);
-        void accept();
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        Project& mProject;
-        ComponentInstance& mComponentInstance;
-        SI_Symbol& mSymbol;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
+private:  // Data
+  Project&                                           mProject;
+  ComponentInstance&                                 mComponentInstance;
+  SI_Symbol&                                         mSymbol;
+  UndoStack&                                         mUndoStack;
+  QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#endif  // LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H

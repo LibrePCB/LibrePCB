@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_RECENTPROJECTSMODEL_H
 #define LIBREPCB_RECENTPROJECTSMODEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class SmartSExprFile;
@@ -37,53 +38,48 @@ namespace workspace {
 
 class Workspace;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class RecentProjectsModel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The RecentProjectsModel class
  */
-class RecentProjectsModel : public QAbstractListModel
-{
-        Q_OBJECT
+class RecentProjectsModel : public QAbstractListModel {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  RecentProjectsModel()                                 = delete;
+  RecentProjectsModel(const RecentProjectsModel& other) = delete;
+  explicit RecentProjectsModel(const Workspace& workspace) noexcept;
+  ~RecentProjectsModel() noexcept;
 
-        // Constructors / Destructor
-        RecentProjectsModel() = delete;
-        RecentProjectsModel(const RecentProjectsModel& other) = delete;
-        explicit RecentProjectsModel(const Workspace& workspace) noexcept;
-        ~RecentProjectsModel() noexcept;
+  // General Methods
+  void setLastRecentProject(const FilePath& filepath) noexcept;
 
-        // General Methods
-        void setLastRecentProject(const FilePath& filepath) noexcept;
+  // Operator Overloadings
+  RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
 
-        // Operator Overloadings
-        RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
+private:
+  // General Methods
+  void save() noexcept;
 
+  // Inherited Methods
+  int      rowCount(const QModelIndex& parent = QModelIndex()) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-    private:
-
-        // General Methods
-        void save() noexcept;
-
-        // Inherited Methods
-        int rowCount(const QModelIndex& parent = QModelIndex()) const;
-        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-
-        // Attributes
-        const Workspace& mWorkspace;
-        QScopedPointer<SmartSExprFile> mFile;
-        QList<FilePath> mRecentProjects;
-
+  // Attributes
+  const Workspace&               mWorkspace;
+  QScopedPointer<SmartSExprFile> mFile;
+  QList<FilePath>                mRecentProjects;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_RECENTPROJECTSMODEL_H
+#endif  // LIBREPCB_RECENTPROJECTSMODEL_H

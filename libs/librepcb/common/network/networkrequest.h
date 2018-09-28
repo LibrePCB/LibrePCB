@@ -20,70 +20,65 @@
 #ifndef LIBREPCB_NETWORKREQUEST_H
 #define LIBREPCB_NETWORKREQUEST_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "networkrequestbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NetworkRequest
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief This class is used to process general purpose network requests (up to 100MB)
+ * @brief This class is used to process general purpose network requests (up to
+ * 100MB)
  *
  * @see librepcb::NetworkRequestBase, librepcb::NetworkAccessManager
  *
  * @author ubruhin
  * @date 2016-09-12
  */
-class NetworkRequest final : public NetworkRequestBase
-{
-        Q_OBJECT
+class NetworkRequest final : public NetworkRequestBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NetworkRequest()                            = delete;
+  NetworkRequest(const NetworkRequest& other) = delete;
+  NetworkRequest(const QUrl& url) noexcept;
+  ~NetworkRequest() noexcept;
 
-        // Constructors / Destructor
-        NetworkRequest() = delete;
-        NetworkRequest(const NetworkRequest& other) = delete;
-        NetworkRequest(const QUrl& url) noexcept;
-        ~NetworkRequest() noexcept;
+  // Operator Overloadings
+  NetworkRequest& operator=(const NetworkRequest& rhs) = delete;
 
-        // Operator Overloadings
-        NetworkRequest& operator=(const NetworkRequest& rhs) = delete;
+signals:
 
+  /**
+   * @brief Data successfully received signal (emited right before #finished())
+   */
+  void dataReceived(QByteArray data);
 
-    signals:
+private:  // Methods
+  void prepareRequest() override;
+  void finalizeRequest() override;
+  void emitSuccessfullyFinishedSignals() noexcept override;
+  void fetchNewData() noexcept override;
 
-        /**
-         * @brief Data successfully received signal (emited right before #finished())
-         */
-        void dataReceived(QByteArray data);
-
-
-    private: // Methods
-
-        void prepareRequest() override;
-        void finalizeRequest() override;
-        void emitSuccessfullyFinishedSignals() noexcept override;
-        void fetchNewData() noexcept override;
-
-
-    private: // Data
-
-        QByteArray mReceivedData;
+private:  // Data
+  QByteArray mReceivedData;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_NETWORKREQUEST_H
+#endif  // LIBREPCB_NETWORKREQUEST_H

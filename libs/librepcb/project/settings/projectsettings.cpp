@@ -17,128 +17,123 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "projectsettings.h"
-#include <librepcb/common/fileio/smartsexprfile.h>
-#include <librepcb/common/fileio/sexpression.h>
+
 #include "../project.h"
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly, bool create) :
-    QObject(nullptr), mProject(project),
-    mFilepath(project.getPath().getPathTo("project/settings.lp")), mFile(nullptr)
-{
-    qDebug() << "load settings...";
-    Q_ASSERT(!(create && (restore || readOnly)));
+ProjectSettings::ProjectSettings(Project& project, bool restore, bool readOnly,
+                                 bool create)
+  : QObject(nullptr),
+    mProject(project),
+    mFilepath(project.getPath().getPathTo("project/settings.lp")),
+    mFile(nullptr) {
+  qDebug() << "load settings...";
+  Q_ASSERT(!(create && (restore || readOnly)));
 
-    try
-    {
-        // restore all default values
-        restoreDefaults();
+  try {
+    // restore all default values
+    restoreDefaults();
 
-        // try to create/open the file "settings.lp"
-        if (create)
-        {
-            mFile = SmartSExprFile::create(mFilepath);
-        }
-        else
-        {
-            mFile = new SmartSExprFile(mFilepath, restore, readOnly);
-            SExpression root = mFile->parseFileAndBuildDomTree();
+    // try to create/open the file "settings.lp"
+    if (create) {
+      mFile = SmartSExprFile::create(mFilepath);
+    } else {
+      mFile            = new SmartSExprFile(mFilepath, restore, readOnly);
+      SExpression root = mFile->parseFileAndBuildDomTree();
 
-            // OK - file is open --> now load all settings
+      // OK - file is open --> now load all settings
 
-            // locale order
-            foreach (const SExpression& node, root.getChildByPath("library_locale_order").getChildren()) {
-                mLocaleOrder.append(node.getValueOfFirstChild<QString>(true));
-            }
+      // locale order
+      foreach (const SExpression& node,
+               root.getChildByPath("library_locale_order").getChildren()) {
+        mLocaleOrder.append(node.getValueOfFirstChild<QString>(true));
+      }
 
-            // norm order
-            foreach (const SExpression& node, root.getChildByPath("library_norm_order").getChildren()) {
-                mNormOrder.append(node.getValueOfFirstChild<QString>(true));
-            }
-        }
-
-        triggerSettingsChanged();
-    }
-    catch (...)
-    {
-        // free allocated memory and rethrow the exception
-        delete mFile;            mFile = nullptr;
-        throw;
+      // norm order
+      foreach (const SExpression& node,
+               root.getChildByPath("library_norm_order").getChildren()) {
+        mNormOrder.append(node.getValueOfFirstChild<QString>(true));
+      }
     }
 
-    qDebug() << "settings successfully loaded!";
+    triggerSettingsChanged();
+  } catch (...) {
+    // free allocated memory and rethrow the exception
+    delete mFile;
+    mFile = nullptr;
+    throw;
+  }
+
+  qDebug() << "settings successfully loaded!";
 }
 
-ProjectSettings::~ProjectSettings() noexcept
-{
-    delete mFile;            mFile = nullptr;
+ProjectSettings::~ProjectSettings() noexcept {
+  delete mFile;
+  mFile = nullptr;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ProjectSettings::restoreDefaults() noexcept
-{
-    mLocaleOrder.clear();
-    mNormOrder.clear();
+void ProjectSettings::restoreDefaults() noexcept {
+  mLocaleOrder.clear();
+  mNormOrder.clear();
 }
 
-void ProjectSettings::triggerSettingsChanged() noexcept
-{
-    emit settingsChanged();
+void ProjectSettings::triggerSettingsChanged() noexcept {
+  emit settingsChanged();
 }
 
-bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept
-{
-    bool success = true;
+bool ProjectSettings::save(bool toOriginal, QStringList& errors) noexcept {
+  bool success = true;
 
-    // Save "project/settings.lp"
-    try
-    {
-        SExpression doc(serializeToDomElement("librepcb_project_settings"));
-        mFile->save(doc, toOriginal);
-    }
-    catch (Exception& e)
-    {
-        success = false;
-        errors.append(e.getMsg());
-    }
+  // Save "project/settings.lp"
+  try {
+    SExpression doc(serializeToDomElement("librepcb_project_settings"));
+    mFile->save(doc, toOriginal);
+  } catch (Exception& e) {
+    success = false;
+    errors.append(e.getMsg());
+  }
 
-    return success;
+  return success;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ProjectSettings::serialize(SExpression& root) const
-{
-    SExpression& locale_order = root.appendList("library_locale_order", true);
-    foreach (const QString& locale, mLocaleOrder)
-        locale_order.appendChild("locale", locale, true);
-    SExpression& norm_order = root.appendList("library_norm_order", true);
-    foreach (const QString& norm, mNormOrder)
-        norm_order.appendChild("norm", norm, true);
+void ProjectSettings::serialize(SExpression& root) const {
+  SExpression& locale_order = root.appendList("library_locale_order", true);
+  foreach (const QString& locale, mLocaleOrder)
+    locale_order.appendChild("locale", locale, true);
+  SExpression& norm_order = root.appendList("library_norm_order", true);
+  foreach (const QString& norm, mNormOrder)
+    norm_order.appendChild("norm", norm, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

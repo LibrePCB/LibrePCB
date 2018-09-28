@@ -20,18 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
 #define LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/geometry/stroketext.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -40,13 +41,13 @@ class IF_GraphicsLayerProvider;
 namespace library {
 
 class Component;
-//class Device;
+// class Device;
 class Package;
 class Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPreviewGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FootprintPreviewGraphicsItem class
@@ -54,70 +55,68 @@ class Footprint;
  * @author ubruhin
  * @date 2015-04-21
  */
-class FootprintPreviewGraphicsItem final : public QGraphicsItem, public AttributeProvider
-{
-    public:
+class FootprintPreviewGraphicsItem final : public QGraphicsItem,
+                                           public AttributeProvider {
+public:
+  // Constructors / Destructor
+  explicit FootprintPreviewGraphicsItem(
+      const IF_GraphicsLayerProvider& layerProvider,
+      const QStringList& localeOrder, const Footprint& footprint,
+      const Package*   package   = nullptr, /*const Device* device = nullptr,*/
+      const Component* component = nullptr,
+      const AttributeProvider* attrProvider = nullptr) noexcept;
+  ~FootprintPreviewGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        explicit FootprintPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
-            const QStringList& localeOrder, const Footprint& footprint,
-            const Package* package = nullptr, /*const Device* device = nullptr,*/
-            const Component* component = nullptr,
-            const AttributeProvider* attrProvider = nullptr) noexcept;
-        ~FootprintPreviewGraphicsItem() noexcept;
+  // Setters
+  void setDrawBoundingRect(bool enable) noexcept;
 
-        // Setters
-        void setDrawBoundingRect(bool enable) noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+signals:
 
+  /// @copydoc AttributeProvider::attributesChanged()
+  void attributesChanged() override {}
 
-    signals:
+private:
+  // make some methods inaccessible...
+  FootprintPreviewGraphicsItem() = delete;
+  FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) =
+      delete;
+  FootprintPreviewGraphicsItem& operator       =(
+      const FootprintPreviewGraphicsItem& rhs) = delete;
 
-        /// @copydoc AttributeProvider::attributesChanged()
-        void attributesChanged() override {}
+  // Inherited from AttributeProvider
+  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
+  // General Attributes
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  const Footprint&                mFootprint;
+  const Package*                  mPackage;
+  // const Device* mDevice;
+  const Component*         mComponent;
+  const AttributeProvider* mAttributeProvider;
+  bool                     mDrawBoundingRect;
+  QStringList              mLocaleOrder;
+  StrokeTextList           mStrokeTexts;
 
-    private:
-
-        // make some methods inaccessible...
-        FootprintPreviewGraphicsItem() = delete;
-        FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) = delete;
-        FootprintPreviewGraphicsItem& operator=(const FootprintPreviewGraphicsItem& rhs) = delete;
-
-
-        // Inherited from AttributeProvider
-        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
-        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-
-
-        // General Attributes
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        const Footprint& mFootprint;
-        const Package* mPackage;
-        //const Device* mDevice;
-        const Component* mComponent;
-        const AttributeProvider* mAttributeProvider;
-        bool mDrawBoundingRect;
-        QStringList mLocaleOrder;
-        StrokeTextList mStrokeTexts;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QRectF       mBoundingRect;
+  QPainterPath mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
+#endif  // LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H

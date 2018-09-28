@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
 #define LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -45,51 +45,49 @@ namespace Ui {
 class DeviceInstancePropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class DeviceInstancePropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The DeviceInstancePropertiesDialog class
  */
-class DeviceInstancePropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class DeviceInstancePropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  DeviceInstancePropertiesDialog() = delete;
+  DeviceInstancePropertiesDialog(const DeviceInstancePropertiesDialog& other) =
+      delete;
+  DeviceInstancePropertiesDialog(Project& project, BI_Device& device,
+                                 UndoStack& undoStack,
+                                 QWidget*   parent) noexcept;
+  ~DeviceInstancePropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        DeviceInstancePropertiesDialog() = delete;
-        DeviceInstancePropertiesDialog(const DeviceInstancePropertiesDialog& other) = delete;
-        DeviceInstancePropertiesDialog(Project& project, BI_Device& device,
-                                       UndoStack& undoStack, QWidget* parent) noexcept;
-        ~DeviceInstancePropertiesDialog() noexcept;
+  // Operator Overloadings
+  DeviceInstancePropertiesDialog& operator       =(
+      const DeviceInstancePropertiesDialog& rhs) = delete;
 
+private:  // Methods
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
+  void keyPressEvent(QKeyEvent* e) noexcept override;
+  void accept() noexcept override;
+  bool applyChanges() noexcept;
 
-        // Operator Overloadings
-        DeviceInstancePropertiesDialog& operator=(const DeviceInstancePropertiesDialog& rhs) = delete;
-
-
-    private: // Methods
-        void buttonBoxClicked(QAbstractButton* button) noexcept;
-        void keyPressEvent(QKeyEvent* e) noexcept override;
-        void accept() noexcept override;
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        Project& mProject;
-        BI_Device& mDevice;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::DeviceInstancePropertiesDialog> mUi;
+private:  // Data
+  Project&                                           mProject;
+  BI_Device&                                         mDevice;
+  UndoStack&                                         mUndoStack;
+  QScopedPointer<Ui::DeviceInstancePropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
+#endif  // LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H

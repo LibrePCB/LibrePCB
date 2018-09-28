@@ -17,58 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdnetsignalremove.h"
-#include "../netsignal.h"
-#include "../circuit.h"
 
-/*****************************************************************************************
+#include "../circuit.h"
+#include "../netsignal.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal) noexcept :
-    UndoCommand(tr("Remove netsignal")),
-    mCircuit(circuit), mNetSignal(netsignal)
-{
+CmdNetSignalRemove::CmdNetSignalRemove(Circuit&   circuit,
+                                       NetSignal& netsignal) noexcept
+  : UndoCommand(tr("Remove netsignal")),
+    mCircuit(circuit),
+    mNetSignal(netsignal) {
 }
 
-CmdNetSignalRemove::~CmdNetSignalRemove() noexcept
-{
+CmdNetSignalRemove::~CmdNetSignalRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdNetSignalRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdNetSignalRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdNetSignalRemove::performUndo()
-{
-    mCircuit.addNetSignal(mNetSignal); // can throw
+void CmdNetSignalRemove::performUndo() {
+  mCircuit.addNetSignal(mNetSignal);  // can throw
 }
 
-void CmdNetSignalRemove::performRedo()
-{
-    mCircuit.removeNetSignal(mNetSignal); // can throw
+void CmdNetSignalRemove::performRedo() {
+  mCircuit.removeNetSignal(mNetSignal);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

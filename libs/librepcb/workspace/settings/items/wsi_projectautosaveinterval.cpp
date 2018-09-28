@@ -17,95 +17,91 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_projectautosaveinterval.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(const SExpression& node) :
-    WSI_Base(),
-    mInterval(600), mIntervalTmp(mInterval)
-{
-    if (const SExpression* child = node.tryGetChildByPath("project_autosave_interval")) {
-        mInterval = child->getValueOfFirstChild<uint>();
-    }
+WSI_ProjectAutosaveInterval::WSI_ProjectAutosaveInterval(
+    const SExpression& node)
+  : WSI_Base(), mInterval(600), mIntervalTmp(mInterval) {
+  if (const SExpression* child =
+          node.tryGetChildByPath("project_autosave_interval")) {
+    mInterval = child->getValueOfFirstChild<uint>();
+  }
 
-    if (mInterval % 60 != 0) {
-        mInterval += 60 - (mInterval % 60); // round up to the next full minute
-    }
-    mIntervalTmp = mInterval;
+  if (mInterval % 60 != 0) {
+    mInterval += 60 - (mInterval % 60);  // round up to the next full minute
+  }
+  mIntervalTmp = mInterval;
 
-    // create a spinbox
-    mSpinBox.reset(new QSpinBox());
-    mSpinBox->setMinimum(0);
-    mSpinBox->setMaximum(60);
-    mSpinBox->setValue(mInterval / 60);
-    mSpinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(mSpinBox.data(), static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &WSI_ProjectAutosaveInterval::spinBoxValueChanged);
+  // create a spinbox
+  mSpinBox.reset(new QSpinBox());
+  mSpinBox->setMinimum(0);
+  mSpinBox->setMaximum(60);
+  mSpinBox->setValue(mInterval / 60);
+  mSpinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  connect(mSpinBox.data(),
+          static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
+          &WSI_ProjectAutosaveInterval::spinBoxValueChanged);
 
-    // create a QWidget
-    mWidget.reset(new QWidget());
-    QHBoxLayout* layout = new QHBoxLayout(mWidget.data());
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mSpinBox.data());
-    layout->addWidget(new QLabel(tr("Minutes (0 = disable autosave)")));
+  // create a QWidget
+  mWidget.reset(new QWidget());
+  QHBoxLayout* layout = new QHBoxLayout(mWidget.data());
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mSpinBox.data());
+  layout->addWidget(new QLabel(tr("Minutes (0 = disable autosave)")));
 }
 
-WSI_ProjectAutosaveInterval::~WSI_ProjectAutosaveInterval() noexcept
-{
+WSI_ProjectAutosaveInterval::~WSI_ProjectAutosaveInterval() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_ProjectAutosaveInterval::restoreDefault() noexcept
-{
-    mIntervalTmp = 600;
-    mSpinBox->setValue(mIntervalTmp / 60);
+void WSI_ProjectAutosaveInterval::restoreDefault() noexcept {
+  mIntervalTmp = 600;
+  mSpinBox->setValue(mIntervalTmp / 60);
 }
 
-void WSI_ProjectAutosaveInterval::apply() noexcept
-{
-    mInterval = mIntervalTmp;
+void WSI_ProjectAutosaveInterval::apply() noexcept {
+  mInterval = mIntervalTmp;
 }
 
-void WSI_ProjectAutosaveInterval::revert() noexcept
-{
-    mIntervalTmp = mInterval;
-    mSpinBox->setValue(mIntervalTmp / 60);
+void WSI_ProjectAutosaveInterval::revert() noexcept {
+  mIntervalTmp = mInterval;
+  mSpinBox->setValue(mIntervalTmp / 60);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept
-{
-    mIntervalTmp = value * 60;
+void WSI_ProjectAutosaveInterval::spinBoxValueChanged(int value) noexcept {
+  mIntervalTmp = value * 60;
 }
 
-void WSI_ProjectAutosaveInterval::serialize(SExpression& root) const
-{
-    root.appendChild("project_autosave_interval", mInterval, true);
+void WSI_ProjectAutosaveInterval::serialize(SExpression& root) const {
+  root.appendChild("project_autosave_interval", mInterval, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

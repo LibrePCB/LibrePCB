@@ -20,69 +20,69 @@
 #ifndef LIBREPCB_HOLEGRAPHICSITEM_H
 #define LIBREPCB_HOLEGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "../geometry/hole.h"
+#include "primitivecirclegraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "primitivecirclegraphicsitem.h"
-#include "../geometry/hole.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class HoleGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The HoleGraphicsItem class is the graphical representation of a librepcb::Text
+ * @brief The HoleGraphicsItem class is the graphical representation of a
+ * librepcb::Text
  *
  * @author ubruhin
  * @date 2017-05-30
  */
-class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem, public IF_HoleObserver
-{
-    public:
+class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem,
+                               public IF_HoleObserver {
+public:
+  // Constructors / Destructor
+  HoleGraphicsItem()                              = delete;
+  HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
+  HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
+                   QGraphicsItem* parent = nullptr) noexcept;
+  ~HoleGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        HoleGraphicsItem() = delete;
-        HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-        HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
-                         QGraphicsItem* parent = nullptr) noexcept;
-        ~HoleGraphicsItem() noexcept;
+  // Getters
+  Hole& getHole() noexcept { return mHole; }
 
-        // Getters
-        Hole& getHole() noexcept {return mHole;}
+  // Inherited from QGraphicsItem
+  QPainterPath shape() const noexcept override;
 
-        // Inherited from QGraphicsItem
-        QPainterPath shape() const noexcept override;
+  // Operator Overloadings
+  HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
+private:  // Methods
+  void holePositionChanged(const Point& newPos) noexcept override;
+  void holeDiameterChanged(const PositiveLength& newDiameter) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant&    value) noexcept override;
 
-
-    private: // Methods
-        void holePositionChanged(const Point& newPos) noexcept override;
-        void holeDiameterChanged(const PositiveLength& newDiameter) noexcept override;
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
-
-
-    private: // Data
-        Hole& mHole;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+private:  // Data
+  Hole&                                   mHole;
+  const IF_GraphicsLayerProvider&         mLayerProvider;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_HOLEGRAPHICSITEM_H
+#endif  // LIBREPCB_HOLEGRAPHICSITEM_H

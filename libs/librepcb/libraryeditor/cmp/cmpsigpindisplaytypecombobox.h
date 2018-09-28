@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPECOMBOBOX_H
 #define LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPECOMBOBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/library/cmp/cmpsigpindisplaytype.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmpSigPinDisplayTypeComboBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmpSigPinDisplayTypeComboBox class
@@ -44,47 +45,42 @@ namespace editor {
  * @author ubruhin
  * @date 2016-10-20
  */
-class CmpSigPinDisplayTypeComboBox final : public QWidget
-{
-        Q_OBJECT
+class CmpSigPinDisplayTypeComboBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit CmpSigPinDisplayTypeComboBox(QWidget* parent = nullptr) noexcept;
-        CmpSigPinDisplayTypeComboBox(const CmpSigPinDisplayTypeComboBox& other) = delete;
-        ~CmpSigPinDisplayTypeComboBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit CmpSigPinDisplayTypeComboBox(QWidget* parent = nullptr) noexcept;
+  CmpSigPinDisplayTypeComboBox(const CmpSigPinDisplayTypeComboBox& other) =
+      delete;
+  ~CmpSigPinDisplayTypeComboBox() noexcept;
 
+  // Getters
+  CmpSigPinDisplayType getCurrentItem() const noexcept;
 
-        // Getters
-        CmpSigPinDisplayType getCurrentItem() const noexcept;
+  // Setters
+  void setCurrentItem(const CmpSigPinDisplayType& type) noexcept;
 
+  // Operator Overloadings
+  CmpSigPinDisplayTypeComboBox& operator       =(
+      const CmpSigPinDisplayTypeComboBox& rhs) = delete;
 
-        // Setters
-        void setCurrentItem(const CmpSigPinDisplayType& type) noexcept;
+signals:
+  void currentItemChanged(const CmpSigPinDisplayType& type);
 
+private:  // Methods
+  void currentIndexChanged(int index) noexcept;
 
-        // Operator Overloadings
-        CmpSigPinDisplayTypeComboBox& operator=(const CmpSigPinDisplayTypeComboBox& rhs) = delete;
-
-
-    signals:
-        void currentItemChanged(const CmpSigPinDisplayType& type);
-
-
-    private: // Methods
-        void currentIndexChanged(int index) noexcept;
-
-
-    private: // Data
-        QComboBox* mComboBox;
+private:  // Data
+  QComboBox* mComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPECOMBOBOX_H
+#endif  // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPECOMBOBOX_H

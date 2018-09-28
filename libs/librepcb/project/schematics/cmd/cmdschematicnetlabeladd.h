@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,53 +39,48 @@ class Schematic;
 class SI_NetLabel;
 class SI_NetSegment;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetLabelAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetLabelAdd class
  */
-class CmdSchematicNetLabelAdd final : public UndoCommand
-{
-    public:
+class CmdSchematicNetLabelAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
+                          const Angle& rotation) noexcept;
+  ~CmdSchematicNetLabelAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
-                                const Angle& rotation) noexcept;
-        ~CmdSchematicNetLabelAdd() noexcept;
+  // Getters
+  SI_NetLabel* getNetLabel() const noexcept { return mNetLabel; }
 
-        // Getters
-        SI_NetLabel* getNetLabel() const noexcept {return mNetLabel;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        SI_NetSegment& mNetSegment;
-        Point mPosition;
-        Angle mRotation;
-        SI_NetLabel* mNetLabel;
+  SI_NetSegment& mNetSegment;
+  Point          mPosition;
+  Angle          mRotation;
+  SI_NetLabel*   mNetLabel;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELADD_H

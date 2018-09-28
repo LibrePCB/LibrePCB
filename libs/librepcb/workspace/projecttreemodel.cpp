@@ -17,52 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "projecttreemodel.h"
+
 #include "fileiconprovider.h"
 #include "workspace.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ProjectTreeModel::ProjectTreeModel(const Workspace& workspace, QObject* parent) noexcept :
-    QFileSystemModel(parent)
-{
-    setIconProvider(new FileIconProvider());
-    setRootPath(workspace.getProjectsPath().toStr());
+ProjectTreeModel::ProjectTreeModel(const Workspace& workspace,
+                                   QObject*         parent) noexcept
+  : QFileSystemModel(parent) {
+  setIconProvider(new FileIconProvider());
+  setRootPath(workspace.getProjectsPath().toStr());
 }
 
-ProjectTreeModel::~ProjectTreeModel() noexcept
-{
+ProjectTreeModel::~ProjectTreeModel() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal) && (section == 0)){
-        return QString("Workspace Projects");
-    } else {
-        return QFileSystemModel::headerData(section, orientation, role);
-    }
+QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation,
+                                      int role) const {
+  if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal) &&
+      (section == 0)) {
+    return QString("Workspace Projects");
+  } else {
+    return QFileSystemModel::headerData(section, orientation, role);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
 #define LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,48 +38,46 @@ class BI_NetLineAnchor;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCombineBoardNetSegments
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief This undo command combines two board netsegments together
  *
  * @note Both netsegments must have the same netsignal!
  */
-class CmdCombineBoardNetSegments final : public UndoCommandGroup
-{
-    public:
+class CmdCombineBoardNetSegments final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdCombineBoardNetSegments()                                        = delete;
+  CmdCombineBoardNetSegments(const CmdCombineBoardNetSegments& other) = delete;
+  CmdCombineBoardNetSegments(BI_NetSegment&    toBeRemoved,
+                             BI_NetLineAnchor& oldAnchor, BI_NetSegment& result,
+                             BI_NetLineAnchor& newAnchor) noexcept;
+  ~CmdCombineBoardNetSegments() noexcept;
 
-        // Constructors / Destructor
-        CmdCombineBoardNetSegments() = delete;
-        CmdCombineBoardNetSegments(const CmdCombineBoardNetSegments& other) = delete;
-        CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved, BI_NetLineAnchor& oldAnchor,
-                                   BI_NetSegment& result, BI_NetLineAnchor& newAnchor) noexcept;
-        ~CmdCombineBoardNetSegments() noexcept;
+  // Operator Overloadings
+  CmdCombineBoardNetSegments& operator=(const CmdCombineBoardNetSegments& rhs) =
+      delete;
 
-        // Operator Overloadings
-        CmdCombineBoardNetSegments& operator=(const CmdCombineBoardNetSegments& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-
-    private: // Methods
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-    private: // Data
-        BI_NetSegment& mOldSegment;
-        BI_NetSegment& mNewSegment;
-        BI_NetLineAnchor& mOldAnchor;
-        BI_NetLineAnchor& mNewAnchor;
+private:  // Data
+  BI_NetSegment&    mOldSegment;
+  BI_NetSegment&    mNewSegment;
+  BI_NetLineAnchor& mOldAnchor;
+  BI_NetLineAnchor& mNewAnchor;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-
-#endif // LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
+#endif  // LIBREPCB_PROJECT_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H

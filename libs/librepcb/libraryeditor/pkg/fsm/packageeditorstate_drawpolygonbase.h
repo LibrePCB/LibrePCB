@@ -20,18 +20,21 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGONBASE_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGONBASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "packageeditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Polygon;
@@ -41,9 +44,9 @@ class CmdPolygonEdit;
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_DrawPolygonBase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_DrawPolygonBase class
@@ -51,69 +54,70 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawPolygonBase : public PackageEditorState
-{
-        Q_OBJECT
+class PackageEditorState_DrawPolygonBase : public PackageEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class Mode { LINE, RECT, POLYGON };
 
-        // Types
-        enum class Mode {LINE, RECT, POLYGON};
+  // Constructors / Destructor
+  PackageEditorState_DrawPolygonBase() = delete;
+  PackageEditorState_DrawPolygonBase(
+      const PackageEditorState_DrawPolygonBase& other) = delete;
+  PackageEditorState_DrawPolygonBase(Context& context, Mode mode) noexcept;
+  virtual ~PackageEditorState_DrawPolygonBase() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_DrawPolygonBase() = delete;
-        PackageEditorState_DrawPolygonBase(const PackageEditorState_DrawPolygonBase& other) = delete;
-        PackageEditorState_DrawPolygonBase(Context& context, Mode mode) noexcept;
-        virtual ~PackageEditorState_DrawPolygonBase() noexcept;
+  // General Methods
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
-        // General Methods
-        bool entry() noexcept override;
-        bool exit() noexcept override;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processAbortCommand() noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonDoubleClicked(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processAbortCommand() noexcept override;
+  // Operator Overloadings
+  PackageEditorState_DrawPolygonBase& operator       =(
+      const PackageEditorState_DrawPolygonBase& rhs) = delete;
 
-        // Operator Overloadings
-        PackageEditorState_DrawPolygonBase& operator=(const PackageEditorState_DrawPolygonBase& rhs) = delete;
+private:  // Methods
+  bool start(const Point& pos) noexcept;
+  bool abort() noexcept;
+  bool addNextSegment(const Point& pos) noexcept;
+  bool updateCurrentPosition(const Point& pos) noexcept;
 
+  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void lineWidthSpinBoxValueChanged(double value) noexcept;
+  void angleSpinBoxValueChanged(double value) noexcept;
+  void fillCheckBoxCheckedChanged(bool checked) noexcept;
+  void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
 
-    private: // Methods
-        bool start(const Point& pos) noexcept;
-        bool abort() noexcept;
-        bool addNextSegment(const Point& pos) noexcept;
-        bool updateCurrentPosition(const Point& pos) noexcept;
+private:  // Types / Data
+  Mode                           mMode;
+  QScopedPointer<CmdPolygonEdit> mEditCmd;
+  std::shared_ptr<Polygon>       mCurrentPolygon;
+  Point                          mSegmentStartPos;
+  PolygonGraphicsItem*           mCurrentGraphicsItem;
 
-        void layerComboBoxValueChanged(const QString& layerName) noexcept;
-        void lineWidthSpinBoxValueChanged(double value) noexcept;
-        void angleSpinBoxValueChanged(double value) noexcept;
-        void fillCheckBoxCheckedChanged(bool checked) noexcept;
-        void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
-
-
-    private: // Types / Data
-        Mode mMode;
-        QScopedPointer<CmdPolygonEdit> mEditCmd;
-        std::shared_ptr<Polygon> mCurrentPolygon;
-        Point mSegmentStartPos;
-        PolygonGraphicsItem* mCurrentGraphicsItem;
-
-        // parameter memory
-        GraphicsLayerName mLastLayerName;
-        UnsignedLength mLastLineWidth;
-        Angle mLastAngle;
-        bool mLastFill;
-        bool mLastGrabArea;
+  // parameter memory
+  GraphicsLayerName mLastLayerName;
+  UnsignedLength    mLastLineWidth;
+  Angle             mLastAngle;
+  bool              mLastFill;
+  bool              mLastGrabArea;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGONBASE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWPOLYGONBASE_H

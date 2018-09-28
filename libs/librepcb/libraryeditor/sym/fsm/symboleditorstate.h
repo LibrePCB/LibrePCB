@@ -20,79 +20,98 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/utils/toolbarproxy.h>
+ ******************************************************************************/
 #include "symboleditorfsm.h"
 
-/*****************************************************************************************
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/utils/toolbarproxy.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The SymbolEditorState class is the base class of all symbol editor FSM states
+ * @brief The SymbolEditorState class is the base class of all symbol editor FSM
+ * states
  *
  * @author  ubruhin
  * @date    2016-11-01
  */
-class SymbolEditorState : public QObject
-{
-        Q_OBJECT
+class SymbolEditorState : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  using Context = SymbolEditorFsm::Context;
 
-        using Context = SymbolEditorFsm::Context;
+  // Constructors / Destructor
+  SymbolEditorState()                               = delete;
+  SymbolEditorState(const SymbolEditorState& other) = delete;
+  explicit SymbolEditorState(const Context& context) noexcept;
+  virtual ~SymbolEditorState() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState() = delete;
-        SymbolEditorState(const SymbolEditorState& other) = delete;
-        explicit SymbolEditorState(const Context& context) noexcept;
-        virtual ~SymbolEditorState() noexcept;
+  // General Methods
+  virtual bool entry() noexcept { return true; }
+  virtual bool exit() noexcept { return true; }
 
-        // General Methods
-        virtual bool entry() noexcept {return true;}
-        virtual bool exit() noexcept {return true;}
+  // Event Handlers
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processGraphicsSceneLeftMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processRotateCw() noexcept { return false; }
+  virtual bool processRotateCcw() noexcept { return false; }
+  virtual bool processRemove() noexcept { return false; }
+  virtual bool processAbortCommand() noexcept { return false; }
 
-        // Event Handlers
-        virtual bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept {Q_UNUSED(e); return false;}
-        virtual bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept {Q_UNUSED(e); return false;}
-        virtual bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept {Q_UNUSED(e); return false;}
-        virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(QGraphicsSceneMouseEvent& e) noexcept {Q_UNUSED(e); return false;}
-        virtual bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept {Q_UNUSED(e); return false;}
-        virtual bool processRotateCw() noexcept {return false;}
-        virtual bool processRotateCcw() noexcept {return false;}
-        virtual bool processRemove() noexcept {return false;}
-        virtual bool processAbortCommand() noexcept {return false;}
+  // Operator Overloadings
+  SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
+protected:  // Methods
+  const PositiveLength& getGridInterval() const noexcept;
 
-
-    protected: // Methods
-        const PositiveLength& getGridInterval() const noexcept;
-
-
-    protected: // Data
-        Context mContext;
+protected:  // Data
+  Context mContext;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H

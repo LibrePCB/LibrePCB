@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
 #define LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -37,15 +38,15 @@ class GraphicsLayer;
 namespace library {
 class FootprintPad;
 class PackagePad;
-}
+}  // namespace library
 
 namespace project {
 
 class BI_FootprintPad;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_FootprintPad
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_FootprintPad class
@@ -53,60 +54,56 @@ class BI_FootprintPad;
  * @author ubruhin
  * @date 2015-06-07
  */
-class BGI_FootprintPad final : public BGI_Base
-{
-    public:
+class BGI_FootprintPad final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
+  ~BGI_FootprintPad() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
-        ~BGI_FootprintPad() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+private:
+  // make some methods inaccessible...
+  BGI_FootprintPad()                              = delete;
+  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
+  BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(QString name) const noexcept;
 
-    private:
+  // General Attributes
+  BI_FootprintPad&             mPad;
+  const library::FootprintPad& mLibPad;
 
-        // make some methods inaccessible...
-        BGI_FootprintPad() = delete;
-        BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
-        BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(QString name) const noexcept;
-
-
-        // General Attributes
-        BI_FootprintPad& mPad;
-        const library::FootprintPad& mLibPad;
-
-        // Cached Attributes
-        GraphicsLayer* mPadLayer;
-        GraphicsLayer* mTopStopMaskLayer;
-        GraphicsLayer* mBottomStopMaskLayer;
-        GraphicsLayer* mTopCreamMaskLayer;
-        GraphicsLayer* mBottomCreamMaskLayer;
-        QPainterPath mShape;
-        QPainterPath mCopper;
-        QPainterPath mStopMask;
-        QPainterPath mCreamMask;
-        QRectF mBoundingRect;
-        QFont mFont;
+  // Cached Attributes
+  GraphicsLayer* mPadLayer;
+  GraphicsLayer* mTopStopMaskLayer;
+  GraphicsLayer* mBottomStopMaskLayer;
+  GraphicsLayer* mTopCreamMaskLayer;
+  GraphicsLayer* mBottomCreamMaskLayer;
+  QPainterPath   mShape;
+  QPainterPath   mCopper;
+  QPainterPath   mStopMask;
+  QPainterPath   mCreamMask;
+  QRectF         mBoundingRect;
+  QFont          mFont;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#endif  // LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H

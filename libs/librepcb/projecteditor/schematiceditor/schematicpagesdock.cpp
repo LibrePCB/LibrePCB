@@ -17,146 +17,142 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "schematicpagesdock.h"
-#include "ui_schematicpagesdock.h"
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/schematic.h>
+
+#include "../projecteditor.h"
 #include "schematiceditor.h"
+#include "ui_schematicpagesdock.h"
+
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdschematicadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicremove.h>
-#include <librepcb/common/undostack.h>
-#include "../projecteditor.h"
+#include <librepcb/project/schematics/schematic.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SchematicPagesDock::SchematicPagesDock(Project& project, SchematicEditor& editor) :
-    QDockWidget(0), mProject(project), mEditor(editor), mUi(new Ui::SchematicPagesDock)
-{
-    mUi->setupUi(this);
+SchematicPagesDock::SchematicPagesDock(Project&         project,
+                                       SchematicEditor& editor)
+  : QDockWidget(0),
+    mProject(project),
+    mEditor(editor),
+    mUi(new Ui::SchematicPagesDock) {
+  mUi->setupUi(this);
 
-    // add all schematics to list widget
-    for (int i = 0; i < mProject.getSchematics().count(); i++)
-        schematicAdded(i);
+  // add all schematics to list widget
+  for (int i = 0; i < mProject.getSchematics().count(); i++) schematicAdded(i);
 
-    // connect signals/slots
-    connect(&mEditor, &SchematicEditor::activeSchematicChanged,
-            this, &SchematicPagesDock::activeSchematicChanged);
-    connect(&mProject, &Project::schematicAdded, this, &SchematicPagesDock::schematicAdded);
-    connect(&mProject, &Project::schematicRemoved, this, &SchematicPagesDock::schematicRemoved);
+  // connect signals/slots
+  connect(&mEditor, &SchematicEditor::activeSchematicChanged, this,
+          &SchematicPagesDock::activeSchematicChanged);
+  connect(&mProject, &Project::schematicAdded, this,
+          &SchematicPagesDock::schematicAdded);
+  connect(&mProject, &Project::schematicRemoved, this,
+          &SchematicPagesDock::schematicRemoved);
 
-    // select the current schematic page
-    mUi->listWidget->setCurrentRow(mEditor.getActiveSchematicIndex());
+  // select the current schematic page
+  mUi->listWidget->setCurrentRow(mEditor.getActiveSchematicIndex());
 }
 
-SchematicPagesDock::~SchematicPagesDock()
-{
-    delete mUi;         mUi = 0;
+SchematicPagesDock::~SchematicPagesDock() {
+  delete mUi;
+  mUi = 0;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QDockWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @todo The width of the icons is not very accurate
  */
-void SchematicPagesDock::resizeEvent(QResizeEvent* event)
-{
-    int iconSize = event->size().width() - 10; // this is not good...
-    mUi->listWidget->setIconSize(QSize(iconSize, iconSize));
-    QDockWidget::resizeEvent(event);
+void SchematicPagesDock::resizeEvent(QResizeEvent* event) {
+  int iconSize = event->size().width() - 10;  // this is not good...
+  mUi->listWidget->setIconSize(QSize(iconSize, iconSize));
+  QDockWidget::resizeEvent(event);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Public Slots
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SchematicPagesDock::activeSchematicChanged(int oldIndex, int newIndex)
-{
-    Q_UNUSED(oldIndex);
-    mUi->listWidget->setCurrentRow(newIndex);
+void SchematicPagesDock::activeSchematicChanged(int oldIndex, int newIndex) {
+  Q_UNUSED(oldIndex);
+  mUi->listWidget->setCurrentRow(newIndex);
 }
 
-void SchematicPagesDock::schematicAdded(int newIndex)
-{
-    Schematic* schematic = mProject.getSchematicByIndex(newIndex);
-    Q_ASSERT(schematic); if (!schematic) return;
+void SchematicPagesDock::schematicAdded(int newIndex) {
+  Schematic* schematic = mProject.getSchematicByIndex(newIndex);
+  Q_ASSERT(schematic);
+  if (!schematic) return;
 
-    QListWidgetItem* item = new QListWidgetItem();
-    item->setText(QString("%1: %2").arg(newIndex+1).arg(*schematic->getName()));
-    item->setIcon(schematic->getIcon());
-    mUi->listWidget->insertItem(newIndex, item);
+  QListWidgetItem* item = new QListWidgetItem();
+  item->setText(QString("%1: %2").arg(newIndex + 1).arg(*schematic->getName()));
+  item->setIcon(schematic->getIcon());
+  mUi->listWidget->insertItem(newIndex, item);
 }
 
-void SchematicPagesDock::schematicRemoved(int oldIndex)
-{
-    delete mUi->listWidget->item(oldIndex);
+void SchematicPagesDock::schematicRemoved(int oldIndex) {
+  delete mUi->listWidget->item(oldIndex);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Slots
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SchematicPagesDock::on_btnNewSchematic_clicked()
-{
-    bool ok = false;
-    QString name = QInputDialog::getText(this, tr("Add schematic page"),
-                       tr("Choose a name:"), QLineEdit::Normal, tr("New Page"), &ok);
+void SchematicPagesDock::on_btnNewSchematic_clicked() {
+  bool    ok   = false;
+  QString name = QInputDialog::getText(this, tr("Add schematic page"),
+                                       tr("Choose a name:"), QLineEdit::Normal,
+                                       tr("New Page"), &ok);
 
-    if (!ok)
-        return;
+  if (!ok) return;
 
-    try
-    {
-        CmdSchematicAdd* cmd = new CmdSchematicAdd(mProject, ElementName(name)); // can throw
-        mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-    }
+  try {
+    CmdSchematicAdd* cmd =
+        new CmdSchematicAdd(mProject, ElementName(name));  // can throw
+    mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
 }
 
-void SchematicPagesDock::on_btnRemoveSchematic_clicked()
-{
-    Schematic* schematic = mProject.getSchematicByIndex(mUi->listWidget->currentRow());
-    if (!schematic)
-        return;
+void SchematicPagesDock::on_btnRemoveSchematic_clicked() {
+  Schematic* schematic =
+      mProject.getSchematicByIndex(mUi->listWidget->currentRow());
+  if (!schematic) return;
 
-    try
-    {
-        CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
-        mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-    }
+  try {
+    CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
+    mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
 }
 
-void SchematicPagesDock::on_listWidget_currentRowChanged(int currentRow)
-{
-    mEditor.setActiveSchematicIndex(currentRow);
+void SchematicPagesDock::on_listWidget_currentRowChanged(int currentRow) {
+  mEditor.setActiveSchematicIndex(currentRow);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

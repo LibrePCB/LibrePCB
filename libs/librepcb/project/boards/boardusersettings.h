@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
 #define LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class SmartSExprFile;
@@ -39,54 +40,50 @@ namespace project {
 
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardUserSettings
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardUserSettings class
  */
-class BoardUserSettings final : public QObject, public SerializableObject
-{
-        Q_OBJECT
+class BoardUserSettings final : public QObject, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardUserSettings()                               = delete;
+  BoardUserSettings(const BoardUserSettings& other) = delete;
+  BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
+  explicit BoardUserSettings(Board& board, bool restore, bool readOnly,
+                             bool create);
+  ~BoardUserSettings() noexcept;
 
-        // Constructors / Destructor
-        BoardUserSettings() = delete;
-        BoardUserSettings(const BoardUserSettings& other) = delete;
-        BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
-        explicit BoardUserSettings(Board& board, bool restore, bool readOnly, bool create);
-        ~BoardUserSettings() noexcept;
+  // General Methods
+  bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // General Methods
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+  // Operator Overloadings
+  BoardUserSettings& operator=(const BoardUserSettings& rhs) = delete;
 
-        // Operator Overloadings
-        BoardUserSettings& operator=(const BoardUserSettings& rhs) = delete;
+private:  // Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
+  // General
+  Board& mBoard;
 
-    private: // Methods
+  // File "boards/<BOARDNAME>/settings.user.lp"
+  FilePath                       mFilepath;
+  QScopedPointer<SmartSExprFile> mFile;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-        // General
-        Board& mBoard;
-
-        // File "boards/<BOARDNAME>/settings.user.lp"
-        FilePath mFilepath;
-        QScopedPointer<SmartSExprFile> mFile;
-
-        QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
+  QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
+#endif  // LIBREPCB_PROJECT_BOARDUSERSETTINGS_H

@@ -20,72 +20,74 @@
 #ifndef LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
 #define LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class FilePath;
 
 namespace eagleimport {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ConverterDb
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ConverterDb class
  */
-class ConverterDb final
-{
-    public:
+class ConverterDb final {
+public:
+  // Constructors / Destructor
+  ConverterDb()                         = delete;
+  ConverterDb(const ConverterDb& other) = delete;
+  ConverterDb(const FilePath& ini) noexcept;
+  ~ConverterDb() noexcept;
 
-        // Constructors / Destructor
-        ConverterDb() = delete;
-        ConverterDb(const ConverterDb& other) = delete;
-        ConverterDb(const FilePath& ini) noexcept;
-        ~ConverterDb() noexcept;
+  // General Methods
+  void setCurrentLibraryFilePath(const FilePath& fp) noexcept {
+    mLibFilePath = fp;
+  }
+  const FilePath& getCurrentLibraryFilePath() const noexcept {
+    return mLibFilePath;
+  }
+  Uuid getSymbolUuid(const QString& symbolName);
+  Uuid getSymbolPinUuid(const Uuid& symbolUuid, const QString& pinName);
+  Uuid getFootprintUuid(const QString& packageName);
+  Uuid getPackageUuid(const QString& packageName);
+  Uuid getPackagePadUuid(const Uuid& footprintUuid, const QString& padName);
+  Uuid getComponentUuid(const QString& deviceSetName);
+  Uuid getComponentSignalUuid(const Uuid&    componentUuid,
+                              const QString& gateName, const QString& pinName);
+  Uuid getSymbolVariantUuid(const Uuid& componentUuid);
+  Uuid getSymbolVariantItemUuid(const Uuid&    componentUuid,
+                                const QString& gateName);
+  Uuid getDeviceUuid(const QString& deviceSetName, const QString& deviceName);
 
-        // General Methods
-        void setCurrentLibraryFilePath(const FilePath& fp) noexcept {mLibFilePath = fp;}
-        const FilePath& getCurrentLibraryFilePath() const noexcept {return mLibFilePath;}
-        Uuid getSymbolUuid(const QString& symbolName);
-        Uuid getSymbolPinUuid(const Uuid& symbolUuid, const QString& pinName);
-        Uuid getFootprintUuid(const QString& packageName);
-        Uuid getPackageUuid(const QString& packageName);
-        Uuid getPackagePadUuid(const Uuid& footprintUuid, const QString& padName);
-        Uuid getComponentUuid(const QString& deviceSetName);
-        Uuid getComponentSignalUuid(const Uuid& componentUuid, const QString& gateName,
-                                    const QString& pinName);
-        Uuid getSymbolVariantUuid(const Uuid& componentUuid);
-        Uuid getSymbolVariantItemUuid(const Uuid& componentUuid, const QString& gateName);
-        Uuid getDeviceUuid(const QString& deviceSetName, const QString& deviceName);
+  // Operator Overloadings
+  ConverterDb& operator=(const ConverterDb& rhs) = delete;
 
+private:
+  Uuid getOrCreateUuid(const QString& cat, const QString& key1,
+                       const QString& key2 = QString());
 
-        // Operator Overloadings
-        ConverterDb& operator=(const ConverterDb& rhs) = delete;
-
-
-    private:
-        Uuid getOrCreateUuid(const QString& cat, const QString& key1,
-                             const QString& key2 = QString());
-
-        QSettings mIniFile;
-        FilePath mLibFilePath;
+  QSettings mIniFile;
+  FilePath  mLibFilePath;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace eagleimport
+}  // namespace librepcb
 
-#endif // LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
+#endif  // LIBREPCB_EAGLEIMPORT_CONVERTERDB_H

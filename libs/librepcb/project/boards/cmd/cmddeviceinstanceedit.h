@@ -20,81 +20,77 @@
 #ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDIT_H
 #define LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class BI_Device;
 class CmdDeviceInstanceEditAll;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdDeviceInstanceEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdDeviceInstanceEdit class
  */
-class CmdDeviceInstanceEdit final : public UndoCommand
-{
-    public:
+class CmdDeviceInstanceEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdDeviceInstanceEdit(BI_Device& dev) noexcept;
+  ~CmdDeviceInstanceEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdDeviceInstanceEdit(BI_Device& dev) noexcept;
-        ~CmdDeviceInstanceEdit() noexcept;
+  // General Methods
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void setMirrored(bool mirrored, bool immediate);
+  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
 
-        // General Methods
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate);
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  BI_Device& mDevice;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
+  // General Attributes
+  Point mOldPos;
+  Point mNewPos;
+  Angle mOldRotation;
+  Angle mNewRotation;
+  bool  mOldMirrored;
+  bool  mNewMirrored;
 
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        BI_Device& mDevice;
-
-        // General Attributes
-        Point mOldPos;
-        Point mNewPos;
-        Angle mOldRotation;
-        Angle mNewRotation;
-        bool mOldMirrored;
-        bool mNewMirrored;
-
-        friend class CmdDeviceInstanceEditAll;
+  friend class CmdDeviceInstanceEditAll;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDIT_H

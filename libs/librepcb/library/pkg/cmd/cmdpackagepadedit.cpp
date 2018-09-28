@@ -17,67 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdpackagepadedit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdPackagePadEdit::CmdPackagePadEdit(PackagePad& pad) noexcept :
-    UndoCommand(tr("Edit package pad")), mPad(pad),
-    mOldName(pad.getName()), mNewName(mOldName)
-{
+CmdPackagePadEdit::CmdPackagePadEdit(PackagePad& pad) noexcept
+  : UndoCommand(tr("Edit package pad")),
+    mPad(pad),
+    mOldName(pad.getName()),
+    mNewName(mOldName) {
 }
 
-CmdPackagePadEdit::~CmdPackagePadEdit() noexcept
-{
+CmdPackagePadEdit::~CmdPackagePadEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdPackagePadEdit::setName(const CircuitIdentifier& name) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = name;
+void CmdPackagePadEdit::setName(const CircuitIdentifier& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdPackagePadEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdPackagePadEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewName != mOldName)           return true;
-    return false;
+  if (mNewName != mOldName) return true;
+  return false;
 }
 
-void CmdPackagePadEdit::performUndo()
-{
-    mPad.setName(mOldName);
+void CmdPackagePadEdit::performUndo() {
+  mPad.setName(mOldName);
 }
 
-void CmdPackagePadEdit::performRedo()
-{
-    mPad.setName(mNewName);
+void CmdPackagePadEdit::performRedo() {
+  mPad.setName(mNewName);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

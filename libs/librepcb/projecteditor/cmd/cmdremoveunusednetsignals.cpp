@@ -17,65 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdremoveunusednetsignals.h"
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
+
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
+#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
+#include <librepcb/project/circuit/netsignal.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdRemoveUnusedNetSignals::CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept :
-    UndoCommandGroup(tr("Remove Unused Net Signals")), mCircuit(circuit)
-{
+CmdRemoveUnusedNetSignals::CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept
+  : UndoCommandGroup(tr("Remove Unused Net Signals")), mCircuit(circuit) {
 }
 
-CmdRemoveUnusedNetSignals::~CmdRemoveUnusedNetSignals() noexcept
-{
+CmdRemoveUnusedNetSignals::~CmdRemoveUnusedNetSignals() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdRemoveUnusedNetSignals::performExecute()
-{
-    foreach (NetSignal* netsignal, mCircuit.getNetSignals()) {
-        bool noComponentSignals = netsignal->getComponentSignals().isEmpty();
-        bool noSchematicNetSegments = netsignal->getSchematicNetSegments().isEmpty();
-        if (noComponentSignals && noSchematicNetSegments) {
-            foreach (BI_NetSegment* netsegment, netsignal->getBoardNetSegments()) {
-                appendChild(new CmdBoardNetSegmentRemove(*netsegment));
-            }
-            foreach (BI_Plane* plane, netsignal->getBoardPlanes()) {
-                appendChild(new CmdBoardPlaneRemove(*plane));
-            }
-            appendChild(new CmdNetSignalRemove(mCircuit, *netsignal));
-        }
+bool CmdRemoveUnusedNetSignals::performExecute() {
+  foreach (NetSignal* netsignal, mCircuit.getNetSignals()) {
+    bool noComponentSignals = netsignal->getComponentSignals().isEmpty();
+    bool noSchematicNetSegments =
+        netsignal->getSchematicNetSegments().isEmpty();
+    if (noComponentSignals && noSchematicNetSegments) {
+      foreach (BI_NetSegment* netsegment, netsignal->getBoardNetSegments()) {
+        appendChild(new CmdBoardNetSegmentRemove(*netsegment));
+      }
+      foreach (BI_Plane* plane, netsignal->getBoardPlanes()) {
+        appendChild(new CmdBoardPlaneRemove(*plane));
+      }
+      appendChild(new CmdNetSignalRemove(mCircuit, *netsignal));
     }
+  }
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

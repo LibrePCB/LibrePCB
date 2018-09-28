@@ -17,58 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdnetclassremove.h"
-#include "../netclass.h"
-#include "../circuit.h"
 
-/*****************************************************************************************
+#include "../circuit.h"
+#include "../netclass.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit, NetClass& netclass) noexcept :
-    UndoCommand(tr("Remove netclass")),
-    mCircuit(circuit), mNetClass(netclass)
-{
+CmdNetClassRemove::CmdNetClassRemove(Circuit&  circuit,
+                                     NetClass& netclass) noexcept
+  : UndoCommand(tr("Remove netclass")), mCircuit(circuit), mNetClass(netclass) {
 }
 
-CmdNetClassRemove::~CmdNetClassRemove() noexcept
-{
+CmdNetClassRemove::~CmdNetClassRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdNetClassRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdNetClassRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdNetClassRemove::performUndo()
-{
-    mCircuit.addNetClass(mNetClass); // can throw
+void CmdNetClassRemove::performUndo() {
+  mCircuit.addNetClass(mNetClass);  // can throw
 }
 
-void CmdNetClassRemove::performRedo()
-{
-    mCircuit.removeNetClass(mNetClass); // can throw
+void CmdNetClassRemove::performRedo() {
+  mCircuit.removeNetClass(mNetClass);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -17,93 +17,90 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "circlegraphicsitem.h"
+
 #include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CircleGraphicsItem::CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerProvider& lp,
-                                         QGraphicsItem* parent) noexcept :
-    PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp)
-{
-    setPosition(mCircle.getCenter());
-    setDiameter(positiveToUnsigned(mCircle.getDiameter()));
-    setLineWidth(mCircle.getLineWidth());
-    setLineLayer(mLayerProvider.getLayer(*mCircle.getLayerName()));
-    updateFillLayer();
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
+CircleGraphicsItem::CircleGraphicsItem(Circle&                         circle,
+                                       const IF_GraphicsLayerProvider& lp,
+                                       QGraphicsItem* parent) noexcept
+  : PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp) {
+  setPosition(mCircle.getCenter());
+  setDiameter(positiveToUnsigned(mCircle.getDiameter()));
+  setLineWidth(mCircle.getLineWidth());
+  setLineLayer(mLayerProvider.getLayer(*mCircle.getLayerName()));
+  updateFillLayer();
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-    // register to the circle to get attribute updates
-    mCircle.registerObserver(*this);
+  // register to the circle to get attribute updates
+  mCircle.registerObserver(*this);
 }
 
-CircleGraphicsItem::~CircleGraphicsItem() noexcept
-{
-    mCircle.unregisterObserver(*this);
+CircleGraphicsItem::~CircleGraphicsItem() noexcept {
+  mCircle.unregisterObserver(*this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CircleGraphicsItem::circleLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
-{
-    setLineLayer(mLayerProvider.getLayer(*newLayerName));
-    updateFillLayer(); // required if the area is filled with the line layer
+void CircleGraphicsItem::circleLayerNameChanged(
+    const GraphicsLayerName& newLayerName) noexcept {
+  setLineLayer(mLayerProvider.getLayer(*newLayerName));
+  updateFillLayer();  // required if the area is filled with the line layer
 }
 
-void CircleGraphicsItem::circleLineWidthChanged(const UnsignedLength& newLineWidth) noexcept
-{
-    setLineWidth(newLineWidth);
+void CircleGraphicsItem::circleLineWidthChanged(
+    const UnsignedLength& newLineWidth) noexcept {
+  setLineWidth(newLineWidth);
 }
 
-void CircleGraphicsItem::circleIsFilledChanged(bool newIsFilled) noexcept
-{
-    Q_UNUSED(newIsFilled);
-    updateFillLayer();
+void CircleGraphicsItem::circleIsFilledChanged(bool newIsFilled) noexcept {
+  Q_UNUSED(newIsFilled);
+  updateFillLayer();
 }
 
-void CircleGraphicsItem::circleIsGrabAreaChanged(bool newIsGrabArea) noexcept
-{
-    Q_UNUSED(newIsGrabArea);
-    updateFillLayer();
+void CircleGraphicsItem::circleIsGrabAreaChanged(bool newIsGrabArea) noexcept {
+  Q_UNUSED(newIsGrabArea);
+  updateFillLayer();
 }
 
-void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept
-{
-    setPosition(newCenter);
+void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept {
+  setPosition(newCenter);
 }
 
-void CircleGraphicsItem::circleDiameterChanged(const PositiveLength& newDiameter) noexcept
-{
-    setDiameter(positiveToUnsigned(newDiameter));
+void CircleGraphicsItem::circleDiameterChanged(
+    const PositiveLength& newDiameter) noexcept {
+  setDiameter(positiveToUnsigned(newDiameter));
 }
 
-void CircleGraphicsItem::updateFillLayer() noexcept
-{
-    if (mCircle.isFilled()) {
-        setFillLayer(mLayerProvider.getLayer(*mCircle.getLayerName()));
-    } else if (mCircle.isGrabArea()) {
-        setFillLayer(mLayerProvider.getGrabAreaLayer(*mCircle.getLayerName()));
-    } else {
-        setFillLayer(nullptr);
-    }
+void CircleGraphicsItem::updateFillLayer() noexcept {
+  if (mCircle.isFilled()) {
+    setFillLayer(mLayerProvider.getLayer(*mCircle.getLayerName()));
+  } else if (mCircle.isGrabArea()) {
+    setFillLayer(mLayerProvider.getGrabAreaLayer(*mCircle.getLayerName()));
+  } else {
+    setFillLayer(nullptr);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

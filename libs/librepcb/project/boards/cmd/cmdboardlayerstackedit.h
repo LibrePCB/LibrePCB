@@ -20,68 +20,64 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H
 #define LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class BoardLayerStack;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardLayerStackEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardLayerStackEdit class
  */
-class CmdBoardLayerStackEdit final : public UndoCommand
-{
-    public:
+class CmdBoardLayerStackEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardLayerStackEdit()                                    = delete;
+  CmdBoardLayerStackEdit(const CmdBoardLayerStackEdit& other) = delete;
+  CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept;
+  ~CmdBoardLayerStackEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardLayerStackEdit() = delete;
-        CmdBoardLayerStackEdit(const CmdBoardLayerStackEdit& other) = delete;
-        CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept;
-        ~CmdBoardLayerStackEdit() noexcept;
+  // Setters
+  void setInnerLayerCount(int count) noexcept;
 
-        // Setters
-        void setInnerLayerCount(int count) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Attributes from the constructor
+  BoardLayerStack& mLayerStack;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Attributes from the constructor
-        BoardLayerStack& mLayerStack;
-
-        // General Attributes
-        int mOldInnerLayerCount;
-        int mNewInnerLayerCount;
+  // General Attributes
+  int mOldInnerLayerCount;
+  int mNewInnerLayerCount;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDLAYERSTACKEDIT_H

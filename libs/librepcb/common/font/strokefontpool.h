@@ -20,50 +20,50 @@
 #ifndef LIBREPCB_STROKEFONTPOOL_H
 #define LIBREPCB_STROKEFONTPOOL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
+ ******************************************************************************/
 #include "strokefont.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class StrokeFontPool
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The StrokeFontPool class
  */
-class StrokeFontPool final
-{
-        Q_DECLARE_TR_FUNCTIONS(StrokeFontPool)
+class StrokeFontPool final {
+  Q_DECLARE_TR_FUNCTIONS(StrokeFontPool)
 
-    public:
-        // Constructors / Destructor
-        StrokeFontPool(const FilePath& directory) noexcept;
-        StrokeFontPool(const StrokeFontPool& other) = delete;
-        ~StrokeFontPool() noexcept;
+public:
+  // Constructors / Destructor
+  StrokeFontPool(const FilePath& directory) noexcept;
+  StrokeFontPool(const StrokeFontPool& other) = delete;
+  ~StrokeFontPool() noexcept;
 
-        // Getters
-        const StrokeFont& getFont(const QString& filename) const;
+  // Getters
+  const StrokeFont& getFont(const QString& filename) const;
 
-        // Operator Overloadings
-        StrokeFontPool& operator=(const StrokeFontPool& rhs) noexcept;
+  // Operator Overloadings
+  StrokeFontPool& operator=(const StrokeFontPool& rhs) noexcept;
 
-
-    private: // Data
-        QHash<QString, std::shared_ptr<StrokeFont>> mFonts;
+private:  // Data
+  QHash<QString, std::shared_ptr<StrokeFont>> mFonts;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_STROKEFONTPOOL_H
+#endif  // LIBREPCB_STROKEFONTPOOL_H

@@ -17,213 +17,209 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
 #include <gtest/gtest.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data Type
- ****************************************************************************************/
+ ******************************************************************************/
 
 typedef struct {
-    bool valid;
-    QString uuid;
+  bool    valid;
+  QString uuid;
 } UuidTestData;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class UuidTest : public ::testing::TestWithParam<UuidTestData>
-{
-};
+class UuidTest : public ::testing::TestWithParam<UuidTestData> {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_P(UuidTest, testCopyConstructor)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testCopyConstructor) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid source = Uuid::fromString(data.uuid);
-        Uuid copy(source);
-        EXPECT_TRUE(copy == source);
-        EXPECT_EQ(source.toStr(), copy.toStr());
-    }
+  if (data.valid) {
+    Uuid source = Uuid::fromString(data.uuid);
+    Uuid copy(source);
+    EXPECT_TRUE(copy == source);
+    EXPECT_EQ(source.toStr(), copy.toStr());
+  }
 }
 
-TEST_P(UuidTest, testToStr)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testToStr) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid uuid = Uuid::fromString(data.uuid);
-        EXPECT_EQ(data.uuid, uuid.toStr());
-        EXPECT_EQ(36, uuid.toStr().length());
-    }
+  if (data.valid) {
+    Uuid uuid = Uuid::fromString(data.uuid);
+    EXPECT_EQ(data.uuid, uuid.toStr());
+    EXPECT_EQ(36, uuid.toStr().length());
+  }
 }
 
-TEST_P(UuidTest, testOperatorAssign)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testOperatorAssign) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid source = Uuid::fromString(data.uuid);
-        Uuid destination = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-        EXPECT_NE(source.toStr(), destination.toStr());
-        destination = source;
-        EXPECT_EQ(source.toStr(), destination.toStr());
-    }
+  if (data.valid) {
+    Uuid source = Uuid::fromString(data.uuid);
+    Uuid destination =
+        Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a");  // valid UUID
+    EXPECT_NE(source.toStr(), destination.toStr());
+    destination = source;
+    EXPECT_EQ(source.toStr(), destination.toStr());
+  }
 }
 
-TEST_P(UuidTest, testOperatorEquals)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testOperatorEquals) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid uuid1 = Uuid::fromString(data.uuid);
-        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-        EXPECT_FALSE(uuid2 == uuid1);
-        EXPECT_FALSE(uuid1 == uuid2);
-        uuid2 = uuid1;
-        EXPECT_TRUE(uuid2 == uuid1);
-        EXPECT_TRUE(uuid1 == uuid2);
-    }
+  if (data.valid) {
+    Uuid uuid1 = Uuid::fromString(data.uuid);
+    Uuid uuid2 =
+        Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a");  // valid UUID
+    EXPECT_FALSE(uuid2 == uuid1);
+    EXPECT_FALSE(uuid1 == uuid2);
+    uuid2 = uuid1;
+    EXPECT_TRUE(uuid2 == uuid1);
+    EXPECT_TRUE(uuid1 == uuid2);
+  }
 }
 
-TEST_P(UuidTest, testOperatorNotEquals)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testOperatorNotEquals) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid uuid1 = Uuid::fromString(data.uuid);
-        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-        EXPECT_TRUE(uuid2 != uuid1);
-        EXPECT_TRUE(uuid1 != uuid2);
-        uuid2 = uuid1;
-        EXPECT_FALSE(uuid2 != uuid1);
-        EXPECT_FALSE(uuid1 != uuid2);
-    }
+  if (data.valid) {
+    Uuid uuid1 = Uuid::fromString(data.uuid);
+    Uuid uuid2 =
+        Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a");  // valid UUID
+    EXPECT_TRUE(uuid2 != uuid1);
+    EXPECT_TRUE(uuid1 != uuid2);
+    uuid2 = uuid1;
+    EXPECT_FALSE(uuid2 != uuid1);
+    EXPECT_FALSE(uuid1 != uuid2);
+  }
 }
 
-TEST_P(UuidTest, testOperatorComparisons)
-{
-    const UuidTestData& data = GetParam();
+TEST_P(UuidTest, testOperatorComparisons) {
+  const UuidTestData& data = GetParam();
 
-    if (data.valid) {
-        Uuid uuid1 = Uuid::fromString(data.uuid);
-        Uuid uuid2 = Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a"); // valid UUID
-        if (uuid1.toStr() == uuid2.toStr()) {
-            EXPECT_FALSE((uuid2 < uuid1) || (uuid2 > uuid1));
-            EXPECT_FALSE((uuid1 < uuid2) || (uuid1 > uuid2));
-            EXPECT_TRUE((uuid2 <= uuid1) && (uuid2 >= uuid1));
-            EXPECT_TRUE((uuid1 <= uuid2) && (uuid1 >= uuid2));
-        } else {
-            EXPECT_TRUE((uuid2 < uuid1) != (uuid2 > uuid1));
-            EXPECT_TRUE((uuid1 < uuid2) != (uuid1 > uuid2));
-            EXPECT_TRUE((uuid2 <= uuid1) != (uuid2 >= uuid1));
-            EXPECT_TRUE((uuid1 <= uuid2) != (uuid1 >= uuid2));
-        }
-        EXPECT_EQ(uuid2.toStr() < uuid1.toStr(), uuid2 < uuid1);
-        EXPECT_EQ(uuid1.toStr() < uuid2.toStr(), uuid1 < uuid2);
-        EXPECT_EQ(uuid2.toStr() > uuid1.toStr(), uuid2 > uuid1);
-        EXPECT_EQ(uuid1.toStr() > uuid2.toStr(), uuid1 > uuid2);
-        EXPECT_EQ(uuid2.toStr() <= uuid1.toStr(), uuid2 <= uuid1);
-        EXPECT_EQ(uuid1.toStr() <= uuid2.toStr(), uuid1 <= uuid2);
-        EXPECT_EQ(uuid2.toStr() >= uuid1.toStr(), uuid2 >= uuid1);
-        EXPECT_EQ(uuid1.toStr() >= uuid2.toStr(), uuid1 >= uuid2);
-    }
-}
-
-TEST(UuidTest, testCreateRandom)
-{
-    for (int i = 0; i < 1000; i++) {
-        Uuid uuid = Uuid::createRandom();
-        EXPECT_FALSE(uuid.toStr().isEmpty());
-        EXPECT_EQ(QUuid::DCE, QUuid(uuid.toStr()).variant());
-        EXPECT_EQ(QUuid::Random, QUuid(uuid.toStr()).version());
-    }
-}
-
-TEST_P(UuidTest, testIsValid)
-{
-    const UuidTestData& data = GetParam();
-    EXPECT_EQ(data.valid, Uuid::isValid(data.uuid));
-}
-
-TEST_P(UuidTest, testFromString)
-{
-    const UuidTestData& data = GetParam();
-    if (data.valid) {
-        EXPECT_EQ(data.uuid, Uuid::fromString(data.uuid).toStr());
+  if (data.valid) {
+    Uuid uuid1 = Uuid::fromString(data.uuid);
+    Uuid uuid2 =
+        Uuid::fromString("d2c30518-5cd1-4ce9-a569-44f783a3f66a");  // valid UUID
+    if (uuid1.toStr() == uuid2.toStr()) {
+      EXPECT_FALSE((uuid2 < uuid1) || (uuid2 > uuid1));
+      EXPECT_FALSE((uuid1 < uuid2) || (uuid1 > uuid2));
+      EXPECT_TRUE((uuid2 <= uuid1) && (uuid2 >= uuid1));
+      EXPECT_TRUE((uuid1 <= uuid2) && (uuid1 >= uuid2));
     } else {
-        EXPECT_THROW(Uuid::fromString(data.uuid), Exception);
+      EXPECT_TRUE((uuid2 < uuid1) != (uuid2 > uuid1));
+      EXPECT_TRUE((uuid1 < uuid2) != (uuid1 > uuid2));
+      EXPECT_TRUE((uuid2 <= uuid1) != (uuid2 >= uuid1));
+      EXPECT_TRUE((uuid1 <= uuid2) != (uuid1 >= uuid2));
     }
+    EXPECT_EQ(uuid2.toStr() < uuid1.toStr(), uuid2 < uuid1);
+    EXPECT_EQ(uuid1.toStr() < uuid2.toStr(), uuid1 < uuid2);
+    EXPECT_EQ(uuid2.toStr() > uuid1.toStr(), uuid2 > uuid1);
+    EXPECT_EQ(uuid1.toStr() > uuid2.toStr(), uuid1 > uuid2);
+    EXPECT_EQ(uuid2.toStr() <= uuid1.toStr(), uuid2 <= uuid1);
+    EXPECT_EQ(uuid1.toStr() <= uuid2.toStr(), uuid1 <= uuid2);
+    EXPECT_EQ(uuid2.toStr() >= uuid1.toStr(), uuid2 >= uuid1);
+    EXPECT_EQ(uuid1.toStr() >= uuid2.toStr(), uuid1 >= uuid2);
+  }
 }
 
-TEST_P(UuidTest, testTryFromString)
-{
-    const UuidTestData& data = GetParam();
-    tl::optional<Uuid> uuid = Uuid::tryFromString(data.uuid);
-    if (data.valid) {
-        EXPECT_TRUE(uuid);
-        EXPECT_EQ(data.uuid, uuid->toStr());
-    } else {
-        EXPECT_FALSE(uuid);
-        EXPECT_EQ(tl::nullopt, uuid);
-    }
+TEST(UuidTest, testCreateRandom) {
+  for (int i = 0; i < 1000; i++) {
+    Uuid uuid = Uuid::createRandom();
+    EXPECT_FALSE(uuid.toStr().isEmpty());
+    EXPECT_EQ(QUuid::DCE, QUuid(uuid.toStr()).variant());
+    EXPECT_EQ(QUuid::Random, QUuid(uuid.toStr()).version());
+  }
 }
 
-TEST_P(UuidTest, testSerializeToSExpression)
-{
-    const UuidTestData& data = GetParam();
-    if (data.valid) {
-        Uuid uuid = Uuid::fromString(data.uuid);
-        EXPECT_EQ(data.uuid, serializeToSExpression(uuid).getStringOrToken());
-        EXPECT_EQ(data.uuid, serializeToSExpression(tl::make_optional(uuid)).getStringOrToken());
-    }
+TEST_P(UuidTest, testIsValid) {
+  const UuidTestData& data = GetParam();
+  EXPECT_EQ(data.valid, Uuid::isValid(data.uuid));
 }
 
-TEST_P(UuidTest, testDeserializeFromSExpression)
-{
-    const UuidTestData& data = GetParam();
-    SExpression sexpr = SExpression::createToken(data.uuid);
-    if (data.valid) {
-        EXPECT_EQ(data.uuid, deserializeFromSExpression<Uuid>(sexpr, false).toStr());
-        EXPECT_EQ(data.uuid, deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false)->toStr());
-    } else {
-        EXPECT_THROW(deserializeFromSExpression<Uuid>(sexpr, false), Exception);
-        EXPECT_THROW(deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false), Exception);
-    }
+TEST_P(UuidTest, testFromString) {
+  const UuidTestData& data = GetParam();
+  if (data.valid) {
+    EXPECT_EQ(data.uuid, Uuid::fromString(data.uuid).toStr());
+  } else {
+    EXPECT_THROW(Uuid::fromString(data.uuid), Exception);
+  }
 }
 
-TEST(UuidTest, testSerializeOptionalToSExpression)
-{
-    tl::optional<Uuid> uuid = tl::nullopt;
-    EXPECT_EQ("none", serializeToSExpression(uuid).getStringOrToken());
+TEST_P(UuidTest, testTryFromString) {
+  const UuidTestData& data = GetParam();
+  tl::optional<Uuid>  uuid = Uuid::tryFromString(data.uuid);
+  if (data.valid) {
+    EXPECT_TRUE(uuid);
+    EXPECT_EQ(data.uuid, uuid->toStr());
+  } else {
+    EXPECT_FALSE(uuid);
+    EXPECT_EQ(tl::nullopt, uuid);
+  }
 }
 
-TEST(UuidTest, testDeserializeOptionalFromSExpression)
-{
-    SExpression sexpr = SExpression::createToken("none");
-    EXPECT_EQ(tl::nullopt, deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false));
+TEST_P(UuidTest, testSerializeToSExpression) {
+  const UuidTestData& data = GetParam();
+  if (data.valid) {
+    Uuid uuid = Uuid::fromString(data.uuid);
+    EXPECT_EQ(data.uuid, serializeToSExpression(uuid).getStringOrToken());
+    EXPECT_EQ(
+        data.uuid,
+        serializeToSExpression(tl::make_optional(uuid)).getStringOrToken());
+  }
 }
 
-/*****************************************************************************************
+TEST_P(UuidTest, testDeserializeFromSExpression) {
+  const UuidTestData& data  = GetParam();
+  SExpression         sexpr = SExpression::createToken(data.uuid);
+  if (data.valid) {
+    EXPECT_EQ(data.uuid,
+              deserializeFromSExpression<Uuid>(sexpr, false).toStr());
+    EXPECT_EQ(
+        data.uuid,
+        deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false)->toStr());
+  } else {
+    EXPECT_THROW(deserializeFromSExpression<Uuid>(sexpr, false), Exception);
+    EXPECT_THROW(deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false),
+                 Exception);
+  }
+}
+
+TEST(UuidTest, testSerializeOptionalToSExpression) {
+  tl::optional<Uuid> uuid = tl::nullopt;
+  EXPECT_EQ("none", serializeToSExpression(uuid).getStringOrToken());
+}
+
+TEST(UuidTest, testDeserializeOptionalFromSExpression) {
+  SExpression sexpr = SExpression::createToken("none");
+  EXPECT_EQ(tl::nullopt,
+            deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false));
+}
+
+/*******************************************************************************
  *  Test Data
- ****************************************************************************************/
+ ******************************************************************************/
 
 // Test UUIDs are generated with:
 //  - https://www.uuidgenerator.net
@@ -231,6 +227,8 @@ TEST(UuidTest, testDeserializeOptionalFromSExpression)
 //  - https://www.famkruithof.net/uuid/uuidgen
 //  - http://www.freecodeformat.com/uuid-guid.php
 //  - https://de.wikipedia.org/wiki/Universally_Unique_Identifier
+//
+// clang-format off
 INSTANTIATE_TEST_CASE_P(UuidTest, UuidTest, ::testing::Values(
     // DCE Version 4 (random, the only accepted UUID type for us)
     UuidTestData({true , "bdf7bea5-b88e-41b2-be85-c1604e8ddfca"  }),
@@ -276,10 +274,11 @@ INSTANTIATE_TEST_CASE_P(UuidTest, UuidTest, ::testing::Values(
     UuidTestData({false, "bdf7bea5_b88e_41b2_be85_c1604e8ddfca"  }),    // '_'
     UuidTestData({false, "bdf7bea5 b88e 41b2 be85 c1604e8ddfca"  })     // spaces
 ));
+// clang-format on
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

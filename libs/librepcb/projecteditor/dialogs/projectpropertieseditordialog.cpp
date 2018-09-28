@@ -17,94 +17,95 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "projectpropertieseditordialog.h"
+
+#include "ui_projectpropertieseditordialog.h"
+
+#include <librepcb/common/undostack.h>
+#include <librepcb/project/metadata/cmd/cmdprojectmetadataedit.h>
+#include <librepcb/project/metadata/projectmetadata.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include "projectpropertieseditordialog.h"
-#include "ui_projectpropertieseditordialog.h"
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/metadata/cmd/cmdprojectmetadataedit.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(ProjectMetadata& metadata,
-        UndoStack& undoStack, QWidget* parent) noexcept :
-    QDialog(parent), mMetadata(metadata), mUndoStack(undoStack),
-    mUi(new Ui::ProjectPropertiesEditorDialog)
-{
-    mUi->setupUi(this);
+ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(
+    ProjectMetadata& metadata, UndoStack& undoStack, QWidget* parent) noexcept
+  : QDialog(parent),
+    mMetadata(metadata),
+    mUndoStack(undoStack),
+    mUi(new Ui::ProjectPropertiesEditorDialog) {
+  mUi->setupUi(this);
 
-    mUi->edtName->setText(*mMetadata.getName());
-    mUi->edtAuthor->setText(mMetadata.getAuthor());
-    mUi->edtVersion->setText(mMetadata.getVersion());
-    mUi->lblCreatedDateTime->setText(mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
-    mUi->lblLastModifiedDateTime->setText(mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
-    mUi->attributeListEditorWidget->setAttributeList(mMetadata.getAttributes());
+  mUi->edtName->setText(*mMetadata.getName());
+  mUi->edtAuthor->setText(mMetadata.getAuthor());
+  mUi->edtVersion->setText(mMetadata.getVersion());
+  mUi->lblCreatedDateTime->setText(
+      mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
+  mUi->lblLastModifiedDateTime->setText(
+      mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
+  mUi->attributeListEditorWidget->setAttributeList(mMetadata.getAttributes());
 }
 
-ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept
-{
+ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ProjectPropertiesEditorDialog::keyPressEvent(QKeyEvent* e)
-{
-    switch (e->key())
-    {
-        case Qt::Key_Return:
-            accept();
-            break;
-        case Qt::Key_Escape:
-            reject();
-            break;
-        default:
-            QDialog::keyPressEvent(e);
-            break;
-    }
+void ProjectPropertiesEditorDialog::keyPressEvent(QKeyEvent* e) {
+  switch (e->key()) {
+    case Qt::Key_Return:
+      accept();
+      break;
+    case Qt::Key_Escape:
+      reject();
+      break;
+    default:
+      QDialog::keyPressEvent(e);
+      break;
+  }
 }
 
-void ProjectPropertiesEditorDialog::accept()
-{
-    if (applyChanges()) {
-        QDialog::accept();
-    }
+void ProjectPropertiesEditorDialog::accept() {
+  if (applyChanges()) {
+    QDialog::accept();
+  }
 }
 
-bool ProjectPropertiesEditorDialog::applyChanges() noexcept
-{
-    try {
-        CmdProjectMetadataEdit* cmd = new CmdProjectMetadataEdit(mMetadata);
-        cmd->setName(ElementName(mUi->edtName->text().trimmed())); // can throw
-        cmd->setAuthor(mUi->edtAuthor->text().trimmed());
-        cmd->setVersion(mUi->edtVersion->text().trimmed());
-        cmd->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
-        mUndoStack.execCmd(cmd);
-        return true;
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-        return false;
-    }
+bool ProjectPropertiesEditorDialog::applyChanges() noexcept {
+  try {
+    CmdProjectMetadataEdit* cmd = new CmdProjectMetadataEdit(mMetadata);
+    cmd->setName(ElementName(mUi->edtName->text().trimmed()));  // can throw
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setVersion(mUi->edtVersion->text().trimmed());
+    cmd->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
+    mUndoStack.execCmd(cmd);
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+    return false;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

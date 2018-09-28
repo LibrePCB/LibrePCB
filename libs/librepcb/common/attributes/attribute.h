@@ -20,94 +20,101 @@
 #ifndef LIBREPCB_ATTRIBUTE_H
 #define LIBREPCB_ATTRIBUTE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../fileio/serializableobjectlist.h"
+ ******************************************************************************/
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../fileio/serializableobjectlist.h"
 #include "attributekey.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class AttributeType;
 class AttributeUnit;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Attribute
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Attribute class
  */
-class Attribute final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(Attribute)
+class Attribute final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(Attribute)
 
-    public:
+public:
+  // Constructors / Destructor
+  Attribute() = delete;
+  Attribute(const Attribute& other) noexcept;
+  explicit Attribute(const SExpression& node);
+  Attribute(const AttributeKey& key, const AttributeType& type,
+            const QString& value, const AttributeUnit* unit);
+  ~Attribute() noexcept;
 
-        // Constructors / Destructor
-        Attribute() = delete;
-        Attribute(const Attribute& other) noexcept;
-        explicit Attribute(const SExpression& node);
-        Attribute(const AttributeKey& key, const AttributeType& type,
-                  const QString& value, const AttributeUnit* unit);
-        ~Attribute() noexcept;
+  // Getters
+  const AttributeKey& getKey() const noexcept { return mKey; }
+  const QString&      getName() const noexcept {
+    return *mKey;
+  }  // required for SerializableObjectList
+  const AttributeType& getType() const noexcept { return *mType; }
+  const AttributeUnit* getUnit() const noexcept { return mUnit; }
+  const QString&       getValue() const noexcept { return mValue; }
+  QString              getValueTr(bool showUnit) const noexcept;
 
-        // Getters
-        const AttributeKey& getKey() const noexcept {return mKey;}
-        const QString& getName() const noexcept {return *mKey;} // required for SerializableObjectList
-        const AttributeType& getType() const noexcept {return *mType;}
-        const AttributeUnit* getUnit() const noexcept {return mUnit;}
-        const QString& getValue() const noexcept {return mValue;}
-        QString getValueTr(bool showUnit) const noexcept;
+  // Setters
+  void setKey(const AttributeKey& key) noexcept { mKey = key; }
+  void setTypeValueUnit(const AttributeType& type, const QString& value,
+                        const AttributeUnit* unit);
 
-        // Setters
-        void setKey(const AttributeKey& key) noexcept {mKey = key;}
-        void setTypeValueUnit(const AttributeType& type, const QString& value,
-                              const AttributeUnit* unit);
+  // General Methods
 
-        // General Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool operator==(const Attribute& rhs) const noexcept;
+  bool operator!=(const Attribute& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  Attribute& operator=(const Attribute& rhs) = delete;
 
-        // Operator Overloadings
-        bool operator==(const Attribute& rhs) const noexcept;
-        bool operator!=(const Attribute& rhs) const noexcept {return !(*this == rhs);}
-        Attribute& operator=(const Attribute& rhs) = delete;
+private:  // Methods
+  bool checkAttributesValidity() const noexcept;
 
-
-    private: // Methods
-        bool checkAttributesValidity() const noexcept;
-
-
-    private: // Data
-        AttributeKey mKey;
-        const AttributeType* mType;
-        QString mValue;
-        const AttributeUnit* mUnit;
+private:  // Data
+  AttributeKey         mKey;
+  const AttributeType* mType;
+  QString              mValue;
+  const AttributeUnit* mUnit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttributeList
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct AttributeListNameProvider {static constexpr const char* tagname = "attribute";};
-using AttributeList = SerializableObjectList<Attribute, AttributeListNameProvider>;
-using CmdAttributeInsert = CmdListElementInsert<Attribute, AttributeListNameProvider>;
-using CmdAttributeRemove = CmdListElementRemove<Attribute, AttributeListNameProvider>;
-using CmdAttributesSwap = CmdListElementsSwap<Attribute, AttributeListNameProvider>;
+struct AttributeListNameProvider {
+  static constexpr const char* tagname = "attribute";
+};
+using AttributeList =
+    SerializableObjectList<Attribute, AttributeListNameProvider>;
+using CmdAttributeInsert =
+    CmdListElementInsert<Attribute, AttributeListNameProvider>;
+using CmdAttributeRemove =
+    CmdListElementRemove<Attribute, AttributeListNameProvider>;
+using CmdAttributesSwap =
+    CmdListElementsSwap<Attribute, AttributeListNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRIBUTE_H
+#endif  // LIBREPCB_ATTRIBUTE_H

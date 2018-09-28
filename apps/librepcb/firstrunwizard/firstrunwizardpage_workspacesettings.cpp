@@ -17,51 +17,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QFileDialog>
+ ******************************************************************************/
 #include "firstrunwizardpage_workspacesettings.h"
+
 #include "ui_firstrunwizardpage_workspacesettings.h"
+
 #include <librepcb/common/systeminfo.h>
 #include <librepcb/workspace/workspace.h>
 
-/*****************************************************************************************
+#include <QFileDialog>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FirstRunWizardPage_WorkspaceSettings::FirstRunWizardPage_WorkspaceSettings(QWidget *parent) noexcept :
-    QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspaceSettings)
-{
-    mUi->setupUi(this);
-    registerField("NewWorkspaceUserName", mUi->edtUserName);
+FirstRunWizardPage_WorkspaceSettings::FirstRunWizardPage_WorkspaceSettings(
+    QWidget *parent) noexcept
+  : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspaceSettings) {
+  mUi->setupUi(this);
+  registerField("NewWorkspaceUserName", mUi->edtUserName);
 
-    // Initialize user name with the system's username.
-    mUi->edtUserName->setText(SystemInfo::getFullUsername());
+  // Initialize user name with the system's username.
+  mUi->edtUserName->setText(SystemInfo::getFullUsername());
 }
 
-FirstRunWizardPage_WorkspaceSettings::~FirstRunWizardPage_WorkspaceSettings() noexcept
-{
+FirstRunWizardPage_WorkspaceSettings::
+    ~FirstRunWizardPage_WorkspaceSettings() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool FirstRunWizardPage_WorkspaceSettings::validatePage() noexcept
-{
-    return true; // Any user name is valid
+bool FirstRunWizardPage_WorkspaceSettings::validatePage() noexcept {
+  return true;  // Any user name is valid
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb

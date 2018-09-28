@@ -17,74 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetsegmentremoveelements.h"
-#include "../schematic.h"
-#include "../items/si_netpoint.h"
-#include "../items/si_netline.h"
-#include "../items/si_netsegment.h"
 
-/*****************************************************************************************
+#include "../items/si_netline.h"
+#include "../items/si_netpoint.h"
+#include "../items/si_netsegment.h"
+#include "../schematic.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetSegmentRemoveElements::CmdSchematicNetSegmentRemoveElements(SI_NetSegment& segment) noexcept :
-    UndoCommand(tr("Remove net segment elements")),
-    mNetSegment(segment)
-{
+CmdSchematicNetSegmentRemoveElements::CmdSchematicNetSegmentRemoveElements(
+    SI_NetSegment& segment) noexcept
+  : UndoCommand(tr("Remove net segment elements")), mNetSegment(segment) {
 }
 
-CmdSchematicNetSegmentRemoveElements::~CmdSchematicNetSegmentRemoveElements() noexcept
-{
+CmdSchematicNetSegmentRemoveElements::
+    ~CmdSchematicNetSegmentRemoveElements() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdSchematicNetSegmentRemoveElements::removeNetPoint(SI_NetPoint& netpoint)
-{
-    mNetPoints.append(&netpoint);
+void CmdSchematicNetSegmentRemoveElements::removeNetPoint(
+    SI_NetPoint& netpoint) {
+  mNetPoints.append(&netpoint);
 }
 
-void CmdSchematicNetSegmentRemoveElements::removeNetLine(SI_NetLine& netline)
-{
-    mNetLines.append(&netline);
+void CmdSchematicNetSegmentRemoveElements::removeNetLine(SI_NetLine& netline) {
+  mNetLines.append(&netline);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetSegmentRemoveElements::performExecute()
-{
-    performRedo(); // can throw
+bool CmdSchematicNetSegmentRemoveElements::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicNetSegmentRemoveElements::performUndo()
-{
-    mNetSegment.addNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
+void CmdSchematicNetSegmentRemoveElements::performUndo() {
+  mNetSegment.addNetPointsAndNetLines(mNetPoints, mNetLines);  // can throw
 }
 
-void CmdSchematicNetSegmentRemoveElements::performRedo()
-{
-    mNetSegment.removeNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
+void CmdSchematicNetSegmentRemoveElements::performRedo() {
+  mNetSegment.removeNetPointsAndNetLines(mNetPoints, mNetLines);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

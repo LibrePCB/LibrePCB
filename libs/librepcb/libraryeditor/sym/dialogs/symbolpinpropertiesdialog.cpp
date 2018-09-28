@@ -17,89 +17,95 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "symbolpinpropertiesdialog.h"
+
+#include "ui_symbolpinpropertiesdialog.h"
+
+#include <librepcb/common/undostack.h>
+#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+#include <librepcb/library/sym/symbolpin.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include "symbolpinpropertiesdialog.h"
-#include "ui_symbolpinpropertiesdialog.h"
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/sym/symbolpin.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin, UndoStack& undoStack,
-                                                     QWidget* parent) noexcept :
-    QDialog(parent), mSymbolPin(pin), mUndoStack(undoStack),
-    mUi(new Ui::SymbolPinPropertiesDialog)
-{
-    mUi->setupUi(this);
-    connect(mUi->buttonBox, &QDialogButtonBox::clicked,
-            this, &SymbolPinPropertiesDialog::on_buttonBox_clicked);
+SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin,
+                                                     UndoStack& undoStack,
+                                                     QWidget*   parent) noexcept
+  : QDialog(parent),
+    mSymbolPin(pin),
+    mUndoStack(undoStack),
+    mUi(new Ui::SymbolPinPropertiesDialog) {
+  mUi->setupUi(this);
+  connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
+          &SymbolPinPropertiesDialog::on_buttonBox_clicked);
 
-    // load pin attributes
-    mUi->lblUuid->setText(mSymbolPin.getUuid().toStr());
-    mUi->edtName->setText(*mSymbolPin.getName());
-    mUi->spbPosX->setValue(mSymbolPin.getPosition().getX().toMm());
-    mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());
-    mUi->spbRotation->setValue(mSymbolPin.getRotation().toDeg());
-    mUi->spbLength->setValue(mSymbolPin.getLength()->toMm());
+  // load pin attributes
+  mUi->lblUuid->setText(mSymbolPin.getUuid().toStr());
+  mUi->edtName->setText(*mSymbolPin.getName());
+  mUi->spbPosX->setValue(mSymbolPin.getPosition().getX().toMm());
+  mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());
+  mUi->spbRotation->setValue(mSymbolPin.getRotation().toDeg());
+  mUi->spbLength->setValue(mSymbolPin.getLength()->toMm());
 }
 
-SymbolPinPropertiesDialog::~SymbolPinPropertiesDialog() noexcept
-{
+SymbolPinPropertiesDialog::~SymbolPinPropertiesDialog() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SymbolPinPropertiesDialog::on_buttonBox_clicked(QAbstractButton *button)
-{
-    switch (mUi->buttonBox->buttonRole(button)) {
-        case QDialogButtonBox::ApplyRole:
-            applyChanges();
-            break;
-        case QDialogButtonBox::AcceptRole:
-            if (applyChanges()) {
-                accept();
-            }
-            break;
-        case QDialogButtonBox::RejectRole:
-            reject();
-            break;
-        default: Q_ASSERT(false); break;
-    }
+void SymbolPinPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
+  switch (mUi->buttonBox->buttonRole(button)) {
+    case QDialogButtonBox::ApplyRole:
+      applyChanges();
+      break;
+    case QDialogButtonBox::AcceptRole:
+      if (applyChanges()) {
+        accept();
+      }
+      break;
+    case QDialogButtonBox::RejectRole:
+      reject();
+      break;
+    default:
+      Q_ASSERT(false);
+      break;
+  }
 }
 
-bool SymbolPinPropertiesDialog::applyChanges() noexcept
-{
-    try {
-        CircuitIdentifier name(mUi->edtName->text().trimmed()); // can throw
-        QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
-        cmd->setName(name, false);
-        cmd->setLength(UnsignedLength(Length::fromMm(mUi->spbLength->value())), false); // can throw
-        cmd->setPosition(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-        cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
-        mUndoStack.execCmd(cmd.take());
-        return true;
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-        return false;
-    }
+bool SymbolPinPropertiesDialog::applyChanges() noexcept {
+  try {
+    CircuitIdentifier name(mUi->edtName->text().trimmed());  // can throw
+    QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
+    cmd->setName(name, false);
+    cmd->setLength(UnsignedLength(Length::fromMm(mUi->spbLength->value())),
+                   false);  // can throw
+    cmd->setPosition(
+        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
+    cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
+    mUndoStack.execCmd(cmd.take());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+    return false;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

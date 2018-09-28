@@ -17,120 +17,111 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "schematicselectionquery.h"
-#include "schematic.h"
+
+#include "items/si_netlabel.h"
+#include "items/si_netline.h"
+#include "items/si_netpoint.h"
+#include "items/si_netsegment.h"
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
-#include "items/si_netsegment.h"
-#include "items/si_netpoint.h"
-#include "items/si_netline.h"
-#include "items/si_netlabel.h"
+#include "schematic.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SchematicSelectionQuery::SchematicSelectionQuery(const QList<SI_Symbol*>& symbols,
-                                                 const QList<SI_NetSegment*>& netsegments,
-                                                 QObject* parent) :
-    QObject(parent), mSymbols(symbols), mNetSegments(netsegments)
-{
+SchematicSelectionQuery::SchematicSelectionQuery(
+    const QList<SI_Symbol*>& symbols, const QList<SI_NetSegment*>& netsegments,
+    QObject* parent)
+  : QObject(parent), mSymbols(symbols), mNetSegments(netsegments) {
 }
 
-SchematicSelectionQuery::~SchematicSelectionQuery() noexcept
-{
+SchematicSelectionQuery::~SchematicSelectionQuery() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters: General
- ****************************************************************************************/
+ ******************************************************************************/
 
-int SchematicSelectionQuery::getResultCount() const noexcept
-{
-    return  mResultSymbols.count() +
-            mResultNetPoints.count() +
-            mResultNetLines.count() +
-            mResultNetLabels.count();
+int SchematicSelectionQuery::getResultCount() const noexcept {
+  return mResultSymbols.count() + mResultNetPoints.count() +
+         mResultNetLines.count() + mResultNetLabels.count();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SchematicSelectionQuery::addSelectedSymbols() noexcept
-{
-    foreach (SI_Symbol* symbol, mSymbols) {
-        if (symbol->isSelected()) {
-            mResultSymbols.insert(symbol);
-        }
+void SchematicSelectionQuery::addSelectedSymbols() noexcept {
+  foreach (SI_Symbol* symbol, mSymbols) {
+    if (symbol->isSelected()) {
+      mResultSymbols.insert(symbol);
     }
+  }
 }
 
-void SchematicSelectionQuery::addSelectedNetPoints() noexcept
-{
-    foreach (SI_NetSegment* netsegment, mNetSegments) {
-        foreach (SI_NetPoint* netpoint, netsegment->getNetPoints()) {
-            if (netpoint->isSelected()) {
-                mResultNetPoints.insert(netpoint);
-            }
-        }
+void SchematicSelectionQuery::addSelectedNetPoints() noexcept {
+  foreach (SI_NetSegment* netsegment, mNetSegments) {
+    foreach (SI_NetPoint* netpoint, netsegment->getNetPoints()) {
+      if (netpoint->isSelected()) {
+        mResultNetPoints.insert(netpoint);
+      }
     }
+  }
 }
 
-void SchematicSelectionQuery::addSelectedNetLines() noexcept
-{
-    foreach (SI_NetSegment* netsegment, mNetSegments) {
-        foreach (SI_NetLine* netline, netsegment->getNetLines()) {
-            if (netline->isSelected()) {
-                mResultNetLines.insert(netline);
-            }
-        }
+void SchematicSelectionQuery::addSelectedNetLines() noexcept {
+  foreach (SI_NetSegment* netsegment, mNetSegments) {
+    foreach (SI_NetLine* netline, netsegment->getNetLines()) {
+      if (netline->isSelected()) {
+        mResultNetLines.insert(netline);
+      }
     }
+  }
 }
 
-void SchematicSelectionQuery::addSelectedNetLabels() noexcept
-{
-    foreach (SI_NetSegment* netsegment, mNetSegments) {
-        foreach (SI_NetLabel* netlabel, netsegment->getNetLabels()) {
-            if (netlabel->isSelected()) {
-                mResultNetLabels.insert(netlabel);
-            }
-        }
+void SchematicSelectionQuery::addSelectedNetLabels() noexcept {
+  foreach (SI_NetSegment* netsegment, mNetSegments) {
+    foreach (SI_NetLabel* netlabel, netsegment->getNetLabels()) {
+      if (netlabel->isSelected()) {
+        mResultNetLabels.insert(netlabel);
+      }
     }
+  }
 }
 
-void SchematicSelectionQuery::addNetPointsOfNetLines() noexcept
-{
-    foreach (SI_NetLine* netline, mResultNetLines) {
-        SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getStartPoint());
-        SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getEndPoint());
-        if (p1) mResultNetPoints.insert(p1);
-        if (p2) mResultNetPoints.insert(p2);
-    }
+void SchematicSelectionQuery::addNetPointsOfNetLines() noexcept {
+  foreach (SI_NetLine* netline, mResultNetLines) {
+    SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getStartPoint());
+    SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getEndPoint());
+    if (p1) mResultNetPoints.insert(p1);
+    if (p2) mResultNetPoints.insert(p2);
+  }
 }
 
-void SchematicSelectionQuery::addNetLinesOfSymbolPins() noexcept
-{
-    foreach (SI_Symbol* symbol, mResultSymbols) {
-        foreach (SI_SymbolPin* pin, symbol->getPins()) {
-            mResultNetLines += pin->getNetLines();
-        }
+void SchematicSelectionQuery::addNetLinesOfSymbolPins() noexcept {
+  foreach (SI_Symbol* symbol, mResultSymbols) {
+    foreach (SI_SymbolPin* pin, symbol->getPins()) {
+      mResultNetLines += pin->getNetLines();
     }
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

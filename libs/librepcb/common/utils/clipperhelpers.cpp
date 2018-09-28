@@ -17,220 +17,225 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "clipperhelpers.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
-                            const PositiveLength& maxArcTolerance)
-{
-    try {
-        ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
-        o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-        o.Execute(paths, offset.toNm());
-    } catch (const std::exception& e) {
-        throw LogicError(__FILE__, __LINE__,
-            QString(tr("Failed to offset a path: %1")).arg(e.what()));
-    }
+                            const PositiveLength& maxArcTolerance) {
+  try {
+    ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
+    o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+    o.Execute(paths, offset.toNm());
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString(tr("Failed to offset a path: %1")).arg(e.what()));
+  }
 }
 
-ClipperLib::Paths ClipperHelpers::flattenTree(const ClipperLib::PolyNode& node)
-{
-    ClipperLib::Paths paths;
-    for (const ClipperLib::PolyNode* outlineChild : node.Childs) { Q_ASSERT(outlineChild);
-        if (outlineChild->IsHole()) throw LogicError(__FILE__, __LINE__);
-        ClipperLib::Paths holes;
-        for (ClipperLib::PolyNode* holeChild : outlineChild->Childs) { Q_ASSERT(holeChild);
-            if (!holeChild->IsHole()) throw LogicError(__FILE__, __LINE__);
-            holes.push_back(holeChild->Contour);
-            ClipperLib::Paths subpaths = flattenTree(*holeChild); // can throw
-            paths.insert(paths.end(), subpaths.begin(), subpaths.end());
-        }
-        paths.push_back(convertHolesToCutIns(outlineChild->Contour, holes)); // can throw
+ClipperLib::Paths ClipperHelpers::flattenTree(
+    const ClipperLib::PolyNode& node) {
+  ClipperLib::Paths paths;
+  for (const ClipperLib::PolyNode* outlineChild : node.Childs) {
+    Q_ASSERT(outlineChild);
+    if (outlineChild->IsHole()) throw LogicError(__FILE__, __LINE__);
+    ClipperLib::Paths holes;
+    for (ClipperLib::PolyNode* holeChild : outlineChild->Childs) {
+      Q_ASSERT(holeChild);
+      if (!holeChild->IsHole()) throw LogicError(__FILE__, __LINE__);
+      holes.push_back(holeChild->Contour);
+      ClipperLib::Paths subpaths = flattenTree(*holeChild);  // can throw
+      paths.insert(paths.end(), subpaths.begin(), subpaths.end());
     }
-    return paths;
+    paths.push_back(
+        convertHolesToCutIns(outlineChild->Contour, holes));  // can throw
+  }
+  return paths;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Conversion Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QVector<Path> ClipperHelpers::convert(const ClipperLib::Paths& paths) noexcept
-{
-    QVector<Path> p;
-    p.reserve(paths.size());
-    for (const ClipperLib::Path& path : paths) {
-        p.append(convert(path));
+QVector<Path> ClipperHelpers::convert(const ClipperLib::Paths& paths) noexcept {
+  QVector<Path> p;
+  p.reserve(paths.size());
+  for (const ClipperLib::Path& path : paths) {
+    p.append(convert(path));
+  }
+  return p;
+}
+
+Path ClipperHelpers::convert(const ClipperLib::Path& path) noexcept {
+  Path p;
+  for (const ClipperLib::IntPoint& point : path) {
+    p.addVertex(convert(point));
+  }
+  p.close();
+  return p;
+}
+
+Point ClipperHelpers::convert(const ClipperLib::IntPoint& point) noexcept {
+  return Point(point.X, point.Y);
+}
+
+ClipperLib::Paths ClipperHelpers::convert(
+    const QVector<Path>&  paths,
+    const PositiveLength& maxArcTolerance) noexcept {
+  ClipperLib::Paths p;
+  p.reserve(paths.size());
+  foreach (const Path& path, paths) {
+    p.push_back(convert(path, maxArcTolerance));
+  }
+  return p;
+}
+
+ClipperLib::Path ClipperHelpers::convert(
+    const Path& path, const PositiveLength& maxArcTolerance) noexcept {
+  ClipperLib::Path p;
+  for (int i = 0; i < path.getVertices().count(); ++i) {
+    const Vertex& v  = path.getVertices().at(i);
+    const Vertex& v0 = path.getVertices().at(qMax(i - 1, 0));
+    if ((i == 0) || (v0.getAngle() == 0)) {
+      p.push_back(convert(v.getPos()));
+    } else {
+      // approximate arcs by many short straight line segments
+      Path arc = Path::flatArc(v0.getPos(), v.getPos(), v0.getAngle(),
+                               maxArcTolerance);
+      // skip first point as it is would be a duplicate
+      for (int k = 1; k < arc.getVertices().count(); ++k) {
+        p.push_back(convert(arc.getVertices().at(k).getPos()));
+      }
     }
-    return p;
+  }
+  // make sure all paths have the same orientation, otherwise we get strange
+  // results
+  if (!ClipperLib::Orientation(p)) {
+    ClipperLib::ReversePath(p);
+  }
+  return p;
 }
 
-Path ClipperHelpers::convert(const ClipperLib::Path& path) noexcept
-{
-    Path p;
-    for (const ClipperLib::IntPoint& point : path) {
-        p.addVertex(convert(point));
-    }
-    p.close();
-    return p;
+ClipperLib::IntPoint ClipperHelpers::convert(const Point& point) noexcept {
+  return ClipperLib::IntPoint(point.getX().toNm(), point.getY().toNm());
 }
 
-Point ClipperHelpers::convert(const ClipperLib::IntPoint& point) noexcept
-{
-    return Point(point.X, point.Y);
-}
-
-ClipperLib::Paths ClipperHelpers::convert(const QVector<Path>& paths,
-                                          const PositiveLength& maxArcTolerance) noexcept
-{
-    ClipperLib::Paths p;
-    p.reserve(paths.size());
-    foreach (const Path& path, paths) {
-        p.push_back(convert(path, maxArcTolerance));
-    }
-    return p;
-}
-
-ClipperLib::Path ClipperHelpers::convert(const Path& path,
-                                         const PositiveLength& maxArcTolerance) noexcept
-{
-    ClipperLib::Path p;
-    for (int i = 0; i < path.getVertices().count(); ++i) {
-        const Vertex& v = path.getVertices().at(i);
-        const Vertex& v0 = path.getVertices().at(qMax(i-1, 0));
-        if ((i == 0) || (v0.getAngle() == 0)) {
-            p.push_back(convert(v.getPos()));
-        } else {
-            // approximate arcs by many short straight line segments
-            Path arc = Path::flatArc(v0.getPos(), v.getPos(), v0.getAngle(), maxArcTolerance);
-            // skip first point as it is would be a duplicate
-            for (int k = 1; k < arc.getVertices().count(); ++k) {
-                p.push_back(convert(arc.getVertices().at(k).getPos()));
-            }
-        }
-    }
-    // make sure all paths have the same orientation, otherwise we get strange results
-    if (!ClipperLib::Orientation(p)) {
-        ClipperLib::ReversePath(p);
-    }
-    return p;
-}
-
-ClipperLib::IntPoint ClipperHelpers::convert(const Point& point) noexcept
-{
-    return ClipperLib::IntPoint(point.getX().toNm(), point.getY().toNm());
-}
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Internal Helper Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-ClipperLib::Path ClipperHelpers::convertHolesToCutIns(const ClipperLib::Path& outline,
-                                                      const ClipperLib::Paths& holes)
-{
-    ClipperLib::Path path = outline;
-    ClipperLib::Paths preparedHoles = prepareHoles(holes);
-    for (const ClipperLib::Path& hole : preparedHoles) {
-        addCutInToPath(path, hole); // can throw
-    }
-    return path;
+ClipperLib::Path ClipperHelpers::convertHolesToCutIns(
+    const ClipperLib::Path& outline, const ClipperLib::Paths& holes) {
+  ClipperLib::Path  path          = outline;
+  ClipperLib::Paths preparedHoles = prepareHoles(holes);
+  for (const ClipperLib::Path& hole : preparedHoles) {
+    addCutInToPath(path, hole);  // can throw
+  }
+  return path;
 }
 
-ClipperLib::Paths ClipperHelpers::prepareHoles(const ClipperLib::Paths& holes) noexcept
-{
-    ClipperLib::Paths preparedHoles;
-    for (const ClipperLib::Path& hole : holes) {
-        if (hole.size() > 2) {
-            preparedHoles.push_back(rotateCutInHole(hole));
-        } else {
-            qWarning() << "Detected invalid hole in path flattening algorithm, ignoring it...";
-        }
+ClipperLib::Paths ClipperHelpers::prepareHoles(
+    const ClipperLib::Paths& holes) noexcept {
+  ClipperLib::Paths preparedHoles;
+  for (const ClipperLib::Path& hole : holes) {
+    if (hole.size() > 2) {
+      preparedHoles.push_back(rotateCutInHole(hole));
+    } else {
+      qWarning() << "Detected invalid hole in path flattening algorithm, "
+                    "ignoring it...";
     }
-    // important: sort holes by the y coordinate of their connection point
-    // (to make sure no cut-ins are overlapping in the resulting plane)
-    std::sort(preparedHoles.begin(), preparedHoles.end(),
-              [](const ClipperLib::Path& p1, const ClipperLib::Path& p2)
-              {return p1.front().Y < p2.front().Y;});
-    return preparedHoles;
+  }
+  // important: sort holes by the y coordinate of their connection point
+  // (to make sure no cut-ins are overlapping in the resulting plane)
+  std::sort(preparedHoles.begin(), preparedHoles.end(),
+            [](const ClipperLib::Path& p1, const ClipperLib::Path& p2) {
+              return p1.front().Y < p2.front().Y;
+            });
+  return preparedHoles;
 }
 
-ClipperLib::Path ClipperHelpers::rotateCutInHole(const ClipperLib::Path& hole) noexcept
-{
-    ClipperLib::Path p = hole;
-    if (p.back() == p.front()) {
-        p.pop_back();
-    }
-    std::rotate(p.begin(), p.begin() + getHoleConnectionPointIndex(p), p.end());
-    return p;
+ClipperLib::Path ClipperHelpers::rotateCutInHole(
+    const ClipperLib::Path& hole) noexcept {
+  ClipperLib::Path p = hole;
+  if (p.back() == p.front()) {
+    p.pop_back();
+  }
+  std::rotate(p.begin(), p.begin() + getHoleConnectionPointIndex(p), p.end());
+  return p;
 }
 
-int ClipperHelpers::getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept
-{
-    int index = 0;
-    for (size_t i = 1; i < hole.size(); ++i) {
-        if (hole.at(i).Y < hole.at(index).Y) {
-            index = i;
-        }
+int ClipperHelpers::getHoleConnectionPointIndex(
+    const ClipperLib::Path& hole) noexcept {
+  int index = 0;
+  for (size_t i = 1; i < hole.size(); ++i) {
+    if (hole.at(i).Y < hole.at(index).Y) {
+      index = i;
     }
-    return index;
+  }
+  return index;
 }
 
-void ClipperHelpers::addCutInToPath(ClipperLib::Path& outline, const ClipperLib::Path& hole)
-{
-    int index = insertConnectionPointToPath(outline, hole.front()); // can throw
-    outline.insert(outline.begin() + index, hole.begin(), hole.end());
+void ClipperHelpers::addCutInToPath(ClipperLib::Path&       outline,
+                                    const ClipperLib::Path& hole) {
+  int index = insertConnectionPointToPath(outline, hole.front());  // can throw
+  outline.insert(outline.begin() + index, hole.begin(), hole.end());
 }
 
 int ClipperHelpers::insertConnectionPointToPath(ClipperLib::Path& path,
-                                                const ClipperLib::IntPoint& p)
-{
-    int nearestIndex = -1;
-    ClipperLib::IntPoint nearestPoint;
-    for (size_t i = 0; i < path.size(); ++i) {
-        ClipperLib::cInt y;
-        if (calcIntersectionPos(path.at(i), path.at((i + 1) % path.size()), p.X, y)) {
-            if ((y <= p.Y) && ((nearestIndex < 0) || (p.Y - y < p.Y - nearestPoint.Y))) {
-                nearestIndex = i;
-                nearestPoint = ClipperLib::IntPoint(p.X, y);
-            }
-        }
+                                                const ClipperLib::IntPoint& p) {
+  int                  nearestIndex = -1;
+  ClipperLib::IntPoint nearestPoint;
+  for (size_t i = 0; i < path.size(); ++i) {
+    ClipperLib::cInt y;
+    if (calcIntersectionPos(path.at(i), path.at((i + 1) % path.size()), p.X,
+                            y)) {
+      if ((y <= p.Y) &&
+          ((nearestIndex < 0) || (p.Y - y < p.Y - nearestPoint.Y))) {
+        nearestIndex = i;
+        nearestPoint = ClipperLib::IntPoint(p.X, y);
+      }
     }
-    if (nearestIndex >= 0) {
-        path.insert(path.begin() + nearestIndex + 1, nearestPoint);
-        path.insert(path.begin() + nearestIndex + 1, p);
-        path.insert(path.begin() + nearestIndex + 1, nearestPoint);
-        return nearestIndex + 2;
-    } else {
-        throw LogicError(__FILE__, __LINE__,
-            tr("Failed to calculate the connection point of a cut-in to an outline!"));
-    }
+  }
+  if (nearestIndex >= 0) {
+    path.insert(path.begin() + nearestIndex + 1, nearestPoint);
+    path.insert(path.begin() + nearestIndex + 1, p);
+    path.insert(path.begin() + nearestIndex + 1, nearestPoint);
+    return nearestIndex + 2;
+  } else {
+    throw LogicError(__FILE__, __LINE__,
+                     tr("Failed to calculate the connection point of a cut-in "
+                        "to an outline!"));
+  }
 }
 
 bool ClipperHelpers::calcIntersectionPos(const ClipperLib::IntPoint& p1,
-    const ClipperLib::IntPoint& p2, const ClipperLib::cInt& x, ClipperLib::cInt& y) noexcept
-{
-    if (((p1.X <= x) && (p2.X > x)) || ((p1.X >= x) && (p2.X < x))) {
-        qreal yCalc = p1.Y + (qreal(x - p1.X) * qreal(p2.Y - p1.Y) / qreal(p2.X - p1.X));
-        y = qBound(qMin(p1.Y, p2.Y), ClipperLib::cInt(yCalc), qMax(p1.Y, p2.Y));
-        return true;
-    } else {
-        return false;
-    }
+                                         const ClipperLib::IntPoint& p2,
+                                         const ClipperLib::cInt&     x,
+                                         ClipperLib::cInt& y) noexcept {
+  if (((p1.X <= x) && (p2.X > x)) || ((p1.X >= x) && (p2.X < x))) {
+    qreal yCalc =
+        p1.Y + (qreal(x - p1.X) * qreal(p2.Y - p1.Y) / qreal(p2.X - p1.X));
+    y = qBound(qMin(p1.Y, p2.Y), ClipperLib::cInt(yCalc), qMax(p1.Y, p2.Y));
+    return true;
+  } else {
+    return false;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

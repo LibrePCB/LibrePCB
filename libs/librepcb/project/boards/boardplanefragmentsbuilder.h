@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
 #define LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <clipper/clipper.hpp>
 #include <librepcb/common/geometry/path.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,61 +38,60 @@ class BI_Plane;
 class BI_Via;
 class BI_FootprintPad;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardPlaneFragmentsBuilder
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardPlaneFragmentsBuilder class
  */
-class BoardPlaneFragmentsBuilder final
-{
-    public:
+class BoardPlaneFragmentsBuilder final {
+public:
+  // Constructors / Destructor
+  BoardPlaneFragmentsBuilder()                                        = delete;
+  BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
+  BoardPlaneFragmentsBuilder(BI_Plane& plane) noexcept;
+  ~BoardPlaneFragmentsBuilder() noexcept;
 
-        // Constructors / Destructor
-        BoardPlaneFragmentsBuilder() = delete;
-        BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
-        BoardPlaneFragmentsBuilder(BI_Plane& plane) noexcept;
-        ~BoardPlaneFragmentsBuilder() noexcept;
+  // General Methods
+  QVector<Path> buildFragments() noexcept;
 
-        // General Methods
-        QVector<Path> buildFragments() noexcept;
+  // Operator Overloadings
+  BoardPlaneFragmentsBuilder& operator=(const BoardPlaneFragmentsBuilder& rhs) =
+      delete;
 
-        // Operator Overloadings
-        BoardPlaneFragmentsBuilder& operator=(const BoardPlaneFragmentsBuilder& rhs) = delete;
+private:  // Methods
+  void addPlaneOutline();
+  void clipToBoardOutline();
+  void subtractOtherObjects();
+  void ensureMinimumWidth();
+  void flattenResult();
+  void removeOrphans();
 
+  // Helper Methods
+  ClipperLib::Path createPadCutOut(const BI_FootprintPad& pad) const noexcept;
+  ClipperLib::Path createViaCutOut(const BI_Via& via) const noexcept;
 
-    private: // Methods
-        void addPlaneOutline();
-        void clipToBoardOutline();
-        void subtractOtherObjects();
-        void ensureMinimumWidth();
-        void flattenResult();
-        void removeOrphans();
+  /**
+   * Returns the maximum allowed arc tolerance when flattening arcs. Do not
+   * change this if you don't know exactly what you're doing (it affects all
+   * planes in all existing boards)!
+   */
+  static PositiveLength maxArcTolerance() noexcept {
+    return PositiveLength(5000);
+  }
 
-        // Helper Methods
-        ClipperLib::Path createPadCutOut(const BI_FootprintPad& pad) const noexcept;
-        ClipperLib::Path createViaCutOut(const BI_Via& via) const noexcept;
-
-        /**
-         * Returns the maximum allowed arc tolerance when flattening arcs. Do not change
-         * this if you don't know exactly what you're doing (it affects all planes in
-         * all existing boards)!
-         */
-        static PositiveLength maxArcTolerance() noexcept {return PositiveLength(5000);}
-
-
-    private: // Data
-        BI_Plane& mPlane;
-        ClipperLib::Paths mConnectedNetSignalAreas;
-        ClipperLib::Paths mResult;
+private:  // Data
+  BI_Plane&         mPlane;
+  ClipperLib::Paths mConnectedNetSignalAreas;
+  ClipperLib::Paths mResult;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
+#endif  // LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H

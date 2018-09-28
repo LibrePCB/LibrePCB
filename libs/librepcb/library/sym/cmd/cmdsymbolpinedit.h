@@ -20,83 +20,80 @@
 #ifndef LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
 #define LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../symbolpin.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSymbolPinEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSymbolPinEdit class
  */
-class CmdSymbolPinEdit final : public UndoCommand
-{
-    public:
+class CmdSymbolPinEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSymbolPinEdit()                              = delete;
+  CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
+  explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
+  ~CmdSymbolPinEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdSymbolPinEdit() = delete;
-        CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
-        explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
-        ~CmdSymbolPinEdit() noexcept;
+  // Setters
+  void setName(const CircuitIdentifier& name, bool immediate) noexcept;
+  void setLength(const UnsignedLength& length, bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name, bool immediate) noexcept;
-        void setLength(const UnsignedLength& length, bool immediate) noexcept;
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdSymbolPinEdit& operator=(const CmdSymbolPinEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdSymbolPinEdit& operator=(const CmdSymbolPinEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  SymbolPin& mPin;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        SymbolPin& mPin;
-
-        // General Attributes
-        CircuitIdentifier mOldName;
-        CircuitIdentifier mNewName;
-        UnsignedLength mOldLength;
-        UnsignedLength mNewLength;
-        Point mOldPos;
-        Point mNewPos;
-        Angle mOldRotation;
-        Angle mNewRotation;
+  // General Attributes
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
+  UnsignedLength    mOldLength;
+  UnsignedLength    mNewLength;
+  Point             mOldPos;
+  Point             mNewPos;
+  Angle             mOldRotation;
+  Angle             mNewRotation;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H

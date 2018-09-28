@@ -17,57 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <gtest/gtest.h>
-#include <parseagle/library.h>
 #include <librepcb/eagleimport/converterdb.h>
 #include <librepcb/eagleimport/symbolconverter.h>
 #include <librepcb/library/sym/symbol.h>
+#include <parseagle/library.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace eagleimport {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class SymbolConverterTest : public ::testing::Test
-{
-};
+class SymbolConverterTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_F(SymbolConverterTest, testConversion)
-{
-    FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
+TEST_F(SymbolConverterTest, testConversion) {
+  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
-    // load eagle symbol
-    FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-    parseagle::Library eagleLibrary(eagleLibFp.toStr());
-    ASSERT_EQ(1, eagleLibrary.getSymbols().count());
-    const parseagle::Symbol& eagleSymbol = eagleLibrary.getSymbols().first();
+  // load eagle symbol
+  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  parseagle::Library eagleLibrary(eagleLibFp.toStr());
+  ASSERT_EQ(1, eagleLibrary.getSymbols().count());
+  const parseagle::Symbol& eagleSymbol = eagleLibrary.getSymbols().first();
 
-    // load converter database
-    ConverterDb db(testDataDir.getPathTo("db.ini"));
+  // load converter database
+  ConverterDb db(testDataDir.getPathTo("db.ini"));
 
-    // convert symbol
-    SymbolConverter converter(eagleSymbol, db);
-    std::unique_ptr<library::Symbol> symbol = converter.generate();
+  // convert symbol
+  SymbolConverter                  converter(eagleSymbol, db);
+  std::unique_ptr<library::Symbol> symbol = converter.generate();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace tests
+}  // namespace eagleimport
+}  // namespace librepcb

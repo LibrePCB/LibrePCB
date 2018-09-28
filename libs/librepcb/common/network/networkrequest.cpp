@@ -17,62 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "networkrequest.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NetworkRequest::NetworkRequest(const QUrl& url) noexcept :
-    NetworkRequestBase(url), mReceivedData()
-{
+NetworkRequest::NetworkRequest(const QUrl& url) noexcept
+  : NetworkRequestBase(url), mReceivedData() {
 }
 
-NetworkRequest::~NetworkRequest() noexcept
-{
+NetworkRequest::~NetworkRequest() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NetworkRequest::prepareRequest()
-{
-    mReceivedData.clear();
+void NetworkRequest::prepareRequest() {
+  mReceivedData.clear();
 }
 
-void NetworkRequest::finalizeRequest()
-{
-    if (mReceivedData.size() > 100*1000*1000) {
-        throw RuntimeError(__FILE__, __LINE__,
-            tr("The received content exceeds the 100MB size limit."));
-    }
+void NetworkRequest::finalizeRequest() {
+  if (mReceivedData.size() > 100 * 1000 * 1000) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("The received content exceeds the 100MB size limit."));
+  }
 }
 
-void NetworkRequest::emitSuccessfullyFinishedSignals() noexcept
-{
-    emit dataReceived(mReceivedData);
+void NetworkRequest::emitSuccessfullyFinishedSignals() noexcept {
+  emit dataReceived(mReceivedData);
 }
 
-void NetworkRequest::fetchNewData() noexcept
-{
-    QByteArray data = mReply->readAll();
-    if (mReceivedData.size() <= 100*1000*1000) {
-        mReceivedData.append(data);
-    }
+void NetworkRequest::fetchNewData() noexcept {
+  QByteArray data = mReply->readAll();
+  if (mReceivedData.size() <= 100 * 1000 * 1000) {
+    mReceivedData.append(data);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

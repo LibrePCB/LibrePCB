@@ -20,62 +20,58 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Schematic;
 class SI_NetSegment;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetSegmentRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetSegmentRemove class
  */
-class CmdSchematicNetSegmentRemove final : public UndoCommand
-{
-    public:
+class CmdSchematicNetSegmentRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdSchematicNetSegmentRemove(SI_NetSegment& segment) noexcept;
+  ~CmdSchematicNetSegmentRemove() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdSchematicNetSegmentRemove(SI_NetSegment& segment) noexcept;
-        ~CmdSchematicNetSegmentRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Schematic& mSchematic;
-        SI_NetSegment& mNetSegment;
+  Schematic&     mSchematic;
+  SI_NetSegment& mNetSegment;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVE_H

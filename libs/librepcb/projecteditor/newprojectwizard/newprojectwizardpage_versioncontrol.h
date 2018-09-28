@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H
 #define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace librepcb {
 namespace project {
@@ -38,9 +38,9 @@ namespace Ui {
 class NewProjectWizardPage_VersionControl;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewProjectWizardPage_VersionControl
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewProjectWizardPage_VersionControl class
@@ -50,42 +50,37 @@ class NewProjectWizardPage_VersionControl;
  *
  * @todo Add more functionality (run "git init" and "git commit").
  */
-class NewProjectWizardPage_VersionControl final : public QWizardPage
-{
-        Q_OBJECT
+class NewProjectWizardPage_VersionControl final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
 
-        // Constructors / Destructor
+  explicit NewProjectWizardPage_VersionControl(
+      QWidget* parent = nullptr) noexcept;
+  NewProjectWizardPage_VersionControl(
+      const NewProjectWizardPage_VersionControl& other) = delete;
+  ~NewProjectWizardPage_VersionControl() noexcept;
 
-        explicit NewProjectWizardPage_VersionControl(QWidget* parent = nullptr) noexcept;
-        NewProjectWizardPage_VersionControl(const NewProjectWizardPage_VersionControl& other) = delete;
-        ~NewProjectWizardPage_VersionControl() noexcept;
+  // Getters
+  bool getInitGitRepository() const noexcept;
 
-        // Getters
-        bool getInitGitRepository() const noexcept;
+  // Operator Overloadings
+  NewProjectWizardPage_VersionControl& operator       =(
+      const NewProjectWizardPage_VersionControl& rhs) = delete;
 
-        // Operator Overloadings
-        NewProjectWizardPage_VersionControl& operator=(const NewProjectWizardPage_VersionControl& rhs) = delete;
-
-
-    private: // GUI Action Handlers
-
-
-    private: // Methods
-
-
-    private: // Data
-
-        QScopedPointer<Ui::NewProjectWizardPage_VersionControl> mUi;
+private:  // GUI Action Handlers
+private:  // Methods
+private:  // Data
+  QScopedPointer<Ui::NewProjectWizardPage_VersionControl> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H
+#endif  // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_VERSIONCONTROL_H

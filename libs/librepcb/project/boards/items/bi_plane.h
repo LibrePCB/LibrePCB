@@ -20,19 +20,21 @@
 #ifndef LIBREPCB_PROJECT_BI_PLANE_H
 #define LIBREPCB_PROJECT_BI_PLANE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_base.h"
+
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/graphics/graphicslayername.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -41,9 +43,9 @@ class NetSignal;
 class Board;
 class BGI_Plane;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Plane
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_Plane class
@@ -51,131 +53,143 @@ class BGI_Plane;
  * @author ubruhin
  * @date 2017-11-19
  */
-class BI_Plane final : public BI_Base, public SerializableObject
-{
-        Q_OBJECT
+class BI_Plane final : public BI_Base, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class ConnectStyle {
+    None,  ///< do not connect pads/vias to plane
+    // Thermal,    ///< add thermals to connect pads/vias to plane
+    Solid,  ///< completely connect pads/vias to plane
+  };
 
-        // Types
-        enum class ConnectStyle {
-            None,       ///< do not connect pads/vias to plane
-            //Thermal,    ///< add thermals to connect pads/vias to plane
-            Solid,      ///< completely connect pads/vias to plane
-        };
+  // Constructors / Destructor
+  BI_Plane()                      = delete;
+  BI_Plane(const BI_Plane& other) = delete;
+  BI_Plane(Board& board, const BI_Plane& other);
+  BI_Plane(Board& board, const SExpression& node);
+  BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
+           NetSignal& netsignal, const Path& outline);
+  ~BI_Plane() noexcept;
 
-        // Constructors / Destructor
-        BI_Plane() = delete;
-        BI_Plane(const BI_Plane& other) = delete;
-        BI_Plane(Board& board, const BI_Plane& other);
-        BI_Plane(Board& board, const SExpression& node);
-        BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
-                 NetSignal& netsignal, const Path& outline);
-        ~BI_Plane() noexcept;
+  // Getters
+  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
+  NetSignal&               getNetSignal() const noexcept { return *mNetSignal; }
+  const UnsignedLength&    getMinWidth() const noexcept { return mMinWidth; }
+  const UnsignedLength&    getMinClearance() const noexcept {
+    return mMinClearance;
+  }
+  bool         getKeepOrphans() const noexcept { return mKeepOrphans; }
+  int          getPriority() const noexcept { return mPriority; }
+  ConnectStyle getConnectStyle() const noexcept { return mConnectStyle; }
+  // const Length& getThermalGapWidth() const noexcept {return
+  // mThermalGapWidth;} const Length& getThermalSpokeWidth() const noexcept
+  // {return mThermalSpokeWidth;}
+  const Path&          getOutline() const noexcept { return mOutline; }
+  const QVector<Path>& getFragments() const noexcept { return mFragments; }
+  bool                 isSelectable() const noexcept override;
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
-        NetSignal& getNetSignal() const noexcept {return *mNetSignal;}
-        const UnsignedLength& getMinWidth() const noexcept {return mMinWidth;}
-        const UnsignedLength& getMinClearance() const noexcept {return mMinClearance;}
-        bool getKeepOrphans() const noexcept {return mKeepOrphans;}
-        int getPriority() const noexcept {return mPriority;}
-        ConnectStyle getConnectStyle() const noexcept {return mConnectStyle;}
-        //const Length& getThermalGapWidth() const noexcept {return mThermalGapWidth;}
-        //const Length& getThermalSpokeWidth() const noexcept {return mThermalSpokeWidth;}
-        const Path& getOutline() const noexcept {return mOutline;}
-        const QVector<Path>& getFragments() const noexcept {return mFragments;}
-        bool isSelectable() const noexcept override;
+  // Setters
+  void setOutline(const Path& outline) noexcept;
+  void setLayerName(const GraphicsLayerName& layerName) noexcept;
+  void setNetSignal(NetSignal& netsignal);
+  void setMinWidth(const UnsignedLength& minWidth) noexcept;
+  void setMinClearance(const UnsignedLength& minClearance) noexcept;
+  void setConnectStyle(ConnectStyle style) noexcept;
+  void setPriority(int priority) noexcept;
+  void setKeepOrphans(bool keepOrphans) noexcept;
 
-        // Setters
-        void setOutline(const Path& outline) noexcept;
-        void setLayerName(const GraphicsLayerName& layerName) noexcept;
-        void setNetSignal(NetSignal& netsignal);
-        void setMinWidth(const UnsignedLength& minWidth) noexcept;
-        void setMinClearance(const UnsignedLength& minClearance) noexcept;
-        void setConnectStyle(ConnectStyle style) noexcept;
-        void setPriority(int priority) noexcept;
-        void setKeepOrphans(bool keepOrphans) noexcept;
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
+  void clear() noexcept;
+  void rebuild() noexcept;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
-        void clear() noexcept;
-        void rebuild() noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override { return BI_Base::Type_t::Plane; }
+  const Point& getPosition() const noexcept override {
+    static Point p(0, 0);
+    return p;
+  }
+  bool         getIsMirrored() const noexcept override { return false; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Plane;}
-        const Point& getPosition() const noexcept override {static Point p(0, 0); return p;}
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Operator Overloadings
+  BI_Plane& operator=(const BI_Plane& rhs) = delete;
+  bool      operator<(const BI_Plane& rhs) const noexcept;
 
-        // Operator Overloadings
-        BI_Plane& operator=(const BI_Plane& rhs) = delete;
-        bool operator<(const BI_Plane& rhs) const noexcept;
+private slots:
 
+  void boardAttributesChanged();
 
-    private slots:
+private:  // Methods
+  void init();
 
-        void boardAttributesChanged();
+private:  // Data
+  Uuid              mUuid;
+  GraphicsLayerName mLayerName;
+  NetSignal*        mNetSignal;
+  Path              mOutline;
+  UnsignedLength    mMinWidth;
+  UnsignedLength    mMinClearance;
+  bool              mKeepOrphans;
+  int               mPriority;
+  ConnectStyle      mConnectStyle;
+  // Length mThermalGapWidth;
+  // Length mThermalSpokeWidth;
+  // style [round square miter] ?
+  QScopedPointer<BGI_Plane> mGraphicsItem;
 
-
-    private: // Methods
-        void init();
-
-
-    private: // Data
-        Uuid mUuid;
-        GraphicsLayerName mLayerName;
-        NetSignal* mNetSignal;
-        Path mOutline;
-        UnsignedLength mMinWidth;
-        UnsignedLength mMinClearance;
-        bool mKeepOrphans;
-        int mPriority;
-        ConnectStyle mConnectStyle;
-        //Length mThermalGapWidth;
-        //Length mThermalSpokeWidth;
-        // style [round square miter] ?
-        QScopedPointer<BGI_Plane> mGraphicsItem;
-
-        QVector<Path> mFragments;
+  QVector<Path> mFragments;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
+}  // namespace project
 
 template <>
-inline SExpression serializeToSExpression(const project::BI_Plane::ConnectStyle& obj) {
-    switch (obj) {
-        case project::BI_Plane::ConnectStyle::None:     return SExpression::createToken("none");
-        //case project::BI_Plane::ConnectStyle::Thermal:  return SExpression::createToken("thermal");
-        case project::BI_Plane::ConnectStyle::Solid:    return SExpression::createToken("solid");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+inline SExpression serializeToSExpression(
+    const project::BI_Plane::ConnectStyle& obj) {
+  switch (obj) {
+    case project::BI_Plane::ConnectStyle::None:
+      return SExpression::createToken("none");
+    // case project::BI_Plane::ConnectStyle::Thermal:  return
+    // SExpression::createToken("thermal");
+    case project::BI_Plane::ConnectStyle::Solid:
+      return SExpression::createToken("solid");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline project::BI_Plane::ConnectStyle deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == "none")     return project::BI_Plane::ConnectStyle::None;
-    //else if (str == "thermal")  return project::BI_Plane::ConnectStyle::Thermal;
-    else if (str == "solid")    return project::BI_Plane::ConnectStyle::Solid;
-    else throw RuntimeError(__FILE__, __LINE__,
-        QString(project::BI_Plane::tr("Unknown plane connect style: \"%1\"")).arg(str));
+inline project::BI_Plane::ConnectStyle deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "none") return project::BI_Plane::ConnectStyle::None;
+  // else if (str == "thermal")  return
+  // project::BI_Plane::ConnectStyle::Thermal;
+  else if (str == "solid")
+    return project::BI_Plane::ConnectStyle::Solid;
+  else
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(project::BI_Plane::tr("Unknown plane connect style: \"%1\""))
+            .arg(str));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_PLANE_H
+#endif  // LIBREPCB_PROJECT_BI_PLANE_H

@@ -17,82 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "packagepad.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackagePad::PackagePad(const PackagePad& other) noexcept :
-    mUuid(other.mUuid), mName(other.mName)
-{
+PackagePad::PackagePad(const PackagePad& other) noexcept
+  : mUuid(other.mUuid), mName(other.mName) {
 }
 
-PackagePad::PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept :
-    mUuid(uuid), mName(name)
-{
+PackagePad::PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept
+  : mUuid(uuid), mName(name) {
 }
 
-PackagePad::PackagePad(const SExpression& node) :
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true))
-{
+PackagePad::PackagePad(const SExpression& node)
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mName(node.getValueByPath<CircuitIdentifier>("name", true)) {
 }
 
-PackagePad::~PackagePad() noexcept
-{
+PackagePad::~PackagePad() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePad::setName(const CircuitIdentifier& name) noexcept
-{
-    mName = name;
+void PackagePad::setName(const CircuitIdentifier& name) noexcept {
+  mName = name;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePad::serialize(SExpression& root) const
-{
-    root.appendChild(mUuid);
-    root.appendChild("name", mName, false);
+void PackagePad::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild("name", mName, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool PackagePad::operator==(const PackagePad& rhs) const noexcept
-{
-    if (mUuid != rhs.mUuid) return false;
-    if (mName != rhs.mName) return false;
-    return true;
+bool PackagePad::operator==(const PackagePad& rhs) const noexcept {
+  if (mUuid != rhs.mUuid) return false;
+  if (mName != rhs.mName) return false;
+  return true;
 }
 
-PackagePad& PackagePad::operator=(const PackagePad& rhs) noexcept
-{
-    mUuid = rhs.mUuid;
-    mName = rhs.mName;
-    return *this;
+PackagePad& PackagePad::operator=(const PackagePad& rhs) noexcept {
+  mUuid = rhs.mUuid;
+  mName = rhs.mName;
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

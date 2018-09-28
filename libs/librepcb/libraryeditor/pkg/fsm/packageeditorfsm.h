@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORFSM_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORFSM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
+ ******************************************************************************/
 #include "../../common/editorwidgetbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -50,115 +52,112 @@ namespace editor {
 class PackageEditorState;
 class PackageEditorWidget;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorFsm
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The PackageEditorFsm class is the finit state machine (FSM) of the package editor
+ * @brief The PackageEditorFsm class is the finit state machine (FSM) of the
+ * package editor
  *
  * @author  ubruhin
  * @date    2017-05-28
  */
-class PackageEditorFsm final : public QObject
-{
-        Q_OBJECT
+class PackageEditorFsm final : public QObject {
+  Q_OBJECT
 
-    private: // Types
+private:  // Types
+  enum class State {
+    IDLE,
+    SELECT,
+    ADD_THT_PADS,
+    ADD_SMT_PADS,
+    ADD_NAMES,
+    ADD_VALUES,
+    DRAW_LINE,
+    DRAW_RECT,
+    DRAW_POLYGON,
+    DRAW_CIRCLE,
+    DRAW_TEXT,
+    ADD_HOLES,
+  };
 
-        enum class State {
-            IDLE,
-            SELECT,
-            ADD_THT_PADS,
-            ADD_SMT_PADS,
-            ADD_NAMES,
-            ADD_VALUES,
-            DRAW_LINE,
-            DRAW_RECT,
-            DRAW_POLYGON,
-            DRAW_CIRCLE,
-            DRAW_TEXT,
-            ADD_HOLES,
-        };
+public:  // Types
+  struct Context {
+    PackageEditorWidget&                   editorWidget;
+    UndoStack&                             undoStack;
+    GraphicsScene&                         graphicsScene;
+    GraphicsView&                          graphicsView;
+    const IF_GraphicsLayerProvider&        layerProvider;
+    Package&                               package;
+    std::shared_ptr<Footprint>             currentFootprint;
+    std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;
+    ToolBarProxy&                          commandToolBar;
+  };
 
+public:
+  // Constructors / Destructor
+  PackageEditorFsm()                              = delete;
+  PackageEditorFsm(const PackageEditorFsm& other) = delete;
+  explicit PackageEditorFsm(const Context& context) noexcept;
+  virtual ~PackageEditorFsm() noexcept;
 
-    public: // Types
+  // Getters
+  EditorWidgetBase::Tool getCurrentTool() const noexcept;
 
-        struct Context {
-            PackageEditorWidget& editorWidget;
-            UndoStack& undoStack;
-            GraphicsScene& graphicsScene;
-            GraphicsView& graphicsView;
-            const IF_GraphicsLayerProvider& layerProvider;
-            Package& package;
-            std::shared_ptr<Footprint> currentFootprint;
-            std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;
-            ToolBarProxy& commandToolBar;
-        };
+  // Event Handlers
+  bool processChangeCurrentFootprint(
+      const std::shared_ptr<Footprint>& fpt) noexcept;
+  bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept;
+  bool processGraphicsSceneLeftMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept;
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept;
+  bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept;
+  bool processRotateCw() noexcept;
+  bool processRotateCcw() noexcept;
+  bool processRemove() noexcept;
+  bool processAbortCommand() noexcept;
+  bool processStartSelecting() noexcept;
+  bool processStartAddingFootprintThtPads() noexcept;
+  bool processStartAddingFootprintSmtPads() noexcept;
+  bool processStartAddingNames() noexcept;
+  bool processStartAddingValues() noexcept;
+  bool processStartDrawLines() noexcept;
+  bool processStartDrawRects() noexcept;
+  bool processStartDrawPolygons() noexcept;
+  bool processStartDrawCircles() noexcept;
+  bool processStartDrawTexts() noexcept;
+  bool processStartAddingHoles() noexcept;
 
+  // Operator Overloadings
+  PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;
 
-    public:
+signals:
+  void toolChanged(EditorWidgetBase::Tool newTool);
 
-        // Constructors / Destructor
-        PackageEditorFsm() = delete;
-        PackageEditorFsm(const PackageEditorFsm& other) = delete;
-        explicit PackageEditorFsm(const Context& context) noexcept;
-        virtual ~PackageEditorFsm() noexcept;
+private:  // Methods
+  PackageEditorState* getCurrentState() const noexcept;
+  bool                setNextState(State state) noexcept;
+  bool                leaveCurrentState() noexcept;
+  bool                enterNextState(State state) noexcept;
 
-        // Getters
-        EditorWidgetBase::Tool getCurrentTool() const noexcept;
-
-        // Event Handlers
-        bool processChangeCurrentFootprint(const std::shared_ptr<Footprint>& fpt) noexcept;
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept;
-        bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept;
-        bool processGraphicsSceneLeftMouseButtonDoubleClicked(QGraphicsSceneMouseEvent& e) noexcept;
-        bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept;
-        bool processRotateCw() noexcept;
-        bool processRotateCcw() noexcept;
-        bool processRemove() noexcept;
-        bool processAbortCommand() noexcept;
-        bool processStartSelecting() noexcept;
-        bool processStartAddingFootprintThtPads() noexcept;
-        bool processStartAddingFootprintSmtPads() noexcept;
-        bool processStartAddingNames() noexcept;
-        bool processStartAddingValues() noexcept;
-        bool processStartDrawLines() noexcept;
-        bool processStartDrawRects() noexcept;
-        bool processStartDrawPolygons() noexcept;
-        bool processStartDrawCircles() noexcept;
-        bool processStartDrawTexts() noexcept;
-        bool processStartAddingHoles() noexcept;
-
-        // Operator Overloadings
-        PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;
-
-
-    signals:
-        void toolChanged(EditorWidgetBase::Tool newTool);
-
-
-    private: // Methods
-        PackageEditorState* getCurrentState() const noexcept;
-        bool setNextState(State state) noexcept;
-        bool leaveCurrentState() noexcept;
-        bool enterNextState(State state) noexcept;
-
-
-    private: // Data
-        Context mContext;
-        QMap<State, PackageEditorState*> mStates;
-        State mCurrentState;
-        QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
+private:  // Data
+  Context                                   mContext;
+  QMap<State, PackageEditorState*>          mStates;
+  State                                     mCurrentState;
+  QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORFSM_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORFSM_H

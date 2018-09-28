@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
 #define LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/units/all_length_units.h>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
@@ -43,43 +44,38 @@ class Board;
 class ComponentInstance;
 class BI_Device;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdDeviceInstanceAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdDeviceInstanceAdd class
  */
-class CmdDeviceInstanceAdd final : public UndoCommand
-{
-    public:
+class CmdDeviceInstanceAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdDeviceInstanceAdd(BI_Device& device) noexcept;
+  ~CmdDeviceInstanceAdd() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdDeviceInstanceAdd(BI_Device& device) noexcept;
-        ~CmdDeviceInstanceAdd() noexcept;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        BI_Device& mDeviceInstance;
+private:  // Data
+  BI_Device& mDeviceInstance;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
+#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H

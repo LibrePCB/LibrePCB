@@ -17,59 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "librarycategory.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 LibraryCategory::LibraryCategory(const QString& shortElementName,
-                                 const QString& longElementName, const Uuid& uuid,
-                                 const Version& version, const QString& author,
+                                 const QString& longElementName,
+                                 const Uuid& uuid, const Version& version,
+                                 const QString&     author,
                                  const ElementName& name_en_US,
-                                 const QString& description_en_US,
-                                 const QString& keywords_en_US) :
-    LibraryBaseElement(true, shortElementName, longElementName, uuid, version, author,
-                       name_en_US, description_en_US, keywords_en_US)
-{
+                                 const QString&     description_en_US,
+                                 const QString&     keywords_en_US)
+  : LibraryBaseElement(true, shortElementName, longElementName, uuid, version,
+                       author, name_en_US, description_en_US, keywords_en_US) {
 }
 
 LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
-                                 const QString& shortElementName,
-                                 const QString& longElementName, bool readOnly) :
-    LibraryBaseElement(elementDirectory, true, shortElementName, longElementName, readOnly),
-    mParentUuid(mLoadingFileDocument.getValueByPath<tl::optional<Uuid>>("parent"))
-{
+                                 const QString&  shortElementName,
+                                 const QString& longElementName, bool readOnly)
+  : LibraryBaseElement(elementDirectory, true, shortElementName,
+                       longElementName, readOnly),
+    mParentUuid(
+        mLoadingFileDocument.getValueByPath<tl::optional<Uuid>>("parent")) {
 }
 
-LibraryCategory::~LibraryCategory() noexcept
-{
+LibraryCategory::~LibraryCategory() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Protected Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void LibraryCategory::serialize(SExpression& root) const
-{
-    LibraryBaseElement::serialize(root);
-    root.appendChild("parent", mParentUuid, true);
+void LibraryCategory::serialize(SExpression& root) const {
+  LibraryBaseElement::serialize(root);
+  root.appendChild("parent", mParentUuid, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

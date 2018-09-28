@@ -17,125 +17,117 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdprojectlibraryaddelement.h"
+
 #include "../projectlibrary.h"
+
 #include <librepcb/library/elements.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(ProjectLibrary& library,
-                                                                      ElementType& element) noexcept :
-    UndoCommand(tr("Add element to library")),
-    mLibrary(library), mElement(element)
-{
+CmdProjectLibraryAddElement<ElementType>::CmdProjectLibraryAddElement(
+    ProjectLibrary& library, ElementType& element) noexcept
+  : UndoCommand(tr("Add element to library")),
+    mLibrary(library),
+    mElement(element) {
 }
 
 template <typename ElementType>
-CmdProjectLibraryAddElement<ElementType>::~CmdProjectLibraryAddElement() noexcept
-{
+CmdProjectLibraryAddElement<
+    ElementType>::~CmdProjectLibraryAddElement() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-bool CmdProjectLibraryAddElement<ElementType>::performExecute()
-{
-    performRedo(); // can throw
+bool CmdProjectLibraryAddElement<ElementType>::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::performUndo()
-{
-    removeElement(); // can throw
+void CmdProjectLibraryAddElement<ElementType>::performUndo() {
+  removeElement();  // can throw
 }
 
 template <typename ElementType>
-void CmdProjectLibraryAddElement<ElementType>::performRedo()
-{
-    addElement(); // can throw
+void CmdProjectLibraryAddElement<ElementType>::performRedo() {
+  addElement();  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
-void CmdProjectLibraryAddElement<library::Symbol>::addElement()
-{
-    mLibrary.addSymbol(mElement);
+void CmdProjectLibraryAddElement<library::Symbol>::addElement() {
+  mLibrary.addSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Package>::addElement()
-{
-    mLibrary.addPackage(mElement);
+void CmdProjectLibraryAddElement<library::Package>::addElement() {
+  mLibrary.addPackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Component>::addElement()
-{
-    mLibrary.addComponent(mElement);
+void CmdProjectLibraryAddElement<library::Component>::addElement() {
+  mLibrary.addComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Device>::addElement()
-{
-    mLibrary.addDevice(mElement);
+void CmdProjectLibraryAddElement<library::Device>::addElement() {
+  mLibrary.addDevice(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Symbol>::removeElement()
-{
-    mLibrary.removeSymbol(mElement);
+void CmdProjectLibraryAddElement<library::Symbol>::removeElement() {
+  mLibrary.removeSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Package>::removeElement()
-{
-    mLibrary.removePackage(mElement);
+void CmdProjectLibraryAddElement<library::Package>::removeElement() {
+  mLibrary.removePackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Component>::removeElement()
-{
-    mLibrary.removeComponent(mElement);
+void CmdProjectLibraryAddElement<library::Component>::removeElement() {
+  mLibrary.removeComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryAddElement<library::Device>::removeElement()
-{
-    mLibrary.removeDevice(mElement);
+void CmdProjectLibraryAddElement<library::Device>::removeElement() {
+  mLibrary.removeDevice(mElement);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Explicit Template Instantiation
- ****************************************************************************************/
+ ******************************************************************************/
 
 template class CmdProjectLibraryAddElement<library::Symbol>;
 template class CmdProjectLibraryAddElement<library::Package>;
 template class CmdProjectLibraryAddElement<library::Component>;
 template class CmdProjectLibraryAddElement<library::Device>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

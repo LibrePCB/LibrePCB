@@ -20,113 +20,163 @@
 #ifndef LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
 #define LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardFabricationOutputSettings
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardFabricationOutputSettings class
  */
-class BoardFabricationOutputSettings final : public SerializableObject
-{
-    public:
+class BoardFabricationOutputSettings final : public SerializableObject {
+public:
+  // Constructors / Destructor
+  BoardFabricationOutputSettings() noexcept;
+  BoardFabricationOutputSettings(
+      const BoardFabricationOutputSettings& other) noexcept;
+  explicit BoardFabricationOutputSettings(const SExpression& node);
+  ~BoardFabricationOutputSettings() noexcept;
 
-        // Constructors / Destructor
-        BoardFabricationOutputSettings() noexcept;
-        BoardFabricationOutputSettings(const BoardFabricationOutputSettings& other) noexcept;
-        explicit BoardFabricationOutputSettings(const SExpression& node);
-        ~BoardFabricationOutputSettings() noexcept;
+  // Getters
+  const QString& getOutputBasePath() const noexcept { return mOutputBasePath; }
+  const QString& getSuffixDrills() const noexcept { return mSuffixDrills; }
+  const QString& getSuffixDrillsNpth() const noexcept {
+    return mSuffixDrillsNpth;
+  }
+  const QString& getSuffixDrillsPth() const noexcept {
+    return mSuffixDrillsPth;
+  }
+  const QString& getSuffixOutlines() const noexcept { return mSuffixOutlines; }
+  const QString& getSuffixCopperTop() const noexcept {
+    return mSuffixCopperTop;
+  }
+  const QString& getSuffixCopperInner() const noexcept {
+    return mSuffixCopperInner;
+  }
+  const QString& getSuffixCopperBot() const noexcept {
+    return mSuffixCopperBot;
+  }
+  const QString& getSuffixSolderMaskTop() const noexcept {
+    return mSuffixSolderMaskTop;
+  }
+  const QString& getSuffixSolderMaskBot() const noexcept {
+    return mSuffixSolderMaskBot;
+  }
+  const QString& getSuffixSilkscreenTop() const noexcept {
+    return mSuffixSilkscreenTop;
+  }
+  const QString& getSuffixSilkscreenBot() const noexcept {
+    return mSuffixSilkscreenBot;
+  }
+  const QString& getSuffixSolderPasteTop() const noexcept {
+    return mSuffixSolderPasteTop;
+  }
+  const QString& getSuffixSolderPasteBot() const noexcept {
+    return mSuffixSolderPasteBot;
+  }
+  const QStringList& getSilkscreenLayersTop() const noexcept {
+    return mSilkscreenLayersTop;
+  }
+  const QStringList& getSilkscreenLayersBot() const noexcept {
+    return mSilkscreenLayersBot;
+  }
+  bool getMergeDrillFiles() const noexcept { return mMergeDrillFiles; }
+  bool getEnableSolderPasteTop() const noexcept {
+    return mEnableSolderPasteTop;
+  }
+  bool getEnableSolderPasteBot() const noexcept {
+    return mEnableSolderPasteBot;
+  }
 
-        // Getters
-        const QString& getOutputBasePath()          const noexcept {return mOutputBasePath;}
-        const QString& getSuffixDrills()            const noexcept {return mSuffixDrills;}
-        const QString& getSuffixDrillsNpth()        const noexcept {return mSuffixDrillsNpth;}
-        const QString& getSuffixDrillsPth()         const noexcept {return mSuffixDrillsPth;}
-        const QString& getSuffixOutlines()          const noexcept {return mSuffixOutlines;}
-        const QString& getSuffixCopperTop()         const noexcept {return mSuffixCopperTop;}
-        const QString& getSuffixCopperInner()       const noexcept {return mSuffixCopperInner;}
-        const QString& getSuffixCopperBot()         const noexcept {return mSuffixCopperBot;}
-        const QString& getSuffixSolderMaskTop()     const noexcept {return mSuffixSolderMaskTop;}
-        const QString& getSuffixSolderMaskBot()     const noexcept {return mSuffixSolderMaskBot;}
-        const QString& getSuffixSilkscreenTop()     const noexcept {return mSuffixSilkscreenTop;}
-        const QString& getSuffixSilkscreenBot()     const noexcept {return mSuffixSilkscreenBot;}
-        const QString& getSuffixSolderPasteTop()    const noexcept {return mSuffixSolderPasteTop;}
-        const QString& getSuffixSolderPasteBot()    const noexcept {return mSuffixSolderPasteBot;}
-        const QStringList& getSilkscreenLayersTop() const noexcept {return mSilkscreenLayersTop;}
-        const QStringList& getSilkscreenLayersBot() const noexcept {return mSilkscreenLayersBot;}
-        bool getMergeDrillFiles()                   const noexcept {return mMergeDrillFiles;}
-        bool getEnableSolderPasteTop()              const noexcept {return mEnableSolderPasteTop;}
-        bool getEnableSolderPasteBot()              const noexcept {return mEnableSolderPasteBot;}
+  // Setters
+  void setOutputBasePath(const QString& p) noexcept { mOutputBasePath = p; }
+  void setSuffixDrills(const QString& s) noexcept { mSuffixDrills = s; }
+  void setSuffixDrillsNpth(const QString& s) noexcept { mSuffixDrillsNpth = s; }
+  void setSuffixDrillsPth(const QString& s) noexcept { mSuffixDrillsPth = s; }
+  void setSuffixOutlines(const QString& s) noexcept { mSuffixOutlines = s; }
+  void setSuffixCopperTop(const QString& s) noexcept { mSuffixCopperTop = s; }
+  void setSuffixCopperInner(const QString& s) noexcept {
+    mSuffixCopperInner = s;
+  }
+  void setSuffixCopperBot(const QString& s) noexcept { mSuffixCopperBot = s; }
+  void setSuffixSolderMaskTop(const QString& s) noexcept {
+    mSuffixSolderMaskTop = s;
+  }
+  void setSuffixSolderMaskBot(const QString& s) noexcept {
+    mSuffixSolderMaskBot = s;
+  }
+  void setSuffixSilkscreenTop(const QString& s) noexcept {
+    mSuffixSilkscreenTop = s;
+  }
+  void setSuffixSilkscreenBot(const QString& s) noexcept {
+    mSuffixSilkscreenBot = s;
+  }
+  void setSuffixSolderPasteTop(const QString& s) noexcept {
+    mSuffixSolderPasteTop = s;
+  }
+  void setSuffixSolderPasteBot(const QString& s) noexcept {
+    mSuffixSolderPasteBot = s;
+  }
+  void setSilkscreenLayersTop(const QStringList& l) noexcept {
+    mSilkscreenLayersTop = l;
+  }
+  void setSilkscreenLayersBot(const QStringList& l) noexcept {
+    mSilkscreenLayersBot = l;
+  }
+  void setMergeDrillFiles(bool m) noexcept { mMergeDrillFiles = m; }
+  void setEnableSolderPasteTop(bool e) noexcept { mEnableSolderPasteTop = e; }
+  void setEnableSolderPasteBot(bool e) noexcept { mEnableSolderPasteBot = e; }
 
-        // Setters
-        void setOutputBasePath(const QString& p)          noexcept {mOutputBasePath = p;}
-        void setSuffixDrills(const QString& s)            noexcept {mSuffixDrills = s;}
-        void setSuffixDrillsNpth(const QString& s)        noexcept {mSuffixDrillsNpth = s;}
-        void setSuffixDrillsPth(const QString& s)         noexcept {mSuffixDrillsPth = s;}
-        void setSuffixOutlines(const QString& s)          noexcept {mSuffixOutlines = s;}
-        void setSuffixCopperTop(const QString& s)         noexcept {mSuffixCopperTop = s;}
-        void setSuffixCopperInner(const QString& s)       noexcept {mSuffixCopperInner = s;}
-        void setSuffixCopperBot(const QString& s)         noexcept {mSuffixCopperBot = s;}
-        void setSuffixSolderMaskTop(const QString& s)     noexcept {mSuffixSolderMaskTop = s;}
-        void setSuffixSolderMaskBot(const QString& s)     noexcept {mSuffixSolderMaskBot = s;}
-        void setSuffixSilkscreenTop(const QString& s)     noexcept {mSuffixSilkscreenTop = s;}
-        void setSuffixSilkscreenBot(const QString& s)     noexcept {mSuffixSilkscreenBot = s;}
-        void setSuffixSolderPasteTop(const QString& s)    noexcept {mSuffixSolderPasteTop = s;}
-        void setSuffixSolderPasteBot(const QString& s)    noexcept {mSuffixSolderPasteBot = s;}
-        void setSilkscreenLayersTop(const QStringList& l) noexcept {mSilkscreenLayersTop = l;}
-        void setSilkscreenLayersBot(const QStringList& l) noexcept {mSilkscreenLayersBot = l;}
-        void setMergeDrillFiles(bool m)                   noexcept {mMergeDrillFiles = m;}
-        void setEnableSolderPasteTop(bool e)              noexcept {mEnableSolderPasteTop = e;}
-        void setEnableSolderPasteBot(bool e)              noexcept {mEnableSolderPasteBot = e;}
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  BoardFabricationOutputSettings& operator=(
+      const BoardFabricationOutputSettings& rhs) noexcept;
+  bool operator==(const BoardFabricationOutputSettings& rhs) const noexcept;
+  bool operator!=(const BoardFabricationOutputSettings& rhs) const noexcept {
+    return !(*this == rhs);
+  }
 
-        // Operator Overloadings
-        BoardFabricationOutputSettings& operator=(const BoardFabricationOutputSettings& rhs) noexcept;
-        bool operator==(const BoardFabricationOutputSettings& rhs) const noexcept;
-        bool operator!=(const BoardFabricationOutputSettings& rhs) const noexcept {return !(*this == rhs);}
-
-
-    private: // Data
-        QString mOutputBasePath;
-        QString mSuffixDrills; // NPTH and PTH combined
-        QString mSuffixDrillsNpth;
-        QString mSuffixDrillsPth;
-        QString mSuffixOutlines;
-        QString mSuffixCopperTop;
-        QString mSuffixCopperInner;
-        QString mSuffixCopperBot;
-        QString mSuffixSolderMaskTop;
-        QString mSuffixSolderMaskBot;
-        QString mSuffixSilkscreenTop;
-        QString mSuffixSilkscreenBot;
-        QString mSuffixSolderPasteTop;
-        QString mSuffixSolderPasteBot;
-        QStringList mSilkscreenLayersTop;
-        QStringList mSilkscreenLayersBot;
-        bool mMergeDrillFiles;
-        bool mEnableSolderPasteTop;
-        bool mEnableSolderPasteBot;
+private:  // Data
+  QString     mOutputBasePath;
+  QString     mSuffixDrills;  // NPTH and PTH combined
+  QString     mSuffixDrillsNpth;
+  QString     mSuffixDrillsPth;
+  QString     mSuffixOutlines;
+  QString     mSuffixCopperTop;
+  QString     mSuffixCopperInner;
+  QString     mSuffixCopperBot;
+  QString     mSuffixSolderMaskTop;
+  QString     mSuffixSolderMaskBot;
+  QString     mSuffixSilkscreenTop;
+  QString     mSuffixSilkscreenBot;
+  QString     mSuffixSolderPasteTop;
+  QString     mSuffixSolderPasteBot;
+  QStringList mSilkscreenLayersTop;
+  QStringList mSilkscreenLayersBot;
+  bool        mMergeDrillFiles;
+  bool        mEnableSolderPasteTop;
+  bool        mEnableSolderPasteBot;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
+#endif  // LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H

@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
 #define LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -39,64 +40,68 @@ class SI_NetLine;
 class SI_NetPoint;
 class SI_NetLabel;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicSelectionQuery
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SchematicSelectionQuery class
  */
-class SchematicSelectionQuery final : public QObject
-{
-        Q_OBJECT
+class SchematicSelectionQuery final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SchematicSelectionQuery()                                     = delete;
+  SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
+  SchematicSelectionQuery(const QList<SI_Symbol*>&     symbols,
+                          const QList<SI_NetSegment*>& netsegments,
+                          QObject*                     parent = nullptr);
+  ~SchematicSelectionQuery() noexcept;
 
-        // Constructors / Destructor
-        SchematicSelectionQuery() = delete;
-        SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
-        SchematicSelectionQuery(const QList<SI_Symbol*>& symbols,
-                                const QList<SI_NetSegment*>& netsegments,
-                                QObject* parent = nullptr);
-        ~SchematicSelectionQuery() noexcept;
+  // Getters
+  const QSet<SI_Symbol*>& getSymbols() const noexcept { return mResultSymbols; }
+  const QSet<SI_NetPoint*>& getNetPoints() const noexcept {
+    return mResultNetPoints;
+  }
+  const QSet<SI_NetLine*>& getNetLines() const noexcept {
+    return mResultNetLines;
+  }
+  const QSet<SI_NetLabel*>& getNetLabels() const noexcept {
+    return mResultNetLabels;
+  }
+  int  getResultCount() const noexcept;
+  bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
-        // Getters
-        const QSet<SI_Symbol*>& getSymbols() const noexcept { return mResultSymbols; }
-        const QSet<SI_NetPoint*>& getNetPoints() const noexcept { return mResultNetPoints; }
-        const QSet<SI_NetLine*>& getNetLines() const noexcept { return mResultNetLines; }
-        const QSet<SI_NetLabel*>& getNetLabels() const noexcept { return mResultNetLabels; }
-        int getResultCount() const noexcept;
-        bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
+  // General Methods
+  void addSelectedSymbols() noexcept;
+  void addSelectedNetPoints() noexcept;
+  void addSelectedNetLines() noexcept;
+  void addSelectedNetLabels() noexcept;
+  void addNetPointsOfNetLines() noexcept;
+  void addNetLinesOfSymbolPins() noexcept;
 
-        // General Methods
-        void addSelectedSymbols() noexcept;
-        void addSelectedNetPoints() noexcept;
-        void addSelectedNetLines() noexcept;
-        void addSelectedNetLabels() noexcept;
-        void addNetPointsOfNetLines() noexcept;
-        void addNetLinesOfSymbolPins() noexcept;
+  // Operator Overloadings
+  SchematicSelectionQuery& operator=(const SchematicSelectionQuery& rhs) =
+      delete;
 
-        // Operator Overloadings
-        SchematicSelectionQuery& operator=(const SchematicSelectionQuery& rhs) = delete;
+private:
+  // references to the Schematic object
+  const QList<SI_Symbol*>&     mSymbols;
+  const QList<SI_NetSegment*>& mNetSegments;
 
-
-    private:
-        // references to the Schematic object
-        const QList<SI_Symbol*>& mSymbols;
-        const QList<SI_NetSegment*>& mNetSegments;
-
-        // query result
-        QSet<SI_Symbol*> mResultSymbols;
-        QSet<SI_NetPoint*> mResultNetPoints;
-        QSet<SI_NetLine*> mResultNetLines;
-        QSet<SI_NetLabel*> mResultNetLabels;
+  // query result
+  QSet<SI_Symbol*>   mResultSymbols;
+  QSet<SI_NetPoint*> mResultNetPoints;
+  QSet<SI_NetLine*>  mResultNetLines;
+  QSet<SI_NetLabel*> mResultNetLabels;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
+#endif  // LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H

@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
 #define LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/graphics/graphicslayername.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace parseagle {
 class Package;
@@ -45,43 +47,40 @@ namespace eagleimport {
 
 class ConverterDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageConverter
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageConverter class
  */
-class PackageConverter final
-{
-    public:
+class PackageConverter final {
+public:
+  // Constructors / Destructor
+  PackageConverter()                              = delete;
+  PackageConverter(const PackageConverter& other) = delete;
+  PackageConverter(const parseagle::Package& package, ConverterDb& db) noexcept;
+  ~PackageConverter() noexcept;
 
-        // Constructors / Destructor
-        PackageConverter() = delete;
-        PackageConverter(const PackageConverter& other) = delete;
-        PackageConverter(const parseagle::Package& package, ConverterDb& db) noexcept;
-        ~PackageConverter() noexcept;
+  // General Methods
+  std::unique_ptr<library::Package> generate() const;
 
-        // General Methods
-        std::unique_ptr<library::Package> generate() const;
+  // Operator Overloadings
+  PackageConverter& operator=(const PackageConverter& rhs) = delete;
 
-        // Operator Overloadings
-        PackageConverter& operator=(const PackageConverter& rhs) = delete;
+private:
+  QString                  createDescription() const noexcept;
+  static GraphicsLayerName convertBoardLayer(int eagleLayerId);
 
-
-    private:
-        QString createDescription() const noexcept;
-        static GraphicsLayerName convertBoardLayer(int eagleLayerId);
-
-        const parseagle::Package& mPackage;
-        ConverterDb& mDb;
+  const parseagle::Package& mPackage;
+  ConverterDb&              mDb;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace eagleimport
+}  // namespace librepcb
 
-#endif // LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
+#endif  // LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H

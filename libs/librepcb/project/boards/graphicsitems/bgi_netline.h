@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_NETLINE_H
 #define LIBREPCB_PROJECT_BGI_NETLINE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,58 +39,55 @@ namespace project {
 
 class BI_NetLine;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_NetLine
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_NetLine class
  */
-class BGI_NetLine final : public BGI_Base
-{
-    public:
+class BGI_NetLine final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_NetLine(BI_NetLine& netline) noexcept;
+  ~BGI_NetLine() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_NetLine(BI_NetLine& netline) noexcept;
-        ~BGI_NetLine() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const { return mBoundingRect; }
+  QPainterPath shape() const { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  BGI_NetLine()                         = delete;
+  BGI_NetLine(const BGI_NetLine& other) = delete;
+  BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // Attributes
+  BI_NetLine&    mNetLine;
+  GraphicsLayer* mLayer;
 
-        // make some methods inaccessible...
-        BGI_NetLine() = delete;
-        BGI_NetLine(const BGI_NetLine& other) = delete;
-        BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-        // Attributes
-        BI_NetLine& mNetLine;
-        GraphicsLayer* mLayer;
-
-        // Cached Attributes
-        QLineF mLineF;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QLineF       mLineF;
+  QRectF       mBoundingRect;
+  QPainterPath mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_NETLINE_H
+#endif  // LIBREPCB_PROJECT_BGI_NETLINE_H

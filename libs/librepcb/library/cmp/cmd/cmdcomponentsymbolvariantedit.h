@@ -20,76 +20,76 @@
 #ifndef LIBREPCB_LIBRARY_CMDCOMPONENTSYMBOLVARIANTEDIT_H
 #define LIBREPCB_LIBRARY_CMDCOMPONENTSYMBOLVARIANTEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../componentsymbolvariant.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdComponentSymbolVariantEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdComponentSymbolVariantEdit class
  */
-class CmdComponentSymbolVariantEdit final : public UndoCommand
-{
-    public:
+class CmdComponentSymbolVariantEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdComponentSymbolVariantEdit() = delete;
+  CmdComponentSymbolVariantEdit(const CmdComponentSymbolVariantEdit& other) =
+      delete;
+  explicit CmdComponentSymbolVariantEdit(
+      ComponentSymbolVariant& variant) noexcept;
+  ~CmdComponentSymbolVariantEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdComponentSymbolVariantEdit() = delete;
-        CmdComponentSymbolVariantEdit(const CmdComponentSymbolVariantEdit& other) = delete;
-        explicit CmdComponentSymbolVariantEdit(ComponentSymbolVariant& variant) noexcept;
-        ~CmdComponentSymbolVariantEdit() noexcept;
+  // Setters
+  void setNorm(const QString& norm) noexcept;
+  void setNames(const LocalizedNameMap& names) noexcept;
+  void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
+  void setSymbolItems(const ComponentSymbolVariantItemList& items) noexcept;
 
-        // Setters
-        void setNorm(const QString& norm) noexcept;
-        void setNames(const LocalizedNameMap& names) noexcept;
-        void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
-        void setSymbolItems(const ComponentSymbolVariantItemList& items) noexcept;
+  // Operator Overloadings
+  CmdComponentSymbolVariantEdit& operator       =(
+      const CmdComponentSymbolVariantEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdComponentSymbolVariantEdit& operator=(const CmdComponentSymbolVariantEdit& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+private:  // Data
+  ComponentSymbolVariant& mVariant;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        ComponentSymbolVariant& mVariant;
-
-        QString mOldNorm;
-        QString mNewNorm;
-        LocalizedNameMap mOldNames;
-        LocalizedNameMap mNewNames;
-        LocalizedDescriptionMap mOldDescriptions;
-        LocalizedDescriptionMap mNewDescriptions;
-        ComponentSymbolVariantItemList mOldSymbolItems;
-        ComponentSymbolVariantItemList mNewSymbolItems;
+  QString                        mOldNorm;
+  QString                        mNewNorm;
+  LocalizedNameMap               mOldNames;
+  LocalizedNameMap               mNewNames;
+  LocalizedDescriptionMap        mOldDescriptions;
+  LocalizedDescriptionMap        mNewDescriptions;
+  ComponentSymbolVariantItemList mOldSymbolItems;
+  ComponentSymbolVariantItemList mNewSymbolItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDCOMPONENTSYMBOLVARIANTEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTSYMBOLVARIANTEDIT_H

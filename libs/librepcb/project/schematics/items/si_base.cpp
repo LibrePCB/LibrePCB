@@ -17,85 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "si_base.h"
-#include <librepcb/common/graphics/graphicsscene.h>
+
+#include "../../project.h"
 #include "../graphicsitems/sgi_base.h"
 #include "../schematic.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicsscene.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SI_Base::SI_Base(Schematic& schematic) noexcept :
-    QObject(&schematic), mSchematic(schematic),
-    mIsAddedToSchematic(false), mIsSelected(false)
-{
+SI_Base::SI_Base(Schematic& schematic) noexcept
+  : QObject(&schematic),
+    mSchematic(schematic),
+    mIsAddedToSchematic(false),
+    mIsSelected(false) {
 }
 
-SI_Base::~SI_Base() noexcept
-{
-    Q_ASSERT(!mIsAddedToSchematic);
+SI_Base::~SI_Base() noexcept {
+  Q_ASSERT(!mIsAddedToSchematic);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-Project& SI_Base::getProject() const noexcept
-{
-    return mSchematic.getProject();
+Project& SI_Base::getProject() const noexcept {
+  return mSchematic.getProject();
 }
 
-Circuit& SI_Base::getCircuit() const noexcept
-{
-    return mSchematic.getProject().getCircuit();
+Circuit& SI_Base::getCircuit() const noexcept {
+  return mSchematic.getProject().getCircuit();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_Base::setSelected(bool selected) noexcept
-{
-    mIsSelected = selected;
+void SI_Base::setSelected(bool selected) noexcept {
+  mIsSelected = selected;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_Base::addToSchematic(SGI_Base* item) noexcept
-{
-    Q_ASSERT(!mIsAddedToSchematic);
-    if (item) {
-        mSchematic.getGraphicsScene().addItem(*item);
-    }
-    mIsAddedToSchematic = true;
+void SI_Base::addToSchematic(SGI_Base* item) noexcept {
+  Q_ASSERT(!mIsAddedToSchematic);
+  if (item) {
+    mSchematic.getGraphicsScene().addItem(*item);
+  }
+  mIsAddedToSchematic = true;
 }
 
-void SI_Base::removeFromSchematic(SGI_Base* item) noexcept
-{
-    Q_ASSERT(mIsAddedToSchematic);
-    if (item) {
-        mSchematic.getGraphicsScene().removeItem(*item);
-    }
-    mIsAddedToSchematic = false;
+void SI_Base::removeFromSchematic(SGI_Base* item) noexcept {
+  Q_ASSERT(mIsAddedToSchematic);
+  if (item) {
+    mSchematic.getGraphicsScene().removeItem(*item);
+  }
+  mIsAddedToSchematic = false;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

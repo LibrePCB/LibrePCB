@@ -17,119 +17,106 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_hole.h"
+
+#include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-#include "../../project.h"
+
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const BI_Hole& other) :
-    BI_Base(board)
-{
-    mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
-    init();
+BI_Hole::BI_Hole(Board& board, const BI_Hole& other) : BI_Base(board) {
+  mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
+  init();
 }
 
-BI_Hole::BI_Hole(Board& board, const SExpression& node) :
-    BI_Base(board)
-{
-    mHole.reset(new Hole(node));
-    init();
-
+BI_Hole::BI_Hole(Board& board, const SExpression& node) : BI_Base(board) {
+  mHole.reset(new Hole(node));
+  init();
 }
 
-BI_Hole::BI_Hole(Board& board, const Hole& hole) :
-    BI_Base(board)
-{
-    mHole.reset(new Hole(hole));
-    init();
+BI_Hole::BI_Hole(Board& board, const Hole& hole) : BI_Base(board) {
+  mHole.reset(new Hole(hole));
+  init();
 }
 
-void BI_Hole::init()
-{
-    mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
+void BI_Hole::init() {
+  mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
 }
 
-BI_Hole::~BI_Hole() noexcept
-{
-    mGraphicsItem.reset();
-    mHole.reset();
+BI_Hole::~BI_Hole() noexcept {
+  mGraphicsItem.reset();
+  mHole.reset();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BI_Hole::addToBoard()
-{
-    if (isAddedToBoard()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    BI_Base::addToBoard(mGraphicsItem.data());
+void BI_Hole::addToBoard() {
+  if (isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  BI_Base::addToBoard(mGraphicsItem.data());
 }
 
-void BI_Hole::removeFromBoard()
-{
-    if (!isAddedToBoard()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    BI_Base::removeFromBoard(mGraphicsItem.data());
+void BI_Hole::removeFromBoard() {
+  if (!isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
-void BI_Hole::serialize(SExpression& root) const
-{
-    mHole->serialize(root);
+void BI_Hole::serialize(SExpression& root) const {
+  mHole->serialize(root);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from BI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
-const Point& BI_Hole::getPosition() const noexcept
-{
-    return mHole->getPosition();
+const Point& BI_Hole::getPosition() const noexcept {
+  return mHole->getPosition();
 }
 
-QPainterPath BI_Hole::getGrabAreaScenePx() const noexcept
-{
-    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+QPainterPath BI_Hole::getGrabAreaScenePx() const noexcept {
+  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
-const Uuid& BI_Hole::getUuid() const noexcept
-{
-    return mHole->getUuid();
+const Uuid& BI_Hole::getUuid() const noexcept {
+  return mHole->getUuid();
 }
 
-bool BI_Hole::isSelectable() const noexcept
-{
-    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(GraphicsLayer::sBoardDrillsNpth);
-    return layer && layer->isVisible();
+bool BI_Hole::isSelectable() const noexcept {
+  const GraphicsLayer* layer =
+      mBoard.getLayerStack().getLayer(GraphicsLayer::sBoardDrillsNpth);
+  return layer && layer->isVisible();
 }
 
-void BI_Hole::setSelected(bool selected) noexcept
-{
-    BI_Base::setSelected(selected);
-    mGraphicsItem->setSelected(selected);
+void BI_Hole::setSelected(bool selected) noexcept {
+  BI_Base::setSelected(selected);
+  mGraphicsItem->setSelected(selected);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_WORKSPACE_LIBRARYMANAGER_H
 #define LIBREPCB_WORKSPACE_LIBRARYMANAGER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -49,9 +50,9 @@ namespace Ui {
 class LibraryManager;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryManager
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryManager class
@@ -59,56 +60,50 @@ class LibraryManager;
  * @author ubruhin
  * @date 2016-08-03
  */
-class LibraryManager final : public QMainWindow
-{
-        Q_OBJECT
+class LibraryManager final : public QMainWindow {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryManager()                            = delete;
+  LibraryManager(const LibraryManager& other) = delete;
+  LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
+  ~LibraryManager() noexcept;
 
-        // Constructors / Destructor
-        LibraryManager() = delete;
-        LibraryManager(const LibraryManager& other) = delete;
-        LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
-        ~LibraryManager() noexcept;
+  // General Methods
+  void updateRepositoryLibraryList() noexcept;
 
-        // General Methods
-        void updateRepositoryLibraryList() noexcept;
+  // Operator Overloadings
+  LibraryManager& operator=(const LibraryManager& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryManager& operator=(const LibraryManager& rhs) = delete;
+private:  // Methods
+  void closeEvent(QCloseEvent* event) noexcept override;
+  void clearLibraryList() noexcept;
+  void loadLibraryList() noexcept;
+  void currentListItemChanged(QListWidgetItem* current,
+                              QListWidgetItem* previous) noexcept;
+  void libraryAddedSlot(const FilePath& libDir, bool select) noexcept;
+  void libraryRemovedSlot(const FilePath& libDir) noexcept;
 
+  static bool widgetsLessThan(const LibraryListWidgetItem* a,
+                              const LibraryListWidgetItem* b) noexcept;
 
-    private: // Methods
+signals:
+  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
 
-        void closeEvent(QCloseEvent* event) noexcept override;
-        void clearLibraryList() noexcept;
-        void loadLibraryList() noexcept;
-        void currentListItemChanged(QListWidgetItem* current, QListWidgetItem* previous) noexcept;
-        void libraryAddedSlot(const FilePath& libDir, bool select) noexcept;
-        void libraryRemovedSlot(const FilePath& libDir) noexcept;
-
-        static bool widgetsLessThan(const LibraryListWidgetItem* a,
-                                    const LibraryListWidgetItem* b) noexcept;
-
-
-    signals:
-        void openLibraryEditorTriggered(QSharedPointer<Library> lib);
-
-
-    private: // Data
-
-        workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::LibraryManager> mUi;
-        QScopedPointer<AddLibraryWidget> mAddLibraryWidget;
-        QWidget* mCurrentWidget;
+private:  // Data
+  workspace::Workspace&              mWorkspace;
+  QScopedPointer<Ui::LibraryManager> mUi;
+  QScopedPointer<AddLibraryWidget>   mAddLibraryWidget;
+  QWidget*                           mCurrentWidget;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_LIBRARYMANAGER_H
+#endif  // LIBREPCB_WORKSPACE_LIBRARYMANAGER_H

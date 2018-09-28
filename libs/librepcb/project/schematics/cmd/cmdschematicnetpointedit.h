@@ -20,70 +20,66 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTEDIT_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/point.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class SI_NetPoint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetPointEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetPointEdit class
  */
-class CmdSchematicNetPointEdit final : public UndoCommand
-{
-    public:
+class CmdSchematicNetPointEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept;
+  ~CmdSchematicNetPointEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept;
-        ~CmdSchematicNetPointEdit() noexcept;
+  // Setters
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  SI_NetPoint& mNetPoint;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        SI_NetPoint& mNetPoint;
-
-        // General Attributes
-        Point mOldPos;
-        Point mNewPos;
+  // General Attributes
+  Point mOldPos;
+  Point mNewPos;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETPOINTEDIT_H

@@ -20,76 +20,73 @@
 #ifndef LIBREPCB_PROJECT_SES_FSM_H
 #define LIBREPCB_PROJECT_SES_FSM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ses_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SES_FSM
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SES_FSM (Schematic Editor Finite State Machine) class
  */
-class SES_FSM final : public SES_Base
-{
-        Q_OBJECT
+class SES_FSM final : public SES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  /// FSM States
+  enum State {
+    State_NoState,      ///< no state active
+    State_Select,       ///< @see #project#SES_Select
+    State_DrawWire,     ///< @see #project#SES_DrawWire
+    State_AddNetLabel,  ///< @see #project#SES_AddNetLabel
+    State_AddComponent  ///< @see #project#SES_AddComponent
+  };
 
-        /// FSM States
-        enum State {
-            State_NoState,      ///< no state active
-            State_Select,       ///< @see #project#SES_Select
-            State_DrawWire,     ///< @see #project#SES_DrawWire
-            State_AddNetLabel,  ///< @see #project#SES_AddNetLabel
-            State_AddComponent  ///< @see #project#SES_AddComponent
-        };
+  // Constructors / Destructor
+  explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
+                   GraphicsView& editorGraphicsView,
+                   UndoStack&    undoStack) noexcept;
+  ~SES_FSM() noexcept;
 
-        // Constructors / Destructor
-        explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
-        ~SES_FSM() noexcept;
+  // Getters
+  State getCurrentState() const noexcept { return mCurrentState; }
 
-        // Getters
-        State getCurrentState() const noexcept {return mCurrentState;}
+  // General Methods
+  bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
 
-        // General Methods
-        bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
+signals:
+  void stateChanged(State newState);
 
+private:
+  // General Methods
+  ProcRetVal process(SEE_Base* event) noexcept;
+  State      processEventFromChild(
+           SEE_Base* event) noexcept;  ///< returns the next state
 
-    signals:
-        void stateChanged(State newState);
-
-
-    private:
-
-        // General Methods
-        ProcRetVal process(SEE_Base* event) noexcept;
-        State processEventFromChild(SEE_Base* event) noexcept; ///< returns the next state
-
-
-        // Attributes
-        State mCurrentState;
-        State mPreviousState;
-        QHash<State, SES_Base*> mSubStates;
+  // Attributes
+  State                   mCurrentState;
+  State                   mPreviousState;
+  QHash<State, SES_Base*> mSubStates;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_FSM_H
+#endif  // LIBREPCB_PROJECT_SES_FSM_H

@@ -20,66 +20,62 @@
 #ifndef LIBREPCB_PROJECT_CMDPROJECTLIBRARYREMOVEELEMENT_H
 #define LIBREPCB_PROJECT_CMDPROJECTLIBRARYREMOVEELEMENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class ProjectLibrary;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdProjectLibraryRemoveElement
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdProjectLibraryRemoveElement class
  */
 template <typename ElementType>
-class CmdProjectLibraryRemoveElement final : public UndoCommand
-{
-    public:
+class CmdProjectLibraryRemoveElement final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdProjectLibraryRemoveElement(ProjectLibrary& library,
+                                 ElementType&    element) noexcept;
+  ~CmdProjectLibraryRemoveElement() noexcept;
 
-        // Constructors / Destructor
-        CmdProjectLibraryRemoveElement(ProjectLibrary& library, ElementType& element) noexcept;
-        ~CmdProjectLibraryRemoveElement() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  void addElement();
+  void removeElement();
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        void addElement();
-        void removeElement();
-
-
-        ProjectLibrary& mLibrary;
-        ElementType& mElement;
+  ProjectLibrary& mLibrary;
+  ElementType&    mElement;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTLIBRARYREMOVEELEMENT_H
+#endif  // LIBREPCB_PROJECT_CMDPROJECTLIBRARYREMOVEELEMENT_H

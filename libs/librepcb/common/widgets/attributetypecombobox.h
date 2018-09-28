@@ -20,22 +20,22 @@
 #ifndef LIBREPCB_ATTRIBUTETYPECOMBOBOX_H
 #define LIBREPCB_ATTRIBUTETYPECOMBOBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class AttributeType;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttributeTypeComboBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttributeTypeComboBox class
@@ -43,45 +43,38 @@ class AttributeType;
  * @author ubruhin
  * @date 2017-03-10
  */
-class AttributeTypeComboBox final : public QWidget
-{
-        Q_OBJECT
+class AttributeTypeComboBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit AttributeTypeComboBox(QWidget* parent = nullptr) noexcept;
-        AttributeTypeComboBox(const AttributeTypeComboBox& other) = delete;
-        ~AttributeTypeComboBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit AttributeTypeComboBox(QWidget* parent = nullptr) noexcept;
+  AttributeTypeComboBox(const AttributeTypeComboBox& other) = delete;
+  ~AttributeTypeComboBox() noexcept;
 
+  // Getters
+  const AttributeType& getCurrentItem() const noexcept;
 
-        // Getters
-        const AttributeType& getCurrentItem() const noexcept;
+  // Setters
+  void setCurrentItem(const AttributeType& type) noexcept;
 
+  // Operator Overloadings
+  AttributeTypeComboBox& operator=(const AttributeTypeComboBox& rhs) = delete;
 
-        // Setters
-        void setCurrentItem(const AttributeType& type) noexcept;
+signals:
+  void currentItemChanged(const AttributeType* type);
 
+private:  // Methods
+  void currentIndexChanged(int index) noexcept;
 
-        // Operator Overloadings
-        AttributeTypeComboBox& operator=(const AttributeTypeComboBox& rhs) = delete;
-
-
-    signals:
-        void currentItemChanged(const AttributeType* type);
-
-
-    private: // Methods
-        void currentIndexChanged(int index) noexcept;
-
-
-    private: // Data
-        QComboBox* mComboBox;
+private:  // Data
+  QComboBox* mComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRIBUTETYPECOMBOBOX_H
+#endif  // LIBREPCB_ATTRIBUTETYPECOMBOBOX_H

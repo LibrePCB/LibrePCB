@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
 #define LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/units/all_length_units.h>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -46,68 +47,65 @@ class ComponentSignalInstance;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveSelectedSchematicItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveSelectedSchematicItems class
  */
-class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup
-{
-    private:
+class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup {
+private:
+  // Private Types
+  struct NetSegmentItems {
+    QSet<SI_NetPoint*> netpoints;
+    QSet<SI_NetLine*>  netlines;
+    QSet<SI_NetLabel*> netlabels;
+  };
+  typedef QHash<SI_NetSegment*, NetSegmentItems> NetSegmentItemList;
 
-        // Private Types
-        struct NetSegmentItems {
-            QSet<SI_NetPoint*> netpoints;
-            QSet<SI_NetLine*> netlines;
-            QSet<SI_NetLabel*> netlabels;
-        };
-        typedef QHash<SI_NetSegment*, NetSegmentItems> NetSegmentItemList;
+public:
+  // Constructors / Destructor
+  explicit CmdRemoveSelectedSchematicItems(Schematic& schematic) noexcept;
+  ~CmdRemoveSelectedSchematicItems() noexcept;
 
-    public:
+private:
+  // Private Methods
 
-        // Constructors / Destructor
-        explicit CmdRemoveSelectedSchematicItems(Schematic& schematic) noexcept;
-        ~CmdRemoveSelectedSchematicItems() noexcept;
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  void           removeNetSegment(SI_NetSegment& netsegment);
+  void           splitUpNetSegment(SI_NetSegment&         netsegment,
+                                   const NetSegmentItems& selectedItems);
+  SI_NetSegment* createNewSubNetSegment(SI_NetSegment&         netsegment,
+                                        const NetSegmentItems& items);
+  void           removeNetLabel(SI_NetLabel& netlabel);
+  void           removeSymbol(SI_Symbol& symbol);
+  void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
+  QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(
+      SI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept;
+  void findAllConnectedNetPointsAndNetLines(
+      SI_NetLineAnchor& anchor, QSet<SI_NetLineAnchor*>& processedAnchors,
+      QSet<SI_NetPoint*>& netpoints, QSet<SI_NetLine*>& netlines,
+      QSet<SI_NetLine*>& availableNetLines) const noexcept;
+  int getNearestNetSegmentOfNetLabel(
+      const SI_NetLabel& netlabel, const QList<NetSegmentItems>& segments) const
+      noexcept;
+  Length getDistanceBetweenNetLabelAndNetSegment(
+      const SI_NetLabel& netlabel, const NetSegmentItems& netsegment) const
+      noexcept;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        void removeNetSegment(SI_NetSegment& netsegment);
-        void splitUpNetSegment(SI_NetSegment& netsegment,
-                               const NetSegmentItems& selectedItems);
-        SI_NetSegment* createNewSubNetSegment(SI_NetSegment& netsegment, const NetSegmentItems& items);
-        void removeNetLabel(SI_NetLabel& netlabel);
-        void removeSymbol(SI_Symbol& symbol);
-        void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
-        QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(SI_NetSegment& segment,
-                                                                   const NetSegmentItems& removedItems) noexcept;
-        void findAllConnectedNetPointsAndNetLines(SI_NetLineAnchor& anchor,
-                                                  QSet<SI_NetLineAnchor*>& processedAnchors,
-                                                  QSet<SI_NetPoint*>& netpoints,
-                                                  QSet<SI_NetLine*>& netlines,
-                                                  QSet<SI_NetLine*>& availableNetLines) const noexcept;
-        int getNearestNetSegmentOfNetLabel(const SI_NetLabel& netlabel,
-                                           const QList<NetSegmentItems>& segments) const noexcept;
-        Length getDistanceBetweenNetLabelAndNetSegment(const SI_NetLabel& netlabel,
-                                                       const NetSegmentItems& netsegment) const noexcept;
-
-        // Attributes from the constructor
-        Schematic& mSchematic;
+  // Attributes from the constructor
+  Schematic& mSchematic;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H

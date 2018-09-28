@@ -20,23 +20,25 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDFOOTPRINTITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDFOOTPRINTITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+ ******************************************************************************/
 #include "../packageeditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveSelectedFootprintItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveSelectedFootprintItems class
@@ -44,38 +46,36 @@ namespace editor {
  * @author  ubruhin
  * @date    2016-11-05
  */
-class CmdRemoveSelectedFootprintItems final : public UndoCommandGroup
-{
-    public:
+class CmdRemoveSelectedFootprintItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRemoveSelectedFootprintItems() = delete;
+  CmdRemoveSelectedFootprintItems(
+      const CmdRemoveSelectedFootprintItems& other) = delete;
+  CmdRemoveSelectedFootprintItems(
+      const PackageEditorState::Context& context) noexcept;
+  ~CmdRemoveSelectedFootprintItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRemoveSelectedFootprintItems() = delete;
-        CmdRemoveSelectedFootprintItems(const CmdRemoveSelectedFootprintItems& other) = delete;
-        CmdRemoveSelectedFootprintItems(const PackageEditorState::Context& context) noexcept;
-        ~CmdRemoveSelectedFootprintItems() noexcept;
+  // Operator Overloadings
+  CmdRemoveSelectedFootprintItems& operator       =(
+      const CmdRemoveSelectedFootprintItems& rhs) = delete;
 
-        // Operator Overloadings
-        CmdRemoveSelectedFootprintItems& operator=(const CmdRemoveSelectedFootprintItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        const PackageEditorState::Context& mContext;
+  // Private Member Variables
+  const PackageEditorState::Context& mContext;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDFOOTPRINTITEMS_H

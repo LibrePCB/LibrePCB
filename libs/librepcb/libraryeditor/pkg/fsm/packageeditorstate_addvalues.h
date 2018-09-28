@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDVALUES_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDVALUES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate_drawtextbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddValues
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddValues class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_AddValues final : public PackageEditorState_DrawTextBase
-{
-        Q_OBJECT
+class PackageEditorState_AddValues final
+  : public PackageEditorState_DrawTextBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_AddValues() = delete;
+  PackageEditorState_AddValues(const PackageEditorState_AddValues& other) =
+      delete;
+  explicit PackageEditorState_AddValues(Context& context) noexcept;
+  ~PackageEditorState_AddValues() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_AddValues() = delete;
-        PackageEditorState_AddValues(const PackageEditorState_AddValues& other) = delete;
-        explicit PackageEditorState_AddValues(Context& context) noexcept;
-        ~PackageEditorState_AddValues() noexcept;
-
-        // Operator Overloadings
-        PackageEditorState_AddValues& operator=(const PackageEditorState_AddValues& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_AddValues& operator       =(
+      const PackageEditorState_AddValues& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDVALUES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDVALUES_H

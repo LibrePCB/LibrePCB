@@ -20,20 +20,22 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
+#include "../common/categorylisteditorwidget.h"
+#include "../common/editorwidgetbase.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/library/dev/devicepadsignalmap.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -53,9 +55,9 @@ namespace Ui {
 class DeviceEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class DeviceEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The DeviceEditorWidget class
@@ -63,69 +65,64 @@ class DeviceEditorWidget;
  * @author ubruhin
  * @date 2016-10-16
  */
-class DeviceEditorWidget final : public EditorWidgetBase
-{
-        Q_OBJECT
+class DeviceEditorWidget final : public EditorWidgetBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  DeviceEditorWidget()                                = delete;
+  DeviceEditorWidget(const DeviceEditorWidget& other) = delete;
+  DeviceEditorWidget(const Context& context, const FilePath& fp,
+                     QWidget* parent = nullptr);
+  ~DeviceEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        DeviceEditorWidget() = delete;
-        DeviceEditorWidget(const DeviceEditorWidget& other) = delete;
-        DeviceEditorWidget(const Context& context, const FilePath& fp,
-                           QWidget* parent = nullptr);
-        ~DeviceEditorWidget() noexcept;
+  // Operator Overloadings
+  DeviceEditorWidget& operator=(const DeviceEditorWidget& rhs) = delete;
 
-        // Operator Overloadings
-        DeviceEditorWidget& operator=(const DeviceEditorWidget& rhs) = delete;
+public slots:
+  bool save() noexcept override;
+  bool zoomIn() noexcept override;
+  bool zoomOut() noexcept override;
+  bool zoomAll() noexcept override;
 
+private:  // Methods
+  void btnChooseComponentClicked() noexcept;
+  void btnChoosePackageClicked() noexcept;
+  void updateDeviceComponentUuid(const Uuid& uuid) noexcept;
+  void updateComponentPreview() noexcept;
+  void updateDevicePackageUuid(const Uuid& uuid) noexcept;
+  void updatePackagePreview() noexcept;
+  void memorizeDeviceInterface() noexcept;
+  bool isInterfaceBroken() const noexcept override;
 
-    public slots:
-        bool save() noexcept override;
-        bool zoomIn() noexcept override;
-        bool zoomOut() noexcept override;
-        bool zoomAll() noexcept override;
+private:  // Data
+  QScopedPointer<Ui::DeviceEditorWidget>            mUi;
+  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<Device>                            mDevice;
 
+  // component
+  QScopedPointer<Component>                         mComponent;
+  QScopedPointer<GraphicsScene>                     mComponentGraphicsScene;
+  QList<std::shared_ptr<Symbol>>                    mSymbols;
+  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
 
-    private: // Methods
-        void btnChooseComponentClicked() noexcept;
-        void btnChoosePackageClicked() noexcept;
-        void updateDeviceComponentUuid(const Uuid& uuid) noexcept;
-        void updateComponentPreview() noexcept;
-        void updateDevicePackageUuid(const Uuid& uuid) noexcept;
-        void updatePackagePreview() noexcept;
-        void memorizeDeviceInterface() noexcept;
-        bool isInterfaceBroken() const noexcept override;
+  // package
+  QScopedPointer<Package>                      mPackage;
+  QScopedPointer<GraphicsScene>                mPackageGraphicsScene;
+  QScopedPointer<FootprintPreviewGraphicsItem> mFootprintGraphicsItem;
 
-
-    private: // Data
-        QScopedPointer<Ui::DeviceEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<Device> mDevice;
-
-        // component
-        QScopedPointer<Component> mComponent;
-        QScopedPointer<GraphicsScene> mComponentGraphicsScene;
-        QList<std::shared_ptr<Symbol>> mSymbols;
-        QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
-
-        // package
-        QScopedPointer<Package> mPackage;
-        QScopedPointer<GraphicsScene> mPackageGraphicsScene;
-        QScopedPointer<FootprintPreviewGraphicsItem> mFootprintGraphicsItem;
-
-        // broken interface detection
-        tl::optional<Uuid> mOriginalComponentUuid;
-        tl::optional<Uuid> mOriginalPackageUuid;
-        DevicePadSignalMap mOriginalPadSignalMap;
+  // broken interface detection
+  tl::optional<Uuid> mOriginalComponentUuid;
+  tl::optional<Uuid> mOriginalPackageUuid;
+  DevicePadSignalMap mOriginalPadSignalMap;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H

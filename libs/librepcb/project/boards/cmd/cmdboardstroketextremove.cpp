@@ -17,58 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardstroketextremove.h"
+
 #include "../board.h"
 #include "../items/bi_stroketext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardStrokeTextRemove::CmdBoardStrokeTextRemove(BI_StrokeText& text) noexcept :
-    UndoCommand(tr("Remove text from board")),
-    mBoard(text.getBoard()), mText(text)
-{
+CmdBoardStrokeTextRemove::CmdBoardStrokeTextRemove(BI_StrokeText& text) noexcept
+  : UndoCommand(tr("Remove text from board")),
+    mBoard(text.getBoard()),
+    mText(text) {
 }
 
-CmdBoardStrokeTextRemove::~CmdBoardStrokeTextRemove() noexcept
-{
+CmdBoardStrokeTextRemove::~CmdBoardStrokeTextRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardStrokeTextRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardStrokeTextRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardStrokeTextRemove::performUndo()
-{
-    mBoard.addStrokeText(mText); // can throw
+void CmdBoardStrokeTextRemove::performUndo() {
+  mBoard.addStrokeText(mText);  // can throw
 }
 
-void CmdBoardStrokeTextRemove::performRedo()
-{
-    mBoard.removeStrokeText(mText); // can throw
+void CmdBoardStrokeTextRemove::performRedo() {
+  mBoard.removeStrokeText(mText);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

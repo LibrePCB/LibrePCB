@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
 #define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace librepcb {
 namespace project {
@@ -38,9 +38,9 @@ namespace Ui {
 class NewProjectWizardPage_Initialization;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewProjectWizardPage_Initialization
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewProjectWizardPage_Initialization class
@@ -48,52 +48,47 @@ class NewProjectWizardPage_Initialization;
  * @author ubruhin
  * @date 2016-08-13
  */
-class NewProjectWizardPage_Initialization final : public QWizardPage
-{
-        Q_OBJECT
+class NewProjectWizardPage_Initialization final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
 
-        // Constructors / Destructor
+  explicit NewProjectWizardPage_Initialization(
+      QWidget* parent = nullptr) noexcept;
+  NewProjectWizardPage_Initialization(
+      const NewProjectWizardPage_Initialization& other) = delete;
+  ~NewProjectWizardPage_Initialization() noexcept;
 
-        explicit NewProjectWizardPage_Initialization(QWidget* parent = nullptr) noexcept;
-        NewProjectWizardPage_Initialization(const NewProjectWizardPage_Initialization& other) = delete;
-        ~NewProjectWizardPage_Initialization() noexcept;
+  // Getters
+  bool    getCreateSchematic() const noexcept;
+  QString getSchematicName() const noexcept;
+  QString getSchematicFileName() const noexcept;
+  bool    getCreateBoard() const noexcept;
+  QString getBoardName() const noexcept;
+  QString getBoardFileName() const noexcept;
 
-        // Getters
-        bool getCreateSchematic() const noexcept;
-        QString getSchematicName() const noexcept;
-        QString getSchematicFileName() const noexcept;
-        bool getCreateBoard() const noexcept;
-        QString getBoardName() const noexcept;
-        QString getBoardFileName() const noexcept;
+  // Operator Overloadings
+  NewProjectWizardPage_Initialization& operator       =(
+      const NewProjectWizardPage_Initialization& rhs) = delete;
 
-        // Operator Overloadings
-        NewProjectWizardPage_Initialization& operator=(const NewProjectWizardPage_Initialization& rhs) = delete;
+private:  // GUI Action Handlers
+  void schematicNameChanged(const QString& name) noexcept;
+  void boardNameChanged(const QString& name) noexcept;
 
+private:  // Methods
+  bool isComplete() const noexcept override;
 
-    private: // GUI Action Handlers
-
-        void schematicNameChanged(const QString& name) noexcept;
-        void boardNameChanged(const QString& name) noexcept;
-
-
-    private: // Methods
-
-        bool isComplete() const noexcept override;
-
-
-    private: // Data
-
-        QScopedPointer<Ui::NewProjectWizardPage_Initialization> mUi;
+private:  // Data
+  QScopedPointer<Ui::NewProjectWizardPage_Initialization> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
+#endif  // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H

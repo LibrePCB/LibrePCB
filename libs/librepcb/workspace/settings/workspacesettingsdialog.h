@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_WORKSPACESETTINGSDIALOG_H
 #define LIBREPCB_WORKSPACESETTINGSDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
@@ -38,59 +38,55 @@ class WorkspaceSettingsDialog;
 
 class WorkspaceSettings;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WorkspaceSettingsDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The WorkspaceSettingsDialog class
  *
  * This dialog class implements a GUI for all workspace settings. An instance of
- * WorkspaceSettingsDialog is created in the class WorkspaceSettings. There must not exist
- * more than one instance of this class at the same time in the same application instance!
+ * WorkspaceSettingsDialog is created in the class WorkspaceSettings. There must
+ * not exist more than one instance of this class at the same time in the same
+ * application instance!
  *
  * @author ubruhin
  * @date 2014-07-12
  */
-class WorkspaceSettingsDialog final : public QDialog
-{
-        Q_OBJECT
+class WorkspaceSettingsDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit WorkspaceSettingsDialog(WorkspaceSettings& settings);
+  ~WorkspaceSettingsDialog();
 
-        // Constructors / Destructor
-        explicit WorkspaceSettingsDialog(WorkspaceSettings& settings);
-        ~WorkspaceSettingsDialog();
+protected:
+  // Inherited from QDialog
+  void accept();
+  void reject();
 
-    protected:
+private slots:
 
-        // Inherited from QDialog
-        void accept();
-        void reject();
+  // Private Slots for the GUI elements
+  void on_buttonBox_clicked(QAbstractButton* button);
 
-    private slots:
+private:
+  // make some methods inaccessible...
+  WorkspaceSettingsDialog();
+  WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other);
+  WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs);
 
-        // Private Slots for the GUI elements
-        void on_buttonBox_clicked(QAbstractButton *button);
-
-    private:
-
-        // make some methods inaccessible...
-        WorkspaceSettingsDialog();
-        WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other);
-        WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs);
-
-
-        // General Attributes
-        Ui::WorkspaceSettingsDialog* mUi;
-        WorkspaceSettings& mSettings; ///< a pointer to the WorkspaceSettings object
+  // General Attributes
+  Ui::WorkspaceSettingsDialog* mUi;
+  WorkspaceSettings& mSettings;  ///< a pointer to the WorkspaceSettings object
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#endif  // LIBREPCB_WORKSPACESETTINGSDIALOG_H

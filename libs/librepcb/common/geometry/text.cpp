@@ -17,197 +17,188 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "text.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-Text::Text(const Text& other) noexcept :
-    mUuid(other.mUuid),
+Text::Text(const Text& other) noexcept
+  : mUuid(other.mUuid),
     mLayerName(other.mLayerName),
     mText(other.mText),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
     mHeight(other.mHeight),
-    mAlign(other.mAlign)
-{
+    mAlign(other.mAlign) {
 }
 
-Text::Text(const Uuid& uuid, const Text& other) noexcept :
-    Text(other)
-{
-    mUuid = uuid;
+Text::Text(const Uuid& uuid, const Text& other) noexcept : Text(other) {
+  mUuid = uuid;
 }
 
-Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
-           const Point& pos, const Angle& rotation, const PositiveLength& height,
-           const Alignment& align) noexcept :
-    mUuid(uuid), mLayerName(layerName), mText(text), mPosition(pos), mRotation(rotation),
-    mHeight(height), mAlign(align)
-{
+Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
+           const QString& text, const Point& pos, const Angle& rotation,
+           const PositiveLength& height, const Alignment& align) noexcept
+  : mUuid(uuid),
+    mLayerName(layerName),
+    mText(text),
+    mPosition(pos),
+    mRotation(rotation),
+    mHeight(height),
+    mAlign(align) {
 }
 
-Text::Text(const SExpression& node) :
-    mUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
+Text::Text(const SExpression& node)
+  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
+                                  // time!
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mText(),
     mPosition(0, 0),
     mRotation(0),
     mHeight(node.getValueByPath<PositiveLength>("height")),
-    mAlign(node.getChildByPath("align"))
-{
-    if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
-        mUuid = node.getChildByIndex(0).getValue<Uuid>();
-        mText = node.getValueByPath<QString>("value");
-    } else {
-        // backward compatibility, remove this some time!
-        mText = node.getChildByIndex(0).getValue<QString>();
-    }
-    if (node.tryGetChildByPath("position")) {
-        mPosition = Point(node.getChildByPath("position"));
-    } else {
-        // backward compatibility, remove this some time!
-        mPosition = Point(node.getChildByPath("pos"));
-    }
-    if (node.tryGetChildByPath("rotation")) {
-        mRotation = node.getValueByPath<Angle>("rotation");
-    } else {
-        // backward compatibility, remove this some time!
-        mRotation = node.getValueByPath<Angle>("rot");
-    }
+    mAlign(node.getChildByPath("align")) {
+  if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
+    mUuid = node.getChildByIndex(0).getValue<Uuid>();
+    mText = node.getValueByPath<QString>("value");
+  } else {
+    // backward compatibility, remove this some time!
+    mText = node.getChildByIndex(0).getValue<QString>();
+  }
+  if (node.tryGetChildByPath("position")) {
+    mPosition = Point(node.getChildByPath("position"));
+  } else {
+    // backward compatibility, remove this some time!
+    mPosition = Point(node.getChildByPath("pos"));
+  }
+  if (node.tryGetChildByPath("rotation")) {
+    mRotation = node.getValueByPath<Angle>("rotation");
+  } else {
+    // backward compatibility, remove this some time!
+    mRotation = node.getValueByPath<Angle>("rot");
+  }
 
-    // backward compatibility - remove this some time!
-    mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-    mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"), "{{ \\1 or \\2 }}");
+  // backward compatibility - remove this some time!
+  mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
+  mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
+                "{{ \\1 or \\2 }}");
 }
 
-Text::~Text() noexcept
-{
+Text::~Text() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Text::setLayerName(const GraphicsLayerName& name) noexcept
-{
-    if (name == mLayerName) return;
-    mLayerName = name;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textLayerNameChanged(mLayerName);
-    }
+void Text::setLayerName(const GraphicsLayerName& name) noexcept {
+  if (name == mLayerName) return;
+  mLayerName = name;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textLayerNameChanged(mLayerName);
+  }
 }
 
-void Text::setText(const QString& text) noexcept
-{
-    if (text == mText) return;
-    mText = text;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textTextChanged(mText);
-    }
+void Text::setText(const QString& text) noexcept {
+  if (text == mText) return;
+  mText = text;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textTextChanged(mText);
+  }
 }
 
-void Text::setPosition(const Point& pos) noexcept
-{
-    if (pos == mPosition) return;
-    mPosition = pos;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textPositionChanged(mPosition);
-    }
+void Text::setPosition(const Point& pos) noexcept {
+  if (pos == mPosition) return;
+  mPosition = pos;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textPositionChanged(mPosition);
+  }
 }
 
-void Text::setRotation(const Angle& rotation) noexcept
-{
-    if (rotation == mRotation) return;
-    mRotation = rotation;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textRotationChanged(mRotation);
-    }
+void Text::setRotation(const Angle& rotation) noexcept {
+  if (rotation == mRotation) return;
+  mRotation = rotation;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textRotationChanged(mRotation);
+  }
 }
 
-void Text::setHeight(const PositiveLength& height) noexcept
-{
-    if (height == mHeight) return;
-    mHeight = height;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textHeightChanged(mHeight);
-    }
+void Text::setHeight(const PositiveLength& height) noexcept {
+  if (height == mHeight) return;
+  mHeight = height;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textHeightChanged(mHeight);
+  }
 }
 
-void Text::setAlign(const Alignment& align) noexcept
-{
-    if (align == mAlign) return;
-    mAlign = align;
-    foreach (IF_TextObserver* object, mObservers) {
-        object->textAlignChanged(mAlign);
-    }
+void Text::setAlign(const Alignment& align) noexcept {
+  if (align == mAlign) return;
+  mAlign = align;
+  foreach (IF_TextObserver* object, mObservers) {
+    object->textAlignChanged(mAlign);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Text::registerObserver(IF_TextObserver& object) const noexcept
-{
-    mObservers.insert(&object);
+void Text::registerObserver(IF_TextObserver& object) const noexcept {
+  mObservers.insert(&object);
 }
 
-void Text::unregisterObserver(IF_TextObserver& object) const noexcept
-{
-    mObservers.remove(&object);
+void Text::unregisterObserver(IF_TextObserver& object) const noexcept {
+  mObservers.remove(&object);
 }
 
-void Text::serialize(SExpression& root) const
-{
-    root.appendChild(mUuid);
-    root.appendChild("layer", mLayerName, false);
-    root.appendChild("value", mText, false);
-    root.appendChild(mAlign.serializeToDomElement("align"), true);
-    root.appendChild("height", mHeight, false);
-    root.appendChild(mPosition.serializeToDomElement("position"), false);
-    root.appendChild("rotation", mRotation, false);
+void Text::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild("layer", mLayerName, false);
+  root.appendChild("value", mText, false);
+  root.appendChild(mAlign.serializeToDomElement("align"), true);
+  root.appendChild("height", mHeight, false);
+  root.appendChild(mPosition.serializeToDomElement("position"), false);
+  root.appendChild("rotation", mRotation, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool Text::operator==(const Text& rhs) const noexcept
-{
-    if (mUuid != rhs.mUuid)                 return false;
-    if (mLayerName != rhs.mLayerName)       return false;
-    if (mText != rhs.mText)                 return false;
-    if (mPosition != rhs.mPosition)         return false;
-    if (mRotation != rhs.mRotation)         return false;
-    if (mHeight != rhs.mHeight)             return false;
-    if (mAlign != rhs.mAlign)               return false;
-    return true;
+bool Text::operator==(const Text& rhs) const noexcept {
+  if (mUuid != rhs.mUuid) return false;
+  if (mLayerName != rhs.mLayerName) return false;
+  if (mText != rhs.mText) return false;
+  if (mPosition != rhs.mPosition) return false;
+  if (mRotation != rhs.mRotation) return false;
+  if (mHeight != rhs.mHeight) return false;
+  if (mAlign != rhs.mAlign) return false;
+  return true;
 }
 
-Text& Text::operator=(const Text& rhs) noexcept
-{
-    mUuid = rhs.mUuid;
-    mLayerName = rhs.mLayerName;
-    mText = rhs.mText;
-    mPosition = rhs.mPosition;
-    mRotation = rhs.mRotation;
-    mHeight = rhs.mHeight;
-    mAlign = rhs.mAlign;
-    return *this;
+Text& Text::operator=(const Text& rhs) noexcept {
+  mUuid      = rhs.mUuid;
+  mLayerName = rhs.mLayerName;
+  mText      = rhs.mText;
+  mPosition  = rhs.mPosition;
+  mRotation  = rhs.mRotation;
+  mHeight    = rhs.mHeight;
+  mAlign     = rhs.mAlign;
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

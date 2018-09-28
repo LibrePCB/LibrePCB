@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLCHOOSERDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLCHOOSERDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
@@ -51,9 +52,9 @@ namespace Ui {
 class SymbolChooserDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolChooserDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolChooserDialog class
@@ -61,58 +62,54 @@ class SymbolChooserDialog;
  * @author ubruhin
  * @date 2017-03-19
  */
-class SymbolChooserDialog final : public QDialog
-{
-        Q_OBJECT
+class SymbolChooserDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolChooserDialog()                                 = delete;
+  SymbolChooserDialog(const SymbolChooserDialog& other) = delete;
+  SymbolChooserDialog(const workspace::Workspace&     ws,
+                      const IF_GraphicsLayerProvider& layerProvider,
+                      QWidget* parent = nullptr) noexcept;
+  ~SymbolChooserDialog() noexcept;
 
-        // Constructors / Destructor
-        SymbolChooserDialog() = delete;
-        SymbolChooserDialog(const SymbolChooserDialog& other) = delete;
-        SymbolChooserDialog(const workspace::Workspace& ws,
-                            const IF_GraphicsLayerProvider& layerProvider,
-                            QWidget* parent = nullptr) noexcept;
-        ~SymbolChooserDialog() noexcept;
+  // Getters
+  tl::optional<Uuid> getSelectedSymbolUuid() const noexcept;
+  QString            getSelectedSymbolNameTr() const noexcept;
+  QString            getSelectedSymbolDescriptionTr() const noexcept;
 
-        // Getters
-        tl::optional<Uuid> getSelectedSymbolUuid() const noexcept;
-        QString getSelectedSymbolNameTr() const noexcept;
-        QString getSelectedSymbolDescriptionTr() const noexcept;
+  // Operator Overloadings
+  SymbolChooserDialog& operator=(const SymbolChooserDialog& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolChooserDialog& operator=(const SymbolChooserDialog& rhs) = delete;
+private:  // Methods
+  void treeCategories_currentItemChanged(const QModelIndex& current,
+                                         const QModelIndex& previous) noexcept;
+  void listSymbols_currentItemChanged(QListWidgetItem* current,
+                                      QListWidgetItem* previous) noexcept;
+  void listSymbols_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedSymbol(const FilePath& fp) noexcept;
+  void accept() noexcept override;
+  const QStringList& localeOrder() const noexcept;
 
-
-    private: // Methods
-        void treeCategories_currentItemChanged(const QModelIndex& current,
-                                               const QModelIndex& previous) noexcept;
-        void listSymbols_currentItemChanged(QListWidgetItem* current,
-                                            QListWidgetItem* previous) noexcept;
-        void listSymbols_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-        void setSelectedSymbol(const FilePath& fp) noexcept;
-        void accept() noexcept override;
-        const QStringList& localeOrder() const noexcept;
-
-
-    private: // Data
-        const workspace::Workspace& mWorkspace;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<Ui::SymbolChooserDialog> mUi;
-        QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        QScopedPointer<GraphicsScene> mPreviewScene;
-        tl::optional<Uuid> mSelectedCategoryUuid;
-        QScopedPointer<Symbol> mSelectedSymbol;
-        QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
+private:  // Data
+  const workspace::Workspace&             mWorkspace;
+  const IF_GraphicsLayerProvider&         mLayerProvider;
+  QScopedPointer<Ui::SymbolChooserDialog> mUi;
+  QScopedPointer<QAbstractItemModel>      mCategoryTreeModel;
+  QScopedPointer<GraphicsScene>           mPreviewScene;
+  tl::optional<Uuid>                      mSelectedCategoryUuid;
+  QScopedPointer<Symbol>                  mSelectedSymbol;
+  QScopedPointer<SymbolGraphicsItem>      mGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLCHOOSERDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLCHOOSERDIALOG_H

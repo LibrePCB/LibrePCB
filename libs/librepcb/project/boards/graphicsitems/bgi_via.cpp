@@ -17,144 +17,151 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
+ ******************************************************************************/
 #include "bgi_via.h"
-#include "../items/bi_via.h"
-#include "../board.h"
-#include "../../project.h"
-#include "../boardlayerstack.h"
+
 #include "../../circuit/netsignal.h"
+#include "../../project.h"
+#include "../board.h"
+#include "../boardlayerstack.h"
+#include "../items/bi_via.h"
+
 #include <librepcb/common/application.h>
 #include <librepcb/common/boarddesignrules.h>
 
-/*****************************************************************************************
+#include <QPrinter>
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BGI_Via::BGI_Via(BI_Via& via) noexcept :
-    BGI_Base(), mVia(via), mViaLayer(nullptr), mTopStopMaskLayer(nullptr),
-    mBottomStopMaskLayer(nullptr)
-{
-    setZValue(Board::ZValue_Vias);
+BGI_Via::BGI_Via(BI_Via& via) noexcept
+  : BGI_Base(),
+    mVia(via),
+    mViaLayer(nullptr),
+    mTopStopMaskLayer(nullptr),
+    mBottomStopMaskLayer(nullptr) {
+  setZValue(Board::ZValue_Vias);
 
-    mFont = qApp->getDefaultSansSerifFont();
-    mFont.setPixelSize(1);
+  mFont = qApp->getDefaultSansSerifFont();
+  mFont.setPixelSize(1);
 
-    updateCacheAndRepaint();
+  updateCacheAndRepaint();
 }
 
-BGI_Via::~BGI_Via() noexcept
-{
+BGI_Via::~BGI_Via() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool BGI_Via::isSelectable() const noexcept
-{
-    return mViaLayer && mViaLayer->isVisible();
+bool BGI_Via::isSelectable() const noexcept {
+  return mViaLayer && mViaLayer->isVisible();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_Via::updateCacheAndRepaint() noexcept
-{
-    prepareGeometryChange();
+void BGI_Via::updateCacheAndRepaint() noexcept {
+  prepareGeometryChange();
 
-    setToolTip(*mVia.getNetSignalOfNetSegment().getName());
+  setToolTip(*mVia.getNetSignalOfNetSegment().getName());
 
-    mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
-    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
-    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
+  mViaLayer            = getLayer(GraphicsLayer::sBoardViasTht);
+  mTopStopMaskLayer    = getLayer(GraphicsLayer::sTopStopMask);
+  mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
 
-    // determine stop mask clearance
-    mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(*mVia.getDrillDiameter());
-    UnsignedLength stopMaskClearance = mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
+  // determine stop mask clearance
+  mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(
+      *mVia.getDrillDiameter());
+  UnsignedLength stopMaskClearance =
+      mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
 
-    // set shapes and bounding rect
-    mShape = mVia.getOutline().toQPainterPathPx();
-    mCopper = mVia.toQPainterPathPx();
-    mStopMask = mVia.getOutline(*stopMaskClearance).toQPainterPathPx();
-    mBoundingRect = mStopMask.boundingRect();
+  // set shapes and bounding rect
+  mShape        = mVia.getOutline().toQPainterPathPx();
+  mCopper       = mVia.toQPainterPathPx();
+  mStopMask     = mVia.getOutline(*stopMaskClearance).toQPainterPathPx();
+  mBoundingRect = mStopMask.boundingRect();
 
-    update();
+  update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                    QWidget* widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
 
-    NetSignal& netsignal = mVia.getNetSignalOfNetSegment();
-    bool highlight = mVia.isSelected() || (netsignal.isHighlighted());
+  NetSignal& netsignal = mVia.getNetSignalOfNetSegment();
+  bool       highlight = mVia.isSelected() || (netsignal.isHighlighted());
 
-    if (mDrawStopMask && mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
-        // draw bottom stop mask
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-        painter->drawPath(mStopMask);
-    }
+  if (mDrawStopMask && mBottomStopMaskLayer &&
+      mBottomStopMaskLayer->isVisible()) {
+    // draw bottom stop mask
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
+    painter->drawPath(mStopMask);
+  }
 
-    if (mViaLayer && mViaLayer->isVisible()) {
-        // draw via
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(mViaLayer->getColor(highlight));
-        painter->drawPath(mCopper);
+  if (mViaLayer && mViaLayer->isVisible()) {
+    // draw via
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(mViaLayer->getColor(highlight));
+    painter->drawPath(mCopper);
 
-        // draw netsignal name
-        painter->setFont(mFont);
-        painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-        painter->drawText(mShape.boundingRect(), Qt::AlignCenter, *netsignal.getName());
-    }
+    // draw netsignal name
+    painter->setFont(mFont);
+    painter->setPen(mViaLayer->getColor(highlight).lighter(150));
+    painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                      *netsignal.getName());
+  }
 
-    if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
-        // draw top stop mask
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-        painter->drawPath(mStopMask);
-    }
+  if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
+    // draw top stop mask
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(mTopStopMaskLayer->getColor(highlight));
+    painter->drawPath(mStopMask);
+  }
 
 #ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible()) {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(boundingRect());
-    }
+  GraphicsLayer* layer =
+      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+  Q_ASSERT(layer);
+  if (layer->isVisible()) {
+    // draw bounding rect
+    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(boundingRect());
+  }
 #endif
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayer* BGI_Via::getLayer(const QString& name) const noexcept
-{
-    return mVia.getBoard().getLayerStack().getLayer(name);
+GraphicsLayer* BGI_Via::getLayer(const QString& name) const noexcept {
+  return mVia.getBoard().getLayerStack().getLayer(name);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,51 +20,47 @@
 #ifndef LIBREPCB_GRAPHICSSCENE_H
 #define LIBREPCB_GRAPHICSSCENE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Point;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GraphicsScene
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GraphicsScene class
  */
-class GraphicsScene final : public QGraphicsScene
-{
-        Q_OBJECT
+class GraphicsScene final : public QGraphicsScene {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit GraphicsScene() noexcept;
+  ~GraphicsScene() noexcept;
 
-        // Constructors / Destructor
-        explicit GraphicsScene() noexcept;
-        ~GraphicsScene() noexcept;
+  // General Methods
+  void addItem(QGraphicsItem& item) noexcept;
+  void removeItem(QGraphicsItem& item) noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
 
-        // General Methods
-        void addItem(QGraphicsItem& item) noexcept;
-        void removeItem(QGraphicsItem& item) noexcept;
-        void setSelectionRect(const Point& p1, const Point& p2) noexcept;
-
-
-    private:
-
-        QGraphicsRectItem* mSelectionRectItem;
+private:
+  QGraphicsRectItem* mSelectionRectItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRAPHICSSCENE_H
+#endif  // LIBREPCB_GRAPHICSSCENE_H

@@ -17,110 +17,112 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packagepadcombobox.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackagePadComboBox::PackagePadComboBox(QWidget* parent) noexcept :
-    QWidget(parent), mPackage(nullptr), mFootprint(nullptr), mComboBox(new QComboBox(this))
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+PackagePadComboBox::PackagePadComboBox(QWidget* parent) noexcept
+  : QWidget(parent),
+    mPackage(nullptr),
+    mFootprint(nullptr),
+    mComboBox(new QComboBox(this)) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox);
 
-    mComboBox->setEditable(false);
+  mComboBox->setEditable(false);
 
-    connect(mComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &PackagePadComboBox::currentIndexChanged);
+  connect(
+      mComboBox,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &PackagePadComboBox::currentIndexChanged);
 }
 
-PackagePadComboBox::~PackagePadComboBox() noexcept
-{
-    setPackage(nullptr);
+PackagePadComboBox::~PackagePadComboBox() noexcept {
+  setPackage(nullptr);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackagePad* PackagePadComboBox::getCurrentPad() const noexcept
-{
-    tl::optional<Uuid> uuid = Uuid::tryFromString(mComboBox->itemData(mComboBox->currentIndex(), Qt::UserRole).toString());
-    if (mPackage && uuid) {
-        return mPackage->getPads().find(*uuid).get();
-    } else {
-        return nullptr;
-    }
+PackagePad* PackagePadComboBox::getCurrentPad() const noexcept {
+  tl::optional<Uuid> uuid = Uuid::tryFromString(
+      mComboBox->itemData(mComboBox->currentIndex(), Qt::UserRole).toString());
+  if (mPackage && uuid) {
+    return mPackage->getPads().find(*uuid).get();
+  } else {
+    return nullptr;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadComboBox::setPackage(Package* package, Footprint* footprint) noexcept
-{
-    mPackage = package;
-    mFootprint = footprint;
-    updatePads();
+void PackagePadComboBox::setPackage(Package*   package,
+                                    Footprint* footprint) noexcept {
+  mPackage   = package;
+  mFootprint = footprint;
+  updatePads();
 }
 
-void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept
-{
-    if (mPackage && pad) {
-        mComboBox->setCurrentIndex(mComboBox->findData(*pad->getName(), Qt::UserRole));
-    } else {
-        mComboBox->setCurrentIndex(0);
-    }
+void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept {
+  if (mPackage && pad) {
+    mComboBox->setCurrentIndex(
+        mComboBox->findData(*pad->getName(), Qt::UserRole));
+  } else {
+    mComboBox->setCurrentIndex(0);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadComboBox::currentIndexChanged(int index) noexcept
-{
-    Q_UNUSED(index);
-    emit currentPadChanged(getCurrentPad());
+void PackagePadComboBox::currentIndexChanged(int index) noexcept {
+  Q_UNUSED(index);
+  emit currentPadChanged(getCurrentPad());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadComboBox::updatePads() noexcept
-{
-    mComboBox->clear();
-    mComboBox->addItem(tr("(unconnected)"), QString());
+void PackagePadComboBox::updatePads() noexcept {
+  mComboBox->clear();
+  mComboBox->addItem(tr("(unconnected)"), QString());
 
-    if (mPackage) {
-        for (const PackagePad& pad : mPackage->getPads()) {
-            if ((!mFootprint) || (!mFootprint->getPads().contains(pad.getUuid()))) {
-                mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
-            }
-        }
+  if (mPackage) {
+    for (const PackagePad& pad : mPackage->getPads()) {
+      if ((!mFootprint) || (!mFootprint->getPads().contains(pad.getUuid()))) {
+        mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
+      }
     }
+  }
 
-    mComboBox->setCurrentIndex(mComboBox->count() > 1 ? 1 : 0);
+  mComboBox->setCurrentIndex(mComboBox->count() > 1 ? 1 : 0);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

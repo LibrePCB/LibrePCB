@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
 #define LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -39,47 +39,45 @@ namespace Ui {
 class StrokeTextPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class StrokeTextPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The StrokeTextPropertiesDialog class
  */
-class StrokeTextPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class StrokeTextPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  StrokeTextPropertiesDialog()                                        = delete;
+  StrokeTextPropertiesDialog(const StrokeTextPropertiesDialog& other) = delete;
+  StrokeTextPropertiesDialog(StrokeText& text, UndoStack& undoStack,
+                             QList<GraphicsLayer*> layers,
+                             QWidget*              parent = nullptr) noexcept;
+  ~StrokeTextPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        StrokeTextPropertiesDialog() = delete;
-        StrokeTextPropertiesDialog(const StrokeTextPropertiesDialog& other) = delete;
-        StrokeTextPropertiesDialog(StrokeText& text, UndoStack& undoStack,
-                                   QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
-        ~StrokeTextPropertiesDialog() noexcept;
+  // Operator Overloadings
+  StrokeTextPropertiesDialog& operator=(const StrokeTextPropertiesDialog& rhs) =
+      delete;
 
-        // Operator Overloadings
-        StrokeTextPropertiesDialog& operator=(const StrokeTextPropertiesDialog& rhs) = delete;
+private:  // Methods
+  void on_buttonBox_clicked(QAbstractButton* button);
+  bool applyChanges() noexcept;
+  void addLayersToCombobox(const QList<QString>& names) noexcept;
+  void selectLayerNameInCombobox(const QString& name) noexcept;
 
-
-    private: // Methods
-        void on_buttonBox_clicked(QAbstractButton *button);
-        bool applyChanges() noexcept;
-        void addLayersToCombobox(const QList<QString>& names) noexcept;
-        void selectLayerNameInCombobox(const QString& name) noexcept;
-
-
-    private: // Data
-        StrokeText& mText;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::StrokeTextPropertiesDialog> mUi;
+private:  // Data
+  StrokeText&                                    mText;
+  UndoStack&                                     mUndoStack;
+  QScopedPointer<Ui::StrokeTextPropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
+#endif  // LIBREPCB_STROKETEXTPROPERTIESDIALOG_H

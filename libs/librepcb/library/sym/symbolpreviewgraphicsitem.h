@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
 #define LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/common/attributes/attributeprovider.h>
+#include <librepcb/common/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/attributes/attributeprovider.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Text;
@@ -43,9 +44,9 @@ class Symbol;
 class Component;
 class ComponentSymbolVariantItem;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolPreviewGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolPreviewGraphicsItem class
@@ -53,81 +54,76 @@ class ComponentSymbolVariantItem;
  * @author ubruhin
  * @date 2015-04-21
  */
-class SymbolPreviewGraphicsItem final : public QGraphicsItem, public AttributeProvider
-{
-    public:
+class SymbolPreviewGraphicsItem final : public QGraphicsItem,
+                                        public AttributeProvider {
+public:
+  // Constructors / Destructor
+  explicit SymbolPreviewGraphicsItem(
+      const IF_GraphicsLayerProvider& layerProvider,
+      const QStringList& localeOrder, const Symbol& symbol,
+      const Component*          cmp             = nullptr,
+      const tl::optional<Uuid>& symbVarUuid     = tl::nullopt,
+      const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
+  ~SymbolPreviewGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        explicit SymbolPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
-                                           const QStringList& localeOrder,
-                                           const Symbol& symbol,
-                                           const Component* cmp = nullptr,
-                                           const tl::optional<Uuid>& symbVarUuid = tl::nullopt,
-                                           const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
-        ~SymbolPreviewGraphicsItem() noexcept;
+  // Setters
+  void setDrawBoundingRect(bool enable) noexcept;
 
-        // Setters
-        void setDrawBoundingRect(bool enable) noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+signals:
 
+  /// @copydoc AttributeProvider::attributesChanged()
+  void attributesChanged() override {}
 
-    signals:
+private:
+  // make some methods inaccessible...
+  SymbolPreviewGraphicsItem()                                       = delete;
+  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
+  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
+      delete;
 
-        /// @copydoc AttributeProvider::attributesChanged()
-        void attributesChanged() override {}
+  // Inherited from AttributeProvider
+  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
+  // Types
 
-    private:
+  struct CachedTextProperties_t {
+    QString       text;
+    qreal         fontSize;
+    bool          rotate180;
+    Qt::Alignment align;
+    QRectF        textRect;
+  };
 
-        // make some methods inaccessible...
-        SymbolPreviewGraphicsItem() = delete;
-        SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
-        SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) = delete;
+  // General Attributes
+  const IF_GraphicsLayerProvider&   mLayerProvider;
+  const Symbol&                     mSymbol;
+  const Component*                  mComponent;
+  const ComponentSymbolVariantItem* mSymbVarItem;
+  QFont                             mFont;
+  bool                              mDrawBoundingRect;
+  QStringList                       mLocaleOrder;
 
-
-        // Inherited from AttributeProvider
-        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
-        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-
-
-        // Types
-
-        struct CachedTextProperties_t {
-            QString text;
-            qreal fontSize;
-            bool rotate180;
-            Qt::Alignment align;
-            QRectF textRect;
-        };
-
-
-        // General Attributes
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        const Symbol& mSymbol;
-        const Component* mComponent;
-        const ComponentSymbolVariantItem* mSymbVarItem;
-        QFont mFont;
-        bool mDrawBoundingRect;
-        QStringList mLocaleOrder;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
+  // Cached Attributes
+  QRectF                                     mBoundingRect;
+  QPainterPath                               mShape;
+  QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
+#endif  // LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H

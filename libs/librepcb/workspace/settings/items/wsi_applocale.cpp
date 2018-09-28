@@ -17,136 +17,135 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_applocale.h"
+
 #include <librepcb/common/application.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_AppLocale::WSI_AppLocale(const SExpression& node) :
-    WSI_Base(),
-    mAppLocale(), mAppLocaleTmp(mAppLocale)
-{
-    if (const SExpression* child = node.tryGetChildByPath("application_locale")) {
-        mAppLocale = child->getValueOfFirstChild<QString>();
-        mAppLocaleTmp = mAppLocale;
-    }
-
-    const QString i18nDir = qApp->getResourcesFilePath("i18n").toStr();
-
-    if (!mAppLocale.isEmpty()) {
-        QLocale selectedLocale(mAppLocale);
-        QLocale::setDefault(selectedLocale); // use the selected locale as the application's default locale
-
-        // Install language translations (like "de" for German)
-        QTranslator* newTranslator = new QTranslator();
-        newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0), i18nDir);
-        qApp->installTranslator(newTranslator);
-        mInstalledTranslators.append(newTranslator);
-
-        // Install language/country translations (like "de_ch" for German/Switzerland)
-        newTranslator = new QTranslator();
-        newTranslator->load("librepcb_" % selectedLocale.name(), i18nDir);
-        qApp->installTranslator(newTranslator);
-        mInstalledTranslators.append(newTranslator);
-    }
-
-    // create a QComboBox with all available languages
-    mComboBox.reset(new QComboBox());
-    mComboBox->addItem(tr("System Language"), QString(""));
-    QDir translations(i18nDir);
-    foreach (QString filename, translations.entryList(QDir::Files, QDir::Name)) {
-        filename.remove("librepcb_");
-        QFileInfo fileInfo(filename);
-        if (fileInfo.suffix() == "qm") {
-            QLocale loc(fileInfo.baseName());
-            QString str(loc.nativeLanguageName() % " (" % loc.nativeCountryName() % ")");
-            if (mComboBox->findData(loc.name()) < 0)
-                mComboBox->addItem(str, loc.name());
-        }
-    }
-    updateComboBoxIndex();
-    connect(mComboBox.data(),
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &WSI_AppLocale::comboBoxIndexChanged);
-
-    // create a QWidget
-    mWidget.reset(new QWidget());
-    QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox.data());
-    layout->addWidget(new QLabel(tr("Changing the language needs to restart the application.")));
-}
-
-WSI_AppLocale::~WSI_AppLocale() noexcept
-{
-    foreach (QTranslator* translator, mInstalledTranslators) {
-        qApp->removeTranslator(translator);
-        delete translator;
-    }
-    mInstalledTranslators.clear();
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void WSI_AppLocale::restoreDefault() noexcept
-{
-    mAppLocaleTmp = QString("");
-    updateComboBoxIndex();
-}
-
-void WSI_AppLocale::apply() noexcept
-{
-    mAppLocale = mAppLocaleTmp;
-}
-
-void WSI_AppLocale::revert() noexcept
-{
+WSI_AppLocale::WSI_AppLocale(const SExpression& node)
+  : WSI_Base(), mAppLocale(), mAppLocaleTmp(mAppLocale) {
+  if (const SExpression* child = node.tryGetChildByPath("application_locale")) {
+    mAppLocale    = child->getValueOfFirstChild<QString>();
     mAppLocaleTmp = mAppLocale;
-    updateComboBoxIndex();
-}
+  }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
+  const QString i18nDir = qApp->getResourcesFilePath("i18n").toStr();
 
-void WSI_AppLocale::comboBoxIndexChanged(int index) noexcept
-{
-    mAppLocaleTmp = mComboBox->itemData(index).toString();
-}
+  if (!mAppLocale.isEmpty()) {
+    QLocale selectedLocale(mAppLocale);
+    QLocale::setDefault(selectedLocale);  // use the selected locale as the
+                                          // application's default locale
 
-void WSI_AppLocale::updateComboBoxIndex() noexcept
-{
-    int index = mComboBox->findData(mAppLocaleTmp);
-    mComboBox->setCurrentIndex(index > 0 ? index : 0);
+    // Install language translations (like "de" for German)
+    QTranslator* newTranslator = new QTranslator();
+    newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0),
+                        i18nDir);
+    qApp->installTranslator(newTranslator);
+    mInstalledTranslators.append(newTranslator);
 
-    if ((!mAppLocaleTmp.isEmpty()) && (index < 0)) {
-        qWarning() << "could not find the language:" << mAppLocaleTmp;
+    // Install language/country translations (like "de_ch" for
+    // German/Switzerland)
+    newTranslator = new QTranslator();
+    newTranslator->load("librepcb_" % selectedLocale.name(), i18nDir);
+    qApp->installTranslator(newTranslator);
+    mInstalledTranslators.append(newTranslator);
+  }
+
+  // create a QComboBox with all available languages
+  mComboBox.reset(new QComboBox());
+  mComboBox->addItem(tr("System Language"), QString(""));
+  QDir translations(i18nDir);
+  foreach (QString filename, translations.entryList(QDir::Files, QDir::Name)) {
+    filename.remove("librepcb_");
+    QFileInfo fileInfo(filename);
+    if (fileInfo.suffix() == "qm") {
+      QLocale loc(fileInfo.baseName());
+      QString str(loc.nativeLanguageName() % " (" % loc.nativeCountryName() %
+                  ")");
+      if (mComboBox->findData(loc.name()) < 0)
+        mComboBox->addItem(str, loc.name());
     }
+  }
+  updateComboBoxIndex();
+  connect(
+      mComboBox.data(),
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &WSI_AppLocale::comboBoxIndexChanged);
+
+  // create a QWidget
+  mWidget.reset(new QWidget());
+  QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox.data());
+  layout->addWidget(new QLabel(
+      tr("Changing the language needs to restart the application.")));
 }
 
-void WSI_AppLocale::serialize(SExpression& root) const
-{
-    root.appendChild("application_locale", mAppLocale, true);
+WSI_AppLocale::~WSI_AppLocale() noexcept {
+  foreach (QTranslator* translator, mInstalledTranslators) {
+    qApp->removeTranslator(translator);
+    delete translator;
+  }
+  mInstalledTranslators.clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void WSI_AppLocale::restoreDefault() noexcept {
+  mAppLocaleTmp = QString("");
+  updateComboBoxIndex();
+}
+
+void WSI_AppLocale::apply() noexcept {
+  mAppLocale = mAppLocaleTmp;
+}
+
+void WSI_AppLocale::revert() noexcept {
+  mAppLocaleTmp = mAppLocale;
+  updateComboBoxIndex();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void WSI_AppLocale::comboBoxIndexChanged(int index) noexcept {
+  mAppLocaleTmp = mComboBox->itemData(index).toString();
+}
+
+void WSI_AppLocale::updateComboBoxIndex() noexcept {
+  int index = mComboBox->findData(mAppLocaleTmp);
+  mComboBox->setCurrentIndex(index > 0 ? index : 0);
+
+  if ((!mAppLocaleTmp.isEmpty()) && (index < 0)) {
+    qWarning() << "could not find the language:" << mAppLocaleTmp;
+  }
+}
+
+void WSI_AppLocale::serialize(SExpression& root) const {
+  root.appendChild("application_locale", mAppLocale, true);
+}
+
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

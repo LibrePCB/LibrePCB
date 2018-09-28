@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H
 #define LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/angle.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,44 +38,39 @@ class Schematic;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdMirrorSelectedSchematicItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdMirrorSelectedSchematicItems class
  */
-class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup
-{
-    public:
+class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdMirrorSelectedSchematicItems(Schematic&      schematic,
+                                  Qt::Orientation orientation) noexcept;
+  ~CmdMirrorSelectedSchematicItems() noexcept;
 
-        // Constructors / Destructor
-        CmdMirrorSelectedSchematicItems(Schematic& schematic,
-                                        Qt::Orientation orientation) noexcept;
-        ~CmdMirrorSelectedSchematicItems() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Schematic& mSchematic;
-        Qt::Orientation mOrientation;
+  // Attributes from the constructor
+  Schematic&      mSchematic;
+  Qt::Orientation mOrientation;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDMIRRORSELECTEDSCHEMATICITEMS_H

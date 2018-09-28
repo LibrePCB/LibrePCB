@@ -17,189 +17,186 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "categorylisteditorwidget.h"
+
+#include "categorychooserdialog.h"
 #include "ui_categorylisteditorwidget.h"
-#include <librepcb/workspace/workspace.h>
+
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
-#include "categorychooserdialog.h"
+#include <librepcb/workspace/workspace.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 CategoryListEditorWidgetBase::CategoryListEditorWidgetBase(
-        const workspace::Workspace& ws, QWidget* parent) noexcept :
-    QWidget(parent), mWorkspace(ws), mUi(new Ui::CategoryListEditorWidget)
-{
-    mUi->setupUi(this);
-    connect(mUi->btnAdd, &QPushButton::clicked,
-            this, &CategoryListEditorWidgetBase::btnAddClicked);
-    connect(mUi->btnRemove, &QPushButton::clicked,
-            this, &CategoryListEditorWidgetBase::btnRemoveClicked);
+    const workspace::Workspace& ws, QWidget* parent) noexcept
+  : QWidget(parent), mWorkspace(ws), mUi(new Ui::CategoryListEditorWidget) {
+  mUi->setupUi(this);
+  connect(mUi->btnAdd, &QPushButton::clicked, this,
+          &CategoryListEditorWidgetBase::btnAddClicked);
+  connect(mUi->btnRemove, &QPushButton::clicked, this,
+          &CategoryListEditorWidgetBase::btnRemoveClicked);
 }
 
-CategoryListEditorWidgetBase::~CategoryListEditorWidgetBase() noexcept
-{
+CategoryListEditorWidgetBase::~CategoryListEditorWidgetBase() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CategoryListEditorWidgetBase::setUuids(const QSet<Uuid>& uuids) noexcept
-{
-    mUuids = uuids;
-    mUi->listWidget->clear();
-    foreach (const Uuid& category, mUuids) {
-        addItem(category);
-    }
+void CategoryListEditorWidgetBase::setUuids(const QSet<Uuid>& uuids) noexcept {
+  mUuids = uuids;
+  mUi->listWidget->clear();
+  foreach (const Uuid& category, mUuids) { addItem(category); }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CategoryListEditorWidgetBase::btnAddClicked() noexcept
-{
-    tl::optional<Uuid> uuid = chooseCategoryWithDialog();
-    if (uuid && !mUuids.contains(*uuid)) {
-        mUuids.insert(*uuid);
-        addItem(*uuid);
-        emit categoryAdded(*uuid);
+void CategoryListEditorWidgetBase::btnAddClicked() noexcept {
+  tl::optional<Uuid> uuid = chooseCategoryWithDialog();
+  if (uuid && !mUuids.contains(*uuid)) {
+    mUuids.insert(*uuid);
+    addItem(*uuid);
+    emit categoryAdded(*uuid);
+  }
+}
+
+void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
+  QListWidgetItem*   item = mUi->listWidget->currentItem();
+  tl::optional<Uuid> uuid =
+      item ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
+           : tl::nullopt;
+  if (item && uuid) {
+    mUuids.remove(*uuid);
+    emit categoryRemoved(*uuid);
+    delete item;
+  }
+}
+
+void CategoryListEditorWidgetBase::addItem(
+    const tl::optional<Uuid>& category) noexcept {
+  try {
+    QStringList lines;
+    if (category) {
+      QList<Uuid> parents = getCategoryParents(*category);
+      parents.prepend(*category);
+      foreach (const Uuid& parent, parents) {
+        FilePath filepath = getLatestCategory(parent);  // can throw
+        lines.prepend(getCategoryName(filepath));       // can throw
+      }
     }
+    lines.prepend(tr("Root category"));
+    addItem(category, lines);
+  } catch (const Exception& e) {
+    QString categoryStr = category ? category->toStr() : QString();
+    addItem(category, QString("%1: %2").arg(categoryStr, e.getMsg()));
+  }
 }
 
-void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept
-{
-    QListWidgetItem* item = mUi->listWidget->currentItem();
-    tl::optional<Uuid> uuid = item ? Uuid::tryFromString(item->data(Qt::UserRole).toString()) : tl::nullopt;
-    if (item && uuid) {
-        mUuids.remove(*uuid);
-        emit categoryRemoved(*uuid);
-        delete item;
+void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
+                                           const QStringList& lines) noexcept {
+  QString text;
+  for (int i = 0; i < lines.count(); ++i) {
+    QString line = lines.value(i);
+    if (i == 0) {
+      text.append(line);
+    } else {
+      text.append(QString("\n%1⤷ %2").arg(QString(" ").repeated(i * 2), line));
     }
+  }
+  addItem(category, text);
 }
 
-void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category) noexcept
-{
-    try {
-        QStringList lines;
-        if (category) {
-            QList<Uuid> parents = getCategoryParents(*category);
-            parents.prepend(*category);
-            foreach (const Uuid& parent, parents) {
-                FilePath filepath = getLatestCategory(parent); // can throw
-                lines.prepend(getCategoryName(filepath)); // can throw
-            }
-        }
-        lines.prepend(tr("Root category"));
-        addItem(category, lines);
-    } catch (const Exception& e) {
-        QString categoryStr = category ? category->toStr() : QString();
-        addItem(category, QString("%1: %2").arg(categoryStr, e.getMsg()));
-    }
+void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
+                                           const QString& text) noexcept {
+  QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
+  item->setData(Qt::UserRole, category ? category->toStr() : QString());
 }
 
-void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category, const QStringList& lines) noexcept
-{
-    QString text;
-    for (int i = 0; i < lines.count(); ++i) {
-        QString line = lines.value(i);
-        if (i == 0) {
-            text.append(line);
-        } else {
-            text.append(QString("\n%1⤷ %2").arg(QString(" ").repeated(i * 2), line));
-        }
-    }
-    addItem(category, text);
-}
-
-void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category, const QString& text) noexcept
-{
-    QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
-    item->setData(Qt::UserRole, category ? category->toStr() : QString());
-}
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryListEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
 CategoryListEditorWidget<ElementType>::CategoryListEditorWidget(
-        const workspace::Workspace& ws, QWidget* parent) noexcept :
-    CategoryListEditorWidgetBase(ws, parent)
-{
+    const workspace::Workspace& ws, QWidget* parent) noexcept
+  : CategoryListEditorWidgetBase(ws, parent) {
 }
 
 template <typename ElementType>
-CategoryListEditorWidget<ElementType>::~CategoryListEditorWidget() noexcept
-{
+CategoryListEditorWidget<ElementType>::~CategoryListEditorWidget() noexcept {
 }
 
 template <typename ElementType>
-tl::optional<Uuid> CategoryListEditorWidget<ElementType>::chooseCategoryWithDialog() noexcept
-{
-    CategoryChooserDialog<ElementType> dialog(mWorkspace, this);
-    if (dialog.exec() == QDialog::Accepted) {
-        return dialog.getSelectedCategoryUuid();
-    } else {
-        return tl::nullopt;
-    }
+tl::optional<Uuid>
+CategoryListEditorWidget<ElementType>::chooseCategoryWithDialog() noexcept {
+  CategoryChooserDialog<ElementType> dialog(mWorkspace, this);
+  if (dialog.exec() == QDialog::Accepted) {
+    return dialog.getSelectedCategoryUuid();
+  } else {
+    return tl::nullopt;
+  }
 }
 
 template <>
-FilePath CategoryListEditorWidget<ComponentCategory>::getLatestCategory(const Uuid& category) const
-{
-    return mWorkspace.getLibraryDb().getLatestComponentCategory(category);
+FilePath CategoryListEditorWidget<ComponentCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mWorkspace.getLibraryDb().getLatestComponentCategory(category);
 }
 
 template <>
-FilePath CategoryListEditorWidget<PackageCategory>::getLatestCategory(const Uuid& category) const
-{
-    return mWorkspace.getLibraryDb().getLatestPackageCategory(category);
+FilePath CategoryListEditorWidget<PackageCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mWorkspace.getLibraryDb().getLatestPackageCategory(category);
 }
 
 template <>
-QList<Uuid> CategoryListEditorWidget<ComponentCategory>::getCategoryParents(const Uuid& category) const
-{
-    return mWorkspace.getLibraryDb().getComponentCategoryParents(category);
+QList<Uuid> CategoryListEditorWidget<ComponentCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mWorkspace.getLibraryDb().getComponentCategoryParents(category);
 }
 
 template <>
-QList<Uuid> CategoryListEditorWidget<PackageCategory>::getCategoryParents(const Uuid& category) const
-{
-    return mWorkspace.getLibraryDb().getPackageCategoryParents(category);
+QList<Uuid> CategoryListEditorWidget<PackageCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mWorkspace.getLibraryDb().getPackageCategoryParents(category);
 }
 
 template <typename ElementType>
-QString CategoryListEditorWidget<ElementType>::getCategoryName(const FilePath& fp) const
-{
-    QString name;
-    mWorkspace.getLibraryDb().template getElementTranslations<ElementType>(fp,
-        mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(), &name); // can throw
-    return name;
+QString CategoryListEditorWidget<ElementType>::getCategoryName(
+    const FilePath& fp) const {
+  QString name;
+  mWorkspace.getLibraryDb().template getElementTranslations<ElementType>(
+      fp, mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(),
+      &name);  // can throw
+  return name;
 }
 
 template class CategoryListEditorWidget<library::ComponentCategory>;
 template class CategoryListEditorWidget<library::PackageCategory>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

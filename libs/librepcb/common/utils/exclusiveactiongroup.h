@@ -20,75 +20,71 @@
 #ifndef LIBREPCB_EXCLUSIVEACTIONGROUP_H
 #define LIBREPCB_EXCLUSIVEACTIONGROUP_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ExclusiveActionGroup
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ExclusiveActionGroup class groups multiple QAction's together
  *
- * This class is basically the same as QActionGroup (http://doc.qt.io/qt-5/qactiongroup.html).
- * But there is one important difference: When the user clicks on a QAction, that action
- * won't be checked instantly. Instead, this class only emits the signal
- * #changeRequestTriggered(). Whether the triggered action actually gets checked or the
- * request is rejected can be decided from outside this class (typically by the state
- * machine of an editor window). To change the selected action, #setCurrentAction() needs
- * to be called.
+ * This class is basically the same as QActionGroup
+ * (http://doc.qt.io/qt-5/qactiongroup.html). But there is one important
+ * difference: When the user clicks on a QAction, that action won't be checked
+ * instantly. Instead, this class only emits the signal
+ * #changeRequestTriggered(). Whether the triggered action actually gets checked
+ * or the request is rejected can be decided from outside this class (typically
+ * by the state machine of an editor window). To change the selected action,
+ * #setCurrentAction() needs to be called.
  *
  * @author ubruhin
  * @date 2016-11-29
  */
-class ExclusiveActionGroup final : public QObject
-{
-        Q_OBJECT
+class ExclusiveActionGroup final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ExclusiveActionGroup() noexcept;
+  ExclusiveActionGroup(const ExclusiveActionGroup& other) = delete;
+  ~ExclusiveActionGroup() noexcept;
 
-        // Constructors / Destructor
-        ExclusiveActionGroup() noexcept;
-        ExclusiveActionGroup(const ExclusiveActionGroup& other) = delete;
-        ~ExclusiveActionGroup() noexcept;
+  // General Methods
+  void            reset() noexcept;
+  void            setEnabled(bool enabled) noexcept;
+  void            addAction(const QVariant& key, QAction* action) noexcept;
+  void            setActionEnabled(const QVariant& key, bool enabled) noexcept;
+  void            setCurrentAction(const QVariant& key) noexcept;
+  const QVariant& getCurrentAction() const noexcept { return mCurrentAction; }
 
-        // General Methods
-        void reset() noexcept;
-        void setEnabled(bool enabled) noexcept;
-        void addAction(const QVariant& key, QAction* action) noexcept;
-        void setActionEnabled(const QVariant& key, bool enabled) noexcept;
-        void setCurrentAction(const QVariant& key) noexcept;
-        const QVariant& getCurrentAction() const noexcept {return mCurrentAction;}
+  // Operator Overloadings
+  ExclusiveActionGroup& operator=(const ExclusiveActionGroup& rhs) = delete;
 
-        // Operator Overloadings
-        ExclusiveActionGroup& operator=(const ExclusiveActionGroup& rhs) = delete;
+signals:
+  void changeRequestTriggered(const QVariant& key);
 
+private:  // Methods
+  void actionTriggered() noexcept;
 
-    signals:
-        void changeRequestTriggered(const QVariant& key);
-
-
-    private: // Methods
-        void actionTriggered() noexcept;
-
-
-    private: // Data
-        QVariant mCurrentAction;
-        QMap<QVariant, QAction*> mActions;
+private:  // Data
+  QVariant                 mCurrentAction;
+  QMap<QVariant, QAction*> mActions;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_EXCLUSIVEACTIONGROUP_H
+#endif  // LIBREPCB_EXCLUSIVEACTIONGROUP_H

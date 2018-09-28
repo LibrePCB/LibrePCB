@@ -20,53 +20,57 @@
 #ifndef LIBREPCB_LIBRARY_PACKAGECATEGORY_H
 #define LIBREPCB_LIBRARY_PACKAGECATEGORY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "librarycategory.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageCategory
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageCategory class
  */
-class PackageCategory final : public LibraryCategory
-{
-        Q_OBJECT
+class PackageCategory final : public LibraryCategory {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageCategory()                             = delete;
+  PackageCategory(const PackageCategory& other) = delete;
+  PackageCategory(const Uuid& uuid, const Version& version,
+                  const QString& author, const ElementName& name_en_US,
+                  const QString& description_en_US,
+                  const QString& keywords_en_US);
+  PackageCategory(const FilePath& elementDirectory, bool readOnly);
+  ~PackageCategory() noexcept;
 
-        // Constructors / Destructor
-        PackageCategory() = delete;
-        PackageCategory(const PackageCategory& other) = delete;
-        PackageCategory(const Uuid& uuid, const Version& version, const QString& author,
-                        const ElementName& name_en_US, const QString& description_en_US,
-                        const QString& keywords_en_US);
-        PackageCategory(const FilePath& elementDirectory, bool readOnly);
-        ~PackageCategory() noexcept;
+  // Operator Overloadings
+  PackageCategory& operator=(const PackageCategory& rhs) = delete;
 
-        // Operator Overloadings
-        PackageCategory& operator=(const PackageCategory& rhs) = delete;
-
-        // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("pkgcat");}
-        static QString getLongElementName() noexcept {return QStringLiteral("package_category");}
+  // Static Methods
+  static QString getShortElementName() noexcept {
+    return QStringLiteral("pkgcat");
+  }
+  static QString getLongElementName() noexcept {
+    return QStringLiteral("package_category");
+  }
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_PACKAGECATEGORY_H
+#endif  // LIBREPCB_LIBRARY_PACKAGECATEGORY_H

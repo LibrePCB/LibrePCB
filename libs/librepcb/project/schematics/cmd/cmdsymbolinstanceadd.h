@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
 #define LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/units/all_length_units.h>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,43 +39,38 @@ class Schematic;
 class ComponentInstance;
 class SI_Symbol;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSymbolInstanceAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSymbolInstanceAdd class
  */
-class CmdSymbolInstanceAdd final : public UndoCommand
-{
-    public:
+class CmdSymbolInstanceAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept;
+  ~CmdSymbolInstanceAdd() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept;
-        ~CmdSymbolInstanceAdd() noexcept;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        SI_Symbol& mSymbolInstance;
+private:  // Data
+  SI_Symbol& mSymbolInstance;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
+#endif  // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H

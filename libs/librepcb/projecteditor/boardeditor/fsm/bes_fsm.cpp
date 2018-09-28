@@ -17,190 +17,204 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QtEvents>
+ ******************************************************************************/
 #include "bes_fsm.h"
-#include "boardeditorevent.h"
+
 #include "../boardeditor.h"
-#include "ui_boardeditor.h"
-#include "bes_select.h"
-#include "bes_drawtrace.h"
-#include "bes_drawpolygon.h"
+#include "bes_adddevice.h"
+#include "bes_addhole.h"
 #include "bes_addstroketext.h"
 #include "bes_addvia.h"
-#include "bes_adddevice.h"
 #include "bes_drawplane.h"
-#include "bes_addhole.h"
+#include "bes_drawpolygon.h"
+#include "bes_drawtrace.h"
+#include "bes_select.h"
+#include "boardeditorevent.h"
+#include "ui_boardeditor.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtEvents>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 BES_FSM::BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                 GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept :
-    BES_Base(editor, editorUi, editorGraphicsView, undoStack),
-    mCurrentState(State_NoState), mPreviousState(State_NoState)
-{
-    // create all substates
-    mSubStates.insert(State_Select, new BES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawTrace, new BES_DrawTrace(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawPolygon, new BES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_AddStrokeText, new BES_AddStrokeText(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_AddVia, new BES_AddVia(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_AddDevice, new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_DrawPlane, new BES_DrawPlane(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
-    mSubStates.insert(State_AddHole, new BES_AddHole(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+                 GraphicsView& editorGraphicsView,
+                 UndoStack&    undoStack) noexcept
+  : BES_Base(editor, editorUi, editorGraphicsView, undoStack),
+    mCurrentState(State_NoState),
+    mPreviousState(State_NoState) {
+  // create all substates
+  mSubStates.insert(
+      State_Select,
+      new BES_Select(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_DrawTrace,
+      new BES_DrawTrace(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_DrawPolygon,
+      new BES_DrawPolygon(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(State_AddStrokeText,
+                    new BES_AddStrokeText(mEditor, mEditorUi,
+                                          mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_AddVia,
+      new BES_AddVia(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_AddDevice,
+      new BES_AddDevice(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_DrawPlane,
+      new BES_DrawPlane(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
+  mSubStates.insert(
+      State_AddHole,
+      new BES_AddHole(mEditor, mEditorUi, mEditorGraphicsView, mUndoStack));
 
-    // go to state "Select"
-    if (mSubStates[State_Select]->entry(nullptr)) {
-        mCurrentState = State_Select;
-        emit stateChanged(mCurrentState);
-    }
+  // go to state "Select"
+  if (mSubStates[State_Select]->entry(nullptr)) {
+    mCurrentState = State_Select;
+    emit stateChanged(mCurrentState);
+  }
 }
 
-BES_FSM::~BES_FSM() noexcept
-{
-    // exit the current substate
-    if (mCurrentState != State_NoState) {
-        mSubStates[mCurrentState]->exit(nullptr);
-        mCurrentState = State_NoState;
-        emit stateChanged(mCurrentState);
-    }
-    // delete all substates
-    qDeleteAll(mSubStates);     mSubStates.clear();
+BES_FSM::~BES_FSM() noexcept {
+  // exit the current substate
+  if (mCurrentState != State_NoState) {
+    mSubStates[mCurrentState]->exit(nullptr);
+    mCurrentState = State_NoState;
+    emit stateChanged(mCurrentState);
+  }
+  // delete all substates
+  qDeleteAll(mSubStates);
+  mSubStates.clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool BES_FSM::processEvent(BEE_Base* event, bool deleteEvent) noexcept
-{
-    Q_ASSERT(event->isAccepted() == false);
-    process(event); // the "isAccepted" flag is set here if the event was accepted
-    bool accepted = event->isAccepted();
-    if (deleteEvent) delete event;
-    return accepted;
+bool BES_FSM::processEvent(BEE_Base* event, bool deleteEvent) noexcept {
+  Q_ASSERT(event->isAccepted() == false);
+  process(
+      event);  // the "isAccepted" flag is set here if the event was accepted
+  bool accepted = event->isAccepted();
+  if (deleteEvent) delete event;
+  return accepted;
 }
 
-BES_Base::ProcRetVal BES_FSM::process(BEE_Base* event) noexcept
-{
-    State nextState = mCurrentState;
-    ProcRetVal retval = PassToParentState;
+BES_Base::ProcRetVal BES_FSM::process(BEE_Base* event) noexcept {
+  State      nextState = mCurrentState;
+  ProcRetVal retval    = PassToParentState;
 
-    // let the current state process the event
-    if (mCurrentState != State_NoState)
-        retval = mSubStates[mCurrentState]->process(event);
+  // let the current state process the event
+  if (mCurrentState != State_NoState)
+    retval = mSubStates[mCurrentState]->process(event);
 
-    switch (retval)
-    {
-        case ForceStayInState:
-            nextState = mCurrentState;
-            event->setAccepted(true);
-            break;
-        case ForceLeaveState:
-            nextState = (mPreviousState != State_NoState) ? mPreviousState : State_Select;
-            event->setAccepted(true);
-            break;
-        case PassToParentState:
-            nextState = processEventFromChild(event);
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
+  switch (retval) {
+    case ForceStayInState:
+      nextState = mCurrentState;
+      event->setAccepted(true);
+      break;
+    case ForceLeaveState:
+      nextState =
+          (mPreviousState != State_NoState) ? mPreviousState : State_Select;
+      event->setAccepted(true);
+      break;
+    case PassToParentState:
+      nextState = processEventFromChild(event);
+      break;
+    default:
+      Q_ASSERT(false);
+      break;
+  }
+
+  // switch to the next state, if needed
+  if (nextState != mCurrentState) {
+    if (mCurrentState != State_NoState) {
+      // leave the current state
+      if (mSubStates[mCurrentState]->exit(event)) {
+        mPreviousState = mCurrentState;
+        mCurrentState  = State_NoState;
+        emit stateChanged(mCurrentState);
+      }
     }
-
-    // switch to the next state, if needed
-    if (nextState != mCurrentState)
-    {
-        if (mCurrentState != State_NoState)
-        {
-            // leave the current state
-            if (mSubStates[mCurrentState]->exit(event))
-            {
-                mPreviousState = mCurrentState;
-                mCurrentState = State_NoState;
-                emit stateChanged(mCurrentState);
-            }
-        }
-        if ((mCurrentState == State_NoState) && (nextState != State_NoState))
-        {
-            // entry the next state
-            if (mSubStates[nextState]->entry(event)) {
-                mCurrentState = nextState;
-                emit stateChanged(mCurrentState);
-            } else { // use the select state as fallback
-                processEvent(new BEE_Base(BEE_Base::StartSelect), true);
-            }
-        }
+    if ((mCurrentState == State_NoState) && (nextState != State_NoState)) {
+      // entry the next state
+      if (mSubStates[nextState]->entry(event)) {
+        mCurrentState = nextState;
+        emit stateChanged(mCurrentState);
+      } else {  // use the select state as fallback
+        processEvent(new BEE_Base(BEE_Base::StartSelect), true);
+      }
     }
+  }
 
-    return ForceStayInState; // this is not used...
+  return ForceStayInState;  // this is not used...
 }
 
-BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept
-{
-    switch (event->getType())
-    {
-        case BEE_Base::AbortCommand:
-        case BEE_Base::StartSelect:
-            event->setAccepted(true);
-            return State_Select;
-        case BEE_Base::StartDrawPlane:
-            event->setAccepted(true);
-            return State_DrawPlane;
-        case BEE_Base::StartDrawTrace:
-            event->setAccepted(true);
-            return State_DrawTrace;
-        case BEE_Base::StartDrawPolygon:
-            event->setAccepted(true);
-            return State_DrawPolygon;
-        case BEE_Base::StartAddStrokeText:
-            event->setAccepted(true);
-            return State_AddStrokeText;
-        case BEE_Base::StartAddHole:
-            event->setAccepted(true);
-            return State_AddHole;
-        case BEE_Base::StartAddVia:
-            event->setAccepted(true);
-            return State_AddVia;
-        case BEE_Base::StartAddDevice:
-            event->setAccepted(true);
-            return State_AddDevice;
-        case BEE_Base::GraphicsViewEvent:
-        {
-            QEvent* e = BEE_RedirectedQEvent::getQEventFromBEE(event);
-            Q_ASSERT(e); if (!e) return mCurrentState;
-            if ((e->type() == QEvent::GraphicsSceneMouseRelease) ||
-                (e->type() == QEvent::GraphicsSceneMouseDoubleClick))
-            {
-                QGraphicsSceneMouseEvent* e2 = dynamic_cast<QGraphicsSceneMouseEvent*>(e); Q_ASSERT(e2);
-                if (e2->button() == Qt::RightButton) {
-                    return (mPreviousState != State_NoState) ? mPreviousState : State_Select;
-                }
-            }
-            return mCurrentState;
+BES_FSM::State BES_FSM::processEventFromChild(BEE_Base* event) noexcept {
+  switch (event->getType()) {
+    case BEE_Base::AbortCommand:
+    case BEE_Base::StartSelect:
+      event->setAccepted(true);
+      return State_Select;
+    case BEE_Base::StartDrawPlane:
+      event->setAccepted(true);
+      return State_DrawPlane;
+    case BEE_Base::StartDrawTrace:
+      event->setAccepted(true);
+      return State_DrawTrace;
+    case BEE_Base::StartDrawPolygon:
+      event->setAccepted(true);
+      return State_DrawPolygon;
+    case BEE_Base::StartAddStrokeText:
+      event->setAccepted(true);
+      return State_AddStrokeText;
+    case BEE_Base::StartAddHole:
+      event->setAccepted(true);
+      return State_AddHole;
+    case BEE_Base::StartAddVia:
+      event->setAccepted(true);
+      return State_AddVia;
+    case BEE_Base::StartAddDevice:
+      event->setAccepted(true);
+      return State_AddDevice;
+    case BEE_Base::GraphicsViewEvent: {
+      QEvent* e = BEE_RedirectedQEvent::getQEventFromBEE(event);
+      Q_ASSERT(e);
+      if (!e) return mCurrentState;
+      if ((e->type() == QEvent::GraphicsSceneMouseRelease) ||
+          (e->type() == QEvent::GraphicsSceneMouseDoubleClick)) {
+        QGraphicsSceneMouseEvent* e2 =
+            dynamic_cast<QGraphicsSceneMouseEvent*>(e);
+        Q_ASSERT(e2);
+        if (e2->button() == Qt::RightButton) {
+          return (mPreviousState != State_NoState) ? mPreviousState
+                                                   : State_Select;
         }
-        default:
-            return mCurrentState;
+      }
+      return mCurrentState;
     }
+    default:
+      return mCurrentState;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

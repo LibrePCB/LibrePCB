@@ -17,46 +17,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "centeredcheckbox.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CenteredCheckBox::CenteredCheckBox(QWidget* parent) noexcept :
-    CenteredCheckBox(QString(), parent)
-{
+CenteredCheckBox::CenteredCheckBox(QWidget* parent) noexcept
+  : CenteredCheckBox(QString(), parent) {
 }
 
-CenteredCheckBox::CenteredCheckBox(const QString& text, QWidget* parent) noexcept :
-    QWidget(parent), mCheckBox(nullptr)
-{
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setAlignment(Qt::AlignCenter);
-    layout->setContentsMargins(0,0,0,0);
-    mCheckBox = new QCheckBox(text, this);
-    layout->addWidget(mCheckBox);
-    connect(mCheckBox, &QCheckBox::toggled, this, &CenteredCheckBox::toggled);
-    connect(mCheckBox, &QCheckBox::clicked, this, &CenteredCheckBox::clicked);
-    connect(mCheckBox, &QCheckBox::stateChanged, this, &CenteredCheckBox::stateChanged);
+CenteredCheckBox::CenteredCheckBox(const QString& text,
+                                   QWidget*       parent) noexcept
+  : QWidget(parent), mCheckBox(nullptr) {
+  QHBoxLayout* layout = new QHBoxLayout(this);
+  layout->setAlignment(Qt::AlignCenter);
+  layout->setContentsMargins(0, 0, 0, 0);
+  mCheckBox = new QCheckBox(text, this);
+  layout->addWidget(mCheckBox);
+  connect(mCheckBox, &QCheckBox::toggled, this, &CenteredCheckBox::toggled);
+  connect(mCheckBox, &QCheckBox::clicked, this, &CenteredCheckBox::clicked);
+  connect(mCheckBox, &QCheckBox::stateChanged, this,
+          &CenteredCheckBox::stateChanged);
 }
 
-CenteredCheckBox::~CenteredCheckBox() noexcept
-{
+CenteredCheckBox::~CenteredCheckBox() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

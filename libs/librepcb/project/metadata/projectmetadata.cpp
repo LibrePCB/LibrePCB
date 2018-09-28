@@ -17,145 +17,144 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "projectmetadata.h"
-#include <librepcb/common/fileio/smartsexprfile.h>
-#include <librepcb/common/fileio/sexpression.h>
+
 #include "../project.h"
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly, bool create) :
-    QObject(nullptr), mProject(project),
+ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly,
+                                 bool create)
+  : QObject(nullptr),
+    mProject(project),
     mFilepath(project.getPath().getPathTo("project/metadata.lp")),
-    mUuid(Uuid::createRandom()), mName("New Project")
-{
-    qDebug() << "load project metadata...";
-    Q_ASSERT(!(create && (restore || readOnly)));
+    mUuid(Uuid::createRandom()),
+    mName("New Project") {
+  qDebug() << "load project metadata...";
+  Q_ASSERT(!(create && (restore || readOnly)));
 
-    if (create) {
-        mFile.reset(SmartSExprFile::create(mFilepath));
-
-        try {
-            mName = mProject.getFilepath().getCompleteBasename();
-        } catch (const Exception&) {
-            // fall back to default name
-        }
-        mAuthor = tr("Unknown");
-        mVersion = "v1";
-        mCreated = QDateTime::currentDateTime();
-    } else {
-        mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
-        SExpression root = mFile->parseFileAndBuildDomTree();
-
-        if (root.getChildByIndex(0).isString()) { // backward compatibility, remove this some time!
-            mUuid = root.getChildByIndex(0).getValue<Uuid>();
-        }
-        mName = root.getValueByPath<ElementName>("name");
-        mAuthor = root.getValueByPath<QString>("author");
-        mVersion = root.getValueByPath<QString>("version");
-        mCreated = root.getValueByPath<QDateTime>("created");
-        mAttributes.loadFromDomElement(root); // can throw
-    }
-
-    mLastModified = QDateTime::currentDateTime();
-
-    qDebug() << "metadata successfully loaded!";
-}
-
-ProjectMetadata::~ProjectMetadata() noexcept
-{
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void ProjectMetadata::setName(const ElementName& newName) noexcept
-{
-    if (newName != mName) {
-        mName = newName;
-        emit attributesChanged();
-    }
-}
-
-void ProjectMetadata::setAuthor(const QString& newAuthor) noexcept
-{
-    if (newAuthor != mAuthor) {
-        mAuthor = newAuthor;
-        emit attributesChanged();
-    }
-}
-
-void ProjectMetadata::setVersion(const QString& newVersion) noexcept
-{
-    if (newVersion != mVersion) {
-        mVersion = newVersion;
-        emit attributesChanged();
-    }
-}
-
-void ProjectMetadata::setAttributes(const AttributeList& newAttributes) noexcept
-{
-    if (newAttributes != mAttributes) {
-        mAttributes = newAttributes;
-        emit attributesChanged();
-    }
-}
-
-void ProjectMetadata::updateLastModified() noexcept
-{
-    mLastModified = QDateTime::currentDateTime();
-    emit attributesChanged();
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-bool ProjectMetadata::save(bool toOriginal, QStringList& errors) noexcept
-{
-    bool success = true;
+  if (create) {
+    mFile.reset(SmartSExprFile::create(mFilepath));
 
     try {
-        SExpression doc(serializeToDomElement("librepcb_project_metadata"));
-        mFile->save(doc, toOriginal);
-    } catch (const Exception& e) {
-        success = false;
-        errors.append(e.getMsg());
+      mName = mProject.getFilepath().getCompleteBasename();
+    } catch (const Exception&) {
+      // fall back to default name
     }
+    mAuthor  = tr("Unknown");
+    mVersion = "v1";
+    mCreated = QDateTime::currentDateTime();
+  } else {
+    mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
+    SExpression root = mFile->parseFileAndBuildDomTree();
 
-    return success;
+    if (root.getChildByIndex(0)
+            .isString()) {  // backward compatibility, remove this some time!
+      mUuid = root.getChildByIndex(0).getValue<Uuid>();
+    }
+    mName    = root.getValueByPath<ElementName>("name");
+    mAuthor  = root.getValueByPath<QString>("author");
+    mVersion = root.getValueByPath<QString>("version");
+    mCreated = root.getValueByPath<QDateTime>("created");
+    mAttributes.loadFromDomElement(root);  // can throw
+  }
+
+  mLastModified = QDateTime::currentDateTime();
+
+  qDebug() << "metadata successfully loaded!";
 }
 
-/*****************************************************************************************
+ProjectMetadata::~ProjectMetadata() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void ProjectMetadata::setName(const ElementName& newName) noexcept {
+  if (newName != mName) {
+    mName = newName;
+    emit attributesChanged();
+  }
+}
+
+void ProjectMetadata::setAuthor(const QString& newAuthor) noexcept {
+  if (newAuthor != mAuthor) {
+    mAuthor = newAuthor;
+    emit attributesChanged();
+  }
+}
+
+void ProjectMetadata::setVersion(const QString& newVersion) noexcept {
+  if (newVersion != mVersion) {
+    mVersion = newVersion;
+    emit attributesChanged();
+  }
+}
+
+void ProjectMetadata::setAttributes(
+    const AttributeList& newAttributes) noexcept {
+  if (newAttributes != mAttributes) {
+    mAttributes = newAttributes;
+    emit attributesChanged();
+  }
+}
+
+void ProjectMetadata::updateLastModified() noexcept {
+  mLastModified = QDateTime::currentDateTime();
+  emit attributesChanged();
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+bool ProjectMetadata::save(bool toOriginal, QStringList& errors) noexcept {
+  bool success = true;
+
+  try {
+    SExpression doc(serializeToDomElement("librepcb_project_metadata"));
+    mFile->save(doc, toOriginal);
+  } catch (const Exception& e) {
+    success = false;
+    errors.append(e.getMsg());
+  }
+
+  return success;
+}
+
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ProjectMetadata::serialize(SExpression& root) const
-{
-    root.appendChild(mUuid);
-    root.appendChild("name", mName, true);
-    root.appendChild("author", mAuthor, true);
-    root.appendChild("version", mVersion, true);
-    root.appendChild("created", mCreated, true);
-    mAttributes.serialize(root);
+void ProjectMetadata::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild("name", mName, true);
+  root.appendChild("author", mAuthor, true);
+  root.appendChild("version", mVersion, true);
+  root.appendChild("created", mCreated, true);
+  mAttributes.serialize(root);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

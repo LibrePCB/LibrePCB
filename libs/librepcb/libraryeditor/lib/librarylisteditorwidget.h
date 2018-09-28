@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -43,9 +44,9 @@ namespace Ui {
 class LibraryListEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryListEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryListEditorWidget class
@@ -53,50 +54,48 @@ class LibraryListEditorWidget;
  * @author  ubruhin
  * @date    2017-02-27
  */
-class LibraryListEditorWidget final : public QWidget
-{
-        Q_OBJECT
+class LibraryListEditorWidget final : public QWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryListEditorWidget() = delete;
+  explicit LibraryListEditorWidget(const workspace::Workspace& ws,
+                                   QWidget* parent = nullptr) noexcept;
+  LibraryListEditorWidget(const LibraryListEditorWidget& other) = delete;
+  ~LibraryListEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        LibraryListEditorWidget() = delete;
-        explicit LibraryListEditorWidget(const workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
-        LibraryListEditorWidget(const LibraryListEditorWidget& other) = delete;
-        ~LibraryListEditorWidget() noexcept;
+  // Getters
+  const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
 
-        // Getters
-        const QSet<Uuid>& getUuids() const noexcept {return mUuids;}
+  // Setters
+  void setUuids(const QSet<Uuid>& uuids) noexcept;
 
-        // Setters
-        void setUuids(const QSet<Uuid>& uuids) noexcept;
+  // Operator Overloadings
+  LibraryListEditorWidget& operator=(const LibraryListEditorWidget& rhs) =
+      delete;
 
-        // Operator Overloadings
-        LibraryListEditorWidget& operator=(const LibraryListEditorWidget& rhs) = delete;
+private:
+  void btnAddClicked() noexcept;
+  void btnRemoveClicked() noexcept;
+  void addItem(const Uuid& library) noexcept;
 
+signals:
+  void libraryAdded(const Uuid& lib);
+  void libraryRemoved(const Uuid& lib);
 
-    private:
-        void btnAddClicked() noexcept;
-        void btnRemoveClicked() noexcept;
-        void addItem(const Uuid& library) noexcept;
-
-    signals:
-        void libraryAdded(const Uuid& lib);
-        void libraryRemoved(const Uuid& lib);
-
-
-    protected: // Data
-        const workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::LibraryListEditorWidget> mUi;
-        QSet<Uuid> mUuids;
+protected:  // Data
+  const workspace::Workspace&                 mWorkspace;
+  QScopedPointer<Ui::LibraryListEditorWidget> mUi;
+  QSet<Uuid>                                  mUuids;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H

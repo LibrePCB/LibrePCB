@@ -20,72 +20,72 @@
 #ifndef LIBREPCB_VERTEX_H
 #define LIBREPCB_VERTEX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../fileio/serializableobject.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Vertex
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Vertex class
  */
-class Vertex final : public SerializableObject
-{
-    public:
+class Vertex final : public SerializableObject {
+public:
+  // Constructors / Destructor
+  Vertex() noexcept : mPos(), mAngle() {}
+  Vertex(const Vertex& other) noexcept
+    : mPos(other.mPos), mAngle(other.mAngle) {}
+  explicit Vertex(const Point& pos, const Angle& angle = Angle::deg0()) noexcept
+    : mPos(pos), mAngle(angle) {}
+  explicit Vertex(const SExpression& node);
+  ~Vertex() noexcept {}
 
-        // Constructors / Destructor
-        Vertex() noexcept : mPos(), mAngle() {}
-        Vertex(const Vertex& other) noexcept : mPos(other.mPos), mAngle(other.mAngle) {}
-        explicit Vertex(const Point& pos, const Angle& angle = Angle::deg0()) noexcept :
-            mPos(pos), mAngle(angle) {}
-        explicit Vertex(const SExpression& node);
-        ~Vertex() noexcept {}
+  // Getters
+  const Point& getPos() const noexcept { return mPos; }
+  const Angle& getAngle() const noexcept { return mAngle; }
 
-        // Getters
-        const Point& getPos() const noexcept {return mPos;}
-        const Angle& getAngle() const noexcept {return mAngle;}
+  // Setters
+  void setPos(const Point& pos) noexcept { mPos = pos; }
+  void setAngle(const Angle& angle) noexcept { mAngle = angle; }
 
-        // Setters
-        void setPos(const Point& pos) noexcept {mPos = pos;}
-        void setAngle(const Angle& angle) noexcept {mAngle = angle;}
+  // General Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        // General Methods
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool operator==(const Vertex& rhs) const noexcept;
+  bool operator!=(const Vertex& rhs) const noexcept { return !(*this == rhs); }
+  Vertex& operator=(const Vertex& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const Vertex& rhs) const noexcept;
-        bool operator!=(const Vertex& rhs) const noexcept {return !(*this == rhs);}
-        Vertex& operator=(const Vertex& rhs) noexcept;
-
-
-    private: // Data
-        Point mPos;
-        Angle mAngle; ///< angle of the line between this vertex and the following vertex
+private:  // Data
+  Point mPos;
+  Angle mAngle;  ///< angle of the line between this vertex and the following
+                 ///< vertex
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 inline uint qHash(const Vertex& key, uint seed = 0) noexcept {
-    return ::qHash(qMakePair(key.getPos(), key.getAngle()), seed);
+  return ::qHash(qMakePair(key.getPos(), key.getAngle()), seed);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_VERTEX_H
+#endif  // LIBREPCB_VERTEX_H

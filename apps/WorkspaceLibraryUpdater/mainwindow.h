@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <librepcb/common/fileio/filepath.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/fileio/filepath.h>
 
 namespace Ui {
 class MainWindow;
@@ -17,35 +18,32 @@ namespace library {
 class Library;
 }
 
-}
+}  // namespace librepcb
 
-class MainWindow : public QMainWindow
-{
-        Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
-    public:
+public:
+  explicit MainWindow(QWidget *parent = 0);
+  ~MainWindow();
 
-        explicit MainWindow(QWidget *parent = 0);
-        ~MainWindow();
+private slots:
 
-    private slots:
+  void on_addDirectoryBtn_clicked();
+  void on_removeDirectoryBtn_clicked();
+  void on_clrLibraryBtn_clicked();
+  void on_updateBtn_clicked();
 
-        void on_addDirectoryBtn_clicked();
-        void on_removeDirectoryBtn_clicked();
-        void on_clrLibraryBtn_clicked();
-        void on_updateBtn_clicked();
+private:
+  template <typename ElementType>
+  void updateElements(const librepcb::library::Library &lib) noexcept;
 
-    private:
-
-        template <typename ElementType>
-        void updateElements(const librepcb::library::Library& lib) noexcept;
-
-        // Attributes
-        Ui::MainWindow *ui;
-        QString lastDir;
-        int elementCount;
-        int ignoreCount;
-        int errorCount;
+  // Attributes
+  Ui::MainWindow *ui;
+  QString         lastDir;
+  int             elementCount;
+  int             ignoreCount;
+  int             errorCount;
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

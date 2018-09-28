@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMBINENETSIGNALS_H
 #define LIBREPCB_PROJECT_CMDCOMBINENETSIGNALS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,42 +38,38 @@ class NetSignal;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCombineNetSignals
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdCombineNetSignals class
  */
-class CmdCombineNetSignals final : public UndoCommandGroup
-{
-    public:
+class CmdCombineNetSignals final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdCombineNetSignals(Circuit& circuit, NetSignal& toBeRemoved,
+                       NetSignal& result) noexcept;
+  ~CmdCombineNetSignals() noexcept;
 
-        // Constructors / Destructor
-        CmdCombineNetSignals(Circuit& circuit, NetSignal& toBeRemoved, NetSignal& result) noexcept;
-        ~CmdCombineNetSignals() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        NetSignal& mNetSignalToRemove;
-        NetSignal& mResultingNetSignal;
+  // Attributes from the constructor
+  Circuit&   mCircuit;
+  NetSignal& mNetSignalToRemove;
+  NetSignal& mResultingNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINENETSIGNALS_H
+#endif  // LIBREPCB_PROJECT_CMDCOMBINENETSIGNALS_H

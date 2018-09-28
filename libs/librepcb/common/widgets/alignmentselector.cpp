@@ -17,63 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "alignmentselector.h"
+
 #include "ui_alignmentselector.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AlignmentSelector::AlignmentSelector(QWidget* parent) noexcept :
-    QWidget(parent), mUi(new Ui::AlignmentSelector())
-{
-    mUi->setupUi(this);
-    mLookupTable.insert(mUi->tl, Alignment(HAlign::left(),      VAlign::top()));
-    mLookupTable.insert(mUi->cl, Alignment(HAlign::left(),      VAlign::center()));
-    mLookupTable.insert(mUi->bl, Alignment(HAlign::left(),      VAlign::bottom()));
-    mLookupTable.insert(mUi->tc, Alignment(HAlign::center(),    VAlign::top()));
-    mLookupTable.insert(mUi->cc, Alignment(HAlign::center(),    VAlign::center()));
-    mLookupTable.insert(mUi->bc, Alignment(HAlign::center(),    VAlign::bottom()));
-    mLookupTable.insert(mUi->tr, Alignment(HAlign::right(),     VAlign::top()));
-    mLookupTable.insert(mUi->cr, Alignment(HAlign::right(),     VAlign::center()));
-    mLookupTable.insert(mUi->br, Alignment(HAlign::right(),     VAlign::bottom()));
-    setAlignment(Alignment());
+AlignmentSelector::AlignmentSelector(QWidget* parent) noexcept
+  : QWidget(parent), mUi(new Ui::AlignmentSelector()) {
+  mUi->setupUi(this);
+  mLookupTable.insert(mUi->tl, Alignment(HAlign::left(), VAlign::top()));
+  mLookupTable.insert(mUi->cl, Alignment(HAlign::left(), VAlign::center()));
+  mLookupTable.insert(mUi->bl, Alignment(HAlign::left(), VAlign::bottom()));
+  mLookupTable.insert(mUi->tc, Alignment(HAlign::center(), VAlign::top()));
+  mLookupTable.insert(mUi->cc, Alignment(HAlign::center(), VAlign::center()));
+  mLookupTable.insert(mUi->bc, Alignment(HAlign::center(), VAlign::bottom()));
+  mLookupTable.insert(mUi->tr, Alignment(HAlign::right(), VAlign::top()));
+  mLookupTable.insert(mUi->cr, Alignment(HAlign::right(), VAlign::center()));
+  mLookupTable.insert(mUi->br, Alignment(HAlign::right(), VAlign::bottom()));
+  setAlignment(Alignment());
 }
 
-AlignmentSelector::~AlignmentSelector() noexcept
-{
+AlignmentSelector::~AlignmentSelector() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-Alignment AlignmentSelector::getAlignment() const noexcept
-{
-    foreach (QRadioButton* btn, mLookupTable.keys()) {
-        if (btn->isChecked()) return mLookupTable.value(btn);
-    }
-    Q_ASSERT(false); return Alignment();
+Alignment AlignmentSelector::getAlignment() const noexcept {
+  foreach (QRadioButton* btn, mLookupTable.keys()) {
+    if (btn->isChecked()) return mLookupTable.value(btn);
+  }
+  Q_ASSERT(false);
+  return Alignment();
 }
 
-void AlignmentSelector::setAlignment(const Alignment& align) noexcept
-{
-    QRadioButton* btn = mLookupTable.key(align, nullptr); Q_ASSERT(btn);
-    if (btn) btn->setChecked(true);
+void AlignmentSelector::setAlignment(const Alignment& align) noexcept {
+  QRadioButton* btn = mLookupTable.key(align, nullptr);
+  Q_ASSERT(btn);
+  if (btn) btn->setChecked(true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
 #define LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -45,46 +45,44 @@ namespace Ui {
 class BoardViaPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardViaPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardViaPropertiesDialog class
  */
-class BoardViaPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class BoardViaPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardViaPropertiesDialog()                                      = delete;
+  BoardViaPropertiesDialog(const BoardViaPropertiesDialog& other) = delete;
+  explicit BoardViaPropertiesDialog(Project& project, BI_Via& via,
+                                    UndoStack& undoStack,
+                                    QWidget*   parent) noexcept;
+  ~BoardViaPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        BoardViaPropertiesDialog() = delete;
-        BoardViaPropertiesDialog(const BoardViaPropertiesDialog& other) = delete;
-        explicit BoardViaPropertiesDialog(Project& project, BI_Via& via,
-                                          UndoStack& undoStack, QWidget* parent) noexcept;
-        ~BoardViaPropertiesDialog() noexcept;
+private:
+  // Private Methods
+  void keyPressEvent(QKeyEvent* e);
+  void accept();
+  bool applyChanges() noexcept;
 
-    private:
-
-        // Private Methods
-        void keyPressEvent(QKeyEvent* e);
-        void accept();
-        bool applyChanges() noexcept;
-
-        // General
-        Project& mProject;
-        BI_Via& mVia;
-        QScopedPointer<Ui::BoardViaPropertiesDialog> mUi;
-        UndoStack& mUndoStack;
+  // General
+  Project&                                     mProject;
+  BI_Via&                                      mVia;
+  QScopedPointer<Ui::BoardViaPropertiesDialog> mUi;
+  UndoStack&                                   mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
+#endif  // LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H

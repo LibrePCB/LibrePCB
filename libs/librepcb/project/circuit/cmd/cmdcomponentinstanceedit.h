@@ -20,85 +20,80 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEEDIT_H
 #define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEEDIT_H
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/undocommand.h>
-#include <librepcb/common/attributes/attribute.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
 class Component;
 class ComponentSymbolVariant;
-}
+}  // namespace library
 
 namespace project {
 
 class Circuit;
 class ComponentInstance;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdComponentInstanceEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdComponentInstanceEdit class
  */
-class CmdComponentInstanceEdit final : public UndoCommand
-{
-    public:
+class CmdComponentInstanceEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept;
+  ~CmdComponentInstanceEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept;
-        ~CmdComponentInstanceEdit() noexcept;
+  // Setters
+  void setName(const CircuitIdentifier& name) noexcept;
+  void setValue(const QString& value) noexcept;
+  void setAttributes(const AttributeList& attributes) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name) noexcept;
-        void setValue(const QString& value) noexcept;
-        void setAttributes(const AttributeList& attributes) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Circuit&           mCircuit;
+  ComponentInstance& mComponentInstance;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        ComponentInstance& mComponentInstance;
-
-        // Misc
-        CircuitIdentifier mOldName;
-        CircuitIdentifier mNewName;
-        QString mOldValue;
-        QString mNewValue;
-        AttributeList mOldAttributes;
-        AttributeList mNewAttributes;
+  // Misc
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
+  QString           mOldValue;
+  QString           mNewValue;
+  AttributeList     mOldAttributes;
+  AttributeList     mNewAttributes;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEEDIT_H

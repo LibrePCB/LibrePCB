@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
 #define LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FileIconProvider
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FileIconProvider class
@@ -43,21 +44,20 @@ namespace workspace {
  * @author ubruhin
  * @date 2017-10-22
  */
-class FileIconProvider final : public QFileIconProvider
-{
-    public:
-        FileIconProvider() noexcept;
-        ~FileIconProvider() noexcept;
+class FileIconProvider final : public QFileIconProvider {
+public:
+  FileIconProvider() noexcept;
+  ~FileIconProvider() noexcept;
 
-        // Inherited Methods
-        virtual QIcon icon(const QFileInfo& info) const noexcept override;
+  // Inherited Methods
+  virtual QIcon icon(const QFileInfo& info) const noexcept override;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
+#endif  // LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H

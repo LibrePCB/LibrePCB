@@ -20,83 +20,78 @@
 #ifndef LIBREPCB_GRIDSETTINGSDIALOG_H
 #define LIBREPCB_GRIDSETTINGSDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../gridproperties.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace Ui {
 class GridSettingsDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GridSettingsDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief This class provides a Dialog (GUI) to change the grid settings of a #GraphicsView
+ * @brief This class provides a Dialog (GUI) to change the grid settings of a
+ * #GraphicsView
  *
  * @author ubruhin
  * @date 2014-10-13
  */
-class GridSettingsDialog final : public QDialog
-{
-        Q_OBJECT
+class GridSettingsDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit GridSettingsDialog(const GridProperties& grid, QWidget* parent = 0);
+  ~GridSettingsDialog();
 
-        // Constructors / Destructor
-        explicit GridSettingsDialog(const GridProperties& grid, QWidget* parent = 0);
-        ~GridSettingsDialog();
+  // Getters
+  const GridProperties& getGrid() const noexcept { return mCurrentGrid; }
 
-        // Getters
-        const GridProperties& getGrid() const noexcept {return mCurrentGrid;}
+private slots:
 
+  // Private Slots
+  void rbtnGroupClicked(int id);
+  void spbxIntervalChanged(double value);
+  void cbxUnitsChanged(int index);
+  void btnMul2Clicked();
+  void btnDiv2Clicked();
+  void buttonBoxClicked(QAbstractButton* button);
 
-    private slots:
+signals:
 
-        // Private Slots
-        void rbtnGroupClicked(int id);
-        void spbxIntervalChanged(double value);
-        void cbxUnitsChanged(int index);
-        void btnMul2Clicked();
-        void btnDiv2Clicked();
-        void buttonBoxClicked(QAbstractButton* button);
+  void gridPropertiesChanged(const GridProperties& grid);
 
+private:
+  // make some methods inaccessible...
+  GridSettingsDialog();
+  GridSettingsDialog(const GridSettingsDialog& other);
+  GridSettingsDialog& operator=(const GridSettingsDialog& rhs);
 
-    signals:
+  // Private Methods
+  void updateInternalRepresentation() noexcept;
 
-        void gridPropertiesChanged(const GridProperties& grid);
-
-
-    private:
-
-        // make some methods inaccessible...
-        GridSettingsDialog();
-        GridSettingsDialog(const GridSettingsDialog& other);
-        GridSettingsDialog& operator=(const GridSettingsDialog& rhs);
-
-        // Private Methods
-        void updateInternalRepresentation() noexcept;
-
-
-        // General Attributes
-        Ui::GridSettingsDialog* mUi;
-        GridProperties mOriginalGrid;
-        GridProperties mCurrentGrid;
+  // General Attributes
+  Ui::GridSettingsDialog* mUi;
+  GridProperties          mOriginalGrid;
+  GridProperties          mCurrentGrid;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRIDSETTINGSDIALOG_H
+#endif  // LIBREPCB_GRIDSETTINGSDIALOG_H

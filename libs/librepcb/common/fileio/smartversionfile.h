@@ -20,21 +20,22 @@
 #ifndef LIBREPCB_SMARTVERSIONFILE_H
 #define LIBREPCB_SMARTVERSIONFILE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "smartfile.h"
+ ******************************************************************************/
 #include "../version.h"
+#include "smartfile.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SmartVersionFile
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SmartVersionFile class
@@ -44,122 +45,113 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-08-06
  */
-class SmartVersionFile final : public SmartFile
-{
-        Q_DECLARE_TR_FUNCTIONS(SmartVersionFile)
+class SmartVersionFile final : public SmartFile {
+  Q_DECLARE_TR_FUNCTIONS(SmartVersionFile)
 
-    public:
+public:
+  // Constructors / Destructor
+  SmartVersionFile()                              = delete;
+  SmartVersionFile(const SmartVersionFile& other) = delete;
 
-        // Constructors / Destructor
-        SmartVersionFile() = delete;
-        SmartVersionFile(const SmartVersionFile& other) = delete;
+  /**
+   * @brief The constructor to open an existing version file
+   *
+   * This constructor tries to open an existing file and throws an exception if
+   * an error occurs.
+   *
+   * @param filepath  See SmartFile#SmartFile()
+   * @param restore   See SmartFile#SmartFile()
+   * @param readOnly  See SmartFile#SmartFile()
+   *
+   * @throw Exception See SmartFile#SmartFile()
+   */
+  SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly);
 
-        /**
-         * @brief The constructor to open an existing version file
-         *
-         * This constructor tries to open an existing file and throws an exception if an
-         * error occurs.
-         *
-         * @param filepath  See SmartFile#SmartFile()
-         * @param restore   See SmartFile#SmartFile()
-         * @param readOnly  See SmartFile#SmartFile()
-         *
-         * @throw Exception See SmartFile#SmartFile()
-         */
-        SmartVersionFile(const FilePath& filepath, bool restore, bool readOnly);
+  /**
+   * @copydoc SmartFile#~SmartFile()
+   */
+  ~SmartVersionFile() noexcept;
 
-        /**
-         * @copydoc SmartFile#~SmartFile()
-         */
-        ~SmartVersionFile() noexcept;
+  // Getters
 
+  /**
+   * @brief Get the content of the file
+   *
+   * @return The content of the file
+   */
+  const Version& getVersion() const noexcept { return mVersion; }
 
-        // Getters
+  // Setters
 
-        /**
-         * @brief Get the content of the file
-         *
-         * @return The content of the file
-         */
-        const Version& getVersion() const noexcept {return mVersion;}
+  /**
+   * @brief Set the version of the file
+   *
+   * @note The version won't be written to the file until #save() is called.
+   *
+   * @param version   The new version of the file
+   */
+  void setVersion(const Version& version) noexcept { mVersion = version; }
 
+  // General Methods
 
-        // Setters
+  /**
+   * @brief Write all changes to the file system
+   *
+   * @param toOriginal    Specifies whether the original or the backup file
+   * should be overwritten/created.
+   *
+   * @throw Exception If an error occurs
+   */
+  void save(bool toOriginal);
 
-        /**
-         * @brief Set the version of the file
-         *
-         * @note The version won't be written to the file until #save() is called.
-         *
-         * @param version   The new version of the file
-         */
-        void setVersion(const Version& version) noexcept {mVersion = version;}
+  // Operator Overloadings
+  SmartVersionFile& operator=(const SmartVersionFile& rhs) = delete;
 
+  // Static Methods
 
-        // General Methods
+  /**
+   * @brief Create a new version file
+   *
+   * @note    This method will NOT immediately create the file! The file will be
+   *          created after calling #save().
+   *
+   * @param filepath  The filepath to the file to create (always to the original
+   * file, not to the backup file with "~" at the end of the filename!)
+   *
+   * @return The #SmartVersionFile object of the created file
+   *
+   * @throw Exception If an error occurs
+   */
+  static SmartVersionFile* create(const FilePath& filepath,
+                                  const Version&  version);
 
-        /**
-         * @brief Write all changes to the file system
-         *
-         * @param toOriginal    Specifies whether the original or the backup file should
-         *                      be overwritten/created.
-         *
-         * @throw Exception If an error occurs
-         */
-        void save(bool toOriginal);
+protected:
+  // Protected Methods
 
+  /**
+   * @brief Constructor to create a new version file
+   *
+   * @param filepath      See SmartFile#SmartFile()
+   * @param newVersion    The new version of the file
+   *
+   * @throw Exception See SmartFile#SmartFile()
+   */
+  SmartVersionFile(const FilePath& filepath, const Version& newVersion);
 
-        // Operator Overloadings
-        SmartVersionFile& operator=(const SmartVersionFile& rhs) = delete;
+  static Version readVersionFromFile(const FilePath& filepath);
 
+  // General Attributes
 
-        // Static Methods
-
-        /**
-         * @brief Create a new version file
-         *
-         * @note    This method will NOT immediately create the file! The file will be
-         *          created after calling #save().
-         *
-         * @param filepath  The filepath to the file to create (always to the original file,
-         *                  not to the backup file with "~" at the end of the filename!)
-         *
-         * @return The #SmartVersionFile object of the created file
-         *
-         * @throw Exception If an error occurs
-         */
-        static SmartVersionFile* create(const FilePath& filepath, const Version& version);
-
-
-    protected:
-
-        // Protected Methods
-
-        /**
-         * @brief Constructor to create a new version file
-         *
-         * @param filepath      See SmartFile#SmartFile()
-         * @param newVersion    The new version of the file
-         *
-         * @throw Exception See SmartFile#SmartFile()
-         */
-        SmartVersionFile(const FilePath& filepath, const Version& newVersion);
-
-        static Version readVersionFromFile(const FilePath& filepath);
-
-
-        // General Attributes
-
-        /**
-         * @brief The version number of the file
-         */
-        Version mVersion;
+  /**
+   * @brief The version number of the file
+   */
+  Version mVersion;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SMARTVERSIONFILE_H
+#endif  // LIBREPCB_SMARTVERSIONFILE_H

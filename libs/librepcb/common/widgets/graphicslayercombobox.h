@@ -20,22 +20,22 @@
 #ifndef LIBREPCB_GRAPHICSLAYERCOMBOBOX_H
 #define LIBREPCB_GRAPHICSLAYERCOMBOBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GraphicsLayerComboBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GraphicsLayerComboBox class
@@ -43,46 +43,39 @@ class GraphicsLayer;
  * @author ubruhin
  * @date 2017-08-15
  */
-class GraphicsLayerComboBox final : public QWidget
-{
-        Q_OBJECT
+class GraphicsLayerComboBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit GraphicsLayerComboBox(QWidget* parent = nullptr) noexcept;
-        GraphicsLayerComboBox(const GraphicsLayerComboBox& other) = delete;
-        ~GraphicsLayerComboBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit GraphicsLayerComboBox(QWidget* parent = nullptr) noexcept;
+  GraphicsLayerComboBox(const GraphicsLayerComboBox& other) = delete;
+  ~GraphicsLayerComboBox() noexcept;
 
+  // Getters
+  QString getCurrentLayerName() const noexcept;
 
-        // Getters
-        QString getCurrentLayerName() const noexcept;
+  // Setters
+  void setLayers(const QList<GraphicsLayer*>& layers) noexcept;
+  void setCurrentLayer(const QString& name) noexcept;
 
+  // Operator Overloadings
+  GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;
 
-        // Setters
-        void setLayers(const QList<GraphicsLayer*>& layers) noexcept;
-        void setCurrentLayer(const QString& name) noexcept;
+signals:
+  void currentLayerChanged(const QString& name);
 
+private:  // Methods
+  void currentIndexChanged(int index) noexcept;
 
-        // Operator Overloadings
-        GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;
-
-
-    signals:
-        void currentLayerChanged(const QString& name);
-
-
-    private: // Methods
-        void currentIndexChanged(int index) noexcept;
-
-
-    private: // Data
-        QComboBox* mComboBox;
+private:  // Data
+  QComboBox* mComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRAPHICSLAYERCOMBOBOX_H
+#endif  // LIBREPCB_GRAPHICSLAYERCOMBOBOX_H

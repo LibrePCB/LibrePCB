@@ -17,87 +17,85 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "polygongraphicsitem.h"
+
 #include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
-        const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent) noexcept :
-    PrimitivePathGraphicsItem(parent), mPolygon(polygon), mLayerProvider(lp)
-{
-    setPath(mPolygon.getPath().toQPainterPathPx());
-    setLineWidth(mPolygon.getLineWidth());
-    setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
-    updateFillLayer();
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
+                                         const IF_GraphicsLayerProvider& lp,
+                                         QGraphicsItem* parent) noexcept
+  : PrimitivePathGraphicsItem(parent), mPolygon(polygon), mLayerProvider(lp) {
+  setPath(mPolygon.getPath().toQPainterPathPx());
+  setLineWidth(mPolygon.getLineWidth());
+  setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
+  updateFillLayer();
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-    // register to the polygon to get attribute updates
-    mPolygon.registerObserver(*this);
+  // register to the polygon to get attribute updates
+  mPolygon.registerObserver(*this);
 }
 
-PolygonGraphicsItem::~PolygonGraphicsItem() noexcept
-{
-    mPolygon.unregisterObserver(*this);
+PolygonGraphicsItem::~PolygonGraphicsItem() noexcept {
+  mPolygon.unregisterObserver(*this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PolygonGraphicsItem::polygonLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
-{
-    setLineLayer(mLayerProvider.getLayer(*newLayerName));
-    updateFillLayer(); // required if the area is filled with the line layer
+void PolygonGraphicsItem::polygonLayerNameChanged(
+    const GraphicsLayerName& newLayerName) noexcept {
+  setLineLayer(mLayerProvider.getLayer(*newLayerName));
+  updateFillLayer();  // required if the area is filled with the line layer
 }
 
-void PolygonGraphicsItem::polygonLineWidthChanged(const UnsignedLength& newLineWidth) noexcept
-{
-    setLineWidth(newLineWidth);
+void PolygonGraphicsItem::polygonLineWidthChanged(
+    const UnsignedLength& newLineWidth) noexcept {
+  setLineWidth(newLineWidth);
 }
 
-void PolygonGraphicsItem::polygonIsFilledChanged(bool newIsFilled) noexcept
-{
-    Q_UNUSED(newIsFilled);
-    updateFillLayer();
+void PolygonGraphicsItem::polygonIsFilledChanged(bool newIsFilled) noexcept {
+  Q_UNUSED(newIsFilled);
+  updateFillLayer();
 }
 
-void PolygonGraphicsItem::polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept
-{
-    Q_UNUSED(newIsGrabArea);
-    updateFillLayer();
+void PolygonGraphicsItem::polygonIsGrabAreaChanged(
+    bool newIsGrabArea) noexcept {
+  Q_UNUSED(newIsGrabArea);
+  updateFillLayer();
 }
 
-void PolygonGraphicsItem::polygonPathChanged(const Path& newPath) noexcept
-{
-    setPath(newPath.toQPainterPathPx());
+void PolygonGraphicsItem::polygonPathChanged(const Path& newPath) noexcept {
+  setPath(newPath.toQPainterPathPx());
 }
 
-void PolygonGraphicsItem::updateFillLayer() noexcept
-{
-    if (mPolygon.isFilled()) {
-        setFillLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
-    } else if (mPolygon.isGrabArea()) {
-        setFillLayer(mLayerProvider.getGrabAreaLayer(*mPolygon.getLayerName()));
-    } else {
-        setFillLayer(nullptr);
-    }
+void PolygonGraphicsItem::updateFillLayer() noexcept {
+  if (mPolygon.isFilled()) {
+    setFillLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
+  } else if (mPolygon.isGrabArea()) {
+    setFillLayer(mLayerProvider.getGrabAreaLayer(*mPolygon.getLayerName()));
+  } else {
+    setFillLayer(nullptr);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

@@ -20,23 +20,23 @@
 #ifndef LIBREPCB_WORKSPACE_WSI_REPOSITORIES_H
 #define LIBREPCB_WORKSPACE_WSI_REPOSITORIES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "wsi_base.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Repository;
 
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WSI_Repositories
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The WSI_Repositories class contains a list of used repositories
@@ -44,70 +44,67 @@ namespace workspace {
  * @author ubruhin
  * @date 2016-08-10
  */
-class WSI_Repositories final : public WSI_Base
-{
-        Q_OBJECT
+class WSI_Repositories final : public WSI_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WSI_Repositories()                              = delete;
+  WSI_Repositories(const WSI_Repositories& other) = delete;
+  explicit WSI_Repositories(const SExpression& node);
+  ~WSI_Repositories() noexcept;
 
-        // Constructors / Destructor
-        WSI_Repositories() = delete;
-        WSI_Repositories(const WSI_Repositories& other) = delete;
-        explicit WSI_Repositories(const SExpression& node);
-        ~WSI_Repositories() noexcept;
+  // Getters
+  const QList<const Repository*>& getRepositories() const noexcept {
+    return mList;
+  }
 
-        // Getters
-        const QList<const Repository*>& getRepositories() const noexcept {return mList;}
+  // Getters: Widgets
+  QWidget* getWidget() const noexcept { return mWidget.data(); }
 
-        // Getters: Widgets
-        QWidget* getWidget() const noexcept {return mWidget.data();}
+  // General Methods
+  void restoreDefault() noexcept override;
+  void apply() noexcept override;
+  void revert() noexcept override;
 
-        // General Methods
-        void restoreDefault() noexcept override;
-        void apply() noexcept override;
-        void revert() noexcept override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  WSI_Repositories& operator=(const WSI_Repositories& rhs) = delete;
 
-        // Operator Overloadings
-        WSI_Repositories& operator=(const WSI_Repositories& rhs) = delete;
+private:  // Methods
+  void btnUpClicked() noexcept;
+  void btnDownClicked() noexcept;
+  void btnAddClicked() noexcept;
+  void btnRemoveClicked() noexcept;
+  void updateListWidgetItems() noexcept;
 
+private:  // Data
+  /**
+   * @brief The list of repositories in the right order
+   *
+   * The repository with the highest priority is at index 0 of the list. In case
+   * of version conflicts, the repository with the higher priority will be used.
+   */
+  QList<const Repository*> mList;
+  QList<const Repository*> mListTmp;
 
-    private: // Methods
-        void btnUpClicked() noexcept;
-        void btnDownClicked() noexcept;
-        void btnAddClicked() noexcept;
-        void btnRemoveClicked() noexcept;
-        void updateListWidgetItems() noexcept;
-
-
-    private: // Data
-
-        /**
-         * @brief The list of repositories in the right order
-         *
-         * The repository with the highest priority is at index 0 of the list. In case of
-         * version conflicts, the repository with the higher priority will be used.
-         */
-        QList<const Repository*> mList;
-        QList<const Repository*> mListTmp;
-
-        // Widgets
-        QScopedPointer<QWidget> mWidget;
-        QScopedPointer<QListWidget> mListWidget;
-        QScopedPointer<QLineEdit> mLineEdit;
-        QScopedPointer<QToolButton> mBtnUp;
-        QScopedPointer<QToolButton> mBtnDown;
-        QScopedPointer<QToolButton> mBtnAdd;
-        QScopedPointer<QToolButton> mBtnRemove;
+  // Widgets
+  QScopedPointer<QWidget>     mWidget;
+  QScopedPointer<QListWidget> mListWidget;
+  QScopedPointer<QLineEdit>   mLineEdit;
+  QScopedPointer<QToolButton> mBtnUp;
+  QScopedPointer<QToolButton> mBtnDown;
+  QScopedPointer<QToolButton> mBtnAdd;
+  QScopedPointer<QToolButton> mBtnRemove;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_WSI_REPOSITORIES_H
+#endif  // LIBREPCB_WORKSPACE_WSI_REPOSITORIES_H

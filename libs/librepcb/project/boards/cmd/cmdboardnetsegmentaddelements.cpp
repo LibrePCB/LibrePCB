@@ -17,104 +17,95 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardnetsegmentaddelements.h"
-#include "../items/bi_netpoint.h"
+
 #include "../items/bi_netline.h"
+#include "../items/bi_netpoint.h"
 #include "../items/bi_netsegment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardNetSegmentAddElements::CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept :
-    UndoCommand(tr("Add net segment elements")),
-    mNetSegment(segment)
-{
+CmdBoardNetSegmentAddElements::CmdBoardNetSegmentAddElements(
+    BI_NetSegment& segment) noexcept
+  : UndoCommand(tr("Add net segment elements")), mNetSegment(segment) {
 }
 
-CmdBoardNetSegmentAddElements::~CmdBoardNetSegmentAddElements() noexcept
-{
+CmdBoardNetSegmentAddElements::~CmdBoardNetSegmentAddElements() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-BI_Via* CmdBoardNetSegmentAddElements::addVia(BI_Via& via)
-{
-    mVias.append(&via);
-    return &via;
+BI_Via* CmdBoardNetSegmentAddElements::addVia(BI_Via& via) {
+  mVias.append(&via);
+  return &via;
 }
 
-BI_Via* CmdBoardNetSegmentAddElements::addVia(const Point& position, BI_Via::Shape shape,
-                                              const PositiveLength& size,
-                                              const PositiveLength& drillDiameter)
-{
-    BI_Via* via = new BI_Via(mNetSegment, position, shape, size, drillDiameter);
-    return addVia(*via);
+BI_Via* CmdBoardNetSegmentAddElements::addVia(
+    const Point& position, BI_Via::Shape shape, const PositiveLength& size,
+    const PositiveLength& drillDiameter) {
+  BI_Via* via = new BI_Via(mNetSegment, position, shape, size, drillDiameter);
+  return addVia(*via);
 }
 
-BI_NetPoint* CmdBoardNetSegmentAddElements::addNetPoint(BI_NetPoint& netpoint)
-{
-    mNetPoints.append(&netpoint);
-    return &netpoint;
+BI_NetPoint* CmdBoardNetSegmentAddElements::addNetPoint(BI_NetPoint& netpoint) {
+  mNetPoints.append(&netpoint);
+  return &netpoint;
 }
 
-BI_NetPoint* CmdBoardNetSegmentAddElements::addNetPoint(const Point& position)
-{
-    BI_NetPoint* netpoint = new BI_NetPoint(mNetSegment, position); // can throw
-    return addNetPoint(*netpoint);
+BI_NetPoint* CmdBoardNetSegmentAddElements::addNetPoint(const Point& position) {
+  BI_NetPoint* netpoint = new BI_NetPoint(mNetSegment, position);  // can throw
+  return addNetPoint(*netpoint);
 }
 
-BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLine& netline)
-{
-    mNetLines.append(&netline);
-    return &netline;
+BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLine& netline) {
+  mNetLines.append(&netline);
+  return &netline;
 }
 
-BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLineAnchor& startPoint,
-                                                      BI_NetLineAnchor& endPoint,
-                                                      GraphicsLayer& layer,
-                                                      const PositiveLength& width)
-{
-    BI_NetLine* netline = new BI_NetLine(mNetSegment, startPoint, endPoint, layer, width); // can throw
-    return addNetLine(*netline);
+BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(
+    BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
+    GraphicsLayer& layer, const PositiveLength& width) {
+  BI_NetLine* netline = new BI_NetLine(mNetSegment, startPoint, endPoint, layer,
+                                       width);  // can throw
+  return addNetLine(*netline);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardNetSegmentAddElements::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardNetSegmentAddElements::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardNetSegmentAddElements::performUndo()
-{
-    mNetSegment.removeElements(mVias, mNetPoints, mNetLines); // can throw
+void CmdBoardNetSegmentAddElements::performUndo() {
+  mNetSegment.removeElements(mVias, mNetPoints, mNetLines);  // can throw
 }
 
-void CmdBoardNetSegmentAddElements::performRedo()
-{
-    mNetSegment.addElements(mVias, mNetPoints, mNetLines); // can throw
+void CmdBoardNetSegmentAddElements::performRedo() {
+  mNetSegment.addElements(mVias, mNetPoints, mNetLines);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

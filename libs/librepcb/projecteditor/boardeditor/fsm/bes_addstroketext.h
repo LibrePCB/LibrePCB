@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BES_ADDSTROKETEXT_H
 #define LIBREPCB_PROJECT_EDITOR_BES_ADDSTROKETEXT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
+
 #include <librepcb/project/boards/items/bi_stroketext.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayerComboBox;
@@ -41,73 +43,69 @@ class Board;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_AddStrokeText
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_AddStrokeText class
  */
-class BES_AddStrokeText final : public BES_Base
-{
-        Q_OBJECT
+class BES_AddStrokeText final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_AddStrokeText(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                             GraphicsView& editorGraphicsView,
+                             UndoStack&    undoStack);
+  ~BES_AddStrokeText();
 
-        // Constructors / Destructor
-        explicit BES_AddStrokeText(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                                   GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_AddStrokeText();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processRotateEvent(const Angle& angle) noexcept;
+  ProcRetVal processFlipEvent(Qt::Orientation orientation) noexcept;
+  bool       addText(Board& board, const Point& pos) noexcept;
+  void       updateTextPosition(const Point& pos) noexcept;
+  bool       fixText(const Point& pos) noexcept;
+  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
+  void       textComboBoxValueChanged(const QString& value) noexcept;
+  void       heightSpinBoxValueChanged(double value) noexcept;
+  void       mirrorCheckBoxToggled(bool checked) noexcept;
+  void       makeSelectedLayerVisible() noexcept;
 
+  // State
+  bool                              mUndoCmdActive;
+  BI_StrokeText*                    mText;
+  QScopedPointer<CmdStrokeTextEdit> mEditCmd;
+  GraphicsLayerName                 mCurrentLayerName;
+  QString                           mCurrentText;
+  PositiveLength                    mCurrentHeight;
+  bool                              mCurrentMirror;
+  Angle                             mCurrentRotation;
 
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal processRotateEvent(const Angle& angle) noexcept;
-        ProcRetVal processFlipEvent(Qt::Orientation orientation) noexcept;
-        bool addText(Board& board, const Point& pos) noexcept;
-        void updateTextPosition(const Point& pos) noexcept;
-        bool fixText(const Point& pos) noexcept;
-        void layerComboBoxLayerChanged(const QString& layerName) noexcept;
-        void textComboBoxValueChanged(const QString& value) noexcept;
-        void heightSpinBoxValueChanged(double value) noexcept;
-        void mirrorCheckBoxToggled(bool checked) noexcept;
-        void makeSelectedLayerVisible() noexcept;
-
-
-        // State
-        bool mUndoCmdActive;
-        BI_StrokeText* mText;
-        QScopedPointer<CmdStrokeTextEdit> mEditCmd;
-        GraphicsLayerName mCurrentLayerName;
-        QString mCurrentText;
-        PositiveLength mCurrentHeight;
-        bool mCurrentMirror;
-        Angle mCurrentRotation;
-
-        // Widgets for the command toolbar
-        QScopedPointer<QLabel> mLayerLabel;
-        QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
-        QScopedPointer<QLabel> mTextLabel;
-        QScopedPointer<QComboBox> mTextComboBox;
-        QScopedPointer<QLabel> mHeightLabel;
-        QScopedPointer<QDoubleSpinBox> mHeightSpinBox;
-        QScopedPointer<QLabel> mMirrorLabel;
-        QScopedPointer<QCheckBox> mMirrorCheckBox;
+  // Widgets for the command toolbar
+  QScopedPointer<QLabel>                mLayerLabel;
+  QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QScopedPointer<QLabel>                mTextLabel;
+  QScopedPointer<QComboBox>             mTextComboBox;
+  QScopedPointer<QLabel>                mHeightLabel;
+  QScopedPointer<QDoubleSpinBox>        mHeightSpinBox;
+  QScopedPointer<QLabel>                mMirrorLabel;
+  QScopedPointer<QCheckBox>             mMirrorCheckBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BES_ADDSTROKETEXT_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BES_ADDSTROKETEXT_H

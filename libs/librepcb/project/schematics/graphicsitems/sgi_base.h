@@ -20,48 +20,45 @@
 #ifndef LIBREPCB_PROJECT_SGI_BASE_H
 #define LIBREPCB_PROJECT_SGI_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../schematic.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Schematic Graphics Item Base (SGI_Base) class
  */
-class SGI_Base : public QGraphicsItem
-{
-    public:
+class SGI_Base : public QGraphicsItem {
+public:
+  // Constructors / Destructor
+  explicit SGI_Base() noexcept;
+  virtual ~SGI_Base() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_Base() noexcept;
-        virtual ~SGI_Base() noexcept;
-
-
-    private:
-
-        // make some methods inaccessible...
-        //SGI_Base() = delete;
-        SGI_Base(const SGI_Base& other) = delete;
-        SGI_Base& operator=(const SGI_Base& rhs) = delete;
+private:
+  // make some methods inaccessible...
+  // SGI_Base() = delete;
+  SGI_Base(const SGI_Base& other) = delete;
+  SGI_Base& operator=(const SGI_Base& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_BASE_H
+#endif  // LIBREPCB_PROJECT_SGI_BASE_H

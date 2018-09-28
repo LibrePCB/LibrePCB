@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_ERCMSGDOCK_H
 #define LIBREPCB_PROJECT_ERCMSGDOCK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -42,62 +42,56 @@ namespace Ui {
 class ErcMsgDock;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ErcMsgDock
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ErcMsgDock class
  */
-class ErcMsgDock final : public QDockWidget
-{
-        Q_OBJECT
+class ErcMsgDock final : public QDockWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit ErcMsgDock(Project& project);
+  ~ErcMsgDock();
 
-        // Constructors / Destructor
-        explicit ErcMsgDock(Project& project);
-        ~ErcMsgDock();
+public slots:
 
+  void ercMsgAdded(ErcMsg* ercMsg) noexcept;
+  void ercMsgRemoved(ErcMsg* ercMsg) noexcept;
+  void ercMsgChanged(ErcMsg* ercMsg) noexcept;
 
-    public slots:
+private slots:
 
-        void ercMsgAdded(ErcMsg* ercMsg) noexcept;
-        void ercMsgRemoved(ErcMsg* ercMsg) noexcept;
-        void ercMsgChanged(ErcMsg* ercMsg) noexcept;
+  // GUI Actions
+  void on_treeWidget_itemSelectionChanged();
+  void on_btnIgnore_clicked(bool checked);
 
+private:
+  // Private Methods
+  void updateTopLevelItemTexts() noexcept;
 
-    private slots:
+  // make some methods inaccessible...
+  ErcMsgDock();
+  ErcMsgDock(const ErcMsgDock& other);
+  ErcMsgDock& operator=(const ErcMsgDock& rhs);
 
-        // GUI Actions
-        void on_treeWidget_itemSelectionChanged();
-        void on_btnIgnore_clicked(bool checked);
-
-
-    private:
-
-        // Private Methods
-        void updateTopLevelItemTexts() noexcept;
-
-        // make some methods inaccessible...
-        ErcMsgDock();
-        ErcMsgDock(const ErcMsgDock& other);
-        ErcMsgDock& operator=(const ErcMsgDock& rhs);
-
-        // General
-        Project& mProject;
-        ErcMsgList& mErcMsgList;
-        Ui::ErcMsgDock* mUi;
-        QHash<int, QTreeWidgetItem*> mTopLevelItems;
-        QHash<ErcMsg*, QTreeWidgetItem*> mErcMsgItems;
+  // General
+  Project&                         mProject;
+  ErcMsgList&                      mErcMsgList;
+  Ui::ErcMsgDock*                  mUi;
+  QHash<int, QTreeWidgetItem*>     mTopLevelItems;
+  QHash<ErcMsg*, QTreeWidgetItem*> mErcMsgItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_ERCMSGDOCK_H
+#endif  // LIBREPCB_PROJECT_ERCMSGDOCK_H

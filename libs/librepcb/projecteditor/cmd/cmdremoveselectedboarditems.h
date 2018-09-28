@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDREMOVESELECTEDBOARDITEMS_H
 #define LIBREPCB_PROJECT_CMDREMOVESELECTEDBOARDITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -42,41 +43,40 @@ namespace editor {
 
 class CmdRemoveBoardItems;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveSelectedBoardItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveSelectedBoardItems class
  */
-class CmdRemoveSelectedBoardItems final : public UndoCommand
-{
-    public:
-        // Constructors / Destructor
-        explicit CmdRemoveSelectedBoardItems(Board& board) noexcept;
-        ~CmdRemoveSelectedBoardItems() noexcept;
+class CmdRemoveSelectedBoardItems final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdRemoveSelectedBoardItems(Board& board) noexcept;
+  ~CmdRemoveSelectedBoardItems() noexcept;
 
-    private: // Methods
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-    private: // Data
-        Board& mBoard;
-        QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
+private:  // Data
+  Board&                              mBoard;
+  QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDREMOVESELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDREMOVESELECTEDBOARDITEMS_H

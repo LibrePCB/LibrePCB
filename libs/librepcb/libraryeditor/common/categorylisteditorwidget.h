@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cat/packagecategory.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -44,9 +45,9 @@ namespace Ui {
 class CategoryListEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryListEditorWidgetBase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CategoryListEditorWidgetBase class
@@ -54,56 +55,56 @@ class CategoryListEditorWidget;
  * @author  ubruhin
  * @date    2016-10-29
  */
-class CategoryListEditorWidgetBase : public QWidget
-{
-        Q_OBJECT
+class CategoryListEditorWidgetBase : public QWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  CategoryListEditorWidgetBase() = delete;
+  explicit CategoryListEditorWidgetBase(const workspace::Workspace& ws,
+                                        QWidget* parent = nullptr) noexcept;
+  CategoryListEditorWidgetBase(const CategoryListEditorWidgetBase& other) =
+      delete;
+  virtual ~CategoryListEditorWidgetBase() noexcept;
 
-        // Constructors / Destructor
-        CategoryListEditorWidgetBase() = delete;
-        explicit CategoryListEditorWidgetBase(const workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
-        CategoryListEditorWidgetBase(const CategoryListEditorWidgetBase& other) = delete;
-        virtual ~CategoryListEditorWidgetBase() noexcept;
+  // Getters
+  const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
 
-        // Getters
-        const QSet<Uuid>& getUuids() const noexcept {return mUuids;}
+  // Setters
+  void setUuids(const QSet<Uuid>& uuids) noexcept;
 
-        // Setters
-        void setUuids(const QSet<Uuid>& uuids) noexcept;
+  // Operator Overloadings
+  CategoryListEditorWidgetBase& operator       =(
+      const CategoryListEditorWidgetBase& rhs) = delete;
 
-        // Operator Overloadings
-        CategoryListEditorWidgetBase& operator=(const CategoryListEditorWidgetBase& rhs) = delete;
+protected:
+  virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept            = 0;
+  virtual FilePath           getLatestCategory(const Uuid& category) const  = 0;
+  virtual QList<Uuid>        getCategoryParents(const Uuid& category) const = 0;
+  virtual QString            getCategoryName(const FilePath& fp) const      = 0;
 
+private:
+  void btnAddClicked() noexcept;
+  void btnRemoveClicked() noexcept;
+  void addItem(const tl::optional<Uuid>& category) noexcept;
+  void addItem(const tl::optional<Uuid>& category,
+               const QStringList&        lines) noexcept;
+  void addItem(const tl::optional<Uuid>& category,
+               const QString&            text) noexcept;
 
-    protected:
-        virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept = 0;
-        virtual FilePath getLatestCategory(const Uuid& category) const = 0;
-        virtual QList<Uuid> getCategoryParents(const Uuid& category) const = 0;
-        virtual QString getCategoryName(const FilePath& fp) const = 0;
+signals:
+  void categoryAdded(const Uuid& category);
+  void categoryRemoved(const Uuid& category);
 
-
-    private:
-        void btnAddClicked() noexcept;
-        void btnRemoveClicked() noexcept;
-        void addItem(const tl::optional<Uuid>& category) noexcept;
-        void addItem(const tl::optional<Uuid>& category, const QStringList& lines) noexcept;
-        void addItem(const tl::optional<Uuid>& category, const QString& text) noexcept;
-
-    signals:
-        void categoryAdded(const Uuid& category);
-        void categoryRemoved(const Uuid& category);
-
-
-    protected: // Data
-        const workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::CategoryListEditorWidget> mUi;
-        QSet<Uuid> mUuids;
+protected:  // Data
+  const workspace::Workspace&                  mWorkspace;
+  QScopedPointer<Ui::CategoryListEditorWidget> mUi;
+  QSet<Uuid>                                   mUuids;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryListEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CategoryListEditorWidget class
@@ -112,36 +113,37 @@ class CategoryListEditorWidgetBase : public QWidget
  * @date    2016-10-29
  */
 template <typename ElementType>
-class CategoryListEditorWidget final : public CategoryListEditorWidgetBase
-{
-    public:
+class CategoryListEditorWidget final : public CategoryListEditorWidgetBase {
+public:
+  // Constructors / Destructor
+  CategoryListEditorWidget() = delete;
+  explicit CategoryListEditorWidget(const workspace::Workspace& ws,
+                                    QWidget* parent = nullptr) noexcept;
+  CategoryListEditorWidget(const CategoryListEditorWidget& other) = delete;
+  ~CategoryListEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        CategoryListEditorWidget() = delete;
-        explicit CategoryListEditorWidget(const workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
-        CategoryListEditorWidget(const CategoryListEditorWidget& other) = delete;
-        ~CategoryListEditorWidget() noexcept;
+  // Operator Overloadings
+  CategoryListEditorWidget& operator=(const CategoryListEditorWidget& rhs) =
+      delete;
 
-        // Operator Overloadings
-        CategoryListEditorWidget& operator=(const CategoryListEditorWidget& rhs) = delete;
-
-
-    private:
-        tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
-        FilePath getLatestCategory(const Uuid& category) const override;
-        QList<Uuid> getCategoryParents(const Uuid& category) const override;
-        QString getCategoryName(const FilePath& fp) const override;
+private:
+  tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
+  FilePath           getLatestCategory(const Uuid& category) const override;
+  QList<Uuid>        getCategoryParents(const Uuid& category) const override;
+  QString            getCategoryName(const FilePath& fp) const override;
 };
 
-typedef CategoryListEditorWidget<library::ComponentCategory> ComponentCategoryListEditorWidget;
-typedef CategoryListEditorWidget<library::PackageCategory> PackageCategoryListEditorWidget;
+typedef CategoryListEditorWidget<library::ComponentCategory>
+    ComponentCategoryListEditorWidget;
+typedef CategoryListEditorWidget<library::PackageCategory>
+    PackageCategoryListEditorWidget;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H

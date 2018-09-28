@@ -20,19 +20,21 @@
 #ifndef LIBREPCB_PROJECT_NETCLASS_H
 #define LIBREPCB_PROJECT_NETCLASS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/serializableobject.h>
+
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -40,77 +42,76 @@ class Circuit;
 class NetSignal;
 class ErcMsg;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NetClass
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NetClass class
  */
-class NetClass final : public QObject, public IF_ErcMsgProvider,
-                       public SerializableObject
-{
-        Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(NetClass)
+class NetClass final : public QObject,
+                       public IF_ErcMsgProvider,
+                       public SerializableObject {
+  Q_OBJECT
+  DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
-    public:
+public:
+  // Constructors / Destructor
+  NetClass()                      = delete;
+  NetClass(const NetClass& other) = delete;
+  explicit NetClass(Circuit& circuit, const SExpression& node);
+  explicit NetClass(Circuit& circuit, const ElementName& name);
+  ~NetClass() noexcept;
 
-        // Constructors / Destructor
-        NetClass() = delete;
-        NetClass(const NetClass& other) = delete;
-        explicit NetClass(Circuit& circuit, const SExpression& node);
-        explicit NetClass(Circuit& circuit, const ElementName& name);
-        ~NetClass() noexcept;
+  // Getters
+  Circuit&           getCircuit() const noexcept { return mCircuit; }
+  const Uuid&        getUuid() const noexcept { return mUuid; }
+  const ElementName& getName() const noexcept { return mName; }
+  int                getNetSignalCount() const noexcept {
+    return mRegisteredNetSignals.count();
+  }
+  bool isUsed() const noexcept { return (getNetSignalCount() > 0); }
 
-        // Getters
-        Circuit& getCircuit() const noexcept {return mCircuit;}
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const ElementName& getName() const noexcept {return mName;}
-        int getNetSignalCount() const noexcept {return mRegisteredNetSignals.count();}
-        bool isUsed() const noexcept {return (getNetSignalCount() > 0);}
+  // Setters
+  void setName(const ElementName& name) noexcept;
 
-        // Setters
-        void setName(const ElementName& name) noexcept;
+  // General Methods
+  void addToCircuit();
+  void removeFromCircuit();
+  void registerNetSignal(NetSignal& signal);
+  void unregisterNetSignal(NetSignal& signal);
 
-        // General Methods
-        void addToCircuit();
-        void removeFromCircuit();
-        void registerNetSignal(NetSignal& signal);
-        void unregisterNetSignal(NetSignal& signal);
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  NetClass& operator=(const NetClass& rhs) = delete;
 
-        // Operator Overloadings
-        NetClass& operator=(const NetClass& rhs) = delete;
+private:
+  void updateErcMessages() noexcept;
 
+  // General
+  Circuit& mCircuit;
+  bool     mIsAddedToCircuit;
 
-    private:
-        void updateErcMessages() noexcept;
+  // Attributes
+  Uuid        mUuid;
+  ElementName mName;
 
+  // Registered Elements
+  /// @brief all registered netsignals
+  QHash<Uuid, NetSignal*> mRegisteredNetSignals;
 
-        // General
-        Circuit& mCircuit;
-        bool mIsAddedToCircuit;
-
-        // Attributes
-        Uuid mUuid;
-        ElementName mName;
-
-        // Registered Elements
-        /// @brief all registered netsignals
-        QHash<Uuid, NetSignal*> mRegisteredNetSignals;
-
-        // ERC Messages
-        /// @brief the ERC message for unused netclasses
-        QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
+  // ERC Messages
+  /// @brief the ERC message for unused netclasses
+  QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_NETCLASS_H
+#endif  // LIBREPCB_PROJECT_NETCLASS_H

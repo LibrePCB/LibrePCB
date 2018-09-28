@@ -17,307 +17,309 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "si_symbol.h"
-#include "si_symbolpin.h"
-#include "../schematic.h"
-#include "../../project.h"
+
 #include "../../circuit/circuit.h"
-#include "../../library/projectlibrary.h"
 #include "../../circuit/componentinstance.h"
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
+#include "../../library/projectlibrary.h"
+#include "../../project.h"
+#include "../schematic.h"
+#include "si_symbolpin.h"
+
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/sym/symbol.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node) :
-    SI_Base(schematic), mComponentInstance(nullptr), mSymbVarItem(nullptr), mSymbol(nullptr),
+SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
+  : SI_Base(schematic),
+    mComponentInstance(nullptr),
+    mSymbVarItem(nullptr),
+    mSymbol(nullptr),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mPosition(0, 0),
     mRotation(0),
-    mMirrored(false)
-{
-    if (node.tryGetChildByPath("position")) {
-        mPosition = Point(node.getChildByPath("position"));
-    } else {
-        // backward compatibility, remove this some time!
-        mPosition = Point(node.getChildByPath("pos"));
-    }
-    if (node.tryGetChildByPath("rotation")) {
-        mRotation = node.getValueByPath<Angle>("rotation");
-    } else {
-        // backward compatibility, remove this some time!
-        mRotation = node.getValueByPath<Angle>("rot");
-    }
-    if (node.tryGetChildByPath("mirror")) {
-        mMirrored = node.getValueByPath<bool>("mirror");
-    } else {
-        // backward compatibility, remove this some time!
-        mMirrored = false;
-    }
+    mMirrored(false) {
+  if (node.tryGetChildByPath("position")) {
+    mPosition = Point(node.getChildByPath("position"));
+  } else {
+    // backward compatibility, remove this some time!
+    mPosition = Point(node.getChildByPath("pos"));
+  }
+  if (node.tryGetChildByPath("rotation")) {
+    mRotation = node.getValueByPath<Angle>("rotation");
+  } else {
+    // backward compatibility, remove this some time!
+    mRotation = node.getValueByPath<Angle>("rot");
+  }
+  if (node.tryGetChildByPath("mirror")) {
+    mMirrored = node.getValueByPath<bool>("mirror");
+  } else {
+    // backward compatibility, remove this some time!
+    mMirrored = false;
+  }
 
-    Uuid gcUuid = node.getValueByPath<Uuid>("component");
-    mComponentInstance = schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
-    if (!mComponentInstance) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("No component with the UUID \"%1\" found in the circuit!"))
+  Uuid gcUuid = node.getValueByPath<Uuid>("component");
+  mComponentInstance =
+      schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
+  if (!mComponentInstance) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("No component with the UUID \"%1\" found in the circuit!"))
             .arg(gcUuid.toStr()));
-    }
-    Uuid symbVarItemUuid = Uuid::createRandom(); // only initialization, will be overwritten
-    if (node.tryGetChildByPath("lib_gate")) {
-        symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
-    } else {
-        // backward compatibility, remove this some time!
-        symbVarItemUuid = node.getValueByPath<Uuid>("lib_item");
-    }
-    init(symbVarItemUuid);
+  }
+  Uuid symbVarItemUuid =
+      Uuid::createRandom();  // only initialization, will be overwritten
+  if (node.tryGetChildByPath("lib_gate")) {
+    symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
+  } else {
+    // backward compatibility, remove this some time!
+    symbVarItemUuid = node.getValueByPath<Uuid>("lib_item");
+  }
+  init(symbVarItemUuid);
 }
 
 SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
-                     const Uuid& symbolItem, const Point& position, const Angle& rotation, bool mirrored) :
-    SI_Base(schematic), mComponentInstance(&cmpInstance), mSymbVarItem(nullptr),
-    mSymbol(nullptr), mUuid(Uuid::createRandom()), mPosition(position), mRotation(rotation), mMirrored(mirrored)
-{
-    init(symbolItem);
+                     const Uuid& symbolItem, const Point& position,
+                     const Angle& rotation, bool mirrored)
+  : SI_Base(schematic),
+    mComponentInstance(&cmpInstance),
+    mSymbVarItem(nullptr),
+    mSymbol(nullptr),
+    mUuid(Uuid::createRandom()),
+    mPosition(position),
+    mRotation(rotation),
+    mMirrored(mirrored) {
+  init(symbolItem);
 }
 
-void SI_Symbol::init(const Uuid& symbVarItemUuid)
-{
-    mSymbVarItem = mComponentInstance->getSymbolVariant().getSymbolItems().get(symbVarItemUuid).get(); // can throw
-    mSymbol = mSchematic.getProject().getLibrary().getSymbol(mSymbVarItem->getSymbolUuid());
-    if (!mSymbol) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("No symbol with the UUID \"%1\" found in the project's library."))
-            .arg(mSymbVarItem->getSymbolUuid().toStr()));
+void SI_Symbol::init(const Uuid& symbVarItemUuid) {
+  mSymbVarItem = mComponentInstance->getSymbolVariant()
+                     .getSymbolItems()
+                     .get(symbVarItemUuid)
+                     .get();  // can throw
+  mSymbol = mSchematic.getProject().getLibrary().getSymbol(
+      mSymbVarItem->getSymbolUuid());
+  if (!mSymbol) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("No symbol with the UUID \"%1\" found in the "
+                                  "project's library."))
+                           .arg(mSymbVarItem->getSymbolUuid().toStr()));
+  }
+
+  mGraphicsItem.reset(new SGI_Symbol(*this));
+  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  updateGraphicsItemTransform();
+
+  for (const library::SymbolPin& libPin : mSymbol->getPins()) {
+    SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid());  // can throw
+    if (mPins.contains(libPin.getUuid())) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
+              .arg(libPin.getUuid().toStr()));
     }
+    mPins.insert(libPin.getUuid(), pin);
+  }
+  if (mPins.count() != mSymbVarItem->getPinSignalMap().count()) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("The pin count of the symbol instance \"%1\" "
+                                  "does not match with "
+                                  "the pin-signal-map of its component."))
+                           .arg(mUuid.toStr()));
+  }
 
-    mGraphicsItem.reset(new SGI_Symbol(*this));
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
-    updateGraphicsItemTransform();
+  // connect to the "attributes changes" signal of schematic and component
+  // instance
+  connect(mComponentInstance, &ComponentInstance::attributesChanged, this,
+          &SI_Symbol::schematicOrComponentAttributesChanged);
 
-    for (const library::SymbolPin& libPin : mSymbol->getPins()) {
-        SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid()); // can throw
-        if (mPins.contains(libPin.getUuid())) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
-                .arg(libPin.getUuid().toStr()));
-        }
-        mPins.insert(libPin.getUuid(), pin);
-    }
-    if (mPins.count() != mSymbVarItem->getPinSignalMap().count()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The pin count of the symbol instance \"%1\" does not match with "
-            "the pin-signal-map of its component.")).arg(mUuid.toStr()));
-    }
-
-    // connect to the "attributes changes" signal of schematic and component instance
-    connect(mComponentInstance, &ComponentInstance::attributesChanged,
-            this, &SI_Symbol::schematicOrComponentAttributesChanged);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
-SI_Symbol::~SI_Symbol() noexcept
-{
-    qDeleteAll(mPins);              mPins.clear();
-    mGraphicsItem.reset();
+SI_Symbol::~SI_Symbol() noexcept {
+  qDeleteAll(mPins);
+  mPins.clear();
+  mGraphicsItem.reset();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString SI_Symbol::getName() const noexcept
-{
-    if (mSymbVarItem->getSuffix()->isEmpty()) {
-        return *mComponentInstance->getName();
-    } else {
-        return mComponentInstance->getName() % "-" % mSymbVarItem->getSuffix();
-    }
+QString SI_Symbol::getName() const noexcept {
+  if (mSymbVarItem->getSuffix()->isEmpty()) {
+    return *mComponentInstance->getName();
+  } else {
+    return mComponentInstance->getName() % "-" % mSymbVarItem->getSuffix();
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_Symbol::setPosition(const Point& newPos) noexcept
-{
-    if (newPos != mPosition) {
-        mPosition = newPos;
-        mGraphicsItem->setPos(newPos.toPxQPointF());
-        mGraphicsItem->updateCacheAndRepaint();
-        foreach (SI_SymbolPin* pin, mPins) {
-            pin->updatePosition();
-        }
-    }
-}
-
-void SI_Symbol::setRotation(const Angle& newRotation) noexcept
-{
-    if (newRotation != mRotation) {
-        mRotation = newRotation;
-        updateGraphicsItemTransform();
-        mGraphicsItem->updateCacheAndRepaint();
-        foreach (SI_SymbolPin* pin, mPins) {
-            pin->updatePosition();
-        }
-    }
-}
-
-void SI_Symbol::setMirrored(bool newMirrored) noexcept
-{
-    if (newMirrored != mMirrored) {
-        mMirrored = newMirrored;
-        updateGraphicsItemTransform();
-        mGraphicsItem->updateCacheAndRepaint();
-        foreach (SI_SymbolPin* pin, mPins) {
-            pin->updatePosition();
-        }
-    }
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void SI_Symbol::addToSchematic()
-{
-    if (isAddedToSchematic()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    ScopeGuardList sgl(mPins.count()+1);
-    mComponentInstance->registerSymbol(*this); // can throw
-    sgl.add([&](){mComponentInstance->unregisterSymbol(*this);});
-    foreach (SI_SymbolPin* pin, mPins) {
-        pin->addToSchematic(); // can throw
-        sgl.add([pin](){pin->removeFromSchematic();});
-    }
-    SI_Base::addToSchematic(mGraphicsItem.data());
-    sgl.dismiss();
-}
-
-void SI_Symbol::removeFromSchematic()
-{
-    if (!isAddedToSchematic()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    ScopeGuardList sgl(mPins.count()+1);
-    foreach (SI_SymbolPin* pin, mPins) {
-        pin->removeFromSchematic(); // can throw
-        sgl.add([pin](){pin->addToSchematic();});
-    }
-    mComponentInstance->unregisterSymbol(*this); // can throw
-    sgl.add([&](){mComponentInstance->registerSymbol(*this);});
-    SI_Base::removeFromSchematic(mGraphicsItem.data());
-    sgl.dismiss();
-}
-
-void SI_Symbol::serialize(SExpression& root) const
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    root.appendChild(mUuid);
-    root.appendChild("component", mComponentInstance->getUuid(), true);
-    root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
-    root.appendChild(mPosition.serializeToDomElement("position"), true);
-    root.appendChild("rotation", mRotation, false);
-    root.appendChild("mirror", mMirrored, false);
-}
-
-/*****************************************************************************************
- *  Helper Methods
- ****************************************************************************************/
-
-Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
-{
-    if (mMirrored) {
-        return (mPosition + relativePos).rotated(mRotation, mPosition).mirrored(Qt::Horizontal, mPosition);
-    } else {
-        return (mPosition + relativePos).rotated(mRotation, mPosition);
-    }
-}
-
-/*****************************************************************************************
- *  Inherited from AttributeProvider
- ****************************************************************************************/
-
-QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept
-{
-    if (key == QLatin1String("NAME")) {
-        return getName();
-    } else {
-        return QString();
-    }
-}
-
-QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const noexcept
-{
-    return QVector<const AttributeProvider*>{&mSchematic, mComponentInstance};
-}
-
-/*****************************************************************************************
- *  Inherited from SI_Base
- ****************************************************************************************/
-
-QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept
-{
-    return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_Symbol::setSelected(bool selected) noexcept
-{
-    SI_Base::setSelected(selected);
-    mGraphicsItem->update();
-    foreach (SI_SymbolPin* pin, mPins) {
-        pin->setSelected(selected);
-    }
-}
-
-/*****************************************************************************************
- *  Private Slots
- ****************************************************************************************/
-
-void SI_Symbol::schematicOrComponentAttributesChanged()
-{
+void SI_Symbol::setPosition(const Point& newPos) noexcept {
+  if (newPos != mPosition) {
+    mPosition = newPos;
+    mGraphicsItem->setPos(newPos.toPxQPointF());
     mGraphicsItem->updateCacheAndRepaint();
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+  }
 }
 
-/*****************************************************************************************
+void SI_Symbol::setRotation(const Angle& newRotation) noexcept {
+  if (newRotation != mRotation) {
+    mRotation = newRotation;
+    updateGraphicsItemTransform();
+    mGraphicsItem->updateCacheAndRepaint();
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+  }
+}
+
+void SI_Symbol::setMirrored(bool newMirrored) noexcept {
+  if (newMirrored != mMirrored) {
+    mMirrored = newMirrored;
+    updateGraphicsItemTransform();
+    mGraphicsItem->updateCacheAndRepaint();
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+  }
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SI_Symbol::addToSchematic() {
+  if (isAddedToSchematic()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  ScopeGuardList sgl(mPins.count() + 1);
+  mComponentInstance->registerSymbol(*this);  // can throw
+  sgl.add([&]() { mComponentInstance->unregisterSymbol(*this); });
+  foreach (SI_SymbolPin* pin, mPins) {
+    pin->addToSchematic();  // can throw
+    sgl.add([pin]() { pin->removeFromSchematic(); });
+  }
+  SI_Base::addToSchematic(mGraphicsItem.data());
+  sgl.dismiss();
+}
+
+void SI_Symbol::removeFromSchematic() {
+  if (!isAddedToSchematic()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  ScopeGuardList sgl(mPins.count() + 1);
+  foreach (SI_SymbolPin* pin, mPins) {
+    pin->removeFromSchematic();  // can throw
+    sgl.add([pin]() { pin->addToSchematic(); });
+  }
+  mComponentInstance->unregisterSymbol(*this);  // can throw
+  sgl.add([&]() { mComponentInstance->registerSymbol(*this); });
+  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  sgl.dismiss();
+}
+
+void SI_Symbol::serialize(SExpression& root) const {
+  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+
+  root.appendChild(mUuid);
+  root.appendChild("component", mComponentInstance->getUuid(), true);
+  root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
+  root.appendChild(mPosition.serializeToDomElement("position"), true);
+  root.appendChild("rotation", mRotation, false);
+  root.appendChild("mirror", mMirrored, false);
+}
+
+/*******************************************************************************
+ *  Helper Methods
+ ******************************************************************************/
+
+Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept {
+  if (mMirrored) {
+    return (mPosition + relativePos)
+        .rotated(mRotation, mPosition)
+        .mirrored(Qt::Horizontal, mPosition);
+  } else {
+    return (mPosition + relativePos).rotated(mRotation, mPosition);
+  }
+}
+
+/*******************************************************************************
+ *  Inherited from AttributeProvider
+ ******************************************************************************/
+
+QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept {
+  if (key == QLatin1String("NAME")) {
+    return getName();
+  } else {
+    return QString();
+  }
+}
+
+QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const
+    noexcept {
+  return QVector<const AttributeProvider*>{&mSchematic, mComponentInstance};
+}
+
+/*******************************************************************************
+ *  Inherited from SI_Base
+ ******************************************************************************/
+
+QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept {
+  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+}
+
+void SI_Symbol::setSelected(bool selected) noexcept {
+  SI_Base::setSelected(selected);
+  mGraphicsItem->update();
+  foreach (SI_SymbolPin* pin, mPins) { pin->setSelected(selected); }
+}
+
+/*******************************************************************************
+ *  Private Slots
+ ******************************************************************************/
+
+void SI_Symbol::schematicOrComponentAttributesChanged() {
+  mGraphicsItem->updateCacheAndRepaint();
+}
+
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SI_Symbol::updateGraphicsItemTransform() noexcept
-{
-    QTransform t;
-    if (mMirrored) t.scale(qreal(-1), qreal(1));
-    t.rotate(-mRotation.toDeg());
-    mGraphicsItem->setTransform(t);
+void SI_Symbol::updateGraphicsItemTransform() noexcept {
+  QTransform t;
+  if (mMirrored) t.scale(qreal(-1), qreal(1));
+  t.rotate(-mRotation.toDeg());
+  mGraphicsItem->setTransform(t);
 }
 
-bool SI_Symbol::checkAttributesValidity() const noexcept
-{
-    if (mSymbVarItem == nullptr)        return false;
-    if (mSymbol == nullptr)             return false;
-    if (mComponentInstance == nullptr)  return false;
-    return true;
+bool SI_Symbol::checkAttributesValidity() const noexcept {
+  if (mSymbVarItem == nullptr) return false;
+  if (mSymbol == nullptr) return false;
+  if (mComponentInstance == nullptr) return false;
+  return true;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

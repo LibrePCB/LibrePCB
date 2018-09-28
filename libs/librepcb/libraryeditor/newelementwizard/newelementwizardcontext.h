@@ -20,21 +20,22 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
+#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/attributes/attribute.h>
 #include <librepcb/library/elements.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
@@ -49,9 +50,9 @@ class Library;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardContext
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardContext class
@@ -59,110 +60,109 @@ namespace editor {
  * @author ubruhin
  * @date 2017-03-22
  */
-class NewElementWizardContext final : public QObject
-{
-        Q_OBJECT
+class NewElementWizardContext final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
 
-        // Types
+  enum PageId {
+    ID_None = -1,  ///< last page
+    ID_ChooseType,
+    ID_CopyFrom,
+    ID_EnterMetadata,
+    ID_PackagePads,
+    ID_ComponentProperties,
+    ID_ComponentSymbols,
+    ID_ComponentSignals,
+    ID_ComponentPinSignalMap,
+    ID_DeviceProperties,
+  };
 
-        enum PageId {
-            ID_None = -1, ///< last page
-            ID_ChooseType,
-            ID_CopyFrom,
-            ID_EnterMetadata,
-            ID_PackagePads,
-            ID_ComponentProperties,
-            ID_ComponentSymbols,
-            ID_ComponentSignals,
-            ID_ComponentPinSignalMap,
-            ID_DeviceProperties,
-        };
+  enum class ElementType {
+    None,
+    ComponentCategory,
+    PackageCategory,
+    Symbol,
+    Package,
+    Component,
+    Device,
+  };
 
-        enum class ElementType {
-            None,
-            ComponentCategory,
-            PackageCategory,
-            Symbol,
-            Package,
-            Component,
-            Device,
-        };
+  // Constructors / Destructor
+  NewElementWizardContext()                                     = delete;
+  NewElementWizardContext(const NewElementWizardContext& other) = delete;
+  NewElementWizardContext(const workspace::Workspace& ws, const Library& lib,
+                          const IF_GraphicsLayerProvider& lp,
+                          QObject* parent = nullptr) noexcept;
+  ~NewElementWizardContext() noexcept;
 
+  // Getters
+  const FilePath& getOutputDirectory() const noexcept {
+    return mOutputDirectory;
+  }
+  const workspace::Workspace& getWorkspace() const noexcept {
+    return mWorkspace;
+  }
+  const IF_GraphicsLayerProvider& getLayerProvider() const noexcept {
+    return mLayerProvider;
+  }
+  const QStringList& getLibLocaleOrder() const noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardContext() = delete;
-        NewElementWizardContext(const NewElementWizardContext& other) = delete;
-        NewElementWizardContext(const workspace::Workspace& ws, const Library& lib,
-                                const IF_GraphicsLayerProvider& lp,
-                                QObject* parent = nullptr) noexcept;
-        ~NewElementWizardContext() noexcept;
+  // General Methods
+  void reset() noexcept;
+  void createLibraryElement();
 
+  // Operator Overloadings
+  NewElementWizardContext& operator=(const NewElementWizardContext& rhs) =
+      delete;
 
-        // Getters
-        const FilePath& getOutputDirectory() const noexcept {return mOutputDirectory;}
-        const workspace::Workspace& getWorkspace() const noexcept {return mWorkspace;}
-        const IF_GraphicsLayerProvider& getLayerProvider() const noexcept {return mLayerProvider;}
-        const QStringList& getLibLocaleOrder() const noexcept;
+private:  // Data
+  const workspace::Workspace&     mWorkspace;
+  const library::Library&         mLibrary;
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  FilePath                        mOutputDirectory;
 
+public:  // Data
+  // common
+  ElementType               mElementType;
+  tl::optional<ElementName> mElementName;
+  QString                   mElementDescription;
+  QString                   mElementKeywords;
+  QString                   mElementAuthor;
+  tl::optional<Version>     mElementVersion;
+  tl::optional<Uuid>        mElementCategoryUuid;
 
-        // General Methods
-        void reset() noexcept;
-        void createLibraryElement();
+  // symbol
+  SymbolPinList mSymbolPins;
+  PolygonList   mSymbolPolygons;
+  CircleList    mSymbolCircles;
+  TextList      mSymbolTexts;
 
+  // package
+  PackagePadList mPackagePads;
+  FootprintList  mPackageFootprints;
 
-        // Operator Overloadings
-        NewElementWizardContext& operator=(const NewElementWizardContext& rhs) = delete;
+  // component
+  bool                       mComponentSchematicOnly;
+  AttributeList              mComponentAttributes;
+  QString                    mComponentDefaultValue;
+  NormDependentPrefixMap     mComponentPrefixes;
+  ComponentSignalList        mComponentSignals;
+  ComponentSymbolVariantList mComponentSymbolVariants;
 
-
-    private: // Data
-        const workspace::Workspace& mWorkspace;
-        const library::Library& mLibrary;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        FilePath mOutputDirectory;
-
-
-    public: // Data
-        // common
-        ElementType mElementType;
-        tl::optional<ElementName> mElementName;
-        QString mElementDescription;
-        QString mElementKeywords;
-        QString mElementAuthor;
-        tl::optional<Version> mElementVersion;
-        tl::optional<Uuid> mElementCategoryUuid;
-
-        // symbol
-        SymbolPinList mSymbolPins;
-        PolygonList mSymbolPolygons;
-        CircleList mSymbolCircles;
-        TextList mSymbolTexts;
-
-        // package
-        PackagePadList mPackagePads;
-        FootprintList mPackageFootprints;
-
-        // component
-        bool mComponentSchematicOnly;
-        AttributeList mComponentAttributes;
-        QString mComponentDefaultValue;
-        NormDependentPrefixMap mComponentPrefixes;
-        ComponentSignalList mComponentSignals;
-        ComponentSymbolVariantList mComponentSymbolVariants;
-
-        // device
-        tl::optional<Uuid> mDeviceComponentUuid;
-        tl::optional<Uuid> mDevicePackageUuid;
-        DevicePadSignalMap mDevicePadSignalMap;
+  // device
+  tl::optional<Uuid> mDeviceComponentUuid;
+  tl::optional<Uuid> mDevicePackageUuid;
+  DevicePadSignalMap mDevicePadSignalMap;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H

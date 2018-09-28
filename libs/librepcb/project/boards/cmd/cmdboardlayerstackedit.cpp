@@ -17,69 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardlayerstackedit.h"
+
 #include "../boardlayerstack.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardLayerStackEdit::CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept :
-    UndoCommand(tr("Modify board layer stack")), mLayerStack(layerStack),
-    mOldInnerLayerCount(mLayerStack.getInnerLayerCount()), mNewInnerLayerCount(mOldInnerLayerCount)
-{
+CmdBoardLayerStackEdit::CmdBoardLayerStackEdit(
+    BoardLayerStack& layerStack) noexcept
+  : UndoCommand(tr("Modify board layer stack")),
+    mLayerStack(layerStack),
+    mOldInnerLayerCount(mLayerStack.getInnerLayerCount()),
+    mNewInnerLayerCount(mOldInnerLayerCount) {
 }
 
-CmdBoardLayerStackEdit::~CmdBoardLayerStackEdit() noexcept
-{
+CmdBoardLayerStackEdit::~CmdBoardLayerStackEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdBoardLayerStackEdit::setInnerLayerCount(int count) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewInnerLayerCount = count;
+void CmdBoardLayerStackEdit::setInnerLayerCount(int count) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewInnerLayerCount = count;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardLayerStackEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardLayerStackEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
-    return false;
+  if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
+  return false;
 }
 
-void CmdBoardLayerStackEdit::performUndo()
-{
-    mLayerStack.setInnerLayerCount(mOldInnerLayerCount);
+void CmdBoardLayerStackEdit::performUndo() {
+  mLayerStack.setInnerLayerCount(mOldInnerLayerCount);
 }
 
-void CmdBoardLayerStackEdit::performRedo()
-{
-    mLayerStack.setInnerLayerCount(mNewInnerLayerCount);
+void CmdBoardLayerStackEdit::performRedo() {
+  mLayerStack.setInnerLayerCount(mNewInnerLayerCount);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
-
+}  // namespace project
+}  // namespace librepcb

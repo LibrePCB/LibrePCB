@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_NETPOINT_H
 #define LIBREPCB_PROJECT_BGI_NETPOINT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,55 +39,51 @@ namespace project {
 
 class BI_NetPoint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_NetPoint
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_NetPoint class
  */
-class BGI_NetPoint final : public BGI_Base
-{
-    public:
+class BGI_NetPoint final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_NetPoint(BI_NetPoint& netpoint) noexcept;
+  ~BGI_NetPoint() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_NetPoint(BI_NetPoint& netpoint) noexcept;
-        ~BGI_NetPoint() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF boundingRect() const { return mBoundingRect; }
+  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+               QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  BGI_NetPoint()                          = delete;
+  BGI_NetPoint(const BGI_NetPoint& other) = delete;
+  BGI_NetPoint& operator=(const BGI_NetPoint& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // General Attributes
+  BI_NetPoint& mNetPoint;
 
-        // make some methods inaccessible...
-        BGI_NetPoint() = delete;
-        BGI_NetPoint(const BGI_NetPoint& other) = delete;
-        BGI_NetPoint& operator=(const BGI_NetPoint& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-
-        // General Attributes
-        BI_NetPoint& mNetPoint;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
+  // Cached Attributes
+  QRectF mBoundingRect;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_NETPOINT_H
+#endif  // LIBREPCB_PROJECT_BGI_NETPOINT_H

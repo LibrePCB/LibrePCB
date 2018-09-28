@@ -20,74 +20,72 @@
 #ifndef LIBREPCB_CMDLISTELEMENTREMOVE_H
 #define LIBREPCB_CMDLISTELEMENTREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../../undocommand.h"
 #include "../serializableobjectlist.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdListElementRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdListElementRemove class
  */
 template <typename T, typename P>
-class CmdListElementRemove final : public UndoCommand
-{
-    public:
+class CmdListElementRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdListElementRemove()                                  = delete;
+  CmdListElementRemove(const CmdListElementRemove& other) = delete;
+  CmdListElementRemove(SerializableObjectList<T, P>& list,
+                       const T*                      element) noexcept
+    : UndoCommand(QString(tr("Remove %1")).arg(P::tagname)),
+      mList(list),
+      mElement(element),
+      mIndex(-1) {}
+  ~CmdListElementRemove() noexcept {}
 
-        // Constructors / Destructor
-        CmdListElementRemove() = delete;
-        CmdListElementRemove(const CmdListElementRemove& other) = delete;
-        CmdListElementRemove(SerializableObjectList<T, P>& list, const T* element) noexcept :
-            UndoCommand(QString(tr("Remove %1")).arg(P::tagname)), mList(list),
-            mElement(element), mIndex(-1) {}
-        ~CmdListElementRemove() noexcept {}
+  // Operator Overloadings
+  CmdListElementRemove& operator=(const CmdListElementRemove& rhs) = delete;
 
-        // Operator Overloadings
-        CmdListElementRemove& operator=(const CmdListElementRemove& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override {
+    mIndex = mList.indexOf(mElement);
+    Q_ASSERT(mIndex >= 0);
+    performRedo();  // can throw
+    return true;
+  }
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override { mList.insert(mIndex, mMemorizedElement); }
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override {
+    mMemorizedElement = mList.take(mIndex);
+    Q_ASSERT(mMemorizedElement.get() == mElement);
+  }
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override {
-            mIndex = mList.indexOf(mElement); Q_ASSERT(mIndex >= 0);
-            performRedo(); // can throw
-            return true;
-        }
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override {
-             mList.insert(mIndex, mMemorizedElement);
-        }
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override {
-            mMemorizedElement = mList.take(mIndex);
-            Q_ASSERT(mMemorizedElement.get() == mElement);
-        }
-
-
-    private: // Data
-        SerializableObjectList<T, P>& mList;
-        const T* mElement;
-        std::shared_ptr<T> mMemorizedElement;
-        int mIndex;
+private:  // Data
+  SerializableObjectList<T, P>& mList;
+  const T*                      mElement;
+  std::shared_ptr<T>            mMemorizedElement;
+  int                           mIndex;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDLISTELEMENTREMOVE_H
+#endif  // LIBREPCB_CMDLISTELEMENTREMOVE_H

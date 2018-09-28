@@ -20,108 +20,115 @@
 #ifndef LIBREPCB_LIBRARY_COMPONENTSIGNAL_H
 #define LIBREPCB_LIBRARY_COMPONENTSIGNAL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/signalrole.h>
+ ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/common/signalrole.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentSignal
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentSignal class represents one signal of a component
  */
-class ComponentSignal final : public QObject, public SerializableObject
-{
-        Q_OBJECT
+class ComponentSignal final : public QObject, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentSignal() = delete;
+  ComponentSignal(const ComponentSignal& other) noexcept;
+  ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name) noexcept;
+  explicit ComponentSignal(const SExpression& node);
+  ~ComponentSignal() noexcept;
 
-        // Constructors / Destructor
-        ComponentSignal() = delete;
-        ComponentSignal(const ComponentSignal& other) noexcept;
-        ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name) noexcept;
-        explicit ComponentSignal(const SExpression& node);
-        ~ComponentSignal() noexcept;
+  // Getters
+  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const CircuitIdentifier& getName() const noexcept { return mName; }
+  const SignalRole&        getRole() const noexcept { return mRole; }
+  const QString& getForcedNetName() const noexcept { return mForcedNetName; }
+  bool           isRequired() const noexcept { return mIsRequired; }
+  bool           isNegated() const noexcept { return mIsNegated; }
+  bool           isClock() const noexcept { return mIsClock; }
+  bool           isNetSignalNameForced() const noexcept {
+    return !mForcedNetName.isEmpty();
+  }
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const CircuitIdentifier& getName() const noexcept {return mName;}
-        const SignalRole& getRole() const noexcept {return mRole;}
-        const QString& getForcedNetName() const noexcept {return mForcedNetName;}
-        bool isRequired() const noexcept {return mIsRequired;}
-        bool isNegated() const noexcept {return mIsNegated;}
-        bool isClock() const noexcept {return mIsClock;}
-        bool isNetSignalNameForced() const noexcept {return !mForcedNetName.isEmpty();}
+  // Setters
+  void setName(const CircuitIdentifier& name) noexcept;
+  void setRole(const SignalRole& role) noexcept;
+  void setForcedNetName(const QString& name) noexcept;
+  void setIsRequired(bool required) noexcept;
+  void setIsNegated(bool negated) noexcept;
+  void setIsClock(bool clock) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name) noexcept;
-        void setRole(const SignalRole& role) noexcept;
-        void setForcedNetName(const QString& name) noexcept;
-        void setIsRequired(bool required) noexcept;
-        void setIsNegated(bool negated) noexcept;
-        void setIsClock(bool clock) noexcept;
+  // General Methods
 
-        // General Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool operator==(const ComponentSignal& rhs) const noexcept;
+  bool operator!=(const ComponentSignal& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  ComponentSignal& operator=(const ComponentSignal& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const ComponentSignal& rhs) const noexcept;
-        bool operator!=(const ComponentSignal& rhs) const noexcept {return !(*this == rhs);}
-        ComponentSignal& operator=(const ComponentSignal& rhs) noexcept;
+signals:
+  void edited();
+  void nameChanged(const CircuitIdentifier& name);
+  void roleChanged(const SignalRole& role);
+  void forcedNetNameChanged(const QString& name);
+  void isRequiredChanged(bool required);
+  void isNegatedChanged(bool negated);
+  void isClockChanged(bool clock);
 
-
-    signals:
-        void edited();
-        void nameChanged(const CircuitIdentifier& name);
-        void roleChanged(const SignalRole& role);
-        void forcedNetNameChanged(const QString& name);
-        void isRequiredChanged(bool required);
-        void isNegatedChanged(bool negated);
-        void isClockChanged(bool clock);
-
-
-    private: // Data
-        Uuid mUuid;
-        CircuitIdentifier mName;
-        SignalRole mRole;
-        QString mForcedNetName;
-        bool mIsRequired;
-        bool mIsNegated;
-        bool mIsClock;
+private:  // Data
+  Uuid              mUuid;
+  CircuitIdentifier mName;
+  SignalRole        mRole;
+  QString           mForcedNetName;
+  bool              mIsRequired;
+  bool              mIsNegated;
+  bool              mIsClock;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentSignalList
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct ComponentSignalListNameProvider {static constexpr const char* tagname = "signal";};
-using ComponentSignalList = SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider>;
-using CmdComponentSignalInsert = CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider>;
-using CmdComponentSignalRemove = CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider>;
-using CmdComponentSignalsSwap = CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider>;
+struct ComponentSignalListNameProvider {
+  static constexpr const char* tagname = "signal";
+};
+using ComponentSignalList =
+    SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalInsert =
+    CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalRemove =
+    CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider>;
+using CmdComponentSignalsSwap =
+    CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_COMPONENTSIGNAL_H
+#endif  // LIBREPCB_LIBRARY_COMPONENTSIGNAL_H

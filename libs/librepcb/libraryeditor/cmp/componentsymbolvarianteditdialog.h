@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
@@ -52,9 +53,9 @@ namespace Ui {
 class ComponentSymbolVariantEditDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentSymbolVariantEditDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentSymbolVariantEditDialog class
@@ -62,49 +63,48 @@ class ComponentSymbolVariantEditDialog;
  * @author ubruhin
  * @date 2017-03-18
  */
-class ComponentSymbolVariantEditDialog final : public QDialog
-{
-        Q_OBJECT
+class ComponentSymbolVariantEditDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentSymbolVariantEditDialog() = delete;
+  ComponentSymbolVariantEditDialog(
+      const ComponentSymbolVariantEditDialog& other) = delete;
+  ComponentSymbolVariantEditDialog(
+      const workspace::Workspace&               ws,
+      const librepcb::IF_GraphicsLayerProvider& layerProvider,
+      const Component& cmp, ComponentSymbolVariant& symbVar,
+      QWidget* parent = nullptr) noexcept;
+  ~ComponentSymbolVariantEditDialog() noexcept;
 
-        // Constructors / Destructor
-        ComponentSymbolVariantEditDialog() = delete;
-        ComponentSymbolVariantEditDialog(const ComponentSymbolVariantEditDialog& other) = delete;
-        ComponentSymbolVariantEditDialog(const workspace::Workspace& ws,
-                                         const librepcb::IF_GraphicsLayerProvider& layerProvider,
-                                         const Component& cmp, ComponentSymbolVariant& symbVar,
-                                         QWidget* parent = nullptr) noexcept;
-        ~ComponentSymbolVariantEditDialog() noexcept;
+  // Operator Overloadings
+  ComponentSymbolVariantEditDialog& operator       =(
+      const ComponentSymbolVariantEditDialog& rhs) = delete;
 
-        // Operator Overloadings
-        ComponentSymbolVariantEditDialog& operator=(const ComponentSymbolVariantEditDialog& rhs) = delete;
+private:  // Methods
+  void accept() noexcept override;
+  void updateGraphicsItems() noexcept;
 
+private:  // Data
+  const workspace::Workspace&                          mWorkspace;
+  const IF_GraphicsLayerProvider&                      mLayerProvider;
+  const Component&                                     mComponent;
+  ComponentSymbolVariant&                              mOriginalSymbVar;
+  ComponentSymbolVariant                               mSymbVar;
+  QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
+  QScopedPointer<GraphicsScene>                        mGraphicsScene;
 
-    private: // Methods
-        void accept() noexcept override;
-        void updateGraphicsItems() noexcept;
-
-
-    private: // Data
-        const workspace::Workspace& mWorkspace;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        const Component& mComponent;
-        ComponentSymbolVariant& mOriginalSymbVar;
-        ComponentSymbolVariant mSymbVar;
-        QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-
-        QList<std::shared_ptr<Symbol>> mSymbols;
-        QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;
+  QList<std::shared_ptr<Symbol>>             mSymbols;
+  QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H

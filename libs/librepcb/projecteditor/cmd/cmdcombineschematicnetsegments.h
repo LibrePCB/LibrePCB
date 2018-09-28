@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
 #define LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,47 +38,48 @@ class SI_NetLineAnchor;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCombineSchematicNetSegments
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief This undo command combines two schematic netsegments together
  *
  * @note Both netsegments must have the same netsignal!
  */
-class CmdCombineSchematicNetSegments final : public UndoCommandGroup
-{
-    public:
+class CmdCombineSchematicNetSegments final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdCombineSchematicNetSegments() = delete;
+  CmdCombineSchematicNetSegments(const CmdCombineSchematicNetSegments& other) =
+      delete;
+  CmdCombineSchematicNetSegments(SI_NetSegment&    toBeRemoved,
+                                 SI_NetLineAnchor& oldAnchor,
+                                 SI_NetSegment&    result,
+                                 SI_NetLineAnchor& newAnchor) noexcept;
+  ~CmdCombineSchematicNetSegments() noexcept;
 
-        // Constructors / Destructor
-        CmdCombineSchematicNetSegments() = delete;
-        CmdCombineSchematicNetSegments(const CmdCombineSchematicNetSegments& other) = delete;
-        CmdCombineSchematicNetSegments(SI_NetSegment& toBeRemoved, SI_NetLineAnchor& oldAnchor,
-                                       SI_NetSegment& result, SI_NetLineAnchor& newAnchor) noexcept;
-        ~CmdCombineSchematicNetSegments() noexcept;
+  // Operator Overloadings
+  CmdCombineSchematicNetSegments& operator       =(
+      const CmdCombineSchematicNetSegments& rhs) = delete;
 
-        // Operator Overloadings
-        CmdCombineSchematicNetSegments& operator=(const CmdCombineSchematicNetSegments& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-
-    private: // Methods
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-    private: // Data
-        SI_NetSegment& mOldSegment;
-        SI_NetSegment& mNewSegment;
-        SI_NetLineAnchor& mOldAnchor;
-        SI_NetLineAnchor& mNewAnchor;
+private:  // Data
+  SI_NetSegment&    mOldSegment;
+  SI_NetSegment&    mNewSegment;
+  SI_NetLineAnchor& mOldAnchor;
+  SI_NetLineAnchor& mNewAnchor;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
+#endif  // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H

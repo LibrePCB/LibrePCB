@@ -20,62 +20,59 @@
 #ifndef LIBREPCB_WSI_DEBUGTOOLS_H
 #define LIBREPCB_WSI_DEBUGTOOLS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "wsi_base.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WSI_DebugTools
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The WSI_DebugTools class contains some tools/settings which are useful for debugging
+ * @brief The WSI_DebugTools class contains some tools/settings which are useful
+ * for debugging
  */
-class WSI_DebugTools final : public WSI_Base
-{
-        Q_OBJECT
+class WSI_DebugTools final : public WSI_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WSI_DebugTools()                            = delete;
+  WSI_DebugTools(const WSI_DebugTools& other) = delete;
+  explicit WSI_DebugTools(const SExpression& node);
+  ~WSI_DebugTools() noexcept;
 
-        // Constructors / Destructor
-        WSI_DebugTools() = delete;
-        WSI_DebugTools(const WSI_DebugTools& other) = delete;
-        explicit WSI_DebugTools(const SExpression& node);
-        ~WSI_DebugTools() noexcept;
+  // Getters: Widgets
+  QWidget* getWidget() const noexcept { return mWidget.data(); }
 
-        // Getters: Widgets
-        QWidget* getWidget() const noexcept {return mWidget.data();}
+  // General Methods
+  void restoreDefault() noexcept override;
+  void apply() noexcept override;
+  void revert() noexcept override;
 
-        // General Methods
-        void restoreDefault() noexcept override;
-        void apply() noexcept override;
-        void revert() noexcept override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  WSI_DebugTools& operator=(const WSI_DebugTools& rhs) = delete;
 
-        // Operator Overloadings
-        WSI_DebugTools& operator=(const WSI_DebugTools& rhs) = delete;
-
-
-    private: // Data
-
-        // Widgets
-        QScopedPointer<QWidget> mWidget;
+private:  // Data
+  // Widgets
+  QScopedPointer<QWidget> mWidget;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WSI_DEBUGTOOLS_H
+#endif  // LIBREPCB_WSI_DEBUGTOOLS_H

@@ -17,72 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtypeinductance.h"
+
 #include "attributeunit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeInductance::AttrTypeInductance() noexcept :
-    AttributeType(Type_t::Inductance, "inductance", tr("Inductance"))
-{
-    mDefaultUnit = new AttributeUnit("millihenry", tr("mH"));
+AttrTypeInductance::AttrTypeInductance() noexcept
+  : AttributeType(Type_t::Inductance, "inductance", tr("Inductance")) {
+  mDefaultUnit = new AttributeUnit("millihenry", tr("mH"));
 
-    mAvailableUnits.append(new AttributeUnit("nanohenry",   tr("nH")));
-    mAvailableUnits.append(new AttributeUnit("microhenry",  tr("μH")));
-    mAvailableUnits.append(mDefaultUnit);
-    mAvailableUnits.append(new AttributeUnit("henry",       tr("H")));
+  mAvailableUnits.append(new AttributeUnit("nanohenry", tr("nH")));
+  mAvailableUnits.append(new AttributeUnit("microhenry", tr("μH")));
+  mAvailableUnits.append(mDefaultUnit);
+  mAvailableUnits.append(new AttributeUnit("henry", tr("H")));
 }
 
-AttrTypeInductance::~AttrTypeInductance() noexcept
-{
+AttrTypeInductance::~AttrTypeInductance() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeInductance::isValueValid(const QString& value) const noexcept
-{
-    bool ok = false;
-    value.toFloat(&ok);
-    return (ok || value.isEmpty());
+bool AttrTypeInductance::isValueValid(const QString& value) const noexcept {
+  bool ok = false;
+  value.toFloat(&ok);
+  return (ok || value.isEmpty());
 }
 
-QString AttrTypeInductance::valueFromTr(const QString& value) const noexcept
-{
-    bool ok = false;
-    float v = QLocale().toFloat(value, &ok);
-    if (ok)
-        return QString::number(v);
-    else
-        return QString();
+QString AttrTypeInductance::valueFromTr(const QString& value) const noexcept {
+  bool  ok = false;
+  float v  = QLocale().toFloat(value, &ok);
+  if (ok)
+    return QString::number(v);
+  else
+    return QString();
 }
 
-QString AttrTypeInductance::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    bool ok = false;
-    float v = value.toFloat(&ok);
-    if (ok && unit)
-        return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
-    else if (ok)
-        return QLocale().toString(v);
-    else
-        return QString();
+QString AttrTypeInductance::printableValueTr(const QString&       value,
+                                             const AttributeUnit* unit) const
+    noexcept {
+  bool  ok = false;
+  float v  = value.toFloat(&ok);
+  if (ok && unit)
+    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+  else if (ok)
+    return QLocale().toString(v);
+  else
+    return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SI_BASE_H
 #define LIBREPCB_PROJECT_SI_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -41,80 +42,74 @@ class Circuit;
 class Schematic;
 class SGI_Base;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Schematic Item Base (SI_Base) class
  */
-class SI_Base : public QObject
-{
-        Q_OBJECT
+class SI_Base : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class Type_t {
+    NetSegment,  ///< librepcb#project#SI_NetSegment
+    NetPoint,    ///< librepcb#project#SI_NetPoint
+    NetLine,     ///< librepcb#project#SI_NetLine
+    NetLabel,    ///< librepcb#project#SI_NetLabel
+    Symbol,      ///< librepcb#project#SI_Symbol
+    SymbolPin,   ///< librepcb#project#SI_SymbolPin
+  };
 
-        // Types
-        enum class Type_t {
-            NetSegment, ///< librepcb#project#SI_NetSegment
-            NetPoint,   ///< librepcb#project#SI_NetPoint
-            NetLine,    ///< librepcb#project#SI_NetLine
-            NetLabel,   ///< librepcb#project#SI_NetLabel
-            Symbol,     ///< librepcb#project#SI_Symbol
-            SymbolPin,  ///< librepcb#project#SI_SymbolPin
-        };
+  // Constructors / Destructor
+  SI_Base()                     = delete;
+  SI_Base(const SI_Base& other) = delete;
+  SI_Base(Schematic& schematic) noexcept;
+  virtual ~SI_Base() noexcept;
 
-        // Constructors / Destructor
-        SI_Base() = delete;
-        SI_Base(const SI_Base& other) = delete;
-        SI_Base(Schematic& schematic) noexcept;
-        virtual ~SI_Base() noexcept;
+  // Getters
+  Project&             getProject() const noexcept;
+  Circuit&             getCircuit() const noexcept;
+  Schematic&           getSchematic() const noexcept { return mSchematic; }
+  virtual Type_t       getType() const noexcept            = 0;
+  virtual const Point& getPosition() const noexcept        = 0;
+  virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+  virtual bool         isAddedToSchematic() const noexcept {
+    return mIsAddedToSchematic;
+  }
+  virtual bool isSelected() const noexcept { return mIsSelected; }
 
-        // Getters
-        Project& getProject() const noexcept;
-        Circuit& getCircuit() const noexcept;
-        Schematic& getSchematic() const noexcept {return mSchematic;}
-        virtual Type_t getType() const noexcept = 0;
-        virtual const Point& getPosition() const noexcept = 0;
-        virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
-        virtual bool isAddedToSchematic() const noexcept {return mIsAddedToSchematic;}
-        virtual bool isSelected() const noexcept {return mIsSelected;}
+  // Setters
+  virtual void setSelected(bool selected) noexcept;
 
-        // Setters
-        virtual void setSelected(bool selected) noexcept;
+  // General Methods
+  virtual void addToSchematic()      = 0;
+  virtual void removeFromSchematic() = 0;
 
-        // General Methods
-        virtual void addToSchematic() = 0;
-        virtual void removeFromSchematic() = 0;
+  // Operator Overloadings
+  SI_Base& operator=(const SI_Base& rhs) = delete;
 
-        // Operator Overloadings
-        SI_Base& operator=(const SI_Base& rhs) = delete;
+protected:
+  // General Methods
+  void addToSchematic(SGI_Base* item) noexcept;
+  void removeFromSchematic(SGI_Base* item) noexcept;
 
+protected:
+  Schematic& mSchematic;
 
-    protected:
-
-        // General Methods
-        void addToSchematic(SGI_Base* item) noexcept;
-        void removeFromSchematic(SGI_Base* item) noexcept;
-
-
-    protected:
-
-        Schematic& mSchematic;
-
-
-    private:
-
-        // General Attributes
-        bool mIsAddedToSchematic;
-        bool mIsSelected;
+private:
+  // General Attributes
+  bool mIsAddedToSchematic;
+  bool mIsSelected;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SI_BASE_H
+#endif  // LIBREPCB_PROJECT_SI_BASE_H

@@ -20,123 +20,120 @@
 #ifndef LIBREPCB_FILEDOWNLOAD_H
 #define LIBREPCB_FILEDOWNLOAD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "networkrequestbase.h"
+ ******************************************************************************/
 #include "../fileio/filepath.h"
+#include "networkrequestbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FileDownload
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief This class is used to download a file asynchronously in a separate thread
+ * @brief This class is used to download a file asynchronously in a separate
+ * thread
  *
  * @see librepcb::NetworkRequestBase, librepcb::DownloadManager
  *
  * @author ubruhin
  * @date 2016-09-12
  */
-class FileDownload final : public NetworkRequestBase
-{
-        Q_OBJECT
+class FileDownload final : public NetworkRequestBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  FileDownload()                          = delete;
+  FileDownload(const FileDownload& other) = delete;
 
-        // Constructors / Destructor
-        FileDownload() = delete;
-        FileDownload(const FileDownload& other) = delete;
+  /**
+   * @brief Constructor
+   *
+   * @param url           The URL to the file to download
+   * @param dest          The path to the destination file (must not exist!)
+   */
+  FileDownload(const QUrl& url, const FilePath& dest) noexcept;
 
-        /**
-         * @brief Constructor
-         *
-         * @param url           The URL to the file to download
-         * @param dest          The path to the destination file (must not exist!)
-         */
-        FileDownload(const QUrl& url, const FilePath& dest) noexcept;
+  ~FileDownload() noexcept;
 
-        ~FileDownload() noexcept;
+  // Setters
 
+  /**
+   * @brief Set the expected checksum of the file to download
+   *
+   * If set, the checksum of the downloaded file will be compared with this
+   * checksum. If they differ, the file gets removed and an error will be
+   * reported.
+   *
+   * @param algorithm     The checksum algorithm to be used
+   * @param checksum      The expected checksum of the file to download
+   */
+  void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
+                           const QByteArray&             checksum) noexcept;
 
-        // Setters
+  /**
+   * @brief Set extraction directory of the ZIP file to download
+   *
+   * If set (and valid), the downloaded file (must be a ZIP!) will be extracted
+   * into this directory after downloading it.
+   *
+   * @note The downloaded ZIP file will be removed after extracting it.
+   *
+   * @param dir           Destination directory (may or may not exist)
+   */
+  void setZipExtractionDirectory(const FilePath& dir) noexcept;
 
-        /**
-         * @brief Set the expected checksum of the file to download
-         *
-         * If set, the checksum of the downloaded file will be compared with this
-         * checksum. If they differ, the file gets removed and an error will be reported.
-         *
-         * @param algorithm     The checksum algorithm to be used
-         * @param checksum      The expected checksum of the file to download
-         */
-        void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
-                                 const QByteArray& checksum) noexcept;
+  // Operator Overloadings
+  FileDownload& operator=(const FileDownload& rhs) = delete;
 
-        /**
-         * @brief Set extraction directory of the ZIP file to download
-         *
-         * If set (and valid), the downloaded file (must be a ZIP!) will be extracted into
-         * this directory after downloading it.
-         *
-         * @note The downloaded ZIP file will be removed after extracting it.
-         *
-         * @param dir           Destination directory (may or may not exist)
-         */
-        void setZipExtractionDirectory(const FilePath& dir) noexcept;
+signals:
 
+  /**
+   * @brief File successfully downloaded signal (emited right before
+   * #finished())
+   *
+   * @note The parameter type is specified with the full namespace, reason see
+   * here:
+   *       http://stackoverflow.com/questions/21119397/emitting-signals-with-custom-types-does-not-work
+   */
+  void fileDownloaded(librepcb::FilePath filepath);
 
-        // Operator Overloadings
-        FileDownload& operator=(const FileDownload& rhs) = delete;
+  /**
+   * @brief ZIP file successfully extracted signal (emited right before
+   * #finished())
+   *
+   * @note The parameter type is specified with the full namespace, reason see
+   * here:
+   *       http://stackoverflow.com/questions/21119397/emitting-signals-with-custom-types-does-not-work
+   */
+  void zipFileExtracted(librepcb::FilePath directory);
 
+private:  // Methods
+  void prepareRequest() override;
+  void finalizeRequest() override;
+  void emitSuccessfullyFinishedSignals() noexcept override;
+  void fetchNewData() noexcept override;
 
-    signals:
-
-        /**
-         * @brief File successfully downloaded signal (emited right before #finished())
-         *
-         * @note The parameter type is specified with the full namespace, reason see here:
-         *       http://stackoverflow.com/questions/21119397/emitting-signals-with-custom-types-does-not-work
-         */
-        void fileDownloaded(librepcb::FilePath filepath);
-
-        /**
-         * @brief ZIP file successfully extracted signal (emited right before #finished())
-         *
-         * @note The parameter type is specified with the full namespace, reason see here:
-         *       http://stackoverflow.com/questions/21119397/emitting-signals-with-custom-types-does-not-work
-         */
-        void zipFileExtracted(librepcb::FilePath directory);
-
-
-    private: // Methods
-
-        void prepareRequest() override;
-        void finalizeRequest() override;
-        void emitSuccessfullyFinishedSignals() noexcept override;
-        void fetchNewData() noexcept override;
-
-
-    private: // Data
-
-        FilePath mDestination;
-        QScopedPointer<QSaveFile> mFile;
-        QCryptographicHash::Algorithm mHashAlgorithm;
-        QByteArray mExpectedChecksum;
-        FilePath mExtractZipToDir;
-
+private:  // Data
+  FilePath                      mDestination;
+  QScopedPointer<QSaveFile>     mFile;
+  QCryptographicHash::Algorithm mHashAlgorithm;
+  QByteArray                    mExpectedChecksum;
+  FilePath                      mExtractZipToDir;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_FILEDOWNLOAD_H
+#endif  // LIBREPCB_FILEDOWNLOAD_H

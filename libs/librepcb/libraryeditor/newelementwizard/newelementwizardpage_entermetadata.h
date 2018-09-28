@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_ENTERMETADATA_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_ENTERMETADATA_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_EnterMetadata;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ChooseType
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_EnterMetadata class
@@ -48,53 +49,49 @@ class NewElementWizardPage_EnterMetadata;
  * @author ubruhin
  * @date 2017-03-21
  */
-class NewElementWizardPage_EnterMetadata final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_EnterMetadata final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_EnterMetadata() = delete;
+  NewElementWizardPage_EnterMetadata(
+      const NewElementWizardPage_EnterMetadata& other) = delete;
+  explicit NewElementWizardPage_EnterMetadata(NewElementWizardContext& context,
+                                              QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_EnterMetadata() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_EnterMetadata() = delete;
-        NewElementWizardPage_EnterMetadata(const NewElementWizardPage_EnterMetadata& other) = delete;
-        explicit NewElementWizardPage_EnterMetadata(NewElementWizardContext& context,
-                                                    QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_EnterMetadata() noexcept;
+  // Getters
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_EnterMetadata& operator       =(
+      const NewElementWizardPage_EnterMetadata& rhs) = delete;
 
-        // Getters
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void edtNameTextChanged(const QString& text) noexcept;
+  void edtDescriptionTextChanged() noexcept;
+  void edtKeywordsTextChanged(const QString& text) noexcept;
+  void edtAuthorTextChanged(const QString& text) noexcept;
+  void edtVersionTextChanged(const QString& text) noexcept;
+  void edtCategoryTextChanged(const QString& text) noexcept;
+  void btnChooseCategoryClicked() noexcept;
+  void updateCategoryTreeLabel() noexcept;
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_EnterMetadata& operator=(const NewElementWizardPage_EnterMetadata& rhs) = delete;
-
-
-    private: // Methods
-        void edtNameTextChanged(const QString& text) noexcept;
-        void edtDescriptionTextChanged() noexcept;
-        void edtKeywordsTextChanged(const QString& text) noexcept;
-        void edtAuthorTextChanged(const QString& text) noexcept;
-        void edtVersionTextChanged(const QString& text) noexcept;
-        void edtCategoryTextChanged(const QString& text) noexcept;
-        void btnChooseCategoryClicked() noexcept;
-        void updateCategoryTreeLabel() noexcept;
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_EnterMetadata> mUi;
+private:  // Data
+  NewElementWizardContext&                               mContext;
+  QScopedPointer<Ui::NewElementWizardPage_EnterMetadata> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_ENTERMETADATA_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_ENTERMETADATA_H

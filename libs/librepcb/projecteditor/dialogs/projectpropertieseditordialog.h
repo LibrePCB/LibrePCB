@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
 #define LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -43,49 +43,46 @@ namespace Ui {
 class ProjectPropertiesEditorDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectPropertiesEditorDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectPropertiesEditorDialog class
  */
-class ProjectPropertiesEditorDialog final : public QDialog
-{
-        Q_OBJECT
+class ProjectPropertiesEditorDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ProjectPropertiesEditorDialog() = delete;
+  ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) =
+      delete;
+  ProjectPropertiesEditorDialog(ProjectMetadata& metadata, UndoStack& undoStack,
+                                QWidget* parent) noexcept;
+  ~ProjectPropertiesEditorDialog() noexcept;
 
-        // Constructors / Destructor
-        ProjectPropertiesEditorDialog() = delete;
-        ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) = delete;
-        ProjectPropertiesEditorDialog(ProjectMetadata& metadata, UndoStack& undoStack,
-                                      QWidget* parent) noexcept;
-        ~ProjectPropertiesEditorDialog() noexcept;
+  // Operator Overloadings
+  ProjectPropertiesEditorDialog& operator       =(
+      const ProjectPropertiesEditorDialog& rhs) = delete;
 
+private:  // Methods
+  void keyPressEvent(QKeyEvent* e);
+  void accept();
+  bool applyChanges() noexcept;
 
-        // Operator Overloadings
-        ProjectPropertiesEditorDialog& operator=(const ProjectPropertiesEditorDialog& rhs) = delete;
-
-
-    private: // Methods
-        void keyPressEvent(QKeyEvent* e);
-        void accept();
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        ProjectMetadata& mMetadata;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
+private:  // Data
+  ProjectMetadata&                                  mMetadata;
+  UndoStack&                                        mUndoStack;
+  QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H
+#endif  // LIBREPCB_PROJECT_PROJECTPROPERTIESEDITORDIALOG_H

@@ -20,74 +20,70 @@
 #ifndef LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H
 #define LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class ProjectSettings;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdProjectSettingsChange
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdProjectSettingsChange class
  */
-class CmdProjectSettingsChange final : public UndoCommand
-{
-    public:
+class CmdProjectSettingsChange final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdProjectSettingsChange(ProjectSettings& settings) noexcept;
+  ~CmdProjectSettingsChange() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdProjectSettingsChange(ProjectSettings& settings) noexcept;
-        ~CmdProjectSettingsChange() noexcept;
+  // Setters
+  void restoreDefaults() noexcept;
+  void setLocaleOrder(const QStringList& locales) noexcept;
+  void setNormOrder(const QStringList& norms) noexcept;
 
-        // Setters
-        void restoreDefaults() noexcept;
-        void setLocaleOrder(const QStringList& locales) noexcept;
-        void setNormOrder(const QStringList& norms) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  void applyNewSettings();
+  void applyOldSettings();
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  ProjectSettings& mSettings;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-        void applyNewSettings();
-        void applyOldSettings();
-
-
-        // Attributes from the constructor
-        ProjectSettings& mSettings;
-
-        // Old/New Settings
-        bool mRestoreDefaults;
-        QStringList mLocaleOrderOld;
-        QStringList mLocaleOrderNew;
-        QStringList mNormOrderOld;
-        QStringList mNormOrderNew;
+  // Old/New Settings
+  bool        mRestoreDefaults;
+  QStringList mLocaleOrderOld;
+  QStringList mLocaleOrderNew;
+  QStringList mNormOrderOld;
+  QStringList mNormOrderNew;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H
+#endif  // LIBREPCB_PROJECT_CMDPROJECTSETTINGSCHANGE_H

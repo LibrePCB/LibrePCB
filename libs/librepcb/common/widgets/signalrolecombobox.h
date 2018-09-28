@@ -20,21 +20,22 @@
 #ifndef LIBREPCB_SIGNALROLECOMBOBOX_H
 #define LIBREPCB_SIGNALROLECOMBOBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../signalrole.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SignalRoleComboBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SignalRoleComboBox class
@@ -42,45 +43,38 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-10-20
  */
-class SignalRoleComboBox final : public QWidget
-{
-        Q_OBJECT
+class SignalRoleComboBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit SignalRoleComboBox(QWidget* parent = nullptr) noexcept;
-        SignalRoleComboBox(const SignalRoleComboBox& other) = delete;
-        ~SignalRoleComboBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit SignalRoleComboBox(QWidget* parent = nullptr) noexcept;
+  SignalRoleComboBox(const SignalRoleComboBox& other) = delete;
+  ~SignalRoleComboBox() noexcept;
 
+  // Getters
+  SignalRole getCurrentItem() const noexcept;
 
-        // Getters
-        SignalRole getCurrentItem() const noexcept;
+  // Setters
+  void setCurrentItem(const SignalRole& role) noexcept;
 
+  // Operator Overloadings
+  SignalRoleComboBox& operator=(const SignalRoleComboBox& rhs) = delete;
 
-        // Setters
-        void setCurrentItem(const SignalRole& role) noexcept;
+signals:
+  void currentItemChanged(const SignalRole& role);
 
+private:  // Methods
+  void currentIndexChanged(int index) noexcept;
 
-        // Operator Overloadings
-        SignalRoleComboBox& operator=(const SignalRoleComboBox& rhs) = delete;
-
-
-    signals:
-        void currentItemChanged(const SignalRole& role);
-
-
-    private: // Methods
-        void currentIndexChanged(int index) noexcept;
-
-
-    private: // Data
-        QComboBox* mComboBox;
+private:  // Data
+  QComboBox* mComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SIGNALROLECOMBOBOX_H
+#endif  // LIBREPCB_SIGNALROLECOMBOBOX_H

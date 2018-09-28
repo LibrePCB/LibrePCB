@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SGI_NETLINE_H
 #define LIBREPCB_PROJECT_SGI_NETLINE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "sgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,55 +39,52 @@ namespace project {
 
 class SI_NetLine;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_NetLine
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SGI_NetLine class
  */
-class SGI_NetLine final : public SGI_Base
-{
-    public:
+class SGI_NetLine final : public SGI_Base {
+public:
+  // Constructors / Destructor
+  explicit SGI_NetLine(SI_NetLine& netline) noexcept;
+  ~SGI_NetLine() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_NetLine(SI_NetLine& netline) noexcept;
-        ~SGI_NetLine() noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const { return mBoundingRect; }
+  QPainterPath shape() const { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  SGI_NetLine()                         = delete;
+  SGI_NetLine(const SGI_NetLine& other) = delete;
+  SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // Attributes
+  SI_NetLine&    mNetLine;
+  GraphicsLayer* mLayer;
 
-        // make some methods inaccessible...
-        SGI_NetLine() = delete;
-        SGI_NetLine(const SGI_NetLine& other) = delete;
-        SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-        // Attributes
-        SI_NetLine& mNetLine;
-        GraphicsLayer* mLayer;
-
-        // Cached Attributes
-        QLineF mLineF;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QLineF       mLineF;
+  QRectF       mBoundingRect;
+  QPainterPath mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_NETLINE_H
+#endif  // LIBREPCB_PROJECT_SGI_NETLINE_H

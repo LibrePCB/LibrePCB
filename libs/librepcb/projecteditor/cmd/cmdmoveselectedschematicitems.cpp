@@ -17,129 +17,134 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdmoveselectedschematicitems.h"
+
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetlabelanchorsupdate.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabelanchorsupdate.h>
+#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
+#include <librepcb/project/schematics/items/si_netlabel.h>
+#include <librepcb/project/schematics/items/si_netline.h>
+#include <librepcb/project/schematics/items/si_netpoint.h>
+#include <librepcb/project/schematics/items/si_symbol.h>
+#include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/schematics/schematicselectionquery.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdMoveSelectedSchematicItems::CmdMoveSelectedSchematicItems(Schematic& schematic,
-                                                             const Point& startPos) noexcept :
-    UndoCommandGroup(tr("Move Schematic Elements")),
-    mSchematic(schematic), mStartPos(startPos), mDeltaPos(0, 0)
-{
-    // get all selected items
-    std::unique_ptr<SchematicSelectionQuery> query(mSchematic.createSelectionQuery());
-    query->addSelectedSymbols();
-    query->addSelectedNetPoints();
-    query->addSelectedNetLines();
-    query->addSelectedNetLabels();
-    query->addNetPointsOfNetLines();
+CmdMoveSelectedSchematicItems::CmdMoveSelectedSchematicItems(
+    Schematic& schematic, const Point& startPos) noexcept
+  : UndoCommandGroup(tr("Move Schematic Elements")),
+    mSchematic(schematic),
+    mStartPos(startPos),
+    mDeltaPos(0, 0) {
+  // get all selected items
+  std::unique_ptr<SchematicSelectionQuery> query(
+      mSchematic.createSelectionQuery());
+  query->addSelectedSymbols();
+  query->addSelectedNetPoints();
+  query->addSelectedNetLines();
+  query->addSelectedNetLabels();
+  query->addNetPointsOfNetLines();
 
-    // create undo commands
-    foreach (SI_Symbol* symbol, query->getSymbols()) {
-        CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
-        mSymbolEditCmds.append(cmd);
-    }
-    foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
-        CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
-        mNetPointEditCmds.append(cmd);
-    }
-    foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
-        CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
-        mNetLabelEditCmds.append(cmd);
-    }
+  // create undo commands
+  foreach (SI_Symbol* symbol, query->getSymbols()) {
+    CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
+    mSymbolEditCmds.append(cmd);
+  }
+  foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
+    CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
+    mNetPointEditCmds.append(cmd);
+  }
+  foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
+    CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
+    mNetLabelEditCmds.append(cmd);
+  }
 }
 
-CmdMoveSelectedSchematicItems::~CmdMoveSelectedSchematicItems() noexcept
-{
+CmdMoveSelectedSchematicItems::~CmdMoveSelectedSchematicItems() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdMoveSelectedSchematicItems::setCurrentPosition(const Point& pos) noexcept
-{
-    Point delta = pos - mStartPos;
-    delta.mapToGrid(mSchematic.getGridProperties().getInterval());
+void CmdMoveSelectedSchematicItems::setCurrentPosition(
+    const Point& pos) noexcept {
+  Point delta = pos - mStartPos;
+  delta.mapToGrid(mSchematic.getGridProperties().getInterval());
 
-    if (delta != mDeltaPos) {
-        // move selected elements
-        foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        mDeltaPos = delta;
-    }
-}
-
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
-
-bool CmdMoveSelectedSchematicItems::performExecute()
-{
-    if (mDeltaPos.isOrigin()) {
-        // no movement required --> discard all move commands
-        qDeleteAll(mSymbolEditCmds);    mSymbolEditCmds.clear();
-        qDeleteAll(mNetPointEditCmds);  mNetPointEditCmds.clear();
-        qDeleteAll(mNetLabelEditCmds);  mNetLabelEditCmds.clear();
-        return false;
-    }
-
+  if (delta != mDeltaPos) {
+    // move selected elements
     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
-        appendChild(cmd); // can throw
+      cmd->setDeltaToStartPos(delta, true);
     }
     foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
-        appendChild(cmd); // can throw
+      cmd->setDeltaToStartPos(delta, true);
     }
     foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
-        appendChild(cmd); // can throw
+      cmd->setDeltaToStartPos(delta, true);
     }
-
-    // if something was modified, trigger anchors update of all netlabels
-    if (getChildCount() > 0) {
-        appendChild(new CmdSchematicNetLabelAnchorsUpdate(mSchematic));
-    }
-
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+    mDeltaPos = delta;
+  }
 }
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+bool CmdMoveSelectedSchematicItems::performExecute() {
+  if (mDeltaPos.isOrigin()) {
+    // no movement required --> discard all move commands
+    qDeleteAll(mSymbolEditCmds);
+    mSymbolEditCmds.clear();
+    qDeleteAll(mNetPointEditCmds);
+    mNetPointEditCmds.clear();
+    qDeleteAll(mNetLabelEditCmds);
+    mNetLabelEditCmds.clear();
+    return false;
+  }
+
+  foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+
+  // if something was modified, trigger anchors update of all netlabels
+  if (getChildCount() > 0) {
+    appendChild(new CmdSchematicNetLabelAnchorsUpdate(mSchematic));
+  }
+
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
+}
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

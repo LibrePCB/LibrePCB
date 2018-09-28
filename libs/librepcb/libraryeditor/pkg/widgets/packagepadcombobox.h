@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEPADCOMBOBOX_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEPADCOMBOBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/library/pkg/package.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackagePadComboBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackagePadComboBox class
@@ -44,50 +45,46 @@ namespace editor {
  * @author ubruhin
  * @date 2017-08-16
  */
-class PackagePadComboBox final : public QWidget
-{
-        Q_OBJECT
+class PackagePadComboBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit PackagePadComboBox(QWidget* parent = nullptr) noexcept;
-        PackagePadComboBox(const PackagePadComboBox& other) = delete;
-        ~PackagePadComboBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit PackagePadComboBox(QWidget* parent = nullptr) noexcept;
+  PackagePadComboBox(const PackagePadComboBox& other) = delete;
+  ~PackagePadComboBox() noexcept;
 
-        // Getters
-        PackagePad* getCurrentPad() const noexcept;
+  // Getters
+  PackagePad* getCurrentPad() const noexcept;
 
-        // Setters
-        void setPackage(Package* package, Footprint* footprint = nullptr) noexcept;
-        void setCurrentPad(PackagePad* pad) noexcept;
+  // Setters
+  void setPackage(Package* package, Footprint* footprint = nullptr) noexcept;
+  void setCurrentPad(PackagePad* pad) noexcept;
 
-        // General Methods
-        void updatePads() noexcept;
+  // General Methods
+  void updatePads() noexcept;
 
-        // Operator Overloadings
-        PackagePadComboBox& operator=(const PackagePadComboBox& rhs) = delete;
+  // Operator Overloadings
+  PackagePadComboBox& operator=(const PackagePadComboBox& rhs) = delete;
 
+signals:
+  void currentPadChanged(PackagePad* pad);
 
-    signals:
-        void currentPadChanged(PackagePad* pad);
+private:  // Methods
+  void currentIndexChanged(int index) noexcept;
 
-
-    private: // Methods
-        void currentIndexChanged(int index) noexcept;
-
-
-    private: // Data
-        Package* mPackage;
-        Footprint* mFootprint;
-        QComboBox* mComboBox;
+private:  // Data
+  Package*   mPackage;
+  Footprint* mFootprint;
+  QComboBox* mComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEPADCOMBOBOX_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEPADCOMBOBOX_H

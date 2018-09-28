@@ -17,73 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtyperesistance.h"
+
 #include "attributeunit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeResistance::AttrTypeResistance() noexcept :
-    AttributeType(Type_t::Resistance, "resistance", tr("Resistance"))
-{
-    mDefaultUnit = new AttributeUnit("ohm", tr("Ω"));
+AttrTypeResistance::AttrTypeResistance() noexcept
+  : AttributeType(Type_t::Resistance, "resistance", tr("Resistance")) {
+  mDefaultUnit = new AttributeUnit("ohm", tr("Ω"));
 
-    mAvailableUnits.append(new AttributeUnit("microohm",   tr("μΩ")));
-    mAvailableUnits.append(new AttributeUnit("milliohm",   tr("mΩ")));
-    mAvailableUnits.append(mDefaultUnit);
-    mAvailableUnits.append(new AttributeUnit("kiloohm",    tr("kΩ")));
-    mAvailableUnits.append(new AttributeUnit("megaohm",    tr("MΩ")));
+  mAvailableUnits.append(new AttributeUnit("microohm", tr("μΩ")));
+  mAvailableUnits.append(new AttributeUnit("milliohm", tr("mΩ")));
+  mAvailableUnits.append(mDefaultUnit);
+  mAvailableUnits.append(new AttributeUnit("kiloohm", tr("kΩ")));
+  mAvailableUnits.append(new AttributeUnit("megaohm", tr("MΩ")));
 }
 
-AttrTypeResistance::~AttrTypeResistance() noexcept
-{
+AttrTypeResistance::~AttrTypeResistance() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeResistance::isValueValid(const QString& value) const noexcept
-{
-    bool ok = false;
-    value.toFloat(&ok);
-    return (ok || value.isEmpty());
+bool AttrTypeResistance::isValueValid(const QString& value) const noexcept {
+  bool ok = false;
+  value.toFloat(&ok);
+  return (ok || value.isEmpty());
 }
 
-QString AttrTypeResistance::valueFromTr(const QString& value) const noexcept
-{
-    bool ok = false;
-    float v = QLocale().toFloat(value, &ok);
-    if (ok)
-        return QString::number(v);
-    else
-        return QString();
+QString AttrTypeResistance::valueFromTr(const QString& value) const noexcept {
+  bool  ok = false;
+  float v  = QLocale().toFloat(value, &ok);
+  if (ok)
+    return QString::number(v);
+  else
+    return QString();
 }
 
-QString AttrTypeResistance::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    bool ok = false;
-    float v = value.toFloat(&ok);
-    if (ok && unit)
-        return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
-    else if (ok)
-        return QLocale().toString(v);
-    else
-        return QString();
+QString AttrTypeResistance::printableValueTr(const QString&       value,
+                                             const AttributeUnit* unit) const
+    noexcept {
+  bool  ok = false;
+  float v  = value.toFloat(&ok);
+  if (ok && unit)
+    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+  else if (ok)
+    return QLocale().toString(v);
+  else
+    return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

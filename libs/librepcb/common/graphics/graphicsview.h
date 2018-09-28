@@ -20,113 +20,110 @@
 #ifndef LIBREPCB_GRAPHICSVIEW_H
 #define LIBREPCB_GRAPHICSVIEW_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsViewEventHandler;
 class GraphicsScene;
 class GridProperties;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GraphicsView
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GraphicsView class
  */
-class GraphicsView final : public QGraphicsView
-{
-        Q_OBJECT
+class GraphicsView final : public QGraphicsView {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit GraphicsView(
+      QWidget*                     parent       = nullptr,
+      IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
+  ~GraphicsView() noexcept;
 
-        // Constructors / Destructor
-        explicit GraphicsView(QWidget* parent = nullptr,
-                              IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
-        ~GraphicsView() noexcept;
+  // Getters
+  GraphicsScene*        getScene() const noexcept { return mScene; }
+  QRectF                getVisibleSceneRect() const noexcept;
+  bool                  getUseOpenGl() const noexcept { return mUseOpenGl; }
+  const GridProperties& getGridProperties() const noexcept {
+    return *mGridProperties;
+  }
 
-        // Getters
-        GraphicsScene* getScene() const noexcept {return mScene;}
-        QRectF getVisibleSceneRect() const noexcept;
-        bool getUseOpenGl() const noexcept {return mUseOpenGl;}
-        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
+  // Setters
+  void setUseOpenGl(bool useOpenGl) noexcept;
+  void setGridProperties(const GridProperties& properties) noexcept;
+  void setScene(GraphicsScene* scene) noexcept;
+  void setVisibleSceneRect(const QRectF& rect) noexcept;
+  void setOriginCrossVisible(bool visible) noexcept;
+  void setEventHandlerObject(
+      IF_GraphicsViewEventHandler* eventHandler) noexcept;
 
-        // Setters
-        void setUseOpenGl(bool useOpenGl) noexcept;
-        void setGridProperties(const GridProperties& properties) noexcept;
-        void setScene(GraphicsScene* scene) noexcept;
-        void setVisibleSceneRect(const QRectF& rect) noexcept;
-        void setOriginCrossVisible(bool visible) noexcept;
-        void setEventHandlerObject(IF_GraphicsViewEventHandler* eventHandler) noexcept;
+  // General Methods
+  Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
+                               bool mapToGrid) const noexcept;
+  void  handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
-        // General Methods
-        Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
-                                     bool mapToGrid) const noexcept;
-        void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
+public slots:
 
+  // Public Slots
+  void zoomIn() noexcept;
+  void zoomOut() noexcept;
+  void zoomAll() noexcept;
 
-    public slots:
+signals:
+  /**
+   * @brief Cursor scene position changed signal
+   *
+   * @param pos   The new cursor position (*not* mapped to grid!)
+   */
+  void cursorScenePositionChanged(const Point& pos);
 
-        // Public Slots
-        void zoomIn() noexcept;
-        void zoomOut() noexcept;
-        void zoomAll() noexcept;
+private slots:
 
+  // Private Slots
+  void zoomAnimationValueChanged(const QVariant& value) noexcept;
 
-    signals:
-        /**
-         * @brief Cursor scene position changed signal
-         *
-         * @param pos   The new cursor position (*not* mapped to grid!)
-         */
-        void cursorScenePositionChanged(const Point& pos);
+private:
+  // make some methods inaccessible...
+  GraphicsView(const GraphicsView& other) = delete;
+  GraphicsView& operator=(const GraphicsView& rhs) = delete;
 
+  // Inherited Methods
+  bool eventFilter(QObject* obj, QEvent* event);
+  void drawBackground(QPainter* painter, const QRectF& rect);
+  void drawForeground(QPainter* painter, const QRectF& rect);
 
-    private slots:
+  // General Attributes
+  IF_GraphicsViewEventHandler* mEventHandlerObject;
+  GraphicsScene*               mScene;
+  QVariantAnimation*           mZoomAnimation;
+  GridProperties*              mGridProperties;
+  bool                         mOriginCrossVisible;
+  bool                         mUseOpenGl;
+  volatile bool                mPanningActive;
+  QCursor                      mCursorBeforePanning;
 
-        // Private Slots
-        void zoomAnimationValueChanged(const QVariant& value) noexcept;
-
-
-    private:
-
-        // make some methods inaccessible...
-        GraphicsView(const GraphicsView& other) = delete;
-        GraphicsView& operator=(const GraphicsView& rhs) = delete;
-
-        // Inherited Methods
-        bool eventFilter(QObject* obj, QEvent* event);
-        void drawBackground(QPainter* painter, const QRectF& rect);
-        void drawForeground(QPainter* painter, const QRectF& rect);
-
-
-        // General Attributes
-        IF_GraphicsViewEventHandler* mEventHandlerObject;
-        GraphicsScene* mScene;
-        QVariantAnimation* mZoomAnimation;
-        GridProperties* mGridProperties;
-        bool mOriginCrossVisible;
-        bool mUseOpenGl;
-        volatile bool mPanningActive;
-        QCursor mCursorBeforePanning;
-
-        // Static Variables
-        static constexpr qreal sZoomStepFactor = 1.3;
+  // Static Variables
+  static constexpr qreal sZoomStepFactor = 1.3;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRAPHICSVIEW_H
+#endif  // LIBREPCB_GRAPHICSVIEW_H

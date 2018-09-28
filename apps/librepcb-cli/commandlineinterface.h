@@ -20,14 +20,14 @@
 #ifndef LIBREPCB_CLI_COMMANDLINEINTERFACE_H
 #define LIBREPCB_CLI_COMMANDLINEINTERFACE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Application;
@@ -35,49 +35,44 @@ class FilePath;
 
 namespace cli {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CommandLineInterface
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CommandLineInterface class
  */
-class CommandLineInterface final
-{
-        Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+class CommandLineInterface final {
+  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
 
-    public:
+public:
+  // Constructors / Destructor
+  CommandLineInterface() = delete;
+  explicit CommandLineInterface(const Application& app) noexcept;
+  ~CommandLineInterface() noexcept = default;
 
-        // Constructors / Destructor
-        CommandLineInterface() = delete;
-        explicit CommandLineInterface(const Application& app) noexcept;
-        ~CommandLineInterface() noexcept = default;
+  // General Methods
+  int execute() noexcept;
 
-        // General Methods
-        int execute() noexcept;
+private:  // Methods
+  bool           openProject(const QString& projectFile, bool runErc,
+                             const QStringList& exportSchematicsFiles,
+                             bool exportPcbFabricationData, const QStringList& boards,
+                             bool save) const noexcept;
+  static QString prettyPath(const FilePath& path,
+                            const QString&  style) noexcept;
+  static void    print(const QString& str, int newlines = 1) noexcept;
+  static void    printErr(const QString& str, int newlines = 1) noexcept;
 
-
-    private: // Methods
-        bool openProject(const QString& projectFile,
-                         bool runErc,
-                         const QStringList& exportSchematicsFiles,
-                         bool exportPcbFabricationData,
-                         const QStringList& boards,
-                         bool save) const noexcept;
-        static QString prettyPath(const FilePath& path, const QString& style) noexcept;
-        static void print(const QString& str, int newlines = 1) noexcept;
-        static void printErr(const QString& str, int newlines = 1) noexcept;
-
-
-    private: // Data
-        const Application& mApp;
+private:  // Data
+  const Application& mApp;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace cli
-} // namespace librepcb
+}  // namespace cli
+}  // namespace librepcb
 
-#endif // LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H

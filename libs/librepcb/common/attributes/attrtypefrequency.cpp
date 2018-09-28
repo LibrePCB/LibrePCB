@@ -17,74 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtypefrequency.h"
+
 #include "attributeunit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeFrequency::AttrTypeFrequency() noexcept :
-    AttributeType(Type_t::Frequency, "frequency", tr("Frequency"))
-{
-    mDefaultUnit = new AttributeUnit("hertz", tr("Hz"));
+AttrTypeFrequency::AttrTypeFrequency() noexcept
+  : AttributeType(Type_t::Frequency, "frequency", tr("Frequency")) {
+  mDefaultUnit = new AttributeUnit("hertz", tr("Hz"));
 
-    mAvailableUnits.append(new AttributeUnit("microhertz",   tr("μHz")));
-    mAvailableUnits.append(new AttributeUnit("millihertz",   tr("mHz")));
-    mAvailableUnits.append(mDefaultUnit);
-    mAvailableUnits.append(new AttributeUnit("kilohertz",    tr("kHz")));
-    mAvailableUnits.append(new AttributeUnit("megahertz",    tr("MHz")));
-    mAvailableUnits.append(new AttributeUnit("gigahertz",    tr("GHz")));
+  mAvailableUnits.append(new AttributeUnit("microhertz", tr("μHz")));
+  mAvailableUnits.append(new AttributeUnit("millihertz", tr("mHz")));
+  mAvailableUnits.append(mDefaultUnit);
+  mAvailableUnits.append(new AttributeUnit("kilohertz", tr("kHz")));
+  mAvailableUnits.append(new AttributeUnit("megahertz", tr("MHz")));
+  mAvailableUnits.append(new AttributeUnit("gigahertz", tr("GHz")));
 }
 
-AttrTypeFrequency::~AttrTypeFrequency() noexcept
-{
+AttrTypeFrequency::~AttrTypeFrequency() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeFrequency::isValueValid(const QString& value) const noexcept
-{
-    bool ok = false;
-    value.toFloat(&ok);
-    return (ok || value.isEmpty());
+bool AttrTypeFrequency::isValueValid(const QString& value) const noexcept {
+  bool ok = false;
+  value.toFloat(&ok);
+  return (ok || value.isEmpty());
 }
 
-QString AttrTypeFrequency::valueFromTr(const QString& value) const noexcept
-{
-    bool ok = false;
-    float v = QLocale().toFloat(value, &ok);
-    if (ok)
-        return QString::number(v);
-    else
-        return QString();
+QString AttrTypeFrequency::valueFromTr(const QString& value) const noexcept {
+  bool  ok = false;
+  float v  = QLocale().toFloat(value, &ok);
+  if (ok)
+    return QString::number(v);
+  else
+    return QString();
 }
 
-QString AttrTypeFrequency::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    bool ok = false;
-    float v = value.toFloat(&ok);
-    if (ok && unit)
-        return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
-    else if (ok)
-        return QLocale().toString(v);
-    else
-        return QString();
+QString AttrTypeFrequency::printableValueTr(const QString&       value,
+                                            const AttributeUnit* unit) const
+    noexcept {
+  bool  ok = false;
+  float v  = value.toFloat(&ok);
+  if (ok && unit)
+    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+  else if (ok)
+    return QLocale().toString(v);
+  else
+    return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

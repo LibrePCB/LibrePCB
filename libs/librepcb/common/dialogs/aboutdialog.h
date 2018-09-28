@@ -20,57 +20,57 @@
 #ifndef LIBREPCB_ABOUTDIALOG_H
 #define LIBREPCB_ABOUTDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QDialog>
-#include <QAbstractButton>
-#include <QLabel>
+ ******************************************************************************/
 #include "../version.h"
 
-/*****************************************************************************************
+#include <QAbstractButton>
+#include <QDialog>
+#include <QLabel>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace Ui {
 class AboutDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AboutDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AboutDialog class
  */
-class AboutDialog final : public QDialog
-{
-        Q_OBJECT
+class AboutDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  AboutDialog()                         = delete;
+  AboutDialog(const AboutDialog& other) = delete;
+  explicit AboutDialog(QWidget* parent = nullptr) noexcept;
+  ~AboutDialog() noexcept;
 
-        // Constructors / Destructor
-        AboutDialog() = delete;
-        AboutDialog(const AboutDialog& other) = delete;
-        explicit AboutDialog(QWidget* parent = nullptr) noexcept;
-        ~AboutDialog() noexcept;
+  // Operator Overloadings
+  AboutDialog& operator=(const AboutDialog& rhs) = delete;
 
-        // Operator Overloadings
-        AboutDialog& operator=(const AboutDialog& rhs) = delete;
+private:  // Methods
+  void formatLabelHeading(QLabel* label) noexcept;
+  void formatLabelText(QLabel* label, bool selectable,
+                       bool containsLinks) noexcept;
 
-    private: // Methods
-        void formatLabelHeading(QLabel* label) noexcept;
-        void formatLabelText(QLabel* label, bool selectable, bool containsLinks) noexcept;
-
-    private: // Data
-        QScopedPointer<Ui::AboutDialog> mUi;
+private:  // Data
+  QScopedPointer<Ui::AboutDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ABOUTDIALOG_H
+#endif  // LIBREPCB_ABOUTDIALOG_H

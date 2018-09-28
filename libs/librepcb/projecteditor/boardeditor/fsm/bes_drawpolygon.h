@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H
 #define LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "bes_base.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdPolygonEdit;
@@ -42,81 +44,75 @@ class BI_Polygon;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_DrawPolygon
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_DrawPolygon class
  */
-class BES_DrawPolygon final : public BES_Base
-{
-        Q_OBJECT
+class BES_DrawPolygon final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                           GraphicsView& editorGraphicsView,
+                           UndoStack&    undoStack);
+  ~BES_DrawPolygon() noexcept;
 
-        // Constructors / Destructor
-        explicit BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                                 GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_DrawPolygon() noexcept;
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:  // Methods
+  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
+  ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
+  ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
+  bool       start(Board& board, const Point& pos) noexcept;
+  bool       addSegment(Board& board, const Point& pos) noexcept;
+  bool       abort(bool showErrMsgBox) noexcept;
+  void       updateSegmentPosition(const Point& cursorPos) noexcept;
+  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
+  void       widthComboBoxTextChanged(const QString& width) noexcept;
+  void       filledCheckBoxCheckedChanged(bool checked) noexcept;
+  void       makeSelectedLayerVisible() noexcept;
 
+private:  // Types
+  /// Internal FSM States (substates)
+  enum class SubState {
+    Idle,
+    Positioning,
+  };
 
-    private: // Methods
-        ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-        ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
-        ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
-        bool start(Board& board, const Point& pos) noexcept;
-        bool addSegment(Board& board, const Point& pos) noexcept;
-        bool abort(bool showErrMsgBox) noexcept;
-        void updateSegmentPosition(const Point& cursorPos) noexcept;
-        void layerComboBoxLayerChanged(const QString& layerName) noexcept;
-        void widthComboBoxTextChanged(const QString& width) noexcept;
-        void filledCheckBoxCheckedChanged(bool checked) noexcept;
-        void makeSelectedLayerVisible() noexcept;
+private:  // Data
+  // State
+  SubState          mSubState;
+  GraphicsLayerName mCurrentLayerName;
+  UnsignedLength    mCurrentWidth;
+  bool              mCurrentIsFilled;
+  BI_Polygon*       mCurrentPolygon;
+  CmdPolygonEdit*   mCmdEditCurrentPolygon;
+  Point             mLastSegmentPos;
 
-
-    private: // Types
-
-        /// Internal FSM States (substates)
-        enum class SubState {
-            Idle,
-            Positioning,
-        };
-
-
-    private: // Data
-
-        // State
-        SubState mSubState;
-        GraphicsLayerName mCurrentLayerName;
-        UnsignedLength mCurrentWidth;
-        bool mCurrentIsFilled;
-        BI_Polygon* mCurrentPolygon;
-        CmdPolygonEdit* mCmdEditCurrentPolygon;
-        Point mLastSegmentPos;
-
-        // Widgets for the command toolbar
-        QList<QAction*> mActionSeparators;
-        QLabel* mLayerLabel;
-        GraphicsLayerComboBox* mLayerComboBox;
-        QLabel* mWidthLabel;
-        QComboBox* mWidthComboBox;
-        QLabel* mFillLabel;
-        QCheckBox* mFillCheckBox;
+  // Widgets for the command toolbar
+  QList<QAction*>        mActionSeparators;
+  QLabel*                mLayerLabel;
+  GraphicsLayerComboBox* mLayerComboBox;
+  QLabel*                mWidthLabel;
+  QComboBox*             mWidthComboBox;
+  QLabel*                mFillLabel;
+  QCheckBox*             mFillCheckBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BES_DRAWPOLYGON_H

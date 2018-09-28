@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/library/pkg/footprintpad.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPadShapeSelectorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FootprintPadShapeSelectorWidget class
@@ -44,48 +45,46 @@ namespace editor {
  * @author ubruhin
  * @date 2017-08-17
  */
-class FootprintPadShapeSelectorWidget final : public QWidget
-{
-        Q_OBJECT
+class FootprintPadShapeSelectorWidget final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit FootprintPadShapeSelectorWidget(QWidget* parent = nullptr) noexcept;
-        FootprintPadShapeSelectorWidget(const FootprintPadShapeSelectorWidget& other) = delete;
-        ~FootprintPadShapeSelectorWidget() noexcept;
+public:
+  // Constructors / Destructor
+  explicit FootprintPadShapeSelectorWidget(QWidget* parent = nullptr) noexcept;
+  FootprintPadShapeSelectorWidget(
+      const FootprintPadShapeSelectorWidget& other) = delete;
+  ~FootprintPadShapeSelectorWidget() noexcept;
 
-        // Getters
-        FootprintPad::Shape getCurrentShape() const noexcept;
+  // Getters
+  FootprintPad::Shape getCurrentShape() const noexcept;
 
-        // Setters
-        void setCurrentShape(FootprintPad::Shape shape) noexcept;
+  // Setters
+  void setCurrentShape(FootprintPad::Shape shape) noexcept;
 
-        // Operator Overloadings
-        FootprintPadShapeSelectorWidget& operator=(const FootprintPadShapeSelectorWidget& rhs) = delete;
+  // Operator Overloadings
+  FootprintPadShapeSelectorWidget& operator       =(
+      const FootprintPadShapeSelectorWidget& rhs) = delete;
 
+signals:
+  void currentShapeChanged(FootprintPad::Shape shape);
 
-    signals:
-        void currentShapeChanged(FootprintPad::Shape shape);
+private:  // Methods
+  void btnRoundToggled(bool checked) noexcept;
+  void btnRectToggled(bool checked) noexcept;
+  void btnOctagonToggled(bool checked) noexcept;
 
-
-    private: // Methods
-        void btnRoundToggled(bool checked) noexcept;
-        void btnRectToggled(bool checked) noexcept;
-        void btnOctagonToggled(bool checked) noexcept;
-
-
-    private: // Data
-        QToolButton* mBtnRound;
-        QToolButton* mBtnRect;
-        QToolButton* mBtnOctagon;
+private:  // Data
+  QToolButton* mBtnRound;
+  QToolButton* mBtnRect;
+  QToolButton* mBtnOctagon;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H

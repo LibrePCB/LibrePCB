@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/point.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -38,54 +39,50 @@ class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLineAnchor;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetSegmentAddElements
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetSegmentAddElements class
  */
-class CmdSchematicNetSegmentAddElements final : public UndoCommand
-{
-    public:
+class CmdSchematicNetSegmentAddElements final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept;
+  ~CmdSchematicNetSegmentAddElements() noexcept;
 
-        // Constructors / Destructor
-        CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept;
-        ~CmdSchematicNetSegmentAddElements() noexcept;
+  // General Methods
+  SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
+  SI_NetPoint* addNetPoint(const Point& position);
+  SI_NetLine*  addNetLine(SI_NetLine& netline);
+  SI_NetLine*  addNetLine(SI_NetLineAnchor& startPoint,
+                          SI_NetLineAnchor& endPoint);
 
-        // General Methods
-        SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
-        SI_NetPoint* addNetPoint(const Point& position);
-        SI_NetLine* addNetLine(SI_NetLine& netline);
-        SI_NetLine* addNetLine(SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint);
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        SI_NetSegment& mNetSegment;
-        QList<SI_NetPoint*> mNetPoints;
-        QList<SI_NetLine*> mNetLines;
+  SI_NetSegment&      mNetSegment;
+  QList<SI_NetPoint*> mNetPoints;
+  QList<SI_NetLine*>  mNetLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H

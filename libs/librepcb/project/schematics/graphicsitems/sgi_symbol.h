@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SGI_SYMBOL_H
 #define LIBREPCB_PROJECT_SGI_SYMBOL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "sgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Text;
@@ -43,10 +44,9 @@ namespace project {
 
 class SI_Symbol;
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_Symbol
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SGI_Symbol class
@@ -54,63 +54,58 @@ class SI_Symbol;
  * @author ubruhin
  * @date 2014-08-23
  */
-class SGI_Symbol final : public SGI_Base
-{
-    public:
+class SGI_Symbol final : public SGI_Base {
+public:
+  // Constructors / Destructor
+  explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
+  ~SGI_Symbol() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
-        ~SGI_Symbol() noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+private:
+  // make some methods inaccessible...
+  SGI_Symbol()                        = delete;
+  SGI_Symbol(const SGI_Symbol& other) = delete;
+  SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // Types
 
-        // make some methods inaccessible...
-        SGI_Symbol() = delete;
-        SGI_Symbol(const SGI_Symbol& other) = delete;
-        SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
+  struct CachedTextProperties_t {
+    QString text;
+    int     fontPixelSize;
+    qreal   scaleFactor;
+    bool    rotate180;
+    bool    mirrored;
+    int     flags;
+    QRectF  textRect;  // not scaled
+  };
 
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
+  // General Attributes
+  SI_Symbol&             mSymbol;
+  const library::Symbol& mLibSymbol;
+  QFont                  mFont;
 
-
-        // Types
-
-        struct CachedTextProperties_t {
-            QString text;
-            int fontPixelSize;
-            qreal scaleFactor;
-            bool rotate180;
-            bool mirrored;
-            int flags;
-            QRectF textRect;    // not scaled
-        };
-
-
-        // General Attributes
-        SI_Symbol& mSymbol;
-        const library::Symbol& mLibSymbol;
-        QFont mFont;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
+  // Cached Attributes
+  QRectF                                     mBoundingRect;
+  QPainterPath                               mShape;
+  QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_SYMBOL_H
+#endif  // LIBREPCB_PROJECT_SGI_SYMBOL_H

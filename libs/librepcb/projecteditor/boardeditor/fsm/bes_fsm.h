@@ -20,81 +20,77 @@
 #ifndef LIBREPCB_PROJECT_BES_FSM_H
 #define LIBREPCB_PROJECT_BES_FSM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_FSM
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_FSM (Board Editor Finite State Machine) class
  */
-class BES_FSM final : public BES_Base
-{
-        Q_OBJECT
+class BES_FSM final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  /// FSM States
+  enum State {
+    State_NoState,        ///< no state active
+    State_Select,         ///< @see #project#BES_Select
+    State_DrawTrace,      ///< @see #project#BES_DrawTrace
+    State_DrawPolygon,    ///< @see librepcb#project#BES_DrawPolygon
+    State_AddStrokeText,  ///< @see librepcb#project#BES_AddStrokeText
+    State_AddHole,        ///< @see librepcb#project#BES_AddHole
+    State_AddVia,         ///< @see librepcb#project#BES_AddVia
+    State_AddDevice,      ///< @see librepcb#project#BES_AddDevice
+    State_DrawPlane,      ///< @see #project#BES_DrawPlane
+  };
 
-        /// FSM States
-        enum State {
-            State_NoState,      ///< no state active
-            State_Select,       ///< @see #project#BES_Select
-            State_DrawTrace,    ///< @see #project#BES_DrawTrace
-            State_DrawPolygon,  ///< @see librepcb#project#BES_DrawPolygon
-            State_AddStrokeText,///< @see librepcb#project#BES_AddStrokeText
-            State_AddHole,      ///< @see librepcb#project#BES_AddHole
-            State_AddVia,       ///< @see librepcb#project#BES_AddVia
-            State_AddDevice,    ///< @see librepcb#project#BES_AddDevice
-            State_DrawPlane,    ///< @see #project#BES_DrawPlane
-        };
+  // Constructors / Destructor
+  explicit BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                   GraphicsView& editorGraphicsView,
+                   UndoStack&    undoStack) noexcept;
+  ~BES_FSM() noexcept;
 
+  // Getters
+  State getCurrentState() const noexcept { return mCurrentState; }
 
-        // Constructors / Destructor
-        explicit BES_FSM(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                         GraphicsView& editorGraphicsView, UndoStack& undoStack) noexcept;
-        ~BES_FSM() noexcept;
+  // General Methods
+  bool processEvent(BEE_Base* event, bool deleteEvent = false) noexcept;
 
-        // Getters
-        State getCurrentState() const noexcept {return mCurrentState;}
+signals:
+  void stateChanged(State newState);
 
-        // General Methods
-        bool processEvent(BEE_Base* event, bool deleteEvent = false) noexcept;
+private:
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept;
+  State      processEventFromChild(
+           BEE_Base* event) noexcept;  ///< returns the next state
 
-
-    signals:
-        void stateChanged(State newState);
-
-
-    private:
-
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept;
-        State processEventFromChild(BEE_Base* event) noexcept; ///< returns the next state
-
-
-        // Attributes
-        State mCurrentState;
-        State mPreviousState;
-        QHash<State, BES_Base*> mSubStates;
+  // Attributes
+  State                   mCurrentState;
+  State                   mPreviousState;
+  QHash<State, BES_Base*> mSubStates;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_FSM_H
+#endif  // LIBREPCB_PROJECT_BES_FSM_H

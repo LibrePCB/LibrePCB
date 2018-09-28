@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
 #define LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "sgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -42,9 +43,9 @@ namespace project {
 
 class SI_SymbolPin;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_SymbolPin
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SGI_SymbolPin class
@@ -52,57 +53,53 @@ class SI_SymbolPin;
  * @author ubruhin
  * @date 2014-08-23
  */
-class SGI_SymbolPin final : public SGI_Base
-{
-    public:
+class SGI_SymbolPin final : public SGI_Base {
+public:
+  // Constructors / Destructor
+  explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
+  ~SGI_SymbolPin() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
-        ~SGI_SymbolPin() noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+private:
+  // make some methods inaccessible...
+  SGI_SymbolPin()                           = delete;
+  SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
+  SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // General Attributes
+  SI_SymbolPin&             mPin;
+  const library::SymbolPin& mLibPin;
+  QFont                     mFont;
+  qreal                     mRadiusPx;
 
-        // make some methods inaccessible...
-        SGI_SymbolPin() = delete;
-        SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
-        SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-
-        // General Attributes
-        SI_SymbolPin& mPin;
-        const library::SymbolPin& mLibPin;
-        QFont mFont;
-        qreal mRadiusPx;
-
-        // Cached Attributes
-        bool mIsVisibleJunction;
-        GraphicsLayer* mJunctionLayer;
-        QStaticText mStaticText;
-        bool mRotate180;
-        bool mMirrored;
-        QRectF mBoundingRect;
-        QPointF mTextOrigin;
-        QRectF mTextBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  bool           mIsVisibleJunction;
+  GraphicsLayer* mJunctionLayer;
+  QStaticText    mStaticText;
+  bool           mRotate180;
+  bool           mMirrored;
+  QRectF         mBoundingRect;
+  QPointF        mTextOrigin;
+  QRectF         mTextBoundingRect;
+  QPainterPath   mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
+#endif  // LIBREPCB_PROJECT_SGI_SYMBOLPIN_H

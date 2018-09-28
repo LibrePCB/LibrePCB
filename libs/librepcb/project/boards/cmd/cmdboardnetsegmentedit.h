@@ -20,69 +20,65 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H
 #define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class BI_NetSegment;
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardNetSegmentEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardNetSegmentEdit class
  */
-class CmdBoardNetSegmentEdit final : public UndoCommand
-{
-    public:
+class CmdBoardNetSegmentEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept;
+  ~CmdBoardNetSegmentEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept;
-        ~CmdBoardNetSegmentEdit() noexcept;
+  // Setters
+  void setNetSignal(NetSignal& netsignal) noexcept;
 
-        // Setters
-        void setNetSignal(NetSignal& netsignal) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  BI_NetSegment& mNetSegment;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        BI_NetSegment& mNetSegment;
-
-        // General Attributes
-        NetSignal* mOldNetSignal;
-        NetSignal* mNewNetSignal;
+  // General Attributes
+  NetSignal* mOldNetSignal;
+  NetSignal* mNewNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTEDIT_H

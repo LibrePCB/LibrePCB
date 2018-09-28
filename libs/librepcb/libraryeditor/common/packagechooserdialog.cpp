@@ -17,181 +17,191 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "packagechooserdialog.h"
+
+#include "ui_packagechooserdialog.h"
+
+#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/workspace/library/cat/categorytreemodel.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include "packagechooserdialog.h"
-#include "ui_packagechooserdialog.h"
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
-#include <librepcb/workspace/workspace.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/library/cat/categorytreemodel.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackageChooserDialog::PackageChooserDialog(const workspace::Workspace& ws,
-        const IF_GraphicsLayerProvider* layerProvider, QWidget* parent) noexcept :
-    QDialog(parent), mWorkspace(ws), mLayerProvider(layerProvider),
-    mUi(new Ui::PackageChooserDialog)
-{
-    mUi->setupUi(this);
+PackageChooserDialog::PackageChooserDialog(
+    const workspace::Workspace&     ws,
+    const IF_GraphicsLayerProvider* layerProvider, QWidget* parent) noexcept
+  : QDialog(parent),
+    mWorkspace(ws),
+    mLayerProvider(layerProvider),
+    mUi(new Ui::PackageChooserDialog) {
+  mUi->setupUi(this);
 
-    mGraphicsScene.reset(new GraphicsScene());
-    mUi->graphicsView->setBackgroundBrush(Qt::black);
-    mUi->graphicsView->setScene(mGraphicsScene.data());
+  mGraphicsScene.reset(new GraphicsScene());
+  mUi->graphicsView->setBackgroundBrush(Qt::black);
+  mUi->graphicsView->setScene(mGraphicsScene.data());
 
-    mCategoryTreeModel.reset(new workspace::PackageCategoryTreeModel(mWorkspace.getLibraryDb(),
-                                                                     localeOrder()));
-    mUi->treeCategories->setModel(mCategoryTreeModel.data());
-    connect(mUi->treeCategories->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &PackageChooserDialog::treeCategories_currentItemChanged);
-    connect(mUi->listPackages, &QListWidget::currentItemChanged,
-            this, &PackageChooserDialog::listPackages_currentItemChanged);
-    connect(mUi->listPackages, &QListWidget::itemDoubleClicked,
-            this, &PackageChooserDialog::listPackages_itemDoubleClicked);
+  mCategoryTreeModel.reset(new workspace::PackageCategoryTreeModel(
+      mWorkspace.getLibraryDb(), localeOrder()));
+  mUi->treeCategories->setModel(mCategoryTreeModel.data());
+  connect(mUi->treeCategories->selectionModel(),
+          &QItemSelectionModel::currentChanged, this,
+          &PackageChooserDialog::treeCategories_currentItemChanged);
+  connect(mUi->listPackages, &QListWidget::currentItemChanged, this,
+          &PackageChooserDialog::listPackages_currentItemChanged);
+  connect(mUi->listPackages, &QListWidget::itemDoubleClicked, this,
+          &PackageChooserDialog::listPackages_itemDoubleClicked);
 
-    setSelectedPackage(tl::nullopt);
+  setSelectedPackage(tl::nullopt);
 }
 
-PackageChooserDialog::~PackageChooserDialog() noexcept
-{
-    setSelectedPackage(tl::nullopt);
+PackageChooserDialog::~PackageChooserDialog() noexcept {
+  setSelectedPackage(tl::nullopt);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackageChooserDialog::treeCategories_currentItemChanged(const QModelIndex& current,
-                                                            const QModelIndex& previous) noexcept
-{
-    Q_UNUSED(previous);
-    setSelectedCategory(Uuid::tryFromString(current.data(Qt::UserRole).toString()));
+void PackageChooserDialog::treeCategories_currentItemChanged(
+    const QModelIndex& current, const QModelIndex& previous) noexcept {
+  Q_UNUSED(previous);
+  setSelectedCategory(
+      Uuid::tryFromString(current.data(Qt::UserRole).toString()));
 }
 
-void PackageChooserDialog::listPackages_currentItemChanged(QListWidgetItem* current,
-                                                         QListWidgetItem* previous) noexcept
-{
-    Q_UNUSED(previous);
-    if (current) {
-        setSelectedPackage(Uuid::tryFromString(current->data(Qt::UserRole).toString()));
-    } else {
-        setSelectedPackage(tl::nullopt);
-    }
-}
-
-void PackageChooserDialog::listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept
-{
-    if (item) {
-        setSelectedPackage(Uuid::tryFromString(item->data(Qt::UserRole).toString()));
-        accept();
-    }
-}
-
-void PackageChooserDialog::setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept
-{
-    if (uuid && (uuid == mSelectedCategoryUuid)) return;
-
+void PackageChooserDialog::listPackages_currentItemChanged(
+    QListWidgetItem* current, QListWidgetItem* previous) noexcept {
+  Q_UNUSED(previous);
+  if (current) {
+    setSelectedPackage(
+        Uuid::tryFromString(current->data(Qt::UserRole).toString()));
+  } else {
     setSelectedPackage(tl::nullopt);
-    mUi->listPackages->clear();
+  }
+}
 
-    mSelectedCategoryUuid = uuid;
+void PackageChooserDialog::listPackages_itemDoubleClicked(
+    QListWidgetItem* item) noexcept {
+  if (item) {
+    setSelectedPackage(
+        Uuid::tryFromString(item->data(Qt::UserRole).toString()));
+    accept();
+  }
+}
 
+void PackageChooserDialog::setSelectedCategory(
+    const tl::optional<Uuid>& uuid) noexcept {
+  if (uuid && (uuid == mSelectedCategoryUuid)) return;
+
+  setSelectedPackage(tl::nullopt);
+  mUi->listPackages->clear();
+
+  mSelectedCategoryUuid = uuid;
+
+  try {
+    QSet<Uuid> packages =
+        mWorkspace.getLibraryDb().getPackagesByCategory(uuid);  // can throw
+    foreach (const Uuid& pkgUuid, packages) {
+      try {
+        FilePath fp =
+            mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+        QString name;
+        mWorkspace.getLibraryDb().getElementTranslations<Package>(
+            fp, localeOrder(),
+            &name);  // can throw
+        QListWidgetItem* item = new QListWidgetItem(name);
+        item->setData(Qt::UserRole, pkgUuid.toStr());
+        mUi->listPackages->addItem(item);
+      } catch (const Exception& e) {
+        continue;  // should we do something here?
+      }
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
+  }
+}
+
+void PackageChooserDialog::setSelectedPackage(
+    const tl::optional<Uuid>& uuid) noexcept {
+  QString uuidStr = "00000000-0000-0000-0000-000000000000";
+  QString name, desc;
+  mSelectedPackageUuid = uuid;
+
+  if (uuid) {
     try {
-        QSet<Uuid> packages = mWorkspace.getLibraryDb().getPackagesByCategory(uuid); // can throw
-        foreach (const Uuid& pkgUuid, packages) {
-            try {
-                FilePath fp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid); // can throw
-                QString name;
-                mWorkspace.getLibraryDb().getElementTranslations<Package>(fp, localeOrder(),
-                                                                          &name); // can throw
-                QListWidgetItem* item = new QListWidgetItem(name);
-                item->setData(Qt::UserRole, pkgUuid.toStr());
-                mUi->listPackages->addItem(item);
-            } catch (const Exception& e) {
-                continue; // should we do something here?
-            }
-        }
+      uuidStr = uuid->toStr();
+      mPackageFilePath =
+          mWorkspace.getLibraryDb().getLatestPackage(*uuid);  // can throw
+      mWorkspace.getLibraryDb().getElementTranslations<Package>(
+          mPackageFilePath, localeOrder(), &name, &desc);  // can throw
     } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not load packages"), e.getMsg());
+      QMessageBox::critical(this, tr("Could not load package metadata"),
+                            e.getMsg());
     }
+  }
+
+  mUi->lblPackageUuid->setText(uuidStr);
+  mUi->lblPackageName->setText(name);
+  mUi->lblPackageDescription->setText(desc);
+  updatePreview();
 }
 
-void PackageChooserDialog::setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept
-{
-    QString uuidStr = "00000000-0000-0000-0000-000000000000";
-    QString name, desc;
-    mSelectedPackageUuid = uuid;
+void PackageChooserDialog::updatePreview() noexcept {
+  mGraphicsItem.reset();
+  mPackage.reset();
 
-    if (uuid) {
-        try {
-            uuidStr = uuid->toStr();
-            mPackageFilePath = mWorkspace.getLibraryDb().getLatestPackage(*uuid); // can throw
-            mWorkspace.getLibraryDb().getElementTranslations<Package>(
-                mPackageFilePath, localeOrder(), &name, &desc); // can throw
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Could not load package metadata"), e.getMsg());
-        }
+  if (mPackageFilePath.isValid() && mLayerProvider) {
+    try {
+      mPackage.reset(new Package(mPackageFilePath, true));  // can throw
+      if (mPackage->getFootprints().count() > 0) {
+        mGraphicsItem.reset(new FootprintPreviewGraphicsItem(
+            *mLayerProvider, QStringList(), *mPackage->getFootprints().first(),
+            mPackage.data()));
+        mGraphicsScene->addItem(*mGraphicsItem);
+        mUi->graphicsView->zoomAll();
+      }
+    } catch (const Exception& e) {
+      // ignore errors...
     }
-
-    mUi->lblPackageUuid->setText(uuidStr);
-    mUi->lblPackageName->setText(name);
-    mUi->lblPackageDescription->setText(desc);
-    updatePreview();
+  }
 }
 
-void PackageChooserDialog::updatePreview() noexcept
-{
-    mGraphicsItem.reset();
-    mPackage.reset();
-
-    if (mPackageFilePath.isValid() && mLayerProvider) {
-        try {
-            mPackage.reset(new Package(mPackageFilePath, true)); // can throw
-            if (mPackage->getFootprints().count() > 0) {
-                mGraphicsItem.reset(new FootprintPreviewGraphicsItem(*mLayerProvider,
-                    QStringList(), *mPackage->getFootprints().first(), mPackage.data()));
-                mGraphicsScene->addItem(*mGraphicsItem);
-                mUi->graphicsView->zoomAll();
-            }
-        } catch (const Exception& e) {
-            // ignore errors...
-        }
-    }
+void PackageChooserDialog::accept() noexcept {
+  if (!mSelectedPackageUuid) {
+    QMessageBox::information(this, tr("Invalid Selection"),
+                             tr("Please select a package."));
+    return;
+  }
+  QDialog::accept();
 }
 
-void PackageChooserDialog::accept() noexcept
-{
-    if (!mSelectedPackageUuid) {
-        QMessageBox::information(this, tr("Invalid Selection"), tr("Please select a package."));
-        return;
-    }
-    QDialog::accept();
+const QStringList& PackageChooserDialog::localeOrder() const noexcept {
+  return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
 }
 
-const QStringList& PackageChooserDialog::localeOrder() const noexcept
-{
-    return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
-}
-
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

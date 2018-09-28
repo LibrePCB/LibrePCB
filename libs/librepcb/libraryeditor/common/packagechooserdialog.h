@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -51,9 +52,9 @@ namespace Ui {
 class PackageChooserDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageChooserDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageChooserDialog class
@@ -61,61 +62,59 @@ class PackageChooserDialog;
  * @author ubruhin
  * @date 2017-03-25
  */
-class PackageChooserDialog final : public QDialog
-{
-        Q_OBJECT
+class PackageChooserDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageChooserDialog()                                  = delete;
+  PackageChooserDialog(const PackageChooserDialog& other) = delete;
+  PackageChooserDialog(const workspace::Workspace&     ws,
+                       const IF_GraphicsLayerProvider* layerProvider,
+                       QWidget* parent = nullptr) noexcept;
+  ~PackageChooserDialog() noexcept;
 
-        // Constructors / Destructor
-        PackageChooserDialog() = delete;
-        PackageChooserDialog(const PackageChooserDialog& other) = delete;
-        PackageChooserDialog(const workspace::Workspace& ws,
-                             const IF_GraphicsLayerProvider* layerProvider,
-                             QWidget* parent = nullptr) noexcept;
-        ~PackageChooserDialog() noexcept;
+  // Getters
+  const tl::optional<Uuid>& getSelectedPackageUuid() const noexcept {
+    return mSelectedPackageUuid;
+  }
 
-        // Getters
-        const tl::optional<Uuid>& getSelectedPackageUuid() const noexcept {return mSelectedPackageUuid;}
+  // Operator Overloadings
+  PackageChooserDialog& operator=(const PackageChooserDialog& rhs) = delete;
 
-        // Operator Overloadings
-        PackageChooserDialog& operator=(const PackageChooserDialog& rhs) = delete;
+private:  // Methods
+  void treeCategories_currentItemChanged(const QModelIndex& current,
+                                         const QModelIndex& previous) noexcept;
+  void listPackages_currentItemChanged(QListWidgetItem* current,
+                                       QListWidgetItem* previous) noexcept;
+  void listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept;
+  void updatePreview() noexcept;
+  void accept() noexcept override;
+  const QStringList& localeOrder() const noexcept;
 
+private:  // Data
+  const workspace::Workspace&              mWorkspace;
+  const IF_GraphicsLayerProvider*          mLayerProvider;
+  QScopedPointer<Ui::PackageChooserDialog> mUi;
+  QScopedPointer<QAbstractItemModel>       mCategoryTreeModel;
+  tl::optional<Uuid>                       mSelectedCategoryUuid;
+  tl::optional<Uuid>                       mSelectedPackageUuid;
 
-    private: // Methods
-        void treeCategories_currentItemChanged(const QModelIndex& current,
-                                               const QModelIndex& previous) noexcept;
-        void listPackages_currentItemChanged(QListWidgetItem* current,
-                                             QListWidgetItem* previous) noexcept;
-        void listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-        void setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept;
-        void updatePreview() noexcept;
-        void accept() noexcept override;
-        const QStringList& localeOrder() const noexcept;
-
-
-    private: // Data
-        const workspace::Workspace& mWorkspace;
-        const IF_GraphicsLayerProvider* mLayerProvider;
-        QScopedPointer<Ui::PackageChooserDialog> mUi;
-        QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        tl::optional<Uuid> mSelectedCategoryUuid;
-        tl::optional<Uuid> mSelectedPackageUuid;
-
-        // preview
-        FilePath mPackageFilePath;
-        QScopedPointer<Package> mPackage;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QScopedPointer<FootprintPreviewGraphicsItem> mGraphicsItem;
+  // preview
+  FilePath                                     mPackageFilePath;
+  QScopedPointer<Package>                      mPackage;
+  QScopedPointer<GraphicsScene>                mGraphicsScene;
+  QScopedPointer<FootprintPreviewGraphicsItem> mGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H

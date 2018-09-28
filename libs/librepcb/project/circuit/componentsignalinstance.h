@@ -20,18 +20,20 @@
 #ifndef LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
 #define LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../erc/if_ercmsgprovider.h"
-#include <librepcb/common/fileio/serializableobject.h>
+
 #include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class DomElement;
@@ -49,115 +51,117 @@ class NetSignal;
 class Circuit;
 class ErcMsg;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentSignalInstance
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentSignalInstance class
  */
-class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider,
-                                      public SerializableObject
-{
-        Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
+class ComponentSignalInstance final : public QObject,
+                                      public IF_ErcMsgProvider,
+                                      public SerializableObject {
+  Q_OBJECT
+  DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentSignalInstance()                                     = delete;
+  ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
+  explicit ComponentSignalInstance(Circuit&           circuit,
+                                   ComponentInstance& cmpInstance,
+                                   const SExpression& node);
+  explicit ComponentSignalInstance(Circuit&                        circuit,
+                                   ComponentInstance&              cmpInstance,
+                                   const library::ComponentSignal& cmpSignal,
+                                   NetSignal* netsignal = nullptr);
+  ~ComponentSignalInstance() noexcept;
 
-        // Constructors / Destructor
-        ComponentSignalInstance() = delete;
-        ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
-        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const SExpression& node);
-        explicit ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                                         const library::ComponentSignal& cmpSignal,
-                                         NetSignal* netsignal = nullptr);
-        ~ComponentSignalInstance() noexcept;
+  // Getters
+  Circuit& getCircuit() const noexcept { return mCircuit; }
+  const library::ComponentSignal& getCompSignal() const noexcept {
+    return *mComponentSignal;
+  }
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
+  bool       isNetSignalNameForced() const noexcept;
+  QString    getForcedNetSignalName() const noexcept;
+  const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {
+    return mRegisteredSymbolPins;
+  }
+  const QList<BI_FootprintPad*>& getRegisteredFootprintPads() const noexcept {
+    return mRegisteredFootprintPads;
+  }
+  int  getRegisteredElementsCount() const noexcept;
+  bool isUsed() const noexcept { return (getRegisteredElementsCount() > 0); }
+  bool arePinsOrPadsUsed() const noexcept;
 
-        // Getters
-        Circuit& getCircuit() const noexcept {return mCircuit;}
-        const library::ComponentSignal& getCompSignal() const noexcept {return *mComponentSignal;}
-        NetSignal* getNetSignal() const noexcept {return mNetSignal;}
-        bool isNetSignalNameForced() const noexcept;
-        QString getForcedNetSignalName() const noexcept;
-        const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {return mRegisteredSymbolPins;}
-        const QList<BI_FootprintPad*>& getRegisteredFootprintPads() const noexcept {return mRegisteredFootprintPads;}
-        int getRegisteredElementsCount() const noexcept;
-        bool isUsed() const noexcept {return (getRegisteredElementsCount() > 0);}
-        bool arePinsOrPadsUsed() const noexcept;
+  // Setters
 
+  /**
+   * @brief (Re-)Connect/Disconnect this component signal to/from a circuit's
+   * netsignal
+   *
+   * @warning This method must always be called from inside an UndoCommand!
+   *
+   * @param netsignal     - (Re-)Connect: A Pointer to the new netsignal
+   *                      - Disconnect: 0
+   *
+   * @throw Exception     This method throws an exception in case of an error
+   */
+  void setNetSignal(NetSignal* netsignal);
 
-        // Setters
+  // General Methods
+  void addToCircuit();
+  void removeFromCircuit();
+  void registerSymbolPin(SI_SymbolPin& pin);
+  void unregisterSymbolPin(SI_SymbolPin& pin);
+  void registerFootprintPad(BI_FootprintPad& pad);
+  void unregisterFootprintPad(BI_FootprintPad& pad);
 
-        /**
-         * @brief (Re-)Connect/Disconnect this component signal to/from a circuit's netsignal
-         *
-         * @warning This method must always be called from inside an UndoCommand!
-         *
-         * @param netsignal     - (Re-)Connect: A Pointer to the new netsignal
-         *                      - Disconnect: 0
-         *
-         * @throw Exception     This method throws an exception in case of an error
-         */
-        void setNetSignal(NetSignal* netsignal);
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
+  // Operator Overloadings
+  ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) =
+      delete;
 
-        // General Methods
-        void addToCircuit();
-        void removeFromCircuit();
-        void registerSymbolPin(SI_SymbolPin& pin);
-        void unregisterSymbolPin(SI_SymbolPin& pin);
-        void registerFootprintPad(BI_FootprintPad& pad);
-        void unregisterFootprintPad(BI_FootprintPad& pad);
+signals:
+  void netSignalChanged(NetSignal* from, NetSignal* to);
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+private slots:
 
-        // Operator Overloadings
-        ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) = delete;
+  void netSignalNameChanged(const CircuitIdentifier& newName) noexcept;
+  void updateErcMessages() noexcept;
 
+private:
+  void init();
+  bool checkAttributesValidity() const noexcept;
 
-    signals:
-        void netSignalChanged(NetSignal* from, NetSignal* to);
+  // General
+  Circuit&                        mCircuit;
+  ComponentInstance&              mComponentInstance;
+  const library::ComponentSignal* mComponentSignal;
+  bool                            mIsAddedToCircuit;
 
+  // Attributes
+  NetSignal* mNetSignal;
 
-    private slots:
+  // Registered Elements
+  QList<SI_SymbolPin*>    mRegisteredSymbolPins;
+  QList<BI_FootprintPad*> mRegisteredFootprintPads;
 
-        void netSignalNameChanged(const CircuitIdentifier& newName) noexcept;
-        void updateErcMessages() noexcept;
-
-
-    private:
-
-        void init();
-        bool checkAttributesValidity() const noexcept;
-
-
-        // General
-        Circuit& mCircuit;
-        ComponentInstance& mComponentInstance;
-        const library::ComponentSignal* mComponentSignal;
-        bool mIsAddedToCircuit;
-
-        // Attributes
-        NetSignal* mNetSignal;
-
-        // Registered Elements
-        QList<SI_SymbolPin*> mRegisteredSymbolPins;
-        QList<BI_FootprintPad*> mRegisteredFootprintPads;
-
-        // ERC Messages
-        /// @brief The ERC message for an unconnected required component signal
-        QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
-        /// @brief The ERC message for a global net signal name mismatch
-        QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;
+  // ERC Messages
+  /// @brief The ERC message for an unconnected required component signal
+  QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
+  /// @brief The ERC message for a global net signal name mismatch
+  QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
+#endif  // LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H

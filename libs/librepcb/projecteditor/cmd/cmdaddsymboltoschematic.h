@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
 #define LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -49,54 +50,51 @@ class SI_Symbol;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdAddSymbolToSchematic
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdAddSymbolToSchematic class
  */
-class CmdAddSymbolToSchematic final : public UndoCommandGroup
-{
-    public:
+class CmdAddSymbolToSchematic final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdAddSymbolToSchematic(workspace::Workspace& workspace, Schematic& schematic,
+                          ComponentInstance& cmpInstance,
+                          const Uuid&        symbolItem,
+                          const Point&       position = Point(),
+                          const Angle&       angle    = Angle()) noexcept;
+  ~CmdAddSymbolToSchematic() noexcept;
 
-        // Constructors / Destructor
-        CmdAddSymbolToSchematic(workspace::Workspace& workspace, Schematic& schematic,
-                                ComponentInstance& cmpInstance, const Uuid& symbolItem,
-                                const Point& position = Point(), const Angle& angle = Angle()) noexcept;
-        ~CmdAddSymbolToSchematic() noexcept;
+  // Getters
+  SI_Symbol* getSymbolInstance() const noexcept { return mSymbolInstance; }
 
-        // Getters
-        SI_Symbol* getSymbolInstance() const noexcept {return mSymbolInstance;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
+  // Attributes from the constructor
+  workspace::Workspace& mWorkspace;
+  Schematic&            mSchematic;
+  ComponentInstance&    mComponentInstance;
+  Uuid                  mSymbolItemUuid;
+  Point                 mPosition;
+  Angle                 mAngle;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        workspace::Workspace& mWorkspace;
-        Schematic& mSchematic;
-        ComponentInstance& mComponentInstance;
-        Uuid mSymbolItemUuid;
-        Point mPosition;
-        Angle mAngle;
-
-        SI_Symbol* mSymbolInstance; // the created symbol instance
+  SI_Symbol* mSymbolInstance;  // the created symbol instance
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
+#endif  // LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H

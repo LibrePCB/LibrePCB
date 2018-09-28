@@ -17,44 +17,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "componentcategory.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 ComponentCategory::ComponentCategory(const Uuid& uuid, const Version& version,
-        const QString& author, const ElementName& name_en_US, const QString& description_en_US,
-        const QString& keywords_en_US) :
-    LibraryCategory(getShortElementName(), getLongElementName(), uuid, version, author,
-                    name_en_US, description_en_US, keywords_en_US)
-{
+                                     const QString&     author,
+                                     const ElementName& name_en_US,
+                                     const QString&     description_en_US,
+                                     const QString&     keywords_en_US)
+  : LibraryCategory(getShortElementName(), getLongElementName(), uuid, version,
+                    author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-ComponentCategory::ComponentCategory(const FilePath& elementDirectory, bool readOnly) :
-    LibraryCategory(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
-{
-    cleanupAfterLoadingElementFromFile();
+ComponentCategory::ComponentCategory(const FilePath& elementDirectory,
+                                     bool            readOnly)
+  : LibraryCategory(elementDirectory, getShortElementName(),
+                    getLongElementName(), readOnly) {
+  cleanupAfterLoadingElementFromFile();
 }
 
-ComponentCategory::~ComponentCategory() noexcept
-{
+ComponentCategory::~ComponentCategory() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

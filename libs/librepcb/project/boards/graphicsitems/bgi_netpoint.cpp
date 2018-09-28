@@ -17,107 +17,107 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "bgi_netpoint.h"
+
+#include "../../circuit/netsignal.h"
+#include "../../project.h"
+#include "../board.h"
+#include "../boardlayerstack.h"
+#include "../items/bi_netpoint.h"
+
+#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
-#include <QPrinter>
-#include "bgi_netpoint.h"
-#include "../items/bi_netpoint.h"
-#include "../board.h"
-#include "../../project.h"
-#include "../boardlayerstack.h"
-#include "../../circuit/netsignal.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept :
-    BGI_Base(), mNetPoint(netpoint)
-{
-    updateCacheAndRepaint();
+BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept
+  : BGI_Base(), mNetPoint(netpoint) {
+  updateCacheAndRepaint();
 }
 
-BGI_NetPoint::~BGI_NetPoint() noexcept
-{
+BGI_NetPoint::~BGI_NetPoint() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool BGI_NetPoint::isSelectable() const noexcept
-{
-    GraphicsLayer* layer = mNetPoint.getLayerOfLines();
-    return layer ? layer->isVisible() : false;
+bool BGI_NetPoint::isSelectable() const noexcept {
+  GraphicsLayer* layer = mNetPoint.getLayerOfLines();
+  return layer ? layer->isVisible() : false;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_NetPoint::updateCacheAndRepaint() noexcept
-{
-    setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
+void BGI_NetPoint::updateCacheAndRepaint() noexcept {
+  setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
 
-    prepareGeometryChange();
+  prepareGeometryChange();
 
-    // set Z value
-    GraphicsLayer* layer = mNetPoint.getLayerOfLines();
-    setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
+  // set Z value
+  GraphicsLayer* layer = mNetPoint.getLayerOfLines();
+  setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
 
-    qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
-    mBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
+  qreal radius  = mNetPoint.getMaxLineWidth()->toPx() / 2;
+  mBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);
 
-    update();
+  update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+void BGI_NetPoint::paint(QPainter*                       painter,
+                         const QStyleOptionGraphicsItem* option,
+                         QWidget*                        widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
 
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignalOfNetSegment().isHighlighted();
+  bool highlight = mNetPoint.isSelected() ||
+                   mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
 #ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(boundingRect());
-    }
+  GraphicsLayer* layer =
+      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+  Q_ASSERT(layer);
+  if (layer->isVisible()) {
+    // draw bounding rect
+    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(boundingRect());
+  }
 #else
-    Q_UNUSED(highlight);
-    Q_UNUSED(painter);
+  Q_UNUSED(highlight);
+  Q_UNUSED(painter);
 #endif
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept
-{
-    return mNetPoint.getBoard().getLayerStack().getLayer(name);
+GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept {
+  return mNetPoint.getBoard().getLayerStack().getLayer(name);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

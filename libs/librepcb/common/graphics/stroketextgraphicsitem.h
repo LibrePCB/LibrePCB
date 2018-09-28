@@ -20,80 +20,83 @@
 #ifndef LIBREPCB_STROKETEXTGRAPHICSITEM_H
 #define LIBREPCB_STROKETEXTGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "../geometry/stroketext.h"
+#include "primitivepathgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "primitivepathgraphicsitem.h"
-#include "../geometry/stroketext.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class StrokeTextGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The StrokeTextGraphicsItem class is the graphical representation of a
  *        librepcb::StrokeText
  */
 class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem,
-                                     public IF_StrokeTextObserver
-{
-    public:
+                                     public IF_StrokeTextObserver {
+public:
+  // Constructors / Destructor
+  StrokeTextGraphicsItem()                                    = delete;
+  StrokeTextGraphicsItem(const StrokeTextGraphicsItem& other) = delete;
+  StrokeTextGraphicsItem(StrokeText& text, const IF_GraphicsLayerProvider& lp,
+                         QGraphicsItem* parent = nullptr) noexcept;
+  ~StrokeTextGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        StrokeTextGraphicsItem() = delete;
-        StrokeTextGraphicsItem(const StrokeTextGraphicsItem& other) = delete;
-        StrokeTextGraphicsItem(StrokeText& text, const IF_GraphicsLayerProvider& lp,
-                               QGraphicsItem* parent = nullptr) noexcept;
-        ~StrokeTextGraphicsItem() noexcept;
+  // Getters
+  StrokeText& getText() noexcept { return mText; }
 
-        // Getters
-        StrokeText& getText() noexcept {return mText;}
+  // Inherited from QGraphicsItem
+  QPainterPath shape() const noexcept override;
 
-        // Inherited from QGraphicsItem
-        QPainterPath shape() const noexcept override;
+  // Operator Overloadings
+  StrokeTextGraphicsItem& operator=(const StrokeTextGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        StrokeTextGraphicsItem& operator=(const StrokeTextGraphicsItem& rhs) = delete;
+private:  // Methods
+  void strokeTextLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept override;
+  void strokeTextTextChanged(const QString& newText) noexcept override;
+  void strokeTextPositionChanged(const Point& newPos) noexcept override;
+  void strokeTextRotationChanged(const Angle& newRot) noexcept override;
+  void strokeTextHeightChanged(
+      const PositiveLength& newHeight) noexcept override;
+  void strokeTextStrokeWidthChanged(
+      const UnsignedLength& newStrokeWidth) noexcept override;
+  void strokeTextLetterSpacingChanged(
+      const StrokeTextSpacing& spacing) noexcept override;
+  void strokeTextLineSpacingChanged(
+      const StrokeTextSpacing& spacing) noexcept override;
+  void     strokeTextAlignChanged(const Alignment& newAlign) noexcept override;
+  void     strokeTextMirroredChanged(bool mirrored) noexcept override;
+  void     strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override;
+  void     strokeTextPathsChanged(const QVector<Path>& paths) noexcept override;
+  void     updateLayer(const GraphicsLayerName& layerName) noexcept;
+  void     updateTransform() noexcept;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant&    value) noexcept override;
 
-
-    private: // Methods
-        void strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
-        void strokeTextTextChanged(const QString& newText) noexcept override;
-        void strokeTextPositionChanged(const Point& newPos) noexcept override;
-        void strokeTextRotationChanged(const Angle& newRot) noexcept override;
-        void strokeTextHeightChanged(const PositiveLength& newHeight) noexcept override;
-        void strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept override;
-        void strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
-        void strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept override;
-        void strokeTextAlignChanged(const Alignment& newAlign) noexcept override;
-        void strokeTextMirroredChanged(bool mirrored) noexcept override;
-        void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override;
-        void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override;
-        void updateLayer(const GraphicsLayerName& layerName) noexcept;
-        void updateTransform() noexcept;
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) noexcept override;
-
-
-    private: // Data
-        StrokeText& mText;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+private:  // Data
+  StrokeText&                             mText;
+  const IF_GraphicsLayerProvider&         mLayerProvider;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_STROKETEXTGRAPHICSITEM_H
+#endif  // LIBREPCB_STROKETEXTGRAPHICSITEM_H

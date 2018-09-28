@@ -17,133 +17,127 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "categorytreemodel.h"
+
 #include "../workspacelibrarydb.h"
 #include "categorytreeitem.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-CategoryTreeModel<ElementType>::CategoryTreeModel(const WorkspaceLibraryDb& library,
-                                                  const QStringList& localeOrder) noexcept :
-    QAbstractItemModel(nullptr)
-{
-    mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder, nullptr, tl::nullopt));
+CategoryTreeModel<ElementType>::CategoryTreeModel(
+    const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept
+  : QAbstractItemModel(nullptr) {
+  mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder,
+                                                    nullptr, tl::nullopt));
 }
 
 template <typename ElementType>
-CategoryTreeModel<ElementType>::~CategoryTreeModel() noexcept
-{
+CategoryTreeModel<ElementType>::~CategoryTreeModel() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-CategoryTreeItem<ElementType>* CategoryTreeModel<ElementType>::getItem(const QModelIndex& index) const
-{
-    if (index.isValid())
-    {
-        CategoryTreeItem<ElementType>* item = static_cast<CategoryTreeItem<ElementType>*>(
-                                                  index.internalPointer());
-        if (item)
-            return item;
-    }
-    return mRootItem.data();
+CategoryTreeItem<ElementType>* CategoryTreeModel<ElementType>::getItem(
+    const QModelIndex& index) const {
+  if (index.isValid()) {
+    CategoryTreeItem<ElementType>* item =
+        static_cast<CategoryTreeItem<ElementType>*>(index.internalPointer());
+    if (item) return item;
+  }
+  return mRootItem.data();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-int CategoryTreeModel<ElementType>::columnCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent);
-    return mRootItem->getColumnCount();
+int CategoryTreeModel<ElementType>::columnCount(
+    const QModelIndex& parent) const {
+  Q_UNUSED(parent);
+  return mRootItem->getColumnCount();
 }
 
 template <typename ElementType>
-int CategoryTreeModel<ElementType>::rowCount(const QModelIndex& parent) const
-{
-    CategoryTreeItem<ElementType>* parentItem = getItem(parent);
-    return parentItem->getChildCount();
+int CategoryTreeModel<ElementType>::rowCount(const QModelIndex& parent) const {
+  CategoryTreeItem<ElementType>* parentItem = getItem(parent);
+  return parentItem->getChildCount();
 }
 
 template <typename ElementType>
-QModelIndex CategoryTreeModel<ElementType>::index(int row, int column, const QModelIndex& parent) const
-{
-    if (parent.isValid() && parent.column() != 0)
-        return QModelIndex();
+QModelIndex CategoryTreeModel<ElementType>::index(
+    int row, int column, const QModelIndex& parent) const {
+  if (parent.isValid() && parent.column() != 0) return QModelIndex();
 
-    CategoryTreeItem<ElementType>* parentItem = getItem(parent);
-    CategoryTreeItem<ElementType>* childItem = parentItem->getChild(row);
+  CategoryTreeItem<ElementType>* parentItem = getItem(parent);
+  CategoryTreeItem<ElementType>* childItem  = parentItem->getChild(row);
 
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
+  if (childItem)
+    return createIndex(row, column, childItem);
+  else
+    return QModelIndex();
 }
 
 template <typename ElementType>
-QModelIndex CategoryTreeModel<ElementType>::parent(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
+QModelIndex CategoryTreeModel<ElementType>::parent(
+    const QModelIndex& index) const {
+  if (!index.isValid()) return QModelIndex();
 
-    CategoryTreeItem<ElementType>* childItem = getItem(index);
-    CategoryTreeItem<ElementType>* parentItem = childItem->getParent();
+  CategoryTreeItem<ElementType>* childItem  = getItem(index);
+  CategoryTreeItem<ElementType>* parentItem = childItem->getParent();
 
-    if (parentItem == mRootItem.data())
-        return QModelIndex();
+  if (parentItem == mRootItem.data()) return QModelIndex();
 
-    return createIndex(parentItem->getChildNumber(), 0, parentItem);
+  return createIndex(parentItem->getChildNumber(), 0, parentItem);
 }
 
 template <typename ElementType>
-QVariant CategoryTreeModel<ElementType>::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal))
-    {
-        switch (section)
-        {
-            case 0:
-                return QString("Category");
-        }
+QVariant CategoryTreeModel<ElementType>::headerData(int             section,
+                                                    Qt::Orientation orientation,
+                                                    int role) const {
+  if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal)) {
+    switch (section) {
+      case 0:
+        return QString("Category");
     }
-    return QVariant();
+  }
+  return QVariant();
 }
 
 template <typename ElementType>
-QVariant CategoryTreeModel<ElementType>::data(const QModelIndex& index, int role) const
-{
-    CategoryTreeItem<ElementType>* item = getItem(index);
-    return item->data(role);
+QVariant CategoryTreeModel<ElementType>::data(const QModelIndex& index,
+                                              int                role) const {
+  CategoryTreeItem<ElementType>* item = getItem(index);
+  return item->data(role);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Explicit template instantiations
- ****************************************************************************************/
+ ******************************************************************************/
 template class CategoryTreeModel<library::ComponentCategory>;
 template class CategoryTreeModel<library::PackageCategory>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

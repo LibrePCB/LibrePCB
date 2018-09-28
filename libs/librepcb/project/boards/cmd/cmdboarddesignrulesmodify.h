@@ -20,66 +20,63 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H
 #define LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include <librepcb/common/boarddesignrules.h>
+#include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardDesignRulesModify
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardDesignRulesModify class
  */
-class CmdBoardDesignRulesModify final : public UndoCommand
-{
-    public:
+class CmdBoardDesignRulesModify final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardDesignRulesModify()                                       = delete;
+  CmdBoardDesignRulesModify(const CmdBoardDesignRulesModify& other) = delete;
+  CmdBoardDesignRulesModify(Board&                  board,
+                            const BoardDesignRules& newRules) noexcept;
+  ~CmdBoardDesignRulesModify() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardDesignRulesModify() = delete;
-        CmdBoardDesignRulesModify(const CmdBoardDesignRulesModify& other) = delete;
-        CmdBoardDesignRulesModify(Board& board, const BoardDesignRules& newRules) noexcept;
-        ~CmdBoardDesignRulesModify() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Attributes from the constructor
+  Board& mBoard;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Attributes from the constructor
-        Board& mBoard;
-
-        // General Attributes
-        BoardDesignRules mOldRules;
-        BoardDesignRules mNewRules;
+  // General Attributes
+  BoardDesignRules mOldRules;
+  BoardDesignRules mNewRules;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDDESIGNRULESMODIFY_H

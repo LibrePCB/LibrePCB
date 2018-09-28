@@ -17,70 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ercmsg.h"
-#include "ercmsglist.h"
-#include "../project.h"
 
-/*****************************************************************************************
+#include "../project.h"
+#include "ercmsglist.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ErcMsg::ErcMsg(Project& project, const IF_ErcMsgProvider& owner, const QString& ownerKey,
-               const QString& msgKey, ErcMsgType_t msgType, const QString& msg) :
-    mProject(project), mErcMsgList(project.getErcMsgList()), mOwner(owner),
-    mOwnerKey(ownerKey), mMsgKey(msgKey), mMsgType(msgType), mMsg(msg),
-    mIsVisible(false), mIsIgnored(false)
-{
+ErcMsg::ErcMsg(Project& project, const IF_ErcMsgProvider& owner,
+               const QString& ownerKey, const QString& msgKey,
+               ErcMsgType_t msgType, const QString& msg)
+  : mProject(project),
+    mErcMsgList(project.getErcMsgList()),
+    mOwner(owner),
+    mOwnerKey(ownerKey),
+    mMsgKey(msgKey),
+    mMsgType(msgType),
+    mMsg(msg),
+    mIsVisible(false),
+    mIsIgnored(false) {
 }
 
-ErcMsg::~ErcMsg() noexcept
-{
-    setVisible(false);
+ErcMsg::~ErcMsg() noexcept {
+  setVisible(false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ErcMsg::setMsg(const QString& msg) noexcept
-{
-    if (msg == mMsg) return;
-    mMsg = msg;
-    if (mIsVisible) mErcMsgList.update(this);
+void ErcMsg::setMsg(const QString& msg) noexcept {
+  if (msg == mMsg) return;
+  mMsg = msg;
+  if (mIsVisible) mErcMsgList.update(this);
 }
 
-void ErcMsg::setVisible(bool visible) noexcept
-{
-    if (visible == mIsVisible) return;
-    mIsVisible = visible;
-    mIsIgnored = false; // changing the visibility will always reset the ignore flag!
+void ErcMsg::setVisible(bool visible) noexcept {
+  if (visible == mIsVisible) return;
+  mIsVisible = visible;
+  mIsIgnored =
+      false;  // changing the visibility will always reset the ignore flag!
 
-    if (mIsVisible)
-        mErcMsgList.add(this);
-    else
-        mErcMsgList.remove(this);
+  if (mIsVisible)
+    mErcMsgList.add(this);
+  else
+    mErcMsgList.remove(this);
 }
 
-void ErcMsg::setIgnored(bool ignored) noexcept
-{
-    if (ignored == mIsIgnored) return;
-    mIsIgnored = ignored;
-    mErcMsgList.update(this);
+void ErcMsg::setIgnored(bool ignored) noexcept {
+  if (ignored == mIsIgnored) return;
+  mIsIgnored = ignored;
+  mErcMsgList.update(this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

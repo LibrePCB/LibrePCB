@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_PACKAGEPADS_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_PACKAGEPADS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_PackagePads;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_PackagePads
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_PackagePads class
@@ -48,46 +49,42 @@ class NewElementWizardPage_PackagePads;
  * @author ubruhin
  * @date 2017-03-27
  */
-class NewElementWizardPage_PackagePads final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_PackagePads final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_PackagePads() = delete;
+  NewElementWizardPage_PackagePads(
+      const NewElementWizardPage_PackagePads& other) = delete;
+  explicit NewElementWizardPage_PackagePads(NewElementWizardContext& context,
+                                            QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_PackagePads() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_PackagePads() = delete;
-        NewElementWizardPage_PackagePads(const NewElementWizardPage_PackagePads& other) = delete;
-        explicit NewElementWizardPage_PackagePads(NewElementWizardContext& context,
-                                                  QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_PackagePads() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_PackagePads& operator       =(
+      const NewElementWizardPage_PackagePads& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_PackagePads& operator=(const NewElementWizardPage_PackagePads& rhs) = delete;
-
-
-    private: // Methods
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_PackagePads> mUi;
+private:  // Data
+  NewElementWizardContext&                             mContext;
+  QScopedPointer<Ui::NewElementWizardPage_PackagePads> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_PACKAGEPADS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_PACKAGEPADS_H

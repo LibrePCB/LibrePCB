@@ -20,14 +20,14 @@
 #ifndef LIBREPCB_PROJECT_ERCMSG_H
 #define LIBREPCB_PROJECT_ERCMSG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -35,78 +35,74 @@ class IF_ErcMsgProvider;
 class ErcMsgList;
 class Project;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ErcMsg
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The ErcMsg class represents a message in the ERC (Electrical Rule Check) list
+ * @brief The ErcMsg class represents a message in the ERC (Electrical Rule
+ * Check) list
  */
-class ErcMsg
-{
-    public:
+class ErcMsg {
+public:
+  /// ERC message types
+  enum class ErcMsgType_t {
+    CircuitError = 0,  ///< example: two output pins in the same net
+    CircuitWarning,    ///< example: nets with only one pin
+    SchematicError,    ///< example: unplaced required symbols
+    SchematicWarning,  ///< example: unplaced optional symbols
+    BoardError,        ///< example: unplaced footprints
+    BoardWarning,      ///< example: ???
+    _Count             ///< count of message types
+  };
 
-        /// ERC message types
-        enum class ErcMsgType_t {
-            CircuitError = 0,   ///< example: two output pins in the same net
-            CircuitWarning,     ///< example: nets with only one pin
-            SchematicError,     ///< example: unplaced required symbols
-            SchematicWarning,   ///< example: unplaced optional symbols
-            BoardError,         ///< example: unplaced footprints
-            BoardWarning,       ///< example: ???
-            _Count              ///< count of message types
-        };
+  // Constructors / Destructor
+  explicit ErcMsg(Project& project, const IF_ErcMsgProvider& owner,
+                  const QString& ownerKey, const QString& msgKey,
+                  ErcMsg::ErcMsgType_t msgType, const QString& msg = QString());
+  virtual ~ErcMsg() noexcept;
 
-        // Constructors / Destructor
-        explicit ErcMsg(Project& project, const IF_ErcMsgProvider& owner,
-                        const QString& ownerKey, const QString& msgKey,
-                        ErcMsg::ErcMsgType_t msgType, const QString& msg = QString());
-        virtual ~ErcMsg() noexcept;
+  // Getters
+  const IF_ErcMsgProvider& getOwner() const noexcept { return mOwner; }
+  const QString&           getOwnerKey() const noexcept { return mOwnerKey; }
+  const QString&           getMsgKey() const noexcept { return mMsgKey; }
+  ErcMsgType_t             getMsgType() const noexcept { return mMsgType; }
+  const QString&           getMsg() const noexcept { return mMsg; }
+  bool                     isVisible() const noexcept { return mIsVisible; }
+  bool                     isIgnored() const noexcept { return mIsIgnored; }
 
-        // Getters
-        const IF_ErcMsgProvider& getOwner() const noexcept {return mOwner;}
-        const QString& getOwnerKey() const noexcept {return mOwnerKey;}
-        const QString& getMsgKey() const noexcept {return mMsgKey;}
-        ErcMsgType_t getMsgType() const noexcept {return mMsgType;}
-        const QString& getMsg() const noexcept {return mMsg;}
-        bool isVisible() const noexcept {return mIsVisible;}
-        bool isIgnored() const noexcept {return mIsIgnored;}
+  // Setters
+  void setMsg(const QString& msg) noexcept;
+  void setVisible(bool visible) noexcept;
+  void setIgnored(bool ignored) noexcept;
 
-        // Setters
-        void setMsg(const QString& msg) noexcept;
-        void setVisible(bool visible) noexcept;
-        void setIgnored(bool ignored) noexcept;
+private:
+  // make some methods inaccessible...
+  ErcMsg();
+  ErcMsg(const ErcMsg& other);
+  ErcMsg& operator=(const ErcMsg& rhs);
 
+  // General
+  Project&    mProject;
+  ErcMsgList& mErcMsgList;
 
-    private:
+  // Attributes
+  const IF_ErcMsgProvider& mOwner;
+  QString                  mOwnerKey;
+  QString                  mMsgKey;
+  ErcMsgType_t             mMsgType;
+  QString                  mMsg;
 
-        // make some methods inaccessible...
-        ErcMsg();
-        ErcMsg(const ErcMsg& other);
-        ErcMsg& operator=(const ErcMsg& rhs);
-
-
-        // General
-        Project& mProject;
-        ErcMsgList& mErcMsgList;
-
-        // Attributes
-        const IF_ErcMsgProvider& mOwner;
-        QString mOwnerKey;
-        QString mMsgKey;
-        ErcMsgType_t mMsgType;
-        QString mMsg;
-
-        // Misc
-        bool mIsVisible;
-        bool mIsIgnored;
+  // Misc
+  bool mIsVisible;
+  bool mIsIgnored;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_ERCMSG_H
+#endif  // LIBREPCB_PROJECT_ERCMSG_H

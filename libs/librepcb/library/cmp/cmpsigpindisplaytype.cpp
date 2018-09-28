@@ -17,87 +17,87 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmpsigpindisplaytype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmpSigPinDisplayType::CmpSigPinDisplayType() noexcept :
-    CmpSigPinDisplayType(componentSignal())
-{
+CmpSigPinDisplayType::CmpSigPinDisplayType() noexcept
+  : CmpSigPinDisplayType(componentSignal()) {
 }
 
-CmpSigPinDisplayType::CmpSigPinDisplayType(const QString& type, const QString& name) noexcept :
-    mDisplayType(type), mName(name)
-{
+CmpSigPinDisplayType::CmpSigPinDisplayType(const QString& type,
+                                           const QString& name) noexcept
+  : mDisplayType(type), mName(name) {
 }
 
-CmpSigPinDisplayType::CmpSigPinDisplayType(const CmpSigPinDisplayType& other) noexcept :
-    mDisplayType(other.mDisplayType), mName(other.mName)
-{
+CmpSigPinDisplayType::CmpSigPinDisplayType(
+    const CmpSigPinDisplayType& other) noexcept
+  : mDisplayType(other.mDisplayType), mName(other.mName) {
 }
 
-CmpSigPinDisplayType::~CmpSigPinDisplayType() noexcept
-{
+CmpSigPinDisplayType::~CmpSigPinDisplayType() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmpSigPinDisplayType::operator==(const CmpSigPinDisplayType& rhs) const noexcept
-{
-    return mDisplayType == rhs.mDisplayType;
+bool CmpSigPinDisplayType::operator==(const CmpSigPinDisplayType& rhs) const
+    noexcept {
+  return mDisplayType == rhs.mDisplayType;
 }
 
-CmpSigPinDisplayType& CmpSigPinDisplayType::operator=(const CmpSigPinDisplayType& rhs) noexcept
-{
-    mDisplayType = rhs.mDisplayType;
-    mName = rhs.mName;
-    return *this;
+CmpSigPinDisplayType& CmpSigPinDisplayType::operator=(
+    const CmpSigPinDisplayType& rhs) noexcept {
+  mDisplayType = rhs.mDisplayType;
+  mName        = rhs.mName;
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(const QString& str)
-{
-    foreach (const CmpSigPinDisplayType& type, getAllTypes()) {
-        if (type.toString() == str) {
-            return type;
-        }
+const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(
+    const QString& str) {
+  foreach (const CmpSigPinDisplayType& type, getAllTypes()) {
+    if (type.toString() == str) {
+      return type;
     }
-    throw RuntimeError(__FILE__, __LINE__,
-        QString(tr("Invalid component signal pin display type: \"%1\"")).arg(str));
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString(tr("Invalid component signal pin display type: \"%1\""))
+          .arg(str));
 }
 
-const QList<CmpSigPinDisplayType>& CmpSigPinDisplayType::getAllTypes() noexcept
-{
-    static QList<CmpSigPinDisplayType> list{
-        none(),
-        pinName(),
-        componentSignal(),
-        netSignal(),
-    };
-    return list;
+const QList<CmpSigPinDisplayType>&
+CmpSigPinDisplayType::getAllTypes() noexcept {
+  static QList<CmpSigPinDisplayType> list{
+      none(),
+      pinName(),
+      componentSignal(),
+      netSignal(),
+  };
+  return list;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
-
+}  // namespace library
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_VIA_H
 #define LIBREPCB_PROJECT_BGI_VIA_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,65 +39,61 @@ namespace project {
 
 class BI_Via;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_Via
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_Via class
  */
-class BGI_Via final : public BGI_Base
-{
-    public:
+class BGI_Via final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_Via(BI_Via& via) noexcept;
+  ~BGI_Via() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_Via(BI_Via& via) noexcept;
-        ~BGI_Via() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  BGI_Via()                     = delete;
+  BGI_Via(const BGI_Via& other) = delete;
+  BGI_Via& operator=(const BGI_Via& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // General Attributes
+  BI_Via&        mVia;
+  GraphicsLayer* mViaLayer;
+  GraphicsLayer* mTopStopMaskLayer;
+  GraphicsLayer* mBottomStopMaskLayer;
 
-        // make some methods inaccessible...
-        BGI_Via() = delete;
-        BGI_Via(const BGI_Via& other) = delete;
-        BGI_Via& operator=(const BGI_Via& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-
-        // General Attributes
-        BI_Via& mVia;
-        GraphicsLayer* mViaLayer;
-        GraphicsLayer* mTopStopMaskLayer;
-        GraphicsLayer* mBottomStopMaskLayer;
-
-        // Cached Attributes
-        bool mDrawStopMask;
-        QPainterPath mShape;
-        QPainterPath mCopper;
-        QPainterPath mStopMask;
-        QPainterPath mCreamMask;
-        QRectF mBoundingRect;
-        QFont mFont;
+  // Cached Attributes
+  bool         mDrawStopMask;
+  QPainterPath mShape;
+  QPainterPath mCopper;
+  QPainterPath mStopMask;
+  QPainterPath mCreamMask;
+  QRectF       mBoundingRect;
+  QFont        mFont;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_VIA_H
+#endif  // LIBREPCB_PROJECT_BGI_VIA_H

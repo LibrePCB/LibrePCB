@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BI_BASE_H
 #define LIBREPCB_PROJECT_BI_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -41,88 +42,80 @@ class Circuit;
 class Board;
 class BGI_Base;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Board Item Base (BI_Base) class
  */
-class BI_Base : public QObject
-{
-        Q_OBJECT
+class BI_Base : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class Type_t {
+    NetSegment,    ///< librepcb#project#BI_NetSegment
+    NetPoint,      ///< librepcb#project#BI_NetPoint
+    NetLine,       ///< librepcb#project#BI_NetLine
+    Via,           ///< librepcb#project#BI_Via
+    Device,        ///< librepcb#project#BI_Device
+    Footprint,     ///< librepcb#project#BI_Footprint
+    FootprintPad,  ///< librepcb#project#BI_FootprintPad
+    Polygon,       ///< librepcb#project#BI_Polygon
+    StrokeText,    ///< librepcb#project#BI_StrokeText
+    Hole,          ///< librepcb#project#BI_Hole
+    Plane,         ///< librepcb#project#BI_Plane
+    AirWire,       ///< librepcb#project#BI_AirWire
+  };
 
-        // Types
-        enum class Type_t {
-            NetSegment,     ///< librepcb#project#BI_NetSegment
-            NetPoint,       ///< librepcb#project#BI_NetPoint
-            NetLine,        ///< librepcb#project#BI_NetLine
-            Via,            ///< librepcb#project#BI_Via
-            Device,         ///< librepcb#project#BI_Device
-            Footprint,      ///< librepcb#project#BI_Footprint
-            FootprintPad,   ///< librepcb#project#BI_FootprintPad
-            Polygon,        ///< librepcb#project#BI_Polygon
-            StrokeText,     ///< librepcb#project#BI_StrokeText
-            Hole,           ///< librepcb#project#BI_Hole
-            Plane,          ///< librepcb#project#BI_Plane
-            AirWire,        ///< librepcb#project#BI_AirWire
-        };
+  // Constructors / Destructor
+  BI_Base()                     = delete;
+  BI_Base(const BI_Base& other) = delete;
+  BI_Base(Board& board) noexcept;
+  virtual ~BI_Base() noexcept;
 
-        // Constructors / Destructor
-        BI_Base() = delete;
-        BI_Base(const BI_Base& other) = delete;
-        BI_Base(Board& board) noexcept;
-        virtual ~BI_Base() noexcept;
+  // Getters
+  Project&             getProject() const noexcept;
+  Circuit&             getCircuit() const noexcept;
+  Board&               getBoard() const noexcept { return mBoard; }
+  virtual Type_t       getType() const noexcept            = 0;
+  virtual const Point& getPosition() const noexcept        = 0;
+  virtual bool         getIsMirrored() const noexcept      = 0;
+  virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
+  virtual bool isAddedToBoard() const noexcept { return mIsAddedToBoard; }
+  virtual bool isSelectable() const noexcept = 0;
+  virtual bool isSelected() const noexcept { return mIsSelected; }
 
-        // Getters
-        Project& getProject() const noexcept;
-        Circuit& getCircuit() const noexcept;
-        Board& getBoard() const noexcept {return mBoard;}
-        virtual Type_t getType() const noexcept = 0;
-        virtual const Point& getPosition() const noexcept = 0;
-        virtual bool getIsMirrored() const noexcept = 0;
-        virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
-        virtual bool isAddedToBoard() const noexcept {return mIsAddedToBoard;}
-        virtual bool isSelectable() const noexcept = 0;
-        virtual bool isSelected() const noexcept {return mIsSelected;}
+  // Setters
+  virtual void setSelected(bool selected) noexcept;
 
-        // Setters
-        virtual void setSelected(bool selected) noexcept;
+  // General Methods
+  virtual void addToBoard()      = 0;
+  virtual void removeFromBoard() = 0;
 
-        // General Methods
-        virtual void addToBoard() = 0;
-        virtual void removeFromBoard() = 0;
+  // Operator Overloadings
+  BI_Base& operator=(const BI_Base& rhs) = delete;
 
-        // Operator Overloadings
-        BI_Base& operator=(const BI_Base& rhs) = delete;
+protected:
+  // General Methods
+  void addToBoard(QGraphicsItem* item) noexcept;
+  void removeFromBoard(QGraphicsItem* item) noexcept;
 
+protected:
+  Board& mBoard;
 
-    protected:
-
-        // General Methods
-        void addToBoard(QGraphicsItem* item) noexcept;
-        void removeFromBoard(QGraphicsItem* item) noexcept;
-
-
-    protected:
-
-        Board& mBoard;
-
-
-    private:
-
-        // General Attributes
-        bool mIsAddedToBoard;
-        bool mIsSelected;
+private:
+  // General Attributes
+  bool mIsAddedToBoard;
+  bool mIsSelected;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_BASE_H
+#endif  // LIBREPCB_PROJECT_BI_BASE_H

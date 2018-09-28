@@ -17,116 +17,118 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "undostackactiongroup.h"
+
 #include "../undostack.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-UndoStackActionGroup::UndoStackActionGroup(QAction& undo, QAction& redo, QAction* save,
-                                           UndoStack* stack, QWidget* msgBoxParent) noexcept :
-    QObject(nullptr), mUndo(undo), mRedo(redo), mSave(save), mStack(nullptr),
-    mMsgBoxParent(msgBoxParent)
-{
-    connect(&mUndo, &QAction::triggered, this, &UndoStackActionGroup::undoTriggered);
-    connect(&mRedo, &QAction::triggered, this, &UndoStackActionGroup::redoTriggered);
-    registerToStack(stack);
+UndoStackActionGroup::UndoStackActionGroup(QAction& undo, QAction& redo,
+                                           QAction* save, UndoStack* stack,
+                                           QWidget* msgBoxParent) noexcept
+  : QObject(nullptr),
+    mUndo(undo),
+    mRedo(redo),
+    mSave(save),
+    mStack(nullptr),
+    mMsgBoxParent(msgBoxParent) {
+  connect(&mUndo, &QAction::triggered, this,
+          &UndoStackActionGroup::undoTriggered);
+  connect(&mRedo, &QAction::triggered, this,
+          &UndoStackActionGroup::redoTriggered);
+  registerToStack(stack);
 }
 
-UndoStackActionGroup::~UndoStackActionGroup() noexcept
-{
-    unregisterFromStack();
+UndoStackActionGroup::~UndoStackActionGroup() noexcept {
+  unregisterFromStack();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void UndoStackActionGroup::setUndoStack(UndoStack* stack) noexcept
-{
-    if (stack != mStack) {
-        unregisterFromStack();
-        registerToStack(stack);
-    }
+void UndoStackActionGroup::setUndoStack(UndoStack* stack) noexcept {
+  if (stack != mStack) {
+    unregisterFromStack();
+    registerToStack(stack);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void UndoStackActionGroup::undoTriggered() noexcept
-{
-    try {
-        if (mStack) mStack->undo();
-    } catch (const Exception& e) {
-        QMessageBox::critical(mMsgBoxParent, tr("Undo failed"), e.getMsg());
-    }
+void UndoStackActionGroup::undoTriggered() noexcept {
+  try {
+    if (mStack) mStack->undo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(mMsgBoxParent, tr("Undo failed"), e.getMsg());
+  }
 }
 
-void UndoStackActionGroup::redoTriggered() noexcept
-{
-    try {
-        if (mStack) mStack->redo();
-    } catch (const Exception& e) {
-        QMessageBox::critical(mMsgBoxParent, tr("Redo failed"), e.getMsg());
-    }
+void UndoStackActionGroup::redoTriggered() noexcept {
+  try {
+    if (mStack) mStack->redo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(mMsgBoxParent, tr("Redo failed"), e.getMsg());
+  }
 }
 
-void UndoStackActionGroup::unregisterFromStack() noexcept
-{
-    while (mConnections.count() > 0) {
-        disconnect(mConnections.takeLast());
-    }
-    mUndo.setText(QString());
-    mUndo.setEnabled(false);
-    mRedo.setText(QString());
-    mRedo.setEnabled(false);
-    if (mSave) mSave->setEnabled(false);
-    mStack = nullptr;
+void UndoStackActionGroup::unregisterFromStack() noexcept {
+  while (mConnections.count() > 0) {
+    disconnect(mConnections.takeLast());
+  }
+  mUndo.setText(QString());
+  mUndo.setEnabled(false);
+  mRedo.setText(QString());
+  mRedo.setEnabled(false);
+  if (mSave) mSave->setEnabled(false);
+  mStack = nullptr;
 }
 
-void UndoStackActionGroup::registerToStack(UndoStack* stack) noexcept
-{
-    Q_ASSERT(!mStack);
-    if (stack) {
-        mConnections.append(connect(stack, &UndoStack::undoTextChanged,
-                                    &mUndo, &QAction::setText));
-        mUndo.setText(stack->getUndoText());
+void UndoStackActionGroup::registerToStack(UndoStack* stack) noexcept {
+  Q_ASSERT(!mStack);
+  if (stack) {
+    mConnections.append(
+        connect(stack, &UndoStack::undoTextChanged, &mUndo, &QAction::setText));
+    mUndo.setText(stack->getUndoText());
 
-        mConnections.append(connect(stack, &UndoStack::canUndoChanged,
-                                    &mUndo, &QAction::setEnabled));
-        mUndo.setEnabled(stack->canUndo());
+    mConnections.append(connect(stack, &UndoStack::canUndoChanged, &mUndo,
+                                &QAction::setEnabled));
+    mUndo.setEnabled(stack->canUndo());
 
-        mConnections.append(connect(stack, &UndoStack::redoTextChanged,
-                                    &mRedo, &QAction::setText));
-        mRedo.setText(stack->getRedoText());
+    mConnections.append(
+        connect(stack, &UndoStack::redoTextChanged, &mRedo, &QAction::setText));
+    mRedo.setText(stack->getRedoText());
 
-        mConnections.append(connect(stack, &UndoStack::canRedoChanged,
-                                    &mRedo, &QAction::setEnabled));
-        mRedo.setEnabled(stack->canRedo());
+    mConnections.append(connect(stack, &UndoStack::canRedoChanged, &mRedo,
+                                &QAction::setEnabled));
+    mRedo.setEnabled(stack->canRedo());
 
-        if (mSave) {
-            mConnections.append(connect(stack, &UndoStack::cleanChanged,
-                                        mSave, &QAction::setDisabled));
-            mSave->setDisabled(stack->isClean());
-        }
+    if (mSave) {
+      mConnections.append(connect(stack, &UndoStack::cleanChanged, mSave,
+                                  &QAction::setDisabled));
+      mSave->setDisabled(stack->isClean());
     }
-    mStack = stack;
+  }
+  mStack = stack;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

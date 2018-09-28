@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_BOARDEDITOR_H
 #define LIBREPCB_PROJECT_BOARDEDITOR_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
+#include <librepcb/common/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsView;
@@ -56,110 +57,102 @@ namespace Ui {
 class BoardEditor;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardEditor
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardEditor class
  */
-class BoardEditor final : public QMainWindow, public IF_GraphicsViewEventHandler
-{
-        Q_OBJECT
+class BoardEditor final : public QMainWindow,
+                          public IF_GraphicsViewEventHandler {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
+  ~BoardEditor();
 
-        // Constructors / Destructor
-        explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
-        ~BoardEditor();
+  // Getters
+  ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
+  Project&       getProject() const noexcept { return mProject; }
+  int    getActiveBoardIndex() const noexcept { return mActiveBoardIndex; }
+  Board* getActiveBoard() const noexcept;
 
-        // Getters
-        ProjectEditor& getProjectEditor() const noexcept {return mProjectEditor;}
-        Project& getProject() const noexcept {return mProject;}
-        int getActiveBoardIndex() const noexcept {return mActiveBoardIndex;}
-        Board* getActiveBoard() const noexcept;
+  // Setters
+  bool setActiveBoardIndex(int index) noexcept;
 
-        // Setters
-        bool setActiveBoardIndex(int index) noexcept;
+  // General Methods
+  void abortAllCommands() noexcept;
 
-        // General Methods
-        void abortAllCommands() noexcept;
+protected:
+  void closeEvent(QCloseEvent* event);
 
+public slots:
 
-    protected:
+  void boardAdded(int newIndex);
+  void boardRemoved(int oldIndex);
 
-        void closeEvent(QCloseEvent* event);
+private slots:
 
+  // Actions
+  void on_actionProjectClose_triggered();
+  void on_actionNewBoard_triggered();
+  void on_actionCopyBoard_triggered();
+  void on_actionRemoveBoard_triggered();
+  void on_actionGrid_triggered();
+  void on_actionExportAsPdf_triggered();
+  void on_actionGenerateFabricationData_triggered();
+  void on_actionProjectProperties_triggered();
+  void on_actionUpdateLibrary_triggered();
+  void on_actionLayerStackSetup_triggered();
+  void on_actionModifyDesignRules_triggered();
+  void on_actionRebuildPlanes_triggered();
+  void on_tabBar_currentChanged(int index);
+  void boardListActionGroupTriggered(QAction* action);
 
-    public slots:
+signals:
 
-        void boardAdded(int newIndex);
-        void boardRemoved(int oldIndex);
+  void activeBoardChanged(int oldIndex, int newIndex);
 
+private:
+  // make some methods inaccessible...
+  BoardEditor()                         = delete;
+  BoardEditor(const BoardEditor& other) = delete;
+  BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
-    private slots:
+  // Private Methods
+  bool graphicsViewEventHandler(QEvent* event);
+  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
 
-        // Actions
-        void on_actionProjectClose_triggered();
-        void on_actionNewBoard_triggered();
-        void on_actionCopyBoard_triggered();
-        void on_actionRemoveBoard_triggered();
-        void on_actionGrid_triggered();
-        void on_actionExportAsPdf_triggered();
-        void on_actionGenerateFabricationData_triggered();
-        void on_actionProjectProperties_triggered();
-        void on_actionUpdateLibrary_triggered();
-        void on_actionLayerStackSetup_triggered();
-        void on_actionModifyDesignRules_triggered();
-        void on_actionRebuildPlanes_triggered();
-        void on_tabBar_currentChanged(int index);
-        void boardListActionGroupTriggered(QAction* action);
+  // General Attributes
+  ProjectEditor&                       mProjectEditor;
+  Project&                             mProject;
+  Ui::BoardEditor*                     mUi;
+  GraphicsView*                        mGraphicsView;
+  QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
+  QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
+  // Misc
+  int             mActiveBoardIndex;
+  QList<QAction*> mBoardListActions;
+  QActionGroup    mBoardListActionGroup;
 
-    signals:
+  // Docks
+  ErcMsgDock*             mErcMsgDock;
+  UnplacedComponentsDock* mUnplacedComponentsDock;
+  BoardLayersDock*        mBoardLayersDock;
 
-        void activeBoardChanged(int oldIndex, int newIndex);
-
-
-    private:
-
-        // make some methods inaccessible...
-        BoardEditor() = delete;
-        BoardEditor(const BoardEditor& other) = delete;
-        BoardEditor& operator=(const BoardEditor& rhs) = delete;
-
-        // Private Methods
-        bool graphicsViewEventHandler(QEvent* event);
-        void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
-
-        // General Attributes
-        ProjectEditor& mProjectEditor;
-        Project& mProject;
-        Ui::BoardEditor* mUi;
-        GraphicsView* mGraphicsView;
-        QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
-        QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
-
-        // Misc
-        int mActiveBoardIndex;
-        QList<QAction*> mBoardListActions;
-        QActionGroup mBoardListActionGroup;
-
-        // Docks
-        ErcMsgDock* mErcMsgDock;
-        UnplacedComponentsDock* mUnplacedComponentsDock;
-        BoardLayersDock* mBoardLayersDock;
-
-        // Finite State Machine
-        BES_FSM* mFsm;
+  // Finite State Machine
+  BES_FSM* mFsm;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDEDITOR_H
+#endif  // LIBREPCB_PROJECT_BOARDEDITOR_H

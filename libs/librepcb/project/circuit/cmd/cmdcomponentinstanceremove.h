@@ -20,63 +20,59 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
 #define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Circuit;
 class ComponentInstance;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdComponentInstanceRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdComponentInstanceRemove class
  */
-class CmdComponentInstanceRemove final : public UndoCommand
-{
-    public:
+class CmdComponentInstanceRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdComponentInstanceRemove(Circuit& circuit, ComponentInstance& cmp) noexcept;
+  ~CmdComponentInstanceRemove() noexcept;
 
-        // Constructors / Destructor
-        CmdComponentInstanceRemove(Circuit& circuit, ComponentInstance& cmp) noexcept;
-        ~CmdComponentInstanceRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        ComponentInstance& mComponentInstance;
+  // Attributes from the constructor
+  Circuit&           mCircuit;
+  ComponentInstance& mComponentInstance;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEREMOVE_H

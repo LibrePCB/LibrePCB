@@ -20,99 +20,108 @@
 #ifndef LIBREPCB_APPLICATION_H
 #define LIBREPCB_APPLICATION_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
+#include "fileio/filepath.h"
+#include "version.h"
+
 #include <QApplication>
 #include <QFont>
-#include "version.h"
-#include "fileio/filepath.h"
+#include <QtCore>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class StrokeFont;
 class StrokeFontPool;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Macros
- ****************************************************************************************/
+ ******************************************************************************/
 #if defined(qApp)
 #undef qApp
 #endif
 #define qApp (Application::instance())
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Application
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The Application class extends the QApplication with the exception-safe method
- *        #notify()
+ * @brief The Application class extends the QApplication with the exception-safe
+ * method #notify()
  *
  * @author ubruhin
  * @date 2014-10-23
  */
-class Application final : public QApplication
-{
-        Q_OBJECT
+class Application final : public QApplication {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Application()                         = delete;
+  Application(const Application& other) = delete;
+  Application(int& argc, char** argv) noexcept;
+  ~Application() noexcept;
 
-        // Constructors / Destructor
-        Application() = delete;
-        Application(const Application& other) = delete;
-        Application(int& argc, char** argv) noexcept;
-        ~Application() noexcept;
+  // Getters
+  const Version& getAppVersion() const noexcept { return mAppVersion; }
+  const QString& getAppVersionLabel() const noexcept {
+    return mAppVersionLabel;
+  }
+  const QString&   getGitRevision() const noexcept { return mGitRevision; }
+  const QDateTime& getBuildDate() const noexcept { return mBuildDate; }
+  const Version&   getFileFormatVersion() const noexcept {
+    return mFileFormatVersion;
+  }
+  bool isFileFormatStable() const noexcept { return mIsFileFormatStable; }
+  const FilePath& getResourcesDir() const noexcept { return mResourcesDir; }
+  FilePath        getResourcesFilePath(const QString& filepath) const noexcept;
+  const QFont&    getDefaultSansSerifFont() const noexcept {
+    return mSansSerifFont;
+  }
+  const QFont& getDefaultMonospaceFont() const noexcept {
+    return mMonospaceFont;
+  }
+  const StrokeFontPool& getStrokeFonts() const noexcept {
+    return *mStrokeFontPool;
+  }
+  QString getDefaultStrokeFontName() const noexcept { return "newstroke.bene"; }
+  const StrokeFont& getDefaultStrokeFont() const noexcept;
 
-        // Getters
-        const Version& getAppVersion() const noexcept {return mAppVersion;}
-        const QString& getAppVersionLabel() const noexcept {return mAppVersionLabel;}
-        const QString& getGitRevision() const noexcept {return mGitRevision;}
-        const QDateTime& getBuildDate() const noexcept {return mBuildDate;}
-        const Version& getFileFormatVersion() const noexcept {return mFileFormatVersion;}
-        bool isFileFormatStable() const noexcept {return mIsFileFormatStable;}
-        const FilePath& getResourcesDir() const noexcept {return mResourcesDir;}
-        FilePath getResourcesFilePath(const QString& filepath) const noexcept;
-        const QFont& getDefaultSansSerifFont() const noexcept {return mSansSerifFont;}
-        const QFont& getDefaultMonospaceFont() const noexcept {return mMonospaceFont;}
-        const StrokeFontPool& getStrokeFonts() const noexcept {return *mStrokeFontPool;}
-        QString getDefaultStrokeFontName() const noexcept {return "newstroke.bene";}
-        const StrokeFont& getDefaultStrokeFont() const noexcept;
+  // Reimplemented from QApplication
+  bool notify(QObject* receiver, QEvent* e);
 
-        // Reimplemented from QApplication
-        bool notify(QObject* receiver, QEvent* e);
+  // Operator Overloadings
+  Application& operator=(const Application& rhs) = delete;
 
-        // Operator Overloadings
-        Application& operator=(const Application& rhs) = delete;
+  // Static Methods
+  static Application* instance() noexcept;
 
-        // Static Methods
-        static Application* instance() noexcept;
+public slots:
+  static void about() noexcept;
 
-
-    public slots:
-        static void about() noexcept;
-
-    private: // Data
-        Version mAppVersion;
-        QString mAppVersionLabel;
-        QString mGitRevision;
-        QDateTime mBuildDate;
-        Version mFileFormatVersion;
-        bool mIsFileFormatStable;
-        FilePath mResourcesDir;
-        QScopedPointer<StrokeFontPool> mStrokeFontPool; ///< all application stroke fonts
-        QFont mSansSerifFont;
-        QFont mMonospaceFont;
+private:  // Data
+  Version   mAppVersion;
+  QString   mAppVersionLabel;
+  QString   mGitRevision;
+  QDateTime mBuildDate;
+  Version   mFileFormatVersion;
+  bool      mIsFileFormatStable;
+  FilePath  mResourcesDir;
+  QScopedPointer<StrokeFontPool>
+        mStrokeFontPool;  ///< all application stroke fonts
+  QFont mSansSerifFont;
+  QFont mMonospaceFont;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_APPLICATION_H
+#endif  // LIBREPCB_APPLICATION_H

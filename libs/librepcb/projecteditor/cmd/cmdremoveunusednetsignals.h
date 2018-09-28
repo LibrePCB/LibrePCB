@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDREMOVEUNUSEDNETSIGNALS_H
 #define LIBREPCB_PROJECT_CMDREMOVEUNUSEDNETSIGNALS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,44 +38,39 @@ class NetSignal;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveUnusedNetSignals
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveUnusedNetSignals class
  */
-class CmdRemoveUnusedNetSignals final : public UndoCommandGroup
-{
-    public:
+class CmdRemoveUnusedNetSignals final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept;
+  ~CmdRemoveUnusedNetSignals() noexcept;
 
-        // Constructors / Destructor
-        CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept;
-        ~CmdRemoveUnusedNetSignals() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  bool buildAndExecuteChildCommands();
 
-        // Private Methods
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        bool buildAndExecuteChildCommands();
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
+  // Attributes from the constructor
+  Circuit& mCircuit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDREMOVEUNUSEDNETSIGNALS_H
+#endif  // LIBREPCB_PROJECT_CMDREMOVEUNUSEDNETSIGNALS_H
