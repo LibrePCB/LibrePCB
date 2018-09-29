@@ -39,9 +39,6 @@
 namespace librepcb {
 namespace project {
 
-static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-static const QTransform gIdent(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -109,8 +106,7 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid)
 
     mGraphicsItem.reset(new SGI_Symbol(*this));
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setTransform(mMirrored ? gMirror : gIdent, false);
-    mGraphicsItem->setRotation(-mRotation.toDeg());
+    updateGraphicsItemTransform();
 
     for (const library::SymbolPin& libPin : mSymbol->getPins()) {
         SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid()); // can throw
@@ -173,7 +169,7 @@ void SI_Symbol::setRotation(const Angle& newRotation) noexcept
 {
     if (newRotation != mRotation) {
         mRotation = newRotation;
-        mGraphicsItem->setRotation(-newRotation.toDeg());
+        updateGraphicsItemTransform();
         mGraphicsItem->updateCacheAndRepaint();
         foreach (SI_SymbolPin* pin, mPins) {
             pin->updatePosition();
@@ -185,7 +181,7 @@ void SI_Symbol::setMirrored(bool newMirrored) noexcept
 {
     if (newMirrored != mMirrored) {
         mMirrored = newMirrored;
-        mGraphicsItem->setTransform(mMirrored ? gMirror : gIdent, false);
+        updateGraphicsItemTransform();
         mGraphicsItem->updateCacheAndRepaint();
         foreach (SI_SymbolPin* pin, mPins) {
             pin->updatePosition();
@@ -247,10 +243,11 @@ void SI_Symbol::serialize(SExpression& root) const
 
 Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept
 {
-    if (mMirrored)
+    if (mMirrored) {
         return (mPosition + relativePos).rotated(mRotation, mPosition).mirrored(Qt::Horizontal, mPosition);
-    else
+    } else {
         return (mPosition + relativePos).rotated(mRotation, mPosition);
+    }
 }
 
 /*****************************************************************************************
@@ -301,6 +298,14 @@ void SI_Symbol::schematicOrComponentAttributesChanged()
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+void SI_Symbol::updateGraphicsItemTransform() noexcept
+{
+    QTransform t;
+    if (mMirrored) t.scale(qreal(-1), qreal(1));
+    t.rotate(-mRotation.toDeg());
+    mGraphicsItem->setTransform(t);
+}
 
 bool SI_Symbol::checkAttributesValidity() const noexcept
 {

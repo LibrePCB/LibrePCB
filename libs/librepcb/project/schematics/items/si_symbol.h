@@ -128,6 +128,7 @@ class SI_Symbol final : public SI_Base, public SerializableObject,
     private:
 
         void init(const Uuid& symbVarItemUuid);
+        void updateGraphicsItemTransform() noexcept;
         bool checkAttributesValidity() const noexcept;
 
 

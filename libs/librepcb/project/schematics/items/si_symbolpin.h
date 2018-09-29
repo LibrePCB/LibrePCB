@@ -110,6 +110,9 @@ class SI_SymbolPin final : public SI_Base,
 
     private:
 
+        void updateGraphicsItemTransform() noexcept;
+
+
         // General
         SI_Symbol& mSymbol;
         const library::SymbolPin* mSymbolPin;

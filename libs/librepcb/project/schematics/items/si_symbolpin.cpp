@@ -37,9 +37,6 @@
 namespace librepcb {
 namespace project {
 
-static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-static const QTransform gIdent(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
@@ -206,8 +203,7 @@ void SI_SymbolPin::updatePosition() noexcept
     mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
     mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
     mGraphicsItem->setPos(mPosition.toPxQPointF());
-    mGraphicsItem->setTransform(mSymbol.getMirrored() ? gMirror : gIdent, false);
-    mGraphicsItem->setRotation(-mRotation.toDeg());
+    updateGraphicsItemTransform();
     mGraphicsItem->updateCacheAndRepaint();
     foreach (SI_NetLine* netline, mRegisteredNetLines) {
         netline->updateLine();
@@ -241,6 +237,18 @@ void SI_SymbolPin::updateErcMessages() noexcept
 
     mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() && isRequired()
                                               && (!isUsed()));
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+void SI_SymbolPin::updateGraphicsItemTransform() noexcept
+{
+    QTransform t;
+    if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
+    t.rotate(-mRotation.toDeg());
+    mGraphicsItem->setTransform(t);
 }
 
 /*****************************************************************************************

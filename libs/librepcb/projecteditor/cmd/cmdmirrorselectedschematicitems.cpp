@@ -47,8 +47,10 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdMirrorSelectedSchematicItems::CmdMirrorSelectedSchematicItems(Schematic& schematic) noexcept :
-    UndoCommandGroup(tr("Mirror Schematic Elements")), mSchematic(schematic)
+CmdMirrorSelectedSchematicItems::CmdMirrorSelectedSchematicItems(
+        Schematic& schematic, Qt::Orientation orientation) noexcept :
+    UndoCommandGroup(tr("Mirror Schematic Elements")), mSchematic(schematic),
+    mOrientation(orientation)
 {
 }
 
@@ -95,17 +97,17 @@ bool CmdMirrorSelectedSchematicItems::performExecute()
     // mirror all selected elements
     foreach (SI_Symbol* symbol, query->getSymbols()) {
         CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
-        cmd->mirror(center, false);
+        cmd->mirror(center, mOrientation, false);
         appendChild(cmd);
     }
     foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
         CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
-        cmd->setPosition(netpoint->getPosition().mirrored(Qt::Horizontal, center), false);
+        cmd->setPosition(netpoint->getPosition().mirrored(mOrientation, center), false);
         appendChild(cmd);
     }
     foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
         CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
-        cmd->setPosition(netlabel->getPosition().mirrored(Qt::Horizontal, center), false);
+        cmd->setPosition(netlabel->getPosition().mirrored(mOrientation, center), false);
         appendChild(cmd);
     }
 

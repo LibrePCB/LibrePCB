@@ -247,7 +247,9 @@ void SGI_Symbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         painter->translate(text.getPosition().toPxQPointF());
         if (props.mirrored) {
             static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-            painter->translate(props.textRect.width() * props.scaleFactor, 0);
+            if (text.getAlign().getH() != HAlign::center()) {
+                painter->translate(props.textRect.width() * props.scaleFactor, 0);
+            }
             painter->setTransform(gMirror, true);
         }
         painter->rotate(-text.getRotation().toDeg());

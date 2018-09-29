@@ -416,7 +416,7 @@ bool SES_Select::mirrorSelectedItems() noexcept
 
     try
     {
-        CmdMirrorSelectedSchematicItems* cmd = new CmdMirrorSelectedSchematicItems(*schematic);
+        CmdMirrorSelectedSchematicItems* cmd = new CmdMirrorSelectedSchematicItems(*schematic, Qt::Horizontal);
         mUndoStack.execCmd(cmd);
         return true;
     }

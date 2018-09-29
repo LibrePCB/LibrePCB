@@ -49,7 +49,8 @@ class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup
     public:
 
         // Constructors / Destructor
-        CmdMirrorSelectedSchematicItems(Schematic& schematic) noexcept;
+        CmdMirrorSelectedSchematicItems(Schematic& schematic,
+                                        Qt::Orientation orientation) noexcept;
         ~CmdMirrorSelectedSchematicItems() noexcept;
 
 
@@ -65,6 +66,7 @@ class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup
 
         // Attributes from the constructor
         Schematic& mSchematic;
+        Qt::Orientation mOrientation;
 };
 
 /*****************************************************************************************
