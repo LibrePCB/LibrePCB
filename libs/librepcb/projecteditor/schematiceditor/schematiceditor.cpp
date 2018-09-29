@@ -139,6 +139,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCW), true);});
     connect(mUi->actionRotate_CCW, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCCW), true);});
+    connect(mUi->actionMirror, &QAction::triggered,
+            [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Mirror), true);});
     connect(mUi->actionRemove, &QAction::triggered,
             [this](){mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Remove), true);});
 

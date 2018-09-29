@@ -80,6 +80,7 @@
     <addaction name="separator"/>
     <addaction name="actionRotate_CCW"/>
     <addaction name="actionRotate_CW"/>
+    <addaction name="actionMirror"/>
     <addaction name="actionCopy"/>
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
@@ -182,6 +183,7 @@
    </attribute>
    <addaction name="actionRotate_CCW"/>
    <addaction name="actionRotate_CW"/>
+   <addaction name="actionMirror"/>
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
@@ -437,6 +439,18 @@
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
+   </property>
+  </action>
+  <action name="actionMirror">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
+   </property>
+   <property name="text">
+     <string>M&amp;irror</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
    </property>
   </action>
   <action name="actionCopy">

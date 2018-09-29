@@ -37,7 +37,8 @@ namespace project {
 CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept :
     UndoCommand(tr("Edit symbol instance")), mSymbol(symbol),
     mOldPos(symbol.getPosition()), mNewPos(mOldPos),
-    mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation)
+    mOldRotation(symbol.getRotation()), mNewRotation(mOldRotation),
+    mOldMirrored(symbol.getMirrored()), mNewMirrored(mOldMirrored)
 {
 }
 
@@ -46,6 +47,7 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept
     if (!wasEverExecuted()) {
         mSymbol.setPosition(mOldPos);
         mSymbol.setRotation(mOldRotation);
+        mSymbol.setMirrored(mOldMirrored);
     }
 }
 
@@ -78,12 +80,51 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center, bool
 {
     Q_ASSERT(!wasEverExecuted());
     mNewPos.rotate(angle, center);
-    mNewRotation += angle;
-    if (immediate)
-    {
+    mNewRotation += mNewMirrored ? -angle : angle; // mirror --> rotation direction is inverted!
+    if (immediate) {
         mSymbol.setPosition(mNewPos);
         mSymbol.setRotation(mNewRotation);
     }
+}
+
+void CmdSymbolInstanceEdit::setMirrored(bool mirrored, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewMirrored = mirrored;
+    if (immediate) mSymbol.setMirrored(mNewMirrored);
+}
+
+void CmdSymbolInstanceEdit::mirror(const Point& center, Qt::Orientation orientation,
+                                   bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    bool mirror = !mNewMirrored;
+    Point position = mNewPos;
+    Angle rotation = mNewRotation;
+    switch (orientation)
+    {
+        case Qt::Vertical: {
+            position.setY(position.getY() + Length(2) * (center.getY() - position.getY()));
+            rotation += Angle::deg180();
+            break;
+        }
+        case Qt::Horizontal: {
+            position.setX(position.getX() + Length(2) * (center.getX() - position.getX()));
+            break;
+        }
+        default: {
+            qCritical() << "Invalid orientation:" << orientation;
+            break;
+        }
+    }
+    if (immediate) {
+        mSymbol.setPosition(position);
+        mSymbol.setRotation(rotation);
+        mSymbol.setMirrored(mirror);
+    }
+    mNewMirrored = mirror;
+    mNewPos = position;
+    mNewRotation = rotation;
 }
 
 /*****************************************************************************************
@@ -96,6 +137,7 @@ bool CmdSymbolInstanceEdit::performExecute()
 
     if (mNewPos != mOldPos)             return true;
     if (mNewRotation != mOldRotation)   return true;
+    if (mNewMirrored != mOldMirrored)   return true;
     return false;
 }
 
@@ -103,12 +145,14 @@ void CmdSymbolInstanceEdit::performUndo()
 {
     mSymbol.setPosition(mOldPos);
     mSymbol.setRotation(mOldRotation);
+    mSymbol.setMirrored(mOldMirrored);
 }
 
 void CmdSymbolInstanceEdit::performRedo()
 {
     mSymbol.setPosition(mNewPos);
     mSymbol.setRotation(mNewRotation);
+    mSymbol.setMirrored(mNewMirrored);
 }
 
 /*****************************************************************************************

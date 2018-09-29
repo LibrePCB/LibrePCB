@@ -66,6 +66,7 @@ class SEE_Base
             Edit_Paste,         ///< paste the elements from the clipboard (ctrl+v)
             Edit_RotateCCW,     ///< rotate the selected elements 90° CCW (r)
             Edit_RotateCW,      ///< rotate the selected elements 90° CW (Shift+r)
+            Edit_Mirror,        ///< mirror selected items (horizontally)
             Edit_Remove,        ///< remove the selected elements
             // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a QEvent)
             GraphicsViewEvent,  ///< event from #GraphicsView @see #project#SEE_RedirectedQEvent
