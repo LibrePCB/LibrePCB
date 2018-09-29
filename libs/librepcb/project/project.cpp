@@ -250,18 +250,29 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
           filesMoved = true;
         }
       }
-      if (filesMoved) {
+      bool     upgradeGitignore = false;
+      FilePath gitignorePath    = mPath.getPathTo(".gitignore");
+      try {
+        QByteArray hash =
+            QCryptographicHash::hash(FileUtils::readFile(gitignorePath),
+                                     QCryptographicHash::Md5)
+                .toHex();
+        upgradeGitignore = (hash == "0a5b717fd1d3946b1d06e67e4ebee362");
+      } catch (...) {
+      }
+      if (filesMoved || upgradeGitignore) {
         FilePath src =
             qApp->getResourcesDir().getPathTo("project/gitignore_template");
-        FilePath dst = mPath.getPathTo(".gitignore");
         try {
-          FileUtils::removeFile(dst);
+          FileUtils::removeFile(gitignorePath);
         } catch (...) {
         }
         try {
-          FileUtils::copyFile(src, dst);
+          FileUtils::copyFile(src, gitignorePath);
         } catch (...) {
         }
+      }
+      if (filesMoved) {
         foreach (const FilePath& src, filesToMove.keys()) {
           if (src.isExistingFile()) {
             try {

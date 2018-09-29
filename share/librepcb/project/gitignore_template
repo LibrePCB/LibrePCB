@@ -5,6 +5,8 @@
 # a new issue on our issue tracker: https://github.com/LibrePCB/LibrePCB/issues
 
 # LibrePCB files
+.autosave/
+.backup/
 user/
 *.user.lp
 .lock
@@ -17,3 +19,4 @@ Thumbs.db
 # Files created by other applications
 *.autosave
 *.swp
+*.tmp
