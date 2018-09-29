@@ -15,6 +15,7 @@ Basically, a workspace contains following entries:
         ├── .librepcb-workspace
         ├── projects/
         └── v<VERSION>/
+            ├── settings.lp
             └── libraries/
                 ├── local/
                 └── remote/
@@ -37,10 +38,17 @@ Each project is represented by a directory, see its
 
 ## v<VERSION>/ {#doc_workspace_version_dir}
 
-For each major application version, a separate directory is created to store workspace metadata
-(e.g. settings) and libraries. These directories are called for example `v0.1`, `v1` or `v2`. A
-specific application version will only access the metadata/libraries of its corresponding directory,
-all other `v*` directories will be ignored.
+For each major application version, a separate directory is created to store
+workspace metadata (e.g. settings) and libraries. These directories are named
+according the file format version of the application (e.g. `v0.1`, `v1` or `v2`).
+A specific application version may access the metadata/libraries of its
+corresponding directory or any older version directory. Directories of newer
+versions will be ignored.
+
+## v<VERSION>/settings.lp {#doc_workspace_settings_file}
+
+This file contains workspace settings (selected language/locale, measurement
+unit, ...).
 
 ## v<VERSION>/libraries/ {#doc_workspace_libraries_dir}
 
@@ -97,16 +105,7 @@ This is an example how a workspace could look like:
         │           ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
         │           └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
         └── v2/
-            ├── settings.lp
-            └── libraries/
-                ├── local/
-                │   ├── Library_A.lplib/
-                │   ├── Library_B.lplib/
-                │   └── Library_C.lplib/
-                └── remote/
-                    ├── 5d9abd1b-cf0b-4cf7-8666-20a1add9971e.lplib/
-                    ├── 193ef70d-8dab-4a6c-a672-274c5bf09b68.lplib/
-                    └── c2c427a9-17c6-4400-981c-6ece1c9735c3.lplib/
+            └── settings.lp
 
 
 # Upgrade workspace to newer application version {#doc_workspace_upgrade}
@@ -117,13 +116,23 @@ after updating LibrePCB from `v1.x` to `v2.x`), LibrePCB realizes that the new [
 newer version. Basically, an older [version directory] (e.g. `v1`) will just be cloned (e.g. to
 `v2`) and the contained files will be upgraded then, if required.
 
+It's also possible that a higher major version does not introduce a new library
+file format (e.g. only projects have a new file format, but not libraries). In
+that case, there is no need to clone all libraries. Instead, the new application
+continues using the libraries of the older version. For example an application
+of version `v2.x` may still use the libraries in the [version directory] `v1`.
+So the [version directory] `v2` may only contain workspace settings (i.e.
+`settings.lp`). Or if workspace settings are also compatible with the older
+appplication version, the whole [version directory] `v2` is not created at all.
+
 
 # Downgrade workspace to older application version {#doc_workspace_downgrade}
 
 As the old [version directory] is not removed automatically after an upgrade, a downgrade is not
 required at all. The workspace can thus smoothly be used with different application versions at the
 same time. If an older [version directory] is no longer required for sure, the user can just remove
-it by himself (to reduce disk usage).
+it by himself (to reduce disk usage). But this needs to be done carefully, as
+an old [version directory] may still be used with newer application versions.
 
 
 # Library Index (SQLite Database) {#doc_workspace_library_database}
