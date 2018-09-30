@@ -121,17 +121,18 @@ public:
   // Library Management
 
   /**
-   * @brief Get the (highest) version of a specific library
+   * @brief Get the (highest version) library of a given UUID
    *
    * @param uuid      The uuid of the library
    * @param local     If true, local libraries are searched
    * @param remote    If true, remote libraries are searched
    *
-   * @return The highest version of the library (tl::nullopt if library not
-   * installed)
+   * @return The library with the highest version (nullptr if not installed)
    */
-  tl::optional<Version> getVersionOfLibrary(const Uuid& uuid, bool local = true,
-                                            bool remote = true) const noexcept;
+  QSharedPointer<library::Library> getLibrary(const Uuid& uuid,
+                                              bool        local  = true,
+                                              bool        remote = true) const
+      noexcept;
 
   /**
    * @brief Get all local libraries (located in "workspace/v#/libraries/local")

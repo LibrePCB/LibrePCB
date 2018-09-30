@@ -195,17 +195,17 @@ FavoriteProjectsModel& Workspace::getFavoriteProjectsModel() const noexcept {
  *  Library Management
  ******************************************************************************/
 
-tl::optional<Version> Workspace::getVersionOfLibrary(const Uuid& uuid,
-                                                     bool        local,
-                                                     bool        remote) const
+QSharedPointer<library::Library> Workspace::getLibrary(const Uuid& uuid,
+                                                       bool        local,
+                                                       bool        remote) const
     noexcept {
-  tl::optional<Version> version;
+  QSharedPointer<library::Library> library;
   if (local) {
     foreach (const auto& lib, mLocalLibraries) {
       Q_ASSERT(lib);
       if ((lib->getUuid() == uuid) &&
-          ((!version) || (version < lib->getVersion()))) {
-        version = lib->getVersion();
+          ((!library) || (library->getVersion() < lib->getVersion()))) {
+        library = lib;
       }
     }
   }
@@ -213,12 +213,12 @@ tl::optional<Version> Workspace::getVersionOfLibrary(const Uuid& uuid,
     foreach (const auto& lib, mRemoteLibraries) {
       Q_ASSERT(lib);
       if ((lib->getUuid() == uuid) &&
-          ((!version) || (version < lib->getVersion()))) {
-        version = lib->getVersion();
+          ((!library) || (library->getVersion() < lib->getVersion()))) {
+        library = lib;
       }
     }
   }
-  return version;
+  return library;
 }
 
 void Workspace::addLocalLibrary(const QString& libDirName) {
