@@ -73,6 +73,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::saveTriggered);
   connect(mUi->actionRemoveElement, &QAction::triggered, this,
           &LibraryEditor::removeElementTriggered);
+  connect(mUi->actionShowElementInFileManager, &QAction::triggered, this,
+          &LibraryEditor::showElementInFileExplorerTriggered);
   connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
@@ -375,6 +377,12 @@ void LibraryEditor::removeElementTriggered() noexcept {
     }
     mWorkspace.getLibraryDb().startLibraryRescan();
   }
+}
+
+void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
+  if (!mCurrentEditorWidget) return;
+  FilePath fp = mCurrentEditorWidget->getFilePath();
+  QDesktopServices::openUrl(fp.toQUrl());
 }
 
 void LibraryEditor::rotateCwTriggered() noexcept {

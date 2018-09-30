@@ -130,6 +130,7 @@ private:  // GUI Event Handlers
   void newElementTriggered() noexcept;
   void saveTriggered() noexcept;
   void removeElementTriggered() noexcept;
+  void showElementInFileExplorerTriggered() noexcept;
   void rotateCwTriggered() noexcept;
   void rotateCcwTriggered() noexcept;
   void removeTriggered() noexcept;
